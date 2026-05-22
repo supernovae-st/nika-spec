@@ -296,7 +296,7 @@ Compose versionless · AWS exponential-backoff-and-jitter.
 
 ### Decisions
 
-- **5 pillars immutable forever** · envelope · 5 verbs · DAG · variables ·
+- **5 pillars immutable forever** · envelope · 4 verbs · DAG · variables ·
   errors. Everything else evolves in the stdlib.
 - **License split** · the spec is Apache-2.0 (adoption + patent grant) · the
   reference engine is AGPL-3.0-or-later (anti-extraction).

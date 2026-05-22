@@ -177,7 +177,7 @@ See [07-conformance.md](./07-conformance.md). In summary ·
 |---|---|
 | Core | None · only parse + DAG + variable + error · no execution needed |
 | Runtime | Must execute the 4 verbs · provider/tool implementations engine's choice |
-| Stdlib v0.1 | Must ship the 13 providers + 9 extract modes + 37 builtins |
+| Stdlib v0.1 | Must ship the 13 providers + 9 extract modes + 42 builtins |
 | Stdlib v0.1+media | Stdlib v0.1 + 24 media builtins |
 
 A v0.1-compliant engine for a workflow author depends on which level they need.

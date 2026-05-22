@@ -53,7 +53,7 @@ Error codes follow the format `NIKA-<NAMESPACE>-<NNN>` where namespace is 2-5 up
 | `NIKA-VAR` | Variable resolution failures | 001-099 |
 | `NIKA-INFER` | `infer:` verb errors | 001-099 |
 | `NIKA-EXEC` | `exec:` verb errors | 001-099 |
-| `NIKA-FETCH` | `fetch:` verb errors | 001-099 |
+| `NIKA-FETCH` | `nika:fetch` builtin errors (HTTP + extraction) | 001-099 |
 | `NIKA-INVOKE` | `invoke:` verb errors | 001-099 |
 | `NIKA-AGENT` | `agent:` verb errors | 001-099 |
 | `NIKA-PROVIDER` | Provider adapter errors | 001-099 per provider |

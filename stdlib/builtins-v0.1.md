@@ -626,4 +626,4 @@ New builtins MAY enter stdlib v0.x. Builtin removal is **never** allowed within 
 
 ---
 
-🦋 *37 builtins canonical · 24 media deferred · clear forever.*
+🦋 *42 builtins canonical · 24 media deferred · clear forever.*
