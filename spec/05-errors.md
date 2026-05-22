@@ -242,7 +242,7 @@ The engine MUST emit a typed completion event with this state.
 
 The error structure (fields · categories · namespaces · retry shape · on_error shape) is locked at v1. Additional categories MAY be added in minor bumps (additive only · existing categories never repurposed). Additional retry strategies MAY be added.
 
-Out of scope for v0.1 · structured retry conditions (e.g. `retry_when: $error.details.status_code == 503`) · global on_error handlers · workflow-level circuit breakers. See [08-out-of-scope.md](./08-out-of-scope.md).
+Out of scope for v0.1 · structured retry conditions (e.g. `retry_when: ${{ error.details.status_code == 503 }}`) · global on_error handlers · workflow-level circuit breakers. See [08-out-of-scope.md](./08-out-of-scope.md).
 
 ---
 

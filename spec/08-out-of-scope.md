@@ -71,18 +71,25 @@ macro retry_with_backoff:
 
 ## Control flow · DEFERRED
 
-### Loops (`for_each:` · `while:`)
+> **Note** · bounded map iteration (`for_each:`) is **IN v1** — it ships as a
+> task field, see [03-dag.md](./03-dag.md#for_each--optional--map-a-task-over-a-collection).
+> What remains deferred is **unbounded** iteration (`while:`).
+
+### Unbounded loops (`while:`)
 
 ```yaml
-# NOT supported in v0.1
-- id: process_each
-  for_each: $items
-  as: item
+# NOT supported in v1 — unbounded iteration
+- id: poll_until
+  while: ${{ tasks.check.output.ready == false }}
   exec:
-    command: "process.sh {{item}}"
+    command: "./check.sh"
 ```
 
-**Why deferred** · loops complicate DAG semantics significantly · need iteration variable scope · need result aggregation. Workaround in v0.1 · use the `agent:` verb with a tool that processes lists, OR generate a workflow programmatically.
+**Why deferred** · unbounded loops break the « acyclic » guarantee of the DAG
+and the static-analyzability that makes Core conformance possible (you cannot
+bound the work statically). Workaround in v1 · use the `agent:` verb with a
+tool + `max_turns` budget (bounded), OR `for_each:` over a known collection
+(bounded fan-out).
 
 ### Goto / jumps
 
@@ -148,25 +155,37 @@ checkpoint:
 ### Workflow versioning / migration
 
 If a workflow needs to be re-runnable across spec versions · use a version
-pin in the envelope (`apiVersion: nika.sh/v1` already does this for major). Per-workflow stdlib version pinning may land in v0.2.
+pin in the envelope (`nika: v1` already does this for the language contract). Per-workflow stdlib version pinning may land in v0.2.
 
 ---
 
-## Memory subsystem · DEFERRED (Diamond v0.5+)
+## The Connectome · DEFERRED capability · NOT a deferred verb
 
-### Memory recall in workflows
+### Cognitive recall in workflows
 
 ```yaml
-# NOT supported in v0.1
+# The CAPABILITY is deferred (engine waypoint) · the SHAPE is already decided
 - id: recall
-  memory:
-    query: "Previous conversations about · ${{ vars.topic }}"
-    top_k: 5
+  invoke:
+    tool: "nika:connectome.recall"
+    args:
+      query: "Previous conversations about · ${{ vars.topic }}"
+      top_k: 5
 ```
 
-**Why deferred** · the memory subsystem (Diamond `nika-memory` + 8 satellites) is on a Phase 1 internal waypoint (~2026-08-30). When the subsystem is admitted · the language MAY expose recall as a 6th verb OR as `invoke: nika:memory.recall`. Decision pending.
+**No 6th verb — ever.** When the Connectome (the Diamond cognitive subsystem ·
+orchestrator + 9 satellites + 12 mechanisms · Phase 1 engine waypoint
+~2026-08-30) ships, recall and ingest are exposed as **builtin tools under
+`invoke:`** — `nika:connectome.recall` · `nika:connectome.ingest` — NOT as a
+new verb. The 5 verbs are absolute (locked D-2026-05-22-N10): a 6th verb would
+require a `nika: v2` contract, which forever-v0.x makes effectively never. So
+the *shape* of cognitive access is already final today; only the *capability*
+waits on the engine.
 
-For v0.1 · workflows that need memory use `invoke: mcp:memory-server::recall` with an external MCP memory server.
+For v1 today · workflows that need recall use `invoke: mcp:memory-server::recall`
+with an external MCP memory server, then swap the tool id to
+`nika:connectome.recall` when the native Connectome admits — zero workflow-shape
+change (same `invoke:` verb).
 
 ---
 

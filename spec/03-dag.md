@@ -32,14 +32,15 @@ tasks:
 - id: my-task                   # required · kebab-case · unique within workflow
   depends_on: [task_a, task_b]  # optional · default []
   when: ${{ tasks.task_a.status == 'success' }}  # optional · conditional execution
+  for_each: ${{ tasks.list.output }}  # optional · map this task over a collection
   retry:                        # optional · retry policy (see 05-errors.md)
     max_attempts: 3
     backoff_ms: 1000
   on_error:                     # optional · error recovery (see 05-errors.md)
-    fallback: "$cached_data"
+    fallback: ${{ tasks.cache.output }}
   timeout_ms: 60000             # optional · task-level timeout
   with:                         # optional · variable scope injection
-    data: $task_a
+    data: ${{ tasks.task_a.output }}
     config: { foo: "bar" }
   infer:                        # required · one of the 5 verbs
     prompt: "..."
@@ -124,6 +125,40 @@ when: ${{ !(tasks.test.status == 'failure') }}
 
 A v0.1-compliant engine MUST implement this DSL canonically · NOT engine-specific. The conformance suite verifies this.
 
+### `for_each` · *optional · map a task over a collection*
+
+```yaml
+- id: summarize-each
+  for_each: ${{ tasks.fetch-pages.output }}   # a static list OR a prior task's array output
+  with:
+    page: ${{ item }}                          # ${{ item }} = the current element
+  infer:
+    prompt: "Summarize this page · ${{ with.page }}"
+```
+
+`for_each` runs the task **once per element** of the collection. Inside the
+task body, `${{ item }}` resolves to the current element (and `${{ index }}`
+to its zero-based position). The collection is either a literal list or a
+reference to an upstream task's array output — this is the **matrix /
+fan-out** pattern familiar from GitHub Actions.
+
+Semantics (closed at v1) ·
+
+- The iterations of a single `for_each` task **MAY run in parallel** (engine
+  SHOULD parallelize · bounded by engine concurrency config).
+- The task's output is the **array of per-iteration outputs**, in input
+  order · referenced downstream as `${{ tasks.summarize-each.output }}`
+  (an array) · `${{ tasks.summarize-each.output[0] }}` for one element.
+- `for_each` is **bounded fan-out**, not recursion · a task cannot
+  `for_each` over its own output. The DAG stays acyclic.
+- If the collection is empty · the task is `skipped` (status `skipped`).
+- `when:` is evaluated **once** before the fan-out · `retry:` /
+  `on_error:` / `timeout_ms:` apply **per iteration**.
+
+This is the one construct that lets a v1 workflow process a
+runtime-computed number of items (N files · N search hits · N pages)
+without statically enumerating tasks. Locked D-2026-05-22-N10.
+
 ### `timeout_ms` · *optional · task-level timeout*
 
 ```yaml
@@ -141,8 +176,8 @@ Hard timeout for the entire task (including any retries). If exceeded · task fa
 - id: summarize
   depends_on: [research]
   with:
-    content: $research                # task output reference
-    style: "concise"                  # literal value
+    content: ${{ tasks.research.output }}   # task output reference
+    style: "concise"                        # literal value
     config:                           # nested object
       max_words: 100
   infer:
@@ -246,9 +281,9 @@ tasks:
   - id: merge
     depends_on: [analyze_a, analyze_b, analyze_c]
     with:
-      a: $analyze_a
-      b: $analyze_b
-      c: $analyze_c
+      a: ${{ tasks.analyze_a.output }}
+      b: ${{ tasks.analyze_b.output }}
+      c: ${{ tasks.analyze_c.output }}
     infer:
       prompt: "Merge · ${{ with.a }} · ${{ with.b }} · ${{ with.c }}"
 ```
@@ -279,13 +314,45 @@ tasks:
 
 Exactly one of `build_prod` or `build_dev` runs · the other is skipped · `deploy` runs after both (one success + one skipped).
 
+### Map fan-out (`for_each`)
+
+```yaml
+tasks:
+  - id: discover
+    fetch:
+      url: "https://example.com/sitemap.xml"
+      mode: sitemap
+    output:
+      pages: "$.urls[*]"
+
+  - id: summarize
+    depends_on: [discover]
+    for_each: ${{ tasks.discover.pages }}
+    with:
+      page: ${{ item }}
+    fetch:
+      url: ${{ with.page }}
+      mode: article
+
+  - id: digest
+    depends_on: [summarize]
+    with:
+      summaries: ${{ tasks.summarize.output }}      # array of per-page outputs
+    infer:
+      prompt: "Write a digest from these summaries · ${{ with.summaries }}"
+```
+
+`discover` finds N pages · `summarize` runs once per page (parallel,
+bounded) · `digest` consumes the array of all summaries. N is computed at
+runtime — no static enumeration.
+
 ---
 
 ## Forward-compat
 
-v0.1 ships with these task fields · `id` · `depends_on` · `when` · `retry` · `on_error` · `timeout_ms` · `with` · `output` · plus the verb selector. Additional fields may be added in minor schema bumps (additive only).
+v1 ships with these task fields · `id` · `depends_on` · `when` · `for_each` · `retry` · `on_error` · `timeout_ms` · `with` · `output` · plus the verb selector. Additional fields may be added in minor bumps (additive only).
 
-Out of scope for v0.1 · `parallel:` for explicit parallelism control · `loop:` / `for_each:` constructs · `include:` for sub-workflow composition. See [08-out-of-scope.md](./08-out-of-scope.md).
+Out of scope for v1 · `parallel:` for explicit concurrency control · `include:` for sub-workflow composition (workaround · `exec: nika run sub.yaml`). See [08-out-of-scope.md](./08-out-of-scope.md).
 
 ---
 

@@ -39,34 +39,31 @@ Standards work · SQL · GraphQL · OpenAPI · Dockerfile · GitHub Actions YAML
 ## The 5 pillars · immutable forever
 
 ```
-1.  ENVELOPE        apiVersion: nika.sh/v1
-                    schema: nika/workflow@v1
+1.  ENVELOPE        nika: v1
                     workflow: my-workflow-id
 
 2.  THE 5 VERBS     infer:  exec:  fetch:  invoke:  agent:
 
-3.  DAG SHAPE       tasks · depends_on · when · output binding
+3.  DAG SHAPE       tasks · depends_on · when · for_each · output binding
 
-4.  VARIABLES       ${{ ... }} substitution
-                    $task_id reference
-                    with: scope rules
+4.  VARIABLES       ${{ ... }} substitution · ONE syntax · 5 namespaces
+                    vars · with · tasks · env · secrets
 
-5.  ERROR MODEL     codes namespace · retry semantics · structured output
+5.  ERROR MODEL     NIKA-<NS>-<NNN> codes · retry semantics · structured output
 ```
 
-These 5 pillars are **locked forever** at v1. Everything else (providers · builtins · extract modes · etc.) lives in the **stdlib** and evolves independently.
+These 5 pillars are **locked forever** at `nika: v1`. Everything else (providers · builtins · extract modes · etc.) lives in the **stdlib** and evolves independently. Minor language additions are **additive** within `v1` (feature-detected · no minor version in the file).
 
 ---
 
 ## Hello world
 
 ```yaml
-apiVersion: nika.sh/v1
-schema: nika/workflow@v1
+nika: v1
 workflow: hello
 
 provider: anthropic
-model: claude-3-5-haiku
+model: claude-haiku-4-5
 
 tasks:
   - id: greet
@@ -79,12 +76,11 @@ tasks:
 ## A more representative example
 
 ```yaml
-apiVersion: nika.sh/v1
-schema: nika/workflow@v1
+nika: v1
 workflow: scrape-and-summarize
 
 provider: anthropic
-model: claude-3-5-sonnet
+model: claude-sonnet-4-6
 
 tasks:
   - id: fetch_page
@@ -95,14 +91,14 @@ tasks:
   - id: summarize
     depends_on: [fetch_page]
     with:
-      content: $fetch_page
+      content: ${{ tasks.fetch_page.output }}
     infer:
       prompt: "Summarize in 3 bullets · ${{ with.content }}"
 
   - id: write_file
     depends_on: [summarize]
     with:
-      summary: $summarize
+      summary: ${{ tasks.summarize.output }}
     invoke:
       tool: "nika:write"
       args:
@@ -118,10 +114,10 @@ tasks:
 
 | Section | What it covers |
 |---|---|
-| [01 envelope](./01-envelope.md) | The required header · `apiVersion` · `schema` · `workflow` |
+| [01 envelope](./01-envelope.md) | The header · `nika: v1` · `workflow:` · typed `vars` · `env` · `secrets` |
 | [02 verbs](./02-verbs.md) | The 5 verbs · signatures · semantics |
-| [03 DAG](./03-dag.md) | Tasks · `depends_on` · `when` · output binding |
-| [04 variables](./04-variables.md) | `${{ vars.X }}` · `${{ with.X }}` · `${{ tasks.X.output }}` · `${{ env.X }}` |
+| [03 DAG](./03-dag.md) | Tasks · `depends_on` · `when` · `for_each` · output binding |
+| [04 variables](./04-variables.md) | `${{ vars · with · tasks · env · secrets }}` · 5 namespaces |
 | [05 errors](./05-errors.md) | Error codes · retry · structured output schemas |
 | [06 stdlib contract](./06-stdlib-contract.md) | How the stdlib versions independently |
 | [07 conformance](./07-conformance.md) | What « v0.1-compliant » means |
@@ -147,7 +143,7 @@ See [`08-out-of-scope.md`](./08-out-of-scope.md) for the explicit list.
 
 ## Forever-v0.x
 
-This spec follows the **forever-v0.x** discipline (per the reference engine ADR-002). No v1.0 release target. The 5 pillars are locked at v1 of the major version (`apiVersion: nika.sh/v1`) · minor schema bumps (`schema: nika/workflow@v1.X`) are additive only · breaking changes ship as a new major (`apiVersion: nika.sh/v2`) and a new spec.
+This spec follows the **forever-v0.x** discipline (per the reference engine ADR-002). No v1.0 release target. The 5 pillars are locked at the `nika: v1` contract · minor language additions are additive only (feature-detected · no minor version in the file) · breaking changes would ship as a new contract (`nika: v2`) with its own spec — and per forever-v0.x, that is effectively never.
 
 In practice · we expect v1 to last 10+ years.
 

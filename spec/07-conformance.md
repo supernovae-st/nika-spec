@@ -25,8 +25,9 @@ A higher level **includes** the lower levels.
 An engine claims « Core v0.1-compliant » if it ·
 
 1. **Parses** any valid v0.1 workflow YAML correctly
-   - Accepts `apiVersion: nika.sh/v1` · `schema: nika/workflow@v1` · `workflow: <id>`
+   - Accepts exactly `nika: v1` · `workflow: <id>` · rejects any other `nika:` value
    - Validates the `workflow` identifier kebab-case
+   - Validates typed `vars` (type + required) · validates `env` / `secrets` shape
    - Recognizes the 5 verbs (`infer` · `exec` · `fetch` · `invoke` · `agent`)
    - Rejects unknown top-level fields with a clear error OR ignores with warning (engine's choice · documented behavior)
 
@@ -35,11 +36,12 @@ An engine claims « Core v0.1-compliant » if it ·
    - Detects unresolved `depends_on` references · rejects with `NIKA-DAG-002`
    - Computes topological waves for parallel execution
 
-3. **Resolves variables** correctly
-   - `${{ vars.x }}` from envelope `vars:`
-   - `${{ with.x }}` from task `with:` block
-   - `${{ tasks.X.field }}` from upstream task outputs
-   - `${{ env.X }}` from environment (engine MAY restrict)
+3. **Resolves variable references** correctly (static · reference-resolution · NOT runtime evaluation)
+   - `${{ vars.x }}` resolves to a declared envelope `vars:` entry
+   - `${{ with.x }}` resolves to a declared task `with:` key
+   - `${{ tasks.X.field }}` resolves to a declared upstream task + a valid field name
+   - `${{ env.X }}` · `${{ secrets.X }}` resolve to declared namespaces
+   - `when:` and `for_each:` expressions **parse** and their references **resolve to known namespaces** — Core does NOT *evaluate* them (no execution = no `tasks.X.status` to compare against · that is Runtime's job)
    - Reports undefined references with `NIKA-VAR-001`
 
 4. **Produces typed errors** matching the v0.1 spec
@@ -49,7 +51,7 @@ An engine claims « Core v0.1-compliant » if it ·
 
 5. **Passes** all tests in `conformance/tests/core/`
 
-A Core-compliant engine does NOT need to execute verbs. It needs to parse · validate · build the DAG · resolve variables · produce typed errors.
+A Core-compliant engine does NOT execute verbs and does NOT evaluate `when:` / `for_each:` over runtime state. It parses · validates · builds the DAG · resolves variable *references* (syntax + namespace validity) · produces typed errors. Runtime evaluation of conditions and iteration is Level 2.
 
 **Use case** · linters · spec editors · LSP server intelligence · static analyzers.
 

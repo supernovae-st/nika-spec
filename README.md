@@ -33,12 +33,11 @@ The **how** lives in conformant engines. The reference implementation
 ## Hello world
 
 ```yaml
-apiVersion: nika.sh/v1
-schema: nika/workflow@v1
+nika: v1
 workflow: hello
 
 provider: anthropic
-model: claude-3-5-haiku
+model: claude-haiku-4-5
 
 tasks:
   - id: greet
@@ -56,11 +55,11 @@ nika run hello.nika.yaml
 
 ## The 5 pillars · immutable forever
 
-1. **Envelope** — `apiVersion: nika.sh/v1` + `schema:` + workflow header
-2. **The 5 verbs** — `infer:` · `exec:` · `fetch:` · `invoke:` · `agent:`
-3. **DAG shape** — tasks + `depends_on` + `when` + output binding
-4. **Variables** — `{{var}}` substitution · `$task_id` reference · `with:` scope
-5. **Error model** — codes namespace · retry semantics · structured output
+1. **Envelope** — one line · `nika: v1` + `workflow:` header (+ typed `vars` · `env` · `secrets`)
+2. **The 5 verbs** — `infer:` · `exec:` · `fetch:` · `invoke:` · `agent:` (5, absolute)
+3. **DAG shape** — tasks + `depends_on` + `when` + `for_each` + output binding
+4. **Variables** — one `${{ ... }}` syntax · 5 namespaces (`vars` · `with` · `tasks` · `env` · `secrets`)
+5. **Error model** — `NIKA-<NS>-<NNN>` codes · retry semantics · structured output
 
 These 5 things never change. Everything else (providers · builtins ·
 extract modes · etc.) lives in the **stdlib** and evolves separately.
@@ -75,10 +74,10 @@ See [spec/](./spec/) for the full specification.
 nika-spec/
 ├── spec/                      ← THE specification (~30 pages markdown)
 │   ├── 00-overview.md           one-page vision
-│   ├── 01-envelope.md           apiVersion + schema + workflow header
+│   ├── 01-envelope.md           nika: v1 + workflow + typed vars/env/secrets
 │   ├── 02-verbs.md              the 5 verbs · signatures + semantics
-│   ├── 03-dag.md                tasks · depends_on · when · output
-│   ├── 04-variables.md          {{var}} · $task_id · with: scope
+│   ├── 03-dag.md                tasks · depends_on · when · for_each · output
+│   ├── 04-variables.md          ${{ }} · 5 namespaces · vars/with/tasks/env/secrets
 │   ├── 05-errors.md             error codes · retry · structured output
 │   ├── 06-stdlib-contract.md    how the stdlib versions independently
 │   ├── 07-conformance.md        what « v0.1-compliant » means

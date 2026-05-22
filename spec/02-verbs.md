@@ -308,6 +308,8 @@ The agent loops · model response → if tool calls present, execute tools → f
 3. `max_tokens_total` exhausted, OR
 4. A tool returns the canonical completion sentinel `nika:done` (the builtin tool · see [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md))
 
+`nika:done` is **valid only inside an `agent:` loop's tool whitelist** — it is the loop-completion sentinel. Calling `nika:done` from a standalone `invoke:` task (outside any agent loop) is an error (`NIKA-BUILTIN-NNN`). The sentinel has no meaning without a loop to terminate.
+
 ### Tool whitelist · glob semantics
 
 The `tools:` whitelist uses **gitignore-style globs** for matching ·
@@ -344,7 +346,9 @@ The engine MUST ·
 
 ## Forward-compat
 
-The 5 verb names are **immutable forever**. Field additions to each verb are **additive minor bumps** (`schema: nika/workflow@v1.X`). Field removal NEVER happens at v1.
+The 5 verb names are **immutable forever** — and the count is **5, absolute**. The operation space is complete: call a model (`infer`), run a command (`exec`), fetch + extract content (`fetch`), call a tool (`invoke`), run an agentic loop (`agent`). Every other capability is either an **invoke-able tool** (a database query → `invoke: mcp:postgres::query` · a file write → `invoke: nika:write` · cognitive recall → `invoke: nika:connectome.recall`) or a **DAG control-flow construct** (iteration → `for_each` · branching → `when`). A 6th verb would require a `nika: v2` contract — and per forever-v0.x, that is effectively never. (Locked D-2026-05-22-N10.)
+
+Field additions to each verb are **additive** within `nika: v1` (feature-detected · no minor version in the file). Field removal NEVER happens at v1.
 
 A v0.1-compliant engine that encounters an unknown field on a verb may ·
 

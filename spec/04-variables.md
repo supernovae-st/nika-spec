@@ -30,27 +30,30 @@ If you have used GitHub Actions, this is the same. If you have not, the rule is 
 
 ---
 
-## The 4 namespaces
+## The 5 namespaces
 
 ```
-${{ vars.X }}             workflow-level scope          (declared in envelope `vars:`)
+${{ vars.X }}             workflow inputs               (declared in envelope `vars:` · untyped or typed)
 ${{ with.X }}             task-level scope               (declared per-task `with:` block)
 ${{ tasks.X.output }}      task output reference          (or .status · .error · .duration_ms)
-${{ env.X }}              environment variable           (engine may restrict for security)
+${{ env.X }}              environment variable           (non-sensitive runtime config)
+${{ secrets.X }}          masked secret reference        (vault-backed · never in logs)
 ```
 
-Four namespaces. That's it.
+Five namespaces. That's it.
 
-### `${{ vars.X }}` · workflow-level scope
+### `${{ vars.X }}` · workflow inputs
 
-Declared once in the envelope · immutable across the workflow run ·
+Declared once in the envelope · immutable across the workflow run · may be
+**untyped** (the value is the default) or **typed** (enables validation +
+schema generation for callable workflows · see [01-envelope.md](./01-envelope.md#vars--optional--workflow-inputs--untyped-or-typed)) ·
 
 ```yaml
-apiVersion: nika.sh/v1
+nika: v1
 workflow: research-pipeline
 
 vars:
-  topic: "Rust async runtimes 2026"
+  topic: "Rust async runtimes 2026"    # untyped · value is the default
   output_dir: "./output"
 
 tasks:
@@ -98,11 +101,33 @@ ${{ tasks.X.duration_ms }}           execution time
 ### `${{ env.X }}` · environment variable
 
 ```yaml
-headers:
-  Authorization: "Bearer ${{ env.API_TOKEN }}"
+env:
+  LOG_LEVEL: info
+infer:
+  prompt: "Running at ${{ env.LOG_LEVEL }} verbosity"
 ```
 
-The engine MAY restrict environment access (security policy).
+`env` holds **non-sensitive** runtime config. Values may appear in logs +
+traces. For anything secret, use `secrets:` (below) instead — never put a
+credential in `env`.
+
+### `${{ secrets.X }}` · masked secret reference
+
+```yaml
+secrets:
+  api_key:
+    source: vault
+    key: prod/anthropic/api-key
+headers:
+  Authorization: "Bearer ${{ secrets.api_key }}"
+```
+
+A secret is always a **reference to a store** (the local `nika-vault` by
+default), declared in the envelope `secrets:` block — never an inline
+literal. The engine **masks** every resolved `secrets.X` value in logs,
+traces, and journal events (it renders as `••••••`). This `env` / `secrets`
+split is the modern secure-workflow default: non-sensitive config in `env`,
+masked references in `secrets`.
 
 ---
 
@@ -191,7 +216,7 @@ Reasons ·
 
 ## Forward-compat
 
-The `${{ ... }}` substitution surface and the 4 namespaces are locked at v1. Additional template helpers (e.g. `${{ vars.x | json }}` · `${{ vars.x | upper }}`) MAY be added in minor bumps. JSONPath grammar MAY extend (e.g. filters `?(@.field == value)`).
+The `${{ ... }}` substitution surface and the 5 namespaces are locked at v1. Additional template helpers (e.g. `${{ vars.x | json }}` · `${{ vars.x | upper }}`) MAY be added in minor bumps. JSONPath grammar MAY extend (e.g. filters `?(@.field == value)`).
 
 Out of scope for v0.1 (deferred · see [`08-out-of-scope.md`](./08-out-of-scope.md)) ·
 - Expression language (no arithmetic in templates)

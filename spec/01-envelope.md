@@ -1,16 +1,15 @@
 # 01 · Envelope
 
-> Every Nika workflow starts with a header. This is the envelope. It
-> identifies the language version, the schema version, and gives the
-> workflow an id + sensible defaults.
+> Every Nika workflow starts with one header line. That line names the
+> language and pins the contract version. Everything else is the
+> workflow id, optional defaults, and the task graph.
 
 ---
 
 ## Minimal envelope
 
 ```yaml
-apiVersion: nika.sh/v1
-schema: nika/workflow@v1
+nika: v1
 workflow: my-workflow-id
 
 tasks:
@@ -18,26 +17,39 @@ tasks:
     ...
 ```
 
-That's the **minimum required** to be a valid Nika workflow.
+Two required lines (`nika:` + `workflow:`) and a non-empty `tasks:`. That's
+the **whole minimum** to be a valid Nika workflow.
 
 ---
 
 ## Full envelope
 
 ```yaml
-apiVersion: nika.sh/v1                  # required · immutable forever
-schema: nika/workflow@v1                # required · minor bumps allowed
+nika: v1                                # required · language + contract version
 workflow: scrape-and-summarize          # required · kebab-case · unique within file
-description: "Fetch + summarize"        # optional · human-readable
+description: "Fetch + summarize"         # optional · human-readable
 
 # Workflow-level defaults · any task may override
 provider: anthropic                     # optional · default LLM provider
-model: claude-3-5-sonnet                # optional · default model
+model: claude-sonnet-4-6                 # optional · default model
 
-# Workflow-level variables · available as ${{ vars.<name> }} in every task
+# Inputs · available as ${{ vars.<name> }} · untyped OR typed
 vars:
-  output_dir: "./output"
-  base_url: "https://example.com"
+  output_dir: "./output"                 # untyped · the value is the default
+  topic:                                 # typed · enables schema-gen + validation
+    type: string
+    required: true
+    description: "Subject to research"
+
+# Non-sensitive runtime config · available as ${{ env.<name> }}
+env:
+  LOG_LEVEL: info
+
+# Sensitive values · vault-backed · masked in logs · available as ${{ secrets.<name> }}
+secrets:
+  api_key:
+    source: vault                        # never inline · a reference to a store
+    key: prod/anthropic/api-key
 
 # Tasks (the DAG)
 tasks:
@@ -49,33 +61,35 @@ tasks:
 
 ## Field-by-field
 
-### `apiVersion` · **required · immutable forever**
+### `nika` · **required · the contract version**
 
 ```yaml
-apiVersion: nika.sh/v1
+nika: v1
 ```
 
-The **major version of the language**. `nika.sh/v1` is the only value
-for the entire lifetime of v1. A future `nika.sh/v2` would be a
-deliberate breaking-change generation, with its own spec and not
-backward-compatible with v1.
+The first line of every workflow. The key `nika` declares « this is a
+Nika workflow »; the value `v1` pins the **language contract version**.
 
-**Anti-pattern** · do not write `apiVersion: nika.sh/v1.0` or similar.
-The value is exactly `nika.sh/v1`.
+`v1` is the only value for the entire lifetime of the v1 contract. Minor
+additions to the language (a new optional field, a new builtin) are
+**additive** and never change this value. A future `nika: v2` would be a
+deliberate breaking-change generation with its own spec, not
+backward-compatible with v1 — and per `forever-v0.x`, that is
+effectively never.
 
-### `schema` · *optional · default `nika/workflow@v1`*
+**Anti-pattern** · do not write `nika: v1.0` · `nika: "1"` · or
+`nika: 1.0`. The value is exactly `v1`.
 
-```yaml
-schema: nika/workflow@v1     # OPTIONAL · defaults to this value if absent
-```
-
-The **schema version + document type discriminator**. Minor additions (e.g. a new optional field on a verb) get a minor bump (`@v1.1` · `@v1.2` · …). Breaking changes never happen at this level · they require an `apiVersion` major bump.
-
-A conformant engine MUST accept any `schema: nika/workflow@v1.X` value where X is less than or equal to the engine's supported minor. **If absent · the engine MUST treat the document as `nika/workflow@v1`**.
-
-**Why optional** · in v0.1 we have ONLY ONE document type (workflow). The `schema:` field is forward-compat for future document types (e.g. `nika/agent@v1` for agent definitions · `nika/skill@v1` for skill manifests). Today · omitting it is the simpler default.
-
-Pantheon council ratified this simplification 2026-05-22 (D-2026-05-22-N8 · convergent across Jobs+Rams lens · contested by Hykes+Carmack who prefer K8s pattern · final lean to less-but-better Rams 10).
+> **Why one field, not `apiVersion` + `schema`?** Earlier drafts used a
+> Kubernetes-style `apiVersion: nika.sh/v1` plus a separate
+> `schema: nika/workflow@v1`. That is two version-ish fields and
+> ceremony a workflow file does not need. Modern specs converge on a
+> single version marker — OpenAPI writes `openapi: 3.1.0`, Docker
+> Compose dropped its `version:` field entirely. Nika takes the
+> middle, proven path: **one field, the language name as the key, the
+> contract version as the value.** The engine's internal canonical URI
+> stays `https://nika.sh/spec/v1` for RDF / conformance tooling — but
+> the author never types a URL. (Locked D-2026-05-22-N10.)
 
 ### `workflow` · **required · kebab-case · unique within file**
 
@@ -83,8 +97,13 @@ Pantheon council ratified this simplification 2026-05-22 (D-2026-05-22-N8 · con
 workflow: scrape-and-summarize
 ```
 
-A stable identifier for the workflow. Kebab-case. Used in journal events
-+ traces + error messages.
+A stable identifier for the workflow. Kebab-case. Used in journal events,
+traces, and error messages.
+
+The presence of `workflow:` is also the **document-type discriminator** —
+it marks this file as a workflow. Future Nika document types (if any ever
+ship) would use their own top-level key; there is no separate `kind:`
+field in v1.
 
 Must match · `^[a-z][a-z0-9-]*$`.
 
@@ -94,7 +113,8 @@ Must match · `^[a-z][a-z0-9-]*$`.
 description: "Fetch article, summarize in 3 bullets, write to disk"
 ```
 
-Free-form text. Not used by the engine for execution. Useful for `nika ls` listings + LSP hover hints.
+Free-form text. Not used by the engine for execution. Useful for `nika ls`
+listings + LSP hover hints.
 
 ### `provider` · *optional · default LLM provider*
 
@@ -103,29 +123,73 @@ provider: anthropic
 ```
 
 Default LLM provider for any `infer:` or `agent:` verb in this workflow.
-A task may override this. See [stdlib/providers-v0.1.md](../stdlib/providers-v0.1.md) for the canonical list.
+A task may override this. See [stdlib/providers-v0.1.md](../stdlib/providers-v0.1.md)
+for the canonical list.
 
 If absent · each task with `infer:` or `agent:` must specify its own `provider:`.
 
 ### `model` · *optional · default model*
 
 ```yaml
-model: claude-3-5-sonnet
+model: claude-sonnet-4-6
 ```
 
 Default model name. Provider-specific. See provider docs for valid names.
 
-### `vars` · *optional · workflow-level variable scope*
+### `vars` · *optional · workflow inputs · untyped OR typed*
 
 ```yaml
 vars:
+  # Untyped form — the value IS the default
   output_dir: "./output"
   base_url: "https://example.com"
-  api_token: "${env:MY_TOKEN}"        # env var reference
+
+  # Typed form — enables validation + schema generation
+  topic:
+    type: string                 # string · number · boolean · array · object
+    required: true               # default false
+    default: "Rust async 2026"   # used when the caller omits it
+    description: "Subject to research"
 ```
 
-Variables available in every task via `${{ vars.<name> }}` substitution. See
-[04-variables.md](./04-variables.md) for the full substitution grammar.
+Inputs available in every task via `${{ vars.<name> }}` substitution.
+
+The **untyped form** (`name: value`) is the value's default — simplest for
+a workflow you run yourself. The **typed form** (`name: { type, required,
+default, description }`) lets the engine validate inputs and
+**generate a callable schema** — this is what powers `nika.run_workflow`
+over MCP (a caller like an agent host sees the typed inputs and knows
+exactly what to pass) and UI generation. Simple stays simple; power is
+there when a workflow becomes a reusable, callable unit.
+
+See [04-variables.md](./04-variables.md) for the full substitution grammar.
+
+### `env` · *optional · non-sensitive runtime config*
+
+```yaml
+env:
+  LOG_LEVEL: info
+  REGION: eu-west
+```
+
+Non-sensitive configuration available via `${{ env.<name> }}`. Values may
+appear in logs and traces. For anything secret, use `secrets:` instead.
+
+### `secrets` · *optional · vault-backed · masked*
+
+```yaml
+secrets:
+  api_key:
+    source: vault                 # a reference to a store · never an inline value
+    key: prod/anthropic/api-key
+```
+
+Sensitive values available via `${{ secrets.<name> }}`. A secret is always
+a **reference to a store** (the local `nika-vault` by default) — never an
+inline literal. The engine **masks** resolved secret values in logs,
+traces, and journal events. The `env` / `secrets` split is the modern
+secure-workflow default: non-sensitive config in `env`, masked references
+in `secrets`.
 
 ### `tasks` · **required · non-empty**
 
@@ -143,9 +207,9 @@ The DAG. See [03-dag.md](./03-dag.md) for the task model.
 
 ## What the envelope is NOT
 
-- It is NOT a place to declare credentials. Use `${env:VAR_NAME}` substitution + an external env or vault.
-- It is NOT a place for runtime config (timeouts · retry policies · etc.). Those belong on individual tasks or in engine config files (out of scope of the spec).
-- It is NOT a place for imports / includes. v0.1 is single-file workflows only.
+- It is NOT a place to inline credentials. Use `secrets:` with a `source` reference.
+- It is NOT a place for engine runtime config (global timeouts · concurrency limits). Those live in engine config files, out of scope of the spec.
+- It is NOT a place for imports / includes. v1 is single-file workflows. (Static composition is a candidate for a later additive minor — see [08-out-of-scope.md](./08-out-of-scope.md).)
 
 ---
 
@@ -154,8 +218,7 @@ The DAG. See [03-dag.md](./03-dag.md) for the task model.
 ### Minimal
 
 ```yaml
-apiVersion: nika.sh/v1
-schema: nika/workflow@v1
+nika: v1
 workflow: hello
 
 tasks:
@@ -163,23 +226,27 @@ tasks:
     infer:
       prompt: "Hello"
       provider: anthropic
-      model: claude-3-5-haiku
+      model: claude-haiku-4-5
 ```
 
-### Full
+### Full · with typed inputs (callable over MCP)
 
 ```yaml
-apiVersion: nika.sh/v1
-schema: nika/workflow@v1
+nika: v1
 workflow: research-pipeline
 description: "Research a topic and write a markdown brief"
 
 provider: anthropic
-model: claude-3-5-sonnet
+model: claude-sonnet-4-6
 
 vars:
-  topic: "Rust async runtimes 2026"
-  output_path: "./brief.md"
+  topic:
+    type: string
+    required: true
+    description: "Subject to research"
+  output_path:
+    type: string
+    default: "./brief.md"
 
 tasks:
   - id: research
@@ -189,7 +256,7 @@ tasks:
   - id: write
     depends_on: [research]
     with:
-      content: $research
+      content: ${{ tasks.research.output }}
     invoke:
       tool: "nika:write"
       args:
@@ -201,14 +268,14 @@ tasks:
 
 ## Conformance
 
-A v0.1-compliant engine MUST ·
+A v1-compliant engine MUST ·
 
-1. Reject any workflow without an `apiVersion`, `schema`, or `workflow` field with a clear error
-2. Accept any `apiVersion: nika.sh/v1`
-3. Accept any `schema: nika/workflow@v1.X` where X is supported
-4. Reject `apiVersion` or `schema` values not matching the strict format
-5. Validate `workflow` identifier kebab-case format
-6. Make workflow-level `provider`, `model`, `vars` available to all tasks as defaults
+1. Reject any workflow missing `nika:` or `workflow:` with a clear error
+2. Accept exactly `nika: v1` · reject any other value (`v1.0` · `1` · `v2` …) with a clear error
+3. Validate `workflow` identifier kebab-case format
+4. Make workflow-level `provider`, `model`, `vars`, `env`, `secrets` available to all tasks as defaults
+5. Validate typed `vars` (type + required) before execution · reject missing required inputs
+6. Mask resolved `secrets` values in all logs · traces · journal events
 
 ---
 

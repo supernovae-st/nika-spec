@@ -1,9 +1,9 @@
 # Nika spec · CHANGELOG
 
 All notable changes to the **Nika workflow language specification** are
-documented here. The spec follows `apiVersion: nika.sh/v1` forever (per
-ADR-044) · only the schema version (`schema: nika/workflow@v1`) may
-receive additive minor bumps.
+documented here. The spec is pinned at the `nika: v1` contract forever ·
+language additions are additive within v1 (feature-detected · no minor
+version in the file).
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
@@ -11,10 +11,37 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed — language consolidation (pre-public final · D-2026-05-22-N10)
+
+Grounded in SOTA primary sources (Docker Compose versionless · OpenAPI
+single-field · Kestra minimal · env⊥secrets separation now standard). Done
+while pre-public (zero adopters) — free to perfect the pillars to their
+immutable-forever form.
+
+- **Envelope → `nika: v1`** · one field replaces `apiVersion: nika.sh/v1` +
+  `schema: nika/workflow@v1` (OpenAPI `openapi: 3.1.0` pattern · drops K8s
+  ceremony + the two-version-field redundancy). Doc-type discriminated by the
+  resource key (`workflow:`). Engine canonical URI `https://nika.sh/spec/v1`
+  internal-only.
+- **5 verbs · absolute** · the count is locked at 5 forever · the operation
+  space is complete · a 6th verb would require `nika: v2` (effectively never).
+
 ### Added
-- (Working towards v0.1.0 GA · spec sections drafted · examples + conformance
-  pending recopy from brouillon · JSON schemas pending generation from prose
-  spec.)
+- **`for_each:`** task field · bounded map/fan-out over a static list or a
+  prior task's array output (`${{ item }}` · `${{ index }}`) · the iteration
+  construct a workflow language must have.
+- **`${{ secrets.X }}`** · 5th variable namespace · vault-backed · masked in
+  logs · the modern `env`⊥`secrets` security split.
+- **Typed `vars`** · optional `{ type, required, default, description }` form ·
+  enables `nika.run_workflow` MCP schema-gen + UI-gen + input validation ·
+  simple `name: value` untyped form preserved.
+- **`nika:done`** · locked agent-loop-only (completion sentinel · error if
+  invoked outside an `agent:` loop).
+- **Core conformance** · clarified as static-check mode · `when:` / `for_each:`
+  references resolve to known namespaces but are NOT evaluated (runtime eval is
+  Level 2).
+- (Still towards v0.1.0 GA · examples + conformance fixtures pending recopy ·
+  JSON schemas pending generation from prose spec.)
 
 ---
 
