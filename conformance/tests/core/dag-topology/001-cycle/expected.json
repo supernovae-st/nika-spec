@@ -1,0 +1,9 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-DAG-001",
+      "category": "validation_error"
+    }
+  ]
+}

@@ -132,7 +132,7 @@ etc. resolve against the live DAG state.
 
 If a task's `when:` **or** `with:` references `tasks.<id>` (any field), that
 task **MUST** declare `<id>` in its `depends_on:`. The engine **rejects the
-workflow at parse time** otherwise (`validation_error` · `NIKA-DAG` namespace) —
+workflow at parse time** otherwise (`NIKA-DAG-003` · `validation_error`) —
 it does **not** silently infer the edge.
 
 ```yaml

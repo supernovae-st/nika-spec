@@ -6,11 +6,22 @@
 
 ---
 
-## Status · placeholder for v0.1.0-draft
+## Status · 14 core fixtures shipped (parse/validate layer) · runtime+stdlib pending
 
-The suite will ship in this directory for v0.1.0 GA. Authoring the
-suite is one of the four blocker tasks to GA · alongside spec
-finalization · examples recopy · and JSON schemas.
+The **Core conformance fixture set** (14 cases · `tests/core/`) is shipped — the
+machine-checkable parse + validate + DAG + variable layer, the part that needs
+NO engine to define. Each is an `input.yaml` + `expected.json` pair (see
+[`runner-protocol.md`](./runner-protocol.md) for the contract). 10 are
+schema-checkable (a YAML + `schemas/workflow.schema.json` validator passes them
+with zero engine code) · 4 are engine-parse cross-reference rules (cycle
+`NIKA-DAG-001` · unresolved depends_on `NIKA-DAG-002` · undeclared `when:`/`with:`
+reference `NIKA-DAG-003` · missing `outputs:`/`${{ }}` task ref `NIKA-VAR`).
+They lock every rule hardened in the v1 language reviews (incl. the new
+`outputs:` block · agent `schema:` · and the `when→depends_on` rule).
+
+Runtime + Stdlib fixtures (verb execution · provider/builtin behavior · mock-driven)
+land with the reference engine. Of the four GA blockers (spec · examples · JSON
+schemas · conformance) the static conformance layer is now seeded.
 
 ## Planned structure
 
@@ -93,4 +104,4 @@ Many tests use the `mock` provider and HTTP mocks for · (a) determinism · (b) 
 
 ---
 
-🦋 *Conformance · pending v0.1.0 GA · machine-checkable forever.*
+🦋 *14 core fixtures shipped (parse/validate) · runtime+stdlib pending · machine-checkable forever.*

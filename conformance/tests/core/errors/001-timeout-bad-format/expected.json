@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "validation_error"
+    }
+  ],
+  "note": "timeout is a Go-duration string \u00b7 'w' is not a valid unit (use 'h'/compound)."
+}

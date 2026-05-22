@@ -1,0 +1,9 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "category": "validation_error"
+    }
+  ],
+  "note": "A task MUST bind exactly one verb."
+}

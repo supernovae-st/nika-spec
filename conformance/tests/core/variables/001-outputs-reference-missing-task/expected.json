@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-VAR",
+      "category": "variable_error"
+    }
+  ],
+  "note": "outputs: reference must point at a declared task ('ghost' does not exist)."
+}

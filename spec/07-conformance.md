@@ -44,6 +44,7 @@ An engine claims « Core v0.1-compliant » if it ·
 2. **Computes DAG topology** correctly
    - Detects cycles · rejects with `NIKA-DAG-001`
    - Detects unresolved `depends_on` references · rejects with `NIKA-DAG-002`
+   - Detects a `when:`/`with:` reference to an undeclared dependency · rejects with `NIKA-DAG-003`
    - Computes topological waves for parallel execution
 
 3. **Resolves variable references** correctly (static · reference-resolution · NOT runtime evaluation)

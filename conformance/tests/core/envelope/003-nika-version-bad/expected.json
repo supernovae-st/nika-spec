@@ -1,0 +1,9 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "parse_error"
+    }
+  ]
+}
