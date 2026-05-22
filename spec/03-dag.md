@@ -38,15 +38,16 @@ tasks:
     backoff_ms: 1000
   on_error:                     # optional · error recovery (see 05-errors.md)
     fallback: ${{ tasks.cache.output }}
-  timeout_ms: 60000             # optional · task-level timeout
+  timeout: "60s"                # optional · task-level timeout (Go duration string)
   with:                         # optional · variable scope injection
     data: ${{ tasks.task_a.output }}
     config: { foo: "bar" }
   infer:                        # required · one of the 4 verbs
     prompt: "..."
-  output:                       # optional · output binding
+  output:                       # optional · named JSONPath bindings
     result: "$.choices[0].message.content"
     tokens: "$.usage.total_tokens"
+  output_format: structured     # optional · text | structured | bytes · default inferred
 ```
 
 ---
@@ -174,22 +175,45 @@ Semantics (closed at v1) ·
   `for_each` over its own output. The DAG stays acyclic.
 - If the collection is empty · the task is `skipped` (status `skipped`).
 - `when:` is evaluated **once** before the fan-out · `retry:` /
-  `on_error:` / `timeout_ms:` apply **per iteration**.
+  `on_error:` / `timeout:` apply **per iteration**.
 
 This is the one construct that lets a v1 workflow process a
 runtime-computed number of items (N files · N search hits · N pages)
 without statically enumerating tasks.
 
-### `timeout_ms` · *optional · task-level timeout*
+### `timeout` · *optional · task-level timeout (Go duration string)*
 
 ```yaml
 - id: long_task
-  timeout_ms: 300000        # 5 minutes
+  timeout: "5m"             # 5 minutes
   exec:
     command: "./long-running.sh"
 ```
 
-Hard timeout for the entire task (including any retries). If exceeded · task fails with a typed timeout error.
+Hard timeout for the entire task (including any retries). If exceeded · task fails with a typed timeout error (`NIKA-TIMEOUT-001`).
+
+**Format · Go-duration / Kubernetes-style string** `[0-9]+(\.[0-9]+)?(ns|us|µs|ms|s|m|h)`.
+
+```yaml
+timeout: "500ms"           # half a second
+timeout: "30s"             # 30 seconds
+timeout: "5m"              # 5 minutes
+timeout: "1h30m"           # compound · 1.5 hours
+timeout: "2.5s"            # fractional · 2500 ms
+```
+
+**Rules** ·
+- MUST be a **quoted YAML string** · unquoted reject (`30s` unquoted parses as string OK but `30` unquoted parses as integer · ambiguous · forbidden).
+- Positive · `> 0`.
+- Maximum · `24h`. Tasks needing longer should split into a workflow chain.
+- Compound units · combine in descending order (`1h30m500ms` ✓ · `30m1h` ✗).
+- Unit suffixes (case-sensitive) · `ns` · `us` (or `µs`) · `ms` · `s` · `m` · `h`. No `d`/`w` (use compound · `48h` instead of `2d`).
+
+**Why a duration string (not `timeout_ms: 30000`)** ·
+- Industry standard · Go `time.ParseDuration` · Kubernetes resource limits · Prometheus rules.
+- Reads naturally · `"5m"` beats `300000`.
+- One field for all granularities · `ns` to `h`.
+- Quoted-string requirement defeats YAML 1.2 numeric traps (Norway · sexagesimal · float drift).
 
 ### `with` · *optional · variable scope injection*
 
@@ -373,11 +397,47 @@ tasks:
 bounded) · `digest` consumes the array of all summaries. N is computed at
 runtime — no static enumeration.
 
+### `output_format` · *optional · type hint*
+
+```yaml
+- id: fetch_image
+  invoke:
+    tool: nika:fetch
+    args:
+      url: "https://example.com/diagram.png"
+      mode: bytes
+  output_format: bytes
+```
+
+Declares the **raw shape** of the task's output. Optional · default **inferred per verb** ·
+
+| Verb | Default `output_format` |
+|---|---|
+| `infer:` (no `schema:`) | `text` (raw LLM response · string) |
+| `infer:` (with `schema:`) | `structured` (validated JSON object/array) |
+| `exec:` | `structured` (always `{stdout, stderr, exit_code}`) |
+| `invoke:` | `structured` (tool-determined · check tool spec) |
+| `agent:` | `structured` (always `{result, steps_taken, ...}`) |
+
+**Closed enum** · `text` · `structured` · `bytes`.
+
+**Why explicit override** ·
+- **`bytes`** · the only way to declare binary output. Downstream consumers must be binary-aware (e.g. `nika:write` with `mode: binary` · NOT `${{ … }}` string substitution which would corrupt binary data with UTF-8 coercion).
+- **`structured`** · forces validation that raw output is a JSON object/array. Catches the « text-leak » bug where a tool returns text when caller expected JSON.
+- **`text`** · explicit string treatment · downstream `${{ … }}` substitution is verbatim.
+
+**Conformance** · the engine MUST honor explicit `output_format:` and reject mismatches at parse time (structured demand on a text-only verb · etc.).
+
+**Why a top-level task field (not nested inside `output:`)** ·
+- `output:` is a **map of named JSONPath bindings** (existing semantics · downstream `${{ tasks.X.<name> }}` access).
+- `output_format:` is a **type hint on the raw output** (before bindings extract from it).
+- Two distinct concerns → two distinct fields → Rams 4 understandable.
+
 ---
 
 ## Forward-compat
 
-v1 ships with these task fields · `id` · `depends_on` · `when` · `for_each` · `retry` · `on_error` · `timeout_ms` · `with` · `output` · plus the verb selector. Additional fields may be added in minor bumps (additive only).
+v1 ships with these task fields · `id` · `depends_on` · `when` · `for_each` · `retry` · `on_error` · `timeout` · `with` · `output` · `output_format` · plus the verb selector. Additional fields may be added in minor bumps (additive only).
 
 Out of scope for v1 · `parallel:` for explicit concurrency control · `include:` for sub-workflow composition (workaround · `exec: nika run sub.yaml`). See [08-out-of-scope.md](./08-out-of-scope.md).
 

@@ -12,7 +12,35 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-### Added / Changed — more local providers + stabilization
+### Added — task-level `timeout` duration string + `output_format` type hint
+
+User-locked v0.2 amendment candidates from `nika/hq/blueprint/NIKA_ROADMAP.md` §16
+(D-2026-05-22-N23 · « Aok Bok Cok »). Two additive changes within `nika: v1` · zero
+breaking · per forever-v0.x discipline (additive on language MINOR-equivalent).
+
+- **`timeout_ms: 30000` → `timeout: "30s"`** · Go-duration / Kubernetes-style string ·
+  format `[0-9]+(\.[0-9]+)?(ns|us|µs|ms|s|m|h)` · compound `"1h30m"` · MUST be
+  quoted (YAML 1.2 numeric trap defense). Adopters get cleaner reads · `"5m"` >
+  `300000`. Industry standard · Go `time.ParseDuration` · Kubernetes resource
+  limits · Prometheus rules. Replaced at 7 sites · `03-dag.md` x4 ·
+  `02-verbs.md` x3 · `07-conformance.md` x1.
+
+- **NEW `output_format` task-level field** · optional · closed enum
+  `text | structured | bytes` · default **inferred per verb**
+  (`infer:` text-or-structured · `exec:` structured · `invoke:`
+  structured · `agent:` structured). Explicit override unlocks **`bytes`**
+  for binary output (the only-way · downstream consumers become binary-aware
+  · avoids UTF-8 corruption via string substitution) AND statically declares
+  shape for IDE autocomplete + parse-time mismatch detection. Section at
+  `03-dag.md#output_format`.
+
+### Skipped — `workflow:` `description:` field
+
+Already existed in spec (`01-envelope.md:109`) · candidate B was redundant.
+
+---
+
+## [Previous Unreleased] — more local providers + stabilization
 
 More local-provider options + a few consistency fixes.
 

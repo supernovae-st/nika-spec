@@ -96,7 +96,7 @@ An engine claims « Runtime v0.1-compliant » if it satisfies Core conformance P
 2. **Honors task fields** correctly
    - `depends_on` blocks until deps resolve
    - `when` skips when false
-   - `timeout_ms` hard-kills on timeout
+   - `timeout` (Go-duration string · `"30s"` · `"5m"` etc.) hard-kills on timeout
    - `retry` strategy honored on transient errors
    - `on_error` recovery honored on terminal errors
    - `with` scope injected into task body

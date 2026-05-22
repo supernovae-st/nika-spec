@@ -40,7 +40,7 @@ shape depends on the verb (know this before you bind downstream) ·
 |---|---|---|
 | `infer:` | the model's reply · **string** | `schema:` set → **object** matching it |
 | `exec:` | **stdout string** (default) | `capture: structured` → `{ stdout, stderr, exit_code }` |
-| `invoke:` | the **tool's response** (tool-defined · string OR object) | per builtin / MCP tool schema |
+| `invoke:` | the **tool's response** (tool-defined · string OR object · sometimes bytes) | per builtin / MCP tool schema · use `output_format: bytes` for binary tools |
 | `agent:` | the loop's **final message** · string | (the agent's last assistant turn) |
 
 ---
@@ -121,7 +121,7 @@ Run a shell command. The result is the command's stdout (default) or a structure
 
 ```yaml
 - id: test
-  timeout_ms: 60000                # task-level (applies to any verb · see 03-dag)
+  timeout: "60s"                   # task-level (applies to any verb · Go duration · see 03-dag)
   exec:
     command: "cargo test --workspace --lib"
     cwd: "./engine"
@@ -147,7 +147,7 @@ Run a shell command. The result is the command's stdout (default) or a structure
 > are NOT auto-connected — to pass a workflow value into the process, do it
 > explicitly: `env: { API_BASE: "${{ env.API_BASE }}" }`.
 
-> `timeout_ms` and `retry` are **task-level** fields (see [03-dag.md](./03-dag.md)) — they apply uniformly to every verb, so they are not repeated inside `exec:`.
+> `timeout` and `retry` are **task-level** fields (see [03-dag.md](./03-dag.md)) — they apply uniformly to every verb, so they are not repeated inside `exec:`.
 
 ### Security
 
@@ -155,7 +155,7 @@ A v0.1-compliant engine MUST ·
 
 - Implement a shell **blocklist** for dangerous commands (see reference impl `nika-policy` for canonical list · 100+ patterns including `rm -rf /` · `chmod 777` · `curl … | sh` · etc.)
 - Reject blocklist matches with a clear error
-- Honor `timeout_ms` with a hard kill
+- Honor `timeout` with a hard kill (Go-duration string · see 03-dag)
 - Sandbox `cwd` if configured (engine-specific)
 
 ### Conformance
