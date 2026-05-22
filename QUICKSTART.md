@@ -120,10 +120,34 @@ tasks:
       args:
         path: "./summary.md"
         content: "${{ tasks.summarize.output }}"
+
+outputs:                        # what the workflow RETURNS · symmetric to vars:
+  summary: ${{ tasks.summarize.output }}
 ```
 
 Tools are `<namespace>:<path>` · `nika:*` are stdlib builtins ·
 `mcp:<server>/<tool>` are external MCP tools. See [spec/02-verbs.md](./spec/02-verbs.md).
+
+> **One rule to internalize** · whenever a task's `${{ tasks.X.output }}`,
+> `with:`, or `when:` references another task, declare it in `depends_on:` —
+> the engine rejects an undeclared reference (`NIKA-DAG-003`), it does not
+> guess the edge. Every example above pairs the two.
+
+### The 4 verbs at a glance
+
+```yaml
+infer:  { prompt: "Summarize ${{ vars.text }}" }              # call a model
+exec:   { command: "cargo test --workspace --lib" }           # run a process
+invoke: { tool: "nika:fetch", args: { url: "https://..." } }  # call a tool
+agent:                                                         # agentic loop
+  prompt: "Review the diff"
+  tools: ["nika:read", "nika:done"]   # default-deny · grant explicitly
+  schema: { type: object, required: [findings] }   # optional · structured final message
+```
+
+Exactly four · `fetch` is not among them (it's the `nika:fetch` tool via
+`invoke:`). See [spec/02-verbs.md](./spec/02-verbs.md) and the runnable
+[examples/](./examples/).
 
 ---
 
@@ -143,7 +167,9 @@ contract, the runtime is an implementation detail.
 You touched all 5 pillars · the **envelope** (`nika: v1` + `workflow:`) · the
 **4 verbs** · the **DAG** (`depends_on` + task outputs) · **variables**
 (`${{ }}` · 5 namespaces) · and the start of the **error model** (engines
-return `NIKA-<NS>-<NNN>` codes · see [spec/05-errors.md](./spec/05-errors.md)).
+return `NIKA-<NS>-<NNN>` codes · see [spec/05-errors.md](./spec/05-errors.md)) ·
+plus the workflow's **`outputs:`** return contract (what `nika run` prints + what
+a caller receives).
 
 ## Zero-cloud · local-first
 
@@ -158,7 +184,7 @@ model: ollama/llama3.1        # or lmstudio/... · llamacpp/... · vllm/...
 
 - **[spec/](./spec/)** — the full specification (~30 pages · the contract)
 - **[stdlib/](./stdlib/)** — the 13 providers · 9 extract modes · 42 builtins
-- **[examples/](./examples/)** — canonical workflows (pending for GA)
+- **[examples/](./examples/)** — 7 foundation workflows (full v0.1 construct coverage · 19 more pending for GA)
 - **[README.md](./README.md)** — why a language · repo layout · governance
 
 ---

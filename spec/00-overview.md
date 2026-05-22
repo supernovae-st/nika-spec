@@ -101,9 +101,12 @@ tasks:
       args:
         path: "summary.md"
         content: "${{ with.summary }}"
+
+outputs:                              # what the workflow returns · symmetric to vars:
+  summary: ${{ tasks.summarize.output }}
 ```
 
-3 tasks · DAG with deps · 2 verbs (`invoke:` ×2 incl `nika:fetch` · `infer:`) · variable substitution + task output reference.
+3 tasks · DAG with deps · 2 verbs (`invoke:` ×2 incl `nika:fetch` · `infer:`) · variable substitution + task output reference · an `outputs:` return contract. Note each task that references `${{ tasks.X.output }}` also lists `X` in `depends_on:` — that pairing is **required** (`NIKA-DAG-003` · the engine never infers the edge). The 4th verb, `agent:` (an agentic loop · may declare a `schema:`), is shown in [examples/](../examples/).
 
 ---
 

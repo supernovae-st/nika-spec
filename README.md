@@ -91,7 +91,7 @@ nika-spec/
 │   └── 08-out-of-scope.md       explicit defer list (memory · macros · etc.)
 │
 ├── schemas/                   ← machine-readable JSON Schemas
-├── examples/                  ← 26 canonical workflows
+├── examples/                  ← 7 foundation workflows (full v0.1 coverage · 19 pending)
 ├── conformance/               ← test suite for any implementation
 │
 └── stdlib/                    ← versioned independently
@@ -145,7 +145,7 @@ Nika is that for AI workflows.
 
 ## Status
 
-- v0.1.0-draft · spec drafted · examples + conformance + schemas pending
+- v0.1.0-draft · spec drafted · 7 examples + workflow.schema.json + 14 core conformance fixtures shipped · runtime+stdlib conformance pending
 - v0.1.0 GA · target Q3 2026 (after spec review + examples +
   conformance suite + schemas)
 
