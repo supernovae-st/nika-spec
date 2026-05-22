@@ -603,7 +603,7 @@ Spawn a dynamic sub-DAG. Returns when all spawned tasks complete.
 
 ## Media builtins · **DEFERRED to stdlib v0.x · enumeration not in v0.1 spec**
 
-The media builtins are NOT enumerated in v0.1. They exist in the reference engine under a feature flag · they MAY graduate to stdlib v0.x as a separate document · but the v0.1 spec stays focused on the 37 canonical builtins above.
+The media builtins are NOT enumerated in v0.1. They exist in the reference engine under a feature flag · they MAY graduate to stdlib v0.x as a separate document · but the v0.1 spec stays focused on the 42 canonical builtins above.
 
 This is a deliberate **less-but-better** decision (Rams principle 10) · enumeration of 24 media-specific tools would inflate the spec surface 40% without serving the 80% audience.
 

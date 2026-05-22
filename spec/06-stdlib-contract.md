@@ -46,7 +46,7 @@ The stdlib has **independent versioning** ·
 
 - `stdlib/providers-v0.1.md` — the 13 canonical providers for v0.1
 - `stdlib/extract-modes-v0.1.md` — the 9 canonical extract modes for v0.1
-- `stdlib/builtins-v0.1.md` — the 37 canonical builtins for v0.1
+- `stdlib/builtins-v0.1.md` — the 42 canonical builtins for v0.1
 
 When the stdlib evolves to v0.2 · those files become `*-v0.2.md` and new versions are published. The core language contract (`nika: v1`) is unchanged.
 
@@ -81,14 +81,14 @@ Selected via a single `model: <provider>/<name>` field. Any other OpenAI-compati
 
 See [stdlib/extract-modes-v0.1.md](../stdlib/extract-modes-v0.1.md).
 
-### Builtins (37)
+### Builtins (42)
 
-6 core (sleep · log · emit · assert · prompt · done)
+7 core (sleep · log · emit · assert · prompt · done · wait_until)
 + 5 file (read · write · edit · glob · grep)
-+ 19 data (jq · json_merge · yaml_validate · …)
++ 22 data (jq · json_merge · yaml_validate · uuid · date · hash · …)
 + 6 introspection (cost · records · dag_info · task_status · threads · orchestrate)
-+ 1 network (fetch)
-= **37 canonical builtins** (Stdlib v0.1)
++ 2 network (fetch · notify)
+= **42 canonical builtins** (Stdlib v0.1)
 (+ 24 media · pdf_extract · chart · qr_validate · … · **deferred** to stdlib v0.x · NOT in the v0.1 count)
 
 See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md).

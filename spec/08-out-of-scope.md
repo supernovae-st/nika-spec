@@ -240,6 +240,23 @@ providers:
 
 **Why deferred** · provider config belongs in engine config · not in workflow YAML. v0.2 may introduce a `provider_config:` envelope field for openai-compatible custom endpoints.
 
+### MCP server dependency declaration (`requires_mcp:`)
+
+```yaml
+# NOT supported in v0.1
+requires_mcp: [postgres, browser]    # engine pre-flight-validates these servers exist
+tasks: ...
+```
+
+**Why deferred** · a workflow references MCP tools by `mcp:<server>/<tool>` · the
+server set lives in **engine config** (like provider config · not workflow YAML).
+A `requires_mcp:` manifest would let the engine *pre-flight* (« no `postgres`
+server configured » *before* the run) and document intent — but it is a
+convenience, **not a v0.1 incompleteness** · a missing server already fails with
+a clear `NIKA-MCP` error at first call. Single-file v0.1 stays free of
+external-resolution declarations (the same rationale that defers `import:`).
+May land in v0.2 alongside the composition / import grammar.
+
 ---
 
 ## Observability · DEFERRED
