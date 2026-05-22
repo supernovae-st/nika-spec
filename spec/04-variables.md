@@ -49,6 +49,12 @@ ${{ secrets.X }}          masked secret reference        (vault-backed · never 
 
 Five namespaces. That's it.
 
+> **Loop-locals are not a 6th namespace.** Inside a `for_each` task body, two
+> extra identifiers are in scope — `${{ item }}` (the current element) and
+> `${{ index }}` (its 0-based position). They are **loop-scoped locals**, alive
+> only within that task's body — not global namespaces. So the count stays
+> « 5 namespaces » + the for-each locals where a loop is present.
+
 ### `${{ vars.X }}` · workflow inputs
 
 Declared once in the envelope · immutable across the workflow run · may be
@@ -72,6 +78,12 @@ tasks:
 ### `${{ with.X }}` · task-level scope
 
 Declared per-task · resolves at task dispatch time · often references upstream task outputs ·
+
+> **`with:` is optional sugar.** You can always reference `${{ tasks.X.output }}`
+> directly inside any verb field. `with:` exists to (a) pre-bind + **alias**
+> upstream values to short local names for readable prompts/commands, and (b)
+> make a task's inputs explicit at a glance. Use it when it helps readability;
+> skip it when a direct `${{ tasks.X.output }}` is clearer.
 
 ```yaml
 - id: summarize

@@ -21,6 +21,19 @@
 
 A task **must** specify exactly one of these. Multiple verbs on a single task is a validation error.
 
+### What `${{ tasks.<id>.output }}` holds · per verb
+
+Every task also exposes `.status` · `.error` · `.duration_ms`. The `.output`
+shape depends on the verb (know this before you bind downstream) ·
+
+| Verb | `.output` is | Structured when |
+|---|---|---|
+| `infer:` | the model's reply · **string** | `schema:` set → **object** matching it |
+| `exec:` | **stdout string** (default) | `capture: structured` → `{ stdout, stderr, exit_code }` |
+| `fetch:` | **extracted text string** (markdown/article/text) | `mode: jsonpath`/`metadata`/`feed`/`links` → **array/object** |
+| `invoke:` | the **tool's response** (tool-defined · string OR object) | per builtin / MCP tool schema |
+| `agent:` | the loop's **final message** · string | (the agent's last assistant turn) |
+
 ---
 
 ## `infer:` · LLM call
