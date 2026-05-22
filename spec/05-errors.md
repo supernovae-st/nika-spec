@@ -13,7 +13,7 @@ Every error is a typed structure ·
 
 ```json
 {
-  "code": "NIKA-VERB-INFER-001",
+  "code": "NIKA-INFER-001",
   "category": "provider_error",
   "message": "Anthropic API returned 503 service unavailable",
   "transient": true,
@@ -146,7 +146,7 @@ A task MAY declare an `on_error:` block to recover from non-transient errors (or
     url: "https://api.example.com/data"
   retry: { max_attempts: 3 }
   on_error:
-    fallback: $cached_data                # use another task's output
+    fallback: ${{ tasks.cached_data.output }}    # use another task's output
     # OR
     # value: { default: "empty" }         # use a literal value
     # OR
@@ -159,7 +159,7 @@ A task MAY declare an `on_error:` block to recover from non-transient errors (or
 
 | Field | Effect | Downstream sees |
 |---|---|---|
-| `fallback: $task` | Use another task's output as this task's output | `status: success` · output from fallback |
+| `fallback: ${{ tasks.X.output }}` | Use another task's output as this task's output | `status: success` · output from fallback |
 | `value: <literal>` | Use a literal value as this task's output | `status: success` · output = literal |
 | `skip: true` | Skip this task on error | `status: skipped` |
 | `fail_workflow: true` | Fail the whole workflow (default behavior) | n/a (workflow fails) |
@@ -171,7 +171,7 @@ A task MAY declare an `on_error:` block to recover from non-transient errors (or
 - id: api_call
   fetch: { url: "https://api.example.com/data" }
   on_error:
-    fallback: $cached_data
+    fallback: ${{ tasks.cached_data.output }}
 
 # Use a default on error
 - id: get_count
@@ -188,7 +188,7 @@ A task MAY declare an `on_error:` block to recover from non-transient errors (or
 
 - id: next
   depends_on: [optional_step]
-  when: $optional_step.status == "success"   # only run if not skipped
+  when: ${{ tasks.optional_step.status == 'success' }}   # only run if not skipped
   exec: { command: "..." }
 ```
 
@@ -203,7 +203,7 @@ The engine MAY auto-retry validation failures internally (transparent to the wor
 ```yaml
 - id: extract
   infer:
-    prompt: "Extract entities from · {{var.text}}"
+    prompt: "Extract entities from · ${{ vars.text }}"
     schema:
       type: object
       required: [entities]

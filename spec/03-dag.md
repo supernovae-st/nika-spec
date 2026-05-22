@@ -31,7 +31,7 @@ tasks:
 ```yaml
 - id: my-task                   # required · kebab-case · unique within workflow
   depends_on: [task_a, task_b]  # optional · default []
-  when: $task_a.status == "success"  # optional · conditional execution
+  when: ${{ tasks.task_a.status == 'success' }}  # optional · conditional execution
   retry:                        # optional · retry policy (see 05-errors.md)
     max_attempts: 3
     backoff_ms: 1000
@@ -146,11 +146,11 @@ Hard timeout for the entire task (including any retries). If exceeded · task fa
     config:                           # nested object
       max_words: 100
   infer:
-    prompt: "Summarize · style {{with.style}} · {{with.content}}"
+    prompt: "Summarize · style ${{ with.style }} · ${{ with.content }}"
 ```
 
 Injects variables into the task's scope. The variables are referenced
-via `{{with.<name>}}` substitution within the task body.
+via `${{ with.<name> }}` substitution within the task body.
 
 See [04-variables.md](./04-variables.md) for the full substitution grammar.
 
@@ -175,9 +175,9 @@ See [05-errors.md](./05-errors.md).
     raw: "$"
 ```
 
-Defines named bindings extracted from the verb's raw response via JSONPath. These bindings are available downstream as `$task_id.user_count`, `$task_id.first_user`, etc.
+Defines named bindings extracted from the verb's raw response via JSONPath. These bindings are available downstream as `${{ tasks.task_id.user_count }}`, `${{ tasks.task_id.first_user }}`, etc.
 
-If `output` is absent · the task output defaults to the verb's raw response, referenced as `$task_id`.
+If `output` is absent · the task output defaults to the verb's raw response, referenced as `${{ tasks.task_id.output }}`.
 
 ---
 
@@ -206,7 +206,7 @@ A v0.1-compliant engine MUST ·
 | `skipped` | Task was skipped (`when` evaluated false) |
 | `cancelled` | Task was cancelled (workflow cancellation or upstream failure) |
 
-A downstream task sees an upstream's status via `$task_id.status`. The default `depends_on` behavior is to run only when all deps have `success` or `skipped` status. To run regardless · use `when: true`.
+A downstream task sees an upstream's status via `${{ tasks.task_id.status }}`. The default `depends_on` behavior is to run only when all deps have `success` or `skipped` status. To run regardless · use `when: true`.
 
 ---
 
@@ -220,12 +220,12 @@ tasks:
     infer: { prompt: "Step 1" }
   - id: b
     depends_on: [a]
-    infer: { prompt: "Step 2 · prev was {{with.prev}}" }
-    with: { prev: $a }
+    infer: { prompt: "Step 2 · prev was ${{ with.prev }}" }
+    with: { prev: ${{ tasks.a.output }} }
   - id: c
     depends_on: [b]
-    infer: { prompt: "Step 3 · prev was {{with.prev}}" }
-    with: { prev: $b }
+    infer: { prompt: "Step 3 · prev was ${{ with.prev }}" }
+    with: { prev: ${{ tasks.b.output }} }
 ```
 
 ### Parallel fan-out
@@ -250,7 +250,7 @@ tasks:
       b: $analyze_b
       c: $analyze_c
     infer:
-      prompt: "Merge · {{with.a}} · {{with.b}} · {{with.c}}"
+      prompt: "Merge · ${{ with.a }} · ${{ with.b }} · ${{ with.c }}"
 ```
 
 `analyze_a` · `analyze_b` · `analyze_c` run in parallel after `setup` · `merge` runs after all three.
@@ -264,12 +264,12 @@ tasks:
 
   - id: build_prod
     depends_on: [check]
-    when: $check.output.env == "production"
+    when: ${{ tasks.check.output.env == 'production' }}
     exec: { command: "./build.sh --release" }
 
   - id: build_dev
     depends_on: [check]
-    when: $check.output.env != "production"
+    when: ${{ tasks.check.output.env != 'production' }}
     exec: { command: "./build.sh --debug" }
 
   - id: deploy

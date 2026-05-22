@@ -47,7 +47,7 @@ Standards work · SQL · GraphQL · OpenAPI · Dockerfile · GitHub Actions YAML
 
 3.  DAG SHAPE       tasks · depends_on · when · output binding
 
-4.  VARIABLES       {{var}} substitution
+4.  VARIABLES       ${{ ... }} substitution
                     $task_id reference
                     with: scope rules
 
@@ -97,7 +97,7 @@ tasks:
     with:
       content: $fetch_page
     infer:
-      prompt: "Summarize in 3 bullets · {{with.content}}"
+      prompt: "Summarize in 3 bullets · ${{ with.content }}"
 
   - id: write_file
     depends_on: [summarize]
@@ -107,7 +107,7 @@ tasks:
       tool: "nika:write"
       args:
         path: "summary.md"
-        content: "{{with.summary}}"
+        content: "${{ with.summary }}"
 ```
 
 3 tasks · DAG with deps · 3 different verbs (`fetch:` · `infer:` · `invoke:`) · variable substitution + task output reference.
@@ -121,7 +121,7 @@ tasks:
 | [01 envelope](./01-envelope.md) | The required header · `apiVersion` · `schema` · `workflow` |
 | [02 verbs](./02-verbs.md) | The 5 verbs · signatures · semantics |
 | [03 DAG](./03-dag.md) | Tasks · `depends_on` · `when` · output binding |
-| [04 variables](./04-variables.md) | `{{var}}` · `$task_id` · `with:` scope |
+| [04 variables](./04-variables.md) | `${{ vars.X }}` · `${{ with.X }}` · `${{ tasks.X.output }}` · `${{ env.X }}` |
 | [05 errors](./05-errors.md) | Error codes · retry · structured output schemas |
 | [06 stdlib contract](./06-stdlib-contract.md) | How the stdlib versions independently |
 | [07 conformance](./07-conformance.md) | What « v0.1-compliant » means |

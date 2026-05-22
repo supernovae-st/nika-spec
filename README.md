@@ -89,9 +89,9 @@ nika-spec/
 ├── conformance/               ← test suite for any implementation
 │
 └── stdlib/                    ← versioned independently
-    ├── providers-v0.1.md        9 providers canonical (anthropic · openai · …)
+    ├── providers-v0.1.md        8 providers canonical (anthropic · openai · …)
     ├── extract-modes-v0.1.md    9 extract modes (markdown · article · jsonpath · …)
-    └── builtins-v0.1.md         61 builtins curated (core · file · data · …)
+    └── builtins-v0.1.md         36 builtins curated (core · file · data · …)
 ```
 
 ---

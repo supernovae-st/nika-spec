@@ -34,7 +34,7 @@ description: "Fetch + summarize"        # optional · human-readable
 provider: anthropic                     # optional · default LLM provider
 model: claude-3-5-sonnet                # optional · default model
 
-# Workflow-level variables · available as {{var}} in every task
+# Workflow-level variables · available as ${{ vars.<name> }} in every task
 vars:
   output_dir: "./output"
   base_url: "https://example.com"
@@ -124,7 +124,7 @@ vars:
   api_token: "${env:MY_TOKEN}"        # env var reference
 ```
 
-Variables available in every task via `{{var.<name>}}` substitution. See
+Variables available in every task via `${{ vars.<name> }}` substitution. See
 [04-variables.md](./04-variables.md) for the full substitution grammar.
 
 ### `tasks` · **required · non-empty**
@@ -184,7 +184,7 @@ vars:
 tasks:
   - id: research
     infer:
-      prompt: "Research the topic · {{var.topic}} · in 5 paragraphs"
+      prompt: "Research the topic · ${{ vars.topic }} · in 5 paragraphs"
 
   - id: write
     depends_on: [research]
@@ -193,8 +193,8 @@ tasks:
     invoke:
       tool: "nika:write"
       args:
-        path: "{{var.output_path}}"
-        content: "{{with.content}}"
+        path: "${{ vars.output_path }}"
+        content: "${{ with.content }}"
 ```
 
 ---

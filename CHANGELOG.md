@@ -25,7 +25,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   included for implementers).
 - `spec/` · 9 markdown sections covering envelope · 5 verbs · DAG · variables ·
   errors · stdlib contract · conformance · out-of-scope.
-- `stdlib/` · curated v0.1 inclusions (9 providers · 9 extract modes · 61
+- `stdlib/` · curated v0.1 inclusions (8 providers · 9 extract modes · 36
   builtins · 24 media builtins deferred to stdlib v0.x).
 - `examples/` placeholder (26 canonical workflows to be recopied clean from
   the brouillon exploration era).

@@ -14,7 +14,7 @@ Three nested levels · increasing scope ·
 |---|---|---|
 | **Core** | Parse + validate · DAG semantics · variable resolution · error structure | Linters · spec editors · static analyzers |
 | **Runtime** | Core + verb execution | Working engine (with own provider/tool impls) |
-| **Stdlib v0.1** | Runtime + the 9 providers + 9 extract modes + 37 builtins (61 total minus 24 deferred media) | Full reference-impl-equivalent engine |
+| **Stdlib v0.1** | Runtime + the 8 providers + 9 extract modes + 36 builtins | Full reference-impl-equivalent engine |
 
 A higher level **includes** the lower levels.
 
@@ -36,10 +36,10 @@ An engine claims « Core v0.1-compliant » if it ·
    - Computes topological waves for parallel execution
 
 3. **Resolves variables** correctly
-   - `{{var.x}}` from envelope `vars:`
-   - `{{with.x}}` from task `with:` block
-   - `{{$task.field}}` from upstream task outputs
-   - `{{env.X}}` from environment (engine MAY restrict)
+   - `${{ vars.x }}` from envelope `vars:`
+   - `${{ with.x }}` from task `with:` block
+   - `${{ tasks.X.field }}` from upstream task outputs
+   - `${{ env.X }}` from environment (engine MAY restrict)
    - Reports undefined references with `NIKA-VAR-001`
 
 4. **Produces typed errors** matching the v0.1 spec
@@ -97,7 +97,7 @@ Runtime-compliant engines may bring **their own** provider implementations · to
 
 An engine claims « Stdlib v0.1-compliant » if it satisfies Runtime conformance PLUS ·
 
-1. **Ships all 9 canonical providers** (per [stdlib/providers-v0.1.md](../stdlib/providers-v0.1.md))
+1. **Ships all 8 canonical providers** (per [stdlib/providers-v0.1.md](../stdlib/providers-v0.1.md))
 2. **Ships all 9 canonical extract modes** (per [stdlib/extract-modes-v0.1.md](../stdlib/extract-modes-v0.1.md))
 3. **Ships at least all 36 canonical builtins (post pantheon 2026-05-22)** (core 7 + file 5 + data 19 + introspection 6 · the 24 media builtins are optional)
 4. **Passes** all tests in `conformance/tests/stdlib/`

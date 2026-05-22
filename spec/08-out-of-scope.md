@@ -160,7 +160,7 @@ pin in the envelope (`apiVersion: nika.sh/v1` already does this for major). Per-
 # NOT supported in v0.1
 - id: recall
   memory:
-    query: "Previous conversations about · {{var.topic}}"
+    query: "Previous conversations about · ${{ vars.topic }}"
     top_k: 5
 ```
 

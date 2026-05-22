@@ -64,7 +64,7 @@ A single LLM call. The result is the model's response.
 
 | Field | Required | Type | Notes |
 |---|---|---|---|
-| `prompt` | yes | string | User prompt · may use `{{var}}` substitution |
+| `prompt` | yes | string | User prompt · may use `${{ ... }}` substitution |
 | `system` | no | string | System prompt |
 | `provider` | no | string | Override workflow default · see stdlib/providers-v0.1.md |
 | `model` | no | string | Override workflow default · provider-specific |
@@ -115,11 +115,11 @@ Run a shell command. The result is the command's stdout (default) or a structure
 
 | Field | Required | Type | Notes |
 |---|---|---|---|
-| `command` | yes | string | Command to run · may use `{{var}}` substitution |
+| `command` | yes | string | Command to run · may use `${{ ... }}` substitution |
 | `cwd` | no | string | Working directory · default = engine's cwd |
 | `timeout_ms` | no | integer | Default 30000 (30s) · max engine-configurable |
 | `env` | no | object | Extra env vars · merged with engine env |
-| `stdin` | no | string | Stdin data · may use `{{var}}` |
+| `stdin` | no | string | Stdin data · may use `${{ ... }}` |
 | `capture` | no | enum | `stdout` (default) · `stderr` · `combined` · `structured` (= `{ stdout, stderr, exit_code }`) |
 
 ### Security
@@ -180,7 +180,7 @@ Defaults · `method: GET` · `mode: markdown`.
 
 | Field | Required | Type | Notes |
 |---|---|---|---|
-| `url` | yes | string | Target URL · may use `{{var}}` |
+| `url` | yes | string | Target URL · may use `${{ ... }}` |
 | `method` | no | enum | `GET` (default) · `POST` · `PUT` · `DELETE` · `PATCH` · `HEAD` |
 | `headers` | no | object | Extra request headers |
 | `body` | no | string\|object | Request body · objects auto-serialized to JSON |

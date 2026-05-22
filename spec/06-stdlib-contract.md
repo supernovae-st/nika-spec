@@ -44,9 +44,9 @@ Three reasons ·
 
 The stdlib has **independent versioning** ·
 
-- `stdlib/providers-v0.1.md` — the 9 canonical providers for v0.1
+- `stdlib/providers-v0.1.md` — the 8 canonical providers for v0.1
 - `stdlib/extract-modes-v0.1.md` — the 9 canonical extract modes for v0.1
-- `stdlib/builtins-v0.1.md` — the 61 canonical builtins for v0.1
+- `stdlib/builtins-v0.1.md` — the 36 canonical builtins for v0.1
 
 When the stdlib evolves to v0.2 · those files become `*-v0.2.md` and new versions are published. The core language reference (`apiVersion: nika.sh/v1`) is unchanged.
 
@@ -81,13 +81,14 @@ See [stdlib/providers-v0.1.md](../stdlib/providers-v0.1.md).
 
 See [stdlib/extract-modes-v0.1.md](../stdlib/extract-modes-v0.1.md).
 
-### Builtins (61)
+### Builtins (36)
 
-7 core (sleep · log · emit · assert · prompt · run · complete)
+6 core (sleep · log · emit · assert · prompt · done)
 + 5 file (read · write · edit · glob · grep)
 + 19 data (jq · json_merge · yaml_validate · …)
 + 6 introspection (cost · records · dag_info · task_status · threads · orchestrate)
-+ 24 media (pdf_extract · chart · qr_validate · …) — **deferred** to stdlib v0.x
+= **36 canonical builtins** (Stdlib v0.1)
+(+ 24 media · pdf_extract · chart · qr_validate · … · **deferred** to stdlib v0.x · NOT in the v0.1 count · per D-2026-05-22-N8)
 
 See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md).
 
@@ -173,7 +174,7 @@ See [07-conformance.md](./07-conformance.md). In summary ·
 |---|---|
 | Core | None · only parse + DAG + variable + error · no execution needed |
 | Runtime | Must execute the 5 verbs · provider/tool implementations engine's choice |
-| Stdlib v0.1 | Must ship the 9 providers + 9 extract modes + 61 builtins |
+| Stdlib v0.1 | Must ship the 8 providers + 9 extract modes + 36 builtins |
 | Stdlib v0.1+media | Stdlib v0.1 + 24 media builtins |
 
 A v0.1-compliant engine for a workflow author depends on which level they need.

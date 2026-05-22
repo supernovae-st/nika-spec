@@ -1,6 +1,6 @@
 # Stdlib v0.1 · Builtins
 
-> The canonical 37 builtins shipped with Stdlib v0.1-compliant engines.
+> The canonical 36 builtins shipped with Stdlib v0.1-compliant engines.
 > Invoked via `invoke: tool: "nika:<name>"`. Plus 24 media builtins
 > deferred to stdlib v0.x (`opt-in feature flag`).
 
@@ -46,7 +46,7 @@ invoke:
   tool: "nika:log"
   args:
     level: info        # debug | info | warn | error
-    message: "Processing user {{var.user_id}}"
+    message: "Processing user ${{ vars.user_id }}"
     data: { foo: "bar" }    # optional structured data
 ```
 
@@ -325,7 +325,7 @@ invoke:
       - key: "fetched_at"
         value: "$now"
       - key: "source"
-        value: "{{var.source_name}}"
+        value: "${{ vars.source_name }}"
 ```
 
 Add fields to an object.
@@ -477,4 +477,4 @@ New builtins MAY enter stdlib v0.x. Builtin removal is **never** allowed within 
 
 ---
 
-🦋 *37 builtins canonical · 24 deferred · clear forever.*
+🦋 *36 builtins canonical · 24 media deferred · clear forever.*
