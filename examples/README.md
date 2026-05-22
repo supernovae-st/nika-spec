@@ -6,17 +6,41 @@
 
 ---
 
-## Status · placeholder for v0.1.0-draft
+## Status · 7 foundation examples shipped · 19 pending
 
-The examples are pending for v0.1.0 GA. They distill **26 workflows from an
-earlier Nika prototype** — the empirical source of what real workflows look
-like — into a clean canonical set.
+The **7-example foundation set** (✅ below) is shipped — it covers the
+*complete v0.1 construct space* so an LLM few-shot-prompted on these has seen
+every load-bearing pattern: all 4 verbs · `depends_on` · `when` · `for_each`
+(+ `max_parallel` + `fail_fast`) · `retry` · `on_error` · `on_finally` ·
+`with` · `output:` JSONPath binding · `schema:` structured output · the 5
+namespaces · `${{ item }}`/`${{ index }}` loop locals · tool refs. This is the
+**Phase L2 few-shot library** seed (per `nika/hq/blueprint/NIKA_EXECUTION_PHASES.md`):
+the literal training signal that teaches an LLM to author Nika correctly.
 
-Each will be re-authored to · (a) match the v0.1 envelope exactly
-(`nika: v1`) · (b) use only stdlib v0.1 inclusions · (c) carry an SPDX
-Apache-2.0 header · (d) pass the conformance suite.
+The remaining 19 distill **26 workflows from an earlier Nika prototype** — the
+empirical source of what real workflows look like — into a clean canonical set.
 
-## Planned examples
+Every example · (a) matches the v0.1 envelope exactly (`nika: v1`) · (b) uses
+only stdlib v0.1 inclusions · (c) carries an SPDX Apache-2.0 header · (d) is
+authored to pass the conformance suite (YAML-parse + spec-lint verified ·
+one-verb-per-task · snake_case ids · resolvable deps · zero phantom builtins).
+
+## Shipped · the 7-example foundation set
+
+```
+examples/
+├── 01-hello.nika.yaml            ✅  envelope · 1 infer task · mock model
+├── 06-parallel-fanout.nika.yaml  ✅  DAG fan-out + merge · depends_on · with
+├── 16-exec-pipeline.nika.yaml    ✅  exec · capture:structured · timeout · when · on_finally
+├── 19-schema-retry.nika.yaml     ✅  infer schema (JSON Schema) · retry · typed vars
+├── 22-fetch-chain.nika.yaml      ✅  invoke nika:fetch · output: JSONPath · on_error fallback
+├── 23-code-review.nika.yaml      ✅  agent loop · default-deny tools · max_turns · nika:done
+└── 26-for-each-locales.nika.yaml ✅  for_each · max_parallel · fail_fast · item/index
+```
+
+Together these exercise every v0.1 construct an LLM must learn to author Nika.
+
+## Full planned set (26)
 
 ```
 examples/
@@ -74,4 +98,4 @@ nika run examples/01-hello.nika.yaml
 
 ---
 
-🦋 *26 examples · canonical · pending for v0.1.0 GA.*
+🦋 *7 foundation examples shipped (full v0.1 construct coverage) · 19 pending · canonical for v0.1.0 GA.*
