@@ -44,7 +44,7 @@ Three reasons ·
 
 The stdlib has **independent versioning** ·
 
-- `stdlib/providers-v0.1.md` — the 10 canonical providers for v0.1
+- `stdlib/providers-v0.1.md` — the 13 canonical providers for v0.1
 - `stdlib/extract-modes-v0.1.md` — the 9 canonical extract modes for v0.1
 - `stdlib/builtins-v0.1.md` — the 36 canonical builtins for v0.1
 
@@ -69,11 +69,11 @@ The reference engine provides these elements behind strict quality gates. Other 
 
 ## What's IN stdlib v0.1
 
-### Providers (10)
+### Providers (13)
 
-`anthropic` · `openai` · `mistral` · `groq` · `deepseek` · `gemini` · `xai` · `ollama` (local) · `lmstudio` (local) · `mock`
+`anthropic` · `openai` · `mistral` · `groq` · `deepseek` · `gemini` · `xai` (7 cloud) · `ollama` · `lmstudio` · `llamacpp` · `localai` · `vllm` (5 local) · `mock` (test)
 
-Selected via a single `model: <provider>/<name>` field. See [stdlib/providers-v0.1.md](../stdlib/providers-v0.1.md).
+Selected via a single `model: <provider>/<name>` field. Any other OpenAI-compatible local/remote server routes through the `openai` + `base_url` escape hatch (no new provider name). See [stdlib/providers-v0.1.md](../stdlib/providers-v0.1.md).
 
 ### Extract modes (9)
 
@@ -88,7 +88,7 @@ See [stdlib/extract-modes-v0.1.md](../stdlib/extract-modes-v0.1.md).
 + 19 data (jq · json_merge · yaml_validate · …)
 + 6 introspection (cost · records · dag_info · task_status · threads · orchestrate)
 = **36 canonical builtins** (Stdlib v0.1)
-(+ 24 media · pdf_extract · chart · qr_validate · … · **deferred** to stdlib v0.x · NOT in the v0.1 count · per D-2026-05-22-N8)
+(+ 24 media · pdf_extract · chart · qr_validate · … · **deferred** to stdlib v0.x · NOT in the v0.1 count)
 
 See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md).
 
@@ -148,7 +148,7 @@ invoke:
 
 These are not stdlib · they depend on the engine's MCP server registry being configured.
 
-## Namespace ownership · `nika:` · `mcp:` · `x-` (post pantheon 2026-05-22)
+## Namespace ownership · `nika:` · `mcp:` · `x-`
 
 The three canonical tool namespaces ·
 
@@ -162,7 +162,7 @@ The `nika:*` namespace is **spec-owned**. A custom engine MUST NOT add tools to 
 
 Custom engines that want to ship engine-specific builtins MUST use the `x-<vendor>:*` prefix. Workflows referencing `x-*` tools are explicitly NOT portable across engines · the workflow author acknowledges the vendor lock-in.
 
-This is the OpenAPI `x-` extension pattern · industry canonical. Pantheon council ratified 2026-05-22 (4-0 vote).
+This is the OpenAPI `x-` extension pattern · industry canonical.
 
 ---
 
@@ -174,7 +174,7 @@ See [07-conformance.md](./07-conformance.md). In summary ·
 |---|---|
 | Core | None · only parse + DAG + variable + error · no execution needed |
 | Runtime | Must execute the 5 verbs · provider/tool implementations engine's choice |
-| Stdlib v0.1 | Must ship the 10 providers + 9 extract modes + 36 builtins |
+| Stdlib v0.1 | Must ship the 13 providers + 9 extract modes + 36 builtins |
 | Stdlib v0.1+media | Stdlib v0.1 + 24 media builtins |
 
 A v0.1-compliant engine for a workflow author depends on which level they need.

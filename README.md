@@ -86,7 +86,7 @@ nika-spec/
 ├── conformance/               ← test suite for any implementation
 │
 └── stdlib/                    ← versioned independently
-    ├── providers-v0.1.md        10 providers canonical (anthropic · openai · …)
+    ├── providers-v0.1.md        13 providers canonical (anthropic · openai · …)
     ├── extract-modes-v0.1.md    9 extract modes (markdown · article · jsonpath · …)
     └── builtins-v0.1.md         36 builtins curated (core · file · data · …)
 ```
@@ -137,7 +137,7 @@ Nika is that for AI workflows.
 ## Status
 
 - v0.1.0-draft · spec drafted · examples + conformance + schemas pending
-- v0.1.0 GA · target Q3 2026 (after pantheon review + example recopy +
+- v0.1.0 GA · target Q3 2026 (after spec review + examples +
   conformance suite + schemas)
 
 Forever after GA · the 5 pillars are locked. Stdlib evolves independently.

@@ -22,7 +22,7 @@ conformance/
 │   │   │   ├── 001-valid-minimal/
 │   │   │   │   ├── input.yaml
 │   │   │   │   └── expected.json
-│   │   │   ├── 002-missing-apiVersion/
+│   │   │   ├── 002-missing-envelope/
 │   │   │   ├── 003-bad-workflow-id/
 │   │   │   └── ...
 │   │   ├── verbs-shape/
@@ -70,7 +70,7 @@ conformance-runner --engine "nika run --input -" --tests ./tests/core/
 
 # Output
 PASS  core/envelope/001-valid-minimal
-PASS  core/envelope/002-missing-apiVersion
+PASS  core/envelope/002-missing-envelope
 FAIL  core/dag-topology/001-cycle-detection (expected NIKA-DAG-001, got NIKA-PARSE-007)
 ...
 

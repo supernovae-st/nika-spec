@@ -67,8 +67,7 @@ the workflow file.
 the **subtraction operator** — `tasks.research-topic.output` would parse as
 `tasks.research - topic.output`, a silent trap. Snake_case ids are always
 clean CEL identifiers. (The workflow-level `workflow:` id stays kebab-case —
-it is a resource name, never referenced inside an expression. Locked
-D-2026-05-22-N11.)
+it is a resource name, never referenced inside an expression.)
 
 ### `depends_on` · *optional · default `[]`*
 
@@ -99,8 +98,7 @@ Everything inside `${{ ... }}` — both value substitution and `when:`
 conditions — is **[CEL](https://cel.dev) (Common Expression Language)**, the
 validated, non-Turing-complete, side-effect-free expression standard used by
 Kubernetes (ValidatingAdmissionPolicy), Kyverno, Envoy, and gRPC. Nika does
-**not** invent an expression DSL — it adopts the standard. (Locked
-D-2026-05-22-N11; this supersedes the « custom minimal DSL » framing.)
+**not** invent an expression DSL — it adopts the standard. (This supersedes the « custom minimal DSL » framing.)
 
 **Why CEL** · it is *common* (millions of K8s users), *comprehensible*
 (reads like a boolean expression), *validated* (a published spec + multiple
@@ -180,7 +178,7 @@ Semantics (closed at v1) ·
 
 This is the one construct that lets a v1 workflow process a
 runtime-computed number of items (N files · N search hits · N pages)
-without statically enumerating tasks. Locked D-2026-05-22-N10.
+without statically enumerating tasks.
 
 ### `timeout_ms` · *optional · task-level timeout*
 

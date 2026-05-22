@@ -115,9 +115,15 @@ Run a shell command. The result is the command's stdout (default) or a structure
 |---|---|---|---|
 | `command` | yes | string | Command to run · may use `${{ ... }}` substitution |
 | `cwd` | no | string | Working directory · default = engine's cwd |
-| `env` | no | object | Extra subprocess env vars · merged with engine env (distinct from the envelope `env:`) |
+| `env` | no | object | OS environment variables for **this subprocess** · key→value map |
 | `stdin` | no | string | Stdin data · may use `${{ ... }}` |
 | `capture` | no | enum | `stdout` (default) · `stderr` · `combined` · `structured` (= `{ stdout, stderr, exit_code }`) |
+
+> **`exec.env` ≠ the envelope `env:`** — different scopes, same word (the one
+> overlap to know). The envelope `env:` is *workflow config* read via
+> `${{ env.* }}`; `exec.env` is the *OS environment of this subprocess*. They
+> are NOT auto-connected — to pass a workflow value into the process, do it
+> explicitly: `env: { API_BASE: "${{ env.API_BASE }}" }`.
 
 > `timeout_ms` and `retry` are **task-level** fields (see [03-dag.md](./03-dag.md)) — they apply uniformly to every verb, so they are not repeated inside `exec:`.
 
@@ -209,7 +215,7 @@ The engine MUST ·
 
 Call a builtin (`nika:` namespace) or an MCP tool (`mcp:` namespace). The result is the tool's response.
 
-### Tool reference grammar (canonical · D-2026-05-22-N11)
+### Tool reference grammar (canonical)
 
 ```
 <namespace>:<path>          one colon introduces the namespace · `/` separates the path
@@ -305,7 +311,7 @@ Run an agentic loop · the model + a set of tools · iterating until completion 
 | `system` | no | string | System prompt |
 | `prompt` | yes | string | Initial user message (same field name as `infer:` · consistent) |
 | `model` | no | string | Override workflow default · `<provider>/<name>` |
-| `tools` | no | array | Tool whitelist · glob patterns · **default-deny** · if absent the agent gets NO tools (pure conversation · least-privilege · per D-2026-05-22-N11). Grant explicitly. |
+| `tools` | no | array | Tool whitelist · glob patterns · **default-deny** · if absent the agent gets NO tools (pure conversation · least-privilege). Grant explicitly. |
 | `max_turns` | no | integer | Loop limit · default 10 |
 | `max_tokens_total` | no | integer | Cumulative token budget · default engine-configurable |
 | `temperature` | no | number 0-2 | Sampling temperature |
@@ -358,7 +364,7 @@ The engine MUST ·
 
 ## Forward-compat
 
-The 5 verb names are **immutable forever** — and the count is **5, absolute**. The operation space is complete: call a model (`infer`), run a command (`exec`), fetch + extract content (`fetch`), call a tool (`invoke`), run an agentic loop (`agent`). Every other capability is either an **invoke-able tool** (a database query → `invoke: mcp:postgres/query` · a file write → `invoke: nika:write` · cognitive recall → `invoke: nika:connectome/recall`) or a **DAG control-flow construct** (iteration → `for_each` · branching → `when`). A 6th verb would require a `nika: v2` contract — and per forever-v0.x, that is effectively never. (Locked D-2026-05-22-N10.)
+The 5 verb names are **immutable forever** — and the count is **5, absolute**. The operation space is complete: call a model (`infer`), run a command (`exec`), fetch + extract content (`fetch`), call a tool (`invoke`), run an agentic loop (`agent`). Every other capability is either an **invoke-able tool** (a database query → `invoke: mcp:postgres/query` · a file write → `invoke: nika:write` · cognitive recall → `invoke: nika:connectome/recall`) or a **DAG control-flow construct** (iteration → `for_each` · branching → `when`). A 6th verb would require a `nika: v2` contract — and per forever-v0.x, that is effectively never.
 
 Field additions to each verb are **additive** within `nika: v1` (feature-detected · no minor version in the file). Field removal NEVER happens at v1.
 

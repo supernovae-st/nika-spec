@@ -1,13 +1,13 @@
 # Stdlib v0.1 · Providers
 
-> The canonical 10 providers shipped with v0.1-compliant engines. Each
+> The canonical 13 providers shipped with v0.1-compliant engines. Each
 > provider implements the same interface (LLM chat completion + optional
 > streaming + vision + structured output) against a different backend.
 > You select one with a single `model: <provider>/<name>` field.
 
 ---
 
-## Model selection · ONE field · `model: <provider>/<name>` (D-2026-05-22-N13)
+## Model selection · ONE field · `model: <provider>/<name>`
 
 You select an LLM with a **single `model:` field** in the form
 `<provider>/<model-name>` — the de-facto standard convention (LiteLLM ·
@@ -45,12 +45,12 @@ tasks:
 
 ---
 
-## The 10 canonical providers (D-2026-05-22-N13)
+## The 13 canonical providers
 
 | Provider | Backend | Local? | Auth |
 |---|---|---|---|
 | `anthropic` | Anthropic Claude API | cloud | `${{ secrets.* }}` |
-| `openai` | OpenAI API | cloud | `${{ secrets.* }}` |
+| `openai` | OpenAI API (+ the universal OpenAI-compat escape hatch · see below) | cloud | `${{ secrets.* }}` |
 | `mistral` | Mistral AI API (EU · sovereign-leaning) | cloud | `${{ secrets.* }}` |
 | `groq` | Groq Cloud (fastest open-weight) | cloud | `${{ secrets.* }}` |
 | `deepseek` | DeepSeek API (reasoning · cost-efficient) | cloud | `${{ secrets.* }}` |
@@ -58,9 +58,15 @@ tasks:
 | `xai` | xAI Grok API | cloud | `${{ secrets.* }}` |
 | `ollama` | Ollama daemon (`localhost:11434`) | **local** | none |
 | `lmstudio` | LM Studio (`localhost:1234/v1`) | **local** | none |
+| `llamacpp` | llama.cpp `llama-server` (`localhost:8080/v1`) | **local** | none |
+| `localai` | LocalAI (`localhost:8080/v1` · OpenAI drop-in · multi-backend) | **local** | none |
+| `vllm` | vLLM OpenAI server (`localhost:8000/v1` · high-throughput · self-hosted) | **local** | none |
 | `mock` | deterministic test fixture · no LLM call | test | none |
 
-A Stdlib v0.1-compliant engine MUST ship all **10**.
+A Stdlib v0.1-compliant engine MUST ship all **13** (7 cloud · 5 local · 1 test).
+Any *other* OpenAI-compatible local server (Jan · llamafile · KoboldCpp ·
+text-generation-webui · a custom one) routes through the **`openai` escape
+hatch** below — no new provider name needed.
 
 ## Local vs cloud · the prefix decides
 
@@ -68,21 +74,41 @@ The **provider prefix IS the local/cloud signal** — no separate `local:` flag,
 no hidden config to read:
 
 ```
-ollama/…     lmstudio/…          → LOCAL  · localhost · no API key · sovereign
-anthropic/…  openai/…  groq/…    → CLOUD  · remote API · key via ${{ secrets.* }}
-…  mistral/…  deepseek/…  gemini/…  xai/…
-mock/…                            → TEST   · deterministic fixture
+ollama/…  lmstudio/…  llamacpp/…  localai/…  vllm/…   → LOCAL · localhost · no key · sovereign
+anthropic/…  openai/…  groq/…  mistral/…  deepseek/…   → CLOUD · remote API · key via ${{ secrets.* }}
+  …  gemini/…  xai/…
+mock/…                                                 → TEST  · deterministic fixture
 ```
 
-Sovereignty (Rule 1) · **local-first** · nothing leaves the machine unless a
+Sovereignty · **local-first** · nothing leaves the machine unless a
 cloud provider is *explicitly* selected. `ollama/llama3.1` makes a sovereign,
 zero-cloud run trivial.
 
-`ollama` and `lmstudio` are external **HTTP servers** (OpenAI-compatible API ·
-the engine talks to them over localhost). They are NOT the in-process GGUF
-runtime `native`, which was DEFERRED post pantheon (D-2026-05-22-N8 · mistral.rs
-crashed the host) — re-enters stdlib v0.x when a candle/llama.cpp binding
-stabilizes + 30-day crash-free cohort + cross-platform conformance.
+All 5 local providers are external **HTTP servers** (OpenAI-compatible API · the
+engine talks to them over localhost). They are NOT the in-process GGUF runtime
+`native`, which was DEFERRED (mistral.rs crashed
+the host) — re-enters stdlib v0.x when a candle/llama.cpp binding stabilizes +
+30-day crash-free cohort + cross-platform conformance. **The named local
+providers are ergonomic shortcuts; the long tail uses the escape hatch.**
+
+## The `openai` escape hatch · any OpenAI-compatible server
+
+Most local servers (and many cloud gateways · OpenRouter · Together · etc.)
+speak the **OpenAI chat-completions protocol**. Rather than mint a provider
+name for every one, the `openai` provider accepts a `base_url` override in
+**engine config** (never in the workflow) and routes there:
+
+```
+model: openai/<model-name>          # workflow · unchanged · selects the model
+OPENAI_BASE_URL=http://localhost:1337/v1   # engine config · points at Jan
+```
+
+This is the LiteLLM pattern: **named providers for the popular backends ·
+`openai`+base_url for everything else.** It is how Jan · llamafile ·
+KoboldCpp · text-generation-webui · and any custom OpenAI-compatible server
+run today — zero spec change, the stdlib stays curated, the long tail is
+covered. Adding a *new named* local provider later (its own prefix) is an
+additive stdlib bump — also already planned.
 
 ## Provider config lives OUTSIDE the workflow
 
@@ -154,7 +180,7 @@ infer:
 
 **Features** · tool use · vision · structured output (JSON mode).
 
-**Compat endpoints** · the openai provider also routes any openai-compatible endpoint (`OPENAI_BASE_URL` override). Used by · LM Studio · Ollama compatibility mode · LocalAI · Groq's OpenAI-compat endpoint · OpenRouter · etc.
+**Escape hatch** · the openai provider routes ANY OpenAI-compatible endpoint via the `OPENAI_BASE_URL` engine-config override (see « The `openai` escape hatch » above). Covers the local servers without their own named provider — **Jan · llamafile · KoboldCpp · text-generation-webui** — plus cloud gateways (**OpenRouter · Together · Fireworks**) and custom servers. The popular local servers (`ollama` · `lmstudio` · `llamacpp` · `localai` · `vllm`) have their own named prefix and don't need this.
 
 ---
 
@@ -274,6 +300,60 @@ infer:
 
 ---
 
+### `llamacpp` · **local-first sovereign**
+
+```yaml
+infer:
+  model: llamacpp/qwen2.5-7b-instruct
+  prompt: "..."
+```
+
+**Backend** · llama.cpp's `llama-server` (`http://localhost:8080/v1`) · OpenAI-compatible API · the reference local inference server.
+
+**Models** · whatever GGUF you serve with `llama-server` · pass-through.
+
+**Auth** · none (localhost).
+
+**Features** · 100% local · zero cloud egress · GPU + CPU · the leanest local server.
+
+---
+
+### `localai` · **local-first sovereign**
+
+```yaml
+infer:
+  model: localai/llama-3.1-8b-instruct
+  prompt: "..."
+```
+
+**Backend** · LocalAI (`http://localhost:8080/v1`) · OpenAI drop-in · multi-backend (llama.cpp · transformers · diffusers · etc.).
+
+**Models** · whatever LocalAI has configured · pass-through.
+
+**Auth** · none (localhost · optional API key).
+
+**Features** · 100% local · zero cloud egress · multi-modal · OpenAI API surface for the whole local stack.
+
+---
+
+### `vllm` · **local / self-hosted**
+
+```yaml
+infer:
+  model: vllm/meta-llama-3.1-70b-instruct
+  prompt: "..."
+```
+
+**Backend** · vLLM's OpenAI server (`http://localhost:8000/v1`) · high-throughput batched serving.
+
+**Models** · whatever vLLM is serving · pass-through.
+
+**Auth** · none locally (optional token if the deployment sets one).
+
+**Features** · highest throughput for open-weight models · local OR self-hosted on your own GPU box (sovereign as long as it's your infra).
+
+---
+
 ### `mock`
 
 ```yaml
@@ -327,4 +407,4 @@ The reference engine implements `provider_options:` as best-effort pass-through.
 
 ---
 
-🦋 *10 providers · 1 contract · sovereignty preserved.*
+🦋 *13 providers · 1 contract · sovereignty preserved.*

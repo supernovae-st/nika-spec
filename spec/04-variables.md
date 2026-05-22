@@ -33,7 +33,7 @@ Language · the validated, non-Turing-complete standard used by Kubernetes,
 Envoy, and gRPC). A bare reference like `${{ vars.topic }}` is a CEL identifier
 path that evaluates to its value; a condition like `${{ tasks.test.coverage > 80 }}`
 is a CEL boolean. One expression language, everywhere — Nika does not invent a
-DSL (per D-2026-05-22-N11). See [03-dag.md](./03-dag.md#expression-language--a-documented-subset-of-cel) for the v0.1 CEL subset.
+DSL. See [03-dag.md](./03-dag.md#expression-language--a-documented-subset-of-cel) for the v0.1 CEL subset.
 
 ---
 
@@ -216,7 +216,7 @@ infer:
 
 ## Why one syntax everywhere
 
-Earlier draft of this spec proposed two syntaxes (`$task_id` in value positions · `{{var}}` inside strings). User feedback during v0.1 design surfaced this as a confusion source. Pantheon council (Jobs · Rams · Hykes · Carmack lenses · 2026-05-22) ratified unanimous unification to `${{ }}`.
+An earlier draft proposed two syntaxes (`$task_id` in value positions · `{{var}}` inside strings). That was a confusion source · v0.1 unifies on a single `${{ }}` syntax for everything.
 
 Reasons ·
 

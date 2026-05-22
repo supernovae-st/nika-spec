@@ -49,7 +49,7 @@ tasks: ...
       workflow: ./subroutine.nika.yaml
 ```
 
-**Why deferred** · subroutine calling needs scope/binding rules that need thought · plus risks of stack overflow (recursion) and scheduler complexity. Pantheon council ratified killing the proposed `nika:run` builtin 2026-05-22 (3-1 verdict · Jobs+Rams+Carmack kill · Hykes argued for keeping as "FROM scratch" composition primitive).
+**Why deferred** · subroutine calling needs scope/binding rules that need thought · plus risks of stack overflow (recursion) and scheduler complexity. The proposed `nika:run` builtin is therefore deferred from v0.1 · use `exec: command: "nika run subroutine.yaml"` as the workaround.
 
 Workaround in v0.1 · use `exec: command: "nika run subroutine.yaml"` to launch a sibling workflow process.
 

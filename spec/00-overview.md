@@ -139,7 +139,7 @@ See [`08-out-of-scope.md`](./08-out-of-scope.md) for the explicit list.
 
 ## Forever-v0.x
 
-This spec follows the **forever-v0.x** discipline (per the reference engine ADR-002). No v1.0 release target. The 5 pillars are locked at the `nika: v1` contract · minor language additions are additive only (feature-detected · no minor version in the file) · breaking changes would ship as a new contract (`nika: v2`) with its own spec — and per forever-v0.x, that is effectively never.
+This spec follows the **forever-v0.x** discipline. No v1.0 release target. The 5 pillars are locked at the `nika: v1` contract · minor language additions are additive only (feature-detected · no minor version in the file) · breaking changes would ship as a new contract (`nika: v2`) with its own spec — and per forever-v0.x, that is effectively never.
 
 In practice · we expect v1 to last 10+ years.
 

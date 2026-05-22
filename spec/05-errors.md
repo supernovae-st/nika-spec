@@ -116,7 +116,7 @@ A task MAY declare a `retry:` block. Retries apply to **transient** errors only 
 | `backoff_ms` | no | integer | Initial backoff · default 1000 |
 | `backoff_strategy` | no | enum | `fixed` · `linear` · `exponential` (default `exponential`) |
 | `backoff_max_ms` | no | integer | Cap · default 60000 (1 min) |
-| `jitter` | no | boolean | Randomize the computed backoff to avoid thundering-herd · **default true** · engines SHOULD use a full-jitter / equal-jitter family (AWS « exponential backoff and jitter » · per D-2026-05-22-N11) |
+| `jitter` | no | boolean | Randomize the computed backoff to avoid thundering-herd · **default true** · engines SHOULD use a full-jitter / equal-jitter family (AWS « exponential backoff and jitter ») |
 | `on_codes` | no | array | If present · only retry on listed `NIKA-<NS>-<NNN>` codes · else retry all transient |
 
 ### Backoff strategies

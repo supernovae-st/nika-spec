@@ -12,7 +12,36 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-### Changed — model selection · one field (pass 4 · D-2026-05-22-N13)
+### Added / Changed — more local providers + stabilization (pass 5 · D-2026-05-22-N14)
+
+Socratic audit (« add other local providers — not in-process GGUF — + find
+anything else non-conventional / mélange / non-intuitive »).
+
+- **5 local providers** now (was 2) · added `llamacpp` (llama.cpp `llama-server`
+  `:8080`) · `localai` (`:8080` · OpenAI drop-in · multi-backend) · `vllm`
+  (`:8000` · high-throughput · self-hosted). All external OpenAI-compatible HTTP
+  servers — NOT the deferred in-process `native` GGUF runtime. Providers 10 → 13.
+- **The `openai` escape hatch documented** · any other OpenAI-compatible server
+  (Jan · llamafile · KoboldCpp · text-generation-webui · OpenRouter · Together ·
+  custom) routes via `model: openai/<name>` + `OPENAI_BASE_URL` engine config —
+  no new provider name. The LiteLLM pattern: named providers for the popular
+  backends + `openai`+base_url for the long tail. (« Did we plan to add more? »
+  → yes: named-provider set + escape hatch + independent stdlib versioning.)
+- **`secrets source:` is now a closed enum** · `vault` (default · sovereign) ·
+  `env` (read a secret from an OS env var · still masked) · `file` (Docker/k8s
+  mounted secret). Previously only `vault` was shown → an author couldn't know
+  what else was valid.
+- **`exec.env` vs envelope `env:` disambiguated** · the one same-word overlap.
+  Envelope `env:` = workflow config (`${{ env.* }}`) · `exec.env` = the OS
+  environment of *that subprocess* · NOT auto-connected · pass values through
+  explicitly. Crisp note added so it isn't a trap.
+
+Audit also confirmed CLEAN (no change): tool refs consistently `namespace:path`
+with `/` (zero `::` survivors) · Connectome is `nika:connectome/recall`
+everywhere (no dot drift) · the kebab `workflow:` vs snake task-`id` split is
+justified (CEL hyphen-minus) and documented.
+
+### Changed — model selection · one field (pass 4)
 
 Research-validated against LiteLLM · OpenRouter · Vercel AI SDK · PydanticAI
 (all converged on a single `provider/model` string).

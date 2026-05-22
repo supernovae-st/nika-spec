@@ -88,7 +88,7 @@ effectively never.
 > middle, proven path: **one field, the language name as the key, the
 > contract version as the value.** The engine's internal canonical URI
 > stays `https://nika.sh/spec/v1` for RDF / conformance tooling — but
-> the author never types a URL. (Locked D-2026-05-22-N10.)
+> the author never types a URL.
 
 ### `workflow` · **required · kebab-case · unique within file**
 
@@ -127,7 +127,7 @@ Default model for any `infer:` or `agent:` verb in this workflow, as a single
 there is no separate `provider:` field). The provider prefix selects the
 backend and decides local-vs-cloud (`ollama/` · `lmstudio/` = local · the rest
 = cloud). See [stdlib/providers-v0.1.md](../stdlib/providers-v0.1.md) for the
-10-provider catalog.
+13-provider catalog.
 
 A task may override this. If absent · each `infer:`/`agent:` task must specify
 its own `model:`.
@@ -176,16 +176,29 @@ appear in logs and traces. For anything secret, use `secrets:` instead.
 ```yaml
 secrets:
   api_key:
-    source: vault                 # a reference to a store · never an inline value
+    source: vault                 # vault | env | file · never an inline value
     key: prod/anthropic/api-key
+  github_token:
+    source: env                   # read from the OS env var below · still masked
+    key: GITHUB_TOKEN
 ```
 
 Sensitive values available via `${{ secrets.<name> }}`. A secret is always
-a **reference to a store** (the local `nika-vault` by default) — never an
-inline literal. The engine **masks** resolved secret values in logs,
-traces, and journal events. The `env` / `secrets` split is the modern
-secure-workflow default: non-sensitive config in `env`, masked references
-in `secrets`.
+a **reference to a store** — never an inline literal. The engine **masks**
+resolved secret values in logs, traces, and journal events.
+
+**`source` · closed enum** (the only three v0.1 values) ·
+
+| `source` | `key` means | Use |
+|---|---|---|
+| `vault` (default) | path in the local `nika-vault` | the sovereign default |
+| `env` | name of an OS environment variable | 12-factor / CI secrets |
+| `file` | path to a file holding the value | Docker / k8s mounted secrets |
+
+The `env` / `secrets` split is the modern secure-workflow default: non-sensitive
+config in `env:` (appears in logs), masked references in `secrets:` (never
+logged) — note `source: env` reads a *secret* from an env var and still masks
+it, which is different from the plain `env:` block.
 
 ### `tasks` · **required · non-empty**
 

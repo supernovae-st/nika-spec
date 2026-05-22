@@ -6,7 +6,7 @@
 
 ---
 
-## The 5 builtin categories (post pantheon · 2026-05-22)
+## The 5 builtin categories
 
 | Category | Count v0.1 | Status |
 |---|---|---|
@@ -14,15 +14,15 @@
 | File | 5 | I/O primitives |
 | Data | 19 | Transformation + validation |
 | Introspection | 6 | Workflow self-awareness |
-| Media | — | **Deferred to stdlib v0.x** (opt-in feature flag · enumeration NOT in v0.1 spec per Jobs lens · cf §Out of scope) |
+| Media | — | **Deferred to stdlib v0.x** (opt-in feature flag · cf §Out of scope) |
 | **Total v0.1 stdlib** | **36** | |
 
 A Stdlib v0.1-compliant engine MUST ship the 36 builtins.
 
-**Changes vs initial draft (post pantheon 2026-05-22 · D-2026-05-22-N8)** ·
+**Changes vs initial draft** ·
 - `nika:complete` **renamed** to `nika:done` (avoid overlap with agent verb completion semantics · 4-0 council vote)
-- `nika:run` (nested workflow builtin) **REMOVED** · deferred per §Out of scope (3-1 vote · stack-overflow/recursion concerns)
-- Media builtins **enumeration removed** from this spec · still feature-flag available in reference engine but not in canonical stdlib v0.1 (Jobs lens · less but better)
+- `nika:run` (nested workflow builtin) **REMOVED** · deferred per §Out of scope(stack-overflow/recursion concerns)
+- Media builtins **enumeration removed** from this spec · still feature-flag available in reference engine but not in canonical stdlib v0.1
 
 ---
 
@@ -101,7 +101,7 @@ invoke:
 
 Mark the current `agent:` loop as complete and exit. Inside an agent's tool whitelist · this is the sentinel for graceful termination.
 
-(The `nika:run` nested-workflow builtin was deferred per §Out of scope · D-2026-05-22-N8. Use `exec: command: "nika run subroutine.yaml"` as the v0.1 workaround.)
+(The `nika:run` nested-workflow builtin was deferred per §Out of scope. Use `exec: command: "nika run subroutine.yaml"` as the v0.1 workaround.)
 
 ---
 
@@ -454,7 +454,7 @@ Spawn a dynamic sub-DAG. Returns when all spawned tasks complete.
 
 ## Media builtins · **DEFERRED to stdlib v0.x · enumeration not in v0.1 spec**
 
-Per pantheon council 2026-05-22 (Jobs lens) · the media builtins are NOT enumerated in v0.1. They exist in the reference engine under a feature flag · they MAY graduate to stdlib v0.x as a separate document · but the v0.1 spec stays focused on the 36 canonical builtins above.
+The media builtins are NOT enumerated in v0.1. They exist in the reference engine under a feature flag · they MAY graduate to stdlib v0.x as a separate document · but the v0.1 spec stays focused on the 36 canonical builtins above.
 
 This is a deliberate **less-but-better** decision (Rams principle 10) · enumeration of 24 media-specific tools would inflate the spec surface 40% without serving the 80% audience.
 
