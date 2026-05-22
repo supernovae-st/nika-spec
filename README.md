@@ -49,6 +49,8 @@ Run it (with the reference engine) ·
 nika run hello.nika.yaml
 ```
 
+**New to Nika?** → [**QUICKSTART.md**](./QUICKSTART.md) builds a real workflow in 5 minutes.
+
 ---
 
 ## The 5 pillars · immutable forever
