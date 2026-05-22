@@ -1,12 +1,12 @@
 # Stdlib v0.1 · Builtins
 
-> The canonical 36 builtins shipped with Stdlib v0.1-compliant engines.
+> The canonical 37 builtins shipped with Stdlib v0.1-compliant engines.
 > Invoked via `invoke: tool: "nika:<name>"`. Plus 24 media builtins
 > deferred to stdlib v0.x (`opt-in feature flag`).
 
 ---
 
-## The 5 builtin categories
+## Builtin categories
 
 | Category | Count v0.1 | Status |
 |---|---|---|
@@ -14,10 +14,11 @@
 | File | 5 | I/O primitives |
 | Data | 19 | Transformation + validation |
 | Introspection | 6 | Workflow self-awareness |
+| Network | 1 | `nika:fetch` · HTTP + extraction |
 | Media | — | **Deferred to stdlib v0.x** (opt-in feature flag · cf §Out of scope) |
-| **Total v0.1 stdlib** | **36** | |
+| **Total v0.1 stdlib** | **37** | |
 
-A Stdlib v0.1-compliant engine MUST ship the 36 builtins.
+A Stdlib v0.1-compliant engine MUST ship the 37 builtins.
 
 **Changes vs initial draft** ·
 - `nika:complete` **renamed** to `nika:done` (avoid overlap with agent verb completion semantics · 4-0 council vote)
@@ -383,6 +384,38 @@ Base64 encode/decode. (Counts as 2 builtins in some engine inventories · counts
 
 ---
 
+## Network builtins (1)
+
+### `nika:fetch`
+
+HTTP request + content extraction. Reached via `invoke` — fetching a URL is
+*calling a tool*, not a distinct execution model (see
+[../spec/02-verbs.md](../spec/02-verbs.md)).
+
+```yaml
+- id: scrape
+  invoke:
+    tool: "nika:fetch"
+    args:
+      url: "https://example.com/article"
+      mode: article            # default · markdown
+```
+
+| Arg | Required | Type | Notes |
+|---|---|---|---|
+| `url` | yes | string | Target URL · may use `${{ ... }}` |
+| `method` | no | enum | `GET` (default) · `POST` · `PUT` · `DELETE` · `PATCH` · `HEAD` |
+| `headers` | no | object | Extra request headers |
+| `body` | no | string\|object | Request body · objects auto-serialized to JSON |
+| `mode` | no | enum | Extraction mode · see [extract-modes-v0.1.md](./extract-modes-v0.1.md) · default `markdown` |
+| `jsonpath` | no | string | RFC 9535 JSONPath · only with `mode: jsonpath` |
+
+**Output** · extracted content · **string** for text modes (`markdown`/`article`/`text`) · **array/object** for `jsonpath`/`metadata`/`feed`/`links`.
+
+**Security (engine MUST)** · SSRF defense — reject private-network targets (`10.0.0.0/8` · `172.16.0.0/12` · `192.168.0.0/16` · `127.0.0.0/8` · IPv6 link-local · cloud-metadata `169.254.169.254`) unless engine config allows. Honor task-level `timeout_ms`. TLS · reject self-signed by default.
+
+---
+
 ## Introspection builtins (6)
 
 ### `nika:cost`
@@ -454,7 +487,7 @@ Spawn a dynamic sub-DAG. Returns when all spawned tasks complete.
 
 ## Media builtins · **DEFERRED to stdlib v0.x · enumeration not in v0.1 spec**
 
-The media builtins are NOT enumerated in v0.1. They exist in the reference engine under a feature flag · they MAY graduate to stdlib v0.x as a separate document · but the v0.1 spec stays focused on the 36 canonical builtins above.
+The media builtins are NOT enumerated in v0.1. They exist in the reference engine under a feature flag · they MAY graduate to stdlib v0.x as a separate document · but the v0.1 spec stays focused on the 37 canonical builtins above.
 
 This is a deliberate **less-but-better** decision (Rams principle 10) · enumeration of 24 media-specific tools would inflate the spec surface 40% without serving the 80% audience.
 
@@ -477,4 +510,4 @@ New builtins MAY enter stdlib v0.x. Builtin removal is **never** allowed within 
 
 ---
 
-🦋 *36 builtins canonical · 24 media deferred · clear forever.*
+🦋 *37 builtins canonical · 24 media deferred · clear forever.*

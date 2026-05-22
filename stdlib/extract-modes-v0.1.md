@@ -33,9 +33,11 @@ Plus an implicit ·
 ### `markdown` · default for content scraping
 
 ```yaml
-fetch:
-  url: "https://example.com/article"
-  mode: markdown
+invoke:
+  tool: "nika:fetch"
+  args:
+    url: "https://example.com/article"
+    mode: markdown
 ```
 
 **Behavior** · HTML → cleaned Markdown. Removes scripts · styles · nav · footer · ads. Preserves headings · paragraphs · lists · code blocks · links · images.
@@ -49,9 +51,11 @@ fetch:
 ### `article` · readability-based extraction
 
 ```yaml
-fetch:
-  url: "https://news.example.com/2026/05/22/headline"
-  mode: article
+invoke:
+  tool: "nika:fetch"
+  args:
+    url: "https://news.example.com/2026/05/22/headline"
+    mode: article
 ```
 
 **Behavior** · uses Readability algorithm to extract the main article body · stripping out navigation · sidebars · ads · comments.
@@ -67,9 +71,11 @@ fetch:
 ### `text` · plain text
 
 ```yaml
-fetch:
-  url: "https://example.com"
-  mode: text
+invoke:
+  tool: "nika:fetch"
+  args:
+    url: "https://example.com"
+    mode: text
 ```
 
 **Behavior** · HTML tags stripped · text content preserved with line breaks. No Markdown formatting.
@@ -81,10 +87,12 @@ fetch:
 ### `selector` · CSS selector
 
 ```yaml
-fetch:
-  url: "https://example.com/products"
-  mode: selector
-  selector: "div.product-list"
+invoke:
+  tool: "nika:fetch"
+  args:
+    url: "https://example.com/products"
+    mode: selector
+    selector: "div.product-list"
 ```
 
 **Behavior** · returns the raw HTML of the element(s) matching the CSS selector. If multiple match · concatenated.
@@ -98,10 +106,12 @@ fetch:
 ### `jsonpath` · structured API responses
 
 ```yaml
-fetch:
-  url: "https://api.example.com/v1/users"
-  mode: jsonpath
-  jsonpath: "$.data.users[*].email"
+invoke:
+  tool: "nika:fetch"
+  args:
+    url: "https://api.example.com/v1/users"
+    mode: jsonpath
+    jsonpath: "$.data.users[*].email"
 ```
 
 **Behavior** · parses response as JSON · applies the JSONPath expression · returns the matched value(s).
@@ -121,9 +131,11 @@ fetch:
 ### `metadata` · page metadata
 
 ```yaml
-fetch:
-  url: "https://example.com/article"
-  mode: metadata
+invoke:
+  tool: "nika:fetch"
+  args:
+    url: "https://example.com/article"
+    mode: metadata
 ```
 
 **Behavior** · extracts `<meta>` tags from HTML head. Returns a structured object.
@@ -155,9 +167,11 @@ fetch:
 ### `links` · all outbound links
 
 ```yaml
-fetch:
-  url: "https://example.com"
-  mode: links
+invoke:
+  tool: "nika:fetch"
+  args:
+    url: "https://example.com"
+    mode: links
 ```
 
 **Behavior** · extracts all `<a href>` URLs. Resolves relative to absolute.
@@ -180,9 +194,11 @@ fetch:
 ### `feed` · RSS · Atom · JSON Feed
 
 ```yaml
-fetch:
-  url: "https://example.com/feed.xml"
-  mode: feed
+invoke:
+  tool: "nika:fetch"
+  args:
+    url: "https://example.com/feed.xml"
+    mode: feed
 ```
 
 **Behavior** · parses RSS · Atom · or JSON Feed. Returns normalized structure.
@@ -212,9 +228,11 @@ fetch:
 ### `sitemap` · sitemap.xml
 
 ```yaml
-fetch:
-  url: "https://example.com/sitemap.xml"
-  mode: sitemap
+invoke:
+  tool: "nika:fetch"
+  args:
+    url: "https://example.com/sitemap.xml"
+    mode: sitemap
 ```
 
 **Behavior** · parses sitemap.xml or sitemap index. Returns array of URLs with optional lastmod.
@@ -234,9 +252,11 @@ fetch:
 ### `llm-txt` · (special) · llms.txt convention
 
 ```yaml
-fetch:
-  url: "https://example.com/llms.txt"
-  mode: llm-txt
+invoke:
+  tool: "nika:fetch"
+  args:
+    url: "https://example.com/llms.txt"
+    mode: llm-txt
 ```
 
 **Behavior** · fetches and parses an `llms.txt` file (the emerging convention for LLM-friendly site descriptions). Returns parsed structure.

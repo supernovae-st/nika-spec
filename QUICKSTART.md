@@ -89,8 +89,10 @@ There are 5 variable namespaces · `vars` · `with` · `tasks` · `env` ·
 ## 4 · Use the other verbs
 
 There are exactly **4 verbs** — `infer` (call a model) · `exec` (run a
-command) · `fetch` (get + extract a URL) · `invoke` (call a tool) · `agent`
-(run an agentic loop). Here's `fetch` + `invoke` working with `infer` ·
+command) · `invoke` (call a tool) · `agent` (run an agentic loop).
+Everything else — fetching a URL, querying a DB, writing a file — is a
+**tool** reached with `invoke`. Here `invoke` fetches a page (the
+`nika:fetch` builtin), then `infer` summarizes ·
 
 ```yaml
 nika: v1
@@ -100,9 +102,11 @@ model: anthropic/claude-haiku-4-5
 
 tasks:
   - id: fetch_page
-    fetch:
-      url: "https://example.com"
-      mode: article             # extract readable article text
+    invoke:
+      tool: "nika:fetch"        # fetch is a builtin tool, not a verb
+      args:
+        url: "https://example.com"
+        mode: article           # extract readable article text
 
   - id: summarize
     depends_on: [fetch_page]
@@ -153,7 +157,7 @@ model: ollama/llama3.1        # or lmstudio/... · llamacpp/... · vllm/...
 ## Where to go next
 
 - **[spec/](./spec/)** — the full specification (~30 pages · the contract)
-- **[stdlib/](./stdlib/)** — the 13 providers · 9 extract modes · 36 builtins
+- **[stdlib/](./stdlib/)** — the 13 providers · 9 extract modes · 37 builtins
 - **[examples/](./examples/)** — canonical workflows (pending for GA)
 - **[README.md](./README.md)** — why a language · repo layout · governance
 

@@ -55,7 +55,7 @@ nika run hello.nika.yaml
 ## The 5 pillars · immutable forever
 
 1. **Envelope** — one line · `nika: v1` + `workflow:` header (+ typed `vars` · `env` · `secrets`)
-2. **The 4 verbs** — `infer:` · `exec:` · `invoke:` · `agent:` (5, absolute)
+2. **The 4 verbs** — `infer:` · `exec:` · `invoke:` · `agent:` (4, absolute · `fetch` is a tool via `invoke`)
 3. **DAG shape** — tasks + `depends_on` + `when` + `for_each` + output binding
 4. **Variables** — one `${{ ... }}` syntax · 5 namespaces (`vars` · `with` · `tasks` · `env` · `secrets`)
 5. **Error model** — `NIKA-<NS>-<NNN>` codes · retry semantics · structured output
@@ -89,7 +89,7 @@ nika-spec/
 └── stdlib/                    ← versioned independently
     ├── providers-v0.1.md        13 providers canonical (anthropic · openai · …)
     ├── extract-modes-v0.1.md    9 extract modes (markdown · article · jsonpath · …)
-    └── builtins-v0.1.md         36 builtins curated (core · file · data · …)
+    └── builtins-v0.1.md         37 builtins curated (core · file · data · …)
 ```
 
 ---
