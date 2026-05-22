@@ -42,8 +42,7 @@ A single LLM call. The result is the model's response.
   infer:
     prompt: "Research Rust async runtimes 2026 in 5 paragraphs"
     system: "You are a senior software architect."
-    provider: anthropic               # override workflow default
-    model: claude-sonnet-4-6
+    model: anthropic/claude-sonnet-4-6   # override default · <provider>/<name>
     temperature: 0.3
     max_tokens: 2000
     schema:                            # optional · structured output
@@ -66,8 +65,7 @@ A single LLM call. The result is the model's response.
 |---|---|---|---|
 | `prompt` | yes | string | User prompt · may use `${{ ... }}` substitution |
 | `system` | no | string | System prompt |
-| `provider` | no | string | Override workflow default · see stdlib/providers-v0.1.md |
-| `model` | no | string | Override workflow default · provider-specific |
+| `model` | no | string | Override workflow default · `<provider>/<name>` · see stdlib/providers-v0.1.md |
 | `temperature` | no | number 0-2 | Sampling temperature |
 | `max_tokens` | no | integer | Max output tokens · provider-dependent default |
 | `schema` | no | object | JSON Schema · structured output validation |
@@ -290,8 +288,7 @@ Run an agentic loop · the model + a set of tools · iterating until completion 
   agent:
     system: "You are a research assistant. Use tools to gather info."
     prompt: "Research the topic · ${{ vars.topic }} · and produce a markdown brief"
-    provider: anthropic
-    model: claude-sonnet-4-6
+    model: anthropic/claude-sonnet-4-6
     tools:                            # whitelist · default-deny (no tools if omitted)
       - "nika:fetch"
       - "nika:write"
@@ -307,8 +304,7 @@ Run an agentic loop · the model + a set of tools · iterating until completion 
 |---|---|---|---|
 | `system` | no | string | System prompt |
 | `prompt` | yes | string | Initial user message (same field name as `infer:` · consistent) |
-| `provider` | no | string | Provider override |
-| `model` | no | string | Model override |
+| `model` | no | string | Override workflow default · `<provider>/<name>` |
 | `tools` | no | array | Tool whitelist · glob patterns · **default-deny** · if absent the agent gets NO tools (pure conversation · least-privilege · per D-2026-05-22-N11). Grant explicitly. |
 | `max_turns` | no | integer | Loop limit · default 10 |
 | `max_tokens_total` | no | integer | Cumulative token budget · default engine-configurable |

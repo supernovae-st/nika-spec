@@ -62,9 +62,7 @@ These 5 pillars are **locked forever** at `nika: v1`. Everything else (providers
 nika: v1
 workflow: hello
 
-provider: anthropic
-model: claude-haiku-4-5
-
+model: anthropic/claude-haiku-4-5
 tasks:
   - id: greet
     infer:
@@ -79,9 +77,7 @@ tasks:
 nika: v1
 workflow: scrape-and-summarize
 
-provider: anthropic
-model: claude-sonnet-4-6
-
+model: anthropic/claude-sonnet-4-6
 tasks:
   - id: fetch_page
     fetch:

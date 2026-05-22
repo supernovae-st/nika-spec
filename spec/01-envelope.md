@@ -29,9 +29,8 @@ nika: v1                                # required · language + contract versio
 workflow: scrape-and-summarize          # required · kebab-case · unique within file
 description: "Fetch + summarize"         # optional · human-readable
 
-# Workflow-level defaults · any task may override
-provider: anthropic                     # optional · default LLM provider
-model: claude-sonnet-4-6                 # optional · default model
+# Workflow-level default model · any task may override · <provider>/<name>
+model: anthropic/claude-sonnet-4-6      # optional · ollama/llama3.1 for local
 
 # Inputs · available as ${{ vars.<name> }} · untyped OR typed
 vars:
@@ -116,25 +115,22 @@ description: "Fetch article, summarize in 3 bullets, write to disk"
 Free-form text. Not used by the engine for execution. Useful for `nika ls`
 listings + LSP hover hints.
 
-### `provider` · *optional · default LLM provider*
+### `model` · *optional · default model · `<provider>/<name>`*
 
 ```yaml
-provider: anthropic
+model: anthropic/claude-sonnet-4-6      # cloud
+# model: ollama/llama3.1                # local · same shape
 ```
 
-Default LLM provider for any `infer:` or `agent:` verb in this workflow.
-A task may override this. See [stdlib/providers-v0.1.md](../stdlib/providers-v0.1.md)
-for the canonical list.
+Default model for any `infer:` or `agent:` verb in this workflow, as a single
+**`<provider>/<name>`** string (the LiteLLM / OpenRouter / Vercel convention —
+there is no separate `provider:` field). The provider prefix selects the
+backend and decides local-vs-cloud (`ollama/` · `lmstudio/` = local · the rest
+= cloud). See [stdlib/providers-v0.1.md](../stdlib/providers-v0.1.md) for the
+10-provider catalog.
 
-If absent · each task with `infer:` or `agent:` must specify its own `provider:`.
-
-### `model` · *optional · default model*
-
-```yaml
-model: claude-sonnet-4-6
-```
-
-Default model name. Provider-specific. See provider docs for valid names.
+A task may override this. If absent · each `infer:`/`agent:` task must specify
+its own `model:`.
 
 ### `vars` · *optional · workflow inputs · untyped OR typed*
 
@@ -255,8 +251,7 @@ tasks:
   - id: greet
     infer:
       prompt: "Hello"
-      provider: anthropic
-      model: claude-haiku-4-5
+      model: anthropic/claude-haiku-4-5
 ```
 
 ### Full · with typed inputs (callable over MCP)
@@ -266,9 +261,7 @@ nika: v1
 workflow: research-pipeline
 description: "Research a topic and write a markdown brief"
 
-provider: anthropic
-model: claude-sonnet-4-6
-
+model: anthropic/claude-sonnet-4-6
 vars:
   topic:
     type: string

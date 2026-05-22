@@ -19,12 +19,11 @@ The language describes the **what** of an AI workflow ·
 - which agentic loops to spawn (`agent:`)
 
 The **how** lives in conformant engines. The reference implementation
-(SuperNovae Diamond Rust engine) is at
-[supernovae-st/nika](https://github.com/supernovae-st/nika)
-(AGPL-3.0-or-later).
+is at [supernovae-st/nika](https://github.com/supernovae-st/nika)
+(Rust · AGPL-3.0-or-later).
 
 **Analogies** ·
-- `SQL` is to PostgreSQL what `Nika` is to the Diamond engine
+- `SQL` is to PostgreSQL what `Nika` is to its reference engine
 - `Dockerfile` is to Docker what `Nika YAML` is to a workflow runtime
 - `GitHub Actions YAML` is to GitHub Actions what `Nika YAML` is to its engine
 
@@ -36,8 +35,7 @@ The **how** lives in conformant engines. The reference implementation
 nika: v1
 workflow: hello
 
-provider: anthropic
-model: claude-haiku-4-5
+model: anthropic/claude-haiku-4-5
 
 tasks:
   - id: greet
@@ -88,7 +86,7 @@ nika-spec/
 ├── conformance/               ← test suite for any implementation
 │
 └── stdlib/                    ← versioned independently
-    ├── providers-v0.1.md        8 providers canonical (anthropic · openai · …)
+    ├── providers-v0.1.md        10 providers canonical (anthropic · openai · …)
     ├── extract-modes-v0.1.md    9 extract modes (markdown · article · jsonpath · …)
     └── builtins-v0.1.md         36 builtins curated (core · file · data · …)
 ```
@@ -110,7 +108,7 @@ If you want to implement Nika in your language ·
 
 ## Reference implementation
 
-[supernovae-st/nika](https://github.com/supernovae-st/nika) · AGPL-3.0-or-later · Diamond Rust engine.
+[supernovae-st/nika](https://github.com/supernovae-st/nika) · the reference engine · Rust · AGPL-3.0-or-later.
 
 The reference impl ·
 - Implements the v0.1 spec end-to-end
@@ -150,7 +148,7 @@ Forever after GA · the 5 pillars are locked. Stdlib evolves independently.
 
 - **Editor** · SuperNovae Studio (Thibaut Melen + Nicolas)
 - **Discussion** · GitHub Issues on this repo
-- **Decisions** · documented in `dx/state/decisions.yaml` (private monorepo) · public summary in CHANGELOG.md
+- **Decisions** · summarized in this repo's CHANGELOG.md
 - **RFC process** · TBD post-v0.1 GA · when external implementations emerge
 
 ---

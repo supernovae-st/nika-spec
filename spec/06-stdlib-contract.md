@@ -44,7 +44,7 @@ Three reasons ·
 
 The stdlib has **independent versioning** ·
 
-- `stdlib/providers-v0.1.md` — the 8 canonical providers for v0.1
+- `stdlib/providers-v0.1.md` — the 10 canonical providers for v0.1
 - `stdlib/extract-modes-v0.1.md` — the 9 canonical extract modes for v0.1
 - `stdlib/builtins-v0.1.md` — the 36 canonical builtins for v0.1
 
@@ -69,11 +69,11 @@ Reference implementation (Diamond Rust engine) provides these elements with qual
 
 ## What's IN stdlib v0.1
 
-### Providers (9)
+### Providers (10)
 
-`anthropic` · `openai` · `mistral` · `groq` · `deepseek` · `gemini` · `xai` · `native` · `mock`
+`anthropic` · `openai` · `mistral` · `groq` · `deepseek` · `gemini` · `xai` · `ollama` (local) · `lmstudio` (local) · `mock`
 
-See [stdlib/providers-v0.1.md](../stdlib/providers-v0.1.md).
+Selected via a single `model: <provider>/<name>` field. See [stdlib/providers-v0.1.md](../stdlib/providers-v0.1.md).
 
 ### Extract modes (9)
 
@@ -109,11 +109,11 @@ When these mature · they enter stdlib v0.x. The core language doesn't need to c
 
 ## How a workflow references the stdlib
 
-### Provider
+### Model selection
 
 ```yaml
-provider: anthropic           # references stdlib/providers-v0.1.md
-model: claude-3-5-sonnet      # provider-specific
+model: anthropic/claude-sonnet-4-6   # <provider>/<name> · see stdlib/providers-v0.1.md
+# model: ollama/llama3.1             # local · same shape
 ```
 
 ### Extract mode
@@ -174,7 +174,7 @@ See [07-conformance.md](./07-conformance.md). In summary ·
 |---|---|
 | Core | None · only parse + DAG + variable + error · no execution needed |
 | Runtime | Must execute the 5 verbs · provider/tool implementations engine's choice |
-| Stdlib v0.1 | Must ship the 8 providers + 9 extract modes + 36 builtins |
+| Stdlib v0.1 | Must ship the 10 providers + 9 extract modes + 36 builtins |
 | Stdlib v0.1+media | Stdlib v0.1 + 24 media builtins |
 
 A v0.1-compliant engine for a workflow author depends on which level they need.

@@ -1,33 +1,95 @@
 # Stdlib v0.1 · Providers
 
-> The canonical 9 providers shipped with v0.1-compliant engines. Each
+> The canonical 10 providers shipped with v0.1-compliant engines. Each
 > provider implements the same interface (LLM chat completion + optional
 > streaming + vision + structured output) against a different backend.
+> You select one with a single `model: <provider>/<name>` field.
 
 ---
 
-## The 8 canonical providers (post pantheon · 2026-05-22 · native dropped)
+## Model selection · ONE field · `model: <provider>/<name>` (D-2026-05-22-N13)
 
-| Provider | Backend | Local? | Notes |
+You select an LLM with a **single `model:` field** in the form
+`<provider>/<model-name>` — the de-facto standard convention (LiteLLM ·
+OpenRouter · Vercel AI SDK · PydanticAI all converged on it). There is **no
+separate `provider:` field** · the provider is the prefix.
+
+```yaml
+infer:
+  model: anthropic/claude-sonnet-4-6     # cloud
+  prompt: "..."
+
+infer:
+  model: ollama/llama3.1                 # local · same shape
+  prompt: "..."
+```
+
+**Why one field, not two** · a model belongs to a provider · two separate
+fields let you write the silent-nonsense combination `provider: anthropic` +
+`model: gpt-4o`. One `<provider>/<name>` string is atomic, self-documenting,
+trivially swappable, and the industry standard. The same open model served by
+different backends disambiguates cleanly · `groq/llama-3.1-70b` vs
+`ollama/llama-3.1-70b`.
+
+**Parameterize it** · combine with typed inputs (D-N10) to run one workflow
+against any backend ·
+
+```yaml
+vars:
+  model: { type: string, default: "anthropic/claude-sonnet-4-6" }
+tasks:
+  - id: x
+    infer: { model: "${{ vars.model }}", prompt: "..." }
+# nika run flow.yaml --var model=ollama/llama3.1   ← same workflow, local
+```
+
+---
+
+## The 10 canonical providers (D-2026-05-22-N13)
+
+| Provider | Backend | Local? | Auth |
 |---|---|---|---|
-| `anthropic` | Anthropic Claude API | no | Default for many v0.1 examples · canonical for tool-use + extended thinking |
-| `openai` | OpenAI API | no | Industry standard · openai-compat endpoints route here (LM Studio · Ollama · etc.) |
-| `mistral` | Mistral AI API | no | EU-based · sovereign-leaning · multi-model |
-| `groq` | Groq Cloud | no | Fastest inference for open-weight models (Llama · Mixtral) |
-| `deepseek` | DeepSeek API | no | Reasoning-strong · cost-efficient |
-| `gemini` | Google Gemini API | no | Long context · multi-modal native |
-| `xai` | xAI Grok API | no | Real-time data integration option |
-| `mock` | Deterministic test fixture | yes | For workflow tests · no real LLM call |
+| `anthropic` | Anthropic Claude API | cloud | `${{ secrets.* }}` |
+| `openai` | OpenAI API | cloud | `${{ secrets.* }}` |
+| `mistral` | Mistral AI API (EU · sovereign-leaning) | cloud | `${{ secrets.* }}` |
+| `groq` | Groq Cloud (fastest open-weight) | cloud | `${{ secrets.* }}` |
+| `deepseek` | DeepSeek API (reasoning · cost-efficient) | cloud | `${{ secrets.* }}` |
+| `gemini` | Google Gemini API (long context · multimodal) | cloud | `${{ secrets.* }}` |
+| `xai` | xAI Grok API | cloud | `${{ secrets.* }}` |
+| `ollama` | Ollama daemon (`localhost:11434`) | **local** | none |
+| `lmstudio` | LM Studio (`localhost:1234/v1`) | **local** | none |
+| `mock` | deterministic test fixture · no LLM call | test | none |
 
-A Stdlib v0.1-compliant engine MUST ship all **8** providers. The reference engine ships these 8.
+A Stdlib v0.1-compliant engine MUST ship all **10**.
 
-**Note · the `native` provider (local GGUF via mistral.rs) was originally proposed for v0.1 but DEFERRED to stdlib v0.x post pantheon council 2026-05-22 (D-2026-05-22-N8 · 3-1 verdict drop)**. Empirical evidence · the mistral.rs implementation crashes the host machine in production loads (confirmed during the brouillon dynergie-scrap mission · canonical fallback is `--provider openai` with a local OpenAI-compatible URL). The `native` provider will re-enter stdlib v0.x when ·
+## Local vs cloud · the prefix decides
 
-1. mistral.rs stabilizes OR is replaced with candle/llama.cpp Rust binding
-2. Empirical 30-day cohort runs without machine-crash incidents
-3. Conformance test passes on Apple Silicon · Linux x86_64 · Linux ARM
+The **provider prefix IS the local/cloud signal** — no separate `local:` flag,
+no hidden config to read:
 
-**Local-first sovereign use cases for v0.1** · use the `openai` provider with a local OpenAI-compatible endpoint (LM Studio · Ollama compatibility mode · LocalAI · llama-server). Configure via the engine's provider config (`OPENAI_BASE_URL=http://localhost:11434/v1`). The workflow YAML doesn't need to know · it just says `provider: openai`.
+```
+ollama/…     lmstudio/…          → LOCAL  · localhost · no API key · sovereign
+anthropic/…  openai/…  groq/…    → CLOUD  · remote API · key via ${{ secrets.* }}
+…  mistral/…  deepseek/…  gemini/…  xai/…
+mock/…                            → TEST   · deterministic fixture
+```
+
+Sovereignty (Rule 1) · **local-first** · nothing leaves the machine unless a
+cloud provider is *explicitly* selected. `ollama/llama3.1` makes a sovereign,
+zero-cloud run trivial.
+
+`ollama` and `lmstudio` are external **HTTP servers** (OpenAI-compatible API ·
+the engine talks to them over localhost). They are NOT the in-process GGUF
+runtime `native`, which was DEFERRED post pantheon (D-2026-05-22-N8 · mistral.rs
+crashed the host) — re-enters stdlib v0.x when a candle/llama.cpp binding
+stabilizes + 30-day crash-free cohort + cross-platform conformance.
+
+## Provider config lives OUTSIDE the workflow
+
+A workflow only *selects* (`model: <provider>/<name>`). It never inlines
+`base_url` or keys. The engine resolves each provider's endpoint + auth from
+**engine/provider config** (cloud → `${{ secrets.* }}` · local → localhost,
+no key). This keeps workflows portable + secrets masked.
 
 ---
 
@@ -39,8 +101,7 @@ Every provider supports ·
 infer:
   prompt: "..."                # required
   system: "..."                # optional
-  provider: <name>             # this provider
-  model: <provider-specific>   # see provider section
+  model: <provider>/<name>     # one field · e.g. anthropic/claude-sonnet-4-6
   temperature: 0.0 to 2.0      # optional
   max_tokens: <int>            # optional
   schema: { ... }              # optional · structured output
@@ -58,8 +119,7 @@ Errors map to `NIKA-PROVIDER-NNN` codes with the provider-specific status.
 
 ```yaml
 infer:
-  provider: anthropic
-  model: claude-3-5-sonnet
+  model: anthropic/claude-3-5-sonnet
   prompt: "..."
 ```
 
@@ -72,7 +132,7 @@ infer:
 **Specific fields** ·
 ```yaml
 infer:
-  provider: anthropic
+  model: anthropic/claude-sonnet-4-6
   thinking:
     enabled: true
     budget_tokens: 4000
@@ -84,8 +144,7 @@ infer:
 
 ```yaml
 infer:
-  provider: openai
-  model: gpt-4o
+  model: openai/gpt-4o
   prompt: "..."
 ```
 
@@ -103,8 +162,7 @@ infer:
 
 ```yaml
 infer:
-  provider: mistral
-  model: mistral-large-latest
+  model: mistral/mistral-large-latest
   prompt: "..."
 ```
 
@@ -120,8 +178,7 @@ infer:
 
 ```yaml
 infer:
-  provider: groq
-  model: llama-3.3-70b-versatile
+  model: groq/llama-3.3-70b-versatile
   prompt: "..."
 ```
 
@@ -137,8 +194,7 @@ infer:
 
 ```yaml
 infer:
-  provider: deepseek
-  model: deepseek-chat
+  model: deepseek/deepseek-chat
   prompt: "..."
 ```
 
@@ -154,8 +210,7 @@ infer:
 
 ```yaml
 infer:
-  provider: gemini
-  model: gemini-2.0-flash
+  model: gemini/gemini-2.0-flash
   prompt: "..."
 ```
 
@@ -171,8 +226,7 @@ infer:
 
 ```yaml
 infer:
-  provider: xai
-  model: grok-2-latest
+  model: xai/grok-2-latest
   prompt: "..."
 ```
 
@@ -184,26 +238,39 @@ infer:
 
 ---
 
-### `native` · **local-first sovereign**
+### `ollama` · **local-first sovereign**
 
 ```yaml
 infer:
-  provider: native
-  model: hf://meta-llama/Llama-3.3-70B-Instruct      # or local path
+  model: ollama/llama3.1                 # or any pulled Ollama model
   prompt: "..."
 ```
 
-**Backend** · mistral.rs OR candle (engine choice · both pure Rust · no Python dep).
+**Backend** · the Ollama daemon (`http://localhost:11434`) · OpenAI-compatible API · the engine talks to it over HTTP.
 
-**Models** · any GGUF / safetensors model · resolved via `hf://` URI to HuggingFace OR direct local path.
+**Models** · any model pulled into Ollama (`llama3.1` · `qwen2.5` · `mistral` · `gemma2` · etc.) · pass-through.
 
-**Auth** · none for public models · `HF_TOKEN` for gated models.
+**Auth** · none (localhost).
 
-**Features** · GPU acceleration (Metal · CUDA · Vulkan) · structured output (varies by model) · 100% local · zero cloud egress.
+**Features** · 100% local · zero cloud egress · GPU-accelerated by Ollama. The sovereign default — `model: ollama/<x>` runs offline / air-gapped, zero vendor lock-in. (NOT the in-process `native` GGUF runtime, which is deferred — Ollama is an external server, stable.)
 
-**The sovereignty axis** · `native` is what makes Nika's 7-axis moat real. Workflows using `native` provider can run offline · in air-gapped environments · with model lock-in zero.
+---
 
-**Note** · the reference engine's `native` provider is empirically less stable than cloud providers (mistral.rs has crashed under load in some configurations). Engines MAY recommend `--provider openai` with a local OpenAI-compatible server (LM Studio · Ollama) as an alternative local path.
+### `lmstudio` · **local-first sovereign**
+
+```yaml
+infer:
+  model: lmstudio/qwen2.5-14b-instruct
+  prompt: "..."
+```
+
+**Backend** · LM Studio's local server (`http://localhost:1234/v1`) · OpenAI-compatible API.
+
+**Models** · whatever you load in LM Studio · pass-through.
+
+**Auth** · none (localhost · dummy key tolerated).
+
+**Features** · 100% local · zero cloud egress · GUI model management.
 
 ---
 
@@ -211,8 +278,7 @@ infer:
 
 ```yaml
 infer:
-  provider: mock
-  model: mock-deterministic
+  model: mock/mock-deterministic
   prompt: "..."
 ```
 
@@ -240,7 +306,7 @@ When using the same workflow with different providers ·
 - The **structured output** uses JSON Schema (engine adapts to provider's native mechanism · JSON mode · function calling · etc.)
 - The **vision input** is provider-agnostic in the workflow · the engine adapts
 
-A workflow can switch providers with one line change (`provider: anthropic` → `provider: openai`) for most use cases.
+A workflow can switch providers with one line change (`model: anthropic/claude-sonnet-4-6` → `model: openai/gpt-4o`, or → `model: ollama/llama3.1` to go fully local) for most use cases.
 
 ---
 
@@ -251,8 +317,7 @@ New providers MAY enter stdlib v0.x. Provider-specific options that don't map to
 ```yaml
 # Forward-compat (post-v0.1)
 infer:
-  provider: anthropic
-  model: claude-3-5-sonnet
+  model: anthropic/claude-3-5-sonnet
   provider_options:
     cache_control: { type: "ephemeral" }
     beta: ["custom-feature"]
@@ -262,4 +327,4 @@ The reference engine implements `provider_options:` as best-effort pass-through.
 
 ---
 
-🦋 *9 providers · 1 contract · sovereignty preserved.*
+🦋 *10 providers · 1 contract · sovereignty preserved.*

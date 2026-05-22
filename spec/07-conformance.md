@@ -14,7 +14,7 @@ Three nested levels · increasing scope ·
 |---|---|---|
 | **Core** | Parse + validate · DAG semantics · variable resolution · error structure | Linters · spec editors · static analyzers |
 | **Runtime** | Core + verb execution | Working engine (with own provider/tool impls) |
-| **Stdlib v0.1** | Runtime + the 8 providers + 9 extract modes + 36 builtins | Full reference-impl-equivalent engine |
+| **Stdlib v0.1** | Runtime + the 10 providers + 9 extract modes + 36 builtins | Full reference-impl-equivalent engine |
 
 A higher level **includes** the lower levels.
 

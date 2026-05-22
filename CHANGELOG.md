@@ -3,7 +3,8 @@
 All notable changes to the **Nika workflow language specification** are
 documented here. The spec is pinned at the `nika: v1` contract forever ·
 language additions are additive within v1 (feature-detected · no minor
-version in the file).
+version in the file). Stdlib (providers · extract modes · builtins) versions
+independently.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
@@ -11,139 +12,130 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-### Added — SOTA completeness (pass 3 · D-2026-05-22-N12)
+### Changed — model selection · one field (pass 4 · D-2026-05-22-N13)
 
-Socratic « do we have ALL the industry standards » audit · 13-concern SOTA
-checklist · 2 genuine gaps closed.
+Socratic « is `provider:` + `model:` as two fields a good idea? » audit ·
+research-validated against LiteLLM · OpenRouter · Vercel AI SDK · PydanticAI
+(all converged on a single `provider/model` string).
 
-- **YAML 1.2 mandated + quoting conventions** · a Nika file is YAML 1.2 (a JSON
-  superset). New « YAML conventions · no traps » section in 01-envelope fixes
-  the classic generated-config footguns: the Norway problem (`no` → boolean),
-  leading-zero octal (`0755`), sexagesimal colons (`12:30`), version floats
-  (`1.10` → `1.1`). One rule: quote anything that could be misread as a
-  number/boolean/date · quote expressions containing `: # [ { , >`. This is the
-  « no traps when an AI writes it » guarantee.
-- **Canonical JSON Schema established** · `schemas/nika-workflow.schema.json` is
-  the machine-readable companion (envelope + task + verb shapes), consumed by
-  editors (`yaml.schemas` / `$schema` modeline) for autocomplete + inline
-  validation — the same DX as GitHub Actions / Docker Compose. Specified in
-  07-conformance (the schema file is generated/maintained alongside the prose,
-  which stays normative).
-- **Retry jitter precision** · « ±50% » softened to the standard full-jitter /
-  equal-jitter family (AWS « exponential backoff and jitter ») rather than
-  over-specifying a formula.
+- **`provider:` + `model:` collapsed into ONE `model: <provider>/<name>` field.**
+  The provider is the prefix (`anthropic/claude-sonnet-4-6` · `openai/gpt-4o`).
+  Removes the silent-nonsense trap (`provider: anthropic` + `model: gpt-4o`) ·
+  one atomic, self-documenting, swappable string · the de-facto industry
+  convention. Applied across envelope · verbs · stdlib contract · providers doc
+  · overview · README. The `provider:` field no longer exists.
+- **Local-vs-cloud = the prefix.** `ollama/…` · `lmstudio/…` = LOCAL (localhost ·
+  no key · sovereign) · the 7 cloud providers = CLOUD (key via `${{ secrets.* }}`) ·
+  `mock/…` = TEST. No separate `local:` flag · no hidden config.
+- **Providers 8 → 10.** Added `ollama` + `lmstudio` as first-class local providers
+  (external OpenAI-compatible HTTP servers · NOT the crash-prone in-process
+  `native` GGUF runtime, which stays deferred per D-N8). `model: ollama/llama3.1`
+  makes a zero-cloud run trivial.
+- **Provider config stays OUT of the workflow** · `base_url` + auth in
+  engine/provider config · a workflow only *selects*. Combine with typed `vars`
+  (D-N10) to parameterize the model and run one workflow against any backend.
 
-### Changed — language logic hardening (pass 2 · D-2026-05-22-N11)
+Pre-public hardening of the v0.1 draft (no adopters yet · free to perfect the
+pillars to their immutable-forever form). Grounded in SOTA primary sources ·
+CEL (cel.dev) · RFC 9535 JSONPath · OpenAPI single-field envelope · Docker
+Compose versionless · AWS exponential-backoff-and-jitter.
 
-Second SOTA pass · scrutinized every detail against validated conventions +
-idiomatic-Rust mapping · nuked everything weird/inconsistent/unvalidated.
-Grounded: perplexity (CEL = de-facto standard for declarative conditions ·
-K8s ValidatingAdmissionPolicy + Kyverno 1.17 · default-deny least-privilege
-standard · RFC 9535 JSONPath standardized).
+### Changed
 
-- **Expression language = CEL** (was a hand-rolled « custom minimal DSL »).
-  Everything inside `${{ }}` — substitution and `when:`/predicates — is a
-  documented subset of **CEL** (Common Expression Language · cel.dev). Common,
-  comprehensible, validated, safe (non-Turing-complete), portable (zero parser
-  drift). Engines may embed `cel-interpreter` or hand-roll the small subset.
-- **Task `id` = snake_case** (`^[a-z][a-z0-9_]*$`, was kebab+snake mixed). Task
-  ids appear in CEL paths (`tasks.fetch_page.output`) — a hyphen is CEL's minus
-  operator, so kebab ids were a silent trap. `workflow:` stays kebab (never in
-  expressions).
-- **Message fields unified** · `infer:` and `agent:` both use `system:` +
-  `prompt:` (was `infer.prompt` vs `agent.user` — inconsistent).
-- **Tool reference grammar** · `<namespace>:<path>` with `/` hierarchy ·
-  `nika:write` · `nika:connectome/recall` · `mcp:browser/navigate` (was the
-  inconsistent `mcp:server::tool` `::` + `nika:connectome.recall` `.`). One
-  colon for the namespace, slash for the path. Globs `mcp:browser/*`.
-- **Agent tools = default-deny** · `agent.tools:` absent → NO tools (pure
-  conversation · least-privilege), was « all engine tools allowed » (a hole).
-- **Cross-cutting fields task-level only** · `timeout_ms` + `retry` live on the
-  task, removed from inside `exec:`/`fetch:` (was duplicated · ambiguous).
-- **Output binding pinned to RFC 9535** JSONPath (was « a subset »). Engines use
-  `serde_json_path` or any RFC 9535 impl.
-- **Retry `jitter`** · added (default true · ±50% full-jitter · anti-thundering-
-  herd). Fixed the bad `on_codes` example (used a non-existent namespace + an
-  HTTP status as a code).
-- **Builtin count = 36** (Core 6 + File 5 + Data 19 + Introspection 6) ·
-  canonical · nuked the « 61 » (verbs doc) and « core 7 » (conformance) drifts.
-
-### Changed — language consolidation (pre-public final · D-2026-05-22-N10)
-
-Grounded in SOTA primary sources (Docker Compose versionless · OpenAPI
-single-field · Kestra minimal · env⊥secrets separation now standard). Done
-while pre-public (zero adopters) — free to perfect the pillars to their
-immutable-forever form.
-
-- **Envelope → `nika: v1`** · one field replaces `apiVersion: nika.sh/v1` +
-  `schema: nika/workflow@v1` (OpenAPI `openapi: 3.1.0` pattern · drops K8s
-  ceremony + the two-version-field redundancy). Doc-type discriminated by the
-  resource key (`workflow:`). Engine canonical URI `https://nika.sh/spec/v1`
-  internal-only.
-- **5 verbs · absolute** · the count is locked at 5 forever · the operation
-  space is complete · a 6th verb would require `nika: v2` (effectively never).
+- **Envelope → `nika: v1`** · one field (was two · `apiVersion` + `schema`).
+  Follows the OpenAPI `openapi: 3.1.0` pattern · the document type is
+  discriminated by the resource key (`workflow:`).
+- **The 5 verbs are absolute** · the count is locked at 5 forever · the
+  operation space is complete · a 6th verb would require `nika: v2` (never).
+- **Expression language = CEL** (Common Expression Language · cel.dev) ·
+  everything inside `${{ }}` — substitutions and `when:` predicates — is a
+  documented subset of CEL. Common · validated · non-Turing-complete · portable
+  (zero parser drift). Engines may embed a CEL interpreter or implement the
+  small v0.1 subset.
+- **Task `id` = snake_case** (`^[a-z][a-z0-9_]*$`) · ids appear in CEL paths
+  (`tasks.fetch_page.output`) where a hyphen is CEL's minus operator. The
+  `workflow:` name stays kebab-case (it never appears in an expression).
+- **Message fields unified** · `infer:` and `agent:` both take `system:` +
+  `prompt:`.
+- **Tool reference grammar** · `<namespace>:<path>` with a `/` hierarchy ·
+  `nika:write` · `nika:connectome/recall` · `mcp:browser/navigate` · globs
+  `mcp:browser/*`. One colon for the namespace, slash for the path.
+- **Agent tools default-deny** · `agent.tools:` absent → no tools (least
+  privilege · pure conversation).
+- **Cross-cutting fields are task-level** · `timeout_ms` and `retry` live on
+  the task, not inside a verb block.
+- **Output binding is RFC 9535 JSONPath** · engines use any RFC 9535
+  implementation.
+- **Builtin count = 36** (Core 6 + File 5 + Data 19 + Introspection 6).
 
 ### Added
-- **`for_each:`** task field · bounded map/fan-out over a static list or a
-  prior task's array output (`${{ item }}` · `${{ index }}`) · the iteration
-  construct a workflow language must have.
+
+- **`for_each:`** · bounded map / fan-out over a static list or a prior task's
+  array output (`${{ item }}` · `${{ index }}`).
 - **`${{ secrets.X }}`** · 5th variable namespace · vault-backed · masked in
-  logs · the modern `env`⊥`secrets` security split.
-- **Typed `vars`** · optional `{ type, required, default, description }` form ·
-  enables `nika.run_workflow` MCP schema-gen + UI-gen + input validation ·
-  simple `name: value` untyped form preserved.
-- **`nika:done`** · locked agent-loop-only (completion sentinel · error if
-  invoked outside an `agent:` loop).
-- **Core conformance** · clarified as static-check mode · `when:` / `for_each:`
-  references resolve to known namespaces but are NOT evaluated (runtime eval is
-  Level 2).
-- (Still towards v0.1.0 GA · examples + conformance fixtures pending recopy ·
-  JSON schemas pending generation from prose spec.)
+  logs · the modern `env` ⊥ `secrets` security split.
+- **Typed `vars`** · optional `{ type, required, default, description }` form
+  (enables input validation + schema generation) · the simple `name: value`
+  form is preserved.
+- **`nika:done`** · agent-loop completion sentinel · error if invoked outside
+  an `agent:` loop.
+- **YAML conventions section** (in `01-envelope`) · a Nika file is YAML 1.2 ·
+  one rule covers the classic generated-config footguns (the Norway problem
+  `no` → boolean · leading-zero octal · sexagesimal `12:30` · version floats
+  `1.10` → `1.1`) · quote anything that could be misread, and any expression
+  containing `: # [ { , >`.
+- **Canonical JSON Schema** · `schemas/nika-workflow.schema.json` is the
+  machine-readable companion (envelope + task + verb shapes) for editor
+  autocomplete + inline validation (the same DX as GitHub Actions / Docker
+  Compose). The prose spec stays normative.
+- **Retry `jitter`** · default on · full-jitter / equal-jitter family (AWS
+  exponential-backoff-and-jitter) · anti-thundering-herd.
+- **Conformance levels clarified** · Core is a static-check mode (`when:` /
+  `for_each:` references resolve to known namespaces but are not evaluated) ·
+  runtime evaluation is Level 2.
+
+> Still towards v0.1.0 GA · examples + conformance fixtures + JSON schemas
+> pending.
 
 ---
 
 ## [0.1.0-draft] — 2026-05-22
 
 ### Added
-- Initial scaffold of the spec repo (Apache-2.0 license · patent grant
-  included for implementers).
-- `spec/` · 9 markdown sections covering envelope · 5 verbs · DAG · variables ·
-  errors · stdlib contract · conformance · out-of-scope.
-- `stdlib/` · curated v0.1 inclusions (8 providers · 9 extract modes · 36
-  builtins · 24 media builtins deferred to stdlib v0.x).
-- `examples/` placeholder (26 canonical workflows to be recopied clean from
-  the brouillon exploration era).
-- `conformance/` placeholder (test suite for « v0.1-compliant » claim).
-- `schemas/` placeholder (machine-readable JSON Schemas for
-  yaml-language-server consumption).
 
-### Locked decisions (cross-ref `dx/state/decisions.yaml`)
-- D-2026-05-22-N1 · 5 pillars immutable forever (envelope · 5 verbs · DAG ·
-  variables · errors).
-- D-2026-05-22-N2 · License split · Apache-2.0 spec + AGPL-3.0-or-later engine.
-- D-2026-05-22-N3 · GitHub topology · 7 public repos + monorepo orchestrator.
-- D-2026-05-22-N4 · Diamond CRAFT sharpenings · `nika-syntax` L0 NEW · break
-  engine→lsp-core · break media→mcp · ~25 crate target.
-- D-2026-05-22-N5 · Stdlib v0.1 inclusion list.
-- D-2026-05-22-N6 · v0.1 ship plan · 3 weeks (Phase A spec public) + 7 weeks
-  (Phase B engine vertical slice).
-- D-2026-05-22-N7 · `supernovae-st/nika-spec` NEW Apache-2.0 public repo (creation pending
-  Thibaut go-ahead).
+- Initial spec repo · Apache-2.0 (patent grant for implementers).
+- `spec/` · 9 sections · envelope · 5 verbs · DAG · variables · errors · stdlib
+  contract · conformance · out-of-scope.
+- `stdlib/` · curated v0.1 lists (9 providers · 9 extract modes · 36 builtins ·
+  media builtins deferred to a later stdlib release).
+- `examples/` · placeholder (26 canonical workflows pending).
+- `conformance/` · placeholder (test suite for the « v0.1-compliant » claim).
+- `schemas/` · placeholder (JSON Schemas for `yaml-language-server`).
+
+### Decisions
+
+- **5 pillars immutable forever** · envelope · 5 verbs · DAG · variables ·
+  errors. Everything else evolves in the stdlib.
+- **License split** · the spec is Apache-2.0 (adoption + patent grant) · the
+  reference engine is AGPL-3.0-or-later (anti-extraction).
+- **Stdlib v0.1 inclusion list** · the providers / extract modes / builtins
+  shipped at v0.1 (see `stdlib/`).
 
 ---
 
 ## Why no « 0.0.x »
 
-This spec exists from the start as v0.1.0-draft because the brouillon
-exploration era (`supernovae-st/nika` brouillon branch) already shipped
-`nika/workflow@0.12` in 26 canonical examples. The v0.1 spec **derives
-from empirical examples** · not invented from scratch.
+This spec starts at v0.1.0-draft because it **derives from empirical
+examples**, not from scratch · an earlier Nika prototype already ran 26
+canonical workflows. The v0.1 spec distills that experience into the locked
+contract.
 
-The first GA release (`0.1.0`) will be cut when ·
-1. All 9 spec sections finalized + reviewed (pantheon · architect lenses)
-2. 26 examples recopied clean (zero brouillon references in spec corpus)
-3. Conformance tests `conformance/tests/` published
-4. JSON schemas in `schemas/` consumable by `yaml-language-server`
+The first GA release (`0.1.0`) is cut when ·
 
-After GA · the 5 pillars are immutable forever. Stdlib evolves
-independently via its own versioning (`stdlib/providers-v0.x.md` etc.).
+1. All 9 spec sections finalized + reviewed.
+2. 26 examples published clean (`examples/`).
+3. Conformance tests published (`conformance/tests/`).
+4. JSON schemas consumable by `yaml-language-server` (`schemas/`).
+
+After GA the 5 pillars are immutable forever. The stdlib evolves independently
+via its own versioning (`stdlib/providers-v0.x.md` · etc.).
