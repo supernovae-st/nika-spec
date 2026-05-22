@@ -1,8 +1,10 @@
 # Stdlib v0.1 · Builtins
 
-> The canonical 37 builtins shipped with Stdlib v0.1-compliant engines.
-> Invoked via `invoke: tool: "nika:<name>"`. Plus 24 media builtins
-> deferred to stdlib v0.x (`opt-in feature flag`).
+> The canonical 42 builtins shipped with Stdlib v0.1-compliant engines
+> (37 baseline · +5 amended D-2026-05-22-N26 ultrathink session · `notify` ·
+> `uuid` · `date` · `hash` · `wait_until`). Invoked via
+> `invoke: tool: "nika:<name>"`. Plus 24 media builtins deferred to
+> stdlib v0.x (`opt-in feature flag`).
 
 ---
 
@@ -10,15 +12,15 @@
 
 | Category | Count v0.1 | Status |
 |---|---|---|
-| Core | 6 | Required for any execution |
+| Core | 7 | Required for any execution (sleep · log · emit · assert · prompt · done · **wait_until** D-N26) |
 | File | 5 | I/O primitives |
-| Data | 19 | Transformation + validation |
+| Data | 22 | Transformation + validation (+3 D-N26 · `uuid` · `date` · `hash`) |
 | Introspection | 6 | Workflow self-awareness |
-| Network | 1 | `nika:fetch` · HTTP + extraction |
+| Network | 2 | `nika:fetch` HTTP + extraction · **`nika:notify`** D-N26 |
 | Media | — | **Deferred to stdlib v0.x** (opt-in feature flag · cf §Out of scope) |
-| **Total v0.1 stdlib** | **37** | |
+| **Total v0.1 stdlib** | **42** | |
 
-A Stdlib v0.1-compliant engine MUST ship the 37 builtins.
+A Stdlib v0.1-compliant engine MUST ship the 42 builtins.
 
 **Changes vs initial draft** ·
 - `nika:complete` **renamed** to `nika:done` (avoid overlap with agent verb completion semantics · 4-0 council vote)
@@ -27,7 +29,7 @@ A Stdlib v0.1-compliant engine MUST ship the 37 builtins.
 
 ---
 
-## Core builtins (6) · required for execution
+## Core builtins (7) · required for execution
 
 ### `nika:sleep`
 
@@ -35,10 +37,12 @@ A Stdlib v0.1-compliant engine MUST ship the 37 builtins.
 invoke:
   tool: "nika:sleep"
   args:
-    duration_ms: 5000
+    duration: "5s"             # Go-duration string · D-N23 consistency
 ```
 
-Pause execution for N milliseconds.
+Pause execution for the specified duration. Format · Go-duration / Kubernetes-style quoted string (`"500ms"` · `"30s"` · `"5m"` · `"1h30m"` etc. · see `03-dag.md` §timeout for full grammar).
+
+**D-N26 drift fix** · `duration_ms: 5000` (numeric ms) → `duration: "5s"` (Go-duration string) · consistency with D-N23 task-level `timeout:` field · ONE duration format across the language · Rams 4 understandable.
 
 ### `nika:log`
 
@@ -103,6 +107,28 @@ invoke:
 Mark the current `agent:` loop as complete and exit. Inside an agent's tool whitelist · this is the sentinel for graceful termination.
 
 (The `nika:run` nested-workflow builtin was deferred per §Out of scope. Use `exec: command: "nika run subroutine.yaml"` as the v0.1 workaround.)
+
+---
+
+### `nika:wait_until`
+
+```yaml
+invoke:
+  tool: "nika:wait_until"
+  args:
+    timestamp: "2026-05-23T09:00:00Z"     # ISO 8601 UTC · MAY be a CEL expression
+    timeout: "1h"                          # optional safeguard · default unbounded
+```
+
+Pause execution until the specified absolute timestamp is reached. Distinct from `nika:sleep` (relative duration) · `wait_until` is for scheduled execution within a workflow (e.g. « wait until 9 AM UTC then process »).
+
+**`timestamp:`** · required · ISO 8601 string (RFC 3339) · MUST include timezone (use `Z` for UTC) · MAY be a CEL expression that evaluates to a timestamp string.
+
+**`timeout:`** · optional · Go-duration string · safeguard if `timestamp` is very far in the future · returns timeout error if elapsed before target reached.
+
+**Returns** · null on success · throws `NIKA-BUILTIN-WAIT-001` on timeout · throws `NIKA-BUILTIN-WAIT-002` if `timestamp` is in the past.
+
+**Why distinct from `nika:sleep`** · `sleep` is relative (`"5s"` from now) · `wait_until` is absolute (`"2026-05-23T09:00:00Z"`). Both compose · `wait_until` for cron-like scheduling within a workflow run.
 
 ---
 
@@ -174,7 +200,7 @@ Recursive grep. Returns array of `{ path, line, match }`.
 
 ---
 
-## Data builtins (19)
+## Data builtins (22)
 
 ### `nika:jq`
 
@@ -384,7 +410,67 @@ Base64 encode/decode. (Counts as 2 builtins in some engine inventories · counts
 
 ---
 
-## Network builtins (1)
+### `nika:uuid` · D-N26
+
+```yaml
+invoke:
+  tool: "nika:uuid"
+  args:
+    version: v7                # default v7 (timestamped · sortable · RFC 9562) · or v4 (random)
+```
+
+Generate a UUID. Default **v7** (timestamped + sortable per RFC 9562 · 2024 SOTA · DB-friendly insertion order) · `v4` available for legacy compat (purely random · no time ordering).
+
+**Returns** · canonical hex string (e.g. `"01975a8c-7f3d-7c2e-9a4b-5f8e6d3c1a2b"` for v7).
+
+**Use cases** · workflow run IDs · resource identifiers · trace correlation · idempotency keys (cf v0.2 G8 candidate).
+
+### `nika:date` · D-N26
+
+```yaml
+invoke:
+  tool: "nika:date"
+  args:
+    op: now                    # now | add | subtract | format | parse | diff
+    # op-specific args ·
+    # now    · { tz: "UTC" | "America/New_York" | "Europe/Paris" }    default UTC
+    # add    · { base: "2026-05-22T12:00:00Z", duration: "1h30m" }    returns ISO 8601
+    # subtract · { base: "...", duration: "..." }                      returns ISO 8601
+    # format · { input: "...", format: "RFC3339" | "%Y-%m-%d" }        returns string
+    # parse  · { input: "May 22 2026", format: "%b %d %Y" }            returns ISO 8601
+    # diff   · { start: "...", end: "...", unit: "seconds"|"hours"|... } returns number
+```
+
+Timestamp arithmetic. Op-discriminated single builtin (Rams 10 less but better · vs 6 separate builtins).
+
+**Returns** · ISO 8601 string for `now`/`add`/`subtract`/`parse` · arbitrary format string for `format` · number for `diff`.
+
+**Timezone-aware** · all timestamps include timezone offset (default UTC). Specify `tz:` per IANA timezone DB name.
+
+**Use cases** · log timestamps · scheduling logic · cron-like workflows · duration calculations · TZ conversion for human-readable output.
+
+### `nika:hash` · D-N26
+
+```yaml
+invoke:
+  tool: "nika:hash"
+  args:
+    algo: blake3               # default blake3 (studio standard · faster than sha256) · or sha256 · sha512
+    content: "${{ tasks.X.output }}"   # string OR bytes (use output_format: bytes upstream)
+    encoding: hex              # default hex · or base64
+```
+
+Cryptographic content hashing. Default **blake3** (studio canonical · faster than SHA-2 · used by olympus-os-brand-core content-addressed storage). Alternatives · sha256 · sha512.
+
+**Explicitly NOT supported** · md5 · sha1 (legacy · broken for crypto · use a separate non-crypto-hash tool if needed for compatibility).
+
+**Returns** · hex string by default (lowercase) · base64 if `encoding: base64`.
+
+**Use cases** · cache keys (cf v0.2 G9 candidate) · content addressing · idempotency tokens (cf v0.2 G8) · diff detection · provenance audit trails.
+
+---
+
+## Network builtins (2)
 
 ### `nika:fetch`
 
@@ -413,6 +499,36 @@ HTTP request + content extraction. Reached via `invoke` — fetching a URL is
 **Output** · extracted content · **string** for text modes (`markdown`/`article`/`text`) · **array/object** for `jsonpath`/`metadata`/`feed`/`links`.
 
 **Security (engine MUST)** · SSRF defense — reject private-network targets (`10.0.0.0/8` · `172.16.0.0/12` · `192.168.0.0/16` · `127.0.0.0/8` · IPv6 link-local · cloud-metadata `169.254.169.254`) unless engine config allows. Honor task-level `timeout_ms`. TLS · reject self-signed by default.
+
+---
+
+### `nika:notify` · D-N26
+
+```yaml
+invoke:
+  tool: "nika:notify"
+  args:
+    channel: webhook           # webhook | slack | email | discord | sms
+    target: "https://hooks.slack.com/services/..."  # endpoint · email · phone number
+    message: "Task completed · ${{ tasks.X.status }}"
+    severity: info             # info | warning | error (optional · default info)
+    metadata: { trace_id: "${{ tasks.X.trace_id }}" }  # optional structured data
+```
+
+Send notifications to external channels. Single builtin · `channel:` enum (Rams 10 less but better · vs 4-5 separate builtins `nika:slack_send` · `nika:email_send` · `nika:webhook_send` · etc.).
+
+**Supported channels (v0.81 engine MAY support subset · MUST gracefully degrade)** ·
+- `webhook` · POST JSON to URL · universal (works with Slack · Discord · Teams · custom)
+- `slack` · native Slack Web API (richer · requires bot token in secrets)
+- `email` · SMTP (requires SMTP config in engine settings)
+- `discord` · native Discord webhook (richer than generic webhook)
+- `sms` · SMS gateway (requires gateway config · typically Twilio/Vonage)
+
+**Returns** · `{ delivered: bool, channel: string, target: string, timestamp: ISO8601 }`.
+
+**Use cases** · workflow completion alerts · error escalation · human-in-the-loop notifications · pipeline status updates · monitoring integration.
+
+**Conformance** · v0.81 engine MUST support at least `webhook` channel · other channels MAY be feature-gated · unsupported channel returns `NIKA-BUILTIN-NOTIFY-001` (channel-not-configured).
 
 ---
 

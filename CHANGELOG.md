@@ -12,7 +12,67 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-### Added — for_each concurrency control + on_finally cleanup hook + 4 clarifications
+### Added — 5 NEW stdlib builtins (MANDATE 37 → 42 · D-N26 ultrathink)
+
+User-locked ultrathink session 2026-05-22 evening · « le langage des LLM
+pour les 20 prochaines années · prends le best · go au max ». 5 NEW
+canonical builtins applied to `stdlib/builtins-v0.1.md` · spec MANDATE
+expanded 37 → 42 · zero breaking · per forever-v0.x discipline (stdlib
+versions independently from `nika: v1` language envelope · additive).
+
+- **`nika:notify`** (Network +1 · 1 → 2) · single builtin · `channel:`
+  enum (webhook · slack · email · discord · sms) · Rams 10 less but
+  better (vs 4-5 granular `slack_send` · `email_send` · `webhook_send`).
+  v0.81 engine MUST support webhook · other channels feature-gated.
+
+- **`nika:uuid`** (Data +1) · default v7 (timestamped · sortable · RFC
+  9562 · 2024 SOTA · DB-friendly insertion order) · `v4` for legacy
+  compat · returns canonical hex string.
+
+- **`nika:date`** (Data +1) · op-discriminated single builtin · ops `now ·
+  add · subtract · format · parse · diff` · TZ-aware (default UTC · IANA
+  TZ DB names) · returns ISO 8601 strings (or number for diff).
+
+- **`nika:hash`** (Data +1) · default blake3 (studio canonical · faster
+  than SHA-2 · used by olympus-os-brand-core content-addressed storage) ·
+  alternatives sha256/sha512 · md5/sha1 EXCLUDED (broken for crypto).
+  Returns hex (default) or base64.
+
+- **`nika:wait_until`** (Core +1 · 6 → 7) · absolute timestamp sister to
+  `nika:sleep` (relative duration) · ISO 8601 timestamp arg + optional
+  timeout safeguard · throws on past-timestamp or timeout-elapsed.
+
+### Drift fix — `nika:sleep` `duration_ms` → `duration` Go-duration
+
+Consistency with D-N23 task-level `timeout:` Go-duration string · ONE
+duration format across the language (Go/Kubernetes-style `"5s"` ·
+`"1h30m"`) · was `duration_ms: 5000` numeric · now `duration: "5s"`
+quoted string. Rams 4 understandable.
+
+### Brouillon audit findings · NONE of B1-B5 in brouillon
+
+Brouillon `tools/nika-builtin/src/` audit confirmed NONE of the 5 new
+builtins exist · brouillon HAD `aggregate · assert · complete · cost ·
+data/* · emit · file/* · introspect_* · json_transform · json_verify ·
+locale_lookup · log · prompt · run_tool · sleep · yaml_validate` (33
+files · partial overlap with v0.1 37). B1-B5 are GENUINELY NEW for
+v0.81 stdlib expansion · NOT brouillon ports.
+
+### Forward-compat — v0.2 « 20-year scope » candidates documented
+
+Per AI-2027 scenario alignment + Rams 10 discipline · 5 high-priority
+v0.2 candidates documented in monorepo ROADMAP §16 (NOT applied · need
+user explicit re-lock per §2.7 supersession discipline) ·
+- V1 sessions/threads · multi-turn context · LangGraph checkpoints
+- V2 workflow composition include · sub-workflow execution · Argo
+- V3 cost tracking output fields (`tasks.X.cost`/`tokens`/`provider`)
+- V4 multi-agent handoffs (OpenAI Agents SDK pattern · ai-2027 « 200K
+  parallel agents · hierarchical »)
+- V5 cost-aware model router · per-task cheap-vs-expensive switching
+
+---
+
+## [Previous Unreleased] — for_each concurrency control + on_finally cleanup hook + 4 clarifications
 
 D-2026-05-22-N24 · ultrathink session · « ok enregistre tout ce qui manque ·
 verifie buildin + brouillon · prend les meilleures conventions · max parallel
