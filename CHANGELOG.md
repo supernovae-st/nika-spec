@@ -11,6 +11,41 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed — language logic hardening (pass 2 · D-2026-05-22-N11)
+
+Second SOTA pass · scrutinized every detail against validated conventions +
+idiomatic-Rust mapping · nuked everything weird/inconsistent/unvalidated.
+Grounded: perplexity (CEL = de-facto standard for declarative conditions ·
+K8s ValidatingAdmissionPolicy + Kyverno 1.17 · default-deny least-privilege
+standard · RFC 9535 JSONPath standardized).
+
+- **Expression language = CEL** (was a hand-rolled « custom minimal DSL »).
+  Everything inside `${{ }}` — substitution and `when:`/predicates — is a
+  documented subset of **CEL** (Common Expression Language · cel.dev). Common,
+  comprehensible, validated, safe (non-Turing-complete), portable (zero parser
+  drift). Engines may embed `cel-interpreter` or hand-roll the small subset.
+- **Task `id` = snake_case** (`^[a-z][a-z0-9_]*$`, was kebab+snake mixed). Task
+  ids appear in CEL paths (`tasks.fetch_page.output`) — a hyphen is CEL's minus
+  operator, so kebab ids were a silent trap. `workflow:` stays kebab (never in
+  expressions).
+- **Message fields unified** · `infer:` and `agent:` both use `system:` +
+  `prompt:` (was `infer.prompt` vs `agent.user` — inconsistent).
+- **Tool reference grammar** · `<namespace>:<path>` with `/` hierarchy ·
+  `nika:write` · `nika:connectome/recall` · `mcp:browser/navigate` (was the
+  inconsistent `mcp:server::tool` `::` + `nika:connectome.recall` `.`). One
+  colon for the namespace, slash for the path. Globs `mcp:browser/*`.
+- **Agent tools = default-deny** · `agent.tools:` absent → NO tools (pure
+  conversation · least-privilege), was « all engine tools allowed » (a hole).
+- **Cross-cutting fields task-level only** · `timeout_ms` + `retry` live on the
+  task, removed from inside `exec:`/`fetch:` (was duplicated · ambiguous).
+- **Output binding pinned to RFC 9535** JSONPath (was « a subset »). Engines use
+  `serde_json_path` or any RFC 9535 impl.
+- **Retry `jitter`** · added (default true · ±50% full-jitter · anti-thundering-
+  herd). Fixed the bad `on_codes` example (used a non-existent namespace + an
+  HTTP status as a code).
+- **Builtin count = 36** (Core 6 + File 5 + Data 19 + Introspection 6) ·
+  canonical · nuked the « 61 » (verbs doc) and « core 7 » (conformance) drifts.
+
 ### Changed — language consolidation (pre-public final · D-2026-05-22-N10)
 
 Grounded in SOTA primary sources (Docker Compose versionless · OpenAPI

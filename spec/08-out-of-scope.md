@@ -167,7 +167,7 @@ pin in the envelope (`nika: v1` already does this for the language contract). Pe
 # The CAPABILITY is deferred (engine waypoint) · the SHAPE is already decided
 - id: recall
   invoke:
-    tool: "nika:connectome.recall"
+    tool: "nika:connectome/recall"
     args:
       query: "Previous conversations about · ${{ vars.topic }}"
       top_k: 5
@@ -176,15 +176,15 @@ pin in the envelope (`nika: v1` already does this for the language contract). Pe
 **No 6th verb — ever.** When the Connectome (the Diamond cognitive subsystem ·
 orchestrator + 9 satellites + 12 mechanisms · Phase 1 engine waypoint
 ~2026-08-30) ships, recall and ingest are exposed as **builtin tools under
-`invoke:`** — `nika:connectome.recall` · `nika:connectome.ingest` — NOT as a
+`invoke:`** — `nika:connectome/recall` · `nika:connectome/ingest` — NOT as a
 new verb. The 5 verbs are absolute (locked D-2026-05-22-N10): a 6th verb would
 require a `nika: v2` contract, which forever-v0.x makes effectively never. So
 the *shape* of cognitive access is already final today; only the *capability*
 waits on the engine.
 
-For v1 today · workflows that need recall use `invoke: mcp:memory-server::recall`
+For v1 today · workflows that need recall use `invoke: mcp:memory-server/recall`
 with an external MCP memory server, then swap the tool id to
-`nika:connectome.recall` when the native Connectome admits — zero workflow-shape
+`nika:connectome/recall` when the native Connectome admits — zero workflow-shape
 change (same `invoke:` verb).
 
 ---

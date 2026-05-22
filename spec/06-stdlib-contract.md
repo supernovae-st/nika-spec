@@ -141,7 +141,7 @@ For MCP tools (not in the stdlib · provided by external MCP servers) ·
 
 ```yaml
 invoke:
-  tool: "mcp:postgres::query"  # mcp:<server>::<tool> namespace
+  tool: "mcp:postgres/query"   # mcp:<server>/<tool> namespace (one colon · slash path)
   args:
     sql: "..."
 ```
@@ -155,7 +155,7 @@ The three canonical tool namespaces ·
 | Namespace | Owner | Source of truth | Examples |
 |---|---|---|---|
 | `nika:*` | **Spec-owned** | `stdlib/builtins-v0.1.md` (this directory's sibling) | `nika:read` · `nika:jq` · `nika:done` |
-| `mcp:<server>::*` | Engine + user | Engine's MCP server registry config | `mcp:postgres::query` · `mcp:browser::navigate` |
+| `mcp:<server>/*` | Engine + user | Engine's MCP server registry config | `mcp:postgres/query` · `mcp:browser/navigate` |
 | `x-<vendor>:*` | **Custom · engine-specific** | Engine documentation (OUT of spec) | `x-superclever:research` · `x-myengine:custom_tool` |
 
 The `nika:*` namespace is **spec-owned**. A custom engine MUST NOT add tools to the `nika:*` namespace · it would violate portability (a workflow using a vendor's `nika:custom` builtin would not run on a different engine).

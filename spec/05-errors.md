@@ -100,11 +100,12 @@ A task MAY declare a `retry:` block. Retries apply to **transient** errors only 
   retry:
     max_attempts: 5              # default 1 (no retry)
     backoff_ms: 1000             # initial backoff
-    backoff_strategy: exponential  # linear | exponential | fixed
+    backoff_strategy: exponential  # fixed | linear | exponential
     backoff_max_ms: 30000        # cap on backoff (default 60000)
+    jitter: true                 # randomize backoff ±50% (default true · anti-thundering-herd)
     on_codes:                    # optional · whitelist of codes to retry
-      - NIKA-NETWORK-001
-      - NIKA-PROVIDER-503
+      - NIKA-FETCH-001
+      - NIKA-PROVIDER-001
 ```
 
 ### Fields
@@ -115,13 +116,19 @@ A task MAY declare a `retry:` block. Retries apply to **transient** errors only 
 | `backoff_ms` | no | integer | Initial backoff · default 1000 |
 | `backoff_strategy` | no | enum | `fixed` · `linear` · `exponential` (default `exponential`) |
 | `backoff_max_ms` | no | integer | Cap · default 60000 (1 min) |
-| `on_codes` | no | array | If present · only retry on listed codes · else retry all transient |
+| `jitter` | no | boolean | Randomize backoff ±50% to avoid thundering-herd · **default true** (SOTA · per D-2026-05-22-N11) |
+| `on_codes` | no | array | If present · only retry on listed `NIKA-<NS>-<NNN>` codes · else retry all transient |
 
 ### Backoff strategies
 
 - `fixed` · `backoff_ms` between every attempt
 - `linear` · `backoff_ms * attempt` between attempts (1s · 2s · 3s · …)
 - `exponential` · `backoff_ms * 2^(attempt-1)` between attempts (1s · 2s · 4s · 8s · …) · capped at `backoff_max_ms`
+
+With `jitter: true` (the default) the computed delay is randomized within
+±50% (full-jitter family) so many tasks retrying the same upstream do not
+synchronize into a thundering herd. `on_codes` lists canonical
+`NIKA-<NS>-<NNN>` codes (e.g. `NIKA-FETCH-001`) — not HTTP status numbers.
 
 ### Conformance
 
@@ -176,7 +183,7 @@ A task MAY declare an `on_error:` block to recover from non-transient errors (or
 # Use a default on error
 - id: get_count
   invoke:
-    tool: "mcp:db::count_users"
+    tool: "mcp:db/count_users"
   on_error:
     value: 0
 

@@ -43,7 +43,7 @@ A single LLM call. The result is the model's response.
     prompt: "Research Rust async runtimes 2026 in 5 paragraphs"
     system: "You are a senior software architect."
     provider: anthropic               # override workflow default
-    model: claude-3-5-sonnet
+    model: claude-sonnet-4-6
     temperature: 0.3
     max_tokens: 2000
     schema:                            # optional · structured output
@@ -101,13 +101,13 @@ Run a shell command. The result is the command's stdout (default) or a structure
 
 ```yaml
 - id: test
+  timeout_ms: 60000                # task-level (applies to any verb · see 03-dag)
   exec:
     command: "cargo test --workspace --lib"
     cwd: "./engine"
-    timeout_ms: 60000
     env:
       RUST_LOG: "debug"
-    stdin: "${{ vars.input_data}}"
+    stdin: "${{ vars.input_data }}"
     capture: structured            # stdout | stderr | structured | combined
 ```
 
@@ -117,10 +117,11 @@ Run a shell command. The result is the command's stdout (default) or a structure
 |---|---|---|---|
 | `command` | yes | string | Command to run · may use `${{ ... }}` substitution |
 | `cwd` | no | string | Working directory · default = engine's cwd |
-| `timeout_ms` | no | integer | Default 30000 (30s) · max engine-configurable |
-| `env` | no | object | Extra env vars · merged with engine env |
+| `env` | no | object | Extra subprocess env vars · merged with engine env (distinct from the envelope `env:`) |
 | `stdin` | no | string | Stdin data · may use `${{ ... }}` |
 | `capture` | no | enum | `stdout` (default) · `stderr` · `combined` · `structured` (= `{ stdout, stderr, exit_code }`) |
+
+> `timeout_ms` and `retry` are **task-level** fields (see [03-dag.md](./03-dag.md)) — they apply uniformly to every verb, so they are not repeated inside `exec:`.
 
 ### Security
 
@@ -160,20 +161,18 @@ Defaults · `method: GET` · `mode: markdown`.
 
 ```yaml
 - id: api_call
+  timeout_ms: 10000                # task-level (see 03-dag)
+  retry: { max_attempts: 3 }       # task-level (see 05-errors)
   fetch:
     url: "https://api.example.com/v1/users"
     method: POST
     headers:
-      Authorization: "Bearer ${env:API_TOKEN}"
+      Authorization: "Bearer ${{ secrets.api_token }}"
       Content-Type: "application/json"
     body:
-      query: "${{ vars.search_term}}"
+      query: "${{ vars.search_term }}"
     mode: jsonpath
-    jsonpath: "$.data.users[*].name"
-    timeout_ms: 10000
-    retry:
-      max_attempts: 3
-      backoff_ms: 1000
+    jsonpath: "$.data.users[*].name"   # RFC 9535 JSONPath
 ```
 
 ### Fields
@@ -185,9 +184,9 @@ Defaults · `method: GET` · `mode: markdown`.
 | `headers` | no | object | Extra request headers |
 | `body` | no | string\|object | Request body · objects auto-serialized to JSON |
 | `mode` | no | enum | See [stdlib/extract-modes-v0.1.md](../stdlib/extract-modes-v0.1.md) · default `markdown` |
-| `jsonpath` | no | string | JSONPath expression · only with `mode: jsonpath` |
-| `timeout_ms` | no | integer | Default 10000 (10s) |
-| `retry` | no | object | See [05-errors.md](./05-errors.md) |
+| `jsonpath` | no | string | RFC 9535 JSONPath expression · only with `mode: jsonpath` |
+
+> `timeout_ms` and `retry` are **task-level** fields (see [03-dag.md](./03-dag.md) + [05-errors.md](./05-errors.md)) — not repeated inside `fetch:`.
 
 ### Security
 
@@ -210,7 +209,22 @@ The engine MUST ·
 
 ## `invoke:` · builtin or MCP tool call
 
-Call a builtin (`nika:*` namespace) or an MCP tool (`server::tool` namespace). The result is the tool's response.
+Call a builtin (`nika:` namespace) or an MCP tool (`mcp:` namespace). The result is the tool's response.
+
+### Tool reference grammar (canonical · D-2026-05-22-N11)
+
+```
+<namespace>:<path>          one colon introduces the namespace · `/` separates the path
+
+nika:write                  builtin · flat name
+nika:connectome/recall      builtin · grouped path
+mcp:browser/navigate        MCP · server `browser` · tool `navigate`
+mcp:postgres/query          MCP · server `postgres` · tool `query`
+```
+
+One rule everywhere · the **colon** marks the namespace boundary (exactly once),
+the **slash** separates the path within it. No `::`, no mixed `.`/`:`. Globs are
+clean · `nika:*` · `nika:connectome/*` · `mcp:browser/*`.
 
 ### Builtin call
 
@@ -222,26 +236,26 @@ Call a builtin (`nika:*` namespace) or an MCP tool (`server::tool` namespace). T
       path: "./config.yaml"
 ```
 
-See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md) for the canonical builtin list (61 tools in v0.1).
+See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md) for the canonical builtin list (36 builtins in v0.1).
 
 ### MCP call
 
 ```yaml
 - id: query_db
   invoke:
-    tool: "mcp:postgres::query"
+    tool: "mcp:postgres/query"
     args:
       sql: "SELECT * FROM users WHERE id = $1"
-      params: ["${{ vars.user_id}}"]
+      params: ["${{ vars.user_id }}"]
 ```
 
-The namespace prefix · `mcp:` · then `<server>::<tool>`. The MCP server `postgres` must be configured in the engine's MCP server registry.
+The MCP server `postgres` must be configured in the engine's MCP server registry.
 
 ### Fields
 
 | Field | Required | Type | Notes |
 |---|---|---|---|
-| `tool` | yes | string | Tool identifier · `nika:<builtin>` OR `mcp:<server>::<tool>` |
+| `tool` | yes | string | Tool identifier · `nika:<path>` OR `mcp:<server>/<tool>` |
 | `args` | no | object | Tool arguments · schema is tool-specific |
 
 ### Conformance
@@ -265,7 +279,8 @@ Run an agentic loop · the model + a set of tools · iterating until completion 
 - id: research
   agent:
     system: "You are a research assistant."
-    user: "Research the topic · ${{ vars.topic}}"
+    prompt: "Research the topic · ${{ vars.topic }}"
+    tools: ["nika:fetch"]             # default-deny · grant explicitly
 ```
 
 ### Full
@@ -274,13 +289,13 @@ Run an agentic loop · the model + a set of tools · iterating until completion 
 - id: research
   agent:
     system: "You are a research assistant. Use tools to gather info."
-    user: "Research the topic · ${{ vars.topic}} · and produce a markdown brief"
+    prompt: "Research the topic · ${{ vars.topic }} · and produce a markdown brief"
     provider: anthropic
-    model: claude-3-5-sonnet
-    tools:                            # whitelist
+    model: claude-sonnet-4-6
+    tools:                            # whitelist · default-deny (no tools if omitted)
       - "nika:fetch"
       - "nika:write"
-      - "mcp:browser::*"              # all tools from browser MCP server
+      - "mcp:browser/*"               # all tools from browser MCP server
     max_turns: 20
     max_tokens_total: 100000
     temperature: 0.3
@@ -291,10 +306,10 @@ Run an agentic loop · the model + a set of tools · iterating until completion 
 | Field | Required | Type | Notes |
 |---|---|---|---|
 | `system` | no | string | System prompt |
-| `user` | yes | string | Initial user message |
+| `prompt` | yes | string | Initial user message (same field name as `infer:` · consistent) |
 | `provider` | no | string | Provider override |
 | `model` | no | string | Model override |
-| `tools` | no | array | Tool whitelist · glob patterns supported · if absent · all engine tools allowed (engine config) |
+| `tools` | no | array | Tool whitelist · glob patterns · **default-deny** · if absent the agent gets NO tools (pure conversation · least-privilege · per D-2026-05-22-N11). Grant explicitly. |
 | `max_turns` | no | integer | Loop limit · default 10 |
 | `max_tokens_total` | no | integer | Cumulative token budget · default engine-configurable |
 | `temperature` | no | number 0-2 | Sampling temperature |
@@ -318,16 +333,17 @@ The `tools:` whitelist uses **gitignore-style globs** for matching ·
 tools:
   - "nika:read"                  # exact match
   - "nika:*"                     # any nika builtin
-  - "mcp:browser::*"             # any tool from the `browser` MCP server
-  - "mcp:postgres::query"        # exact match · postgres query only
+  - "mcp:browser/*"              # any tool from the `browser` MCP server
+  - "mcp:postgres/query"         # exact match · postgres query only
 ```
 
 Match rules (canonical) ·
 
-- `*` matches any sequence of characters EXCEPT `:` (so `nika:*` does NOT match `nika:read::sub`)
-- `**` matches any sequence including `:` (rare · use sparingly)
+- `*` matches any sequence of characters EXCEPT the path separator `/` (so `mcp:browser/*` matches `mcp:browser/navigate` but not `mcp:browser/tab/open`)
+- `**` matches any sequence including `/` (rare · use sparingly)
+- The namespace colon is never crossed by `*` (so `nika:*` never matches an `mcp:` tool)
 - Order matters · later rules override earlier rules
-- Negation via `!` prefix · `tools: ["mcp:browser::*", "!mcp:browser::navigate"]`
+- Negation via `!` prefix · `tools: ["mcp:browser/*", "!mcp:browser/navigate"]`
 
 A v0.1-compliant engine MUST implement these glob semantics canonically · NOT engine-specific. This is a portability invariant.
 
@@ -337,7 +353,7 @@ The task output is the final model response.
 
 The engine MUST ·
 
-- Honor the `tools` whitelist · reject tool calls not in the whitelist
+- Honor the `tools` whitelist · reject tool calls not in the whitelist · **default-deny when `tools:` is absent** (the agent gets no tools · least-privilege)
 - Enforce `max_turns` and `max_tokens_total` budgets · terminate on exhaustion
 - Detect the `nika:done` completion sentinel and exit gracefully
 - Return the final model response as task output
@@ -346,7 +362,7 @@ The engine MUST ·
 
 ## Forward-compat
 
-The 5 verb names are **immutable forever** — and the count is **5, absolute**. The operation space is complete: call a model (`infer`), run a command (`exec`), fetch + extract content (`fetch`), call a tool (`invoke`), run an agentic loop (`agent`). Every other capability is either an **invoke-able tool** (a database query → `invoke: mcp:postgres::query` · a file write → `invoke: nika:write` · cognitive recall → `invoke: nika:connectome.recall`) or a **DAG control-flow construct** (iteration → `for_each` · branching → `when`). A 6th verb would require a `nika: v2` contract — and per forever-v0.x, that is effectively never. (Locked D-2026-05-22-N10.)
+The 5 verb names are **immutable forever** — and the count is **5, absolute**. The operation space is complete: call a model (`infer`), run a command (`exec`), fetch + extract content (`fetch`), call a tool (`invoke`), run an agentic loop (`agent`). Every other capability is either an **invoke-able tool** (a database query → `invoke: mcp:postgres/query` · a file write → `invoke: nika:write` · cognitive recall → `invoke: nika:connectome/recall`) or a **DAG control-flow construct** (iteration → `for_each` · branching → `when`). A 6th verb would require a `nika: v2` contract — and per forever-v0.x, that is effectively never. (Locked D-2026-05-22-N10.)
 
 Field additions to each verb are **additive** within `nika: v1` (feature-detected · no minor version in the file). Field removal NEVER happens at v1.
 

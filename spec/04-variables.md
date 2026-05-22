@@ -28,6 +28,13 @@ tools:
 
 If you have used GitHub Actions, this is the same. If you have not, the rule is simple · **anywhere you want a value resolved at task dispatch time, wrap it in `${{ }}`**.
 
+**What's inside `${{ }}` is [CEL](https://cel.dev)** (Common Expression
+Language · the validated, non-Turing-complete standard used by Kubernetes,
+Envoy, and gRPC). A bare reference like `${{ vars.topic }}` is a CEL identifier
+path that evaluates to its value; a condition like `${{ tasks.test.coverage > 80 }}`
+is a CEL boolean. One expression language, everywhere — Nika does not invent a
+DSL (per D-2026-05-22-N11). See [03-dag.md](./03-dag.md#expression-language--a-documented-subset-of-cel) for the v0.1 CEL subset.
+
 ---
 
 ## The 5 namespaces
@@ -158,19 +165,26 @@ Downstream ·
       Emails · ${{ tasks.api_call.user_emails }}
 ```
 
-### Path grammar
+### Path grammar · RFC 9535 JSONPath
 
-JSONPath subset (v0.1 conformance) ·
+Output binding uses **[RFC 9535](https://www.rfc-editor.org/rfc/rfc9535) JSONPath**
+— the IETF-standardized JSONPath (2024), not a vendor dialect. Engines use a
+conformant implementation (e.g. the Rust `serde_json_path` crate) so paths
+behave identically everywhere.
+
+v0.1 conformance subset (every engine MUST support) ·
 
 ```
 $                          root
-.<field>                   object field
+.<name>  ['<name>']        object member (dot or bracket)
 [<index>]                  array index
-[*]                        array wildcard
-..                         recursive descent (optional engine support)
+[*]                        wildcard (all members / elements)
+..<name>                   descendant segment (optional engine support)
 ```
 
-A v0.1-compliant engine MUST support the first four. Recursive descent is optional.
+A v0.1-compliant engine MUST support the first four; the descendant segment is
+optional. Full RFC 9535 (filters `?(@.x > 1)`, slices) MAY be supported and is
+the additive growth path.
 
 ---
 

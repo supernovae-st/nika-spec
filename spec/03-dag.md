@@ -29,7 +29,7 @@ tasks:
 ## Task shape · full
 
 ```yaml
-- id: my-task                   # required · kebab-case · unique within workflow
+- id: my_task                   # required · snake_case · unique within workflow
   depends_on: [task_a, task_b]  # optional · default []
   when: ${{ tasks.task_a.status == 'success' }}  # optional · conditional execution
   for_each: ${{ tasks.list.output }}  # optional · map this task over a collection
@@ -53,15 +53,22 @@ tasks:
 
 ## Field-by-field
 
-### `id` · **required · kebab-case · unique**
+### `id` · **required · snake_case · unique**
 
 ```yaml
-- id: research-topic
+- id: research_topic
 ```
 
-Match · `^[a-z][a-z0-9_-]*$`. Must be unique within the workflow file.
+Match · `^[a-z][a-z0-9_]*$` (snake_case · no hyphens). Must be unique within
+the workflow file.
 
-Underscores **and** hyphens allowed (kebab + snake), but pick one style per workflow for readability.
+**Why snake_case, not kebab** · task ids are referenced in CEL expressions as
+`tasks.<id>.output`. In CEL (and almost every expression language) a hyphen is
+the **subtraction operator** — `tasks.research-topic.output` would parse as
+`tasks.research - topic.output`, a silent trap. Snake_case ids are always
+clean CEL identifiers. (The workflow-level `workflow:` id stays kebab-case —
+it is a resource name, never referenced inside an expression. Locked
+D-2026-05-22-N11.)
 
 ### `depends_on` · *optional · default `[]`*
 
@@ -86,32 +93,49 @@ A list of task ids this task depends on. The engine MUST not start this task unt
     command: "./notify.sh"
 ```
 
-#### Expression grammar (custom minimal DSL · v0.1)
+#### Expression language · a documented subset of CEL
 
-Per pantheon council ratification (2026-05-22 · D-2026-05-22-N8) the `when:` expression language is a **small custom DSL** · NOT jq · NOT jsonpath-filter · NOT a full expression language. The rationale · keep the surface tiny so engines have no parser drift and workflows stay grep-able.
+Everything inside `${{ ... }}` — both value substitution and `when:`
+conditions — is **[CEL](https://cel.dev) (Common Expression Language)**, the
+validated, non-Turing-complete, side-effect-free expression standard used by
+Kubernetes (ValidatingAdmissionPolicy), Kyverno, Envoy, and gRPC. Nika does
+**not** invent an expression DSL — it adopts the standard. (Locked
+D-2026-05-22-N11; this supersedes the « custom minimal DSL » framing.)
 
-The grammar (closed at v1) ·
+**Why CEL** · it is *common* (millions of K8s users), *comprehensible*
+(reads like a boolean expression), *validated* (a published spec + multiple
+conformant implementations), *safe* (non-Turing-complete · bounded · no side
+effects) and *portable* (zero parser drift between engines). A hand-rolled
+DSL would be none of those.
+
+**The v0.1 subset** (the only CEL features a conformant engine must support) ·
 
 ```
-expr        := literal
-            |  reference
-            |  expr binary_op expr
-            |  unary_op expr
-            |  ( expr )
-
-literal     := boolean | number | string         # true · false · 42 · "foo"
-reference   := ${{ namespace.path }}              # vars.x · with.x · tasks.X.field · env.X
-
-binary_op   := == | != | < | <= | > | >= | && | ||
-unary_op    := !
-
-string      := single or double quoted
-number      := integer or decimal
+identifier / field access   vars.topic · tasks.build.status · with.content
+index access                tasks.list.output[0] · obj['key-with-dash']
+comparison                  == · != · < · <= · > · >=
+boolean                     && · || · !
+membership                  in            (e.g. status in ['success','skipped'])
+literals                    true · false · 42 · 3.14 · 'str' · "str" · null
+grouping                    ( … )
 ```
 
-That's the full grammar. No arithmetic · no function calls · no regex · no string operators (use `==` for equality only). If you need richer logic · do it in a `nika:assert` task or in an `infer:` task that returns a boolean.
+Arithmetic, CEL macros (`has()`, `all()`, `exists()`), and string functions
+are **reserved** — not in the v0.1 subset, addable in a later minor (CEL is a
+superset, so growth is additive and never breaking). If you need richer logic
+today, compute it in a `nika:assert` builtin or an `infer:` task.
 
-A boolean expression wrapped in `${{ ... }}`. If `false`, the task is **skipped** (not failed). Skipped tasks have status `skipped` · downstream tasks see them as if they completed.
+**Namespaces are CEL variables** · the 5 namespaces (`vars` · `with` · `tasks`
+· `env` · `secrets`) are bound as top-level CEL variables. `tasks.<id>.status`
+etc. resolve against the live DAG state.
+
+**Implementation** · an engine MAY embed a CEL library (e.g. the Rust
+`cel-interpreter` crate) OR hand-roll the small v0.1 subset above — both are
+conformant because the subset is exactly CEL. The Core conformance suite tests
+the subset against the CEL spec.
+
+A `when:` expression evaluates to a boolean. If `false`, the task is
+**skipped** (not failed) · status `skipped` · downstream sees it as completed.
 
 Common patterns ·
 
@@ -120,16 +144,15 @@ when: ${{ tasks.build.status == 'success' }}
 when: ${{ tasks.test.output.coverage > 80 }}
 when: ${{ vars.env == 'production' }}
 when: ${{ tasks.a.status == 'success' && tasks.b.status == 'success' }}
+when: ${{ tasks.deploy.status in ['success', 'skipped'] }}
 when: ${{ !(tasks.test.status == 'failure') }}
 ```
-
-A v0.1-compliant engine MUST implement this DSL canonically · NOT engine-specific. The conformance suite verifies this.
 
 ### `for_each` · *optional · map a task over a collection*
 
 ```yaml
-- id: summarize-each
-  for_each: ${{ tasks.fetch-pages.output }}   # a static list OR a prior task's array output
+- id: summarize_each
+  for_each: ${{ tasks.fetch_pages.output }}   # a static list OR a prior task's array output
   with:
     page: ${{ item }}                          # ${{ item }} = the current element
   infer:
@@ -147,8 +170,8 @@ Semantics (closed at v1) ·
 - The iterations of a single `for_each` task **MAY run in parallel** (engine
   SHOULD parallelize · bounded by engine concurrency config).
 - The task's output is the **array of per-iteration outputs**, in input
-  order · referenced downstream as `${{ tasks.summarize-each.output }}`
-  (an array) · `${{ tasks.summarize-each.output[0] }}` for one element.
+  order · referenced downstream as `${{ tasks.summarize_each.output }}`
+  (an array) · `${{ tasks.summarize_each.output[0] }}` for one element.
 - `for_each` is **bounded fan-out**, not recursion · a task cannot
   `for_each` over its own output. The DAG stays acyclic.
 - If the collection is empty · the task is `skipped` (status `skipped`).
@@ -162,7 +185,7 @@ without statically enumerating tasks. Locked D-2026-05-22-N10.
 ### `timeout_ms` · *optional · task-level timeout*
 
 ```yaml
-- id: long-task
+- id: long_task
   timeout_ms: 300000        # 5 minutes
   exec:
     command: "./long-running.sh"

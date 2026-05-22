@@ -46,7 +46,7 @@ Standards work · SQL · GraphQL · OpenAPI · Dockerfile · GitHub Actions YAML
 
 3.  DAG SHAPE       tasks · depends_on · when · for_each · output binding
 
-4.  VARIABLES       ${{ ... }} substitution · ONE syntax · 5 namespaces
+4.  VARIABLES       ${{ ... }} = CEL · ONE syntax · 5 namespaces
                     vars · with · tasks · env · secrets
 
 5.  ERROR MODEL     NIKA-<NS>-<NNN> codes · retry semantics · structured output
