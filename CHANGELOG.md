@@ -11,6 +11,28 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added — SOTA completeness (pass 3 · D-2026-05-22-N12)
+
+Socratic « do we have ALL the industry standards » audit · 13-concern SOTA
+checklist · 2 genuine gaps closed.
+
+- **YAML 1.2 mandated + quoting conventions** · a Nika file is YAML 1.2 (a JSON
+  superset). New « YAML conventions · no traps » section in 01-envelope fixes
+  the classic generated-config footguns: the Norway problem (`no` → boolean),
+  leading-zero octal (`0755`), sexagesimal colons (`12:30`), version floats
+  (`1.10` → `1.1`). One rule: quote anything that could be misread as a
+  number/boolean/date · quote expressions containing `: # [ { , >`. This is the
+  « no traps when an AI writes it » guarantee.
+- **Canonical JSON Schema established** · `schemas/nika-workflow.schema.json` is
+  the machine-readable companion (envelope + task + verb shapes), consumed by
+  editors (`yaml.schemas` / `$schema` modeline) for autocomplete + inline
+  validation — the same DX as GitHub Actions / Docker Compose. Specified in
+  07-conformance (the schema file is generated/maintained alongside the prose,
+  which stays normative).
+- **Retry jitter precision** · « ±50% » softened to the standard full-jitter /
+  equal-jitter family (AWS « exponential backoff and jitter ») rather than
+  over-specifying a formula.
+
 ### Changed — language logic hardening (pass 2 · D-2026-05-22-N11)
 
 Second SOTA pass · scrutinized every detail against validated conventions +

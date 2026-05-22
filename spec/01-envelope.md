@@ -205,6 +205,36 @@ The DAG. See [03-dag.md](./03-dag.md) for the task model.
 
 ---
 
+## YAML conventions · no traps
+
+A Nika file is **YAML 1.2** (which is a strict superset of JSON — every Nika
+workflow can also be written as JSON). YAML 1.2 is mandated specifically to
+avoid the classic YAML 1.1 footguns that bite generated configs:
+
+| Trap (YAML 1.1) | What happens | The rule |
+|---|---|---|
+| `region: no` | parsed as boolean `false` (the « Norway problem ») | YAML 1.2 keeps it a string · still, **quote** bare words that look boolean (`no` · `yes` · `on` · `off`) |
+| `id: 0755` | parsed as octal `493` | **quote** numbers with leading zeros · `"0755"` |
+| `at: 12:30` | parsed as sexagesimal `750` | **quote** colon-bearing scalars |
+| `v: 1.10` | parsed as float `1.1` (trailing zero lost) | **quote** version-like strings · `"1.10"` |
+
+**One rule that removes all of them** · when a scalar *could* be misread as a
+number, boolean, or date, **quote it**. When in doubt, quote.
+
+**Expressions** · a bare `${{ … }}` reference is a safe plain scalar
+(`prompt: ${{ vars.topic }}` is fine). But **quote** any expression that
+contains `:` `#` `[` `{` `,` or `>` so YAML does not misparse it ·
+
+```yaml
+when: "${{ tasks.x.status == 'ok' && tasks.y.count > 3 }}"   # quoted · contains > and :
+prompt: ${{ vars.topic }}                                    # bare ok · no special chars
+```
+
+A conformant engine parses YAML 1.2. Authoring tools (and the AI writing
+these files) should quote-by-default for the four ambiguous-scalar cases above.
+
+---
+
 ## What the envelope is NOT
 
 - It is NOT a place to inline credentials. Use `secrets:` with a `source` reference.

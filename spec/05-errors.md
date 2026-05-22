@@ -102,7 +102,7 @@ A task MAY declare a `retry:` block. Retries apply to **transient** errors only 
     backoff_ms: 1000             # initial backoff
     backoff_strategy: exponential  # fixed | linear | exponential
     backoff_max_ms: 30000        # cap on backoff (default 60000)
-    jitter: true                 # randomize backoff ±50% (default true · anti-thundering-herd)
+    jitter: true                 # randomize backoff (default true · anti-thundering-herd)
     on_codes:                    # optional · whitelist of codes to retry
       - NIKA-FETCH-001
       - NIKA-PROVIDER-001
@@ -116,7 +116,7 @@ A task MAY declare a `retry:` block. Retries apply to **transient** errors only 
 | `backoff_ms` | no | integer | Initial backoff · default 1000 |
 | `backoff_strategy` | no | enum | `fixed` · `linear` · `exponential` (default `exponential`) |
 | `backoff_max_ms` | no | integer | Cap · default 60000 (1 min) |
-| `jitter` | no | boolean | Randomize backoff ±50% to avoid thundering-herd · **default true** (SOTA · per D-2026-05-22-N11) |
+| `jitter` | no | boolean | Randomize the computed backoff to avoid thundering-herd · **default true** · engines SHOULD use a full-jitter / equal-jitter family (AWS « exponential backoff and jitter » · per D-2026-05-22-N11) |
 | `on_codes` | no | array | If present · only retry on listed `NIKA-<NS>-<NNN>` codes · else retry all transient |
 
 ### Backoff strategies
@@ -125,10 +125,11 @@ A task MAY declare a `retry:` block. Retries apply to **transient** errors only 
 - `linear` · `backoff_ms * attempt` between attempts (1s · 2s · 3s · …)
 - `exponential` · `backoff_ms * 2^(attempt-1)` between attempts (1s · 2s · 4s · 8s · …) · capped at `backoff_max_ms`
 
-With `jitter: true` (the default) the computed delay is randomized within
-±50% (full-jitter family) so many tasks retrying the same upstream do not
-synchronize into a thundering herd. `on_codes` lists canonical
-`NIKA-<NS>-<NNN>` codes (e.g. `NIKA-FETCH-001`) — not HTTP status numbers.
+With `jitter: true` (the default) the computed delay is randomized (full-jitter
+or equal-jitter family · per AWS « exponential backoff and jitter ») so many
+tasks retrying the same upstream do not synchronize into a thundering herd.
+`on_codes` lists canonical `NIKA-<NS>-<NNN>` codes (e.g. `NIKA-FETCH-001`) — not
+HTTP status numbers.
 
 ### Conformance
 

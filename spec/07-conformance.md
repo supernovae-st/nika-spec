@@ -54,6 +54,21 @@ An engine claims « Core v0.1-compliant » if it ·
 
 A Core-compliant engine does NOT execute verbs and does NOT evaluate `when:` / `for_each:` over runtime state. It parses · validates · builds the DAG · resolves variable *references* (syntax + namespace validity) · produces typed errors. Runtime evaluation of conditions and iteration is Level 2.
 
+### Editor tooling · the canonical JSON Schema
+
+The spec ships a canonical **JSON Schema** at
+[`schemas/nika-workflow.schema.json`](../schemas/) describing the envelope +
+task shape + verb argument structures. It is the machine-readable companion to
+this prose spec (kept in sync · the prose is normative on conflict).
+
+Editors (VS Code · Zed · JetBrains · Neovim) pick it up via the standard
+`yaml.schemas` association (or a `# yaml-language-server: $schema=…` modeline)
+to give **autocomplete + inline validation** as you type — the same DX as
+GitHub Actions and Docker Compose. This is also what makes a Nika file
+pleasant (and trap-free) for an AI to author: the schema constrains the shape
+before the engine ever runs. CEL expressions and RFC 9535 paths inside string
+fields are validated by the engine (Core level), not the JSON Schema.
+
 **Use case** · linters · spec editors · LSP server intelligence · static analyzers.
 
 ---
