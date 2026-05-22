@@ -179,6 +179,42 @@ Downstream ·
       Emails · ${{ tasks.api_call.user_emails }}
 ```
 
+#### Raw output vs named bindings · dual-accessible
+
+When a task has an `output:` block defining named bindings · downstream
+access is **dual-accessible** ·
+
+```yaml
+- id: api_call
+  invoke:
+    tool: nika:fetch
+    args: { url: "..." }
+  output:
+    body: $.body
+    status: $.status
+```
+
+Downstream ·
+
+```yaml
+# Raw output (whole structure · pre-binding extraction)
+${{ tasks.api_call.output }}             # full raw JSON · including all fields the verb returned
+
+# Named bindings (defined in output: block above)
+${{ tasks.api_call.body }}               # extracted via $.body
+${{ tasks.api_call.status }}             # extracted via $.status
+```
+
+**Rules** ·
+- `tasks.X.output` ALWAYS returns the raw output (unmodified value
+  returned by the verb · before any binding extraction)
+- `tasks.X.<name>` for any `<name>` declared in `output:` block returns
+  the extracted JSONPath result
+- `<name>` collisions with reserved words `output` · `status` · `error` ·
+  `started_at` · `ended_at` · `duration_ms` are forbidden at parse time
+- If no `output:` block · only `tasks.X.output` is accessible (named
+  bindings are an opt-in convenience)
+
 ### Path grammar · RFC 9535 JSONPath
 
 Output binding uses **[RFC 9535](https://www.rfc-editor.org/rfc/rfc9535) JSONPath**

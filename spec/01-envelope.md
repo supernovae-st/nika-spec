@@ -316,3 +316,52 @@ A v0.1-compliant engine MUST ·
 ---
 
 🦋 *Next · [02 · The 4 verbs](./02-verbs.md)*
+
+---
+
+### Multi-line strings · canonical `|`
+
+For multi-line `prompt:` · `system:` · `command:` · or any free-form text
+field · use the **literal block** indicator `|` (keeps newlines verbatim) ·
+
+```yaml
+prompt: |
+  Line 1 keeps its newline
+  Line 2 keeps its newline
+  Line 3 ends with a trailing newline
+```
+
+**YAML multi-line forms · ranked for Nika** ·
+
+| Form | Newlines | Trailing newline | Verdict |
+|---|---|---|---|
+| `|` | preserved | preserved | **✅ canonical** · use for prompts · system · command · long strings |
+| `|-` | preserved | STRIPPED | ✅ alternative · for compact prompts without trailing newline |
+| `>` | folded to SPACES | preserved | **❌ forbidden in prompts** · whitespace-collapses · corrupts LLM intent |
+| `>-` | folded to SPACES | STRIPPED | **❌ forbidden in prompts** · same whitespace issue |
+
+**Why forbid `>` and `>-` in prompts** · they collapse newlines into
+spaces · which often changes LLM behavior (intended paragraphs become
+one long line). Engines MAY warn or reject `>` / `>-` for prompt/system/
+command fields at parse time.
+
+**Single-line strings** · prefer **unquoted** when no special chars · use
+**double-quoted** `"..."` when escaping is needed (`\n` · `\t` · etc.) ·
+use **single-quoted** `'...'` for literal strings with quotes.
+
+```yaml
+# Unquoted (preferred)
+prompt: Say hello in French.
+
+# Double-quoted (when escaping needed)
+prompt: "Line 1\nLine 2 (escaped newline)"
+
+# Single-quoted (literal · no escapes)
+prompt: 'He said "hi"'
+
+# Multi-line literal (most common · use this for any prompt > 1 line)
+prompt: |
+  You are a helpful assistant.
+  Answer the user's question in 3 sentences.
+```
+

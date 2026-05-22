@@ -147,15 +147,56 @@ when: ${{ tasks.deploy.status in ['success', 'skipped'] }}
 when: ${{ !(tasks.test.status == 'failure') }}
 ```
 
+
+### `when:` · *MUST be a CEL boolean expression*
+
+```yaml
+- id: send_alert
+  when: ${{ tasks.check.alert_count > 0 }}     # CEL expression evaluating to bool
+  invoke: { ... }
+```
+
+The engine **rejects non-boolean `when:` expressions at parse time**
+(`NIKA-PARSE-WHEN-001`).
+
+**Valid** · expressions that return a bool ·
+```yaml
+when: ${{ vars.env == "production" }}          # bool comparison
+when: ${{ tasks.upstream.status == "success" }}
+when: ${{ tasks.scan.alerts.size() > 0 }}
+when: ${{ vars.dry_run == false && tasks.check.passed }}
+when: ${{ tasks.X.output != null }}            # null check
+```
+
+**Invalid** · rejected at parse time ·
+```yaml
+when: ${{ vars.threshold }}                    # ❌ returns integer · not bool
+when: ${{ tasks.X.output }}                    # ❌ returns object · not bool
+when: ${{ vars.message }}                      # ❌ returns string · not bool
+when: "literal string"                          # ❌ not a ${{ }} expression
+```
+
+For non-boolean values · use explicit comparison ·
+```yaml
+when: ${{ vars.threshold > 0 }}                # explicit > comparison
+when: ${{ vars.message != "" }}                # empty string check
+when: ${{ size(vars.items) > 0 }}              # collection size check
+```
+
+---
+
 ### `for_each` · *optional · map a task over a collection*
 
 ```yaml
-- id: summarize_each
-  for_each: ${{ tasks.fetch_pages.output }}   # a static list OR a prior task's array output
+- id: scrape_all
+  for_each: ${{ vars.urls }}                  # a static list OR a prior task's array output
+  max_parallel: 5                              # optional · cap concurrent iterations · default unbounded
+  fail_fast: false                             # optional · false = keep going on errors · default true
   with:
     page: ${{ item }}                          # ${{ item }} = the current element
-  infer:
-    prompt: "Summarize this page · ${{ with.page }}"
+  invoke:
+    tool: nika:fetch
+    args: { url: "${{ with.page }}" }
 ```
 
 `for_each` runs the task **once per element** of the collection. Inside the
@@ -164,18 +205,65 @@ to its zero-based position). The collection is either a literal list or a
 reference to an upstream task's array output — this is the **matrix /
 fan-out** pattern familiar from GitHub Actions.
 
-Semantics (closed at v1) ·
+#### ⚠️ Parallel by default
 
-- The iterations of a single `for_each` task **MAY run in parallel** (engine
-  SHOULD parallelize · bounded by engine concurrency config).
+By default · `for_each` iterations run **in parallel** (engine spawns all
+iterations concurrently · bounded by `max_parallel:` if set).
+
+This is **different from Python's sequential `for` loop**. If you need
+sequential iteration · set `max_parallel: 1` ·
+
+```yaml
+- id: process_in_order
+  for_each: ${{ vars.items }}
+  max_parallel: 1                              # iterations run one-at-a-time, in order
+  exec:
+    command: "process ${{ item }}"
+```
+
+#### `max_parallel:` · *optional · cap concurrent iterations*
+
+```yaml
+for_each: ${{ vars.urls }}     # 1000 URLs
+max_parallel: 5                # at most 5 in-flight at any time
+```
+
+- **Default · unbounded** (subject to engine-wide concurrency budget · v0.3
+  daemon adds workflow-level cap).
+- **Positive integer** · `1` to `n`. `1` = sequential.
+- **Engine impl** · `tokio::sync::Semaphore` (or equivalent) · iterations
+  acquire a permit before executing · release on completion.
+- **Use cases** · rate-limiting provider APIs · avoiding resource
+  exhaustion · compliance with concurrency limits.
+
+#### `fail_fast:` · *optional · abort-on-error policy*
+
+```yaml
+for_each: ${{ vars.urls }}
+fail_fast: false                # default true · false = process all even if some fail
+```
+
+- **Default · `true`** · first iteration error aborts remaining iterations ·
+  parent task transitions to `failed` status immediately.
+- **`fail_fast: false`** · iteration errors are collected · remaining
+  iterations keep running · parent task transitions to `failed` (with
+  per-iteration error details) ONLY after all iterations complete.
+- **Use cases** · « process N URLs · report which failed but don't abort »
+  (false) vs « if any LLM call fails, the whole batch is invalid » (true).
+
+#### Semantics (closed at v1)
+
 - The task's output is the **array of per-iteration outputs**, in input
-  order · referenced downstream as `${{ tasks.summarize_each.output }}`
-  (an array) · `${{ tasks.summarize_each.output[0] }}` for one element.
+  order · referenced downstream as `${{ tasks.scrape_all.output }}`
+  (an array) · `${{ tasks.scrape_all.output[0] }}` for one element.
 - `for_each` is **bounded fan-out**, not recursion · a task cannot
   `for_each` over its own output. The DAG stays acyclic.
 - If the collection is empty · the task is `skipped` (status `skipped`).
 - `when:` is evaluated **once** before the fan-out · `retry:` /
   `on_error:` / `timeout:` apply **per iteration**.
+- `max_parallel:` + `fail_fast:` apply uniformly across all iterations.
+- `on_finally:` (see below) runs **once** after all iterations complete
+  (success OR failure).
 
 This is the one construct that lets a v1 workflow process a
 runtime-computed number of items (N files · N search hits · N pages)
@@ -433,11 +521,72 @@ Declares the **raw shape** of the task's output. Optional · default **inferred 
 - `output_format:` is a **type hint on the raw output** (before bindings extract from it).
 - Two distinct concerns → two distinct fields → Rams 4 understandable.
 
+### `on_finally` · *optional · cleanup hook · ALWAYS runs*
+
+```yaml
+- id: process
+  exec:
+    command: "./process.sh > /tmp/output.json"
+  on_finally:                                  # runs always · success/fail/timeout/cancel
+    - exec:
+        command: "rm -f /tmp/output.json"
+    - invoke:
+        tool: nika:emit
+        args: { event: "task_completed", task_id: "process" }
+```
+
+`on_finally:` declares **cleanup tasks** that run after the parent task
+completes · REGARDLESS of outcome (success · failure · timeout · cancel).
+
+#### Semantics (closed at v1)
+
+- **List of mini-tasks** · zero or more · each with its own verb (`exec:` ·
+  `invoke:` · or `infer:` · `agent:` rarely used here).
+- **Runs sequentially** in declared order · cleanup-task-N starts after
+  cleanup-task-(N-1) completes.
+- **Cleanup errors are LOGGED but DO NOT propagate** · the parent task's
+  final status reflects ONLY the main verb's outcome · NOT the cleanup
+  outcomes (best-effort semantics).
+- **Cleanup tasks have access to** `${{ tasks.<parent>.status }}` and
+  `${{ tasks.<parent>.error }}` to branch behavior (e.g. only-on-error
+  notification).
+- **Default cleanup timeout** · 30 seconds per cleanup task (overridable
+  per cleanup task via `timeout:` field).
+- **Failed parent task's `on_finally:` runs BEFORE** the error propagates
+  upward in the DAG (gives cleanup a chance to undo side effects).
+- **Engine MUST execute** `on_finally:` on cancel (Ctrl+C) and timeout.
+- **Engine MAY skip** `on_finally:` only if the workflow process itself
+  crashes (SIGSEGV · OOM · hard kill).
+
+#### Use cases
+
+```yaml
+# 1 · cleanup temp files
+on_finally:
+  - exec: { command: "rm -rf /tmp/workflow-${{ workflow_run_id }}" }
+
+# 2 · always-emit completion event
+on_finally:
+  - invoke:
+      tool: nika:emit
+      args: { event: "task_done", status: "${{ tasks.process.status }}" }
+
+# 3 · on-error notification only
+on_finally:
+  - when: ${{ tasks.process.status == 'failed' }}
+    invoke:
+      tool: nika:fetch
+      args:
+        url: "https://hooks.slack.com/..."
+        method: POST
+        body: { text: "Task failed · ${{ tasks.process.error }}" }
+```
+
 ---
 
 ## Forward-compat
 
-v1 ships with these task fields · `id` · `depends_on` · `when` · `for_each` · `retry` · `on_error` · `timeout` · `with` · `output` · `output_format` · plus the verb selector. Additional fields may be added in minor bumps (additive only).
+v1 ships with these task fields · `id` · `depends_on` · `when` · `for_each` · `max_parallel` · `fail_fast` · `retry` · `on_error` · `timeout` · `on_finally` · `with` · `output` · `output_format` · plus the verb selector. Additional fields may be added in minor bumps (additive only).
 
 Out of scope for v1 · `parallel:` for explicit concurrency control · `include:` for sub-workflow composition (workaround · `exec: nika run sub.yaml`). See [08-out-of-scope.md](./08-out-of-scope.md).
 

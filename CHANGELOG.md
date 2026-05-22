@@ -12,7 +12,73 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-### Added — task-level `timeout` duration string + `output_format` type hint
+### Added — for_each concurrency control + on_finally cleanup hook + 4 clarifications
+
+D-2026-05-22-N24 · ultrathink session · « ok enregistre tout ce qui manque ·
+verifie buildin + brouillon · prend les meilleures conventions · max parallel
+on a Rust+Tokio pas pour rien · go au max ». User-locked. 3 NEW additive
+fields (zero breaking · within nika: v1) + 4 clarifications (zero new fields).
+
+- **NEW `max_parallel:` on `for_each:` block** · cap concurrent iterations ·
+  optional · positive integer · default UNBOUNDED · engine impl via
+  `tokio::sync::Semaphore`. Critical for production · rate-limit upstream
+  APIs · avoid DOS on `for_each` over 1000+ items · compliance with provider
+  concurrency limits. Field name `max_parallel:` per GitHub Actions canon
+  (matrix.max-parallel) · explicit naming (vs brouillon's `concurrency:`
+  which we considered but rejected for clarity).
+
+- **NEW `fail_fast:` on `for_each:` block** · abort-on-error policy ·
+  optional · boolean · default TRUE (first iteration error aborts remaining
+  iterations · parent task fails immediately). When false · iteration
+  errors are collected · all iterations run to completion · parent fails
+  after all iterations done (with per-iteration error details). Brouillon
+  convention adopted (best-of-best · production-essential for « process
+  all even if some fail » pattern).
+
+- **NEW `on_finally:` task field** · cleanup hook list of mini-tasks that
+  ALWAYS run after the parent task completes (success/fail/timeout/cancel).
+  Sequential in declared order · errors LOGGED but NOT propagated to
+  parent status (best-effort semantics). Universal cleanup pattern · cf
+  Argo `onExit:` · Temporal `defer` · GitHub Actions `if: always()` ·
+  LangGraph `finally` · Airflow `on_failure_callback`.
+
+- **NEW for_each « parallel-by-default » explicit callout** · spec
+  clarification (C2) · big warning box · for_each is PARALLEL by default
+  (differs from Python's sequential `for` loop) · `max_parallel: 1`
+  forces sequential.
+
+- **NEW `when:` CEL boolean conformance rule** · spec clarification (C3) ·
+  `when:` MUST be a CEL expression returning bool · engine rejects
+  non-boolean expressions at parse time (`NIKA-PARSE-WHEN-001`). Examples
+  · valid (comparisons · `&&` · `||` · `null` checks) · invalid (integer ·
+  object · string · literal). Truthy-coercion forbidden · explicit
+  comparison required.
+
+- **NEW raw-output-vs-named-bindings clarification** · spec clarification
+  (C1) · `tasks.X.output` is the raw verb output · `tasks.X.<name>` are
+  the JSONPath-extracted named bindings · both dual-accessible · reserved
+  names (`output` · `status` · `error` · `started_at` · `ended_at` ·
+  `duration_ms`) cannot be used as binding names.
+
+- **NEW YAML multi-line `|` canonical guidance** · spec clarification
+  (C4) · `|` (literal · preserves newlines) is canonical for prompts /
+  system / command fields · `|-` (literal + strip trailing) alternative ·
+  `>` and `>-` (folded · collapses newlines into spaces) FORBIDDEN in
+  prompts (corrupts LLM intent).
+
+### Skipped — `nika:notify` · `nika:uuid` · `nika:date` · `nika:hash` · `nika:wait_until`
+
+Brouillon audit revealed these 5 builtins NOT in current brouillon
+nika-builtin/src (no notify.rs · no uuid.rs · no date.rs · no hash.rs ·
+no wait_until.rs). Adding them would change the spec MANDATE from 37 to
+42 builtins · catastrophic spec/engine consistency violation per D-N22
+architect-audit-verdict. Per Rams 10 « less but better » · current 37 list
+is the v0.81 conformance contract · expansion to 42+ is a v0.2 candidate
+requiring explicit user re-lock + spec amendment.
+
+---
+
+## [Previous Unreleased] — task-level `timeout` duration string + `output_format` type hint
 
 User-locked v0.2 amendment candidates from `nika/hq/blueprint/NIKA_ROADMAP.md` §16
 (D-2026-05-22-N23 · « Aok Bok Cok »). Two additive changes within `nika: v1` · zero
