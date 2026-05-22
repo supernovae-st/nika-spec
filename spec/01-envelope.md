@@ -304,12 +304,12 @@ tasks:
 
 ## Conformance
 
-A v1-compliant engine MUST ·
+A v0.1-compliant engine MUST ·
 
 1. Reject any workflow missing `nika:` or `workflow:` with a clear error
 2. Accept exactly `nika: v1` · reject any other value (`v1.0` · `1` · `v2` …) with a clear error
 3. Validate `workflow` identifier kebab-case format
-4. Make workflow-level `provider`, `model`, `vars`, `env`, `secrets` available to all tasks as defaults
+4. Make workflow-level `model`, `vars`, `env`, `secrets` available to all tasks as defaults
 5. Validate typed `vars` (type + required) before execution · reject missing required inputs
 6. Mask resolved `secrets` values in all logs · traces · journal events
 
