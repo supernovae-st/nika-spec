@@ -30,9 +30,8 @@ schemas/
 ## How to use (planned)
 
 ```yaml
-# yaml-language-server: $schema=https://supernovae.studio/nika/v0.1/workflow.schema.json
-apiVersion: nika.sh/v1
-schema: nika/workflow@v1
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+nika: v1
 workflow: my-workflow
 ...
 ```

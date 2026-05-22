@@ -12,10 +12,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-### Added / Changed — more local providers + stabilization (pass 5 · D-2026-05-22-N14)
+### Added / Changed — more local providers + stabilization
 
-Socratic audit (« add other local providers — not in-process GGUF — + find
-anything else non-conventional / mélange / non-intuitive »).
+More local-provider options + a few consistency fixes.
 
 - **5 local providers** now (was 2) · added `llamacpp` (llama.cpp `llama-server`
   `:8080`) · `localai` (`:8080` · OpenAI drop-in · multi-backend) · `vllm`
@@ -41,7 +40,7 @@ with `/` (zero `::` survivors) · Connectome is `nika:connectome/recall`
 everywhere (no dot drift) · the kebab `workflow:` vs snake task-`id` split is
 justified (CEL hyphen-minus) and documented.
 
-### Changed — model selection · one field (pass 4)
+### Changed — model selection · one field
 
 Research-validated against LiteLLM · OpenRouter · Vercel AI SDK · PydanticAI
 (all converged on a single `provider/model` string).
@@ -134,7 +133,7 @@ Compose versionless · AWS exponential-backoff-and-jitter.
 - Initial spec repo · Apache-2.0 (patent grant for implementers).
 - `spec/` · 9 sections · envelope · 5 verbs · DAG · variables · errors · stdlib
   contract · conformance · out-of-scope.
-- `stdlib/` · curated v0.1 lists (10 providers · 9 extract modes · 36 builtins ·
+- `stdlib/` · curated v0.1 lists (13 providers · 9 extract modes · 36 builtins ·
   media builtins deferred to a later stdlib release).
 - `examples/` · placeholder (26 canonical workflows pending).
 - `conformance/` · placeholder (test suite for the « v0.1-compliant » claim).

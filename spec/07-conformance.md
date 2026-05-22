@@ -115,7 +115,7 @@ Runtime-compliant engines may bring **their own** provider implementations · to
 
 An engine claims « Stdlib v0.1-compliant » if it satisfies Runtime conformance PLUS ·
 
-1. **Ships all 8 canonical providers** (per [stdlib/providers-v0.1.md](../stdlib/providers-v0.1.md))
+1. **Ships all 13 canonical providers** (per [stdlib/providers-v0.1.md](../stdlib/providers-v0.1.md))
 2. **Ships all 9 canonical extract modes** (per [stdlib/extract-modes-v0.1.md](../stdlib/extract-modes-v0.1.md))
 3. **Ships at least all 36 canonical builtins** (core 6 + file 5 + data 19 + introspection 6 · the 24 media builtins are optional)
 4. **Passes** all tests in `conformance/tests/stdlib/`
