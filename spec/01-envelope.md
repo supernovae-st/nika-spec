@@ -315,4 +315,4 @@ A v0.1-compliant engine MUST ·
 
 ---
 
-🦋 *Next · [02 · The 5 verbs](./02-verbs.md)*
+🦋 *Next · [02 · The 4 verbs](./02-verbs.md)*

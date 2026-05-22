@@ -95,8 +95,10 @@ A task MAY declare a `retry:` block. Retries apply to **transient** errors only 
 
 ```yaml
 - id: flaky_api
-  fetch:
-    url: "https://flaky.example.com/data"
+  invoke:
+    tool: "nika:fetch"
+    args:
+      url: "https://flaky.example.com/data"
   retry:
     max_attempts: 5              # default 1 (no retry)
     backoff_ms: 1000             # initial backoff
@@ -150,8 +152,10 @@ A task MAY declare an `on_error:` block to recover from non-transient errors (or
 
 ```yaml
 - id: api_call
-  fetch:
-    url: "https://api.example.com/data"
+  invoke:
+    tool: "nika:fetch"
+    args:
+      url: "https://api.example.com/data"
   retry: { max_attempts: 3 }
   on_error:
     fallback: ${{ tasks.cached_data.output }}    # use another task's output
@@ -177,7 +181,7 @@ A task MAY declare an `on_error:` block to recover from non-transient errors (or
 ```yaml
 # Use cached data on API failure
 - id: api_call
-  fetch: { url: "https://api.example.com/data" }
+  invoke: { tool: "nika:fetch", args: { url: "https://api.example.com/data" } }
   on_error:
     fallback: ${{ tasks.cached_data.output }}
 

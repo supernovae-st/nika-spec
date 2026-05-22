@@ -14,7 +14,6 @@ Nika is a **language**. Not a framework, not a runtime, not a SaaS.
 The language describes the **what** of an AI workflow ·
 - which LLMs to call (`infer:`)
 - which commands to run (`exec:`)
-- which URLs to fetch (`fetch:`)
 - which tools to invoke (`invoke:`)
 - which agentic loops to spawn (`agent:`)
 
@@ -56,7 +55,7 @@ nika run hello.nika.yaml
 ## The 5 pillars · immutable forever
 
 1. **Envelope** — one line · `nika: v1` + `workflow:` header (+ typed `vars` · `env` · `secrets`)
-2. **The 5 verbs** — `infer:` · `exec:` · `fetch:` · `invoke:` · `agent:` (5, absolute)
+2. **The 4 verbs** — `infer:` · `exec:` · `invoke:` · `agent:` (5, absolute)
 3. **DAG shape** — tasks + `depends_on` + `when` + `for_each` + output binding
 4. **Variables** — one `${{ ... }}` syntax · 5 namespaces (`vars` · `with` · `tasks` · `env` · `secrets`)
 5. **Error model** — `NIKA-<NS>-<NNN>` codes · retry semantics · structured output
@@ -75,7 +74,7 @@ nika-spec/
 ├── spec/                      ← THE specification (~30 pages markdown)
 │   ├── 00-overview.md           one-page vision
 │   ├── 01-envelope.md           nika: v1 + workflow + typed vars/env/secrets
-│   ├── 02-verbs.md              the 5 verbs · signatures + semantics
+│   ├── 02-verbs.md              the 4 verbs · signatures + semantics
 │   ├── 03-dag.md                tasks · depends_on · when · for_each · output
 │   ├── 04-variables.md          ${{ }} · 5 namespaces · vars/with/tasks/env/secrets
 │   ├── 05-errors.md             error codes · retry · structured output

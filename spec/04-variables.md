@@ -156,10 +156,12 @@ Use `output:` to define **named bindings** extracted from a task's raw response 
 
 ```yaml
 - id: api_call
-  fetch:
-    url: "https://api.example.com/v1/users"
-    mode: jsonpath
-    jsonpath: "$"
+  invoke:
+    tool: "nika:fetch"
+    args:
+      url: "https://api.example.com/v1/users"
+      mode: jsonpath
+      jsonpath: "$"
   output:
     user_count: "$.data.users.length"
     first_user: "$.data.users[0]"

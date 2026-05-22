@@ -1,25 +1,35 @@
-# 02 · The 5 verbs
+# 02 · The 4 verbs
 
-> Every task in a Nika workflow binds to **exactly one** of 5 verbs.
-> No 4. No 6. Five forever.
+> Every task in a Nika workflow binds to **exactly one** of 4 verbs.
+> A verb is a **distinct native execution model** the engine itself
+> implements — call a model, run a process, dispatch a tool, drive an
+> agentic loop. That is the whole operation space.
 >
-> The verbs are the **operations** the workflow performs. Everything
-> else (providers · builtins · extract modes · etc.) lives in the
-> stdlib and is invoked through the 5 verbs.
+> Everything *callable* — fetching a URL, a database query, a file
+> write, cognitive recall — is a **tool** reached through `invoke:`.
+> Everything about *ordering* — iteration, branching — is a **DAG**
+> construct (`for_each` · `when`). The 4 verbs never change; tools and
+> the stdlib grow freely.
 
 ---
 
-## The 5 verbs · summary
+## The 4 verbs · summary
 
 | Verb | What it does | Stdlib it consumes |
 |---|---|---|
 | `infer:` | Single LLM call · text · structured · vision · thinking | providers |
 | `exec:` | Shell command with sandboxing | (none · pure effect) |
-| `fetch:` | HTTP request + content extraction | extract modes |
 | `invoke:` | Call a builtin tool OR an MCP tool | builtins · MCP servers |
 | `agent:` | Multi-turn agentic loop with tool calls | providers · builtins · MCP |
 
 A task **must** specify exactly one of these. Multiple verbs on a single task is a validation error.
+
+> **Where did `fetch` go?** Fetching a URL is *calling a tool*, not a
+> distinct execution model — so it is the `nika:fetch` builtin, reached
+> through `invoke:` (the extract modes become its `mode` argument). Same
+> reason a DB query (`invoke: mcp:postgres/query`) or a file write
+> (`invoke: nika:write`) is not its own verb. See
+> [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md).
 
 ### What `${{ tasks.<id>.output }}` holds · per verb
 
@@ -30,7 +40,6 @@ shape depends on the verb (know this before you bind downstream) ·
 |---|---|---|
 | `infer:` | the model's reply · **string** | `schema:` set → **object** matching it |
 | `exec:` | **stdout string** (default) | `capture: structured` → `{ stdout, stderr, exit_code }` |
-| `fetch:` | **extracted text string** (markdown/article/text) | `mode: jsonpath`/`metadata`/`feed`/`links` → **array/object** |
 | `invoke:` | the **tool's response** (tool-defined · string OR object) | per builtin / MCP tool schema |
 | `agent:` | the loop's **final message** · string | (the agent's last assistant turn) |
 
@@ -157,70 +166,6 @@ The engine MUST ·
 - Capture stdout/stderr as configured
 - Return exit code in `structured` capture mode
 - Fail the task on non-zero exit (unless `on_error:` overrides · see [05-errors.md](./05-errors.md))
-
----
-
-## `fetch:` · HTTP request + extraction
-
-Make an HTTP request, extract content. The result is the extracted text (or structured data depending on mode).
-
-### Minimal
-
-```yaml
-- id: scrape
-  fetch:
-    url: "https://example.com/article"
-```
-
-Defaults · `method: GET` · `mode: markdown`.
-
-### Full
-
-```yaml
-- id: api_call
-  timeout_ms: 10000                # task-level (see 03-dag)
-  retry: { max_attempts: 3 }       # task-level (see 05-errors)
-  fetch:
-    url: "https://api.example.com/v1/users"
-    method: POST
-    headers:
-      Authorization: "Bearer ${{ secrets.api_token }}"
-      Content-Type: "application/json"
-    body:
-      query: "${{ vars.search_term }}"
-    mode: jsonpath
-    jsonpath: "$.data.users[*].name"   # RFC 9535 JSONPath
-```
-
-### Fields
-
-| Field | Required | Type | Notes |
-|---|---|---|---|
-| `url` | yes | string | Target URL · may use `${{ ... }}` |
-| `method` | no | enum | `GET` (default) · `POST` · `PUT` · `DELETE` · `PATCH` · `HEAD` |
-| `headers` | no | object | Extra request headers |
-| `body` | no | string\|object | Request body · objects auto-serialized to JSON |
-| `mode` | no | enum | See [stdlib/extract-modes-v0.1.md](../stdlib/extract-modes-v0.1.md) · default `markdown` |
-| `jsonpath` | no | string | RFC 9535 JSONPath expression · only with `mode: jsonpath` |
-
-> `timeout_ms` and `retry` are **task-level** fields (see [03-dag.md](./03-dag.md) + [05-errors.md](./05-errors.md)) — not repeated inside `fetch:`.
-
-### Security
-
-A v0.1-compliant engine MUST ·
-
-- Implement **SSRF defense** · reject URLs targeting private networks (`10.0.0.0/8` · `172.16.0.0/12` · `192.168.0.0/16` · `127.0.0.0/8` · IPv6 link-local · cloud-metadata `169.254.169.254`) unless engine config explicitly allows
-- Enforce `timeout_ms` with hard kill
-- Honor TLS · reject self-signed by default
-
-### Conformance
-
-The engine MUST ·
-
-- Issue the HTTP request as specified
-- Apply the configured extraction mode (see stdlib)
-- Return the extracted content as task output
-- Fail with a typed error on network failure · timeout · non-2xx (unless `on_error:` overrides)
 
 ---
 
@@ -377,7 +322,7 @@ The engine MUST ·
 
 ## Forward-compat
 
-The 5 verb names are **immutable forever** — and the count is **5, absolute**. The operation space is complete: call a model (`infer`), run a command (`exec`), fetch + extract content (`fetch`), call a tool (`invoke`), run an agentic loop (`agent`). Every other capability is either an **invoke-able tool** (a database query → `invoke: mcp:postgres/query` · a file write → `invoke: nika:write` · cognitive recall → `invoke: nika:connectome/recall`) or a **DAG control-flow construct** (iteration → `for_each` · branching → `when`). A 6th verb would require a `nika: v2` contract — and per forever-v0.x, that is effectively never.
+The 4 verb names are **immutable forever** — and the count is **4, absolute**. The operation space is complete: call a model (`infer`), run a process (`exec`), call a tool (`invoke`), run an agentic loop (`agent`). Every other capability is either an **invoke-able tool** (an HTTP fetch → `invoke: nika:fetch` · a database query → `invoke: mcp:postgres/query` · a file write → `invoke: nika:write` · cognitive recall → `invoke: nika:connectome/recall`) or a **DAG control-flow construct** (iteration → `for_each` · branching → `when`). A new verb would require a `nika: v2` contract — and per forever-v0.x, that is effectively never.
 
 Field additions to each verb are **additive** within `nika: v1` (feature-detected · no minor version in the file). Field removal NEVER happens at v1.
 

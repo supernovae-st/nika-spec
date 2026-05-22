@@ -62,7 +62,7 @@ macro retry_with_backoff:
 
 - id: task
   use_macro: retry_with_backoff
-  fetch: ...
+  invoke: { tool: "nika:fetch", ... }
 ```
 
 **Why deferred** · macros are a powerful but dangerous primitive (expansion order · debugging · drift). Most needs are met by `with:` scope + structured retry. Revisit only if empirical demand emerges.
@@ -176,7 +176,7 @@ pin in the envelope (`nika: v1` already does this for the language contract). Pe
 **No 6th verb — ever.** When the Connectome (the engine's cognitive subsystem)
 ships, recall and ingest are exposed as **builtin tools under
 `invoke:`** — `nika:connectome/recall` · `nika:connectome/ingest` — NOT as a
-new verb. The 5 verbs are absolute: a 6th verb would
+new verb. The 4 verbs are absolute: a new verb would
 require a `nika: v2` contract, which forever-v0.x makes effectively never. So
 the *shape* of cognitive access is already final today; only the *capability*
 waits on the engine.

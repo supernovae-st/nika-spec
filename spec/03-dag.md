@@ -1,7 +1,7 @@
 # 03 · DAG shape
 
 > A Nika workflow is a **Directed Acyclic Graph** of tasks. Each node is a
-> task (one of the 5 verbs). Each edge is a dependency.
+> task (one of the 4 verbs). Each edge is a dependency.
 >
 > The DAG semantics are minimal · `depends_on` for order · `when` for
 > conditional execution · output binding via JSONPath.
@@ -42,7 +42,7 @@ tasks:
   with:                         # optional · variable scope injection
     data: ${{ tasks.task_a.output }}
     config: { foo: "bar" }
-  infer:                        # required · one of the 5 verbs
+  infer:                        # required · one of the 4 verbs
     prompt: "..."
   output:                       # optional · output binding
     result: "$.choices[0].message.content"
@@ -222,9 +222,11 @@ See [05-errors.md](./05-errors.md).
 
 ```yaml
 - id: api_call
-  fetch:
-    url: "https://api.example.com/data"
-    mode: raw
+  invoke:
+    tool: "nika:fetch"
+    args:
+      url: "https://api.example.com/data"
+      mode: raw
   output:
     user_count: "$.data.users.length"
     first_user: "$.data.users[0]"
@@ -340,9 +342,11 @@ Exactly one of `build_prod` or `build_dev` runs · the other is skipped · `depl
 ```yaml
 tasks:
   - id: discover
-    fetch:
-      url: "https://example.com/sitemap.xml"
-      mode: sitemap
+    invoke:
+      tool: "nika:fetch"
+      args:
+        url: "https://example.com/sitemap.xml"
+        mode: sitemap
     output:
       pages: "$.urls[*]"
 
@@ -351,9 +355,11 @@ tasks:
     for_each: ${{ tasks.discover.pages }}
     with:
       page: ${{ item }}
-    fetch:
-      url: ${{ with.page }}
-      mode: article
+    invoke:
+      tool: "nika:fetch"
+      args:
+        url: ${{ with.page }}
+        mode: article
 
   - id: digest
     depends_on: [summarize]

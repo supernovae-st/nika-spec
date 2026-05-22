@@ -38,7 +38,7 @@ An engine claims « Core v0.1-compliant » if it ·
    - Accepts exactly `nika: v1` · `workflow: <id>` · rejects any other `nika:` value
    - Validates the `workflow` identifier kebab-case
    - Validates typed `vars` (type + required) · validates `env` / `secrets` shape
-   - Recognizes the 5 verbs (`infer` · `exec` · `fetch` · `invoke` · `agent`)
+   - Recognizes the 4 verbs (`infer` · `exec` · `invoke` · `agent`)
    - Rejects unknown top-level fields with a clear error OR ignores with warning (engine's choice · documented behavior)
 
 2. **Computes DAG topology** correctly
@@ -87,10 +87,9 @@ fields are validated by the engine (Core level), not the JSON Schema.
 
 An engine claims « Runtime v0.1-compliant » if it satisfies Core conformance PLUS ·
 
-1. **Executes the 5 verbs** with correct semantics
+1. **Executes the 4 verbs** with correct semantics
    - `infer:` calls a configured provider · returns response
    - `exec:` runs the command in a shell · honors timeout + security
-   - `fetch:` issues the HTTP request · applies extract mode
    - `invoke:` resolves and calls the tool · returns response
    - `agent:` runs the multi-turn loop · honors max_turns + tools whitelist
 
@@ -151,8 +150,7 @@ conformance/
 │   ├── runtime/               # verb execution · task fields · events
 │   │   ├── infer/
 │   │   ├── exec/
-│   │   ├── fetch/
-│   │   ├── invoke/
+││   │   ├── invoke/
 │   │   ├── agent/
 │   │   └── workflow-lifecycle/
 │   │

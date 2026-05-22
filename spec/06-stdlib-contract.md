@@ -13,7 +13,7 @@
 CORE LANGUAGE                          STDLIB
 ─────────────                          ──────
 envelope                                providers (infer · agent)
-5 verbs (signatures only)               extract modes (fetch)
+4 verbs (signatures only)               extract modes (the nika:fetch tool)
 DAG semantics                           builtins (invoke)
 variable substitution
 error model
@@ -119,9 +119,11 @@ model: anthropic/claude-sonnet-4-6   # <provider>/<name> · see stdlib/providers
 ### Extract mode
 
 ```yaml
-fetch:
-  url: "https://example.com"
-  mode: article               # references stdlib/extract-modes-v0.1.md
+invoke:
+  tool: "nika:fetch"
+  args:
+    url: "https://example.com"
+    mode: article             # references stdlib/extract-modes-v0.1.md
 ```
 
 ### Builtin
@@ -173,7 +175,7 @@ See [07-conformance.md](./07-conformance.md). In summary ·
 | Level | Stdlib requirement |
 |---|---|
 | Core | None · only parse + DAG + variable + error · no execution needed |
-| Runtime | Must execute the 5 verbs · provider/tool implementations engine's choice |
+| Runtime | Must execute the 4 verbs · provider/tool implementations engine's choice |
 | Stdlib v0.1 | Must ship the 13 providers + 9 extract modes + 36 builtins |
 | Stdlib v0.1+media | Stdlib v0.1 + 24 media builtins |
 

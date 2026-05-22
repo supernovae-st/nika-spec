@@ -12,8 +12,7 @@ It describes the **what** ·
 
 - which LLMs to call (`infer:`)
 - which commands to run (`exec:`)
-- which URLs to fetch (`fetch:`)
-- which tools to invoke (`invoke:`)
+- which tools to call — including fetching a URL (`invoke:`)
 - which agentic loops to spawn (`agent:`)
 
 The **how** lives in conformant engines.
@@ -42,7 +41,7 @@ Standards work · SQL · GraphQL · OpenAPI · Dockerfile · GitHub Actions YAML
 1.  ENVELOPE        nika: v1
                     workflow: my-workflow-id
 
-2.  THE 5 VERBS     infer:  exec:  fetch:  invoke:  agent:
+2.  THE 4 VERBS     infer:  exec:  invoke:  agent:
 
 3.  DAG SHAPE       tasks · depends_on · when · for_each · output binding
 
@@ -80,9 +79,11 @@ workflow: scrape-and-summarize
 model: anthropic/claude-sonnet-4-6
 tasks:
   - id: fetch_page
-    fetch:
-      url: "https://example.com/article"
-      mode: article          # readability extraction
+    invoke:
+      tool: "nika:fetch"        # fetching is a TOOL, not a verb (4-verb taxonomy)
+      args:
+        url: "https://example.com/article"
+        mode: article          # readability extraction
 
   - id: summarize
     depends_on: [fetch_page]
@@ -102,7 +103,7 @@ tasks:
         content: "${{ with.summary }}"
 ```
 
-3 tasks · DAG with deps · 3 different verbs (`fetch:` · `infer:` · `invoke:`) · variable substitution + task output reference.
+3 tasks · DAG with deps · 2 verbs (`invoke:` ×2 incl `nika:fetch` · `infer:`) · variable substitution + task output reference.
 
 ---
 
@@ -111,7 +112,7 @@ tasks:
 | Section | What it covers |
 |---|---|
 | [01 envelope](./01-envelope.md) | The header · `nika: v1` · `workflow:` · typed `vars` · `env` · `secrets` |
-| [02 verbs](./02-verbs.md) | The 5 verbs · signatures · semantics |
+| [02 verbs](./02-verbs.md) | The 4 verbs · signatures · semantics |
 | [03 DAG](./03-dag.md) | Tasks · `depends_on` · `when` · `for_each` · output binding |
 | [04 variables](./04-variables.md) | `${{ vars · with · tasks · env · secrets }}` · 5 namespaces |
 | [05 errors](./05-errors.md) | Error codes · retry · structured output schemas |

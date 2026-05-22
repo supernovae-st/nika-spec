@@ -88,7 +88,7 @@ There are 5 variable namespaces · `vars` · `with` · `tasks` · `env` ·
 
 ## 4 · Use the other verbs
 
-There are exactly **5 verbs** — `infer` (call a model) · `exec` (run a
+There are exactly **4 verbs** — `infer` (call a model) · `exec` (run a
 command) · `fetch` (get + extract a URL) · `invoke` (call a tool) · `agent`
 (run an agentic loop). Here's `fetch` + `invoke` working with `infer` ·
 
@@ -137,7 +137,7 @@ contract, the runtime is an implementation detail.
 ## What you just learned
 
 You touched all 5 pillars · the **envelope** (`nika: v1` + `workflow:`) · the
-**5 verbs** · the **DAG** (`depends_on` + task outputs) · **variables**
+**4 verbs** · the **DAG** (`depends_on` + task outputs) · **variables**
 (`${{ }}` · 5 namespaces) · and the start of the **error model** (engines
 return `NIKA-<NS>-<NNN>` codes · see [spec/05-errors.md](./spec/05-errors.md)).
 
