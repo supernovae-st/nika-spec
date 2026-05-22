@@ -14,8 +14,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed — model selection · one field (pass 4 · D-2026-05-22-N13)
 
-Socratic « is `provider:` + `model:` as two fields a good idea? » audit ·
-research-validated against LiteLLM · OpenRouter · Vercel AI SDK · PydanticAI
+Research-validated against LiteLLM · OpenRouter · Vercel AI SDK · PydanticAI
 (all converged on a single `provider/model` string).
 
 - **`provider:` + `model:` collapsed into ONE `model: <provider>/<name>` field.**
@@ -29,11 +28,11 @@ research-validated against LiteLLM · OpenRouter · Vercel AI SDK · PydanticAI
   `mock/…` = TEST. No separate `local:` flag · no hidden config.
 - **Providers 8 → 10.** Added `ollama` + `lmstudio` as first-class local providers
   (external OpenAI-compatible HTTP servers · NOT the crash-prone in-process
-  `native` GGUF runtime, which stays deferred per D-N8). `model: ollama/llama3.1`
+  `native` GGUF runtime, which stays deferred). `model: ollama/llama3.1`
   makes a zero-cloud run trivial.
 - **Provider config stays OUT of the workflow** · `base_url` + auth in
   engine/provider config · a workflow only *selects*. Combine with typed `vars`
-  (D-N10) to parameterize the model and run one workflow against any backend.
+  to parameterize the model and run one workflow against any backend.
 
 Pre-public hardening of the v0.1 draft (no adopters yet · free to perfect the
 pillars to their immutable-forever form). Grounded in SOTA primary sources ·
@@ -106,7 +105,7 @@ Compose versionless · AWS exponential-backoff-and-jitter.
 - Initial spec repo · Apache-2.0 (patent grant for implementers).
 - `spec/` · 9 sections · envelope · 5 verbs · DAG · variables · errors · stdlib
   contract · conformance · out-of-scope.
-- `stdlib/` · curated v0.1 lists (9 providers · 9 extract modes · 36 builtins ·
+- `stdlib/` · curated v0.1 lists (10 providers · 9 extract modes · 36 builtins ·
   media builtins deferred to a later stdlib release).
 - `examples/` · placeholder (26 canonical workflows pending).
 - `conformance/` · placeholder (test suite for the « v0.1-compliant » claim).

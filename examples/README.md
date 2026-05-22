@@ -2,20 +2,21 @@
 
 > 26 canonical example workflows demonstrating the language. Each file
 > is a complete, runnable workflow (with the reference engine) or a
-> teaching example (with `mock` provider) that doesn't require API keys.
+> teaching example (with the `mock/` model) that doesn't require API keys.
 
 ---
 
 ## Status · placeholder for v0.1.0-draft
 
-The examples will be **recopied clean from the brouillon exploration era**
-(supernovae-st/nika brouillon branch · `examples/` directory ships 26
-canonical workflows that informed the v0.1 spec design).
+The examples are pending for v0.1.0 GA. They distill **26 workflows from an
+earlier Nika prototype** — the empirical source of what real workflows look
+like — into a clean canonical set.
 
-**The recopy is a CRAFT operation** · the brouillon examples will be
-re-authored to · (a) match the v0.1 envelope exactly (`apiVersion: nika.sh/v1`) · (b) use only stdlib v0.1 inclusions · (c) carry SPDX Apache-2.0 headers · (d) be testable against the conformance suite.
+Each will be re-authored to · (a) match the v0.1 envelope exactly
+(`nika: v1`) · (b) use only stdlib v0.1 inclusions · (c) carry an SPDX
+Apache-2.0 header · (d) pass the conformance suite.
 
-## Planned examples (recopied clean from brouillon)
+## Planned examples
 
 ```
 examples/
@@ -27,7 +28,7 @@ examples/
 ├── 06-parallel-fanout.nika.yaml          DAG fan-out + merge
 ├── 07-mcp-invoke.nika.yaml               Call an MCP tool
 ├── 08-multi-locale-mcp.nika.yaml         Combine locale loop + MCP
-├── 09-orchestrate-mock.nika.yaml         Use mock provider for testing
+├── 09-orchestrate-mock.nika.yaml         Use mock model for testing
 ├── 10-orchestrate-openai.nika.yaml       Use openai · structured output
 ├── 11-orchestrate-simple.nika.yaml       Sequential 3-task workflow
 ├── 12-provider-structured-parity.nika.yaml  Structured output across providers
@@ -42,7 +43,7 @@ examples/
 ├── 21-use-output-demo.nika.yaml          output: binding showcase
 ├── 22-weather-chain.nika.yaml            API chain · fetch + infer
 ├── 23-code-review.nika.yaml              Code review agent
-├── 24-diamond.nika.yaml                  Showcase complex DAG
+├── 24-complex-dag.nika.yaml              Showcase a complex DAG
 ├── 25-agents-preset.nika.yaml            Agent presets · model routing
 ├── 26-for-each-locales.nika.yaml         Locale iteration pattern
 │
@@ -55,9 +56,9 @@ Plus a `showcase/` subdirectory for end-to-end project templates.
 
 Each example file ·
 
-- Starts with `# SPDX-License-Identifier: Apache-2.0` comment
+- Starts with a `# SPDX-License-Identifier: Apache-2.0` comment
 - Has a top comment explaining what it demonstrates
-- Uses provider `mock` where possible (for portability + CI testability)
+- Uses the `mock/` model where possible (for portability + CI testability)
 - References only stdlib v0.1 elements
 - Is included in the conformance test suite as an input fixture
 
@@ -71,13 +72,6 @@ nika run examples/01-hello.nika.yaml
 <engine> run examples/01-hello.nika.yaml
 ```
 
-## Sources
-
-The examples derive from the 26 workflows in the brouillon exploration era
-(`supernovae-st/nika` brouillon branch · `examples/` directory). The
-brouillon is the source of empirical knowledge about what real workflows
-look like · v0.1 distills that into a clean canonical set.
-
 ---
 
-🦋 *26 examples · canonical · pending recopy from brouillon.*
+🦋 *26 examples · canonical · pending for v0.1.0 GA.*

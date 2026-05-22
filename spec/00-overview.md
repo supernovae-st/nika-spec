@@ -125,7 +125,7 @@ tasks:
 
 The following are **deferred** to stdlib v0.x or beyond ·
 
-- Memory subsystem APIs (Diamond memory · `nika-memory` orchestrator + satellites · separate stdlib version)
+- Memory subsystem APIs (the engine's memory subsystem · the Connectome · separate stdlib version)
 - Workflow include/import (single-file workflows only in v0.1)
 - Macros / templates (no preprocessing layer)
 - 24 media builtins (`pdf_extract` · `chart` · `qr_validate` · etc. · stdlib v0.x)

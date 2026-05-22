@@ -139,7 +139,7 @@ schedule: "0 */6 * * *"             # every 6 hours
 tasks: ...
 ```
 
-**Why deferred** · scheduling is engine-runtime concern · not language concern. The Diamond reference engine `nika-daemon` (v0.3+) handles cron · workflows themselves stay schedule-agnostic.
+**Why deferred** · scheduling is an engine-runtime concern · not a language concern. A conformant engine handles cron at runtime · workflows themselves stay schedule-agnostic.
 
 ### Workflow checkpointing / resumption
 
@@ -150,7 +150,7 @@ checkpoint:
   storage: sqlite://./checkpoints.db
 ```
 
-**Why deferred** · persistence is engine-runtime concern. The Diamond `nika-storage` (SQLite actor) handles this internally · workflows don't declare it.
+**Why deferred** · persistence is an engine-runtime concern. A conformant engine handles this internally · workflows don't declare it.
 
 ### Workflow versioning / migration
 
@@ -173,11 +173,10 @@ pin in the envelope (`nika: v1` already does this for the language contract). Pe
       top_k: 5
 ```
 
-**No 6th verb — ever.** When the Connectome (the Diamond cognitive subsystem ·
-orchestrator + 9 satellites + 12 mechanisms · Phase 1 engine waypoint
-~2026-08-30) ships, recall and ingest are exposed as **builtin tools under
+**No 6th verb — ever.** When the Connectome (the engine's cognitive subsystem)
+ships, recall and ingest are exposed as **builtin tools under
 `invoke:`** — `nika:connectome/recall` · `nika:connectome/ingest` — NOT as a
-new verb. The 5 verbs are absolute (locked D-2026-05-22-N10): a 6th verb would
+new verb. The 5 verbs are absolute: a 6th verb would
 require a `nika: v2` contract, which forever-v0.x makes effectively never. So
 the *shape* of cognitive access is already final today; only the *capability*
 waits on the engine.
@@ -266,7 +265,7 @@ budget:
 
 Pipeline-of-workflows orchestration · cross-workflow dependencies · workflow registries · service mesh integration · ALL out of scope **forever**. Nika is a single-workflow language. Multi-workflow orchestration is a different problem (cf Temporal · Airflow · etc.).
 
-If you need that · the Diamond reference engine's HTTP server (`nika-serve`) exposes per-workflow run API · build your orchestrator on top of it.
+If you need that · the reference engine's HTTP server exposes a per-workflow run API · build your orchestrator on top of it.
 
 ---
 

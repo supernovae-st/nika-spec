@@ -63,7 +63,7 @@ For an element to enter the stdlib · it MUST satisfy ·
 3. **Forward-compat safe** · signature stable · no breaking semantic risk
 4. **Sovereignty-aligned** · prefers local-first OR multi-vendor (no single-cloud lock-in)
 
-Reference implementation (Diamond Rust engine) provides these elements with quality gates (12-gate admission per ADR-003). Other engines may match this bar.
+The reference engine provides these elements behind strict quality gates. Other engines may match this bar.
 
 ---
 
@@ -100,7 +100,7 @@ Deliberately deferred to stdlib v0.x ·
 
 - **24 media builtins** · pdf_extract · svg_render · chart · phash · thumbhash · provenance · etc. (heavy · high maintenance · niche audience)
 - **Advanced agent presets** · multi-agent coordination patterns · supervisor/worker · etc.
-- **Memory recall builtins** · awaiting Diamond memory subsystem ship (`nika-memory` orchestrator + satellites · v0.5+)
+- **Memory recall builtins** · awaiting the engine's memory subsystem (the Connectome · stdlib v0.5+)
 - **Workflow include / import** · single-file workflows in v0.1
 
 When these mature · they enter stdlib v0.x. The core language doesn't need to change.
