@@ -178,6 +178,7 @@ Call a builtin (`nika:` namespace) or an MCP tool (`mcp:` namespace). The result
 ```
 <namespace>:<path>          one colon introduces the namespace · `/` separates the path
 
+nika:fetch                  builtin · HTTP + extraction (used to be a verb)
 nika:write                  builtin · flat name
 nika:connectome/recall      builtin · grouped path
 mcp:browser/navigate        MCP · server `browser` · tool `navigate`

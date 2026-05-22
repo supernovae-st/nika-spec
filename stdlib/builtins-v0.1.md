@@ -398,7 +398,7 @@ HTTP request + content extraction. Reached via `invoke` — fetching a URL is
     tool: "nika:fetch"
     args:
       url: "https://example.com/article"
-      mode: article            # default · markdown
+      mode: article            # optional · default = markdown
 ```
 
 | Arg | Required | Type | Notes |
