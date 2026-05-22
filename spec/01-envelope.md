@@ -54,6 +54,10 @@ secrets:
 tasks:
   - id: ...
     ...
+
+# What this workflow returns · ${{ tasks.<id>.output }} refs · untyped OR typed
+outputs:
+  summary: ${{ tasks.summarize.output }}
 ```
 
 ---
@@ -156,7 +160,9 @@ default, description }`) lets the engine validate inputs and
 **generate a callable schema** — this is what powers `nika.run_workflow`
 over MCP (a caller like an agent host sees the typed inputs and knows
 exactly what to pass) and UI generation. Simple stays simple; power is
-there when a workflow becomes a reusable, callable unit.
+there when a workflow becomes a reusable, callable unit. Typed `vars:` are
+the **input** half of that callable contract; typed [`outputs:`](#outputs--optional--the-workflows-return-value--untyped-or-typed)
+(below) are the **output** half.
 
 See [04-variables.md](./04-variables.md) for the full substitution grammar.
 
@@ -211,6 +217,46 @@ tasks:
 ```
 
 The DAG. See [03-dag.md](./03-dag.md) for the task model.
+
+### `outputs` · *optional · the workflow's return value · untyped OR typed*
+
+```yaml
+outputs:
+  # Untyped form — just a reference to a task output
+  summary: ${{ tasks.synthesize.output }}
+
+  # Typed form — declares the return shape · powers the callable-workflow output schema
+  report:
+    value: ${{ tasks.write_report.output }}
+    type: string
+    description: "The final markdown brief"
+```
+
+`outputs:` declares **what the workflow returns** — the symmetric twin of
+`vars:` (what it takes in). Each entry is a name bound to a
+`${{ tasks.<id>.output }}` reference (or any `${{ ... }}` expression), in the
+**untyped form** (bare reference) or the **typed form**
+(`{ value, type, description }`).
+
+This single block serves three consumers ·
+
+- **`nika run`** — prints this object as the workflow result (without `outputs:`,
+  the CLI result is engine-defined and implicit).
+- **`nika.run_workflow` over MCP** — a caller (agent host · parent workflow)
+  receives exactly this shape. Together with typed `vars:` it forms the
+  **complete callable contract** · typed in, typed out.
+- **Schema generation** — typed outputs generate the *output half* of the
+  callable schema (typed `vars:` generate the input half).
+
+If `outputs:` is omitted, the workflow still runs; its result is
+engine-defined (a reusable/callable workflow SHOULD declare `outputs:`). The
+referenced task ids must exist (parse-time validated).
+
+> **`outputs:` (envelope · plural) ≠ `output:` (task · singular).** The
+> workflow-level `outputs:` is the *return contract*; the task-level `output:`
+> ([04-variables.md](./04-variables.md#output-binding--output)) defines *named
+> JSONPath bindings* on one task. Plural-at-the-top, singular-per-task — the
+> same split GitHub Actions uses for `workflow_call.outputs` vs step `outputs`.
 
 ---
 

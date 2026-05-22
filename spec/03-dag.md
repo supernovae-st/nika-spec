@@ -128,6 +128,32 @@ today, compute it in a `nika:assert` builtin or an `infer:` task.
 · `env` · `secrets`) are bound as top-level CEL variables. `tasks.<id>.status`
 etc. resolve against the live DAG state.
 
+#### Referencing a task requires an explicit `depends_on`
+
+If a task's `when:` **or** `with:` references `tasks.<id>` (any field), that
+task **MUST** declare `<id>` in its `depends_on:`. The engine **rejects the
+workflow at parse time** otherwise (`validation_error` · `NIKA-DAG` namespace) —
+it does **not** silently infer the edge.
+
+```yaml
+# ❌ REJECTED at parse — `when:` reads tasks.test but no depends_on
+- id: deploy
+  when: ${{ tasks.test.status == 'success' }}
+  exec: { command: "./deploy.sh" }
+
+# ✅ CORRECT — the reference is backed by an explicit edge
+- id: deploy
+  depends_on: [test]
+  when: ${{ tasks.test.status == 'success' }}
+  exec: { command: "./deploy.sh" }
+```
+
+**Why explicit, not inferred** · an inferred edge is an invisible edge — it
+makes the DAG harder to read and lets a typo (`tasks.tset`) silently change
+ordering. Requiring the declaration keeps the graph honest: every dependency
+is visible in `depends_on`, and a dangling reference is a loud parse error, not
+a race. (This is the one rule an LLM most often gets wrong — so it fails fast.)
+
 **Implementation** · an engine MAY embed a CEL library (e.g. the Rust
 `cel-interpreter` crate) OR hand-roll the small v0.1 subset above — both are
 conformant because the subset is exactly CEL. The Core conformance suite tests

@@ -45,3 +45,13 @@ tasks:
     infer:
       # .output is an object here (schema was set) → index into it directly
       prompt: "Write one sentence summarizing these entities · ${{ tasks.extract.output.entities }}"
+
+# Typed return contract · the output half of the callable-workflow schema.
+outputs:
+  entities:
+    value: ${{ tasks.extract.output.entities }}
+    type: array
+    description: "The extracted named entities"
+  summary:
+    value: ${{ tasks.report.output }}
+    type: string

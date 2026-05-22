@@ -64,6 +64,25 @@
       "type": "array",
       "minItems": 1,
       "items": { "$ref": "#/$defs/task" }
+    },
+    "outputs": {
+      "type": "object",
+      "description": "The workflow's return value · symmetric to vars. Each entry is a `${{ tasks.X.output }}` reference (untyped form · string) OR a typed declaration { value · type · description }. Powers `nika run` result + the output half of the callable-workflow schema.",
+      "additionalProperties": {
+        "anyOf": [
+          { "type": "string" },
+          {
+            "type": "object",
+            "required": ["value"],
+            "additionalProperties": false,
+            "properties": {
+              "value": { "type": "string" },
+              "type": { "type": "string", "enum": ["string", "number", "integer", "boolean", "array", "object"] },
+              "description": { "type": "string" }
+            }
+          }
+        ]
+      }
     }
   },
   "$defs": {
@@ -213,7 +232,8 @@
         },
         "max_turns": { "type": ["integer", "string"] },
         "max_tokens_total": { "type": ["integer", "string"] },
-        "temperature": { "type": ["number", "string"] }
+        "temperature": { "type": ["number", "string"] },
+        "schema": { "type": "object", "description": "JSON Schema · validate the agent's final message as structured output." }
       }
     },
     "retry": {

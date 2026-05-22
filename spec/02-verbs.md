@@ -41,7 +41,7 @@ shape depends on the verb (know this before you bind downstream) ·
 | `infer:` | the model's reply · **string** | `schema:` set → **object** matching it |
 | `exec:` | **stdout string** (default) | `capture: structured` → `{ stdout, stderr, exit_code }` |
 | `invoke:` | the **tool's response** (tool-defined · string OR object · sometimes bytes) | per builtin / MCP tool schema · use `output_format: bytes` for binary tools |
-| `agent:` | the loop's **final message** · string | (the agent's last assistant turn) |
+| `agent:` | the loop's **final message** · string | `schema:` set → **object** matching it |
 
 ---
 
@@ -261,6 +261,11 @@ Run an agentic loop · the model + a set of tools · iterating until completion 
     max_turns: 20
     max_tokens_total: 100000
     temperature: 0.3
+    schema:                           # optional · validate the final message as structured output
+      type: object
+      required: [findings]
+      properties:
+        findings: { type: array, items: { type: string } }
 ```
 
 ### Fields
@@ -274,6 +279,7 @@ Run an agentic loop · the model + a set of tools · iterating until completion 
 | `max_turns` | no | integer | Loop limit · default 10 |
 | `max_tokens_total` | no | integer | Cumulative token budget · default engine-configurable |
 | `temperature` | no | number 0-2 | Sampling temperature |
+| `schema` | no | object | JSON Schema · validates the agent's **final message** as structured output (same contract as `infer.schema:`) · `.output` becomes the matching object |
 
 ### Loop semantics
 

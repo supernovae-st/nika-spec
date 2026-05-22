@@ -12,6 +12,46 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added / Fixed — 3 language amendments from a Socratic gap review (D-2026-05-23-N1)
+
+Step-back Socratic audit of the v1 language (empirically verified against the
+prose spec · `socratic-research-discipline` §1). Two real **incompleteness
+gaps** (the spec contradicting itself / unable to deliver a stated promise —
+*not* deferred scope) + one authorability rule. All additive within `nika: v1`
+· the 5 pillars untouched · user-locked recommended options.
+
+- **NEW `outputs:` envelope block** (GAP 1 · the load-bearing one) · the
+  workflow now declares **what it returns** — the symmetric twin of `vars:`
+  (what it takes in). Each entry binds a name to a `${{ tasks.X.output }}`
+  reference · untyped form (bare ref) OR typed (`{ value, type, description }`).
+  Closes three holes at once · `nika run` result was engine-defined/implicit ·
+  `nika.run_workflow` (v0.2) had no caller-side return shape · the
+  callable-workflow schema had only the input half. Typed `vars:` + typed
+  `outputs:` = the **complete callable contract** (typed in · typed out).
+  Spec · `spec/01-envelope.md`. Schema · `schemas/workflow.schema.json`.
+
+- **`agent:` gains `schema:`** (GAP 2 · spec self-contradiction resolved) ·
+  `05-errors.md` already promised « the `infer:` and `agent:` verbs may declare
+  a JSON Schema for structured output » but `02-verbs.md` omitted it from the
+  agent field table (and the JSON Schema rejected it). Now consistent · an
+  agent may declare `schema:` to validate its **final message** as structured
+  output (same contract as `infer.schema:`) · `.output` becomes the matching
+  object. Spec · `spec/02-verbs.md`. Schema · agent `$def`.
+
+- **Explicit-dependency rule for `when:` / `with:` task references** (GAP 2b ·
+  authorability) · if a task's `when:` or `with:` references `tasks.<id>`, it
+  **MUST** declare `<id>` in `depends_on:` · parse-time `validation_error`
+  (`NIKA-DAG` namespace) otherwise — the engine does **not** silently infer the
+  edge. Keeps the DAG honest (no invisible edges · a typo'd ref is a loud error,
+  not a race) · the one rule LLMs most often get wrong, so it fails fast. Spec ·
+  `spec/03-dag.md`.
+
+Verified · `workflow.schema.json` valid Draft 2020-12 · all 7 foundation
+examples ⊨ schema (06 + 19 + 23 now showcase `outputs:` · 23 showcases agent
+`schema:`) · 4 negative controls pass (agent+schema accepted · typed-output
+missing `value` rejected · untyped reference accepted · unknown envelope key
+still rejected).
+
 ### Added — 5 NEW stdlib builtins (MANDATE 37 → 42 · D-N26 ultrathink)
 
 User-locked ultrathink session 2026-05-22 evening · « le langage des LLM
