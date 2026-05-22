@@ -4,6 +4,14 @@
 > sovereign · multi-provider · local-first.
 >
 > **Status** · v0.1.0-draft (working) · **License** · Apache-2.0
+>
+> **Version note** · The LANGUAGE is locked at `nika: v1` · forever (this is
+> the envelope you write in every workflow file · cohérent SQL/GraphQL/
+> Dockerfile pattern of « one stable contract · evolves additively »). The
+> reference ENGINE today targets `v0.81.0` (its own semver cadence ·
+> forever-v0.x per ADR-002 · breaking changes ship on MINOR). The two
+> version axes are independent · the `nika: v1` contract stays stable while
+> the engine evolves through `v0.81 → v0.82 → ... → v0.99 → v0.100`.
 
 ---
 

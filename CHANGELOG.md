@@ -72,8 +72,9 @@ Compose versionless · AWS exponential-backoff-and-jitter.
 - **Envelope → `nika: v1`** · one field (was two · `apiVersion` + `schema`).
   Follows the OpenAPI `openapi: 3.1.0` pattern · the document type is
   discriminated by the resource key (`workflow:`).
-- **The 5 verbs are absolute** · the count is locked at 5 forever · the
-  operation space is complete · a 6th verb would require `nika: v2` (never).
+- **The 4 verbs are absolute** · the count is locked at 4 forever · the
+  operation space is complete · `fetch` is a TOOL not a verb (`invoke: nika:fetch`) ·
+  a 5th verb would require `nika: v2` (never).
 - **Expression language = CEL** (Common Expression Language · cel.dev) ·
   everything inside `${{ }}` — substitutions and `when:` predicates — is a
   documented subset of CEL. Common · validated · non-Turing-complete · portable
@@ -131,7 +132,7 @@ Compose versionless · AWS exponential-backoff-and-jitter.
 ### Added
 
 - Initial spec repo · Apache-2.0 (patent grant for implementers).
-- `spec/` · 9 sections · envelope · 5 verbs · DAG · variables · errors · stdlib
+- `spec/` · 9 sections · envelope · 4 verbs · DAG · variables · errors · stdlib
   contract · conformance · out-of-scope.
 - `stdlib/` · curated v0.1 lists (13 providers · 9 extract modes · 36 builtins ·
   media builtins deferred to a later stdlib release).
