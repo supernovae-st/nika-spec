@@ -23,6 +23,23 @@ Runtime + Stdlib fixtures (verb execution · provider/builtin behavior · mock-d
 land with the reference engine. Of the four GA blockers (spec · examples · JSON
 schemas · conformance) the static conformance layer is now seeded.
 
+### Run it today · the reference Core runner
+
+[`runner.py`](./runner.py) is the **reference oracle** for Level-1 (Core) — it
+implements the static layer (JSON Schema + the 4 cross-reference rules
+`NIKA-DAG-001/002/003` + `NIKA-VAR-001`) with **no LLM engine required**, so the
+14 fixtures are executable + CI-runnable today ·
+
+```bash
+python conformance/runner.py run                       # all core fixtures → exit non-zero on fail
+python conformance/runner.py validate flow.nika.yaml   # validate one workflow → JSON verdict
+python conformance/runner.py examples examples         # assert every example is valid
+```
+
+Current · **14/14 core fixtures pass · 7/7 examples valid**. A language engine in
+any language re-implements the same checks; this reference runner proves the
+suite is self-consistent and is the canonical static-layer oracle.
+
 ## Planned structure
 
 ```
@@ -104,4 +121,4 @@ Many tests use the `mock` provider and HTTP mocks for · (a) determinism · (b) 
 
 ---
 
-🦋 *14 core fixtures shipped (parse/validate) · runtime+stdlib pending · machine-checkable forever.*
+🦋 *14 core fixtures + reference runner (14/14 pass) · runtime+stdlib pending · machine-checkable forever.*
