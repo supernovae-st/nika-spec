@@ -157,6 +157,26 @@ checkpoint:
 If a workflow needs to be re-runnable across spec versions · use a version
 pin in the envelope (`nika: v1` already does this for the language contract). Per-workflow stdlib version pinning may land in v0.2.
 
+### Idempotency keys / step deduplication
+
+```yaml
+# NOT supported in v0.1
+- id: charge
+  idempotency_key: "${{ vars.order_id }}"   # dedup retried side effects
+  invoke: { tool: "mcp:stripe/charge", args: { ... } }
+```
+
+**Why deferred** · idempotency keys are **table-stakes for the durable-execution
+class** (Temporal · Inngest · Restate · at-least-once delivery systems) — but
+**not** for a finite single-run DAG (GitHub Actions · Argo single-run have no
+idempotency keys either). They earn their keep alongside **durable execution +
+resumption** (retries that survive a process restart), which is itself deferred
+(engine/daemon · v0.3). A v0.1 `retry:` re-runs in-process · a side-effecting
+task handles its own dedup via its tool args. Idempotency lands in v0.2
+together with the durable-execution waypoint · NOT before. *(2025-2026 SOTA
+gap-check · the only near-universal capability v1 lacks · and it is correctly
+durable-class, not finite-DAG-class.)*
+
 ---
 
 ## The Connectome · DEFERRED capability · NOT a deferred verb
