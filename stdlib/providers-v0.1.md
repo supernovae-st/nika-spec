@@ -31,7 +31,7 @@ trivially swappable, and the industry standard. The same open model served by
 different backends disambiguates cleanly · `groq/llama-3.1-70b` vs
 `ollama/llama-3.1-70b`.
 
-**Parameterize it** · combine with typed inputs (D-N10) to run one workflow
+**Parameterize it** · combine with typed inputs to run one workflow
 against any backend ·
 
 ```yaml

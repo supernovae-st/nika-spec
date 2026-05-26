@@ -24,7 +24,7 @@ Three nested levels · increasing scope ·
 |---|---|---|
 | **Core** | Parse + validate · DAG semantics · variable resolution · error structure | Linters · spec editors · static analyzers |
 | **Runtime** | Core + verb execution | Working engine (with own provider/tool impls) |
-| **Stdlib v0.1** | Runtime + the 13 providers + 9 extract modes + 42 builtins | Full reference-impl-equivalent engine |
+| **Stdlib v0.1** | Runtime + the 13 providers + 9 extract modes + 27 builtins | Full reference-impl-equivalent engine |
 
 A higher level **includes** the lower levels.
 
@@ -127,7 +127,7 @@ An engine claims « Stdlib v0.1-compliant » if it satisfies Runtime conformance
 
 1. **Ships all 13 canonical providers** (per [stdlib/providers-v0.1.md](../stdlib/providers-v0.1.md))
 2. **Ships all 9 canonical extract modes** (per [stdlib/extract-modes-v0.1.md](../stdlib/extract-modes-v0.1.md))
-3. **Ships at least all 42 canonical builtins** (core 7 + file 5 + data 22 + introspection 6 + network 2 · the 24 media builtins are optional)
+3. **Ships at least all 27 canonical builtins** (core 7 + file 5 + data 9 + introspection 4 + network 2 · the 24 media builtins are optional)
 4. **Passes** all tests in `conformance/tests/stdlib/`
 
 A Stdlib-compliant engine is functionally equivalent to the reference implementation for any workflow that uses only the canonical stdlib elements.

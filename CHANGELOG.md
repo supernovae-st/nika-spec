@@ -12,309 +12,132 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-### Added / Fixed — 3 language amendments from a Socratic gap review (D-2026-05-23-N1)
-
-Step-back Socratic audit of the v1 language (empirically verified against the
-prose spec · `socratic-research-discipline` §1). Two real **incompleteness
-gaps** (the spec contradicting itself / unable to deliver a stated promise —
-*not* deferred scope) + one authorability rule. All additive within `nika: v1`
-· the 5 pillars untouched · user-locked recommended options.
-
-- **NEW `outputs:` envelope block** (GAP 1 · the load-bearing one) · the
-  workflow now declares **what it returns** — the symmetric twin of `vars:`
-  (what it takes in). Each entry binds a name to a `${{ tasks.X.output }}`
-  reference · untyped form (bare ref) OR typed (`{ value, type, description }`).
-  Closes three holes at once · `nika run` result was engine-defined/implicit ·
-  `nika.run_workflow` (v0.2) had no caller-side return shape · the
-  callable-workflow schema had only the input half. Typed `vars:` + typed
-  `outputs:` = the **complete callable contract** (typed in · typed out).
-  Spec · `spec/01-envelope.md`. Schema · `schemas/workflow.schema.json`.
-
-- **`agent:` gains `schema:`** (GAP 2 · spec self-contradiction resolved) ·
-  `05-errors.md` already promised « the `infer:` and `agent:` verbs may declare
-  a JSON Schema for structured output » but `02-verbs.md` omitted it from the
-  agent field table (and the JSON Schema rejected it). Now consistent · an
-  agent may declare `schema:` to validate its **final message** as structured
-  output (same contract as `infer.schema:`) · `.output` becomes the matching
-  object. Spec · `spec/02-verbs.md`. Schema · agent `$def`.
-
-- **Explicit-dependency rule for `when:` / `with:` task references** (GAP 2b ·
-  authorability) · if a task's `when:` or `with:` references `tasks.<id>`, it
-  **MUST** declare `<id>` in `depends_on:` · parse-time `validation_error`
-  (`NIKA-DAG` namespace) otherwise — the engine does **not** silently infer the
-  edge. Keeps the DAG honest (no invisible edges · a typo'd ref is a loud error,
-  not a race) · the one rule LLMs most often get wrong, so it fails fast. Spec ·
-  `spec/03-dag.md`.
-
-Verified · `workflow.schema.json` valid Draft 2020-12 · all 7 foundation
-examples ⊨ schema (06 + 19 + 23 now showcase `outputs:` · 23 showcases agent
-`schema:`) · 4 negative controls pass (agent+schema accepted · typed-output
-missing `value` rejected · untyped reference accepted · unknown envelope key
-still rejected).
-
-### Added — 5 NEW stdlib builtins (MANDATE 37 → 42 · D-N26 ultrathink)
-
-User-locked ultrathink session 2026-05-22 evening · « le langage des LLM
-pour les 20 prochaines années · prends le best · go au max ». 5 NEW
-canonical builtins applied to `stdlib/builtins-v0.1.md` · spec MANDATE
-expanded 37 → 42 · zero breaking · per forever-v0.x discipline (stdlib
-versions independently from `nika: v1` language envelope · additive).
-
-- **`nika:notify`** (Network +1 · 1 → 2) · single builtin · `channel:`
-  enum (webhook · slack · email · discord · sms) · Rams 10 less but
-  better (vs 4-5 granular `slack_send` · `email_send` · `webhook_send`).
-  v0.81 engine MUST support webhook · other channels feature-gated.
-
-- **`nika:uuid`** (Data +1) · default v7 (timestamped · sortable · RFC
-  9562 · 2024 SOTA · DB-friendly insertion order) · `v4` for legacy
-  compat · returns canonical hex string.
-
-- **`nika:date`** (Data +1) · op-discriminated single builtin · ops `now ·
-  add · subtract · format · parse · diff` · TZ-aware (default UTC · IANA
-  TZ DB names) · returns ISO 8601 strings (or number for diff).
-
-- **`nika:hash`** (Data +1) · default blake3 (studio canonical · faster
-  than SHA-2 · used by olympus-os-brand-core content-addressed storage) ·
-  alternatives sha256/sha512 · md5/sha1 EXCLUDED (broken for crypto).
-  Returns hex (default) or base64.
-
-- **`nika:wait_until`** (Core +1 · 6 → 7) · absolute timestamp sister to
-  `nika:sleep` (relative duration) · ISO 8601 timestamp arg + optional
-  timeout safeguard · throws on past-timestamp or timeout-elapsed.
-
-### Drift fix — `nika:sleep` `duration_ms` → `duration` Go-duration
-
-Consistency with D-N23 task-level `timeout:` Go-duration string · ONE
-duration format across the language (Go/Kubernetes-style `"5s"` ·
-`"1h30m"`) · was `duration_ms: 5000` numeric · now `duration: "5s"`
-quoted string. Rams 4 understandable.
-
-### Brouillon audit findings · NONE of B1-B5 in brouillon
-
-Brouillon `tools/nika-builtin/src/` audit confirmed NONE of the 5 new
-builtins exist · brouillon HAD `aggregate · assert · complete · cost ·
-data/* · emit · file/* · introspect_* · json_transform · json_verify ·
-locale_lookup · log · prompt · run_tool · sleep · yaml_validate` (33
-files · partial overlap with v0.1 37). B1-B5 are GENUINELY NEW for
-v0.81 stdlib expansion · NOT brouillon ports.
-
-### Forward-compat — v0.2 « 20-year scope » candidates documented
-
-Per AI-2027 scenario alignment + Rams 10 discipline · 5 high-priority
-v0.2 candidates documented in monorepo ROADMAP §16 (NOT applied · need
-user explicit re-lock per §2.7 supersession discipline) ·
-- V1 sessions/threads · multi-turn context · LangGraph checkpoints
-- V2 workflow composition include · sub-workflow execution · Argo
-- V3 cost tracking output fields (`tasks.X.cost`/`tokens`/`provider`)
-- V4 multi-agent handoffs (OpenAI Agents SDK pattern · ai-2027 « 200K
-  parallel agents · hierarchical »)
-- V5 cost-aware model router · per-task cheap-vs-expensive switching
-
----
-
-## [Previous Unreleased] — for_each concurrency control + on_finally cleanup hook + 4 clarifications
-
-D-2026-05-22-N24 · ultrathink session · « ok enregistre tout ce qui manque ·
-verifie buildin + brouillon · prend les meilleures conventions · max parallel
-on a Rust+Tokio pas pour rien · go au max ». User-locked. 3 NEW additive
-fields (zero breaking · within nika: v1) + 4 clarifications (zero new fields).
-
-- **NEW `max_parallel:` on `for_each:` block** · cap concurrent iterations ·
-  optional · positive integer · default UNBOUNDED · engine impl via
-  `tokio::sync::Semaphore`. Critical for production · rate-limit upstream
-  APIs · avoid DOS on `for_each` over 1000+ items · compliance with provider
-  concurrency limits. Field name `max_parallel:` per GitHub Actions canon
-  (matrix.max-parallel) · explicit naming (vs brouillon's `concurrency:`
-  which we considered but rejected for clarity).
-
-- **NEW `fail_fast:` on `for_each:` block** · abort-on-error policy ·
-  optional · boolean · default TRUE (first iteration error aborts remaining
-  iterations · parent task fails immediately). When false · iteration
-  errors are collected · all iterations run to completion · parent fails
-  after all iterations done (with per-iteration error details). Brouillon
-  convention adopted (best-of-best · production-essential for « process
-  all even if some fail » pattern).
-
-- **NEW `on_finally:` task field** · cleanup hook list of mini-tasks that
-  ALWAYS run after the parent task completes (success/fail/timeout/cancel).
-  Sequential in declared order · errors LOGGED but NOT propagated to
-  parent status (best-effort semantics). Universal cleanup pattern · cf
-  Argo `onExit:` · Temporal `defer` · GitHub Actions `if: always()` ·
-  LangGraph `finally` · Airflow `on_failure_callback`.
-
-- **NEW for_each « parallel-by-default » explicit callout** · spec
-  clarification (C2) · big warning box · for_each is PARALLEL by default
-  (differs from Python's sequential `for` loop) · `max_parallel: 1`
-  forces sequential.
-
-- **NEW `when:` CEL boolean conformance rule** · spec clarification (C3) ·
-  `when:` MUST be a CEL expression returning bool · engine rejects
-  non-boolean expressions at parse time (`NIKA-PARSE-WHEN-001`). Examples
-  · valid (comparisons · `&&` · `||` · `null` checks) · invalid (integer ·
-  object · string · literal). Truthy-coercion forbidden · explicit
-  comparison required.
-
-- **NEW raw-output-vs-named-bindings clarification** · spec clarification
-  (C1) · `tasks.X.output` is the raw verb output · `tasks.X.<name>` are
-  the JSONPath-extracted named bindings · both dual-accessible · reserved
-  names (`output` · `status` · `error` · `started_at` · `ended_at` ·
-  `duration_ms`) cannot be used as binding names.
-
-- **NEW YAML multi-line `|` canonical guidance** · spec clarification
-  (C4) · `|` (literal · preserves newlines) is canonical for prompts /
-  system / command fields · `|-` (literal + strip trailing) alternative ·
-  `>` and `>-` (folded · collapses newlines into spaces) FORBIDDEN in
-  prompts (corrupts LLM intent).
-
-### Skipped — `nika:notify` · `nika:uuid` · `nika:date` · `nika:hash` · `nika:wait_until`
-
-Brouillon audit revealed these 5 builtins NOT in current brouillon
-nika-builtin/src (no notify.rs · no uuid.rs · no date.rs · no hash.rs ·
-no wait_until.rs). Adding them would change the spec MANDATE from 37 to
-42 builtins · catastrophic spec/engine consistency violation per D-N22
-architect-audit-verdict. Per Rams 10 « less but better » · current 37 list
-is the v0.81 conformance contract · expansion to 42+ is a v0.2 candidate
-requiring explicit user re-lock + spec amendment.
-
----
-
-## [Previous Unreleased] — task-level `timeout` duration string + `output_format` type hint
-
-User-locked v0.2 amendment candidates from `nika/hq/blueprint/NIKA_ROADMAP.md` §16
-(D-2026-05-22-N23 · « Aok Bok Cok »). Two additive changes within `nika: v1` · zero
-breaking · per forever-v0.x discipline (additive on language MINOR-equivalent).
-
-- **`timeout_ms: 30000` → `timeout: "30s"`** · Go-duration / Kubernetes-style string ·
-  format `[0-9]+(\.[0-9]+)?(ns|us|µs|ms|s|m|h)` · compound `"1h30m"` · MUST be
-  quoted (YAML 1.2 numeric trap defense). Adopters get cleaner reads · `"5m"` >
-  `300000`. Industry standard · Go `time.ParseDuration` · Kubernetes resource
-  limits · Prometheus rules. Replaced at 7 sites · `03-dag.md` x4 ·
-  `02-verbs.md` x3 · `07-conformance.md` x1.
-
-- **NEW `output_format` task-level field** · optional · closed enum
-  `text | structured | bytes` · default **inferred per verb**
-  (`infer:` text-or-structured · `exec:` structured · `invoke:`
-  structured · `agent:` structured). Explicit override unlocks **`bytes`**
-  for binary output (the only-way · downstream consumers become binary-aware
-  · avoids UTF-8 corruption via string substitution) AND statically declares
-  shape for IDE autocomplete + parse-time mismatch detection. Section at
-  `03-dag.md#output_format`.
-
-### Skipped — `workflow:` `description:` field
-
-Already existed in spec (`01-envelope.md:109`) · candidate B was redundant.
-
----
-
-## [Previous Unreleased] — more local providers + stabilization
-
-More local-provider options + a few consistency fixes.
-
-- **5 local providers** now (was 2) · added `llamacpp` (llama.cpp `llama-server`
-  `:8080`) · `localai` (`:8080` · OpenAI drop-in · multi-backend) · `vllm`
-  (`:8000` · high-throughput · self-hosted). All external OpenAI-compatible HTTP
-  servers — NOT the deferred in-process `native` GGUF runtime. Providers 10 → 13.
-- **The `openai` escape hatch documented** · any other OpenAI-compatible server
-  (Jan · llamafile · KoboldCpp · text-generation-webui · OpenRouter · Together ·
-  custom) routes via `model: openai/<name>` + `OPENAI_BASE_URL` engine config —
-  no new provider name. The LiteLLM pattern: named providers for the popular
-  backends + `openai`+base_url for the long tail. (« Did we plan to add more? »
-  → yes: named-provider set + escape hatch + independent stdlib versioning.)
-- **`secrets source:` is now a closed enum** · `vault` (default · sovereign) ·
-  `env` (read a secret from an OS env var · still masked) · `file` (Docker/k8s
-  mounted secret). Previously only `vault` was shown → an author couldn't know
-  what else was valid.
-- **`exec.env` vs envelope `env:` disambiguated** · the one same-word overlap.
-  Envelope `env:` = workflow config (`${{ env.* }}`) · `exec.env` = the OS
-  environment of *that subprocess* · NOT auto-connected · pass values through
-  explicitly. Crisp note added so it isn't a trap.
-
-Audit also confirmed CLEAN (no change): tool refs consistently `namespace:path`
-with `/` (zero `::` survivors) · Connectome is `nika:connectome/recall`
-everywhere (no dot drift) · the kebab `workflow:` vs snake task-`id` split is
-justified (CEL hyphen-minus) and documented.
-
-### Changed — model selection · one field
-
-Research-validated against LiteLLM · OpenRouter · Vercel AI SDK · PydanticAI
-(all converged on a single `provider/model` string).
-
-- **`provider:` + `model:` collapsed into ONE `model: <provider>/<name>` field.**
-  The provider is the prefix (`anthropic/claude-sonnet-4-6` · `openai/gpt-4o`).
-  Removes the silent-nonsense trap (`provider: anthropic` + `model: gpt-4o`) ·
-  one atomic, self-documenting, swappable string · the de-facto industry
-  convention. Applied across envelope · verbs · stdlib contract · providers doc
-  · overview · README. The `provider:` field no longer exists.
-- **Local-vs-cloud = the prefix.** `ollama/…` · `lmstudio/…` = LOCAL (localhost ·
-  no key · sovereign) · the 7 cloud providers = CLOUD (key via `${{ secrets.* }}`) ·
-  `mock/…` = TEST. No separate `local:` flag · no hidden config.
-- **Providers 8 → 10.** Added `ollama` + `lmstudio` as first-class local providers
-  (external OpenAI-compatible HTTP servers · NOT the crash-prone in-process
-  `native` GGUF runtime, which stays deferred). `model: ollama/llama3.1`
-  makes a zero-cloud run trivial.
-- **Provider config stays OUT of the workflow** · `base_url` + auth in
-  engine/provider config · a workflow only *selects*. Combine with typed `vars`
-  to parameterize the model and run one workflow against any backend.
-
 Pre-public hardening of the v0.1 draft (no adopters yet · free to perfect the
-pillars to their immutable-forever form). Grounded in SOTA primary sources ·
-CEL (cel.dev) · RFC 9535 JSONPath · OpenAPI single-field envelope · Docker
-Compose versionless · AWS exponential-backoff-and-jitter.
+pillars to their immutable-forever form). Every change below is **additive
+within the `nika: v1` contract** — the 5 pillars stay immutable; the stdlib
+versions independently. Grounded in SOTA primary sources · CEL (cel.dev) · jq ·
+RFC 9562 UUIDv7 · OpenAPI single-field envelope · Go/Kubernetes durations ·
+AWS exponential-backoff-and-jitter.
 
 ### Changed
 
-- **Envelope → `nika: v1`** · one field (was two · `apiVersion` + `schema`).
-  Follows the OpenAPI `openapi: 3.1.0` pattern · the document type is
-  discriminated by the resource key (`workflow:`).
-- **The 4 verbs are absolute** · the count is locked at 4 forever · the
-  operation space is complete · `fetch` is a TOOL not a verb (`invoke: nika:fetch`) ·
-  a 5th verb would require `nika: v2` (never).
-- **Expression language = CEL** (Common Expression Language · cel.dev) ·
-  everything inside `${{ }}` — substitutions and `when:` predicates — is a
-  documented subset of CEL. Common · validated · non-Turing-complete · portable
-  (zero parser drift). Engines may embed a CEL interpreter or implement the
-  small v0.1 subset.
+- **One data language · jq.** Output bindings (`output:`) and `fetch`
+  extraction use **jq** — the same jq as the `nika:jq` builtin. RFC 9535
+  JSONPath is dropped (jq is a strict superset), so an author — or an LLM —
+  never has to choose between two extraction syntaxes. Nika now has exactly
+  **two expression layers**: **CEL** (inside `${{ }}` · conditions +
+  substitution) and **jq** (extraction + transform).
+- **Stdlib consolidated · 42 → 27 builtins** (zero capability loss). jq
+  subsumes ~12 thin data wrappers (map · filter · group_by · aggregate ·
+  enrich · chunk · flatten · unflatten · json_to_csv · base64 ×2 ·
+  json_merge-via-`*`). `nika:json_merge` is **kept** as a builtin (the
+  reference jq lacks a reliable recursive-merge). `task_status` removed (read
+  `tasks.X.status` directly). The two JSON validators merge into one
+  `nika:validate` (`format: json | yaml`).
+- **`on_error` simplified · 4 modes → 3.** `fallback:` + `value:` merge into
+  one `recover:` field (a `${{ }}` ref resolves to either a task output or a
+  literal) · plus `skip:` and `fail_workflow:`.
+- **`depends_on` is the success-gate.** A redundant `when: status == 'success'`
+  is discouraged — `when:` is for conditions *beyond* the default gate. A
+  `when:` / `with:` reference to `tasks.<id>` **MUST** declare `<id>` in
+  `depends_on:` (parse-time error otherwise · no invisible edges).
+- **Envelope → `nika: v1`** · one field (was `apiVersion` + `schema`) ·
+  follows the OpenAPI `openapi: 3.1.0` pattern (document type discriminated by
+  the `workflow:` key).
+- **The 4 verbs are absolute** · `infer` · `exec` · `invoke` · `agent`. The
+  count is locked at 4 forever — `fetch` is a TOOL (`invoke: nika:fetch`), not
+  a verb. A 5th verb would require `nika: v2` (never).
+- **Expression language = CEL** · everything inside `${{ }}` (substitutions +
+  `when:` predicates) is a documented subset of CEL · validated ·
+  non-Turing-complete · portable.
+- **`when:` is a CEL boolean** · the engine rejects non-boolean expressions at
+  parse time · no truthy coercion (explicit comparison required).
 - **Task `id` = snake_case** (`^[a-z][a-z0-9_]*$`) · ids appear in CEL paths
-  (`tasks.fetch_page.output`) where a hyphen is CEL's minus operator. The
-  `workflow:` name stays kebab-case (it never appears in an expression).
-- **Message fields unified** · `infer:` and `agent:` both take `system:` +
+  where a hyphen is the minus operator. The `workflow:` name stays kebab-case.
+- **`infer:` and `agent:` message fields unified** · both take `system:` +
   `prompt:`.
-- **Tool reference grammar** · `<namespace>:<path>` with a `/` hierarchy ·
-  `nika:write` · `nika:connectome/recall` · `mcp:browser/navigate` · globs
-  `mcp:browser/*`. One colon for the namespace, slash for the path.
+- **Tool reference grammar** · `<namespace>:<path>` with a `/` hierarchy
+  (`nika:write` · `nika:connectome/recall` · `mcp:browser/navigate` · globs
+  `mcp:browser/*`).
 - **Agent tools default-deny** · `agent.tools:` absent → no tools (least
   privilege · pure conversation).
-- **Cross-cutting fields are task-level** · `timeout_ms` and `retry` live on
-  the task, not inside a verb block.
-- **Output binding is RFC 9535 JSONPath** · engines use any RFC 9535
-  implementation.
-- **Builtin count = 36** (Core 6 + File 5 + Data 19 + Introspection 6).
+- **Cross-cutting fields are task-level** · `timeout` and `retry` live on the
+  task, not inside a verb block.
+- **One duration format** · Go / Kubernetes-style strings (`"5s"` · `"1h30m"`)
+  for task `timeout`, `nika:sleep`, everywhere — quoted (YAML numeric-trap
+  defense). Replaces the prior numeric `_ms` fields.
+- **Model selection · one field** · `model: <provider>/<name>` (the provider is
+  the prefix · `anthropic/claude-sonnet-4-6` · `openai/gpt-4o`). Removes the
+  silent-nonsense trap of a separate `provider:` field. Local-vs-cloud **is the
+  prefix** · `ollama/…` · `lmstudio/…` = local (no key) · the cloud providers
+  use `${{ secrets.* }}`. **13 providers** (5 local · `ollama` · `lmstudio` ·
+  `llamacpp` · `localai` · `vllm` · plus the `openai` + `OPENAI_BASE_URL` escape
+  hatch for any other OpenAI-compatible backend). Provider config stays out of
+  the workflow — a workflow only *selects*.
+- **`secrets source:` is a closed enum** · `vault` (default · sovereign) ·
+  `env` (an OS env var · still masked) · `file` (mounted secret).
+- **`exec.env` vs envelope `env:` disambiguated** · envelope `env:` = workflow
+  config (`${{ env.* }}`) · `exec.env` = the subprocess OS environment (not
+  auto-connected · pass values explicitly).
 
 ### Added
 
+- **`outputs:` envelope block** · the workflow declares **what it returns** —
+  the symmetric twin of `vars:`. Untyped (a bare `${{ tasks.X.output }}` ref)
+  or typed (`{ value, type, description }`). Typed `vars:` + typed `outputs:` =
+  the complete callable contract (typed in · typed out).
+- **`agent:` gains `schema:`** · an agent may declare a JSON Schema to validate
+  its **final message** as structured output (same contract as `infer.schema:`).
+- **`for_each:` concurrency control** · `max_parallel:` (cap concurrent
+  iterations · default unbounded · `max_parallel: 1` forces sequential) +
+  `fail_fast:` (abort-on-error policy · default true). `for_each` is **parallel
+  by default** — unlike Python's sequential `for`.
+- **`on_finally:` task field** · cleanup-hook mini-tasks that **always** run
+  after the parent task completes (success / fail / timeout / cancel) ·
+  sequential · best-effort (errors logged, not propagated). cf Argo `onExit` ·
+  Temporal `defer` · GitHub Actions `if: always()`.
+- **`output_format` task field** · `text | structured | bytes` · default
+  inferred per verb · explicit `bytes` unlocks binary output without UTF-8
+  corruption, and statically declares shape for IDE autocomplete.
+- **5 stdlib builtins** · `nika:notify` (one builtin · `channel:` enum
+  webhook / slack / email / discord / sms) · `nika:uuid` (v7 default ·
+  timestamped · sortable · RFC 9562) · `nika:date` (op-discriminated ·
+  TZ-aware · ISO 8601) · `nika:hash` (blake3 default · sha256 / sha512 ·
+  md5 / sha1 excluded as broken for crypto) · `nika:wait_until` (absolute
+  timestamp · sister to `nika:sleep`).
 - **`for_each:`** · bounded map / fan-out over a static list or a prior task's
   array output (`${{ item }}` · `${{ index }}`).
 - **`${{ secrets.X }}`** · 5th variable namespace · vault-backed · masked in
   logs · the modern `env` ⊥ `secrets` security split.
 - **Typed `vars`** · optional `{ type, required, default, description }` form
-  (enables input validation + schema generation) · the simple `name: value`
-  form is preserved.
+  (input validation + schema generation) · the simple `name: value` form is
+  preserved.
 - **`nika:done`** · agent-loop completion sentinel · error if invoked outside
   an `agent:` loop.
-- **YAML conventions section** (in `01-envelope`) · a Nika file is YAML 1.2 ·
-  one rule covers the classic generated-config footguns (the Norway problem
-  `no` → boolean · leading-zero octal · sexagesimal `12:30` · version floats
-  `1.10` → `1.1`) · quote anything that could be misread, and any expression
-  containing `: # [ { , >`.
+- **YAML conventions section** (in `01-envelope`) · one rule covers the classic
+  generated-config footguns (the Norway problem `no` → boolean · leading-zero
+  octal · sexagesimal `12:30` · version floats `1.10` → `1.1`) · quote anything
+  that could be misread.
+- **YAML multi-line guidance** · `|` (literal · preserves newlines) is canonical
+  for prompts / system / command fields · `>` / `>-` (folded) **forbidden** in
+  prompts (collapsing newlines corrupts LLM intent).
 - **Canonical JSON Schema** · `schemas/nika-workflow.schema.json` is the
   machine-readable companion (envelope + task + verb shapes) for editor
-  autocomplete + inline validation (the same DX as GitHub Actions / Docker
-  Compose). The prose spec stays normative.
+  autocomplete + inline validation — the same DX as GitHub Actions / Docker
+  Compose. The prose spec stays normative.
 - **Retry `jitter`** · default on · full-jitter / equal-jitter family (AWS
   exponential-backoff-and-jitter) · anti-thundering-herd.
 - **Conformance levels clarified** · Core is a static-check mode (`when:` /
   `for_each:` references resolve to known namespaces but are not evaluated) ·
   runtime evaluation is Level 2.
+
+### Forward-compat — documented, not applied
+
+Long-horizon v0.2 candidates (each needs an explicit re-lock + spec amendment) ·
+sessions / threads (multi-turn context · LangGraph-style checkpoints) · workflow
+composition (`include:` · sub-workflow execution · Argo-style) · cost-tracking
+output fields (`tasks.X.cost` / `tokens` / `provider`) · multi-agent handoffs ·
+cost-aware model routing (per-task cheap-vs-expensive switching).
 
 > Still towards v0.1.0 GA · examples + conformance fixtures + JSON schemas
 > pending.
@@ -328,7 +151,7 @@ Compose versionless · AWS exponential-backoff-and-jitter.
 - Initial spec repo · Apache-2.0 (patent grant for implementers).
 - `spec/` · 9 sections · envelope · 4 verbs · DAG · variables · errors · stdlib
   contract · conformance · out-of-scope.
-- `stdlib/` · curated v0.1 lists (13 providers · 9 extract modes · 36 builtins ·
+- `stdlib/` · curated v0.1 lists (13 providers · 9 extract modes · builtins ·
   media builtins deferred to a later stdlib release).
 - `examples/` · placeholder (26 canonical workflows pending).
 - `conformance/` · placeholder (test suite for the « v0.1-compliant » claim).

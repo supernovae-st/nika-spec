@@ -96,8 +96,8 @@ nika-spec/
 │
 └── stdlib/                    ← versioned independently
     ├── providers-v0.1.md        13 providers canonical (anthropic · openai · …)
-    ├── extract-modes-v0.1.md    9 extract modes (markdown · article · jsonpath · …)
-    └── builtins-v0.1.md         42 builtins curated (core · file · data · …)
+    ├── extract-modes-v0.1.md    9 extract modes (markdown · article · jq · …)
+    └── builtins-v0.1.md         27 builtins curated (core · file · data · …)
 ```
 
 ---
