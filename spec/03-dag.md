@@ -4,7 +4,7 @@
 > task (one of the 4 verbs). Each edge is a dependency.
 >
 > The DAG semantics are minimal · `depends_on` for order · `when` for
-> conditional execution · output binding via JSONPath.
+> conditional execution · output binding via jq.
 
 ---
 
@@ -37,16 +37,16 @@ tasks:
     max_attempts: 3
     backoff_ms: 1000
   on_error:                     # optional · error recovery (see 05-errors.md)
-    fallback: ${{ tasks.cache.output }}
+    recover: ${{ tasks.cache.output }}
   timeout: "60s"                # optional · task-level timeout (Go duration string)
   with:                         # optional · variable scope injection
     data: ${{ tasks.task_a.output }}
     config: { foo: "bar" }
   infer:                        # required · one of the 4 verbs
     prompt: "..."
-  output:                       # optional · named JSONPath bindings
-    result: "$.choices[0].message.content"
-    tokens: "$.usage.total_tokens"
+  output:                       # optional · named jq bindings
+    result: ".choices[0].message.content"
+    tokens: ".usage.total_tokens"
   output_format: structured     # optional · text | structured | bytes · default inferred
 ```
 
@@ -130,10 +130,11 @@ etc. resolve against the live DAG state.
 
 #### Referencing a task requires an explicit `depends_on`
 
-If a task's `when:` **or** `with:` references `tasks.<id>` (any field), that
-task **MUST** declare `<id>` in its `depends_on:`. The engine **rejects the
-workflow at parse time** otherwise (`NIKA-DAG-003` · `validation_error`) —
-it does **not** silently infer the edge.
+If a task references `tasks.<id>` **anywhere** — in `when:` · `with:` · any verb
+field (`prompt:` · `command:` · `args:` · …) · or `output:` — that task **MUST**
+declare `<id>` in its `depends_on:`. The engine **rejects the workflow at parse
+time** otherwise (`NIKA-DAG-003` · `validation_error`) — it does **not** silently
+infer the edge (a verb-body reference is an edge too · no invisible edges).
 
 ```yaml
 # ❌ REJECTED at parse — `when:` reads tasks.test but no depends_on
@@ -366,12 +367,12 @@ See [05-errors.md](./05-errors.md).
       url: "https://api.example.com/data"
       mode: raw
   output:
-    user_count: "$.data.users.length"
-    first_user: "$.data.users[0]"
-    raw: "$"
+    user_count: ".data.users | length"
+    first_user: ".data.users[0]"
+    raw: "."
 ```
 
-Defines named bindings extracted from the verb's raw response via JSONPath. These bindings are available downstream as `${{ tasks.task_id.user_count }}`, `${{ tasks.task_id.first_user }}`, etc.
+Defines named bindings extracted from the verb's raw response via a jq expression. These bindings are available downstream as `${{ tasks.task_id.user_count }}`, `${{ tasks.task_id.first_user }}`, etc.
 
 If `output` is absent · the task output defaults to the verb's raw response, referenced as `${{ tasks.task_id.output }}`.
 
@@ -385,7 +386,7 @@ A v0.1-compliant engine MUST ·
 2. **Topology** · compute topological order · detect cycles · reject with error if cyclic
 3. **Schedule** · group tasks into waves (each wave = tasks whose deps are all done) · execute each wave in parallel (engine MAY use a thread/task pool · configurable concurrency)
 4. **Evaluate `when`** · before starting each task · skip if false
-5. **Execute** · run the verb · capture output · bind via JSONPath
+5. **Execute** · run the verb · capture output · bind via jq
 6. **Propagate** · on success · advance · on failure · honor `retry:` · then `on_error:` · then fail downstream
 7. **Complete** · workflow done when all tasks reached terminal state (success · failure · skipped)
 
@@ -403,6 +404,13 @@ A v0.1-compliant engine MUST ·
 | `cancelled` | Task was cancelled (workflow cancellation or upstream failure) |
 
 A downstream task sees an upstream's status via `${{ tasks.task_id.status }}`. The default `depends_on` behavior is to run only when all deps have `success` or `skipped` status. To run regardless · use `when: true`.
+
+> **`depends_on` IS the success-gate.** Do NOT write
+> `when: ${{ tasks.X.status == 'success' }}` as a plain gate — it is **redundant**
+> (`depends_on` already requires success). Use `when:` ONLY for conditions BEYOND
+> the default gate · a value check (`tasks.X.output.coverage > 80`) · an env check
+> · or to **exclude a skipped** upstream (`when: status == 'success'` is meaningful
+> only when X may be `skipped` via `on_error: skip`).
 
 ---
 
@@ -486,7 +494,7 @@ tasks:
         url: "https://example.com/sitemap.xml"
         mode: sitemap
     output:
-      pages: "$.urls[*]"
+      pages: ".urls[]"
 
   - id: summarize
     depends_on: [discover]
@@ -543,7 +551,7 @@ Declares the **raw shape** of the task's output. Optional · default **inferred 
 **Conformance** · the engine MUST honor explicit `output_format:` and reject mismatches at parse time (structured demand on a text-only verb · etc.).
 
 **Why a top-level task field (not nested inside `output:`)** ·
-- `output:` is a **map of named JSONPath bindings** (existing semantics · downstream `${{ tasks.X.<name> }}` access).
+- `output:` is a **map of named jq bindings** (existing semantics · downstream `${{ tasks.X.<name> }}` access).
 - `output_format:` is a **type hint on the raw output** (before bindings extract from it).
 - Two distinct concerns → two distinct fields → Rams 4 understandable.
 

@@ -77,19 +77,19 @@ Selected via a single `model: <provider>/<name>` field. Any other OpenAI-compati
 
 ### Extract modes (9)
 
-`markdown` · `article` · `jsonpath` · `text` · `selector` · `metadata` · `links` · `feed` · `sitemap`
+`markdown` · `article` · `jq` · `text` · `selector` · `metadata` · `links` · `feed` · `sitemap`
 
 See [stdlib/extract-modes-v0.1.md](../stdlib/extract-modes-v0.1.md).
 
-### Builtins (42)
+### Builtins (27)
 
 7 core (sleep · log · emit · assert · prompt · done · wait_until)
 + 5 file (read · write · edit · glob · grep)
-+ 22 data (jq · json_merge · yaml_validate · uuid · date · hash · …)
-+ 6 introspection (cost · records · dag_info · task_status · threads · orchestrate)
++ 9 data (jq · json_merge · json_diff · validate · json_merge_patch · csv_to_json · uuid · date · hash)
++ 4 introspection (cost · records · dag_info · threads)
 + 2 network (fetch · notify)
-= **42 canonical builtins** (Stdlib v0.1)
-(+ 24 media · pdf_extract · chart · qr_validate · … · **deferred** to stdlib v0.x · NOT in the v0.1 count)
+= **27 canonical builtins** (Stdlib v0.1 · consolidated · was 42 · `jq` subsumes 12 data builtins · validators merged into `validate` · `task_status`/`orchestrate`/`locale_lookup` cut · ZERO capability loss)
+(+ media · **deferred** to stdlib v0.x · NOT in the v0.1 count)
 
 See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md).
 

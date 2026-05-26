@@ -255,7 +255,7 @@ referenced task ids must exist (parse-time validated).
 > **`outputs:` (envelope · plural) ≠ `output:` (task · singular).** The
 > workflow-level `outputs:` is the *return contract*; the task-level `output:`
 > ([04-variables.md](./04-variables.md#output-binding--output)) defines *named
-> JSONPath bindings* on one task. Plural-at-the-top, singular-per-task — the
+> jq bindings* on one task. Plural-at-the-top, singular-per-task — the
 > same split GitHub Actions uses for `workflow_call.outputs` vs step `outputs`.
 
 ---

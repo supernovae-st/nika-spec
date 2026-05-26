@@ -14,7 +14,7 @@
 | `article` | string (Markdown · Readability) | News/blog articles · readability extraction |
 | `text` | string (plain) | Stripped of all HTML · headers/footers preserved |
 | `selector` | string (raw HTML) | Specific element via CSS selector |
-| `jsonpath` | JSON value | API responses · structured data via JSONPath |
+| `jq` | JSON value | API responses · structured data via a jq expression (the one data language) |
 | `metadata` | object | `<meta>` tags · OpenGraph · Twitter cards |
 | `links` | array of strings | All `<a href>` outbound links |
 | `feed` | object (parsed feed) | RSS · Atom · JSON Feed |
@@ -103,28 +103,28 @@ invoke:
 
 ---
 
-### `jsonpath` · structured API responses
+### `jq` · structured JSON extraction
 
 ```yaml
 invoke:
   tool: "nika:fetch"
   args:
     url: "https://api.example.com/v1/users"
-    mode: jsonpath
-    jsonpath: "$.data.users[*].email"
+    mode: jq
+    jq: ".data.users[].email"
 ```
 
-**Behavior** · parses response as JSON · applies the JSONPath expression · returns the matched value(s).
+**Behavior** · parses response as JSON · applies the jq expression · returns the result. The SAME jq language used in `output:` bindings and the `nika:jq` builtin — Nika has ONE data language (replaces the former JSONPath mode · jq is a superset of JSONPath).
 
-**Implementation** · reference engine uses `serde_json_path` (RFC 9535 compliant).
+**Implementation** · reference engine uses `jaq` (Rust jq).
 
-**Output** · JSON value (could be string · array · object).
+**Output** · JSON value (string · array · object).
 
 **Examples** ·
-- `$` — whole response
-- `$.data.users[0]` — first user
-- `$.data.users[*].name` — all user names
-- `$..price` — all prices recursively
+- `.` — whole response
+- `.data.users[0]` — first user
+- `.data.users[].name` — all user names
+- `[.. | .price?] | map(select(. != null))` — all prices recursively
 
 ---
 
@@ -273,7 +273,7 @@ What you have                      Use mode
 HTML page · want content for LLM    markdown    (default)
 News/blog article                   article     (cleaner)
 Want raw HTML structure             selector    (with CSS selector)
-JSON API response                   jsonpath    (with JSONPath)
+JSON API response                   jq          (with a jq expression)
 Want page <meta> tags               metadata
 Want outbound URLs only             links
 RSS · Atom · JSON Feed              feed
@@ -286,7 +286,7 @@ Want raw bytes · no processing      raw
 
 ## Forward-compat
 
-New modes MAY enter stdlib v0.x. Mode-specific options (like `selector`, `jsonpath`) are namespaced on the verb · forward-compat additive.
+New modes MAY enter stdlib v0.x. Mode-specific options (like `selector`, `jq`) are namespaced on the verb · forward-compat additive.
 
 The 9 canonical modes cover ~99% of real-world web fetch use cases. Niche extractions (PDF · Word · Excel · audio · video) belong in the **media builtins** (deferred to stdlib v0.x · invoked via `invoke:` not `fetch:`).
 

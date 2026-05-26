@@ -158,9 +158,7 @@ A task MAY declare an `on_error:` block to recover from non-transient errors (or
       url: "https://api.example.com/data"
   retry: { max_attempts: 3 }
   on_error:
-    fallback: ${{ tasks.cached_data.output }}    # use another task's output
-    # OR
-    # value: { default: "empty" }         # use a literal value
+    recover: ${{ tasks.cached_data.output }}    # recovery output · a ${{ }} ref OR a literal
     # OR
     # skip: true                          # skip · downstream sees status = skipped
     # OR
@@ -171,10 +169,12 @@ A task MAY declare an `on_error:` block to recover from non-transient errors (or
 
 | Field | Effect | Downstream sees |
 |---|---|---|
-| `fallback: ${{ tasks.X.output }}` | Use another task's output as this task's output | `status: success` · output from fallback |
-| `value: <literal>` | Use a literal value as this task's output | `status: success` · output = literal |
+| `recover: <value>` | Use a recovery output — a `${{ }}` ref (e.g. another task's output) OR a literal | `status: success` · output = recover value |
 | `skip: true` | Skip this task on error | `status: skipped` |
 | `fail_workflow: true` | Fail the whole workflow (default behavior) | n/a (workflow fails) |
+
+`recover:` merges the former `fallback:` (ref) + `value:` (literal) into one field
+(`${{ }}` resolves to values either way · 4 modes → 3 · one way).
 
 ### Examples
 
@@ -183,14 +183,14 @@ A task MAY declare an `on_error:` block to recover from non-transient errors (or
 - id: api_call
   invoke: { tool: "nika:fetch", args: { url: "https://api.example.com/data" } }
   on_error:
-    fallback: ${{ tasks.cached_data.output }}
+    recover: ${{ tasks.cached_data.output }}   # a ${{ }} ref
 
 # Use a default on error
 - id: get_count
   invoke:
     tool: "mcp:db/count_users"
   on_error:
-    value: 0
+    recover: 0                                 # a literal
 
 # Skip on error · downstream may handle
 - id: optional_step

@@ -53,7 +53,7 @@ An engine claims « Core v0.1-compliant » if it ·
    - `${{ tasks.X.field }}` resolves to a declared upstream task + a valid field name
    - `${{ env.X }}` · `${{ secrets.X }}` resolve to declared namespaces
    - `when:` and `for_each:` expressions are valid **CEL** (the v0.1 subset · see 03-dag) and their references **resolve to known namespaces** — Core parses but does NOT *evaluate* them (no execution = no `tasks.X.status` to compare against · that is Runtime's job)
-   - `output:` bindings are valid **RFC 9535** JSONPath
+   - `output:` bindings are valid **jq** expressions (the one data language · see 04-variables)
    - Reports undefined references with `NIKA-VAR-001`
 
 4. **Produces typed errors** matching the v0.1 spec
@@ -77,7 +77,7 @@ Editors (VS Code · Zed · JetBrains · Neovim) pick it up via the standard
 to give **autocomplete + inline validation** as you type — the same DX as
 GitHub Actions and Docker Compose. This is also what makes a Nika file
 pleasant (and trap-free) for an AI to author: the schema constrains the shape
-before the engine ever runs. CEL expressions and RFC 9535 paths inside string
+before the engine ever runs. CEL expressions and jq expressions inside string
 fields are validated by the engine (Core level), not the JSON Schema.
 
 **Use case** · linters · spec editors · LSP server intelligence · static analyzers.
@@ -101,7 +101,7 @@ An engine claims « Runtime v0.1-compliant » if it satisfies Core conformance P
    - `retry` strategy honored on transient errors
    - `on_error` recovery honored on terminal errors
    - `with` scope injected into task body
-   - `output` binding via JSONPath
+   - `output` binding via jq
 
 3. **Implements security policies**
    - `exec:` blocklist (engine SHOULD ship a sane default · MAY allow override)

@@ -152,20 +152,18 @@ masked references in `secrets`.
 
 ## Output binding · `output:`
 
-Use `output:` to define **named bindings** extracted from a task's raw response via **full JSONPath**. These bindings appear in the task's typed output and are referenced as `${{ tasks.X.<name> }}` ·
+Use `output:` to define **named bindings** extracted from a task's raw response via a **jq expression** (the one data language). These bindings appear in the task's typed output and are referenced as `${{ tasks.X.<name> }}` ·
 
 ```yaml
 - id: api_call
   invoke:
     tool: "nika:fetch"
     args:
-      url: "https://api.example.com/v1/users"
-      mode: jsonpath
-      jsonpath: "$"
+      url: "https://api.example.com/v1/users"   # returns JSON · output: jq extracts
   output:
-    user_count: "$.data.users.length"
-    first_user: "$.data.users[0]"
-    user_emails: "$.data.users[*].email"
+    user_count: ".data.users | length"
+    first_user: ".data.users[0]"
+    user_emails: ".data.users[].email"
 ```
 
 Downstream ·
@@ -190,8 +188,8 @@ access is **dual-accessible** ·
     tool: nika:fetch
     args: { url: "..." }
   output:
-    body: $.body
-    status: $.status
+    body: .body
+    status: .status
 ```
 
 Downstream ·
@@ -209,32 +207,36 @@ ${{ tasks.api_call.status }}             # extracted via $.status
 - `tasks.X.output` ALWAYS returns the raw output (unmodified value
   returned by the verb · before any binding extraction)
 - `tasks.X.<name>` for any `<name>` declared in `output:` block returns
-  the extracted JSONPath result
+  the extracted jq result
 - `<name>` collisions with reserved words `output` · `status` · `error` ·
   `started_at` · `ended_at` · `duration_ms` are forbidden at parse time
 - If no `output:` block · only `tasks.X.output` is accessible (named
   bindings are an opt-in convenience)
 
-### Path grammar · RFC 9535 JSONPath
+### Path grammar · jq (the one data language)
 
-Output binding uses **[RFC 9535](https://www.rfc-editor.org/rfc/rfc9535) JSONPath**
-— the IETF-standardized JSONPath (2024), not a vendor dialect. Engines use a
-conformant implementation (e.g. the Rust `serde_json_path` crate) so paths
-behave identically everywhere.
+Output binding uses a **jq expression** — the SAME jq as the `nika:jq` builtin.
+Nika has ONE data extraction-and-transform language (jq), **not two**: the former
+RFC 9535 JSONPath was dropped because jq is a superset (any JSONPath query + more)
+and a workflow language must not force the author — or an LLM — to choose between
+two extraction syntaxes (SOTA « one obvious way · ≤2 expression layers »). The two
+expression layers are **CEL** (inside `${{ }}` · conditions + value substitution)
+and **jq** (inside `output:` bindings + `nika:jq` · extraction + transform).
+Reference engines use `jaq` (Rust jq) so paths behave identically everywhere.
 
-v0.1 conformance subset (every engine MUST support) ·
+v0.1 jq conformance subset (every engine MUST support) ·
 
 ```
-$                          root
-.<name>  ['<name>']        object member (dot or bracket)
-[<index>]                  array index
-[*]                        wildcard (all members / elements)
-..<name>                   descendant segment (optional engine support)
+.<name>                    object member
+.<name>[<index>]           array index
+.<name>[]                  iterate all elements (jq `.[]` · was JSONPath `[*]`)
+.a.b.c                     deep path
+. | map(...) | select(...) jq pipeline for reshaping / filtering
 ```
 
-A v0.1-compliant engine MUST support the first four; the descendant segment is
-optional. Full RFC 9535 (filters `?(@.x > 1)`, slices) MAY be supported and is
-the additive growth path.
+The subset above is the portability floor every engine MUST support. Full jq
+(the `jaq` Rust impl · « full stdlib ») MAY be used — it is the single data
+extraction-and-transform language (`output:` bindings + the `nika:jq` builtin).
 
 ---
 
@@ -280,7 +282,7 @@ Reasons ·
 
 ## Forward-compat
 
-The `${{ ... }}` substitution surface and the 5 namespaces are locked at v1. Additional template helpers (e.g. `${{ vars.x | json }}` · `${{ vars.x | upper }}`) MAY be added in minor bumps. JSONPath grammar MAY extend (e.g. filters `?(@.field == value)`).
+The `${{ ... }}` substitution surface and the 5 namespaces are locked at v1. **Template pipe-filters (`${{ vars.x | json }}` · `| upper`) are NOT a growth path** (they would duplicate builtins + push CEL toward a string-DSL). Data transforms live in the `nika:jq` builtin; the `${{ }}` surface grows only with CEL-native features (macros `has`/`all`/`exists` · reserved · additive). jq is the single extraction-and-transform language (`output:` + `nika:jq`).
 
 Out of scope for v0.1 (deferred · see [`08-out-of-scope.md`](./08-out-of-scope.md)) ·
 - Expression language (no arithmetic in templates)

@@ -112,7 +112,7 @@ Never supported. Anti-pattern.
     prompt: "..."
     stream: true
   output:
-    chunks: $.stream                # not in v0.1
+    chunks: .stream                 # not in v0.1
 ```
 
 **Why deferred** · streaming semantics in a YAML/DAG model are tricky · tasks are nominally synchronous. Engines MAY stream internally as an implementation detail · workflows see the final assembled response.
