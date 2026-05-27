@@ -59,6 +59,14 @@ AWS exponential-backoff-and-jitter.
   made `source` **required** (contradiction) · schema now makes `source` optional
   defaulting to `vault` (the sovereign default · `secrets: { k: { key: path } }`
   works without spelling `source: vault`).
+- **Introspection builtins evaluated · `dag_info`/`threads` KEPT, `threads`
+  gets a portability caveat.** A "verifier d'autre candidat" sweep flagged these
+  2 as the most speculative (zero usage · engine-self-introspection). Verdict ·
+  KEEP — the stdlib cut criterion is **redundancy** (jq-subsumes), not rarity;
+  both are **unique** (nothing else provides DAG topology / engine state) so
+  neither falls under the 42→26 principle. `nika:threads` gains an **advisory**
+  note (its counts reflect the engine's concurrency model · impl-dependent ·
+  coarse adaptive-throttling · not a portable contract-precise number).
 - **Schema · expression-leaf `format` tags + JSONPath→jq alignment.** The
   hand-derived `schemas/workflow.schema.json` now tags its expression leaves ·
   `when:` (task + `on_finally`) carries `"format": "cel-expression"` · `output:`

@@ -202,7 +202,7 @@ Send notifications · `channel:` enum (`webhook`/`slack`/`email`/`discord`/`sms`
 `invoke: { tool: "nika:dag_info" }` → `{ nodes, edges, waves }`. DAG topology.
 
 ### `nika:threads`
-`invoke: { tool: "nika:threads" }` → `{ active, queued, completed }`. Engine task-pool state.
+`invoke: { tool: "nika:threads" }` → `{ active, queued, completed }`. Engine task-pool state · **advisory** · the counts reflect the engine's concurrency model (impl-dependent · use for coarse adaptive-throttling · not a portable contract-precise number).
 
 ---
 
