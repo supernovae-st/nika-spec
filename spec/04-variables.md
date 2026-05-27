@@ -107,15 +107,25 @@ Reference any upstream task's output (or status · error · duration_ms) ·
     command: "./deploy.sh ${{ tasks.build.output.artifact_path }}"
 ```
 
-Implicit properties on every task ·
+`tasks.X` is the task **result record** — a CEL object, NOT the bare output
+value. Always write `.output` for the value · the record's fields are ·
 
 ```
-${{ tasks.X }}                       whole output (alias for tasks.X.output)
-${{ tasks.X.output }}                the typed output
-${{ tasks.X.status }}                success | failure | skipped | cancelled
-${{ tasks.X.error }}                 error structure (present if status == failure)
-${{ tasks.X.duration_ms }}           execution time
+${{ tasks.X.output }}                the verb's output (string · object · or bytes · per verb · see 02)
+${{ tasks.X.status }}                success | failure | skipped | cancelled  (closed enum · v1)
+${{ tasks.X.error }}                 typed error record · present iff status == failure (see 05)
+${{ tasks.X.started_at }}            RFC 3339 start timestamp
+${{ tasks.X.ended_at }}              RFC 3339 end timestamp
+${{ tasks.X.duration_ms }}           execution time · integer milliseconds
+${{ tasks.X.<name> }}                a named output: binding (jq · see below)
 ```
+
+**One obvious way · no bare alias.** `${{ tasks.X }}` is the whole result
+object · the output is ALWAYS `${{ tasks.X.output }}` — there is no `tasks.X`
+== output shortcut (it would make `tasks.X` both a scalar and a record · which
+CEL cannot type). This matches every workflow engine · GitHub Actions
+`steps.X.outputs` · Argo node context · Temporal result-vs-state · the task
+result is a record, never a scalar masquerading as the namespace.
 
 ### `${{ env.X }}` · environment variable
 
@@ -163,7 +173,7 @@ Use `output:` to define **named bindings** extracted from a task's raw response 
   output:
     user_count: ".data.users | length"
     first_user: ".data.users[0]"
-    user_emails: ".data.users[].email"
+    user_emails: "[.data.users[].email]"   # [...] collects the stream into an array
 ```
 
 Downstream ·
@@ -189,7 +199,7 @@ access is **dual-accessible** ·
     args: { url: "..." }
   output:
     body: .body
-    status: .status
+    http_status: .status     # NOT `status:` — that name is reserved (the task's own .status)
 ```
 
 Downstream ·
@@ -199,8 +209,9 @@ Downstream ·
 ${{ tasks.api_call.output }}             # full raw JSON · including all fields the verb returned
 
 # Named bindings (defined in output: block above)
-${{ tasks.api_call.body }}               # extracted via $.body
-${{ tasks.api_call.status }}             # extracted via $.status
+${{ tasks.api_call.body }}               # jq .body  · the response body
+${{ tasks.api_call.http_status }}        # jq .status · the HTTP status field
+${{ tasks.api_call.status }}             # RESERVED · the task's own status (success|failure|…) · NOT a binding
 ```
 
 **Rules** ·
@@ -238,6 +249,22 @@ The subset above is the portability floor every engine MUST support. Full jq
 (the `jaq` Rust impl · « full stdlib ») MAY be used — it is the single data
 extraction-and-transform language (`output:` bindings + the `nika:jq` builtin).
 
+#### Binding rules (single-value · pure-jq)
+
+- **A binding resolves to exactly ONE value.** A jq program emits a *stream* —
+  `.users[]` yields N separate values, NOT an array. A binding whose program
+  emits zero or multiple values is a **parse-time error** (`NIKA-VAR-NNN`) ·
+  collect a stream with `[ … ]` (`[.users[].email]` → array) · take one with
+  an index (`.users[0]`) or `first(…)`. One obvious way · no silent
+  first-match, no implicit array-wrap.
+- **An `output:` jq expression is pure jq over the task's raw output** — it does
+  NOT contain `${{ }}` (the two expression layers never nest in one string ·
+  CEL reads the namespaces · jq reads the task output). To parametrize an
+  extraction by a workflow value, shape the verb's *input* with `${{ }}` ·
+  the jq then runs over the result. (Exposing the read namespaces as jq
+  variables — `.items[] | select(.id == $vars.target)` — is a v0.2 candidate ·
+  jq-native · additive · NOT in the v0.1 subset.)
+
 ---
 
 ## Resolution order
@@ -250,6 +277,18 @@ When a task is about to run · the engine resolves `${{ ... }}` references in th
 4. **Single-pass** · substitution result is NOT re-evaluated (no nested substitution)
 
 If a reference is unresolved · the engine raises a `NIKA-VAR-001` (undefined variable) error.
+
+### Value rendering · object → string
+
+When a `${{ }}` reference resolves to an **object or array** and is substituted
+into a **string position** (e.g. inside a `prompt:` or `command:`), it renders
+as **compact JSON** · deterministic (object keys sorted · no insignificant
+whitespace). Scalars render as their natural string (numbers · booleans ·
+`null` → `null`). There are **no template pipe-filters** (`${{ x | json }}` is
+NOT a thing · per the §locked substitution surface) — to control the rendering,
+extract a string with jq in `output:` (`@json` for JSON text · `tostring` /
+`@text` for scalar coercion) and reference that binding. One obvious way ·
+implicit compact-JSON by default · explicit jq when you need a specific shape.
 
 ---
 

@@ -47,6 +47,22 @@ AWS exponential-backoff-and-jitter.
   (schemars) output — a flat grep of `stdlib/builtins-v0.1.md` returns 41 names
   (27 canonical + 14 documented-as-cut), proving the enum needs structured
   codegen, not a drift-prone hand-edit.
+- **Output model hardened · 5 coherence fixes (04-variables).** Audit of the
+  output/binding surface against CEL + jq semantics + SOTA workflow engines
+  (GitHub Actions · Argo · Temporal · n8n · Dagger) · all read the task result
+  as an OBJECT, never a bare value. (1) `tasks.X` is the **result record** ·
+  the bare-alias « `tasks.X` == `.output` » is removed (it made `tasks.X` both
+  a scalar AND a record-with-`.status` · which CEL cannot type) · the output is
+  always `${{ tasks.X.output }}`. (2) A binding resolves to **exactly one jq
+  value** · a stream (`.users[]`) is a parse-time error · collect with `[ … ]`
+  (`[.users[].email]`) · the canonical example was a stream-producing bug · now
+  fixed. (3) **Object→string** substitution renders as compact deterministic
+  JSON (sorted keys) · controlled via jq `@json`/`tostring` in `output:` (no
+  pipe-filters). (4) `output:` jq is **pure jq over the raw output** · no
+  `${{ }}` nesting (the 2 expression layers never mix in one string) · jq-var
+  parametrization is a v0.2 candidate. (5) `.started_at`/`.ended_at` exposed
+  (were reserved-but-hidden) · the dual-access example fixed (used the reserved
+  `status` binding name + JSONPath `$.` syntax · now `http_status` + jq).
 - **`on_error` simplified · 4 modes → 3.** `fallback:` + `value:` merge into
   one `recover:` field (a `${{ }}` ref resolves to either a task output or a
   literal) · plus `skip:` and `fail_workflow:`.
