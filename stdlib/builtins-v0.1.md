@@ -1,14 +1,15 @@
 # Stdlib v0.1 · Builtins
 
-> **27 canonical builtins** shipped with Stdlib v0.1-compliant engines.
+> **26 canonical builtins** shipped with Stdlib v0.1-compliant engines.
 > Invoked via `invoke: tool: "nika:<name>"`. Plus media builtins deferred to
 > stdlib v0.x (opt-in feature flag).
 >
 > **Consolidation (« less but better »)** · was 42 →
-> **27**. `nika:jq` is THE data language · 12 thin wrappers that jq subsumes
-> were cut · the validators merged · `task_status`/`orchestrate`/`locale_lookup`
-> cut. ZERO capability loss (jq ⊇ them all · jaq-verified). See
-> §"What jq subsumes" below.
+> **26**. `nika:jq` is THE data language · 13 thin wrappers that jq subsumes
+> were cut (incl. `json_merge` = jq's recursive `*` · jaq source-verified
+> 2026-05-27 · `obj_merge` impl + test corpus + corelang docs) · the validators
+> merged · `task_status`/`orchestrate`/`locale_lookup` cut. ZERO capability loss
+> (jq ⊇ them all · jaq-verified). See §"What jq subsumes" below.
 
 ---
 
@@ -18,13 +19,13 @@
 |---|---|---|
 | Core | 7 | Required for execution (sleep · log · emit · assert · prompt · done · wait_until) |
 | File | 5 | I/O primitives (read · write · edit · glob · grep) |
-| Data | 9 | `jq` (THE data language) + 8 capabilities jq can't express (json_merge · json_diff · validate · json_merge_patch · csv_to_json · uuid · date · hash) |
+| Data | 8 | `jq` (THE data language) + 7 capabilities jq can't express (json_diff · validate · json_merge_patch · csv_to_json · uuid · date · hash) |
 | Introspection | 4 | Self-awareness (cost · records · dag_info · threads) |
 | Network | 2 | fetch (HTTP+extraction) · notify (alerts out) |
 | Media | — | **Deferred to stdlib v0.x** (opt-in feature flag) |
-| **Total v0.1** | **27** | |
+| **Total v0.1** | **26** | |
 
-A Stdlib v0.1-compliant engine MUST ship these 27.
+A Stdlib v0.1-compliant engine MUST ship these 26.
 
 ---
 
@@ -108,7 +109,7 @@ Recursive grep · returns array of `{ path, line, match }`.
 
 ---
 
-## Data builtins (9) · `jq` is THE data language
+## Data builtins (8) · `jq` is THE data language
 
 ### `nika:jq` · the transform + extraction primitive
 ```yaml
@@ -117,13 +118,6 @@ invoke: { tool: "nika:jq", args: { expression: ".items | map(.price) | add", inp
 Run a jq expression. **The single data-transform-and-extraction language** — map · filter · select · group_by · reshape · string-interpolation `"\(.x)"` · `@base64`/`@base64d`/`@csv` encoders · array `flatten` · `leaf_paths`/`getpath`/`setpath`. The same jq used in `output:` bindings (see `04-variables.md`).
 
 **Implementation** · reference engine uses `jaq` (Rust jq).
-
-### `nika:json_merge` · deep merge
-```yaml
-invoke: { tool: "nika:json_merge", args: { base: { foo: 1, bar: 2 }, overlay: { bar: 99, baz: 3 } } }
-# → { foo: 1, bar: 99, baz: 3 }
-```
-Deep (recursive) merge of two JSON values · overlay wins. **Kept distinct** · jaq does not reliably implement jq's `*` recursive-object-merge operator, so this is a real capability (not jq-expressible today).
 
 ### `nika:json_diff`
 ```yaml
@@ -142,7 +136,7 @@ Validate data against a **JSON Schema** · returns `{ valid: bool, errors: [...]
 ```yaml
 invoke: { tool: "nika:json_merge_patch", args: { target: { ... }, patch: { ... } } }
 ```
-**RFC 7396** merge patch (`null` deletes a key) · distinct from `json_merge` (RFC 7396 delete-on-null semantics · not jq's `*`).
+**RFC 7396** merge patch (`null` deletes a key) · the delete-on-null semantics jq's `*` recursive-merge does NOT provide (so this stays a genuine builtin). Plain recursive merge (no delete) is just `jq '.[0] * .[1]'` on a `[base, overlay]` input · no builtin needed.
 
 ### `nika:csv_to_json`
 ```yaml
@@ -214,7 +208,7 @@ Send notifications · `channel:` enum (`webhook`/`slack`/`email`/`discord`/`sms`
 
 ## What jq subsumes (cut from v0.1)
 
-These 12 former builtins are **expressible in `nika:jq`** (jaq-verified) · cut to
+These 13 former builtins are **expressible in `nika:jq`** (jaq-verified) · cut to
 keep ONE data language (« no two ways to transform data »). Canonical recipes ·
 
 | Former builtin | jq recipe |
@@ -230,6 +224,7 @@ keep ONE data language (« no two ways to transform data »). Canonical recipes 
 | `nika:inject` (template) | `"Hello \(.name), age \(.age)"` (string interpolation) |
 | `nika:base64_encode` / `_decode` | `@base64` / `@base64d` |
 | `nika:json_to_csv` | `@csv` |
+| `nika:json_merge` (recursive `*`) | `.[0] * .[1]` on a `[base, overlay]` input (jaq `obj_merge` · source-verified 2026-05-27) |
 
 Also cut · `nika:task_status` (use `${{ tasks.X.status }}`) · `nika:orchestrate`
 (use `for_each` for bounded fan-out · sub-workflow composition is deferred per
@@ -255,9 +250,9 @@ honors task-level `timeout` · respects engine security policies.
 ## Forward-compat
 
 New builtins MAY enter stdlib v0.x. Builtin removal is never allowed within a
-stdlib v0.x lifetime (removal requires a new stdlib major). The v0.1 → 27
+stdlib v0.x lifetime (removal requires a new stdlib major). The v0.1 → 26
 consolidation happened **pre-public** (0 external users · before the forever-clock).
 
 ---
 
-🦋 *27 builtins canonical · jq = the data language · clear forever.*
+🦋 *26 builtins canonical · jq = the data language · clear forever.*

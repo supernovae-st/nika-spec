@@ -27,13 +27,22 @@ AWS exponential-backoff-and-jitter.
   never has to choose between two extraction syntaxes. Nika now has exactly
   **two expression layers**: **CEL** (inside `${{ }}` · conditions +
   substitution) and **jq** (extraction + transform).
-- **Stdlib consolidated · 42 → 27 builtins** (zero capability loss). jq
-  subsumes ~12 thin data wrappers (map · filter · group_by · aggregate ·
+- **Stdlib consolidated · 42 → 26 builtins** (zero capability loss). jq
+  subsumes ~13 thin data wrappers (map · filter · group_by · aggregate ·
   enrich · chunk · flatten · unflatten · json_to_csv · base64 ×2 ·
-  json_merge-via-`*`). `nika:json_merge` is **kept** as a builtin (the
-  reference jq lacks a reliable recursive-merge). `task_status` removed (read
+  **json_merge** = jq's recursive `*`). `task_status` removed (read
   `tasks.X.status` directly). The two JSON validators merge into one
   `nika:validate` (`format: json | yaml`).
+- **`nika:json_merge` CUT · 27 → 26** (the verification-gated builtin · resolved
+  2026-05-27). It was kept on the claim *"jaq lacks reliable recursive `*`"* —
+  **source-verified false**: jaq's `jaq-json/src/lib.rs` has a dedicated
+  `obj_merge` for `Obj * Obj`, its test corpus asserts
+  `{"k":{"a":1,"b":2}} * {k:{a:0,c:3}}` → `{"k":{"a":0,"b":2,"c":3}}` (recursive),
+  and `docs/corelang.dj` states *"Multiplying two objects merges them
+  recursively."* So `json_merge` is exactly `jq '.[0] * .[1]'` on a `[base,
+  overlay]` input → a jq-wrapper → cut by the same 42→27 principle that cut
+  map/filter/etc. `json_merge_patch` (RFC 7396 · null-deletes) **stays** —
+  delete-on-null is NOT `*` semantics, genuinely not jq-expressible.
 - **Schema · expression-leaf `format` tags + JSONPath→jq alignment.** The
   hand-derived `schemas/workflow.schema.json` now tags its expression leaves ·
   `when:` (task + `on_finally`) carries `"format": "cel-expression"` · `output:`

@@ -46,7 +46,7 @@ The stdlib has **independent versioning** ·
 
 - `stdlib/providers-v0.1.md` — the 13 canonical providers for v0.1
 - `stdlib/extract-modes-v0.1.md` — the 9 canonical extract modes for v0.1
-- `stdlib/builtins-v0.1.md` — the 27 canonical builtins for v0.1
+- `stdlib/builtins-v0.1.md` — the 26 canonical builtins for v0.1
 
 When the stdlib evolves to v0.2 · those files become `*-v0.2.md` and new versions are published. The core language contract (`nika: v1`) is unchanged.
 
@@ -81,14 +81,14 @@ Selected via a single `model: <provider>/<name>` field. Any other OpenAI-compati
 
 See [stdlib/extract-modes-v0.1.md](../stdlib/extract-modes-v0.1.md).
 
-### Builtins (27)
+### Builtins (26)
 
 7 core (sleep · log · emit · assert · prompt · done · wait_until)
 + 5 file (read · write · edit · glob · grep)
-+ 9 data (jq · json_merge · json_diff · validate · json_merge_patch · csv_to_json · uuid · date · hash)
++ 8 data (jq · json_diff · validate · json_merge_patch · csv_to_json · uuid · date · hash)
 + 4 introspection (cost · records · dag_info · threads)
 + 2 network (fetch · notify)
-= **27 canonical builtins** (Stdlib v0.1 · consolidated · was 42 · `jq` subsumes 12 data builtins · validators merged into `validate` · `task_status`/`orchestrate`/`locale_lookup` cut · ZERO capability loss)
+= **26 canonical builtins** (Stdlib v0.1 · consolidated · was 42 · `jq` subsumes 13 data builtins · validators merged into `validate` · `task_status`/`orchestrate`/`locale_lookup` cut · ZERO capability loss)
 (+ media · **deferred** to stdlib v0.x · NOT in the v0.1 count)
 
 See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md).
@@ -177,7 +177,7 @@ See [07-conformance.md](./07-conformance.md). In summary ·
 |---|---|
 | Core | None · only parse + DAG + variable + error · no execution needed |
 | Runtime | Must execute the 4 verbs · provider/tool implementations engine's choice |
-| Stdlib v0.1 | Must ship the 13 providers + 9 extract modes + 27 builtins |
+| Stdlib v0.1 | Must ship the 13 providers + 9 extract modes + 26 builtins |
 | Stdlib v0.1+media | Stdlib v0.1 + 24 media builtins |
 
 A v0.1-compliant engine for a workflow author depends on which level they need.
