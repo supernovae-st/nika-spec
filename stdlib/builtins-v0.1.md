@@ -4,12 +4,16 @@
 > Invoked via `invoke: tool: "nika:<name>"`. Plus media builtins deferred to
 > stdlib v0.x (opt-in feature flag).
 >
-> **Consolidation (« less but better »)** · was 42 →
-> **26**. `nika:jq` is THE data language · 13 thin wrappers that jq subsumes
-> were cut (incl. `json_merge` = jq's recursive `*` · jaq source-verified
-> 2026-05-27 · `obj_merge` impl + test corpus + corelang docs) · the validators
-> merged · `task_status`/`orchestrate`/`locale_lookup` cut. ZERO capability loss
-> (jq ⊇ them all · jaq-verified). See §"What jq subsumes" below.
+> **Consolidation (« less but better »)** · was 42 → 26 (D-N6) →
+> **22**. Step 1 (42 → 26 · D-N6) · `nika:jq` is THE data language · 13 thin
+> wrappers that jq subsumes were cut (incl. `json_merge` = jq's recursive `*` ·
+> jaq source-verified 2026-05-27 · `obj_merge` impl + test corpus + corelang
+> docs) · the validators merged · `task_status`/`orchestrate`/`locale_lookup`
+> cut. Step 2 (26 → 22 · ADR-086/087/088 Rams sweep 2026-05-27) · `convert`
+> replaces `csv_to_json` (multi-format · from:/to:) · `wait` unifies
+> `sleep`+`wait_until` (−1) · `inspect` unifies `cost`+`records`+`dag_info`+
+> `threads` (−3). ZERO capability loss (jq ⊇ the cuts · jaq-verified · the
+> collapses preserve every behavior via mode args). See §"What jq subsumes".
 
 ---
 
@@ -23,9 +27,9 @@
 | Introspection | 1 | Self-awareness (inspect · view-discriminated · 4 views · cost / records / dag_info / threads) |
 | Network | 2 | fetch (HTTP+extraction) · notify (alerts out) |
 | Media | — | **Deferred to stdlib v0.x** (opt-in feature flag) |
-| **Total v0.1** | **26** | |
+| **Total v0.1** | **22** | |
 
-A Stdlib v0.1-compliant engine MUST ship these 26.
+A Stdlib v0.1-compliant engine MUST ship these 22.
 
 ---
 
@@ -166,7 +170,7 @@ Universal format converter · 4 formats v0.1 (`json` · `yaml` · `toml` · `csv
 
 Pattern · `fetch+extract` symmetry · single super-powerful builtin · `from`/`to` mode parameters · all bidirectional pairs canonical · no per-direction builtin slot.
 
-Replaces · legacy `nika:csv_to_json` (cut per D-2026-05-27 Rams sweep · « less but better » audit per the canonical-26 builtin-by-builtin review). The reverse direction (JSON→CSV) is ALSO covered here · jq's `@csv` filter is the in-jq alternative for that specific direction · `nika:convert` is the canonical multi-format builtin.
+Replaces · legacy `nika:csv_to_json` (cut per ADR-086 · D-2026-05-27 Rams sweep · the « less but better » builtin-by-builtin review that cut the canonical set to 22). The reverse direction (JSON→CSV) is ALSO covered here · jq's `@csv` filter is the in-jq alternative for that specific direction · `nika:convert` is the canonical multi-format builtin.
 
 Reference implementation · `serde_transcode` 1.1+ orchestrator (zero-allocation walk · serde-ecosystem canonical · 15M+ downloads · sfackler) + format-specific crates · `serde_json` (JSON · already nika dep) · `serde_yaml_bw` 2.5+ (YAML · modern + maintained 2026) · `toml` 1.1+ (TOML · spec 1.1.0 compliant) · `csv` 1.4+ (CSV · quoting-aware).
 
@@ -282,8 +286,8 @@ honors task-level `timeout` · respects engine security policies.
 ## Forward-compat
 
 New builtins MAY enter stdlib v0.x. Builtin removal is never allowed within a
-stdlib v0.x lifetime (removal requires a new stdlib major). The v0.1 → 26
-consolidation happened **pre-public** (0 external users · before the forever-clock).
+stdlib v0.x lifetime (removal requires a new stdlib major). The v0.1 → 22
+consolidation (42 → 26 → 22) happened **pre-public** (0 external users · before the forever-clock).
 
 ---
 
