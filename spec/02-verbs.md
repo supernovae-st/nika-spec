@@ -199,7 +199,7 @@ clean · `nika:*` · `nika:connectome/*` · `mcp:browser/*`.
       path: "./config.yaml"
 ```
 
-See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md) for the canonical builtin list (26 builtins in v0.1).
+See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md) for the canonical builtin list (22 builtins in v0.1).
 
 ### MCP call
 

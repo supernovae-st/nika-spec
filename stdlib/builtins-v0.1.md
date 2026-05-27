@@ -287,4 +287,4 @@ consolidation happened **pre-public** (0 external users · before the forever-cl
 
 ---
 
-🦋 *26 builtins canonical · jq = the data language · clear forever.*
+🦋 *22 builtins canonical · jq = the data language · 5-layer Rams symmetry (fetch+extract · jq · convert · wait · inspect) · clear forever.*

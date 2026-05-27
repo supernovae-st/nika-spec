@@ -123,7 +123,7 @@ outputs:                              # what the workflow returns · symmetric t
 | [07 conformance](./07-conformance.md) | What « v0.1-compliant » means |
 | [08 out of scope](./08-out-of-scope.md) | Explicit defer list (memory · macros · etc.) |
 
-**Stdlib** (versioned independently · not a spec section) · [stdlib/](../stdlib/) — **13 providers · 9 extract modes · 26 builtins** (7 core · 5 file · 8 data · 4 introspection · 2 network).
+**Stdlib** (versioned independently · not a spec section) · [stdlib/](../stdlib/) — **13 providers · 9 extract modes · 22 builtins** (6 core · 5 file · 8 data · 1 introspection · 2 network · post ADR-086/087/088 Rams sweep 2026-05-27).
 
 ---
 

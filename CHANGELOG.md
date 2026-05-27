@@ -27,7 +27,7 @@ AWS exponential-backoff-and-jitter.
   never has to choose between two extraction syntaxes. Nika now has exactly
   **two expression layers**: **CEL** (inside `${{ }}` · conditions +
   substitution) and **jq** (extraction + transform).
-- **Stdlib consolidated · 42 → 26 builtins** (zero capability loss). jq
+- **Stdlib consolidated · 42 → 22 builtins** (zero capability loss · 2026-05-27 cumulative · pre-ADR-086/087/088 stage was 26 · post is 22). jq
   subsumes ~13 thin data wrappers (map · filter · group_by · aggregate ·
   enrich · chunk · flatten · unflatten · json_to_csv · base64 ×2 ·
   **json_merge** = jq's recursive `*`). `task_status` removed (read
@@ -67,6 +67,24 @@ AWS exponential-backoff-and-jitter.
   neither falls under the 42→26 principle. `nika:threads` gains an **advisory**
   note (its counts reflect the engine's concurrency model · impl-dependent ·
   coarse adaptive-throttling · not a portable contract-precise number).
+  > ⚠️ **§2.7 amendment 2026-05-27 evening · ADR-088 unified** · same-day after
+  > the KEPT verdict above, the next Rams sweep applied the « one super-powerful
+  > builtin · multi-mode args » pattern to the 4 introspection builtins
+  > (`cost` + `records` + `dag_info` + `threads`) and collapsed them into
+  > `nika:inspect view: <which>` view-discriminated · single registration · zero
+  > capability loss. The KEEP-vs-NUKE decision above stays correct (those
+  > capabilities are unique and stay shipped) · the EXPOSURE-SURFACE changed
+  > (4 builtin names → 1 with view enum). Same § 42→22 principle as ADR-086/087.
+- **ADR-086 · `csv_to_json` → `convert` universal multi-format.** Same Rams
+  pattern · ONE super-powerful builtin (`nika:convert format: <X> direction:
+  encode|decode`) subsumes csv↔json + yaml↔json + toml↔json + base64↔text ·
+  zero capability loss · -1 builtin (was 26 · now 25 after this).
+- **ADR-087 · `sleep` + `wait_until` → `wait` unified.** Same Rams pattern ·
+  ONE super-powerful builtin (`nika:wait duration: "5s" | until: <ISO 8601>`) ·
+  -1 builtin (now 24).
+- **ADR-088 · 4 introspection → `inspect` view-discriminated.** Same Rams
+  pattern · `nika:inspect view: cost|records|dag_info|threads` · -3 builtins
+  (now **22 · final**).
 - **Schema · expression-leaf `format` tags + JSONPath→jq alignment.** The
   hand-derived `schemas/workflow.schema.json` now tags its expression leaves ·
   `when:` (task + `on_finally`) carries `"format": "cel-expression"` · `output:`

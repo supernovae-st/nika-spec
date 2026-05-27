@@ -183,7 +183,7 @@ model: ollama/llama3.1        # or lmstudio/... · llamacpp/... · vllm/...
 ## Where to go next
 
 - **[spec/](./spec/)** — the full specification (~30 pages · the contract)
-- **[stdlib/](./stdlib/)** — the 13 providers · 9 extract modes · 26 builtins
+- **[stdlib/](./stdlib/)** — the 13 providers · 9 extract modes · 22 builtins
 - **[examples/](./examples/)** — 7 foundation workflows (full v0.1 construct coverage · 19 more pending for GA)
 - **[README.md](./README.md)** — why a language · repo layout · governance
 
