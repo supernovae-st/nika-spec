@@ -117,6 +117,16 @@ invoke: { tool: "nika:jq", args: { expression: ".items | map(.price) | add", inp
 ```
 Run a jq expression. **The single data-transform-and-extraction language** — map · filter · select · group_by · reshape · string-interpolation `"\(.x)"` · `@base64`/`@base64d`/`@csv` encoders · array `flatten` · `leaf_paths`/`getpath`/`setpath`. The same jq used in `output:` bindings (see `04-variables.md`).
 
+**`input` is any JSON value** — a single ref (`input: "${{ tasks.X.output }}"`) OR a **constructed array for multi-input ops**. Recursive merge of two objects (this is exactly why `json_merge` is NOT a builtin · jaq's `*` does it) ·
+```yaml
+invoke:
+  tool: nika:jq
+  args:
+    input: ["${{ tasks.base.output }}", "${{ tasks.overlay.output }}"]
+    expression: ".[0] * .[1]"      # recursive deep-merge · overlay wins
+```
+Same shape combines / zips N inputs · build the array, index inside jq.
+
 **Implementation** · reference engine uses `jaq` (Rust jq).
 
 ### `nika:json_diff`
