@@ -113,6 +113,7 @@
         },
         "when": {
           "type": "string",
+          "format": "cel-expression",
           "description": "CEL boolean · conditional execution · `${{ ... }}`."
         },
         "for_each": {
@@ -146,8 +147,8 @@
         },
         "output": {
           "type": "object",
-          "description": "Named RFC 9535 JSONPath bindings · `${{ tasks.X.<name> }}`. Reserved names forbidden: output · status · error · started_at · ended_at · duration_ms.",
-          "additionalProperties": { "type": "string" }
+          "description": "Named jq-expression bindings · `${{ tasks.X.<name> }}`. jq is the single data extraction-and-transform language (the former RFC 9535 JSONPath was dropped · jq is a superset · per spec/04-variables.md §216-225). Reserved names forbidden: output · status · error · started_at · ended_at · duration_ms.",
+          "additionalProperties": { "type": "string", "format": "jq" }
         },
         "output_format": {
           "type": "string",
@@ -269,7 +270,7 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "when": { "type": "string" },
+        "when": { "type": "string", "format": "cel-expression" },
         "timeout": { "type": "string" },
         "infer": { "$ref": "#/$defs/infer" },
         "exec": { "$ref": "#/$defs/exec" },

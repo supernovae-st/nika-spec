@@ -34,6 +34,19 @@ AWS exponential-backoff-and-jitter.
   reference jq lacks a reliable recursive-merge). `task_status` removed (read
   `tasks.X.status` directly). The two JSON validators merge into one
   `nika:validate` (`format: json | yaml`).
+- **Schema · expression-leaf `format` tags + JSONPath→jq alignment.** The
+  hand-derived `schemas/workflow.schema.json` now tags its expression leaves ·
+  `when:` (task + `on_finally`) carries `"format": "cel-expression"` · `output:`
+  binding values carry `"format": "jq"`. These are LSP hooks (annotation-only ·
+  validators ignore unknown formats · zero structural break) for future
+  CEL-namespace / jq-path completion. Same change corrects the `output:`
+  description, which still read « RFC 9535 JSONPath bindings » — the schema was
+  lagging the already-decided prose (one data language · jq) · now aligned to
+  spec/04-variables.md §216-225. The closed builtins-enum (LSP autocomplete of
+  the 27) is deliberately deferred to the engine-generated `nika-schema`
+  (schemars) output — a flat grep of `stdlib/builtins-v0.1.md` returns 41 names
+  (27 canonical + 14 documented-as-cut), proving the enum needs structured
+  codegen, not a drift-prone hand-edit.
 - **`on_error` simplified · 4 modes → 3.** `fallback:` + `value:` merge into
   one `recover:` field (a `${{ }}` ref resolves to either a task output or a
   literal) · plus `skip:` and `fail_workflow:`.
