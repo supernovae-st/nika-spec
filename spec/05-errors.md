@@ -53,11 +53,10 @@ Error codes follow the format `NIKA-<NAMESPACE>-<NNN>` where namespace is 2-9 up
 | `NIKA-VAR` | Variable resolution failures | 001-099 |
 | `NIKA-INFER` | `infer:` verb errors | 001-099 |
 | `NIKA-EXEC` | `exec:` verb errors | 001-099 |
-| `NIKA-FETCH` | `nika:fetch` builtin errors (HTTP + extraction) | 001-099 |
 | `NIKA-INVOKE` | `invoke:` verb errors | 001-099 |
 | `NIKA-AGENT` | `agent:` verb errors | 001-099 |
 | `NIKA-PROVIDER` | Provider adapter errors | 001-099 per provider |
-| `NIKA-BUILTIN-<BUILTIN>` | Builtin tool errors · per-builtin sub-namespace (e.g. `NIKA-BUILTIN-WAIT-001` · `NIKA-BUILTIN-NOTIFY-001`) | 001-099 per builtin |
+| `NIKA-BUILTIN-<BUILTIN>` | Builtin tool errors · per-builtin sub-namespace (`NIKA-BUILTIN-WAIT-001` · `NIKA-BUILTIN-NOTIFY-001` · `NIKA-BUILTIN-INSPECT-001` · `NIKA-BUILTIN-FETCH-001` — `nika:fetch`'s network/extraction errors, whose instances carry `category: network_error` though the namespace is the uniform `NIKA-BUILTIN`) | 001-099 per builtin |
 | `NIKA-MCP` | MCP client errors | 001-099 |
 | `NIKA-SEC` | Security policy violations (SSRF · blocklist) | 001-099 |
 | `NIKA-TIMEOUT` | Task or step timeouts | 001-099 |
@@ -106,7 +105,7 @@ A task MAY declare a `retry:` block. Retries apply to **transient** errors only 
     backoff_max_ms: 30000        # cap on backoff (default 60000)
     jitter: true                 # randomize backoff (default true · anti-thundering-herd)
     on_codes:                    # optional · whitelist of codes to retry
-      - NIKA-FETCH-001
+      - NIKA-BUILTIN-FETCH-001
       - NIKA-PROVIDER-001
 ```
 
@@ -130,7 +129,7 @@ A task MAY declare a `retry:` block. Retries apply to **transient** errors only 
 With `jitter: true` (the default) the computed delay is randomized (full-jitter
 or equal-jitter family · per AWS « exponential backoff and jitter ») so many
 tasks retrying the same upstream do not synchronize into a thundering herd.
-`on_codes` lists canonical `NIKA-<NS>-<NNN>` codes (e.g. `NIKA-FETCH-001`) — not
+`on_codes` lists canonical `NIKA-<NS>-<NNN>` codes (e.g. `NIKA-BUILTIN-FETCH-001`) — not
 HTTP status numbers.
 
 ### Conformance
