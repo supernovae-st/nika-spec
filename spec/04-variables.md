@@ -290,6 +290,17 @@ extract a string with jq in `output:` (`@json` for JSON text · `tostring` /
 `@text` for scalar coercion) and reference that binding. One obvious way ·
 implicit compact-JSON by default · explicit jq when you need a specific shape.
 
+A **bytes** output (tool-determined · e.g. MCP image content · a binary
+`nika:read`) is **opaque** · it flows tool→tool by reference
+(`${{ tasks.fetch_img.output }}` → another tool's `content:` arg · or a file
+path for `infer.vision`). Bytes **cannot** be jq-extracted (jq is JSON-only)
+nor substituted into a string position — that is an error (`NIKA-VAR-NNN`) ·
+the engine never silently UTF-8-coerces a blob (it would corrupt the data).
+For `nika:fetch` and `exec` (no binary value channel · the 9 fetch modes are
+text/JSON · `raw` is text), binary is **file-mediated** · write to a path,
+then read or reference the path. There is no `output_format` field · the
+value carries its own type.
+
 ---
 
 ## Escaping

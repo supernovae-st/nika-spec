@@ -150,11 +150,6 @@
           "description": "Named jq-expression bindings · `${{ tasks.X.<name> }}`. jq is the single data extraction-and-transform language (the former RFC 9535 JSONPath was dropped · jq is a superset · per spec/04-variables.md §216-225). Reserved names forbidden: output · status · error · started_at · ended_at · duration_ms.",
           "additionalProperties": { "type": "string", "format": "jq" }
         },
-        "output_format": {
-          "type": "string",
-          "enum": ["text", "structured", "bytes"],
-          "description": "Raw output shape hint · default inferred per verb."
-        },
         "infer": { "$ref": "#/$defs/infer" },
         "exec": { "$ref": "#/$defs/exec" },
         "invoke": { "$ref": "#/$defs/invoke" },

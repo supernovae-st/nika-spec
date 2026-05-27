@@ -86,7 +86,7 @@ Read a file · returns string content.
 ```yaml
 invoke: { tool: "nika:write", args: { path: "./out.md", content: "...", create_dirs: true, overwrite: true } }
 ```
-Write a file · returns the path. Binary · pair with `output_format: bytes` upstream.
+Write a file · returns the path. A binary `content` value (an opaque bytes output from an upstream tool · e.g. MCP image content) is written as-is · no `output_format` declaration needed (the value carries its own type).
 
 ### `nika:edit`
 ```yaml

@@ -47,7 +47,6 @@ tasks:
   output:                       # optional · named jq bindings
     result: ".choices[0].message.content"
     tokens: ".usage.total_tokens"
-  output_format: structured     # optional · text | structured | bytes · default inferred
 ```
 
 ---
@@ -519,41 +518,24 @@ tasks:
 bounded) · `digest` consumes the array of all summaries. N is computed at
 runtime — no static enumeration.
 
-### `output_format` · *optional · type hint*
+### Output shape · *no `output_format` field · shape is per-verb*
 
-```yaml
-- id: fetch_image
-  invoke:
-    tool: nika:fetch
-    args:
-      url: "https://example.com/diagram.png"
-      mode: bytes
-  output_format: bytes
-```
+There is **no `output_format` task field**. The raw output shape is determined
+**per verb** — the single source of truth is the `.output` table in
+[02-verbs.md](./02-verbs.md#what--tasksidoutput--holds--per-verb) ·
 
-Declares the **raw shape** of the task's output. Optional · default **inferred per verb** ·
+- `infer:` → string · or the schema object when `schema:` is set
+- `exec:` → stdout string · or `{stdout, stderr, exit_code}` when `capture: structured`
+- `invoke:` → the tool's response (tool-determined · string · object · or bytes)
+- `agent:` → final message string · or the schema object when `schema:` is set
 
-| Verb | Default `output_format` |
-|---|---|
-| `infer:` (no `schema:`) | `text` (raw LLM response · string) |
-| `infer:` (with `schema:`) | `structured` (validated JSON object/array) |
-| `exec:` | `structured` (always `{stdout, stderr, exit_code}`) |
-| `invoke:` | `structured` (tool-determined · check tool spec) |
-| `agent:` | `structured` (always `{result, steps_taken, ...}`) |
-
-**Closed enum** · `text` · `structured` · `bytes`.
-
-**Why explicit override** ·
-- **`bytes`** · the only way to declare binary output. Downstream consumers must be binary-aware (e.g. `nika:write` with `mode: binary` · NOT `${{ … }}` string substitution which would corrupt binary data with UTF-8 coercion).
-- **`structured`** · forces validation that raw output is a JSON object/array. Catches the « text-leak » bug where a tool returns text when caller expected JSON.
-- **`text`** · explicit string treatment · downstream `${{ … }}` substitution is verbatim.
-
-**Conformance** · the engine MUST honor explicit `output_format:` and reject mismatches at parse time (structured demand on a text-only verb · etc.).
-
-**Why a top-level task field (not nested inside `output:`)** ·
-- `output:` is a **map of named jq bindings** (existing semantics · downstream `${{ tasks.X.<name> }}` access).
-- `output_format:` is a **type hint on the raw output** (before bindings extract from it).
-- Two distinct concerns → two distinct fields → Rams 4 understandable.
+To **force JSON validation** of a raw output, use the per-verb mechanism that
+already owns it (`infer`/`agent` `schema:` · `exec` `capture: structured`) or
+the `nika:validate` builtin — never a duplicate task-level type enum (a single
+source of truth · Rams 4 understandable). A `output_format` field was drafted
+in pre-public hardening and **removed** · it duplicated `capture`/`schema` and
+its default table had drifted out of sync with 02-verbs (the very drift a
+single source prevents).
 
 ### `on_finally` · *optional · cleanup hook · ALWAYS runs*
 
@@ -620,7 +602,7 @@ on_finally:
 
 ## Forward-compat
 
-v1 ships with these task fields · `id` · `depends_on` · `when` · `for_each` · `max_parallel` · `fail_fast` · `retry` · `on_error` · `timeout` · `on_finally` · `with` · `output` · `output_format` · plus the verb selector. Additional fields may be added in minor bumps (additive only).
+v1 ships with these task fields · `id` · `depends_on` · `when` · `for_each` · `max_parallel` · `fail_fast` · `retry` · `on_error` · `timeout` · `on_finally` · `with` · `output` · plus the verb selector. Additional fields may be added in minor bumps (additive only). (Output *shape* is per-verb · not a task field · see [02-verbs.md](./02-verbs.md#what--tasksidoutput--holds--per-verb).)
 
 Out of scope for v1 · `parallel:` for explicit concurrency control · `include:` for sub-workflow composition (workaround · `exec: nika run sub.yaml`). See [08-out-of-scope.md](./08-out-of-scope.md).
 

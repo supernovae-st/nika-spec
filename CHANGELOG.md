@@ -63,6 +63,17 @@ AWS exponential-backoff-and-jitter.
   parametrization is a v0.2 candidate. (5) `.started_at`/`.ended_at` exposed
   (were reserved-but-hidden) · the dual-access example fixed (used the reserved
   `status` binding name + JSONPath `$.` syntax · now `http_status` + jq).
+- **`output_format` task field REMOVED** (drafted in pre-public hardening ·
+  removed before any adopter · net-never-shipped). It duplicated the per-verb
+  output mechanisms (`exec.capture` · `infer`/`agent` `schema:` · the
+  `nika:validate` builtin) AND its default table had drifted out of sync with
+  02-verbs (claimed `exec:`/`agent:` default to `structured` · while 02-verbs
+  says **stdout string** / **final-message string**) — a literal second source
+  of truth contradicting the first. Output **shape is per-verb · one source**
+  (the `.output` table in 02-verbs). Binary output is **tool-determined**
+  (MCP image content · binary read) · opaque · flows tool→tool · file-mediated
+  for `fetch`/`exec` — no task-level type enum (the source + sink tools each
+  already declare their own type · the middle hint was redundant).
 - **`on_error` simplified · 4 modes → 3.** `fallback:` + `value:` merge into
   one `recover:` field (a `${{ }}` ref resolves to either a task output or a
   literal) · plus `skip:` and `fail_workflow:`.
@@ -125,9 +136,6 @@ AWS exponential-backoff-and-jitter.
   after the parent task completes (success / fail / timeout / cancel) ·
   sequential · best-effort (errors logged, not propagated). cf Argo `onExit` ·
   Temporal `defer` · GitHub Actions `if: always()`.
-- **`output_format` task field** · `text | structured | bytes` · default
-  inferred per verb · explicit `bytes` unlocks binary output without UTF-8
-  corruption, and statically declares shape for IDE autocomplete.
 - **5 stdlib builtins** · `nika:notify` (one builtin · `channel:` enum
   webhook / slack / email / discord / sms) · `nika:uuid` (v7 default ·
   timestamped · sortable · RFC 9562) · `nika:date` (op-discriminated ·

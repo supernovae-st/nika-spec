@@ -40,7 +40,7 @@ shape depends on the verb (know this before you bind downstream) ·
 |---|---|---|
 | `infer:` | the model's reply · **string** | `schema:` set → **object** matching it |
 | `exec:` | **stdout string** (default) | `capture: structured` → `{ stdout, stderr, exit_code }` |
-| `invoke:` | the **tool's response** (tool-defined · string OR object · sometimes bytes) | per builtin / MCP tool schema · use `output_format: bytes` for binary tools |
+| `invoke:` | the **tool's response** (tool-defined · string · object · or bytes) | per builtin / MCP tool schema · bytes are tool-determined (MCP image content · binary read) · flow opaquely · see 04 §value rendering |
 | `agent:` | the loop's **final message** · string | `schema:` set → **object** matching it |
 
 ---
