@@ -209,12 +209,10 @@
           "oneOf": [
             {
               "type": "string",
-              "description": "`nika:*` builtin · 25 canonical per stdlib v0.1 (Core 6 · File 5 · Data 8 · Network 2 · Introspection 4). Closed enum for `yaml-language-server` autocomplete.",
+              "description": "`nika:*` builtin · 22 canonical per stdlib v0.1 (Core 6 · File 5 · Data 8 · Network 2 · Introspection 1). Closed enum for `yaml-language-server` autocomplete.",
               "enum": [
                 "nika:assert",
                 "nika:convert",
-                "nika:cost",
-                "nika:dag_info",
                 "nika:date",
                 "nika:done",
                 "nika:edit",
@@ -223,6 +221,7 @@
                 "nika:glob",
                 "nika:grep",
                 "nika:hash",
+                "nika:inspect",
                 "nika:jq",
                 "nika:json_diff",
                 "nika:json_merge_patch",
@@ -230,8 +229,6 @@
                 "nika:notify",
                 "nika:prompt",
                 "nika:read",
-                "nika:records",
-                "nika:threads",
                 "nika:uuid",
                 "nika:validate",
                 "nika:wait",

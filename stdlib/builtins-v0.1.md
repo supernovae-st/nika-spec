@@ -1,6 +1,6 @@
 # Stdlib v0.1 · Builtins
 
-> **25 canonical builtins** shipped with Stdlib v0.1-compliant engines.
+> **22 canonical builtins** shipped with Stdlib v0.1-compliant engines.
 > Invoked via `invoke: tool: "nika:<name>"`. Plus media builtins deferred to
 > stdlib v0.x (opt-in feature flag).
 >
@@ -20,7 +20,7 @@
 | Core | 6 | Required for execution (log · emit · assert · prompt · done · wait) |
 | File | 5 | I/O primitives (read · write · edit · glob · grep) |
 | Data | 8 | `jq` (THE data language) + 7 capabilities jq can't express (json_diff · validate · json_merge_patch · convert · uuid · date · hash) |
-| Introspection | 4 | Self-awareness (cost · records · dag_info · threads) |
+| Introspection | 1 | Self-awareness (inspect · view-discriminated · 4 views · cost / records / dag_info / threads) |
 | Network | 2 | fetch (HTTP+extraction) · notify (alerts out) |
 | Media | — | **Deferred to stdlib v0.x** (opt-in feature flag) |
 | **Total v0.1** | **26** | |
@@ -216,19 +216,25 @@ Send notifications · `channel:` enum (`webhook`/`slack`/`email`/`discord`/`sms`
 
 ---
 
-## Introspection builtins (4)
+## Introspection builtins (1)
 
-### `nika:cost`
-`invoke: { tool: "nika:cost" }` → `{ total_usd, by_task, by_provider }`. Running workflow cost.
+### `nika:inspect` · workflow introspection (4 views · view-discriminated)
+```yaml
+invoke:
+  tool: "nika:inspect"
+  args:
+    view: cost                     # REQUIRED · enum · cost | records | dag_info | threads
+```
+Workflow introspection · 1 builtin · 4 `view:` enum modes (Rams collapse per ADR-088 · 2026-05-27) ·
 
-### `nika:records`
-`invoke: { tool: "nika:records" }` → `{ tasks: [{ id, status, duration_ms, ... }] }`. Full execution record. (Per-task status is read directly via the `${{ tasks.X.status }}` namespace — no separate `task_status` builtin.)
+- `view: cost` → `{ total_usd, by_task, by_provider }`. Running workflow cost.
+- `view: records` → `{ tasks: [{ id, status, duration_ms, ... }] }`. Full execution record. (Per-task status is also read directly via the `${{ tasks.X.status }}` namespace — same shape.)
+- `view: dag_info` → `{ nodes, edges, waves }`. DAG topology.
+- `view: threads` → `{ active, queued, completed }`. Engine task-pool state · **advisory** · counts reflect the engine's concurrency model (impl-dependent · use for coarse adaptive-throttling · not a portable contract-precise number).
 
-### `nika:dag_info`
-`invoke: { tool: "nika:dag_info" }` → `{ nodes, edges, waves }`. DAG topology.
+Replaces · 4 legacy introspection builtins (`nika:cost` · `nika:records` · `nika:dag_info` · `nika:threads`) collapsed per « less but better » Rams sweep · same trust class (PURE) · same query-own-workflow-state semantic family · the split into 4 separate builtins was historical (one-per-shape) not structural · the unified `view:` discriminator + per-shape `args:` is the canonical « one super-powerful builtin · multi-mode args » pattern (matches fetch+extract · jq · convert · wait).
 
-### `nika:threads`
-`invoke: { tool: "nika:threads" }` → `{ active, queued, completed }`. Engine task-pool state · **advisory** · the counts reflect the engine's concurrency model (impl-dependent · use for coarse adaptive-throttling · not a portable contract-precise number).
+Throws · `NIKA-BUILTIN-INSPECT-001` if `view:` value not in the canonical enum.
 
 ---
 

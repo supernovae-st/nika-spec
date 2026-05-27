@@ -86,9 +86,9 @@ See [stdlib/extract-modes-v0.1.md](../stdlib/extract-modes-v0.1.md).
 6 core (log · emit · assert · prompt · done · wait)
 + 5 file (read · write · edit · glob · grep)
 + 8 data (jq · json_diff · validate · json_merge_patch · convert · uuid · date · hash)
-+ 4 introspection (cost · records · dag_info · threads)
++ 1 introspection (inspect · view-discriminated · 4 views cost/records/dag_info/threads)
 + 2 network (fetch · notify)
-= **25 canonical builtins** (Stdlib v0.1 · consolidated · was 42 · `jq` subsumes 13 data builtins · validators merged into `validate` · `task_status`/`orchestrate`/`locale_lookup` cut · `sleep`+`wait_until` merged into unified `nika:wait` per ADR-087 · ZERO capability loss)
+= **22 canonical builtins** (Stdlib v0.1 · consolidated · was 42 · `jq` subsumes 13 data builtins · validators merged into `validate` · `task_status`/`orchestrate`/`locale_lookup` cut · `sleep`+`wait_until` merged into unified `nika:wait` per ADR-087 · `cost`+`records`+`dag_info`+`threads` merged into unified `nika:inspect` per ADR-088 · ZERO capability loss)
 (+ media · **deferred** to stdlib v0.x · NOT in the v0.1 count)
 
 See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md).
