@@ -85,7 +85,7 @@ See [stdlib/extract-modes-v0.1.md](../stdlib/extract-modes-v0.1.md).
 
 7 core (sleep · log · emit · assert · prompt · done · wait_until)
 + 5 file (read · write · edit · glob · grep)
-+ 8 data (jq · json_diff · validate · json_merge_patch · csv_to_json · uuid · date · hash)
++ 8 data (jq · json_diff · validate · json_merge_patch · convert · uuid · date · hash)
 + 4 introspection (cost · records · dag_info · threads)
 + 2 network (fetch · notify)
 = **26 canonical builtins** (Stdlib v0.1 · consolidated · was 42 · `jq` subsumes 13 data builtins · validators merged into `validate` · `task_status`/`orchestrate`/`locale_lookup` cut · ZERO capability loss)
