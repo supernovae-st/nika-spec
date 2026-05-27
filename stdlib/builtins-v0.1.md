@@ -1,6 +1,6 @@
 # Stdlib v0.1 · Builtins
 
-> **26 canonical builtins** shipped with Stdlib v0.1-compliant engines.
+> **25 canonical builtins** shipped with Stdlib v0.1-compliant engines.
 > Invoked via `invoke: tool: "nika:<name>"`. Plus media builtins deferred to
 > stdlib v0.x (opt-in feature flag).
 >
@@ -17,7 +17,7 @@
 
 | Category | Count | Status |
 |---|---|---|
-| Core | 7 | Required for execution (sleep · log · emit · assert · prompt · done · wait_until) |
+| Core | 6 | Required for execution (log · emit · assert · prompt · done · wait) |
 | File | 5 | I/O primitives (read · write · edit · glob · grep) |
 | Data | 8 | `jq` (THE data language) + 7 capabilities jq can't express (json_diff · validate · json_merge_patch · convert · uuid · date · hash) |
 | Introspection | 4 | Self-awareness (cost · records · dag_info · threads) |
@@ -29,13 +29,7 @@ A Stdlib v0.1-compliant engine MUST ship these 26.
 
 ---
 
-## Core builtins (7)
-
-### `nika:sleep`
-```yaml
-invoke: { tool: "nika:sleep", args: { duration: "5s" } }   # Go-duration string
-```
-Pause for a relative duration (`"500ms"`/`"30s"`/`"5m"`/`"1h30m"` · see `03-dag.md` §timeout).
+## Core builtins (6)
 
 ### `nika:log`
 ```yaml
@@ -67,11 +61,21 @@ invoke: { tool: "nika:done", args: { result: { status: "complete" } } }
 ```
 Mark the current `agent:` loop complete and exit · the loop-completion sentinel (**valid only inside an `agent:` tool whitelist** · error elsewhere).
 
-### `nika:wait_until`
+### `nika:wait` · temporal wait (relative OR absolute)
 ```yaml
-invoke: { tool: "nika:wait_until", args: { timestamp: "2026-05-23T09:00:00Z", timeout: "1h" } }
+invoke:
+  tool: "nika:wait"
+  args:
+    duration: "5s"                  # RELATIVE · Go-duration string ("500ms"/"30s"/"5m"/"1h30m")
+    # OR (mutually exclusive · exactly-one-of) ·
+    until: "2026-05-23T09:00:00Z"   # ABSOLUTE · ISO 8601 timestamp · MAY be CEL expression
+    timeout: "1h"                   # OPTIONAL · cap for absolute wait (until: only)
 ```
-Pause until an **absolute** ISO 8601 timestamp (vs `sleep` = relative). `timestamp:` MAY be a CEL expression. Throws `NIKA-BUILTIN-WAIT-001` on timeout · `-002` if the timestamp is in the past.
+Temporal pause · ONE builtin · 2 modes (relative `duration:` XOR absolute `until:` · exactly-one-of validated at parse time).
+
+Replaces · legacy `nika:sleep` (relative-only) + `nika:wait_until` (absolute-only · cut per ADR-087 Rams sweep · 2026-05-27). Same family · same trust class (PURE) · same temporal-control semantics · the unified surface preserves both behaviors via mode arg.
+
+Throws · `NIKA-BUILTIN-WAIT-001` on absolute timeout · `-002` if the timestamp is in the past · `-003` if neither `duration:` nor `until:` set (or both set).
 
 ---
 
