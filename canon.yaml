@@ -68,7 +68,7 @@ verbs:
 
 # ---------------------------------------------------------------- builtins
 # Post atomic-language audit · 42→27→26→25→22 (-20 · -48% · zero functional loss).
-# stdlib/builtins-v0.1.md is the prose home (currently lags at 26 · cascade to 22).
+# stdlib/builtins-v0.1.md is the prose home (matches at 22 · cascade complete 2026-05-27).
 # Admission test · 3 razors · (1) NOT-expressible-in-jq+CEL+Schema · (2) canonical
 # interop format (RFC-6902/7396/9562 · etc.) · (3) cookbook-clarity.
 builtins:
@@ -142,7 +142,7 @@ extract_modes:
 # ---------------------------------------------------------------- error namespaces
 # Post NIKA-FETCH fold into NIKA-BUILTIN (commit b14bf091c · 2026-05-27 ·
 # matching "fetch is a builtin, not a verb" D-N18 · prior count 15 → 14).
-# spec/05-errors.md is the prose home (currently lags at 15 · cascade to 14).
+# spec/05-errors.md is the prose home (matches at 14 · cascade complete 2026-05-27).
 error_namespaces:
   count: 14
   reference: spec/05-errors.md
