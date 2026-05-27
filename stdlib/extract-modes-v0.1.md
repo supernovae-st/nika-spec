@@ -1,8 +1,10 @@
 # Stdlib v0.1 · Extract modes
 
-> The canonical 9 extraction modes used with the `fetch:` verb. Each mode
-> transforms an HTTP response into a useful representation for downstream
-> processing (LLM input · structured data · index entries · etc.).
+> The canonical 9 extraction modes used with the `nika:fetch` builtin
+> (invoked via `invoke:` per D-2026-05-22-N18 · 4 verbs canonical · fetch
+> is an invoke-able tool, not a verb). Each mode transforms an HTTP
+> response into a useful representation for downstream processing (LLM
+> input · structured data · index entries · etc.).
 
 ---
 
