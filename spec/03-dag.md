@@ -114,18 +114,25 @@ index access                tasks.list.output[0] · obj['key-with-dash']
 comparison                  == · != · < · <= · > · >=
 boolean                     && · || · !
 membership                  in            (e.g. status in ['success','skipped'])
+size                        size(coll) · coll.size()   (collection/string length · the ONE v0.1 function · empty-check idiom)
 literals                    true · false · 42 · 3.14 · 'str' · "str" · null
 grouping                    ( … )
 ```
 
-Arithmetic, CEL macros (`has()`, `all()`, `exists()`), and string functions
-are **reserved** — not in the v0.1 subset, addable in a later minor (CEL is a
-superset, so growth is additive and never breaking). If you need richer logic
-today, compute it in a `nika:assert` builtin or an `infer:` task.
+`size()` (collection/string length) is the ONE function in the v0.1 subset —
+the canonical empty/non-empty-check idiom (`size(items) > 0`). Everything else
+is **reserved** · arithmetic · CEL macros (`has()`, `all()`, `exists()`) · and
+string-manipulation functions (`startsWith`, `matches`, `contains`, …) — not in
+the v0.1 subset, addable in a later minor (CEL is a superset, so growth is
+additive and never breaking). If you need richer logic today, compute it in a
+`nika:assert` builtin or an `infer:` task.
 
 **Namespaces are CEL variables** · the 5 namespaces (`vars` · `with` · `tasks`
 · `env` · `secrets`) are bound as top-level CEL variables. `tasks.<id>.status`
-etc. resolve against the live DAG state.
+etc. resolve against the live DAG state. **Inside a `for_each` task body, two
+more scoped CEL variables are bound** · `item` (the current element) and `index`
+(its 0-based position) — available ONLY within that task (the 5 namespaces are
+global · `item`/`index` are for_each-local · see `for_each` below).
 
 #### Referencing a task requires an explicit `depends_on`
 

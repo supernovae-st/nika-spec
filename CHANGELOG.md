@@ -43,6 +43,15 @@ AWS exponential-backoff-and-jitter.
   overlay]` input → a jq-wrapper → cut by the same 42→27 principle that cut
   map/filter/etc. `json_merge_patch` (RFC 7396 · null-deletes) **stays** —
   delete-on-null is NOT `*` semantics, genuinely not jq-expressible.
+- **DAG coherence · 3 fixes (03-dag + 05-errors).** (D1) `for_each` introduces
+  `${{ item }}` / `${{ index }}` but the namespace model claimed "5 namespaces" ·
+  now documented as **for_each-local CEL variables** (the 5 are global · item/index
+  are loop-scoped). (D5) `size()` was used in canonical `when:` examples but was
+  NOT in the v0.1 CEL subset nor explicitly reserved · now **the one v0.1 function**
+  (collection/string length · the empty-check idiom) · string-manipulation functions
+  stay reserved. (D4) the error sub-namespace is **generalized** · `NIKA-<NS>-<SUB>-<NNN>`
+  valid per-builtin (`NIKA-BUILTIN-WAIT-001`) AND per-field (`NIKA-PARSE-WHEN-001`) ·
+  was prose-restricted to builtin while the pattern + usage were already general.
 - **Schema · expression-leaf `format` tags + JSONPath→jq alignment.** The
   hand-derived `schemas/workflow.schema.json` now tags its expression leaves ·
   `when:` (task + `on_finally`) carries `"format": "cel-expression"` · `output:`

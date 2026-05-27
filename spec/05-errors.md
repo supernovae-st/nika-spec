@@ -44,7 +44,7 @@ Every error is a typed structure ·
 
 ## Error code namespaces
 
-Error codes follow the format `NIKA-<NAMESPACE>-<NNN>` where namespace is 2-9 uppercase letters and NNN is a 3-digit zero-padded number. Builtin-specific errors add a **per-builtin sub-namespace** · `NIKA-BUILTIN-<BUILTIN>-<NNN>` (4-segment · each builtin owns its own 001-099 · e.g. `NIKA-BUILTIN-WAIT-001`). The canonical regex is `^NIKA-[A-Z]{2,9}(-[A-Z]{2,9})?-[0-9]{3}$` (also the `retry.on_codes` validation pattern).
+Error codes follow the format `NIKA-<NAMESPACE>-<NNN>` where namespace is 2-9 uppercase letters and NNN is a 3-digit zero-padded number. A code MAY add an **optional sub-namespace** for self-documentation · `NIKA-<NAMESPACE>-<SUB>-<NNN>` (4-segment) — used per-builtin (`NIKA-BUILTIN-WAIT-001` · each builtin owns its own 001-099) or per-field (`NIKA-PARSE-WHEN-001` · the `when:` field of a parse error). The canonical regex is `^NIKA-[A-Z]{2,9}(-[A-Z]{2,9})?-[0-9]{3}$` (also the `retry.on_codes` validation pattern).
 
 | Namespace | Scope | Reserved range |
 |---|---|---|
