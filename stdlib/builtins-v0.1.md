@@ -19,7 +19,7 @@
 |---|---|---|
 | Core | 7 | Required for execution (sleep · log · emit · assert · prompt · done · wait_until) |
 | File | 5 | I/O primitives (read · write · edit · glob · grep) |
-| Data | 8 | `jq` (THE data language) + 7 capabilities jq can't express (json_diff · validate · json_merge_patch · csv_to_json · uuid · date · hash) |
+| Data | 8 | `jq` (THE data language) + 7 capabilities jq can't express (json_diff · validate · json_merge_patch · convert · uuid · date · hash) |
 | Introspection | 4 | Self-awareness (cost · records · dag_info · threads) |
 | Network | 2 | fetch (HTTP+extraction) · notify (alerts out) |
 | Media | — | **Deferred to stdlib v0.x** (opt-in feature flag) |
@@ -148,11 +148,23 @@ invoke: { tool: "nika:json_merge_patch", args: { target: { ... }, patch: { ... }
 ```
 **RFC 7396** merge patch (`null` deletes a key) · the delete-on-null semantics jq's `*` recursive-merge does NOT provide (so this stays a genuine builtin). Plain recursive merge (no delete) is just `jq '.[0] * .[1]'` on a `[base, overlay]` input · no builtin needed.
 
-### `nika:csv_to_json`
+### `nika:convert` · universal multi-format conversion
 ```yaml
-invoke: { tool: "nika:csv_to_json", args: { csv: "name,age\nAlice,30", has_header: true } }
+invoke:
+  tool: "nika:convert"
+  args:
+    input: "${{ tasks.A.output }}"     # the data to convert · string for text formats · structured for json/yaml/toml
+    from: csv                          # REQUIRED · enum · json | yaml | toml | csv
+    to: json                           # REQUIRED · enum · json | yaml | toml | csv
+    has_header: true                   # OPTIONAL · CSV only · default true
 ```
-Parse CSV (quoting-aware) → JSON array. (CSV parsing is not jq's job · the reverse direction is `jq @csv`.)
+Universal format converter · 4 formats v0.1 (`json` · `yaml` · `toml` · `csv`) · 12 directions in scope (4×3 minus identity).
+
+Pattern · `fetch+extract` symmetry · single super-powerful builtin · `from`/`to` mode parameters · all bidirectional pairs canonical · no per-direction builtin slot.
+
+Replaces · legacy `nika:csv_to_json` (cut per D-2026-05-27 Rams sweep · « less but better » audit per the canonical-26 builtin-by-builtin review). The reverse direction (JSON→CSV) is ALSO covered here · jq's `@csv` filter is the in-jq alternative for that specific direction · `nika:convert` is the canonical multi-format builtin.
+
+Reference implementation · `serde_transcode` 1.1+ orchestrator (zero-allocation walk · serde-ecosystem canonical · 15M+ downloads · sfackler) + format-specific crates · `serde_json` (JSON · already nika dep) · `serde_yaml_bw` 2.5+ (YAML · modern + maintained 2026) · `toml` 1.1+ (TOML · spec 1.1.0 compliant) · `csv` 1.4+ (CSV · quoting-aware).
 
 ### `nika:uuid`
 ```yaml

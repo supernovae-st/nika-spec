@@ -212,8 +212,8 @@
               "description": "`nika:*` builtin · 26 canonical per stdlib v0.1 (Core 7 · File 5 · Data 8 · Network 2 · Introspection 4). Closed enum for `yaml-language-server` autocomplete.",
               "enum": [
                 "nika:assert",
+                "nika:convert",
                 "nika:cost",
-                "nika:csv_to_json",
                 "nika:dag_info",
                 "nika:date",
                 "nika:done",
