@@ -1,6 +1,6 @@
 # Stdlib v0.1 · Builtins
 
-> **22 canonical builtins** shipped with Stdlib v0.1-compliant engines.
+> **<!-- canon:builtins -->22<!-- /canon --> canonical builtins** shipped with Stdlib v0.1-compliant engines.
 > Invoked via `invoke: tool: "nika:<name>"`. Plus media builtins deferred to
 > stdlib v0.x (opt-in feature flag).
 >

@@ -13,7 +13,7 @@
 
 ---
 
-## The 4 verbs · summary
+## The <!-- canon:verbs -->4<!-- /canon --> verbs · summary
 
 | Verb | What it does | Stdlib it consumes |
 |---|---|---|

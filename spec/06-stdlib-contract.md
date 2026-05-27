@@ -44,9 +44,9 @@ Three reasons ·
 
 The stdlib has **independent versioning** ·
 
-- `stdlib/providers-v0.1.md` — the 13 canonical providers for v0.1
-- `stdlib/extract-modes-v0.1.md` — the 9 canonical extract modes for v0.1
-- `stdlib/builtins-v0.1.md` — the 22 canonical builtins for v0.1
+- `stdlib/providers-v0.1.md` — the <!-- canon:providers -->13<!-- /canon --> canonical providers for v0.1
+- `stdlib/extract-modes-v0.1.md` — the <!-- canon:extract_modes -->9<!-- /canon --> canonical extract modes for v0.1
+- `stdlib/builtins-v0.1.md` — the <!-- canon:builtins -->22<!-- /canon --> canonical builtins for v0.1
 
 When the stdlib evolves to v0.2 · those files become `*-v0.2.md` and new versions are published. The core language contract (`nika: v1`) is unchanged.
 

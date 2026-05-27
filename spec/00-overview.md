@@ -35,7 +35,7 @@ Standards work · SQL · GraphQL · OpenAPI · Dockerfile · GitHub Actions YAML
 
 ---
 
-## The 5 pillars · immutable forever
+## The <!-- canon:pillars -->5<!-- /canon --> pillars · immutable forever
 
 ```
 1.  ENVELOPE        nika: v1
