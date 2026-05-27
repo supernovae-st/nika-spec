@@ -1,0 +1,153 @@
+# nika canonical registry · the single source of truth for Nika canonical facts
+# License · Apache-2.0 (part of the Nika spec)
+#
+# THIS FILE IS THE SOURCE. Every other surface (the .ttl graph nodes, the
+# engine schemars enum, the prose counts in spec/stdlib/README/docs/blueprint)
+# is a PROJECTION of this file. Edit here once → run the projector to update
+# everywhere → drift caught structurally at commit time.
+#
+# Projector · scripts/audit/nika-canon-project.sh (--check · --report)
+# Architecture · nika/hq/blueprint/ + dx/.claude/rules/self-evolving-olympus.md
+#   PILLAR 1 (projection-by-default) + cross-source-validation §2.7.1
+#   (cascade-completeness). The .ttl is currently parallel-authored · in Phase 3
+#   it gets generated from this file.
+#
+# v0.1 · 2026-05-27 · populated from .ttl HEAD (post atomic-language audit · the
+#   most-current canonical truth · cohort 42→27→26→25→22 builtins + NIKA-FETCH
+#   fold into NIKA-BUILTIN per "fetch is a builtin, not a verb" D-N18).
+
+# ---------------------------------------------------------------- counts
+# Top-level counts · derived from items[] length below · stated here for
+# fast grep-based projection checks (the projector reads `count:` lines).
+counts:
+  verbs: 4
+  builtins: 22
+  providers: 13
+  extract_modes: 9
+  error_namespaces: 14
+  pillars: 5
+
+# ---------------------------------------------------------------- verbs
+# D-2026-05-22-N18 · "the count is 4, absolute · immutable forever".
+# A verb = a distinct native execution model · fetch is NOT a verb (it is the
+# nika:fetch builtin reached via invoke:). spec/02-verbs.md is the prose home.
+verbs:
+  count: 4
+  immutable: true
+  reference: spec/02-verbs.md
+  items:
+    - { name: infer,  semantic: "LLM generation · structured output · vision · thinking" }
+    - { name: exec,   semantic: "Shell command · blocklist · streaming" }
+    - { name: invoke, semantic: "MCP tool call OR builtin (incl. nika:fetch)" }
+    - { name: agent,  semantic: "Multi-turn agentic loop · tool calling · guardrails" }
+
+# ---------------------------------------------------------------- builtins
+# Post atomic-language audit · 42→27→26→25→22 (-20 · -48% · zero functional loss).
+# stdlib/builtins-v0.1.md is the prose home (currently lags at 26 · cascade to 22).
+# Admission test · 3 razors · (1) NOT-expressible-in-jq+CEL+Schema · (2) canonical
+# interop format (RFC-6902/7396/9562 · etc.) · (3) cookbook-clarity.
+builtins:
+  count: 22
+  reference: stdlib/builtins-v0.1.md
+  items:
+    - assert
+    - convert
+    - date
+    - done
+    - edit
+    - emit
+    - fetch
+    - glob
+    - grep
+    - hash
+    - inspect
+    - jq
+    - json_diff
+    - json_merge_patch
+    - log
+    - notify
+    - prompt
+    - read
+    - uuid
+    - validate
+    - wait
+    - write
+
+# ---------------------------------------------------------------- providers
+# 7 cloud + 5 local + 1 test = 13. stdlib/providers-v0.1.md is the prose home.
+# Sovereignty · 5 local providers (sovereignty Rule 1 · zero-cloud default path).
+providers:
+  count: 13
+  reference: stdlib/providers-v0.1.md
+  items:
+    cloud:
+      - anthropic
+      - openai
+      - gemini
+      - deepseek
+      - mistral
+      - xai
+      - groq
+    local:
+      - ollama
+      - lmstudio
+      - llamacpp
+      - localai
+      - vllm
+    test:
+      - mock
+
+# ---------------------------------------------------------------- extract modes
+# 9 modes for the nika:fetch builtin's extract: parameter.
+# stdlib/extract-modes-v0.1.md is the prose home.
+extract_modes:
+  count: 9
+  reference: stdlib/extract-modes-v0.1.md
+  items:
+    - article
+    - feed
+    - jq
+    - links
+    - markdown
+    - metadata
+    - selector
+    - sitemap
+    - text
+
+# ---------------------------------------------------------------- error namespaces
+# Post NIKA-FETCH fold into NIKA-BUILTIN (commit b14bf091c · 2026-05-27 ·
+# matching "fetch is a builtin, not a verb" D-N18 · prior count 15 → 14).
+# spec/05-errors.md is the prose home (currently lags at 15 · cascade to 14).
+error_namespaces:
+  count: 14
+  reference: spec/05-errors.md
+  items:
+    - NIKA-AGENT
+    - NIKA-BUILTIN
+    - NIKA-CANCEL
+    - NIKA-DAG
+    - NIKA-EXEC
+    - NIKA-IMPL
+    - NIKA-INFER
+    - NIKA-INVOKE
+    - NIKA-MCP
+    - NIKA-PARSE
+    - NIKA-PROVIDER
+    - NIKA-SEC
+    - NIKA-TIMEOUT
+    - NIKA-VAR
+
+# ---------------------------------------------------------------- pillars
+# 5 immutable pillars forever (spec/00-overview · the language backbone).
+# Order is semantic · envelope frames · verbs act · dag composes · variables
+# thread state · errors handle failure.
+pillars:
+  count: 5
+  immutable: true
+  reference: spec/00-overview.md
+  items:
+    - { order: 1, name: envelope,  semantic: "nika: v1 contract envelope (single-version marker · ADR-082)" }
+    - { order: 2, name: verbs,     semantic: "the 4 native execution models" }
+    - { order: 3, name: dag,       semantic: "task composition + control flow (for_each · when)" }
+    - { order: 4, name: variables, semantic: "scope-bound state threading + binding (CEL + jq)" }
+    - { order: 5, name: errors,    semantic: "the 14 error namespaces + handling contract" }
