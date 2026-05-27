@@ -44,7 +44,7 @@ Every error is a typed structure ·
 
 ## Error code namespaces
 
-Error codes follow the format `NIKA-<NAMESPACE>-<NNN>` where namespace is 2-5 uppercase letters and NNN is a 3-digit zero-padded number.
+Error codes follow the format `NIKA-<NAMESPACE>-<NNN>` where namespace is 2-9 uppercase letters and NNN is a 3-digit zero-padded number. Builtin-specific errors add a **per-builtin sub-namespace** · `NIKA-BUILTIN-<BUILTIN>-<NNN>` (4-segment · each builtin owns its own 001-099 · e.g. `NIKA-BUILTIN-WAIT-001`). The canonical regex is `^NIKA-[A-Z]{2,9}(-[A-Z]{2,9})?-[0-9]{3}$` (also the `retry.on_codes` validation pattern).
 
 | Namespace | Scope | Reserved range |
 |---|---|---|
@@ -57,7 +57,7 @@ Error codes follow the format `NIKA-<NAMESPACE>-<NNN>` where namespace is 2-5 up
 | `NIKA-INVOKE` | `invoke:` verb errors | 001-099 |
 | `NIKA-AGENT` | `agent:` verb errors | 001-099 |
 | `NIKA-PROVIDER` | Provider adapter errors | 001-099 per provider |
-| `NIKA-BUILTIN` | Builtin tool errors | 001-099 per builtin |
+| `NIKA-BUILTIN-<BUILTIN>` | Builtin tool errors · per-builtin sub-namespace (e.g. `NIKA-BUILTIN-WAIT-001` · `NIKA-BUILTIN-NOTIFY-001`) | 001-099 per builtin |
 | `NIKA-MCP` | MCP client errors | 001-099 |
 | `NIKA-SEC` | Security policy violations (SSRF · blocklist) | 001-099 |
 | `NIKA-TIMEOUT` | Task or step timeouts | 001-099 |

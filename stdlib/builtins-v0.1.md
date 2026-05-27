@@ -18,7 +18,7 @@
 |---|---|---|
 | Core | 7 | Required for execution (sleep · log · emit · assert · prompt · done · wait_until) |
 | File | 5 | I/O primitives (read · write · edit · glob · grep) |
-| Data | 9 | jq + capabilities jq can't express (validate · diff · merge · csv · uuid · date · hash) |
+| Data | 9 | `jq` (THE data language) + 8 capabilities jq can't express (json_merge · json_diff · validate · json_merge_patch · csv_to_json · uuid · date · hash) |
 | Introspection | 4 | Self-awareness (cost · records · dag_info · threads) |
 | Network | 2 | fetch (HTTP+extraction) · notify (alerts out) |
 | Media | — | **Deferred to stdlib v0.x** (opt-in feature flag) |
@@ -167,7 +167,7 @@ Timestamp arithmetic · op-discriminated single builtin · timezone-aware (IANA 
 ```yaml
 invoke: { tool: "nika:hash", args: { algo: blake3, content: "${{ tasks.X.output }}", encoding: hex } }
 ```
-Content hashing · default **blake3** (studio standard) · or `sha256`/`sha512`. md5/sha1 NOT supported (broken). Use cases · cache keys · content addressing · provenance.
+Content hashing · default **blake3** (fastest modern cryptographic hash · parallel · secure) · or `sha256`/`sha512`. md5/sha1 NOT supported (cryptographically broken). Use cases · cache keys · content addressing · provenance.
 
 ---
 
