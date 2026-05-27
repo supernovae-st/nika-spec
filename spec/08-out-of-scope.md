@@ -294,7 +294,7 @@ budget:
   warn_at_pct: 80
 ```
 
-**Why deferred** · budget enforcement is engine concern · the `nika:cost` introspection builtin gives workflows access to running cost. Hard caps may land in v0.2.
+**Why deferred** · budget enforcement is engine concern · the `nika:inspect view: cost` introspection builtin (post-ADR-088 unification) gives workflows access to running cost. Hard caps may land in v0.2.
 
 ---
 
