@@ -52,6 +52,13 @@ AWS exponential-backoff-and-jitter.
   stay reserved. (D4) the error sub-namespace is **generalized** · `NIKA-<NS>-<SUB>-<NNN>`
   valid per-builtin (`NIKA-BUILTIN-WAIT-001`) AND per-field (`NIKA-PARSE-WHEN-001`) ·
   was prose-restricted to builtin while the pattern + usage were already general.
+- **Envelope coherence · 2 prose↔schema drifts (01-envelope + schema).** (E1)
+  the `vars`/`outputs` typed-form `type:` prose listed 5 (`string·number·boolean·
+  array·object`) but the schema enum has 6 (incl `integer`) · prose now lists
+  `integer`. (E4) `secrets.source` prose said "vault **(default)**" but the schema
+  made `source` **required** (contradiction) · schema now makes `source` optional
+  defaulting to `vault` (the sovereign default · `secrets: { k: { key: path } }`
+  works without spelling `source: vault`).
 - **Schema · expression-leaf `format` tags + JSONPath→jq alignment.** The
   hand-derived `schemas/workflow.schema.json` now tags its expression leaves ·
   `when:` (task + `on_finally`) carries `"format": "cel-expression"` · `output:`

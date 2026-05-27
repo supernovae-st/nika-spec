@@ -146,7 +146,7 @@ vars:
 
   # Typed form — enables validation + schema generation
   topic:
-    type: string                 # string · number · boolean · array · object
+    type: string                 # string · number · integer · boolean · array · object
     required: true               # default false
     default: "Rust async 2026"   # used when the caller omits it
     description: "Subject to research"
