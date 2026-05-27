@@ -26,6 +26,13 @@ counts:
   extract_modes: 9
   error_namespaces: 14
   pillars: 5
+  # ---- extended v0.2 · 2026-05-27 · lifecycle + diamond + steal + severity
+  lifecycle_product: 4
+  lifecycle_decision: 4
+  lifecycle_risk: 4
+  diamond_layers: 7
+  steal_pattern_tiers: 4
+  severity: 4
 
 # ---------------------------------------------------------------- verbs
 # D-2026-05-22-N18 · "the count is 4, absolute · immutable forever".
@@ -151,3 +158,51 @@ pillars:
     - { order: 3, name: dag,       semantic: "task composition + control flow (for_each · when)" }
     - { order: 4, name: variables, semantic: "scope-bound state threading + binding (CEL + jq)" }
     - { order: 5, name: errors,    semantic: "the 14 error namespaces + handling contract" }
+
+# ---------------------------------------------------------------- lifecycle enums
+# 4-state lifecycle taxonomies · per ecosystem.md (dx/.claude/rules/) · public
+# framework usable across products. Closed enum forever.
+lifecycle_product:
+  count: 4
+  reference: dx/.claude/rules/ecosystem.md
+  items: [seed, active, mature, sunset]
+
+lifecycle_decision:
+  count: 4
+  reference: dx/.claude/rules/ecosystem.md
+  items: [proposed, active, superseded, archived]
+
+lifecycle_risk:
+  count: 4
+  reference: dx/.claude/rules/ecosystem.md
+  items: [open, mitigated, cleared, archived]
+
+# ---------------------------------------------------------------- diamond layers
+# 7 layers in the Diamond bottom-up admission DAG (ADR-037 + ADR-006 amendment).
+# L0 foundation · L0.5 traits-only · L1 satellites · L2 orchestrators ·
+# L3 verbs · L4 consumers · L5 top apps. Order semantic · monotonic.
+diamond_layers:
+  count: 7
+  reference: nika/engine/docs/adr/adr-037-bottom-up.md
+  items: ["L0", "L0.5", "L1", "L2", "L3", "L4", "L5"]
+
+# ---------------------------------------------------------------- steal-pattern tiers
+# 4-tier triage from steal-pattern.md · A native · B port FSM · C adopt headless ·
+# D defer. Public Tier 0/1/2/3 = the @spnds 3-tier sister (different domain ·
+# CSS/elements/machines). Closed enum forever.
+steal_pattern_tiers:
+  count: 4
+  reference: dx/.claude/rules/steal-pattern.md
+  items:
+    - { name: A, semantic: "NATIVE-FIRST · browsers ship 95%+ (popover= · <dialog> · <details>)" }
+    - { name: B, semantic: "STEAL · port FSM · <2000 LOC · ≤4 algo layers · a11y <30%" }
+    - { name: C, semantic: "ADOPT-AS-DEVDEP · >3000 LOC · headless+MIT/Apache" }
+    - { name: D, semantic: "DEFER · >5000 LOC OR specialist (text engines)" }
+
+# ---------------------------------------------------------------- severity
+# 4-level review/finding severity per hq-hygiene + ds-discipline review canon.
+# Order semantic · descending · BLOCKER halts ship · LOW = informational.
+severity:
+  count: 4
+  reference: dx/.claude/rules/hq-hygiene.md
+  items: [BLOCKER, HIGH, MED, LOW]
