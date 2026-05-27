@@ -12,9 +12,27 @@
 #   (cascade-completeness). The .ttl is currently parallel-authored · in Phase 3
 #   it gets generated from this file.
 #
+# Schema versioning · `schema_version` field forward-compat per
+#   no-legacy-no-back-compat.md (the projector rejects unknown versions with
+#   exit 2 · forces explicit upgrade when schema mutates). v1 baseline locked
+#   2026-05-27 evening · 12 categories · 4 yaml shapes (bare/struct/nested/flow).
+#
+# Self-check · for each category, `count: N` MUST equal `len(items)` ·
+#   projector verifies on every invocation · exits 2 (env error) on
+#   intra-canon drift · structural prevention of count-vs-items mismatch.
+#
 # v0.1 · 2026-05-27 · populated from .ttl HEAD (post atomic-language audit · the
 #   most-current canonical truth · cohort 42→27→26→25→22 builtins + NIKA-FETCH
 #   fold into NIKA-BUILTIN per "fetch is a builtin, not a verb" D-N18).
+# v0.2 · 2026-05-27 evening · schema_version 1 + 6 extended dimensions
+#   (lifecycle_product · lifecycle_decision · lifecycle_risk · diamond_layers ·
+#   steal_pattern_tiers · severity) + flow-style items[] support.
+
+# ---------------------------------------------------------------- schema
+# Forward-compat marker · bump on breaking schema change. The projector
+# refuses to run with an unknown schema_version (exit 2 · explicit upgrade
+# required).
+schema_version: 1
 
 # ---------------------------------------------------------------- counts
 # Top-level counts · derived from items[] length below · stated here for
