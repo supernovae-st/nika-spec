@@ -68,7 +68,7 @@ A Core-compliant engine does NOT execute verbs and does NOT evaluate `when:` / `
 ### Editor tooling · the canonical JSON Schema
 
 The spec ships a canonical **JSON Schema** at
-[`schemas/nika-workflow.schema.json`](../schemas/) describing the envelope +
+[`schemas/workflow.schema.json`](../schemas/) describing the envelope +
 task shape + verb argument structures. It is the machine-readable companion to
 this prose spec (kept in sync · the prose is normative on conflict).
 
