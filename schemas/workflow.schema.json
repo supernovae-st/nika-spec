@@ -38,7 +38,18 @@
               "default": {}
             }
           }
-        ]
+        ],
+        "if": {
+          "type": "object",
+          "required": ["type"],
+          "properties": { "type": { "type": "string" } }
+        },
+        "then": {
+          "properties": {
+            "type": { "enum": ["string", "number", "integer", "boolean", "array", "object"] }
+          },
+          "$comment": "A typed-var declaration (an object carrying a string `type:`) MUST use the closed type enum per spec/01-envelope.md §vars · the untyped-object default form (no `type:` key) is untouched."
+        }
       }
     },
     "env": {
@@ -146,7 +157,10 @@
         },
         "output": {
           "type": "object",
-          "description": "Named jq-expression bindings · `${{ tasks.X.<name> }}`. jq is the single data extraction-and-transform language (the former RFC 9535 JSONPath was dropped · jq is a superset · per spec/04-variables.md §216-225). Reserved names forbidden: output · status · error · started_at · ended_at · duration_ms.",
+          "description": "Named jq-expression bindings · `${{ tasks.X.<name> }}`. jq is the single data extraction-and-transform language (the former RFC 9535 JSONPath was dropped · jq is a superset · per spec/04-variables.md §216-225). Reserved names forbidden at parse time (spec/04-variables.md §Rules): output · status · error · started_at · ended_at · duration_ms — enforced via propertyNames.",
+          "propertyNames": {
+            "not": { "enum": ["output", "status", "error", "started_at", "ended_at", "duration_ms"] }
+          },
           "additionalProperties": { "type": "string", "format": "jq" }
         },
         "infer": { "$ref": "#/$defs/infer" },
@@ -283,12 +297,13 @@
     "onError": {
       "type": "object",
       "additionalProperties": false,
-      "description": "Error recovery · exactly one of fallback / value / skip / fail_workflow.",
+      "description": "Error recovery · exactly one of recover / skip / fail_workflow (mutually exclusive per spec/05-errors.md §Fields · maxProperties enforces it).",
       "minProperties": 1,
       "maxProperties": 1,
       "properties": {
-        "fallback": {},
-        "value": {},
+        "recover": { "description": "Recovery output · a `${{ }}` ref OR a literal (merges the former fallback/value per spec/05-errors.md)." },
+        "fallback": { "description": "LEGACY · pre-merge form of recover (spec/05-errors.md merged fallback+value into recover) · prefer recover." },
+        "value": { "description": "LEGACY · pre-merge form of recover (spec/05-errors.md merged fallback+value into recover) · prefer recover." },
         "skip": { "type": "boolean" },
         "fail_workflow": { "type": "boolean" }
       }
