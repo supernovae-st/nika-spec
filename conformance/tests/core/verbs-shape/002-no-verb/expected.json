@@ -2,6 +2,7 @@
   "valid": false,
   "errors": [
     {
+      "namespace": "NIKA-PARSE",
       "category": "validation_error"
     }
   ],
