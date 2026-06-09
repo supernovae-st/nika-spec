@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-DAG-003",
+      "category": "validation_error"
+    }
+  ],
+  "note": "03-dag.md \u00a7Referencing a task requires an explicit depends_on \u00b7 'summarize' references tasks.research in with: without depends_on:[research] \u00b7 the engine does NOT infer the edge."
+}

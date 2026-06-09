@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "04-variables.md \u00b7 inside a for_each task body \u00b7 ${{ item }} (current element) and ${{ index }} (0-based position) are in scope \u00b7 valid."
+}

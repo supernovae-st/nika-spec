@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "03-dag.md \u00b7 the with: reference to tasks.fetch is backed by an explicit depends_on:[fetch] edge \u00b7 valid."
+}

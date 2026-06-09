@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "validation_error"
+    }
+  ],
+  "note": "04-variables.md \u00a7Rules \u00b7 binding-name collisions with the reserved words output\u00b7status\u00b7error\u00b7started_at\u00b7ended_at\u00b7duration_ms are forbidden at parse time. Namespace choice \u00b7 NIKA-PARSE (not NIKA-VAR) because the rule is schema-checkable structure (workflow.schema.json propertyNames) and the runner emits NIKA-PARSE for the structural layer \u00b7 NIKA-VAR-NNN is reserved for reference RESOLUTION and binding EVALUATION errors (04 \u00a7Binding rules)."
+}

@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-VAR",
+      "category": "variable_error"
+    }
+  ],
+  "note": "01-envelope.md \u00a7secrets + 04-variables.md \u00b7 ${{ secrets.X }} resolves to entries declared in the envelope secrets: block \u00b7 none declares api_key \u2192 unresolved \u2192 NIKA-VAR-001."
+}

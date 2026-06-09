@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "validation_error"
+    }
+  ],
+  "note": "03-dag.md \u00a7id \u00b7 \u00abrequired \u00b7 snake_case \u00b7 unique\u00bb within the workflow \u00b7 + \u00a7DAG execution model step 1 \u00abvalidate task ids unique\u00bb \u00b7 duplicate 'build' rejected at parse time (cross-reference rule \u00b7 JSON Schema cannot express per-field uniqueness across array items)."
+}

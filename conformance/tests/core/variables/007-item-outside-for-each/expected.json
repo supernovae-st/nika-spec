@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-VAR",
+      "category": "variable_error"
+    }
+  ],
+  "note": "04-variables.md \u00a7The 5 namespaces \u00b7 item/index are for_each loop-scoped locals \u00abalive only within that task's body\u00bb \u00b7 'process' has no for_each \u2192 unresolved \u2192 NIKA-VAR-001."
+}

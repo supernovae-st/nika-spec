@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-VAR",
+      "category": "variable_error"
+    }
+  ],
+  "note": "04-variables.md \u00a7with \u00b7 ${{ with.X }} resolves to names declared in the task's own with: block \u00b7 'missing' is not declared \u2192 NIKA-VAR-001."
+}

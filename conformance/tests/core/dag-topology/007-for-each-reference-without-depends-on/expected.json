@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-DAG-003",
+      "category": "validation_error"
+    }
+  ],
+  "note": "03-dag.md \u00b7 for_each: over ${{ tasks.discover.output }} is a task reference like any other \u00b7 'process' MUST declare depends_on:[discover] (cf the \u00a7Map fan-out example which does)."
+}

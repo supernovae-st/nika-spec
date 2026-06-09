@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-VAR",
+      "category": "validation_error"
+    }
+  ],
+  "note": "04-variables.md owns the ${{ }} substitution surface \u00b7 an unescaped ${{ with no closing }} is malformed substitution syntax caught at parse time. Namespace choice \u00b7 NIKA-VAR (not NIKA-PARSE) because the YAML itself parses fine \u2014 the defect is in the variable-substitution grammar (04 \u00a7Resolution order step 1 \u00abParse the expression\u00bb) \u00b7 category validation_error (a spec-rule violation, not a resolution failure of a well-formed reference)."
+}

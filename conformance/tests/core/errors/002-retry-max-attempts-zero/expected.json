@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "validation_error"
+    }
+  ],
+  "note": "05-errors.md \u00a7Retry policy \u00b7 max_attempts is \u00abinteger \u2265 1 \u00b7 total attempts (including first try)\u00bb \u00b7 0 is rejected."
+}

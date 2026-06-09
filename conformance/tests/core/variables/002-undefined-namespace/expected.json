@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-VAR",
+      "category": "variable_error"
+    }
+  ],
+  "note": "04-variables.md \u00a7The 5 namespaces \u00b7 vars \u00b7 with \u00b7 tasks \u00b7 env \u00b7 secrets \u00b7 \u00abFive namespaces. That's it.\u00bb \u00b7 'foo' is not a namespace \u00b7 unresolved reference (\u00a7Resolution order \u00b7 NIKA-VAR-001)."
+}
