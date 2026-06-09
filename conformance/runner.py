@@ -5,11 +5,19 @@
 #
 # Implements the STATIC layer that needs no LLM engine ·
 #   (1) JSON Schema structural validation (schemas/workflow.schema.json)
-#   (2) the 4 engine-parse cross-reference rules the schema cannot express ·
-#         NIKA-DAG-001  cycle in depends_on
+#   (2) the engine-parse cross-reference rules the schema cannot express ·
+#         NIKA-DAG-001  cycle in depends_on (including self-dependency)
 #         NIKA-DAG-002  depends_on references an undeclared task
-#         NIKA-DAG-003  when:/with: references tasks.X without depends_on:[X]
-#         NIKA-VAR-001  outputs:/expression references a non-existent task
+#         NIKA-DAG-003  a `${{ tasks.X }}` reference from when:/with:/for_each:/
+#                       any verb body without depends_on:[X] (03-dag.md ·
+#                       « anywhere — in when: · with: · any verb field … »)
+#         NIKA-VAR-001  an unresolved `${{ }}` reference (04-variables.md
+#                       §Resolution order) · non-existent task · undeclared
+#                       vars./with./env./secrets. entry · undefined namespace ·
+#                       loop-local item/index outside a for_each task
+#         NIKA-VAR      unclosed `${{` delimiter (validation_error · the
+#                       substitution surface is 04-variables.md's)
+#         NIKA-PARSE    duplicate task id (03-dag.md · unique within workflow)
 #
 # This is the canonical ORACLE for Level-1 (Core) conformance · a language
 # engine in any language re-implements the same checks; this reference runner
@@ -31,34 +39,104 @@ HERE = pathlib.Path(__file__).resolve().parent
 SPEC_ROOT = HERE.parent
 SCHEMA_PATH = SPEC_ROOT / "schemas" / "workflow.schema.json"
 TASK_REF = re.compile(r"\btasks\.([a-z][a-z0-9_]*)\b")
+# `${{ ... }}` substitution surface (04-variables.md) · `\${{` is an escaped literal.
+EXPR_OPEN = re.compile(r"(?<!\\)\$\{\{")
+EXPR_BODY = re.compile(r"(?<!\\)\$\{\{(.*?)\}\}", re.DOTALL)
+STR_LIT = re.compile(r"'[^']*'|\"[^\"]*\"")
+# An identifier ROOT (not preceded by `.`) + its first dotted segment if any.
+ROOT_ID = re.compile(r"(?<![.\w])([A-Za-z_][A-Za-z0-9_]*)(?:\.([A-Za-z_][A-Za-z0-9_]*))?")
+CEL_BUILTINS = {"true", "false", "null", "in", "size"}  # v0.1 CEL subset · 03-dag.md
+LOOP_LOCALS = {"item", "index"}  # for_each-scoped locals · 04-variables.md §5 namespaces
+# Fields whose `tasks.X` refs REQUIRE depends_on:[X] (03-dag.md §Referencing a task) ·
+# on_error/on_finally deliberately excluded (recover refs a fallback source ·
+# on_finally refs the parent task itself · neither is an execution-order edge).
+DAG_EDGE_FIELDS = ("when", "with", "for_each", "infer", "exec", "invoke", "agent")
 
 
 def load_schema() -> Draft202012Validator:
     return Draft202012Validator(json.loads(SCHEMA_PATH.read_text()))
 
 
-def _task_refs(value) -> set[str]:
-    """All `tasks.<id>` ids referenced anywhere inside a value (str/dict/list)."""
-    out: set[str] = set()
+def _strings(value):
+    """Yield every string scalar nested anywhere inside a value (str/dict/list)."""
     if isinstance(value, str):
-        out.update(TASK_REF.findall(value))
+        yield value
     elif isinstance(value, dict):
         for v in value.values():
-            out |= _task_refs(v)
+            yield from _strings(v)
     elif isinstance(value, list):
         for v in value:
-            out |= _task_refs(v)
-    return out
+            yield from _strings(v)
+
+
+def _expr_bodies(value):
+    """Every unescaped `${{ ... }}` expression body · quoted CEL literals stripped."""
+    for s in _strings(value):
+        for m in EXPR_BODY.finditer(s):
+            yield STR_LIT.sub(" ", m.group(1))
+
+
+def _expr_task_refs(value) -> set[str]:
+    """All `tasks.<id>` ids referenced inside `${{ }}` expressions of a value."""
+    return {ref for body in _expr_bodies(value) for ref in TASK_REF.findall(body)}
+
+
+def _unclosed_expr_errors(value, where: str) -> list[dict]:
+    """NIKA-VAR validation_error · an unescaped `${{` with no closing `}}` (04)."""
+    errs: list[dict] = []
+    for s in _strings(value):
+        if len(EXPR_OPEN.findall(s)) > len(EXPR_BODY.findall(s)):
+            errs.append({"namespace": "NIKA-VAR", "category": "validation_error",
+                         "detail": f"unclosed '${{{{' delimiter in {where} · {s[:60]!r}"})
+    return errs
+
+
+def _resolution_errors(value, scopes: dict, where: str) -> list[dict]:
+    """NIKA-VAR-001 · unresolved `${{ }}` references per 04-variables.md ·
+    namespace roots resolve against declared envelope/task scopes ·
+    loop-locals (item/index) resolve only inside a for_each task."""
+    errs: list[dict] = []
+
+    def var_err(detail: str) -> None:
+        errs.append({"code": "NIKA-VAR-001", "category": "variable_error",
+                     "detail": f"{where} · {detail}"})
+
+    for body in _expr_bodies(value):
+        for root, seg in ROOT_ID.findall(body):
+            if root in CEL_BUILTINS:
+                continue
+            if root in LOOP_LOCALS:
+                if not scopes["in_for_each"]:
+                    var_err(f"'{root}' is a for_each loop-local · no for_each here")
+            elif root in ("vars", "env", "secrets", "with"):
+                if seg and seg not in scopes[root]:
+                    var_err(f"{root}.{seg} is not declared")
+            elif root == "tasks":
+                if seg and seg not in scopes["tasks"]:
+                    var_err(f"tasks.{seg} references a non-existent task")
+            elif seg:  # dotted unknown root · not one of the 5 namespaces
+                var_err(f"'{root}.{seg}' uses an undefined namespace '{root}'")
+            # bare unknown identifiers are tolerated (conservative · CEL terms)
+    return errs
 
 
 def cross_ref_errors(doc: dict) -> list[dict]:
-    """The 4 engine-parse cross-reference rules (beyond JSON Schema)."""
+    """The engine-parse cross-reference rules (beyond JSON Schema)."""
     errs: list[dict] = []
     tasks = doc.get("tasks") or []
     if not isinstance(tasks, list):
         return errs  # schema layer already rejected this
     ids = [t.get("id") for t in tasks if isinstance(t, dict)]
     idset = {i for i in ids if isinstance(i, str)}
+
+    # NIKA-PARSE · duplicate task id (03-dag.md · id unique within workflow)
+    seen: set[str] = set()
+    for i in ids:
+        if isinstance(i, str):
+            if i in seen:
+                errs.append({"namespace": "NIKA-PARSE", "category": "validation_error",
+                             "detail": f"duplicate task id '{i}'"})
+            seen.add(i)
 
     # NIKA-DAG-002 · depends_on references an undeclared task
     for t in tasks:
@@ -88,23 +166,38 @@ def cross_ref_errors(doc: dict) -> list[dict]:
         errs.append({"code": "NIKA-DAG-001", "category": "validation_error",
                      "detail": "cycle detected in depends_on"})
 
-    # NIKA-DAG-003 · when:/with: references tasks.X without depends_on:[X]
+    # NIKA-DAG-003 · a `${{ tasks.X }}` reference from when:/with:/for_each:/any
+    # verb body without depends_on:[X] (03-dag.md · the edge is never inferred)
     for t in tasks:
         if not isinstance(t, dict):
             continue
         declared = set(t.get("depends_on") or [])
-        refs = _task_refs(t.get("when")) | _task_refs(t.get("with"))
+        refs: set[str] = set()
+        for field in DAG_EDGE_FIELDS:
+            refs |= _expr_task_refs(t.get(field))
         missing = {r for r in refs if r in idset and r not in declared}
         for r in sorted(missing):
             errs.append({"code": "NIKA-DAG-003", "category": "validation_error",
-                         "detail": f"task '{t.get('id')}' references tasks.{r} in when:/with: "
+                         "detail": f"task '{t.get('id')}' references tasks.{r} "
                                    f"without depends_on:[{r}]"})
 
-    # NIKA-VAR-001 · outputs: (or any expression there) references a non-existent task
-    for ref in _task_refs(doc.get("outputs")):
-        if ref not in idset:
-            errs.append({"code": "NIKA-VAR-001", "category": "variable_error",
-                         "detail": f"outputs: references tasks.{ref} · no such task"})
+    # NIKA-VAR-001 + unclosed-`${{` · resolve every `${{ }}` reference statically
+    vars_keys = set((doc.get("vars") or {}).keys())
+    env_keys = set((doc.get("env") or {}).keys())
+    secrets_keys = set((doc.get("secrets") or {}).keys())
+    for t in tasks:
+        if not isinstance(t, dict):
+            continue
+        scopes = {"vars": vars_keys, "env": env_keys, "secrets": secrets_keys,
+                  "tasks": idset, "with": set((t.get("with") or {}).keys()),
+                  "in_for_each": "for_each" in t}
+        where = f"task '{t.get('id')}'"
+        errs.extend(_resolution_errors(t, scopes, where))
+        errs.extend(_unclosed_expr_errors(t, where))
+    out_scopes = {"vars": vars_keys, "env": env_keys, "secrets": secrets_keys,
+                  "tasks": idset, "with": set(), "in_for_each": False}
+    errs.extend(_resolution_errors(doc.get("outputs"), out_scopes, "outputs:"))
+    errs.extend(_unclosed_expr_errors(doc.get("outputs"), "outputs:"))
 
     return errs
 

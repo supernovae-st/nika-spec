@@ -58,10 +58,21 @@ authors and tooling ·
   exactly-one-verb · `additionalProperties` · `timeout` pattern). A YAML+JSON-Schema
   validator passes these with zero engine code.
 - **engine-parse** — *cross-reference* rules the schema structurally cannot
-  express, requiring the engine's DAG/variable resolver · cycle detection
-  (`NIKA-DAG-001`) · unresolved `depends_on` (`NIKA-DAG-002`) · a `when:`/`with:`
-  reference to an undeclared dependency (`NIKA-DAG-003`) · an `outputs:` /
-  `${{ }}` reference to a non-existent task (`NIKA-VAR`).
+  express, requiring the engine's DAG/variable resolver ·
+  - cycle detection, including self-dependency (`NIKA-DAG-001`)
+  - unresolved `depends_on` (`NIKA-DAG-002`)
+  - a `${{ tasks.X }}` reference from `when:` · `with:` · `for_each:` · or any
+    verb body without `depends_on:[X]` (`NIKA-DAG-003` · per
+    [03-dag.md](../spec/03-dag.md) the edge is never inferred)
+  - an unresolved `${{ }}` reference (`NIKA-VAR-001` · per
+    [04-variables.md](../spec/04-variables.md) §Resolution order) · a
+    non-existent task · an undeclared `vars.` / `with.` / `env.` / `secrets.`
+    entry · an undefined namespace (`${{ foo.bar }}`) · a loop-local
+    (`item` / `index`) outside a `for_each` task
+  - an unclosed `${{` delimiter (`NIKA-VAR` · `validation_error` · the
+    substitution surface belongs to 04-variables.md · `\${{` escapes)
+  - a duplicate task id (`NIKA-PARSE` · `validation_error` · per
+    [03-dag.md](../spec/03-dag.md) ids are unique within the workflow)
 
 A minimal Core engine MAY reuse the published JSON Schema for the first layer
 and add the cross-reference checks for the second.
