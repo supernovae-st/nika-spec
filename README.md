@@ -5,13 +5,9 @@
 >
 > **Status** · v0.1.0-draft (working) · **License** · Apache-2.0
 >
-> **Version note** · The LANGUAGE is locked at `nika: v1` · forever (this is
-> the envelope you write in every workflow file · cohérent SQL/GraphQL/
-> Dockerfile pattern of « one stable contract · evolves additively »). The
-> reference ENGINE today targets `v0.81.0` (its own semver cadence ·
-> forever-v0.x per ADR-002 · breaking changes ship on MINOR). The two
-> version axes are independent · the `nika: v1` contract stays stable while
-> the engine evolves through `v0.81 → v0.82 → ... → v0.99 → v0.100`.
+> The language is locked at `nika: v1` — forever. That's the envelope you
+> write in every workflow file; it evolves additively and never breaks (the
+> SQL / Dockerfile contract model). The reference engine versions separately.
 
 ---
 
@@ -63,7 +59,7 @@ nika run hello.nika.yaml
 ## The 5 pillars · immutable forever
 
 1. **Envelope** — one line · `nika: v1` + `workflow:` header (+ typed `vars` · `env` · `secrets`)
-2. **The 4 verbs** — `infer:` · `exec:` · `invoke:` · `agent:` (4, absolute · `fetch` is a tool via `invoke`)
+2. **The 4 verbs** — `infer:` (LLM) · `exec:` (shell) · `invoke:` (tools/MCP) · `agent:` (autonomous loop)
 3. **DAG shape** — tasks + `depends_on` + `when` + `for_each` + output binding
 4. **Variables** — one `${{ ... }}` syntax · 5 namespaces (`vars` · `with` · `tasks` · `env` · `secrets`)
 5. **Error model** — `NIKA-<NS>-<NNN>` codes · retry semantics · structured output
@@ -91,7 +87,7 @@ nika-spec/
 │   └── 08-out-of-scope.md       explicit defer list (memory · macros · etc.)
 │
 ├── schemas/                   ← machine-readable JSON Schemas
-├── examples/                  ← 7 foundation workflows (full v0.1 coverage · 19 pending)
+├── examples/                  ← foundation workflows covering the full v0.1 surface
 ├── conformance/               ← test suite for any implementation
 │
 └── stdlib/                    ← versioned independently
