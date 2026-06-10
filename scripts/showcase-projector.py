@@ -25,10 +25,17 @@
 #
 # Exit codes · 0 in-sync/written · 1 drift (--check) · 2 environment error.
 
+import json
 import os
 import re
 import sys
 from pathlib import Path
+
+try:
+    import yaml
+except ImportError:
+    print("showcase-projector · pyyaml required (pip install pyyaml)", file=sys.stderr)
+    sys.exit(2)
 
 SPEC_ROOT = Path(__file__).resolve().parent.parent
 SHOWCASE = SPEC_ROOT / "examples" / "showcase"
@@ -58,6 +65,125 @@ def load_showcase() -> dict[str, str]:
     return {f.name: lean(f.read_text()) for f in files}
 
 
+def _task_lines(lean_text: str) -> dict[str, tuple[int, int]]:
+    """0-based [start, end] line range of each task block in the LEAN yaml
+    (the exact string the website renders · ranges drive the run-sim
+    highlight)."""
+    lines = lean_text.splitlines()
+    starts: list[tuple[str, int]] = []
+    for i, line in enumerate(lines):
+        m = re.match(r"^  - id: ([a-z][a-z0-9_]*)\s*$", line)
+        if m:
+            starts.append((m.group(1), i))
+    ranges: dict[str, tuple[int, int]] = {}
+    for n, (tid, start) in enumerate(starts):
+        if n + 1 < len(starts):
+            end = starts[n + 1][1] - 1
+        else:
+            end = len(lines) - 1
+            for j in range(start + 1, len(lines)):
+                if re.match(r"^[a-z]", lines[j]):  # next top-level key (outputs:)
+                    end = j - 1
+                    break
+        while end > start and not lines[end].strip():
+            end -= 1
+        ranges[tid] = (start, end)
+    return ranges
+
+
+def _gloss(task: dict) -> str:
+    """One plain-words line per task · what this action does (run-sim caption)."""
+    if "infer" in task:
+        body = task["infer"] or {}
+        g = "ask the model for typed JSON" if isinstance(body, dict) and body.get("schema") else "ask the model"
+        if isinstance(body, dict) and body.get("thinking"):
+            g += " · thinking budget"
+    elif "exec" in task:
+        body = task["exec"] or {}
+        cmd = (body.get("command", "") if isinstance(body, dict) else str(body)).strip()
+        head = cmd.split()[0] if cmd.split() else "a command"
+        g = f"run `{head}`"
+    elif "invoke" in task:
+        body = task["invoke"] or {}
+        tool = body.get("tool", "a tool") if isinstance(body, dict) else "a tool"
+        g = f"call `{tool}`"
+    elif "agent" in task:
+        body = task["agent"] or {}
+        tools = body.get("tools") if isinstance(body, dict) else None
+        n = len(tools) if isinstance(tools, list) else 0
+        g = f"run an agent loop · {n} tools granted" if n else "run an agent loop · no tools (pure conversation)"
+    else:
+        g = "do its one thing"
+    if "for_each" in task:
+        g = "for each item · " + g
+    if "when" in task:
+        g += " — only if its condition holds"
+    return g
+
+
+def _flags(task: dict) -> list[str]:
+    flags: list[str] = []
+    if "for_each" in task:
+        mp = task.get("max_parallel")
+        flags.append(f"fan-out · ≤{mp} in flight" if mp else "fan-out")
+        if task.get("fail_fast") is False:
+            flags.append("collects errors")
+    if "when" in task:
+        flags.append("conditional")
+    if "retry" in task:
+        flags.append("retry")
+    if "timeout" in task:
+        flags.append(f"timeout {task['timeout']}")
+    if "on_finally" in task:
+        flags.append("cleanup always runs")
+    for verb in ("infer", "agent"):
+        body = task.get(verb)
+        if isinstance(body, dict) and body.get("schema"):
+            flags.append("typed output")
+            break
+    return flags
+
+
+def build_dag(lean_text: str) -> dict:
+    """The structured run-sim model · tasks (verb · deps · wave · gloss ·
+    flags · line range) + workflow outputs. Derived from the SAME lean text
+    the site renders — the model and the displayed file cannot drift."""
+    doc = yaml.safe_load(lean_text)
+    ranges = _task_lines(lean_text)
+    tasks_out = []
+    waves: dict[str, int] = {}
+    tasks = doc.get("tasks") or []
+
+    def wave_of(tid: str, seen=()) -> int:
+        if tid in waves:
+            return waves[tid]
+        task = next((t for t in tasks if t.get("id") == tid), None)
+        deps = [d for d in (task.get("depends_on") or []) if d not in seen] if task else []
+        w = 0 if not deps else 1 + max(wave_of(d, (*seen, tid)) for d in deps)
+        waves[tid] = w
+        return w
+
+    for t in tasks:
+        tid = t.get("id")
+        verb = next((v for v in ("infer", "exec", "invoke", "agent") if v in t), "invoke")
+        line0, line1 = ranges.get(tid, (0, 0))
+        tasks_out.append({
+            "id": tid,
+            "verb": verb,
+            "deps": list(t.get("depends_on") or []),
+            "wave": wave_of(tid),
+            "gloss": _gloss(t),
+            "flags": _flags(t),
+            "line0": line0,
+            "line1": line1,
+        })
+    return {
+        "tasks": tasks_out,
+        "outputs": list((doc.get("outputs") or {}).keys()),
+        "waves": (max(waves.values()) + 1) if waves else 1,
+    }
+
+
 def render_ts(workflows: dict[str, str]) -> str:
     entries = []
     for name, body in workflows.items():
@@ -65,6 +191,11 @@ def render_ts(workflows: dict[str, str]) -> str:
         escaped = body.replace("\\", "\\\\").replace("`", "\\`").replace("${", "\\${")
         entries.append(f"  '{slug}': `{escaped}`,")
     joined = "\n".join(entries)
+    dag_entries = []
+    for name, body in workflows.items():
+        slug = name.removesuffix(".nika.yaml")
+        dag_entries.append(f"  '{slug}': {json.dumps(build_dag(body), ensure_ascii=False)},")
+    dag_joined = "\n".join(dag_entries)
     return (
         "// usecases-yaml.generated.ts — AUTO-GENERATED by\n"
         "// scripts/showcase-projector.py (nika-spec repo) from\n"
@@ -74,6 +205,26 @@ def render_ts(workflows: dict[str, str]) -> str:
         "// Drift gate: --check (wired into the SuperNovae run-all audit).\n\n"
         "export const SHOWCASE_YAML: Record<string, string> = {\n"
         f"{joined}\n"
+        "}\n\n"
+        "/** the run-sim model · derived from the SAME lean yaml above ·\n"
+        "    waves = topological depth · line0/line1 = highlight range */\n"
+        "export interface ShowcaseTask {\n"
+        "  id: string\n"
+        "  verb: 'infer' | 'exec' | 'invoke' | 'agent'\n"
+        "  deps: string[]\n"
+        "  wave: number\n"
+        "  gloss: string\n"
+        "  flags: string[]\n"
+        "  line0: number\n"
+        "  line1: number\n"
+        "}\n"
+        "export interface ShowcaseDag {\n"
+        "  tasks: ShowcaseTask[]\n"
+        "  outputs: string[]\n"
+        "  waves: number\n"
+        "}\n\n"
+        "export const SHOWCASE_DAG: Record<string, ShowcaseDag> = {\n"
+        f"{dag_joined}\n"
         "}\n"
     )
 
@@ -132,6 +283,22 @@ def main() -> int:
                 rc = 1
     else:
         print("· docs examples/ absent · skipped")
+
+    # Coverage · every showcase file must be referenced by ≥1 docs page
+    # (an orphan showcase workflow would silently never reach the public
+    # docs · the gallery + the explorer claim the full set).
+    if pages_dir.is_dir():
+        referenced: set[str] = set()
+        for page in pages_dir.glob("*.mdx"):
+            referenced |= set(BEGIN.findall(page.read_text()))
+        orphans = sorted(set(workflows) - referenced)
+        if orphans:
+            msg = f"showcase-projector · {len(orphans)} showcase file(s) with NO docs page · {', '.join(orphans)}"
+            if write:
+                print(f"⚠ {msg}")
+            else:
+                print(msg, file=sys.stderr)
+                rc = 1
 
     # TARGET 2 · website generated module
     web_env = os.environ.get("NIKA_WEBSITE_SRC")
