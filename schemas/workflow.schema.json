@@ -412,7 +412,7 @@
       "additionalProperties": false,
       "properties": {
         "tool": {
-          "description": "Tool ref · `nika:<name>` builtin (closed enum from stdlib v0.1 · LSP-perfect completion) OR `mcp:<server>/<tool>` (open · pattern).",
+          "description": "Tool ref · `nika:<name>` builtin (closed enum from stdlib v0.1 · LSP-perfect completion) OR `mcp:<server>/<tool>` (open · pattern) OR `x-<vendor>:<tool>` (engine-specific · explicitly non-portable · 06-stdlib-contract §Namespace ownership).",
           "oneOf": [
             {
               "type": "string",
@@ -446,6 +446,11 @@
               "type": "string",
               "description": "`mcp:<server>/<tool>` external MCP tool · open (pattern · `/` separates path).",
               "pattern": "^mcp:[a-z][a-z0-9_]*(/[a-z][a-z0-9_]*)*$"
+            },
+            {
+              "type": "string",
+              "description": "`x-<vendor>:<tool>` custom engine-specific tool · open (pattern) · workflows using `x-*` tools are explicitly NOT portable across engines (the OpenAPI `x-` extension pattern · per 06-stdlib-contract §Namespace ownership).",
+              "pattern": "^x-[a-z][a-z0-9-]*:[a-z][a-z0-9_]*(/[a-z][a-z0-9_]*)*$"
             }
           ]
         },

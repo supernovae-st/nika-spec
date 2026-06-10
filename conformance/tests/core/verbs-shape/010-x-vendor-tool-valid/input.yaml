@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: vendor-tool
+tasks:
+  - id: research
+    invoke:
+      tool: "x-superclever:research"
+      args:
+        topic: "rust workflow engines"
