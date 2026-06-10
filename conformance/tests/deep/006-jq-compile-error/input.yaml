@@ -1,0 +1,9 @@
+nika: v1
+workflow: deep-006
+tasks:
+  - id: a
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: []
+        expression: ".foo | | bad"

@@ -1,0 +1,9 @@
+nika: v1
+workflow: deep-005
+tasks:
+  - id: a
+    infer:
+      prompt: "x"
+      schema:
+        type: objet
+        properties: {}

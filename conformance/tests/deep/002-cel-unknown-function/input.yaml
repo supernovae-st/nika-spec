@@ -1,0 +1,8 @@
+nika: v1
+workflow: deep-002
+vars:
+  data: {}
+tasks:
+  - id: a
+    when: ${{ has(vars.data) }}
+    infer: { prompt: "x" }

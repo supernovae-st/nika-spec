@@ -41,7 +41,7 @@
 #   python conformance/runner.py validate <workflow.nika.yaml>
 #   python conformance/runner.py run <fixtures-dir>      # default · tests/core
 #   python conformance/runner.py examples <dir>          # assert all are valid
-#   python conformance/runner.py all                     # core + stdlib + examples (the CI gate)
+#   python conformance/runner.py all                     # core + stdlib + deep + examples (the CI gate)
 #
 # Deps · pyyaml · jsonschema. Exit non-zero on any failure (CI contract).
 
@@ -49,6 +49,8 @@ from __future__ import annotations
 import sys, json, re, pathlib
 import yaml
 from jsonschema import Draft202012Validator
+
+from deep_static import deep_static_errors
 
 HERE = pathlib.Path(__file__).resolve().parent
 SPEC_ROOT = HERE.parent
@@ -389,6 +391,7 @@ def validate_workflow(doc: dict, validator: Draft202012Validator,
         errs.append({"namespace": "NIKA-PARSE", "category": "validation_error",
                      "detail": e.message})
     errs.extend(cross_ref_errors(doc))
+    errs.extend(deep_static_errors(doc))
     if canon is not None:
         errs.extend(stdlib_surface_errors(doc, canon))
     return {"valid": not errs, "errors": errs}
@@ -470,6 +473,8 @@ def main(argv: list[str]) -> int:
         rc |= run_fixtures(HERE / "tests" / "core", validator, canon)
         print("\n== tests/stdlib (static surface) ==")
         rc |= run_fixtures(HERE / "tests" / "stdlib", validator, canon)
+        print("\n== tests/deep (CEL parse · jq compile · durations · schema-meta) ==")
+        rc |= run_fixtures(HERE / "tests" / "deep", validator, canon)
         print("\n== examples (each example = a conformance input) ==")
         rc |= run_examples(SPEC_ROOT / "examples", validator, canon)
         showcase = SPEC_ROOT / "examples" / "showcase"
