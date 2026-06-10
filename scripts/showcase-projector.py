@@ -42,6 +42,17 @@ SHOWCASE = SPEC_ROOT / "examples" / "showcase"
 
 BEGIN = re.compile(r"\{/\* showcase:begin ([a-z0-9-]+\.nika\.yaml) \*/\}")
 END = "{/* showcase:end */}"
+DAG_BEGIN = re.compile(r"\{/\* showcase:dag-begin ([a-z0-9-]+\.nika\.yaml) \*/\}")
+DAG_END = "{/* showcase:dag-end */}"
+COVERAGE_BEGIN = "{/* showcase:coverage-begin */}"
+COVERAGE_END = "{/* showcase:coverage-end */}"
+
+MERMAID_CLASSES = (
+    "  classDef infer fill:#5b8cff22,stroke:#5b8cff,color:#5b8cff\n"
+    "  classDef exec fill:#ff7a3c22,stroke:#ff7a3c,color:#ff7a3c\n"
+    "  classDef invoke fill:#22d3ee22,stroke:#22d3ee,color:#22d3ee\n"
+    "  classDef agent fill:#b07bff22,stroke:#b07bff,color:#b07bff"
+)
 
 
 def lean(yaml_text: str) -> str:
@@ -144,6 +155,147 @@ def _flags(task: dict) -> list[str]:
     return flags
 
 
+def _node_label(task: dict, tid: str) -> str:
+    """Short diagram label · id + the load-bearing detail."""
+    detail = ""
+    if "invoke" in task and isinstance(task["invoke"], dict):
+        detail = task["invoke"].get("tool", "")
+    elif "exec" in task and isinstance(task["exec"], dict):
+        cmd = (task["exec"].get("command") or "").strip()
+        detail = cmd.split()[0] if cmd.split() else ""
+    elif "infer" in task and isinstance(task["infer"], dict):
+        if task["infer"].get("schema"):
+            detail = "typed"
+        if task["infer"].get("thinking"):
+            detail = "thinking"
+    elif "agent" in task and isinstance(task["agent"], dict):
+        tools = task["agent"].get("tools") or []
+        detail = f"{len(tools)} tools"
+    parts = [tid]
+    if "for_each" in task:
+        parts.append("∥ for_each")
+    if detail:
+        parts.append(detail)
+    return " · ".join(parts)
+
+
+def render_mermaid(lean_text: str) -> str:
+    """The docs DAG diagram · GENERATED from the same yaml (drift-proof) ·
+    canonical verb palette · conditional edges dashed with the when label."""
+    doc = yaml.safe_load(lean_text)
+    tasks = doc.get("tasks") or []
+    lines = ["flowchart LR"]
+    verbs = {}
+    for t in tasks:
+        tid = t.get("id")
+        verb = next((v for v in ("infer", "exec", "invoke", "agent") if v in t), "invoke")
+        verbs[tid] = verb
+        label = _node_label(t, tid).replace('"', "'")
+        lines.append(f'  {tid}["{label}"]:::{verb}')
+    for t in tasks:
+        tid = t.get("id")
+        arrow = "-.->" if "when" in t else "-->"
+        for d in (t.get("depends_on") or []):
+            lines.append(f"  {d} {arrow} {tid}")
+    used = sorted(set(verbs.values()))
+    cls = [c for c in MERMAID_CLASSES.split("\n")
+           if any(f"classDef {v} " in c for v in used)]
+    return "\n".join(lines + cls) + "\n"
+
+
+# construct → (detector over the parsed doc · human label · reference href)
+CONSTRUCTS = [
+    ("for_each",      "fan-out over a collection",         "/concepts/workflows"),
+    ("max_parallel",  "bounded concurrency",               "/concepts/workflows"),
+    ("fail_fast",     "collect-errors batches",            "/concepts/workflows"),
+    ("when",          "CEL conditional gate",              "/concepts/workflows"),
+    ("retry",         "transient-error retry",             "/reference/error-codes"),
+    ("timeout",       "task time-bound",                   "/concepts/workflows"),
+    ("on_finally",    "cleanup that always runs",          "/concepts/workflows"),
+    ("on_error",      "fallback recovery",                 "/reference/error-codes"),
+    ("with",          "scoped aliasing",                   "/concepts/bindings"),
+    ("output",        "jq output bindings",                "/concepts/bindings"),
+    ("schema",        "typed (structured) output",         "/concepts/verbs"),
+    ("thinking",      "extended thinking budget",          "/concepts/verbs"),
+    ("secrets",       "vault-backed secrets",              "/reference/yaml-syntax"),
+    ("typed_vars",    "typed workflow inputs",             "/reference/yaml-syntax"),
+    ("outputs",       "typed workflow outputs (callable)", "/reference/yaml-syntax"),
+    ("agent_tools",   "default-deny tool grants",          "/concepts/verbs"),
+    ("capture",       "structured exec capture",           "/concepts/verbs"),
+    ("local_model",   "sovereign local model",             "/concepts/providers"),
+]
+
+
+def _constructs_of(lean_text: str) -> set[str]:
+    doc = yaml.safe_load(lean_text)
+    tasks = doc.get("tasks") or []
+    found: set[str] = set()
+    model = doc.get("model") or ""
+    if isinstance(model, str) and model.split("/")[0] in ("ollama", "lmstudio", "llamacpp", "localai", "vllm"):
+        found.add("local_model")
+    if doc.get("secrets"):
+        found.add("secrets")
+    if doc.get("outputs"):
+        found.add("outputs")
+    for v in (doc.get("vars") or {}).values():
+        if isinstance(v, dict) and "type" in v:
+            found.add("typed_vars")
+    for t in tasks:
+        for k in ("for_each", "max_parallel", "fail_fast", "when", "retry",
+                  "timeout", "on_finally", "on_error", "with", "output"):
+            if k in t:
+                found.add(k)
+        for verb in ("infer", "agent"):
+            body = t.get(verb)
+            if isinstance(body, dict):
+                if body.get("schema"):
+                    found.add("schema")
+                if body.get("thinking"):
+                    found.add("thinking")
+        agent = t.get("agent")
+        if isinstance(agent, dict) and agent.get("tools"):
+            found.add("agent_tools")
+        ex = t.get("exec")
+        if isinstance(ex, dict) and ex.get("capture"):
+            found.add("capture")
+    return found
+
+
+def render_coverage(workflows: dict[str, str]) -> str:
+    """The constructs ↔ examples reverse index · 'find the example that
+    teaches X' · fully derived · zero maintenance."""
+    per_file = {name: _constructs_of(body) for name, body in workflows.items()}
+    lines = ["", "| Construct | Taught by |", "|---|---|"]
+    for key, label, href in CONSTRUCTS:
+        users = sorted(n for n, cs in per_file.items() if key in cs)
+        if not users:
+            continue
+        links = " · ".join(
+            f"[{n.removesuffix('.nika.yaml').split('-', 1)[1]}](/examples/{n.removesuffix('.nika.yaml').split('-', 1)[1]})"
+            for n in users)
+        lines.append(f"| [{label}]({href}) | {links} |")
+    lines.append("")
+    return "\n".join(lines)
+
+
+def render_showcase_snippet(workflows: dict[str, str]) -> str:
+    tiers: dict[str, int] = {}
+    for name in workflows:
+        tiers[name[:2]] = tiers.get(name[:2], 0) + 1
+    return (
+        "{/* _showcase.mdx — AUTO-GENERATED by scripts/showcase-projector.py\n"
+        "    (nika-spec repo) from examples/showcase/ — counts derive · never\n"
+        "    hand-type. Regenerate: python3 scripts/showcase-projector.py --write */}\n\n"
+        "export const SHOWCASE = {\n"
+        f"  count: {len(workflows)},\n"
+        f"  t1: {tiers.get('t1', 0)},\n"
+        f"  t2: {tiers.get('t2', 0)},\n"
+        f"  t3: {tiers.get('t3', 0)},\n"
+        f"  t4: {tiers.get('t4', 0)},\n"
+        "};\n"
+    )
+
+
 def build_dag(lean_text: str) -> dict:
     """The structured run-sim model · tasks (verb · deps · wave · gloss ·
     flags · line range) + workflow outputs. Derived from the SAME lean text
@@ -229,31 +381,54 @@ def render_ts(workflows: dict[str, str]) -> str:
     )
 
 
-def project_docs_page(page: Path, workflows: dict[str, str], write: bool) -> bool:
-    """Rewrite every managed yaml block in one docs page. True = in sync."""
-    text = page.read_text()
+def _replace_blocks(text: str, begin_re, end_marker: str, page_name: str,
+                    content_for) -> tuple[str, bool]:
+    """Generic managed-block rewrite · returns (new_text, dirty)."""
     out, pos, dirty = [], 0, False
-    for m in BEGIN.finditer(text):
-        fname = m.group(1)
-        if fname not in workflows:
-            print(f"showcase-projector · {page.name} references unknown {fname}",
-                  file=sys.stderr)
-            sys.exit(2)
-        end_idx = text.find(END, m.end())
+    for m in begin_re.finditer(text):
+        key = m.group(1) if m.groups() else None
+        end_idx = text.find(end_marker, m.end())
         if end_idx == -1:
-            print(f"showcase-projector · {page.name} · unterminated block {fname}",
+            print(f"showcase-projector · {page_name} · unterminated block {key or end_marker}",
                   file=sys.stderr)
             sys.exit(2)
-        managed = f"\n```yaml {fname}\n{workflows[fname]}```\n"
-        current = text[m.end():end_idx]
-        if current != managed:
+        managed = content_for(key)
+        if text[m.end():end_idx] != managed:
             dirty = True
         out.append(text[pos:m.end()])
         out.append(managed)
         pos = end_idx
     out.append(text[pos:])
+    return "".join(out), dirty
+
+
+def project_docs_page(page: Path, workflows: dict[str, str], write: bool) -> bool:
+    """Rewrite every managed block (yaml · dag mermaid · coverage matrix) in
+    one docs page. True = in sync."""
+    text = page.read_text()
+
+    def yaml_for(fname):
+        if fname not in workflows:
+            print(f"showcase-projector · {page.name} references unknown {fname}",
+                  file=sys.stderr)
+            sys.exit(2)
+        return f"\n```yaml {fname}\n{workflows[fname]}```\n"
+
+    def dag_for(fname):
+        if fname not in workflows:
+            print(f"showcase-projector · {page.name} dag references unknown {fname}",
+                  file=sys.stderr)
+            sys.exit(2)
+        return f"\n```mermaid\n{render_mermaid(workflows[fname])}```\n"
+
+    text, d1 = _replace_blocks(text, BEGIN, END, page.name, yaml_for)
+    text, d2 = _replace_blocks(text, DAG_BEGIN, DAG_END, page.name, dag_for)
+    cov_re = re.compile(re.escape(COVERAGE_BEGIN))
+    text, d3 = _replace_blocks(text, cov_re, COVERAGE_END, page.name,
+                               lambda _k: render_coverage(workflows))
+    dirty = d1 or d2 or d3
     if dirty and write:
-        page.write_text("".join(out))
+        page.write_text(text)
     return not dirty
 
 
@@ -299,6 +474,19 @@ def main() -> int:
             else:
                 print(msg, file=sys.stderr)
                 rc = 1
+
+    # TARGET 1b · docs counts snippet (next to _canon.mdx)
+    snippets_dir = docs_root / "snippets"
+    if snippets_dir.is_dir():
+        target = snippets_dir / "_showcase.mdx"
+        rendered = render_showcase_snippet(workflows)
+        if write:
+            target.write_text(rendered)
+            print(f"✓ wrote docs snippet · {target.name}")
+        elif not target.is_file() or target.read_text() != rendered:
+            print("showcase-projector · DRIFT · docs snippets/_showcase.mdx · run --write",
+                  file=sys.stderr)
+            rc = 1
 
     # TARGET 2 · website generated module
     web_env = os.environ.get("NIKA_WEBSITE_SRC")
