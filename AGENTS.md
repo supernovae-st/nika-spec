@@ -17,8 +17,9 @@ reference engine lives at `supernovae-st/nika` (AGPL-3.0-or-later).
 - **Counts live in `canon.yaml`** (the SSOT — verbs, builtins, providers,
   extract modes, each `count:` self-checked against `items[]`).
   NEVER hardcode a count in prose; cite `canon.yaml`.
-- **Conformance** has 3 levels (Core / Standard / Full) —
-  `spec/07-conformance.md` + `conformance/` runner protocol.
+- **Conformance** has 3 levels (Core / Runtime / Stdlib v0.1) —
+  `spec/07-conformance.md` · the one-command static gate is
+  `python conformance/runner.py all` (core + stdlib surface + examples).
 
 ## Editing rules
 
