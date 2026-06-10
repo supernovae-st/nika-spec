@@ -185,7 +185,9 @@ def render_mermaid(lean_text: str) -> str:
     canonical verb palette · conditional edges dashed with the when label."""
     doc = yaml.safe_load(lean_text)
     tasks = doc.get("tasks") or []
-    lines = ["flowchart LR"]
+    # ≤7 tasks read naturally left-to-right · bigger DAGs squash at page
+    # width — top-down keeps every node label legible (derived · no hand pick)
+    lines = ["flowchart LR" if len(tasks) <= 7 else "flowchart TD"]
     verbs = {}
     for t in tasks:
         tid = t.get("id")
