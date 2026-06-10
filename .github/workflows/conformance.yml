@@ -1,0 +1,37 @@
+name: Conformance
+
+# The static conformance gate · every push/PR runs
+#   · tests/core      — Level-1 Core fixtures (parse + validate + DAG + variables + errors)
+#   · tests/stdlib    — Stdlib v0.1 static-surface fixtures (canon.yaml-driven names + shapes)
+#   · examples/       — every shipped example executed as a conformance input (must be valid)
+# via the reference oracle `conformance/runner.py all` (exit non-zero on any failure).
+#
+# Security note: push/PR/dispatch triggers only · no user-controlled strings
+# reach the shell · the runner reads repo files exclusively.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  static-gate:
+    name: static gate · core + stdlib surface + examples
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install runner deps
+        run: pip install pyyaml jsonschema
+
+      - name: Run the static conformance gate
+        run: python conformance/runner.py all
