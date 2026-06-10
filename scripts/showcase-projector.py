@@ -503,6 +503,24 @@ def main() -> int:
             rc = 1
         else:
             print("✓ website in sync (usecases-yaml.generated.ts)")
+
+        # Coverage · every showcase workflow must have a card in the
+        # explorer (usecases-data.ts) — the docs have the same guard ·
+        # an uncarded workflow would silently never reach the site.
+        data_ts = web_src / "sections" / "usecases-data.ts"
+        if data_ts.is_file():
+            data_text = data_ts.read_text()
+            uncarded = sorted(
+                n for n in workflows
+                if f"'{n.removesuffix('.nika.yaml')}'" not in data_text)
+            if uncarded:
+                msg = (f"showcase-projector · {len(uncarded)} workflow(s) with NO site card "
+                       f"(usecases-data.ts) · {', '.join(uncarded)}")
+                if write:
+                    print(f"⚠ {msg}")
+                else:
+                    print(msg, file=sys.stderr)
+                    rc = 1
     else:
         print("· website src/ absent · skipped")
 
