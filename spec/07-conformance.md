@@ -136,6 +136,26 @@ A Stdlib-compliant engine is functionally equivalent to the reference implementa
 
 ---
 
+## Suite status · v0.1 (honest)
+
+What is populated TODAY vs what lands with the reference engine ·
+
+| Layer | Status | What it proves |
+|---|---|---|
+| **Core fixtures** (`tests/core/`) | ✅ populated · runner-executable | parse + validate + DAG + variables + errors · the full Level-1 static contract |
+| **Stdlib static surface** (`tests/stdlib/`) | ✅ populated · runner-executable | the stdlib **names + shapes** layer · provider prefixes · the closed `nika:*` builtin set · extract modes · checkable with zero execution (lists derive from [`canon.yaml`](../canon.yaml)) |
+| **Examples as conformance inputs** (`examples/`) | ✅ executed by the runner `all` gate | every shipped example MUST validate at the full static level |
+| **Runtime behavioral fixtures** (`tests/runtime/`) | ⏳ **post-announce** | verb execution · task fields · events · they require an executing engine · they land with the reference engine's vertical slice (v0.81.0) |
+| **Stdlib behavioral fixtures** (`tests/stdlib/` · execution half) | ⏳ **post-announce** | provider/builtin/extract-mode *behavior* under the `mock` provider + HTTP mocks |
+
+Run the static gate yourself · `python conformance/runner.py all` — the
+runner output is the live count (counts in prose drift · the suite is the
+source). A « Core v0.1-compliant » claim is FULLY testable today. « Runtime »
+and « Stdlib v0.1 » claims are testable on their static halves today · their
+behavioral halves when the behavioral fixtures publish.
+
+---
+
 ## Conformance test structure
 
 ```

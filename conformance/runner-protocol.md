@@ -48,6 +48,24 @@ An error entry matches an emitted engine error when ·
 
 The engine MUST exit non-zero if any fixture in the claimed level fails.
 
+## The stdlib STATIC-surface layer (`tests/stdlib/`)
+
+Stdlib v0.1 fixtures split the level in two halves ·
+
+- **static surface** (populated · runner-executable today) — the names + shapes
+  half · a literal `model:` must be `<provider>/<name>` with a canonical
+  provider prefix (→ `NIKA-PROVIDER`) · `nika:*` tools come from the closed
+  canonical builtin set (schema enum) · a literal `nika:fetch` `mode:` must be
+  a canonical extract mode and a `jq:` argument requires `mode: jq`
+  (→ `NIKA-BUILTIN`). The canonical lists derive from [`canon.yaml`](../canon.yaml) ·
+  dynamic `${{ }}` values are skipped (runtime's job).
+- **behavioral** (post-announce · lands with the reference engine) — execution
+  semantics under the `mock` provider + HTTP mocks · a future `output.json`
+  companion per fixture.
+
+These fixtures bind **Stdlib-level claims only** — a Core-only engine does not
+run them (a Core engine has no provider/builtin knowledge by design).
+
 ## Two static layers in `core`
 
 Core fixtures split by *what catches the violation* — useful for engine

@@ -6,41 +6,54 @@
 
 ---
 
-## Status · 14 core fixtures shipped (parse/validate layer) · runtime+stdlib pending
+## Status · the full STATIC suite is shipped · behavioral fixtures post-announce
 
-The **Core conformance fixture set** (14 cases · `tests/core/`) is shipped — the
-machine-checkable parse + validate + DAG + variable layer, the part that needs
-NO engine to define. Each is an `input.yaml` + `expected.json` pair (see
-[`runner-protocol.md`](./runner-protocol.md) for the contract). 10 are
-schema-checkable (a YAML + `schemas/workflow.schema.json` validator passes them
-with zero engine code) · 4 are engine-parse cross-reference rules (cycle
-`NIKA-DAG-001` · unresolved depends_on `NIKA-DAG-002` · undeclared `when:`/`with:`
-reference `NIKA-DAG-003` · missing `outputs:`/`${{ }}` task ref `NIKA-VAR`).
-They lock every rule hardened in the v1 language reviews (incl. the new
-`outputs:` block · agent `schema:` · and the `when→depends_on` rule).
+Three populated surfaces today (run the runner for the live counts · counts in
+prose drift · the suite is the source) ·
 
-Runtime + Stdlib fixtures (verb execution · provider/builtin behavior · mock-driven)
-land with the reference engine. Of the four GA blockers (spec · examples · JSON
-schemas · conformance) the static conformance layer is now seeded.
+1. **Core fixtures** (`tests/core/` · envelope · verbs-shape · dag-topology ·
+   variables · errors) — the machine-checkable parse + validate + DAG +
+   variable layer, the part that needs NO engine to define. Each is an
+   `input.yaml` + `expected.json` pair (see
+   [`runner-protocol.md`](./runner-protocol.md) for the contract). They lock
+   every rule hardened in the v1 language reviews (incl. the `outputs:` block ·
+   agent `schema:` · the `when→depends_on` rule · the three tool namespaces).
 
-### Run it today · the reference Core runner
+2. **Stdlib static-surface fixtures** (`tests/stdlib/` · providers · builtins ·
+   extract-modes) — the stdlib **names + shapes** layer · provider prefixes
+   (`model: <provider>/<name>` · the provider is the prefix) · the closed
+   `nika:*` builtin set · the canonical extract modes · the `jq:`/`mode: jq`
+   coupling. The canonical lists derive from [`canon.yaml`](../canon.yaml)
+   (the SSOT) — the runner never hardcodes them.
 
-[`runner.py`](./runner.py) is the **reference oracle** for Level-1 (Core) — it
-implements the static layer (JSON Schema + the 4 cross-reference rules
-`NIKA-DAG-001/002/003` + `NIKA-VAR-001`) with **no LLM engine required**, so the
-14 fixtures are executable + CI-runnable today ·
+3. **Examples as conformance inputs** (`../examples/*.nika.yaml`) — every
+   shipped example is executed by the `all` gate and MUST validate at the full
+   static level. An example that drifts from the spec breaks CI.
+
+**Behavioral** Runtime + Stdlib fixtures (verb execution · provider/builtin
+behavior · mock-driven) are **post-announce** — they require an executing
+engine and land with the reference engine's vertical slice (see
+[`../spec/07-conformance.md`](../spec/07-conformance.md) §Suite status).
+
+### Run it today · the reference static runner
+
+[`runner.py`](./runner.py) is the **reference oracle** for the static layer
+(JSON Schema + the cross-reference rules + the stdlib surface) with **no LLM
+engine required** ·
 
 ```bash
-python conformance/runner.py run                       # all core fixtures → exit non-zero on fail
+python conformance/runner.py all                       # THE static gate · core + stdlib + examples
+python conformance/runner.py run                       # core fixtures only
+python conformance/runner.py run conformance/tests/stdlib   # stdlib surface fixtures
 python conformance/runner.py validate flow.nika.yaml   # validate one workflow → JSON verdict
 python conformance/runner.py examples examples         # assert every example is valid
 ```
 
-Current · **14/14 core fixtures pass · 7/7 examples valid**. A language engine in
-any language re-implements the same checks; this reference runner proves the
-suite is self-consistent and is the canonical static-layer oracle.
+A language engine in any language re-implements the same checks; this
+reference runner proves the suite is self-consistent and is the canonical
+static-layer oracle.
 
-## Planned structure
+## Structure
 
 ```
 conformance/
@@ -50,32 +63,27 @@ conformance/
 │   │   │   ├── 001-valid-minimal/
 │   │   │   │   ├── input.yaml
 │   │   │   │   └── expected.json
-│   │   │   ├── 002-missing-envelope/
-│   │   │   ├── 003-bad-workflow-id/
 │   │   │   └── ...
 │   │   ├── verbs-shape/
 │   │   ├── dag-topology/
-│   │   │   ├── 001-cycle-detection/
-│   │   │   ├── 002-unresolved-depends-on/
-│   │   │   └── ...
 │   │   ├── variables/
 │   │   └── errors/
 │   │
-│   ├── runtime/                   Runtime conformance (verb execution + task fields)
-│   │   ├── infer/
-│   │   ├── exec/
-│   │   ├── fetch/
-│   │   ├── invoke/
-│   │   ├── agent/
-│   │   └── workflow-lifecycle/
+│   ├── stdlib/                    Stdlib v0.1 · static surface (populated) + behavioral (post-announce)
+│   │   ├── providers/             prefix discipline · canon.yaml-driven
+│   │   ├── builtins/              closed nika:* set · namespace ownership
+│   │   └── extract-modes/         canonical modes · jq/mode coupling
 │   │
-│   └── stdlib/                    Stdlib v0.1 conformance
-│       ├── providers/             (uses mock provider where possible)
-│       ├── extract-modes/         (uses HTTP mocks)
-│       └── builtins/
+│   └── runtime/                   Runtime conformance (verb execution + task fields) · post-announce
+│       ├── infer/
+│       ├── exec/
+│       ├── invoke/
+│       ├── agent/
+│       └── workflow-lifecycle/
 │
+├── runner.py                      the reference static oracle (Core + stdlib surface + examples)
 ├── runner-protocol.md             how to run the suite against an engine
-└── README.md                       this file
+└── README.md                      this file
 ```
 
 ## Test format
@@ -121,4 +129,4 @@ Many tests use the `mock` provider and HTTP mocks for · (a) determinism · (b) 
 
 ---
 
-🦋 *14 core fixtures + reference runner (14/14 pass) · runtime+stdlib pending · machine-checkable forever.*
+🦋 *Core + stdlib-surface fixtures + every example · one static gate (`runner.py all`) · behavioral fixtures land with the engine · machine-checkable forever.*
