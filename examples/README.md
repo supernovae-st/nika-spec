@@ -44,12 +44,12 @@ Together these exercise every v0.1 construct an LLM must learn to author Nika.
 
 ```
 examples/
-├── 01-hello.nika.yaml                    "Hello world" · 1 task · infer
+├── 01-hello.nika.yaml                    ✅ "Hello world" · 1 task · infer
 ├── 02-minimal.nika.yaml                  Most minimal workflow possible
 ├── 03-multi-provider.nika.yaml           Compare 3 providers on same prompt
 ├── 04-multi-locale.nika.yaml             Multi-language fan-out
 ├── 05-exec-only.nika.yaml                Workflow with only exec: verbs
-├── 06-parallel-fanout.nika.yaml          DAG fan-out + merge
+├── 06-parallel-fanout.nika.yaml          ✅ DAG fan-out + merge
 ├── 07-mcp-invoke.nika.yaml               Call an MCP tool
 ├── 08-multi-locale-mcp.nika.yaml         Combine locale loop + MCP
 ├── 09-orchestrate-mock.nika.yaml         Use mock model for testing
@@ -59,17 +59,17 @@ examples/
 ├── 13-quickstart-mcp.nika.yaml           First MCP tool call
 ├── 14-quickstart-multilang.nika.yaml     Translation pipeline
 ├── 15-test-extended-thinking.nika.yaml   Anthropic extended thinking
-├── 16-test-file-output-shell.nika.yaml   exec + file write
+├── 16-exec-pipeline.nika.yaml            ✅ exec · capture · when · on_finally (shipped name)
 ├── 17-test-file-output.nika.yaml         infer + nika:write
 ├── 18-test-full-pipeline-mcp.nika.yaml   End-to-end pipeline
-├── 19-test-schema-retry.nika.yaml        Structured output + retry on validation
+├── 19-schema-retry.nika.yaml             ✅ structured output + retry (shipped name)
 ├── 20-travel-planner.nika.yaml           Realistic multi-step agent
 ├── 21-use-output-demo.nika.yaml          output: binding showcase
-├── 22-weather-chain.nika.yaml            API chain · fetch + infer
-├── 23-code-review.nika.yaml              Code review agent
+├── 22-fetch-chain.nika.yaml              ✅ fetch → bind → summarize (shipped name)
+├── 23-code-review.nika.yaml              ✅ code-review agent loop
 ├── 24-complex-dag.nika.yaml              Showcase a complex DAG
 ├── 25-agents-preset.nika.yaml            Agent presets · model routing
-├── 26-for-each-locales.nika.yaml         Locale iteration pattern
+├── 26-for-each-locales.nika.yaml         ✅ locale iteration pattern
 │
 └── README.md                              this file
 ```

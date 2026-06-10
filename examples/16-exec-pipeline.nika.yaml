@@ -26,8 +26,9 @@ tasks:
       - invoke:
           tool: nika:emit
           args:
-            event: "tests_finished"
-            status: "${{ tasks.test.status }}"
+            event_type: "tests.finished"
+            payload:
+              status: "${{ tasks.test.status }}"
 
   - id: deploy
     depends_on: [test]

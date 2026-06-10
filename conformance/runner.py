@@ -472,6 +472,10 @@ def main(argv: list[str]) -> int:
         rc |= run_fixtures(HERE / "tests" / "stdlib", validator, canon)
         print("\n== examples (each example = a conformance input) ==")
         rc |= run_examples(SPEC_ROOT / "examples", validator, canon)
+        showcase = SPEC_ROOT / "examples" / "showcase"
+        if showcase.is_dir():
+            print("\n== examples/showcase (industry workflows · same gate) ==")
+            rc |= run_examples(showcase, validator, canon)
         return rc
     print(__doc__)
     return 2
