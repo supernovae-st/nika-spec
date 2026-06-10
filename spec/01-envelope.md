@@ -84,8 +84,8 @@ effectively never.
 `nika: 1.0`. The value is exactly `v1`.
 
 > **Why one field, not `apiVersion` + `schema`?** Earlier drafts used a
-> Kubernetes-style `apiVersion: nika.sh/v1` plus a separate
-> `schema: nika/workflow@v1`. That is two version-ish fields and
+> Kubernetes-style `apiVersion: nika.sh/v1` (the superseded ADR-021 form)
+> plus a separate `schema: nika/workflow@v1` (superseded too). That is two version-ish fields and
 > ceremony a workflow file does not need. Modern specs converge on a
 > single version marker — OpenAPI writes `openapi: 3.1.0`, Docker
 > Compose dropped its `version:` field entirely. Nika takes the
