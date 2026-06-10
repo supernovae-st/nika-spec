@@ -40,7 +40,7 @@ schema_version: 1
 counts:
   verbs: 4
   builtins: 22
-  providers: 13
+  providers: 14
   extract_modes: 9
   error_namespaces: 14
   pillars: 5
@@ -99,10 +99,10 @@ builtins:
     - write
 
 # ---------------------------------------------------------------- providers
-# 7 cloud + 5 local + 1 test = 13. stdlib/providers-v0.1.md is the prose home.
+# 8 cloud + 5 local + 1 test = 14 (openrouter promoted D-2026-06-10-N2). stdlib/providers-v0.1.md is the prose home.
 # Sovereignty · 5 local providers (sovereignty Rule 1 · zero-cloud default path).
 providers:
-  count: 13
+  count: 14
   reference: stdlib/providers-v0.1.md
   items:
     cloud:
@@ -113,6 +113,7 @@ providers:
       - mistral
       - xai
       - groq
+      - openrouter
     local:
       - ollama
       - lmstudio

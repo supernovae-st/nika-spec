@@ -1,6 +1,6 @@
 # Stdlib v0.1 · Providers
 
-> The canonical 13 providers shipped with v0.1-compliant engines. Each
+> The canonical 14 providers shipped with v0.1-compliant engines. Each
 > provider implements the same interface (LLM chat completion + optional
 > streaming + vision + structured output) against a different backend.
 > You select one with a single `model: <provider>/<name>` field.
@@ -45,12 +45,13 @@ tasks:
 
 ---
 
-## The 13 canonical providers
+## The 14 canonical providers
 
 | Provider | Backend | Local? | Auth |
 |---|---|---|---|
 | `anthropic` | Anthropic Claude API | cloud | `${{ secrets.* }}` |
 | `openai` | OpenAI API (+ the universal OpenAI-compat escape hatch · see below) | cloud | `${{ secrets.* }}` |
+| `openrouter` | OpenRouter gateway (one key · every major model · cross-vendor fallback) | cloud | `${{ secrets.* }}` |
 | `mistral` | Mistral AI API (EU · sovereign-leaning) | cloud | `${{ secrets.* }}` |
 | `groq` | Groq Cloud (fastest open-weight) | cloud | `${{ secrets.* }}` |
 | `deepseek` | DeepSeek API (reasoning · cost-efficient) | cloud | `${{ secrets.* }}` |
@@ -63,10 +64,17 @@ tasks:
 | `vllm` | vLLM OpenAI server (`localhost:8000/v1` · high-throughput · self-hosted) | **local** | none |
 | `mock` | deterministic test fixture · no LLM call | test | none |
 
-A Stdlib v0.1-compliant engine MUST ship all **13** (7 cloud · 5 local · 1 test).
+A Stdlib v0.1-compliant engine MUST ship all **14** (8 cloud · 5 local · 1 test).
 Any *other* OpenAI-compatible local server (Jan · llamafile · KoboldCpp ·
 text-generation-webui · a custom one) routes through the **`openai` escape
 hatch** below — no new provider name needed.
+
+> **2026-06-10 · `openrouter` promoted from escape hatch to named provider**
+> (D-2026-06-10-N2). Earlier revisions routed OpenRouter through
+> `openai`+`base_url`. That override **hijacks the `openai` prefix** — you
+> cannot reach vanilla OpenAI and OpenRouter from the same engine config —
+> and the largest model-aggregation gateway deserves first-class one-field
+> selection. Together · Fireworks · custom gateways still use the escape hatch.
 
 ## Local vs cloud · the prefix decides
 
@@ -76,7 +84,7 @@ no hidden config to read:
 ```
 ollama/…  lmstudio/…  llamacpp/…  localai/…  vllm/…   → LOCAL · localhost · no key · sovereign
 anthropic/…  openai/…  groq/…  mistral/…  deepseek/…   → CLOUD · remote API · key via ${{ secrets.* }}
-  …  gemini/…  xai/…
+  …  gemini/…  xai/…  openrouter/…
 mock/…                                                 → TEST  · deterministic fixture
 ```
 
@@ -93,7 +101,7 @@ providers are ergonomic shortcuts; the long tail uses the escape hatch.**
 
 ## The `openai` escape hatch · any OpenAI-compatible server
 
-Most local servers (and many cloud gateways · OpenRouter · Together · etc.)
+Most local servers (and many cloud gateways · Together · Fireworks · etc.)
 speak the **OpenAI chat-completions protocol**. Rather than mint a provider
 name for every one, the `openai` provider accepts a `base_url` override in
 **engine config** (never in the workflow) and routes there:
@@ -107,8 +115,9 @@ This is the LiteLLM pattern: **named providers for the popular backends ·
 `openai`+base_url for everything else.** It is how Jan · llamafile ·
 KoboldCpp · text-generation-webui · and any custom OpenAI-compatible server
 run today — zero spec change, the stdlib stays curated, the long tail is
-covered. Adding a *new named* local provider later (its own prefix) is an
-additive stdlib bump — also already planned.
+covered. Adding a *new named* provider later (its own prefix) is an
+additive stdlib bump — `openrouter` (2026-06-10 · D-2026-06-10-N2) is the
+first such promotion.
 
 ## Provider config lives OUTSIDE the workflow
 
@@ -180,7 +189,7 @@ infer:
 
 **Features** · tool use · vision · structured output (JSON mode).
 
-**Escape hatch** · the openai provider routes ANY OpenAI-compatible endpoint via the `OPENAI_BASE_URL` engine-config override (see « The `openai` escape hatch » above). Covers the local servers without their own named provider — **Jan · llamafile · KoboldCpp · text-generation-webui** — plus cloud gateways (**OpenRouter · Together · Fireworks**) and custom servers. The popular local servers (`ollama` · `lmstudio` · `llamacpp` · `localai` · `vllm`) have their own named prefix and don't need this.
+**Escape hatch** · the openai provider routes ANY OpenAI-compatible endpoint via the `OPENAI_BASE_URL` engine-config override (see « The `openai` escape hatch » above). Covers the local servers without their own named provider — **Jan · llamafile · KoboldCpp · text-generation-webui** — plus cloud gateways (**Together · Fireworks**) and custom servers. Providers with their own named prefix (`openrouter` · `ollama` · `lmstudio` · `llamacpp` · `localai` · `vllm`) don't need this.
 
 ---
 
@@ -261,6 +270,36 @@ infer:
 **Auth** · `XAI_API_KEY` env var.
 
 **Features** · vision · real-time data option.
+
+---
+
+### `openrouter`
+
+```yaml
+infer:
+  model: openrouter/meta-llama/llama-3.1-70b-instruct
+  prompt: "..."
+```
+
+The cross-vendor **gateway** · one API key reaches every major model
+(Anthropic · OpenAI · Meta · Mistral · Google · open-weight). Promoted from
+the `openai` escape hatch 2026-06-10 (D-2026-06-10-N2) — a named prefix means
+OpenRouter and vanilla `openai` coexist in one engine config.
+
+**Models** · OpenRouter ids are themselves `vendor/model` — the workflow form
+is `openrouter/<vendor>/<model>` (everything after the first `/` passes
+through verbatim). E.g. `openrouter/anthropic/claude-sonnet-4-6` ·
+`openrouter/meta-llama/llama-3.1-70b-instruct` · `openrouter/deepseek/deepseek-r1`.
+
+**Auth** · `OPENROUTER_API_KEY` env var.
+
+**Features** · OpenAI-compatible chat completions · streaming · tool use ·
+structured output · provider-side model fallback/routing.
+
+**When to prefer it** · cross-vendor benchmarking from ONE workflow
+(`--var model=openrouter/...`) · models with no native named provider ·
+provider-side failover. For a vendor's flagship via its own API (latency ·
+native features · billing) prefer the direct provider (`anthropic/…` etc.).
 
 ---
 
@@ -407,4 +446,4 @@ The reference engine implements `provider_options:` as best-effort pass-through.
 
 ---
 
-🦋 *13 providers · 1 contract · sovereignty preserved.*
+🦋 *14 providers · 1 contract · sovereignty preserved.*
