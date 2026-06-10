@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: Apache-2.0
+# Static binding validation (04 §Static binding validation) · the
+# producing task declares a CLOSED schema (additionalProperties: false) ·
+# the downstream reference path `entitties` is a misspelling the schema
+# provably forbids → NIKA-VAR-003 at parse time.
+nika: v1
+workflow: schema-path-invalid
+tasks:
+  - id: extract
+    infer:
+      prompt: "Extract entities"
+      schema:
+        type: object
+        additionalProperties: false
+        required: [entities]
+        properties:
+          entities:
+            type: array
+            items: { type: string }
+  - id: report
+    depends_on: [extract]
+    exec:
+      command: "report ${{ tasks.extract.output.entitties }}"

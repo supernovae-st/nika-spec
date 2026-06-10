@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "Open schema levels (no additionalProperties: false) and schema-less producers are never statically rejected — the check is sound (04 §Static binding validation)."
+}

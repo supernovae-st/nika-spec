@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-VAR-003",
+      "category": "variable_error"
+    }
+  ],
+  "note": "The declared schema is closed (additionalProperties: false) and does not list 'entitties' — the path is provably invalid at parse time (04 §Static binding validation)."
+}

@@ -55,6 +55,16 @@ Five namespaces. That's it.
 > only within that task's body — not global namespaces. So the count stays
 > « 5 namespaces » + the for-each locals where a loop is present.
 
+**Shadowing is structurally impossible.** Every namespace is reached
+through its explicit prefix (`vars.` · `with.` · `tasks.` · `env.` ·
+`secrets.`) — a `vars.item` and the loop-local `item` never collide
+(one is `vars.item` · the other is bare `item`), a task may be named
+`item` (`tasks.item.output` is unambiguous), and `with.X` never hides a
+`vars.X`. The only bare identifiers in the language are the two
+loop-locals, and `for_each` does not nest within a task — so there is no
+scope chain · no resolution-order subtleties · nothing to shadow. This
+is by construction, not by rule.
+
 ### `${{ vars.X }}` · workflow inputs
 
 Declared once in the envelope · immutable across the workflow run · may be
@@ -126,6 +136,40 @@ object · the output is ALWAYS `${{ tasks.X.output }}` — there is no `tasks.X`
 CEL cannot type). This matches every workflow engine · GitHub Actions
 `steps.X.outputs` · Argo node context · Temporal result-vs-state · the task
 result is a record, never a scalar masquerading as the namespace.
+
+### Static binding validation against a declared `schema:` (normative)
+
+When the producing task declares a structured-output **`schema:`** (an
+`infer:` or `agent:` task · [02](./02-verbs.md)), the shape of
+`tasks.X.output` is KNOWN at parse time — so a reference path INTO that
+output (`${{ tasks.X.output.entities }}`) is statically checkable. The
+authoring contract ·
+
+- An engine **SHOULD** validate `tasks.X.output.<path>` references against
+  the declared schema at parse time (the misspelled-key class is caught
+  before any model is called).
+- An engine **MUST reject only provably-invalid paths** ·
+  `NIKA-VAR-003` · `variable_error`. A path step is *provably invalid*
+  when ·
+  1. a **member step** lands on a schema level that declares
+     `additionalProperties: false` and does NOT list the key in
+     `properties`;
+  2. a **member step** lands on a level whose `type` excludes `object`;
+  3. an **index step** lands on a level whose `type` excludes `array`.
+- The static walk covers the v0.1 subset **`properties` · `items` ·
+  `type` · `additionalProperties`** only. Any other construct at a level
+  (`$ref` · `oneOf` / `anyOf` / `allOf` · `patternProperties` · a missing
+  `type` · …) makes that level **open** — the walk stops and the engine
+  **MUST NOT** reject anything beneath it.
+- Tasks with NO declared schema (every `exec:` / `invoke:` task · an
+  `infer:` without `schema:`) are dynamic — paths into their output are
+  never statically rejected (a wrong path surfaces at run time as
+  `NIKA-VAR-001`).
+
+This keeps the check **sound** (zero false rejections · a valid workflow
+is never refused) while making the declared-schema path the
+better-tooling path — one more reason structured output is the default
+authoring style.
 
 ### `${{ env.X }}` · environment variable
 

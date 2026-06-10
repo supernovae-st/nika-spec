@@ -11,6 +11,9 @@
 #         NIKA-DAG-003  a `${{ tasks.X }}` reference from when:/with:/for_each:/
 #                       any verb body without depends_on:[X] (03-dag.md ·
 #                       « anywhere — in when: · with: · any verb field … »)
+#         NIKA-VAR-003  a `tasks.X.output.<path>` reference the producing
+#                       task's declared schema: PROVABLY forbids (04 §Static
+#                       binding validation · closed level / type exclusion)
 #         NIKA-VAR-001  an unresolved `${{ }}` reference (04-variables.md
 #                       §Resolution order) · non-existent task · undeclared
 #                       vars./with./env./secrets. entry · undefined namespace ·
@@ -39,6 +42,10 @@ HERE = pathlib.Path(__file__).resolve().parent
 SPEC_ROOT = HERE.parent
 SCHEMA_PATH = SPEC_ROOT / "schemas" / "workflow.schema.json"
 TASK_REF = re.compile(r"\btasks\.([a-z][a-z0-9_]*)\b")
+OUTPUT_PATH = re.compile(
+    r"\btasks\.([a-z][a-z0-9_]*)\.output"
+    r"((?:\.[A-Za-z_][A-Za-z0-9_]*|\[[0-9]+\]|\['[^']*'\]|\[\"[^\"]*\"\])+)")
+PATH_STEP = re.compile(r"\.([A-Za-z_][A-Za-z0-9_]*)|\[([0-9]+)\]|\['([^']*)'\]|\[\"([^\"]*)\"\]")
 # `${{ ... }}` substitution surface (04-variables.md) · `\${{` is an escaped literal.
 EXPR_OPEN = re.compile(r"(?<!\\)\$\{\{")
 EXPR_BODY = re.compile(r"(?<!\\)\$\{\{(.*?)\}\}", re.DOTALL)
@@ -120,6 +127,91 @@ def _resolution_errors(value, scopes: dict, where: str) -> list[dict]:
     return errs
 
 
+def _provably_invalid(schema, steps):
+    """04 §Static binding validation · walk the v0.1 subset (properties ·
+    items · type · additionalProperties) · return a reason string when a
+    step is PROVABLY invalid · None when the path is valid-or-open."""
+    level = schema
+    for kind, val in steps:
+        if not isinstance(level, dict):
+            return None
+        # any non-subset construct makes the level OPEN · stop walking
+        if any(k in level for k in ("$ref", "oneOf", "anyOf", "allOf",
+                                    "patternProperties", "not", "if")):
+            return None
+        t = level.get("type")
+
+        def type_excludes(name):
+            if t is None:
+                return False
+            return name not in t if isinstance(t, list) else t != name
+
+        if kind == "member":
+            if type_excludes("object"):
+                return f"member step '.{val}' on a level whose type excludes object"
+            props = level.get("properties")
+            if isinstance(props, dict) and val in props:
+                level = props[val]
+                continue
+            if level.get("additionalProperties") is False:
+                return (f"key '{val}' absent from a closed level "
+                        "(additionalProperties: false)")
+            return None  # open level
+        # index step
+        if type_excludes("array"):
+            return f"index step '[{val}]' on a level whose type excludes array"
+        items = level.get("items")
+        if isinstance(items, dict):
+            level = items
+            continue
+        return None
+    return None
+
+
+def _schema_path_errors(doc: dict) -> list[dict]:
+    """NIKA-VAR-003 · static binding validation (04 §Static binding
+    validation) · only provably-invalid paths are rejected (sound)."""
+    errs: list[dict] = []
+    tasks = doc.get("tasks") or []
+    if not isinstance(tasks, list):
+        return errs
+    schemas = {}
+    for t in tasks:
+        if not isinstance(t, dict):
+            continue
+        for verb in ("infer", "agent"):
+            body = t.get(verb)
+            if isinstance(body, dict) and isinstance(body.get("schema"), dict):
+                schemas[t.get("id")] = body["schema"]
+    if not schemas:
+        return errs
+    for t in tasks:
+        if not isinstance(t, dict):
+            continue
+        for body in _expr_bodies(t):
+            for m in OUTPUT_PATH.finditer(body):
+                tid, trail = m.group(1), m.group(2)
+                schema = schemas.get(tid)
+                if schema is None:
+                    continue  # dynamic producer · never rejected
+                steps = []
+                for sm in PATH_STEP.finditer(trail):
+                    member, idx, sq, dq = sm.groups()
+                    if member is not None:
+                        steps.append(("member", member))
+                    elif idx is not None:
+                        steps.append(("index", idx))
+                    else:
+                        steps.append(("member", sq if sq is not None else dq))
+                reason = _provably_invalid(schema, steps)
+                if reason:
+                    errs.append({"code": "NIKA-VAR-003",
+                                 "category": "variable_error",
+                                 "detail": f"task '{t.get('id')}' · "
+                                           f"tasks.{tid}.output{trail} · {reason}"})
+    return errs
+
+
 def cross_ref_errors(doc: dict) -> list[dict]:
     """The engine-parse cross-reference rules (beyond JSON Schema)."""
     errs: list[dict] = []
@@ -198,6 +290,9 @@ def cross_ref_errors(doc: dict) -> list[dict]:
                   "tasks": idset, "with": set(), "in_for_each": False}
     errs.extend(_resolution_errors(doc.get("outputs"), out_scopes, "outputs:"))
     errs.extend(_unclosed_expr_errors(doc.get("outputs"), "outputs:"))
+
+    # NIKA-VAR-003 · static binding validation vs declared schema: (04)
+    errs.extend(_schema_path_errors(doc))
 
     return errs
 
