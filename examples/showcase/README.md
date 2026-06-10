@@ -1,6 +1,6 @@
 # Showcase · industry workflows, simplest → epic
 
-> 16 complete, spec-correct workflows that answer one question per
+> Complete, spec-correct workflows (the count lives in [`../manifest.yaml`](../manifest.yaml)) that answer one question per
 > industry · **« what would MY Monday look like with this? »** Every
 > file passes the same conformance gate as the foundation examples
 > (`python conformance/runner.py all`) — schema + DAG cross-refs +
@@ -23,7 +23,7 @@ T3 FAN-OUT     runtime collections · for_each · retry · jq zips · swarms
 T4 EPIC        multi-stage pipelines · agents under budget · self-reporting runs
 ```
 
-## The 16 workflows
+## The workflows
 
 | File | Industry | The wow | Key constructs |
 |---|---|---|---|
@@ -36,13 +36,17 @@ T4 EPIC        multi-stage pipelines · agents under budget · self-reporting ru
 | `t2-invoice-chaser` | finance / freelance | overdue reminders drafted · NOTHING sent without a yes | `nika:convert` · `nika:prompt` gate · `size()` |
 | `t2-support-triage` | customer support | the overnight queue triaged before coffee | schema-over-list · jq post-filter · `nika:uuid` |
 | `t2-contract-guard` | legal / compliance | the contract **never leaves the machine** (local model) | `ollama/…` · `nika:validate` + `nika:assert` |
+| `t2-etl-quarantine` | data engineering | bad batches degrade to quarantine · the pipeline lives | `on_error: recover:` · `nika:validate` · jq group_by |
+| `t2-release-radar` | devops / dependencies | only the NEW ships reach you | `mode: feed` · state-file diff · RFC 6902 |
 | `t3-competitor-radar` | strategy / PMM | everything they shipped last week, one brief | `for_each` · `max_parallel` · retry · fan-in |
 | `t3-localization-factory` | product / i18n | the whole docs tree translated, voice intact | chained fan-outs · jq `transpose` zip |
 | `t3-config-drift-sentinel` | SRE / platform | only UNSANCTIONED prod drift wakes anyone | RFC 7396 merge + RFC 6902 diff · blake3 |
 | `t3-pr-review-fanout` | engineering | one read-only review agent **per changed file** | `for_each`+`agent:` swarm · default-deny tools |
+| `t3-resume-screener` | HR / recruiting | one local-model rubric per candidate · PII stays home | `ollama/…` · `for_each` · schema enums · jq sort_by |
 | `t4-deep-research-brief` | research / VC | plan → budgeted agent → thinking synthesis | plan-then-execute · budgets · `thinking:` |
 | `t4-incident-war-room` | SRE / on-call | the postmortem drafts itself — after recovery is PROVEN | `nika:wait` settle · assert · `on_finally:` |
 | `t4-ceo-monday-brief` | founders / execs | the brief that reports its own LLM bill | 3-branch gather · `nika:inspect` cost |
+| `t4-release-train` | devops / release | gates → human GO → hold until the window → ship · verify | `nika:wait until:` · `nika:date diff` · `nika:prompt` |
 
 ## Conventions (same gate as the foundation set)
 
@@ -59,4 +63,4 @@ T4 EPIC        multi-stage pipelines · agents under budget · self-reporting ru
   explorer — projected, never hand-copied
   (`scripts/showcase-projector.py` · `--check` is the drift gate)
 
-🦋 *16 showcase workflows · 4 tiers · all 22 builtins exercised across the example corpus.*
+🦋 *The showcase pack · 4 tiers · all 22 builtins exercised across the example corpus · manifest = the contract.*

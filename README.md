@@ -139,6 +139,20 @@ Nika is that for AI workflows.
 
 ---
 
+## The examples pack (versioned · embedded in the binary)
+
+**Every spec version ships its pack.** [`examples/manifest.yaml`](examples/manifest.yaml)
+(generated · `pack_version` = the [`VERSION`](VERSION) file) lists every
+canonical workflow — foundation + showcase — with tier, constructs and a
+sha256 over the exact text every surface renders. The contract:
+
+- the **docs** and the **website** render projections of these files (never copies)
+- the **reference engine embeds the pack of its version** — `nika examples`
+  / `nika docs` / `nika schema` work offline, and an installed binary always
+  carries the canonical examples *of the language version it speaks*
+- the manifest hashes make the pack **verifiable end-to-end** — a tampered or
+  drifted example fails the check, anywhere it travels
+
 ## Tooling (deterministic mesh)
 
 | Tool | Role |
