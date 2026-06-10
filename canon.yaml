@@ -225,3 +225,52 @@ severity:
   count: 4
   reference: dx/.claude/rules/hq-hygiene.md
   items: [BLOCKER, HIGH, MED, LOW]
+
+# ---------------------------------------------------------------- canonical phrasing
+# F2 one-voice registry (2026-06-10 night arc · B1) · the LOAD-BEARING sentences
+# that MUST read identically across spec · engine doc-comments · docs · website.
+# Each entry · key + the canonical sentence (quote VERBATIM · never paraphrase in
+# live canon prose) + the prose home. Sweep tooling matches on distinctive
+# fragments (`match:`) · a live-canon surface contradicting a phrasing = drift.
+# Historical/dated/archive surfaces exempt (leave-coupled-era prose).
+canonical_phrasing:
+  verb_definition:
+    phrase: "A verb is a distinct native execution model"
+    match: "distinct native execution model"
+    home: spec/02-verbs.md
+  callable_is_tool:
+    phrase: "Everything callable is a tool reached through invoke: · everything about ordering is a DAG construct"
+    match: "callable"
+    home: spec/02-verbs.md
+  fetch_not_a_verb:
+    phrase: "fetch is the nika:fetch builtin reached through invoke: · not a verb"
+    match: "nika:fetch builtin"
+    home: spec/02-verbs.md
+  jq_one_data_language:
+    phrase: "jq is the single data extraction-and-transform language"
+    match: "extraction-and-transform"
+    home: spec/04-variables.md
+  provider_is_prefix:
+    phrase: "You select an LLM with a single model: field · the provider is the prefix"
+    match: "the provider is the prefix"
+    home: stdlib/providers-v0.1.md
+  envelope_forever:
+    phrase: "nika: v1 pins the language contract version · v1 is the only value for the entire lifetime of the v1 contract"
+    match: "pins the language contract version"
+    home: spec/01-envelope.md
+  edges_never_inferred:
+    phrase: "the engine rejects the workflow at parse time · it does not silently infer the edge"
+    match: "silently infer the edge"
+    home: spec/03-dag.md
+  cel_not_a_dsl:
+    phrase: "Nika does not invent an expression DSL · it adopts CEL"
+    match: "invent an expression DSL"
+    home: spec/03-dag.md
+  spec_owns_errors:
+    phrase: "the spec table · not any engine's source code · owns the taxonomy"
+    match: "owns the taxonomy"
+    home: spec/05-errors.md
+  prose_wins:
+    phrase: "prose wins on conflict · the published JSON Schema and the reference engine follow the spec"
+    match: "prose wins"
+    home: spec/07-conformance.md
