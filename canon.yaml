@@ -9,9 +9,8 @@
 # Projectors · scripts/canon-projectors.py (in-repo · counts → docs+website) ·
 #   scripts/showcase-projector.py (examples → docs+website) · monorepo gate ·
 #   supernovae scripts/audit/nika-showcase-parity.sh + nika-canon-project.sh
-# Architecture · nika/hq/blueprint/ + dx/.claude/rules/self-evolving-olympus.md
-#   PILLAR 1 (projection-by-default) + cross-source-validation §2.7.1
-#   (cascade-completeness). The .ttl is currently parallel-authored · in Phase 3
+# Architecture · projection-by-default (edit here once → projectors update
+#   every surface · drift is caught structurally at commit time). The .ttl is currently parallel-authored · in Phase 3
 #   it gets generated from this file.
 #
 # Schema versioning · `schema_version` field forward-compat per
@@ -196,21 +195,21 @@ pillars:
     - { order: 5, name: errors,    semantic: "the 14 error namespaces + handling contract" }
 
 # ---------------------------------------------------------------- lifecycle enums
-# 4-state lifecycle taxonomies · per ecosystem.md (dx/.claude/rules/) · public
+# 4-state lifecycle taxonomies · studio-extended dimensions · public
 # framework usable across products. Closed enum forever.
 lifecycle_product:
   count: 4
-  reference: dx/.claude/rules/ecosystem.md
+  reference: studio-internal
   items: [seed, active, mature, sunset]
 
 lifecycle_decision:
   count: 4
-  reference: dx/.claude/rules/ecosystem.md
+  reference: studio-internal
   items: [proposed, active, superseded, archived]
 
 lifecycle_risk:
   count: 4
-  reference: dx/.claude/rules/ecosystem.md
+  reference: studio-internal
   items: [open, mitigated, cleared, archived]
 
 # ---------------------------------------------------------------- diamond layers
@@ -228,7 +227,7 @@ diamond_layers:
 # CSS/elements/machines). Closed enum forever.
 steal_pattern_tiers:
   count: 4
-  reference: dx/.claude/rules/steal-pattern.md
+  reference: studio-internal
   items:
     - { name: A, semantic: "NATIVE-FIRST · browsers ship 95%+ (popover= · <dialog> · <details>)" }
     - { name: B, semantic: "STEAL · port FSM · <2000 LOC · ≤4 algo layers · a11y <30%" }
@@ -240,7 +239,7 @@ steal_pattern_tiers:
 # Order semantic · descending · BLOCKER halts ship · LOW = informational.
 severity:
   count: 4
-  reference: dx/.claude/rules/hq-hygiene.md
+  reference: studio-internal
   items: [BLOCKER, HIGH, MED, LOW]
 
 # ---------------------------------------------------------------- canonical phrasing
