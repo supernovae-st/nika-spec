@@ -291,4 +291,4 @@ consolidation (42 → 26 → 22) happened **pre-public** (0 external users · be
 
 ---
 
-🦋 *22 builtins canonical · jq = the data language · 5-layer Rams symmetry (fetch+extract · jq · convert · wait · inspect) · clear forever.*
+🦋 *<!-- canon:builtins -->22<!-- /canon --> builtins canonical · jq = the data language · 5-layer Rams symmetry (fetch+extract · jq · convert · wait · inspect) · clear forever.*

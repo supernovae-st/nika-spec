@@ -204,7 +204,7 @@ spec minor — it never appears silently.
       path: "./config.yaml"
 ```
 
-See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md) for the canonical builtin list (22 builtins in v0.1).
+See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md) for the canonical builtin list (<!-- canon:builtins -->22<!-- /canon --> builtins in v0.1).
 
 ### MCP call
 

@@ -117,13 +117,13 @@ outputs:                              # what the workflow returns · symmetric t
 | [01 envelope](./01-envelope.md) | The header · `nika: v1` · `workflow:` · typed `vars` · `env` · `secrets` |
 | [02 verbs](./02-verbs.md) | The 4 verbs · signatures · semantics |
 | [03 DAG](./03-dag.md) | Tasks · `depends_on` · `when` · `for_each` · output binding |
-| [04 variables](./04-variables.md) | `${{ vars · with · tasks · env · secrets }}` · 5 namespaces |
+| [04 variables](./04-variables.md) | `${{ vars · with · tasks · env · secrets }}` · <!-- canon:namespaces -->5<!-- /canon --> namespaces |
 | [05 errors](./05-errors.md) | Error codes · retry · structured output schemas |
 | [06 stdlib contract](./06-stdlib-contract.md) | How the stdlib versions independently |
 | [07 conformance](./07-conformance.md) | What « v0.1-compliant » means |
 | [08 out of scope](./08-out-of-scope.md) | Explicit defer list (memory · macros · etc.) |
 
-**Stdlib** (versioned independently · not a spec section) · [stdlib/](../stdlib/) — **14 providers · 9 extract modes · 22 builtins** (6 core · 5 file · 8 data · 1 introspection · 2 network · post ADR-086/087/088 Rams sweep 2026-05-27).
+**Stdlib** (versioned independently · not a spec section) · [stdlib/](../stdlib/) — **<!-- canon:providers -->14<!-- /canon --> providers · <!-- canon:extract_modes -->9<!-- /canon --> extract modes · <!-- canon:builtins -->22<!-- /canon --> builtins** (6 core · 5 file · 8 data · 1 introspection · 2 network · post ADR-086/087/088 Rams sweep 2026-05-27).
 
 ---
 

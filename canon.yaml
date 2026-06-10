@@ -41,6 +41,7 @@ schema_version: 1
 # fast grep-based projection checks (the projector reads `count:` lines).
 counts:
   verbs: 4
+  namespaces: 5
   builtins: 22
   providers: 14
   extract_modes: 9
@@ -67,6 +68,20 @@ verbs:
     - { name: exec,   semantic: "Shell command · blocklist · streaming" }
     - { name: invoke, semantic: "MCP tool call OR builtin (incl. nika:fetch)" }
     - { name: agent,  semantic: "Multi-turn agentic loop · tool calling · guardrails" }
+
+# ---------------------------------------------------------------- namespaces
+# The 5 substitution namespaces · LOCKED at v1 (spec/04-variables.md ·
+# loop-locals item/index are for_each-scoped locals · NOT a 6th namespace).
+namespaces:
+  count: 5
+  immutable: true
+  reference: spec/04-variables.md
+  items:
+    - vars
+    - with
+    - tasks
+    - env
+    - secrets
 
 # ---------------------------------------------------------------- builtins
 # Post atomic-language audit · 42→27→26→25→22 (-20 · -48% · zero functional loss).

@@ -294,4 +294,4 @@ The 9 canonical modes cover ~99% of real-world web fetch use cases. Niche extrac
 
 ---
 
-🦋 *9 modes · 1 verb · zero invention surface.*
+🦋 *<!-- canon:extract_modes -->9<!-- /canon --> modes · 1 verb · zero invention surface.*

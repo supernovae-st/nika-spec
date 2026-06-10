@@ -61,7 +61,7 @@ nika run hello.nika.yaml
 1. **Envelope** — one line · `nika: v1` + `workflow:` header (+ typed `vars` · `env` · `secrets`)
 2. **The 4 verbs** — `infer:` (LLM) · `exec:` (shell) · `invoke:` (tools/MCP) · `agent:` (autonomous loop)
 3. **DAG shape** — tasks + `depends_on` + `when` + `for_each` + output binding
-4. **Variables** — one `${{ ... }}` syntax · 5 namespaces (`vars` · `with` · `tasks` · `env` · `secrets`)
+4. **Variables** — one `${{ ... }}` syntax · <!-- canon:namespaces -->5<!-- /canon --> namespaces (`vars` · `with` · `tasks` · `env` · `secrets`)
 5. **Error model** — `NIKA-<NS>-<NNN>` codes · retry semantics · structured output
 
 These 5 things never change. Everything else (providers · builtins ·
@@ -138,6 +138,20 @@ Standards work · SQL · GraphQL · OpenAPI · Dockerfile · GitHub Actions YAML
 Nika is that for AI workflows.
 
 ---
+
+## Tooling (deterministic mesh)
+
+| Tool | Role |
+|---|---|
+| [`canon.yaml`](canon.yaml) | THE source for every language count (verbs · namespaces · builtins · providers · modes · error namespaces) |
+| [`scripts/canon-projectors.py`](scripts/canon-projectors.py) | projects canon counts → docs snippet + website module (`--write` / `--check`) |
+| [`scripts/showcase-projector.py`](scripts/showcase-projector.py) | projects [`examples/showcase/`](examples/showcase/) → docs example pages + website explorer (yaml · diagrams · run-sim model · coverage matrix) |
+| [`conformance/runner.py`](conformance/runner.py) | the static oracle · core + stdlib fixtures + every example as a conformance input (the CI gate) |
+| [`.pre-commit-hooks.yaml`](.pre-commit-hooks.yaml) | pre-commit hook ids for downstream engines consuming this spec |
+
+Prose counts carry `<!-- canon:X -->N<!-- /canon -->` markers — machine-updatable
+(the monorepo `canon-fix` gate rewrites them when canon.yaml moves · drift is a
+CI failure, not a maybe).
 
 ## Status
 

@@ -104,6 +104,8 @@ def canon_fields(canon: dict) -> dict:
         "schemaVersion": canon["schema_version"],
         "verbs": canon["verbs"]["count"],
         "verbNames": [v["name"] for v in canon["verbs"]["items"]],
+        "namespaces": canon["namespaces"]["count"],
+        "namespaceNames": canon["namespaces"]["items"],
         "builtins": canon["builtins"]["count"],
         "builtinNames": canon["builtins"]["items"],
         "providers": canon["providers"]["count"],

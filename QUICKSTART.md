@@ -166,7 +166,7 @@ contract, the runtime is an implementation detail.
 
 You touched all 5 pillars · the **envelope** (`nika: v1` + `workflow:`) · the
 **4 verbs** · the **DAG** (`depends_on` + task outputs) · **variables**
-(`${{ }}` · 5 namespaces) · and the start of the **error model** (engines
+(`${{ }}` · <!-- canon:namespaces -->5<!-- /canon --> namespaces) · and the start of the **error model** (engines
 return `NIKA-<NS>-<NNN>` codes · see [spec/05-errors.md](./spec/05-errors.md)) ·
 plus the workflow's **`outputs:`** return contract (what `nika run` prints + what
 a caller receives).
@@ -183,7 +183,7 @@ model: ollama/llama3.1        # or lmstudio/... · llamacpp/... · vllm/...
 ## Where to go next
 
 - **[spec/](./spec/)** — the full specification (~30 pages · the contract)
-- **[stdlib/](./stdlib/)** — the 14 providers · 9 extract modes · 22 builtins
+- **[stdlib/](./stdlib/)** — the <!-- canon:providers -->14<!-- /canon --> providers · <!-- canon:extract_modes -->9<!-- /canon --> extract modes · <!-- canon:builtins -->22<!-- /canon --> builtins
 - **[examples/](./examples/)** — 7 foundation workflows (full v0.1 construct coverage · 19 more pending for GA)
 - **[README.md](./README.md)** — why a language · repo layout · governance
 

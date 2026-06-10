@@ -183,11 +183,11 @@ The grammar is versioned (`cel-subset/0.1`) · later minors may only ADD
 productions (arithmetic · macros · string functions) — never change the
 meaning of an expression that parses today.
 
-**Namespaces are CEL variables** · the 5 namespaces (`vars` · `with` · `tasks`
+**Namespaces are CEL variables** · the <!-- canon:namespaces -->5<!-- /canon --> namespaces (`vars` · `with` · `tasks`
 · `env` · `secrets`) are bound as top-level CEL variables. `tasks.<id>.status`
 etc. resolve against the live DAG state. **Inside a `for_each` task body, two
 more scoped CEL variables are bound** · `item` (the current element) and `index`
-(its 0-based position) — available ONLY within that task (the 5 namespaces are
+(its 0-based position) — available ONLY within that task (the <!-- canon:namespaces -->5<!-- /canon --> namespaces are
 global · `item`/`index` are for_each-local · see `for_each` below).
 
 #### Referencing a task requires an explicit `depends_on`
