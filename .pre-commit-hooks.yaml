@@ -1,0 +1,23 @@
+# pre-commit hooks for Nika workflows · https://pre-commit.com
+#
+# Usage in a consumer repo's .pre-commit-config.yaml ·
+#
+#   repos:
+#     - repo: https://github.com/supernovae-st/nika-spec
+#       rev: v0.1.0
+#       hooks:
+#         - id: nika-check
+#
+# Requires the `nika` binary on PATH (https://nika.sh/install).
+- id: nika-check
+  name: nika check (validate Nika workflows)
+  description: Validate .nika.yaml workflows against the Nika v1 language (schema + DAG + bindings).
+  entry: nika check
+  language: system
+  files: '\.nika\.ya?ml$'
+- id: nika-check-strict
+  name: nika check --strict (warnings fail too)
+  description: Strict validation of .nika.yaml workflows (errors AND warnings fail the commit).
+  entry: nika check --strict
+  language: system
+  files: '\.nika\.ya?ml$'
