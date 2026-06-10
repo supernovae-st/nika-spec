@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: bad-mode
+tasks:
+  - id: get
+    invoke:
+      tool: "nika:fetch"
+      args:
+        url: "https://example.com"
+        mode: html

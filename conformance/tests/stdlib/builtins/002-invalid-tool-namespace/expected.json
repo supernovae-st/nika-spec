@@ -1,0 +1,5 @@
+{
+  "valid": false,
+  "errors": [{ "category": "validation_error" }],
+  "note": "06-stdlib-contract.md §Namespace ownership · exactly three tool namespaces · nika:* (spec-owned) · mcp:<server>/<tool> · x-<vendor>:* · anything else is rejected."
+}

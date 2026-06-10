@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "a dynamic `${{ }}` model is resolved at runtime · the static surface layer skips it (the canonical parameterize-the-backend pattern · providers-v0.1.md)."
+}

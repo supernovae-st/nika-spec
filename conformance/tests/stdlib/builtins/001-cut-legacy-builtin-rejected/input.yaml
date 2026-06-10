@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: legacy-builtin
+tasks:
+  - id: conv
+    invoke:
+      tool: "nika:csv_to_json"
+      args:
+        input: "a,b\n1,2"

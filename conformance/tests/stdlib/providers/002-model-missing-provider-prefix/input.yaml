@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: bare-model
+tasks:
+  - id: ask
+    infer:
+      model: claude-sonnet-4-6
+      prompt: "hello"

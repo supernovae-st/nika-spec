@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: swap-backend
+vars:
+  model: { type: string, default: "anthropic/claude-sonnet-4-6" }
+tasks:
+  - id: ask
+    infer:
+      model: "${{ vars.model }}"
+      prompt: "hello"

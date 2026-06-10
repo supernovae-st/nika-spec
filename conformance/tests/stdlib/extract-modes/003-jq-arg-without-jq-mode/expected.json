@@ -1,0 +1,5 @@
+{
+  "valid": false,
+  "errors": [{ "namespace": "NIKA-BUILTIN", "category": "validation_error" }],
+  "note": "builtins-v0.1.md · nika:fetch `jq` is «a jq expression · only with mode: jq» · pairing it with another mode is a static contract violation."
+}

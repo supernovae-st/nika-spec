@@ -1,0 +1,5 @@
+{
+  "valid": false,
+  "errors": [{ "category": "validation_error" }],
+  "note": "nika:csv_to_json was cut from the canonical set (ADR-086 Rams sweep · nika:convert is the canonical multi-format builtin) · the nika:* namespace is spec-owned and CLOSED · an unknown nika:* tool is rejected."
+}

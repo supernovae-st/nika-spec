@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: one-data-language
+vars:
+  payload: { type: string, required: true }
+tasks:
+  - id: shape
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: "${{ vars.payload }}"
+        expr: "map(select(.active)) | length"

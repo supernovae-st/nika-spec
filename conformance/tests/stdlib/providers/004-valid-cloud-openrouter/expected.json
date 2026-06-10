@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "openrouter promoted to named provider (D-2026-06-10-N2) · the model NAME may itself contain `/` (gateway routing) · only the FIRST segment is the provider prefix."
+}

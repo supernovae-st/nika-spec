@@ -1,0 +1,5 @@
+{
+  "valid": false,
+  "errors": [{ "namespace": "NIKA-PROVIDER", "category": "validation_error" }],
+  "note": "the provider-prefix rule binds agent: exactly like infer: · same model: field · same canonical set."
+}

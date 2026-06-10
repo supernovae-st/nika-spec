@@ -22,6 +22,17 @@
 #                       substitution surface is 04-variables.md's)
 #         NIKA-PARSE    duplicate task id (03-dag.md · unique within workflow)
 #
+# PLUS the Stdlib v0.1 STATIC-SURFACE layer (names + shapes · no execution) ·
+#   NIKA-PROVIDER  a literal `model:` that is not `<provider>/<name>` OR whose
+#                  prefix is not one of the canonical stdlib v0.1 providers
+#                  (canon.yaml `providers:` · the provider is the prefix)
+#   NIKA-BUILTIN   a literal `nika:fetch` `mode:` outside the canonical extract
+#                  modes (canon.yaml `extract_modes:` + the implicit `raw`) ·
+#                  a `jq:` argument without `mode: jq` (builtins-v0.1.md)
+# The stdlib surface lists come from canon.yaml (the SSOT) · NEVER hardcoded.
+# Behavioral Runtime/Stdlib fixtures (execution · mock provider) are separate
+# (see 07-conformance.md §Suite status).
+#
 # This is the canonical ORACLE for Level-1 (Core) conformance · a language
 # engine in any language re-implements the same checks; this reference runner
 # proves the fixture suite is self-consistent and is CI-runnable today.
@@ -30,6 +41,7 @@
 #   python conformance/runner.py validate <workflow.nika.yaml>
 #   python conformance/runner.py run <fixtures-dir>      # default · tests/core
 #   python conformance/runner.py examples <dir>          # assert all are valid
+#   python conformance/runner.py all                     # core + stdlib + examples (the CI gate)
 #
 # Deps · pyyaml · jsonschema. Exit non-zero on any failure (CI contract).
 
@@ -41,6 +53,7 @@ from jsonschema import Draft202012Validator
 HERE = pathlib.Path(__file__).resolve().parent
 SPEC_ROOT = HERE.parent
 SCHEMA_PATH = SPEC_ROOT / "schemas" / "workflow.schema.json"
+CANON_PATH = SPEC_ROOT / "canon.yaml"
 TASK_REF = re.compile(r"\btasks\.([a-z][a-z0-9_]*)\b")
 OUTPUT_PATH = re.compile(
     r"\btasks\.([a-z][a-z0-9_]*)\.output"
@@ -62,6 +75,72 @@ DAG_EDGE_FIELDS = ("when", "with", "for_each", "infer", "exec", "invoke", "agent
 
 def load_schema() -> Draft202012Validator:
     return Draft202012Validator(json.loads(SCHEMA_PATH.read_text()))
+
+
+def load_canon() -> dict:
+    """The stdlib v0.1 surface lists · from canon.yaml (the SSOT · never hardcode).
+
+    `raw` joins the extract-mode set as the documented implicit mode
+    (extract-modes-v0.1.md §«Plus an implicit») · not part of the canonical 9.
+    """
+    c = yaml.safe_load(CANON_PATH.read_text())
+    prov = c["providers"]["items"]
+    return {
+        "providers": set(prov["cloud"]) | set(prov["local"]) | set(prov["test"]),
+        "builtins": set(c["builtins"]["items"]),
+        "extract_modes": set(c["extract_modes"]["items"]) | {"raw"},
+    }
+
+
+def _is_static(value) -> bool:
+    """A scalar is statically checkable when it carries no `${{ }}` expression."""
+    return isinstance(value, str) and not EXPR_OPEN.search(value)
+
+
+def stdlib_surface_errors(doc: dict, canon: dict) -> list[dict]:
+    """Stdlib v0.1 STATIC surface (names + shapes · no execution) ·
+    - `model:` MUST be `<provider>/<name>` with a canonical provider prefix
+      (providers-v0.1.md · «the provider is the prefix») → NIKA-PROVIDER
+    - `nika:fetch` `mode:` MUST be a canonical extract mode → NIKA-BUILTIN
+    - a `jq:` fetch argument is only valid with `mode: jq` (builtins-v0.1.md)
+    Dynamic values (`${{ }}`) are skipped · runtime's job."""
+    errs: list[dict] = []
+    tasks = doc.get("tasks") or []
+    if not isinstance(tasks, list):
+        return errs
+    for t in tasks:
+        if not isinstance(t, dict):
+            continue
+        where = f"task '{t.get('id')}'"
+        for verb in ("infer", "agent"):
+            body = t.get(verb)
+            model = body.get("model") if isinstance(body, dict) else None
+            if not _is_static(model):
+                continue
+            prefix, sep, _name = model.partition("/")
+            if not sep or not _name:
+                errs.append({"namespace": "NIKA-PROVIDER", "category": "validation_error",
+                             "detail": f"{where} · model '{model}' is not '<provider>/<name>' · "
+                                       "the provider is the prefix (providers-v0.1.md)"})
+            elif prefix not in canon["providers"]:
+                errs.append({"namespace": "NIKA-PROVIDER", "category": "validation_error",
+                             "detail": f"{where} · unknown provider prefix '{prefix}' · "
+                                       "not a canonical stdlib v0.1 provider (canon.yaml)"})
+        inv = t.get("invoke")
+        if isinstance(inv, dict) and inv.get("tool") == "nika:fetch":
+            args = inv.get("args")
+            if not isinstance(args, dict):
+                continue
+            mode = args.get("mode")
+            if _is_static(mode) and mode not in canon["extract_modes"]:
+                errs.append({"namespace": "NIKA-BUILTIN", "category": "validation_error",
+                             "detail": f"{where} · unknown extract mode '{mode}' · "
+                                       "not a canonical stdlib v0.1 extract mode (canon.yaml)"})
+            if "jq" in args and args.get("mode") != "jq":
+                errs.append({"namespace": "NIKA-BUILTIN", "category": "validation_error",
+                             "detail": f"{where} · 'jq' argument is only valid with mode: jq "
+                                       "(builtins-v0.1.md · nika:fetch)"})
+    return errs
 
 
 def _strings(value):
@@ -297,14 +376,21 @@ def cross_ref_errors(doc: dict) -> list[dict]:
     return errs
 
 
-def validate_workflow(doc: dict, validator: Draft202012Validator) -> dict:
-    """Combined verdict · {valid, errors:[{code|namespace, category, detail}]}."""
+def validate_workflow(doc: dict, validator: Draft202012Validator,
+                      canon: dict | None = None) -> dict:
+    """Combined verdict · {valid, errors:[{code|namespace, category, detail}]}.
+
+    `canon` enables the Stdlib v0.1 static-surface layer (always on for this
+    reference runner · a Core-only engine implements the schema + cross-ref
+    layers and skips it · stdlib fixtures only bind Stdlib-level claims)."""
     errs: list[dict] = []
     for e in validator.iter_errors(doc):
         # Schema violations are spec-rule violations · NIKA-PARSE / validation_error.
         errs.append({"namespace": "NIKA-PARSE", "category": "validation_error",
                      "detail": e.message})
     errs.extend(cross_ref_errors(doc))
+    if canon is not None:
+        errs.extend(stdlib_surface_errors(doc, canon))
     return {"valid": not errs, "errors": errs}
 
 
@@ -324,14 +410,15 @@ def _matches(expected_err: dict, emitted: list[dict]) -> bool:
     return False
 
 
-def run_fixtures(fixtures_dir: pathlib.Path, validator: Draft202012Validator) -> int:
+def run_fixtures(fixtures_dir: pathlib.Path, validator: Draft202012Validator,
+                 canon: dict | None = None) -> int:
     inputs = sorted(fixtures_dir.rglob("input.yaml"))
     passed = failed = 0
     for inp in inputs:
         rel = inp.parent.relative_to(fixtures_dir.parent)
         exp = json.loads((inp.parent / "expected.json").read_text())
         doc = yaml.safe_load(inp.read_text())
-        verdict = validate_workflow(doc, validator)
+        verdict = validate_workflow(doc, validator, canon)
         ok = verdict["valid"] == exp["valid"]
         if ok and not exp["valid"]:
             # at least one expected error must match an emitted one
@@ -347,23 +434,45 @@ def run_fixtures(fixtures_dir: pathlib.Path, validator: Draft202012Validator) ->
     return 1 if failed else 0
 
 
+def run_examples(examples_dir: pathlib.Path, validator: Draft202012Validator,
+                 canon: dict | None = None) -> int:
+    """Every example IS a conformance input · asserted valid at the full
+    static level (Core cross-refs + Stdlib surface) · the moat-proof gate."""
+    bad = 0
+    for f in sorted(examples_dir.glob("*.nika.yaml")):
+        v = validate_workflow(yaml.safe_load(f.read_text()), validator, canon)
+        print(f"{'PASS' if v['valid'] else 'FAIL'}  {f.name}")
+        if not v["valid"]:
+            for e in v["errors"]:
+                print(f"      {e.get('code') or e.get('namespace')} · {e.get('detail', '')[:100]}")
+            bad += 1
+    return 1 if bad else 0
+
+
 def main(argv: list[str]) -> int:
     validator = load_schema()
+    canon = load_canon()
     if len(argv) >= 2 and argv[1] == "validate" and len(argv) == 3:
         doc = yaml.safe_load(pathlib.Path(argv[2]).read_text())
-        v = validate_workflow(doc, validator)
+        v = validate_workflow(doc, validator, canon)
         print(json.dumps(v, indent=2))
         return 0 if v["valid"] else 1
     if len(argv) >= 2 and argv[1] == "run":
         d = pathlib.Path(argv[2]) if len(argv) == 3 else HERE / "tests" / "core"
-        return run_fixtures(d, validator)
+        return run_fixtures(d, validator, canon)
     if len(argv) == 3 and argv[1] == "examples":
-        bad = 0
-        for f in sorted(pathlib.Path(argv[2]).glob("*.nika.yaml")):
-            v = validate_workflow(yaml.safe_load(f.read_text()), validator)
-            print(f"{'PASS' if v['valid'] else 'FAIL'}  {f.name}")
-            bad += 0 if v["valid"] else 1
-        return 1 if bad else 0
+        return run_examples(pathlib.Path(argv[2]), validator, canon)
+    if len(argv) == 2 and argv[1] == "all":
+        # The CI gate · core fixtures + stdlib static-surface fixtures +
+        # every example executed as a conformance input (each must be valid).
+        rc = 0
+        print("== tests/core ==")
+        rc |= run_fixtures(HERE / "tests" / "core", validator, canon)
+        print("\n== tests/stdlib (static surface) ==")
+        rc |= run_fixtures(HERE / "tests" / "stdlib", validator, canon)
+        print("\n== examples (each example = a conformance input) ==")
+        rc |= run_examples(SPEC_ROOT / "examples", validator, canon)
+        return rc
     print(__doc__)
     return 2
 

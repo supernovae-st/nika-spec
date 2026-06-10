@@ -1,0 +1,5 @@
+{
+  "valid": false,
+  "errors": [{ "namespace": "NIKA-BUILTIN", "category": "validation_error" }],
+  "note": "extract-modes-v0.1.md · the canonical extract-mode set is closed at stdlib v0.1 (canon.yaml `extract_modes:` + the implicit raw) · `html` is not a mode (use selector or text)."
+}

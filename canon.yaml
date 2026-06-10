@@ -124,7 +124,7 @@ providers:
       - mock
 
 # ---------------------------------------------------------------- extract modes
-# 9 modes for the nika:fetch builtin's extract: parameter.
+# 9 modes for the nika:fetch builtin's mode: parameter (builtins-v0.1.md).
 # stdlib/extract-modes-v0.1.md is the prose home.
 extract_modes:
   count: 9

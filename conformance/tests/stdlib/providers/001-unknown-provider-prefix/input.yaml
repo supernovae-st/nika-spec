@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: bad-provider
+tasks:
+  - id: ask
+    infer:
+      model: notarealprovider/some-model
+      prompt: "hello"

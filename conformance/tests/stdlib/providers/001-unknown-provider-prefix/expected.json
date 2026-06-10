@@ -1,0 +1,5 @@
+{
+  "valid": false,
+  "errors": [{ "namespace": "NIKA-PROVIDER", "category": "validation_error" }],
+  "note": "providers-v0.1.md · the provider is the prefix · a Stdlib v0.1 engine ships exactly the canonical provider set (canon.yaml `providers:`) · an unknown prefix is rejected statically."
+}

@@ -1,0 +1,5 @@
+{
+  "valid": false,
+  "errors": [{ "namespace": "NIKA-PROVIDER", "category": "validation_error" }],
+  "note": "providers-v0.1.md · ONE field · `model: <provider>/<name>` · there is no separate provider: field and no bare model name · the prefix IS the provider selection."
+}

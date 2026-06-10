@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: agent-bad-provider
+tasks:
+  - id: loop
+    agent:
+      model: fakecloud/agent-model
+      prompt: "do the thing"
+      tools: ["nika:read", "nika:done"]
