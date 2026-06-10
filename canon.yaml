@@ -243,8 +243,9 @@ canonical_phrasing:
     match: "callable"
     home: spec/02-verbs.md
   fetch_not_a_verb:
-    phrase: "fetch is the nika:fetch builtin reached through invoke: · not a verb"
-    match: "nika:fetch builtin"
+    # home text · "so it is the `nika:fetch` builtin, reached through invoke:"
+    phrase: "fetch is the `nika:fetch` builtin, reached through invoke: · not a verb"
+    match: "`nika:fetch` builtin, reached"
     home: spec/02-verbs.md
   jq_one_data_language:
     phrase: "jq is the single data extraction-and-transform language"
@@ -255,12 +256,14 @@ canonical_phrasing:
     match: "the provider is the prefix"
     home: stdlib/providers-v0.1.md
   envelope_forever:
-    phrase: "nika: v1 pins the language contract version · v1 is the only value for the entire lifetime of the v1 contract"
-    match: "pins the language contract version"
+    # home text · "names the language and pins the contract version"
+    phrase: "nika: v1 names the language and pins the contract version · v1 is the only value for the lifetime of the v1 contract"
+    match: "pins the contract version"
     home: spec/01-envelope.md
   edges_never_inferred:
-    phrase: "the engine rejects the workflow at parse time · it does not silently infer the edge"
-    match: "silently infer the edge"
+    # home text · "(a verb-body reference is an edge too · no invisible edges)"
+    phrase: "the engine rejects the workflow at parse time · it does not silently infer the edge · no invisible edges"
+    match: "no invisible edges"
     home: spec/03-dag.md
   cel_not_a_dsl:
     phrase: "Nika does not invent an expression DSL · it adopts CEL"
@@ -271,6 +274,7 @@ canonical_phrasing:
     match: "owns the taxonomy"
     home: spec/05-errors.md
   prose_wins:
-    phrase: "prose wins on conflict · the published JSON Schema and the reference engine follow the spec"
-    match: "prose wins"
+    # home text · "(kept in sync · the prose is normative on conflict)"
+    phrase: "the prose is normative on conflict · the published JSON Schema and the reference engine follow the spec"
+    match: "the prose is normative on conflict"
     home: spec/07-conformance.md

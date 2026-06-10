@@ -84,7 +84,7 @@ canonical form. Two consequences ·
    implementation.
 2. **Drift direction is defined** · if the reference engine and this table
    disagree, the table wins and the engine fixes (same rule as the published
-   JSON Schema · prose wins per [07](./07-conformance.md)).
+   JSON Schema · the prose is normative on conflict per [07](./07-conformance.md)).
 
 ---
 
