@@ -7,7 +7,7 @@
 
 | Implementation | Language | Core | Runtime | Stdlib | Spec commit | Verified |
 |---|---|---|---|---|---|---|
-| [nika](https://github.com/supernovae-st/nika) (reference engine) | Rust | ⏳ verification in progress | — | — | — | — |
+| [nika](https://github.com/supernovae-st/nika) (reference engine) | Rust | ✅ 47/47 fixtures + 7/7 examples (`cargo test -p nika-schema --test conformance_core --test examples_valid`) | — (no runtime crates yet) | — | spec main 2026-06-10 | 2026-06-10 |
 
 ## How to be listed
 

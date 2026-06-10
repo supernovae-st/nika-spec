@@ -189,6 +189,11 @@ One rule everywhere · the **colon** marks the namespace boundary (exactly once)
 the **slash** separates the path within it. No `::`, no mixed `.`/`:`. Globs are
 clean · `nika:*` · `nika:connectome/*` · `mcp:browser/*`.
 
+**The namespace set is CLOSED at v1** · `nika:` and `mcp:` are the only two ·
+any other namespace (`custom:thing` · `x:tool`) is rejected at parse time
+(`NIKA-PARSE` · `validation_error`). A third namespace would be an additive
+spec minor — it never appears silently.
+
 ### Builtin call
 
 ```yaml
