@@ -1,0 +1,44 @@
+# SPDX-License-Identifier: Apache-2.0
+# eval/intents.yaml — the agent-authoring benchmark intents.
+#
+# 12 plain-language jobs, two per canonical template family. Each is
+# what a real user would type — no Nika vocabulary, no construct hints.
+# The harness (run-eval.py) asks a model to author the workflow under
+# two conditions (protocol vs freeform) and validates with the oracle.
+intents:
+  - id: standup-from-jira
+    template_family: chain
+    prompt: "Every morning, read my team's open Jira tickets from a JSON export file and write a short standup summary into a markdown file."
+  - id: blog-to-newsletter
+    template_family: chain
+    prompt: "Take a blog post file and produce a newsletter-friendly version of it, saved next to the original."
+  - id: disk-space-alert
+    template_family: gate-and-act
+    prompt: "Check the disk usage endpoint of my monitoring API and send a webhook alert if usage is above 90 percent."
+  - id: price-drop-ping
+    template_family: gate-and-act
+    prompt: "Watch the price field of a product API and ping my Slack webhook when it drops under 500."
+  - id: screenshot-all-pages
+    template_family: fanout
+    prompt: "For every URL listed in my sitemap, fetch the page as an article and produce one combined digest of what changed."
+  - id: summarize-support-tickets
+    template_family: fanout
+    prompt: "Take every ticket file in a folder and summarize each one, then merge the summaries into a weekly report. Some files may be malformed — keep going anyway."
+  - id: sync-new-invoices
+    template_family: etl-state
+    prompt: "Each run, fetch the invoices list from our billing API and process only the invoices that are new since the last run."
+  - id: changelog-watcher
+    template_family: etl-state
+    prompt: "Track a vendor's releases feed and write a note only when something new appeared compared to the previous check."
+  - id: research-competitor
+    template_family: agent-loop
+    prompt: "Research what a competitor shipped this quarter using web fetches, and return a structured list of findings with sources. Keep the cost bounded."
+  - id: codebase-todo-audit
+    template_family: agent-loop
+    prompt: "Have an agent read through the source folder and produce a typed list of risky TODOs with file references. Read-only — it must not modify anything."
+  - id: deploy-with-approval
+    template_family: human-gated-ship
+    prompt: "Run the test suite and the linter in parallel, then ask me for confirmation before running the deploy script, and notify the team channel either way."
+  - id: publish-docs-release
+    template_family: human-gated-ship
+    prompt: "Build the docs site, check the build passed, get a human sign-off, then publish and verify the live version matches."
