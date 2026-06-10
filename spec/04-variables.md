@@ -140,6 +140,13 @@ infer:
 traces. For anything secret, use `secrets:` (below) instead — never put a
 credential in `env`.
 
+**Declared-only · no ambient OS fallback** · `${{ env.X }}` resolves ONLY
+against the envelope `env:` block. An entry absent from the block is
+`NIKA-VAR-001` — the engine never silently reads the OS environment (a
+workflow's inputs are all visible in the file · sovereignty + portability).
+To pass an OS value in, do it explicitly at launch
+(`nika run flow.yaml --env LOG_LEVEL="$LOG_LEVEL"` · engine CLI concern).
+
 ### `${{ secrets.X }}` · masked secret reference
 
 ```yaml
@@ -221,6 +228,9 @@ ${{ tasks.api_call.status }}             # RESERVED · the task's own status (su
   the extracted jq result
 - `<name>` collisions with reserved words `output` · `status` · `error` ·
   `started_at` · `ended_at` · `duration_ms` are forbidden at parse time
+  (`NIKA-PARSE` · `validation_error` — the rule is structural · schema-checkable
+  via `propertyNames` · `NIKA-VAR-NNN` stays reserved for reference *resolution*
+  and binding *evaluation* errors)
 - If no `output:` block · only `tasks.X.output` is accessible (named
   bindings are an opt-in convenience)
 
@@ -313,6 +323,10 @@ infer:
 ```
 
 (Note · YAML escaping of backslash · `\\` in double-quoted strings · `\` in single-quoted or block scalars.)
+
+An **unclosed `${{`** (an unescaped opener with no closing `}}`) is rejected at
+parse time · `NIKA-VAR` · `validation_error` — the substitution surface belongs
+to this section, even though the YAML itself parses fine.
 
 ---
 

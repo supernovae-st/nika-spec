@@ -196,6 +196,26 @@ A task MAY declare an `on_error:` block to recover from non-transient errors (or
 `recover:` merges the former `fallback:` (ref) + `value:` (literal) into one field
 (`${{ }}` resolves to values either way · 4 modes → 3 · one way).
 
+### `recover:` reference resolution (normative)
+
+A `recover: ${{ tasks.X.output }}` reference is **NOT an execution-order
+edge** (the canonical example references a fallback source with no
+`depends_on` · [03 §referencing carve-out](./03-dag.md#referencing-a-task-requires-an-explicit-depends_on)).
+Resolution happens at **recovery time** ·
+
+1. The failing task exhausts `retry:` · `on_error.recover` fires.
+2. If the referenced task is already **terminal**, its value resolves
+   immediately.
+3. If it is still `pending`/`running`, the engine **awaits its terminal
+   state** before resolving (deterministic · never a race · the DAG is
+   finite so the await always terminates).
+4. If it terminated without a usable value (`failure` · `cancelled` ·
+   `skipped`), the reference is unresolved → `NIKA-VAR-001` → the recovery
+   itself fails → the task fails as if `on_error:` were absent.
+
+Authors SHOULD keep recovery sources cheap and independent (the
+fetch-chain pattern · a local `nika:read` beside a live fetch).
+
 ### Examples
 
 ```yaml

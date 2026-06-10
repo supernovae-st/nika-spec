@@ -164,6 +164,14 @@ there when a workflow becomes a reusable, callable unit. Typed `vars:` are
 the **input** half of that callable contract; typed [`outputs:`](#outputs--optional--the-workflows-return-value--untyped-or-typed)
 (below) are the **output** half.
 
+**The discriminator (normative)** · a var whose value is an **object
+carrying a string `type:` key** IS a typed declaration — `type:` must then be
+one of the closed enum (`string` · `number` · `integer` · `boolean` · `array`
+· `object`) or the workflow is rejected (`NIKA-PARSE` · `validation_error`).
+An untyped object default that legitimately contains a `type` key
+(`config: { type: "custom" }` would be misread) MUST use the typed form
+explicitly · `config: { type: object, default: { type: "custom" } }`.
+
 See [04-variables.md](./04-variables.md) for the full substitution grammar.
 
 ### `env` · *optional · non-sensitive runtime config*

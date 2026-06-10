@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+# The pre-merge on_error legacy forms (fallback:/value:) are NOT the language ·
+# spec/05-errors.md merged them into recover: · rejected at the structural layer.
+nika: v1
+workflow: legacy-fallback-rejected
+model: mock/echo
+tasks:
+  - id: a
+    invoke:
+      tool: "nika:read"
+      args: { path: "./x.json" }
+    on_error:
+      fallback: "stale"

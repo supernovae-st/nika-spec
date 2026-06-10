@@ -192,9 +192,9 @@ global · `item`/`index` are for_each-local · see `for_each` below).
 
 #### Referencing a task requires an explicit `depends_on`
 
-If a task references `tasks.<id>` **anywhere** — in `when:` · `with:` · any verb
-field (`prompt:` · `command:` · `args:` · …) · or `output:` — that task **MUST**
-declare `<id>` in its `depends_on:`. The engine **rejects the workflow at parse
+If a task references `tasks.<id>` inside a `${{ }}` expression — in `when:` ·
+`with:` · `for_each:` · or any verb field (`prompt:` · `command:` · `args:` ·
+…) — that task **MUST** declare `<id>` in its `depends_on:`. The engine **rejects the workflow at parse
 time** otherwise (`NIKA-DAG-003` · `validation_error`) — it does **not** silently
 infer the edge (a verb-body reference is an edge too · no invisible edges).
 
@@ -216,6 +216,16 @@ makes the DAG harder to read and lets a typo (`tasks.tset`) silently change
 ordering. Requiring the declaration keeps the graph honest: every dependency
 is visible in `depends_on`, and a dangling reference is a loud parse error, not
 a race. (This is the one rule an LLM most often gets wrong — so it fails fast.)
+
+**Two surfaces are deliberately NOT in this rule** ·
+
+- **`output:`** — its values are pure **jq** over the task's OWN raw output
+  ([04 §output binding](./04-variables.md#output-binding--output)) · they never
+  contain `${{ }}` · `tasks.X` cannot legitimately appear there.
+- **`on_error:` / `on_finally:`** — a `recover:` reference reads a *fallback
+  source*, an `on_finally:` reads its *own parent* · neither is an
+  execution-order edge ([05 §on_error](./05-errors.md#error-recovery--on_error)
+  defines the recovery-time resolution semantics).
 
 **Implementation** · an engine MAY embed a CEL library (e.g. the Rust
 `cel-interpreter` crate) OR hand-roll the small v0.1 subset above — both are
