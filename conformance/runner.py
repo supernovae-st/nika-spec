@@ -476,6 +476,10 @@ def main(argv: list[str]) -> int:
         if showcase.is_dir():
             print("\n== examples/showcase (industry workflows · same gate) ==")
             rc |= run_examples(showcase, validator, canon)
+        templates = SPEC_ROOT / "templates"
+        if templates.is_dir():
+            print("\n== templates (instantiable skeletons · must stay valid) ==")
+            rc |= run_examples(templates, validator, canon)
         return rc
     print(__doc__)
     return 2

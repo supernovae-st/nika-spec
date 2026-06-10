@@ -462,6 +462,14 @@ def render_manifest(workflows: dict[str, str]) -> str:
         digest = hashlib.sha256(text.encode()).hexdigest()[:16]
         lines.append(f"  - file: examples/{name}")
         lines.append(f"    sha256_16: {digest}")
+    templates_dir = SPEC_ROOT / "templates"
+    if templates_dir.is_dir():
+        lines.append("templates:")
+        for f in sorted(templates_dir.glob("*.nika.yaml")):
+            text = lean(f.read_text())
+            digest = hashlib.sha256(text.encode()).hexdigest()[:16]
+            lines.append(f"  - file: templates/{f.name}")
+            lines.append(f"    sha256_16: {digest}")
     lines.append("showcase:")
     for name, body in workflows.items():
         doc = yaml.safe_load(body)

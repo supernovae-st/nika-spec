@@ -21,6 +21,45 @@ reference engine lives at `supernovae-st/nika` (AGPL-3.0-or-later).
   `spec/07-conformance.md` · the one-command static gate is
   `python conformance/runner.py all` (core + stdlib surface + examples).
 
+## Writing a workflow (the deterministic authoring protocol)
+
+**Agents are the primary authors of Nika.** A weak model following
+this protocol beats a strong model improvising. The path is mechanical:
+
+```
+INTENT ──route──▶ TEMPLATE ──fill──▶ DRAFT ──check──▶ ERRORS ──repair──▶ ✓
+                  (copy · never        slots only      each error
+                   invent structure)                   names its fix
+```
+
+1. **Route** · `templates/README.md` maps intent → one of the 6
+   canonical skeletons (chain · gate-and-act · fanout · etl-state ·
+   agent-loop · human-gated-ship). Composite jobs compose templates.
+2. **Instantiate** · copy the template · fill every `# SLOT:` line ·
+   creativity ONLY in prompts, jq and paths — never in structure.
+3. **Check** · `python conformance/runner.py validate <file>` (this
+   repo's oracle) or `nika check` (engine). NEVER ship unchecked.
+4. **Repair from the error** · the codes are prescriptive ·
+   `NIKA-DAG-003` = add the missing `depends_on` edge ·
+   `NIKA-VAR-001` = declare the name or fix the typo ·
+   `NIKA-PROVIDER` = `model:` needs a canonical `<provider>/<name>`.
+   Re-check until zero errors.
+5. **Match constructs to proof** · need a construct you haven't used?
+   The coverage matrix (docs `examples/overview` · generated) names
+   the canonical example that exercises it — read it, don't guess.
+
+Hard rules the validator enforces (memorize · they catch 90% of LLM
+errors): one verb per task · snake_case task ids · kebab-case
+`workflow:` · every `${{ tasks.X }}` reference REQUIRES
+`depends_on: [X]` · `when:` must be CEL boolean · `size()` is the only
+CEL function · `nika:write` without `content:` writes nothing ·
+`nika:done` only inside `agent.tools`.
+
+The judgment layer (after validity) is the 12 patterns ·
+docs `guides/patterns` — deterministic core · parallel by default ·
+typed boundaries · leashed fan-outs · the three gates · sovereignty ·
+budgets · evidence lands · jq once · callable outputs · mock-first.
+
 ## Editing rules
 
 1. A count change = `canon.yaml` first, prose second (same commit).
