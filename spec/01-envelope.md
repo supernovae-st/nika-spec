@@ -258,6 +258,29 @@ referenced task ids must exist (parse-time validated).
 > jq bindings* on one task. Plural-at-the-top, singular-per-task — the
 > same split GitHub Actions uses for `workflow_call.outputs` vs step `outputs`.
 
+### What leaves a run · the export contract (normative)
+
+Exactly **three** things cross the run boundary · nothing else is promised ·
+
+1. **The `outputs:` object** — when declared, a conformant engine's run
+   command prints it as a **single JSON object on stdout** (and returns the
+   same shape over MCP). Diagnostics · progress · logs go to **stderr** ·
+   never interleaved into the stdout JSON.
+2. **The exit code** — maps 1:1 to the workflow final state
+   ([05 §workflow-level semantics](./05-errors.md#workflow-level-error-semantics)) ·
+   `success` → **0** · `failure` → **non-zero** · `cancelled` → **non-zero**
+   (distinct from failure's code · engine-documented). Parse/validation
+   rejection (the run never started) is also non-zero.
+3. **Tool side effects** — whatever the workflow's tools wrote (files ·
+   notifications · MCP calls). The language does not track these; they are
+   the workflow's business.
+
+A schema'd **machine run report** (per-task statuses · timings · costs ·
+ProofChain-compatible provenance) is deferred — see
+[08 §Horizon postures H10](./08-out-of-scope.md#horizon-postures--the--did-you-think-of-x--table-2026-06-10) ·
+until then `nika:inspect` exposes run introspection *inside* the run, and
+the completion event (05) is the engine-side hook.
+
 ---
 
 ## YAML conventions · no traps
