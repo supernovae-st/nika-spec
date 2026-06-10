@@ -87,7 +87,8 @@ nika-spec/
 │   └── 08-out-of-scope.md       explicit defer list (memory · macros · etc.)
 │
 ├── schemas/                   ← machine-readable JSON Schemas
-├── examples/                  ← foundation workflows covering the full v0.1 surface
+├── examples/                  ← foundation + showcase workflows (the versioned pack)
+├── templates/                 ← 6 instantiable skeletons · the agent authoring path
 ├── conformance/               ← test suite for any implementation
 │
 └── stdlib/                    ← versioned independently

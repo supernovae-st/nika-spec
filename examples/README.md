@@ -74,7 +74,9 @@ examples/
 └── README.md                              this file
 ```
 
-Plus a `showcase/` subdirectory for end-to-end project templates.
+Plus the [`showcase/`](showcase/) subdirectory — real-job workflows,
+tiered T1→T4. (Instantiable SKELETONS live separately in
+[`../templates/`](../templates/) — copy one instead of starting blank.)
 
 ## Convention
 
