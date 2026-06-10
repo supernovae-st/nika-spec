@@ -65,6 +65,27 @@ Error codes follow the format `NIKA-<NAMESPACE>-<NNN>` where namespace is 2-9 up
 
 A v0.1-compliant engine MUST use these namespaces for the canonical categories. New error codes MAY be added in minor bumps (additive · never repurposed).
 
+### Taxonomy ownership · the spec table is normative · engines derive
+
+**This table — not any engine's source code — owns the taxonomy.** A
+conformant engine (the Rust reference included) *derives* its error types
+from this section: every spec-relevant error it emits MUST carry a code
+matching the canonical regex, in the namespace this table assigns to the
+failure's scope, with the category semantics of §Categories. An engine MAY
+keep richer internal error machinery (the reference engine's internal
+diagnostics codes, subsystem-specific numbering, extra metadata) — internal
+codes are **not** spec surface and MUST NOT leak into workflow-visible
+errors (`tasks.X.error` · run reports · conformance output) in place of the
+canonical form. Two consequences ·
+
+1. **A second engine can be error-conformant from this file alone** — the
+   conformance suite matches on `code` OR `namespace`+`category`
+   ([07](./07-conformance.md)) · nothing requires reading the reference
+   implementation.
+2. **Drift direction is defined** · if the reference engine and this table
+   disagree, the table wins and the engine fixes (same rule as the published
+   JSON Schema · prose wins per [07](./07-conformance.md)).
+
 ---
 
 ## Categories

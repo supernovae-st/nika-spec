@@ -53,6 +53,22 @@ tasks: ...
 
 Workaround in v0.1 · use `exec: command: "nika run subroutine.yaml"` to launch a sibling workflow process.
 
+**Recursion guard (normative TODAY · even for the workaround)** · a run that
+launches runs — through the workaround now, through `nika:run` when it lands —
+MUST be bounded by the engine ·
+
+- **Depth cap** · nested run depth above the engine's limit fails the
+  *launching task* (`NIKA-SEC` · the reference engine defaults to a small
+  single-digit depth) — never the host process.
+- **Cycle detection** · a workflow file (transitively) launching itself is an
+  **unconditional block** (`NIKA-SEC` · `validation_error` at launch time) —
+  a self-launching workflow is a fork bomb, not a recursion scheme.
+
+The composition design (v0.2) inherits these rails unchanged · ONE invocation
+surface (`nika:run` under `invoke:` — per the
+[02-verbs closure argument](./02-verbs.md#the-closure-argument--why-no-case-forces-a-5th-verb)
+a sub-workflow call is the dispatch-and-await model · never a verb).
+
 ### Macros / templates
 
 ```yaml
@@ -303,6 +319,34 @@ budget:
 Pipeline-of-workflows orchestration · cross-workflow dependencies · workflow registries · service mesh integration · ALL out of scope **forever**. Nika is a single-workflow language. Multi-workflow orchestration is a different problem (cf Temporal · Airflow · etc.).
 
 If you need that · the reference engine's HTTP server exposes a per-workflow run API · build your orchestrator on top of it.
+
+---
+
+## Horizon postures · the « did you think of X? » table (2026-06-10)
+
+Every recurring 2026-class workflow-language question, answered in one row —
+the posture is written, silence is forbidden. **IN** = normative in v0.1 ·
+**PARTIAL** = a v0.1 piece exists, the rest is deferred · **OUT** = deferred
+or a non-goal, with the line that says whose job it is.
+
+| # | Horizon | Posture | The one-paragraph answer |
+|---|---|---|---|
+| H1 | Durable execution (checkpoint · resume · replay) | **OUT** | A v0.1 run is a single OS process with in-memory state · crash = re-run from the top · `retry:` is in-process only. Checkpoint/resumption + idempotency keys land TOGETHER at the durable-execution waypoint (§Persistence · v0.2+) · until then durability is the **host's responsibility** (run under a supervisor · make side-effecting tools idempotent via their own args). |
+| H2 | Streaming between tasks | **OUT** | Tasks are synchronous · a dependent reads the **final assembled value** (§Streaming). Engines MAY stream provider tokens internally/to the user. A between-task stream changes what an *edge* delivers — a future additive edge semantic, never a verb ([02 closure](./02-verbs.md#the-closure-argument--why-no-case-forces-a-5th-verb)). Pub/sub listeners · NEVER in the finite-DAG v1. |
+| H3 | Multimodal artifacts (typed image/audio/video) | **PARTIAL** | v0.1 values are strings · JSON values · and **opaque bytes pass-through** (tool-determined · [02 §invoke output](./02-verbs.md#what--tasksidoutput--holds--per-verb) · `infer.vision` takes file/url refs). No typed media payloads · no content-addressing in the language. Both arrive with the deferred media builtins (stdlib v0.x · §Tooling extensibility) — addressing (e.g. blake3) is engine detail, not language surface. |
+| H4 | Agent-of-agents (sub-agents · budget propagation · trust inheritance) | **PARTIAL** | The `agent:` verb is a **single loop** with per-task budgets (`max_turns` · `max_tokens_total` · normative · [02 §agent](./02-verbs.md)) and a default-deny tool whitelist. Budgets do NOT propagate across tasks (each declares its own). Multi-agent topology · §Advanced agent features (expressible today as multiple `agent:` tasks + explicit `with:` hand-off). Run-recursion is bounded by the §composition recursion guard. |
+| H5 | Human-in-the-loop (approval gates) | **IN** | `nika:prompt` — blocking confirm with `default:` for non-interactive mode — plus `nika:notify` (fire-and-forget). Pause-state is **live** (the run keeps a process while blocked · durable pauses arrive with H1) · time-bound it with the task-level `timeout:`. ONE construct · a tool under `invoke:` · forever. |
+| H6 | Evals in-language (asserts · LLM-judge · golden runs) | **PARTIAL** | v0.1 ships the pieces · `schema:` (per-task structured-output gate · auto-retry) · `nika:assert` (fail-fast CEL guard) · `nika:validate` (JSON Schema over data). An LLM-judge is an `infer:` task with a verdict `schema:` — no dedicated builtin needed. Golden-run testing reuses the conformance fixture shape (input + expected output on `mock/`). Declarative in-file eval blocks · deferred. |
+| H7 | Cost governance (budgets in €/tokens) | **PARTIAL** | Reading IS in-language · `nika:inspect view: cost` (running cost). Enforcement is NOT · hard caps are engine config (§Observability · `budget:` blocks deferred v0.2). The `agent:` budgets (`max_tokens_total`) are the one normative in-language cap today. |
+| H8 | Model routing / fallback chains | **PARTIAL** | The language surface is ONE field · explicit `model:` per task (+ `vars` parameterization — one workflow, any backend). Provider-side routing exists TODAY via `openrouter/…` (gateway fallback). Declarative capability-based routing in YAML ("any vision model under $X") · deferred · it must not create a second way to pick a model. |
+| H9 | Memory / the Connectome | **IN (as posture)** | Recall is a TOOL, forever · `invoke: mcp:memory-server/recall` today · `nika:connectome/recall` + `/ingest` when the Connectome ships (§The Connectome) · the tool-reference grammar already reserves the `nika:connectome/*` group — the forward-compat seam exists NOW. Never a verb · never an ambient implicit memory. |
+| H10 | Provenance (claim + evidence + confidence) | **PARTIAL** | The **evidence-first shape** — `{ claim, evidence: { step, path, quote }, confidence }` — is the RECOMMENDED (informative) output convention for audit-class workflows · fully expressible today via `schema:`. A normative, ProofChain-compatible machine run-report schema is deferred with the run-report work (v0.2). |
+| H11 | Observability (OTel) | **OUT (mapping recommended)** | Engine concern (§Observability) · zero telemetry by default · local-first. The canonical mapping when an engine exports · **run = trace · task = span · retry attempts = span events** — recommended so two engines' traces line up · never required. |
+| H12 | Security in-language vs runtime | **WRITTEN** | Language-visible security is EXACTLY three surfaces · the `exec:` blocklist (MUST) · the `agent:` tools whitelist (default-deny MUST) · secrets masking + no-inline-literals (`secrets:` envelope). Everything else — trust levels · spotlighting · canaries · taint tracking (the reference engine's Shield · NIKA-SEC family) — is **runtime-side** and intentionally NOT in YAML v0.1. Per-task capability declarations would be an additive task field · deferred. |
+| H13 | Packaging / distribution (registries · semver · signing) | **OUT** | The envelope pin `nika: v1` is the only versioning surface in the language. Workflow registries · package manifests · signing are ecosystem/engine concerns (the reference engine plans `nika-pck`) · not spec surface. |
+| H14 | Testing workflows (dry-run · mocks · goldens) | **IN (pieces)** | The `mock/` provider is one of the 14 (deterministic · no LLM call) — `model: mock/echo` per task or via one `vars.model` swap turns any workflow into a test. Golden runs reuse the conformance fixture pattern. `--dry-run` (parse + plan · execute nothing) is an engine CLI concern · MAY. A workflow without a test story is a script — the test story is · swap to `mock/`, assert with `nika:assert`/`schema:`. |
+| H15 | Concurrency / rate governance | **PARTIAL** | In-language · `max_parallel` (per `for_each`) + `fail_fast` + wave-parallel scheduling (normative · [03 §execution model](./03-dag.md#dag-execution-model)). Per-provider rate limits · engine config (the engine MUST honor declared caps · how it throttles providers is its business). Cross-run/global scheduling · NEVER (§Multi-workflow orchestration). |
+| H16 | Interop (import/export GHA · LangGraph · Temporal) | **PROUD NON-GOAL** | Nika is a source language, not a compatibility layer — no importers/exporters, ever (a translated workflow is a worse workflow). The interop boundaries are **MCP** (any MCP tool is callable · `mcp:<server>/<tool>`) and **`exec:`** (anything with a CLI). That covers the actual need — calling the world — without chaining the language to others' semantics. |
 
 ---
 

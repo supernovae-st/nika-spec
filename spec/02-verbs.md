@@ -331,6 +331,36 @@ The engine MUST ·
 
 The 4 verb names are **immutable forever** — and the count is **4, absolute**. The operation space is complete: call a model (`infer`), run a process (`exec`), call a tool (`invoke`), run an agentic loop (`agent`). Every other capability is either an **invoke-able tool** (an HTTP fetch → `invoke: nika:fetch` · a database query → `invoke: mcp:postgres/query` · a file write → `invoke: nika:write` · cognitive recall → `invoke: nika:connectome/recall`) or a **DAG control-flow construct** (iteration → `for_each` · branching → `when`). A new verb would require a `nika: v2` contract — and per forever-v0.x, that is effectively never.
 
+### The closure argument · why no case forces a 5th verb
+
+Every candidate operation decomposes along **two orthogonal axes** ·
+
+- **WHO executes** — the execution model. There are exactly four · model
+  inference (`infer`) · OS process (`exec`) · dispatch-a-call-and-await-its-
+  result (`invoke`) · model-driven loop over tools (`agent`). Anything with a
+  request/response shape — however exotic the backend — is by construction
+  the `invoke` model.
+- **WHEN it runs** — ordering. Edges (`depends_on`) · conditions (`when`) ·
+  iteration (`for_each`) · time-bounds (`timeout`) · recovery (`retry` ·
+  `on_error` · `on_finally`). Ordering never executes anything — it is
+  DAG-side, or host-side when it concerns *starting* a run at all.
+
+The recurring « doesn't X need a verb? » cases, stress-tested ·
+
+| Candidate | Axis | Resolution |
+|---|---|---|
+| **wait-for-human** (approval gate) | WHO · a call that resolves when a human answers | a **tool** · request/response with a long latency · `invoke:` model — **already shipped** as `nika:prompt` (blocking confirm · [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md)) |
+| **sleep / delay** inside a run | WHO · a call that resolves after a duration | a **tool** — **already shipped** as `nika:wait` (relative `duration:` XOR absolute `until:`) · NOT a verb — nothing is executed, a result (elapsed) is awaited |
+| **cron / schedule** (start a run at time T) | neither · it precedes the run | **host concern** · a workflow describes a run, not its triggering · explicitly out-of-scope ([08](./08-out-of-scope.md)) |
+| **streaming between tasks** | WHEN · changes what an *edge* delivers | a **DAG-edge semantic**, not an execution model · out-of-scope v0.1 · an additive edge attribute later · never a verb |
+| **sub-workflow call** | WHO · dispatch-and-await a run | a **tool** (workflow-as-tool · see [08](./08-out-of-scope.md) §composition) · the `invoke` model again |
+
+A 5th verb would have to name an execution model that is none of
+call-with-result, process, inference, or loop — and every concrete candidate
+inspected since the 4-verb lock (D-2026-05-22-N18) has resolved to a tool
+(WHO · request/response) or an ordering construct (WHEN). That is the
+closure: **the verb set is closed under decomposition into WHO × WHEN.**
+
 Field additions to each verb are **additive** within `nika: v1` (feature-detected · no minor version in the file). Field removal NEVER happens at v1.
 
 A v0.1-compliant engine that encounters an unknown field on a verb may ·

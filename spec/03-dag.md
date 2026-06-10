@@ -127,6 +127,62 @@ the v0.1 subset, addable in a later minor (CEL is a superset, so growth is
 additive and never breaking). If you need richer logic today, compute it in a
 `nika:assert` builtin or an `infer:` task.
 
+##### Formal grammar · CEL v0.1 subset (normative · grammar version `cel-subset/0.1`)
+
+Prose + examples are not re-implementable; this EBNF is. A conformant engine
+parses exactly this grammar inside `${{ }}` (it is a strict subset of
+[cel-spec](https://github.com/google/cel-spec) — any full CEL parser accepts
+every expression below) ·
+
+```ebnf
+expr     = or ;
+or       = and , { "||" , and } ;
+and      = rel , { "&&" , rel } ;
+rel      = unary , [ relop , unary ] ;        (* at most ONE relation · non-associative ·
+                                                 `a < b < c` is a parse error *)
+relop    = "==" | "!=" | "<" | "<=" | ">" | ">=" | "in" ;
+unary    = { "!" } , postfix ;
+postfix  = primary , { "." , IDENT , [ "(" , ")" ]
+                     | "[" , expr , "]" } ;
+primary  = literal | list | call | IDENT | "(" , expr , ")" ;
+call     = "size" , "(" , expr , ")" ;
+list     = "[" , [ expr , { "," , expr } ] , "]" ;
+literal  = INT | FLOAT | STRING | "true" | "false" | "null" ;
+
+IDENT    = /[A-Za-z_][A-Za-z0-9_]*/ ;          (* `true·false·null·in` are reserved words *)
+INT      = /-?[0-9]+/ ;
+FLOAT    = /-?[0-9]+\.[0-9]+/ ;
+STRING   = /'([^'\\]|\\.)*'/ | /"([^"\\]|\\.)*"/ ;   (* escapes · \\ \' \" \n \t *)
+```
+
+**Side constraints (normative)** ·
+
+1. **The only callable is `size`** · free form `size(x)` (exactly 1 argument)
+   and method form `x.size()` (exactly 0 arguments). Any other call suffix is
+   a parse error (reserved for future minors).
+2. **Precedence** (tightest → loosest) · postfix (`.` `[]`) → `!` → relational
+   (`==` `!=` `<` `<=` `>` `>=` `in`) → `&&` → `||`. Parentheses override.
+3. **Relations do not chain** · `rel` admits at most one `relop`
+   (non-associative) — `a == b == c` must be written `(a == b) == c` if that
+   is really meant.
+4. **No implicit coercion** · the subset is strongly typed per CEL ·
+   comparing values of different types (`42 == "42"`) is an evaluation error
+   (`NIKA-VAR` · `variable_error`) · not `false`.
+5. **`when:` is boolean** · the expression MUST evaluate to a boolean ·
+   a non-boolean result is `NIKA-VAR` `variable_error` at evaluation; an
+   engine MAY additionally reject statically-non-boolean-shaped roots
+   (a bare string/number literal · a bare reference with no relation or
+   boolean operator) at parse time.
+6. **Identifier roots resolve against the namespaces** · the 5 global
+   namespaces (`vars` · `with` · `tasks` · `env` · `secrets`) plus the two
+   `for_each` loop-locals (`item` · `index`) per
+   [04-variables.md](./04-variables.md) §Resolution order · an unresolvable
+   root is `NIKA-VAR-001`.
+
+The grammar is versioned (`cel-subset/0.1`) · later minors may only ADD
+productions (arithmetic · macros · string functions) — never change the
+meaning of an expression that parses today.
+
 **Namespaces are CEL variables** · the 5 namespaces (`vars` · `with` · `tasks`
 · `env` · `secrets`) are bound as top-level CEL variables. `tasks.<id>.status`
 etc. resolve against the live DAG state. **Inside a `for_each` task body, two
@@ -606,6 +662,31 @@ on_finally:
 ```
 
 ---
+
+## One obvious way · control-flow preference rules (normative for lints)
+
+Several intents are *expressible* two ways; the spec names ONE as canonical.
+These rules are informative for authors and **normative for linters** — a
+conformant linter (the reference `one-obvious-way` rule set) warns on the
+discouraged form ·
+
+| Intent | ✅ The one way | ❌ Discouraged · why |
+|---|---|---|
+| « run B only if A succeeded » | `depends_on: [a]` alone — success-gating is the **default edge semantic** (a failed dependency cancels dependents · §Task states) | `depends_on: [a]` + `when: ${{ tasks.a.status == 'success' }}` — redundant restatement of the default |
+| « run B even if A failed » | an explicit `when:` (it replaces the default gate · §Task states « to run regardless ») — `when: ${{ tasks.a.status in ['success','failure'] }}` reads the intent precisely | encoding it via `on_error: { skip: true }` on A — that changes A's contract for B's benefit |
+| « retry on transient failure » | `retry:` — the ONE retry shape (`max_attempts` · `backoff_*` · `on_codes`) | a `when:`-guarded duplicate task · a self-referencing recovery chain |
+| « provide a fallback value » | `on_error: { recover: … }` — the route stays *in the failing task* | a second task `when: ${{ tasks.a.status == 'failed' }}` for a mere value — use a task only when real *work* runs on failure |
+| « cleanup that always runs » | `on_finally:` | a terminal task depending on everything with a permissive `when:` |
+| « time-bound an iteration » | `timeout:` on the `for_each` task (covers the whole task per 03 §timeout) | per-element timing tricks inside the body |
+| « cap fan-out concurrency » | `max_parallel:` | manual sharding into N sequential tasks |
+
+The dividing line, stated once · **`when:` reads state to decide *whether* a
+task runs · `on_error:`/`retry:` decide *what happens inside* a task's own
+failure · `depends_on` is pure ordering.** A construct that restates another
+construct's default is noise; a construct that smuggles another's job is a
+trap. The reference validator ships these as warnings (`one-obvious-way/001`
+…`/007` · table order) — never hard errors (the discouraged forms are legal ·
+just not canonical).
 
 ## Forward-compat
 
