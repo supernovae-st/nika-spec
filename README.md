@@ -141,7 +141,7 @@ Nika is that for AI workflows.
 
 ## Status
 
-- v0.1.0-draft · spec drafted · 7 examples + workflow.schema.json + 14 core conformance fixtures shipped · runtime+stdlib conformance pending
+- v0.1.0-draft · spec drafted · 7 foundation + 16 showcase examples · workflow.schema.json · 63 static conformance fixtures (50 core + 13 stdlib surface) — every example gated in CI · runtime/behavioral conformance pending
 - v0.1.0 GA · target Q3 2026 (after spec review + examples +
   conformance suite + schemas)
 

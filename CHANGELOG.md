@@ -161,10 +161,11 @@ AWS exponential-backoff-and-jitter.
   the prefix · `anthropic/claude-sonnet-4-6` · `openai/gpt-4o`). Removes the
   silent-nonsense trap of a separate `provider:` field. Local-vs-cloud **is the
   prefix** · `ollama/…` · `lmstudio/…` = local (no key) · the cloud providers
-  use `${{ secrets.* }}`. **13 providers** (5 local · `ollama` · `lmstudio` ·
-  `llamacpp` · `localai` · `vllm` · plus the `openai` + `OPENAI_BASE_URL` escape
-  hatch for any other OpenAI-compatible backend). Provider config stays out of
-  the workflow — a workflow only *selects*.
+  use `${{ secrets.* }}`. **14 providers** (8 cloud incl. `openrouter` —
+  promoted to a first-class provider per D-2026-06-10-N2 · 5 local · `ollama` ·
+  `lmstudio` · `llamacpp` · `localai` · `vllm` · 1 test `mock`). Any other
+  OpenAI-compatible backend rides the `openai` + base-URL escape hatch.
+  Provider config stays out of the workflow — a workflow only *selects*.
 - **`secrets source:` is a closed enum** · `vault` (default · sovereign) ·
   `env` (an OS env var · still masked) · `file` (mounted secret).
 - **`exec.env` vs envelope `env:` disambiguated** · envelope `env:` = workflow
@@ -209,7 +210,7 @@ AWS exponential-backoff-and-jitter.
 - **YAML multi-line guidance** · `|` (literal · preserves newlines) is canonical
   for prompts / system / command fields · `>` / `>-` (folded) **forbidden** in
   prompts (collapsing newlines corrupts LLM intent).
-- **Canonical JSON Schema** · `schemas/nika-workflow.schema.json` is the
+- **Canonical JSON Schema** · `schemas/workflow.schema.json` is the
   machine-readable companion (envelope + task + verb shapes) for editor
   autocomplete + inline validation — the same DX as GitHub Actions / Docker
   Compose. The prose spec stays normative.

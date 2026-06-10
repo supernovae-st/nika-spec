@@ -6,7 +6,9 @@
 # is a PROJECTION of this file. Edit here once → run the projector to update
 # everywhere → drift caught structurally at commit time.
 #
-# Projector · scripts/audit/nika-canon-project.sh (--check · --report)
+# Projectors · scripts/canon-projectors.py (in-repo · counts → docs+website) ·
+#   scripts/showcase-projector.py (examples → docs+website) · monorepo gate ·
+#   supernovae scripts/audit/nika-showcase-parity.sh + nika-canon-project.sh
 # Architecture · nika/hq/blueprint/ + dx/.claude/rules/self-evolving-olympus.md
 #   PILLAR 1 (projection-by-default) + cross-source-validation §2.7.1
 #   (cascade-completeness). The .ttl is currently parallel-authored · in Phase 3
