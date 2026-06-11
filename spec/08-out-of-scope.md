@@ -320,6 +320,26 @@ Pipeline-of-workflows orchestration · cross-workflow dependencies · workflow r
 
 If you need that · the reference engine's HTTP server exposes a per-workflow run API · build your orchestrator on top of it.
 
+### The three floors (canonical framing)
+
+« Never in the language » does NOT mean « impossible » — it means **not in
+the YAML**. The ladder ·
+
+| Floor | What | Where it lives | Status |
+|---|---|---|---|
+| **1 · launch a sibling run** | one workflow starts another, awaits its typed `outputs:` | `exec: nika run sub.yaml --output json` + `capture: stdout` (the documented workaround · [§composition](#sub-workflow-invocation--nikarun-builtin--import)) | ✅ works in v0.1 |
+| **2 · composition** | a parent calls a child INSIDE a run · dispatch-and-await · one observable tree | the deferred `nika:run` builtin under `invoke:` (+ recursion guard · binding rules) | ⏸️ deferred · additive minor |
+| **3 · orchestration** | long-lived meshes · cross-run dependencies · registries · scheduling · cross-run retry | an orchestrator built ON TOP of the per-workflow run API — never a language construct | 🚫 forever out |
+
+Why the line holds · the conformance contract ([07](./07-conformance.md))
+stays implementable — a conformant engine executes ONE workflow; if
+conformance demanded a durable state store, a scheduler and a registry, no
+alternative engine could ever exist and « one YAML · any conformant engine »
+dies. A language describes one run the way Make describes one build and a
+shell script describes one execution — your CI and your cron live above
+them, not inside them. **Composition IN the language (deferred · additive) ·
+orchestration ON TOP of the language (forever) · never the inverse.**
+
 ---
 
 ## Horizon postures · the « did you think of X? » table (2026-06-10)
