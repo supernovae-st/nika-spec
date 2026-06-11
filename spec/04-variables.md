@@ -236,6 +236,18 @@ traces, and journal events (it renders as `••••••`). This `env` / `s
 split is the modern secure-workflow default: non-sensitive config in `env`,
 masked references in `secrets`.
 
+> **The masking boundary (normative).** Masking covers the engine's OWN
+> observability surface — logs · traces · journal · the `nika:inspect`
+> output. It does NOT follow a secret value that the AUTHOR routes into a
+> subprocess or tool that then re-emits it: a `secrets.X` put into
+> `exec.env` (or a `nika:fetch` header) which the command echoes to stdout
+> is captured verbatim into `tasks.X.output` and flows downstream like any
+> other data — the engine cannot know that captured string IS the secret.
+> **The contract:** the engine masks what IT prints; the author owns what
+> they pipe a secret INTO. The `nika check` pre-flight (lint) flags a
+> `secrets.X` reaching an `exec` capture or a tool whose output is bound,
+> so the leak is caught statically before the run, not after.
+
 ---
 
 ## Output binding · `output:`

@@ -415,7 +415,8 @@ A v0.1-compliant engine MUST ·
 3. Validate `workflow` identifier kebab-case format
 4. Make workflow-level `model`, `vars`, `env`, `secrets` available to all tasks as defaults
 5. Validate typed `vars` (type + required) before execution · reject missing required inputs
-6. Mask resolved `secrets` values in all logs · traces · journal events
+6. Validate each typed `outputs` value against its declared `type:` at run end · a value that does not match its declared type fails the run (`NIKA-VAR-009` · `validation_error`) — the callable contract is enforced on BOTH halves (typed in via `vars`, typed out via `outputs`) · symmetric with rule 5
+7. Mask resolved `secrets` values in all logs · traces · journal events
 
 ---
 

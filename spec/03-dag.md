@@ -353,6 +353,12 @@ fail_fast: false                # default true · false = process all even if so
 
 #### Semantics (closed at v1)
 
+- **Every expression in the task body is re-evaluated PER ITERATION** with
+  `item`/`index` bound — `with:`, the verb fields (`prompt:` · `command:` ·
+  `args:` · …), `when:`, AND the `output:` bindings. (The canonical
+  `with: { page: ${{ item }} }` shape above relies on this: `with:` is NOT
+  evaluated once at dispatch, it is evaluated once per element.) The only
+  thing evaluated once is the `for_each:` collection expression itself.
 - The task's output is the **array of per-iteration outputs**, in input
   order · referenced downstream as `${{ tasks.scrape_all.output }}`
   (an array) · `${{ tasks.scrape_all.output[0] }}` for one element.
