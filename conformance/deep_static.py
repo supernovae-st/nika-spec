@@ -54,7 +54,7 @@ _TOKEN = re.compile(r"""
   | (?P<float>-?[0-9]+\.[0-9]+)
   | (?P<int>-?[0-9]+)
   | (?P<string>'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*")
-  | (?P<op>\|\||&&|==|!=|<=|>=|[<>!.\[\](),])
+  | (?P<op>\|\||&&|==|!=|<=|>=|[<>!.\[\](),?:])
   | (?P<ident>[A-Za-z_][A-Za-z0-9_]*)
 """, re.VERBOSE)
 
@@ -105,7 +105,19 @@ class _Parser:
         return shape
 
     def expr(self):
-        return self.or_()
+        return self.ternary()
+
+    def ternary(self):
+        shape = self.or_()
+        if self.peek()[1] == "?":
+            self.take("?")
+            self.expr()          # then-branch · any value
+            self.take(":")
+            self.ternary()       # else-branch · right-associative
+            # value-selection · commonly boolean · accepted as a when:-shape
+            # (a non-boolean result is caught at runtime · NIKA-VAR-006)
+            return "bool"
+        return shape
 
     def or_(self):
         shape = self.and_()
@@ -153,11 +165,18 @@ class _Parser:
                 if name in RESERVED:
                     raise CelError(f"reserved word {name!r} as member")
                 if self.peek()[1] == "(":
-                    # method form · ONLY size() · zero args
-                    if name != "size":
-                        raise CelError(f"the only callable is size · got .{name}()")
+                    # method form · size() (0-arg) · contains/startsWith/
+                    # endsWith (1-arg string predicates) · cel-subset/0.1
                     self.take("(")
-                    self.take(")")
+                    if name == "size":
+                        self.take(")")
+                    elif name in ("contains", "startsWith", "endsWith"):
+                        self.expr()
+                        if self.peek()[1] == ",":
+                            raise CelError(f".{name}() takes exactly 1 argument")
+                        self.take(")")
+                    else:
+                        raise CelError(f"unknown method .{name}() · cel-subset/0.1")
                     shape = "call"
                 else:
                     shape = "ref" if shape in ("ref", "call") else shape
@@ -198,12 +217,12 @@ class _Parser:
                 raise CelError("reserved word 'in' as identifier")
             self.take(kind="ident")
             if self.peek()[1] == "(":
-                if v != "size":
-                    raise CelError(f"the only callable is size · got {v}()")
+                if v not in ("size", "has"):
+                    raise CelError(f"the only free calls are size/has · got {v}()")
                 self.take("(")
                 self.expr()
                 if self.peek()[1] == ",":
-                    raise CelError("size() takes exactly 1 argument")
+                    raise CelError(f"{v}() takes exactly 1 argument")
                 self.take(")")
                 return "call"
             return "ref"

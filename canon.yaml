@@ -236,6 +236,7 @@ error_codes:
     - { code: NIKA-SEC-001, category: security_error, transient: "false", failure: "exec: blocklist hit" }
     - { code: NIKA-SEC-002, category: security_error, transient: "false", failure: "agent tool call outside the tools: whitelist" }
     - { code: NIKA-SEC-003, category: security_error, transient: "false", failure: "run-recursion bound — nested-run depth exceeded OR self-launching workflow" }
+    - { code: NIKA-SEC-004, category: security_error, transient: "false", failure: "effect outside the declared permits: capability boundary (fs/net/exec/tool)" }
     - { code: NIKA-TIMEOUT-001, category: timeout_error, transient: "false", failure: "task (or for_each iteration) exceeded timeout:" }
     - { code: NIKA-CANCEL-001, category: cancelled, transient: "false", failure: "task cancelled (workflow failure gate · user cancellation)" }
     - { code: NIKA-BUILTIN-DONE-001, category: validation_error, transient: "false", failure: "nika:done invoked outside an agent: loop" }
