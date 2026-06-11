@@ -369,6 +369,37 @@ def cross_ref_errors(doc: dict) -> list[dict]:
                          "detail": f"task '{t.get('id')}' references tasks.{r} "
                                    f"without depends_on:[{r}]"})
 
+    # NIKA-DAG-004 · on_error.recover references a task DOWNSTREAM of the
+    # declaring task — the recovery-time await would deadlock (05 §recover
+    # resolution · the 03 carve-out exempts recover from EDGES, not from
+    # acyclicity). Transitive walk over depends_on.
+    def _transitive_deps(start: str) -> set[str]:
+        seen: set[str] = set()
+        stack = [start]
+        while stack:
+            n = stack.pop()
+            if n in seen:
+                continue
+            seen.add(n)
+            stack.extend(graph.get(n, []))
+        return seen
+
+    for t in tasks:
+        if not isinstance(t, dict):
+            continue
+        tid = t.get("id")
+        on_error = t.get("on_error")
+        if not isinstance(on_error, dict) or not isinstance(tid, str):
+            continue
+        recover = on_error.get("recover")
+        for target in sorted(_expr_task_refs(recover)):
+            if target in idset and tid in _transitive_deps(target):
+                errs.append({"code": "NIKA-DAG-004", "category": "validation_error",
+                             "detail": f"task '{tid}' on_error.recover reads tasks.{target} "
+                                       f"— '{target}' depends (transitively) on '{tid}' · the "
+                                       "recovery await would deadlock · recover from an "
+                                       "upstream or independent source (05 §recover)"})
+
     # NIKA-VAR-001 + unclosed-`${{` · resolve every `${{ }}` reference statically
     def _keys(v) -> set:
         return set(v.keys()) if isinstance(v, dict) else set()

@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: dag-recover-deadlock
+tasks:
+  - id: fetch
+    invoke: { tool: "nika:fetch", args: { url: "https://api.example.com" } }
+    on_error:
+      recover: ${{ tasks.fallback.output }}
+  - id: fallback
+    depends_on: [fetch]
+    infer: { prompt: "depends on the task it would rescue" }
