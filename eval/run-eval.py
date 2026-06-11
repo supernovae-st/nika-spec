@@ -309,6 +309,20 @@ def main() -> int:
             print(clusters(runs))
         return 0
 
+    if args.model.startswith("ollama/"):
+        # pre-warm OUTSIDE the per-case budget · cold model load (and a
+        # loaded machine) otherwise eats the whole case timeout — observed
+        # 2026-06-11: even a 0.5b timed out at 240s under concurrent cargo
+        # builds because load+first-token landed inside the case window.
+        name = args.model.partition("/")[2]
+        print(f"· pre-warming {name} …", flush=True)
+        try:
+            subprocess.run(["ollama", "run", name], input="Say OK",
+                           capture_output=True, text=True, timeout=600)
+        except (subprocess.TimeoutExpired, FileNotFoundError) as e:
+            print(f"⚠ pre-warm failed ({e.__class__.__name__}) — the machine may be "
+                  "too loaded for local eval right now", flush=True)
+
     intents = yaml.safe_load((HERE / "intents.yaml").read_text())["intents"]
     if args.limit:
         intents = intents[:args.limit]
