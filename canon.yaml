@@ -46,7 +46,7 @@ counts:
   extract_modes: 9
   error_namespaces: 14
   error_categories: 12
-  error_codes: 29
+  error_codes: 30
   pillars: 5
   # ---- extended v0.2 · 2026-05-27 · lifecycle + diamond + steal + severity
   lifecycle_product: 4
@@ -207,7 +207,7 @@ error_categories:
 # check binds the prose table to it (same row set · same fields).
 # transient · false | engine-assessed
 error_codes:
-  count: 29
+  count: 30
   reference: spec/05-errors.md
   items:
     - { code: NIKA-DAG-001, category: validation_error, transient: "false", failure: "cycle in depends_on (incl. self-dependency)" }

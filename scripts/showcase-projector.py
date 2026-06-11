@@ -699,6 +699,20 @@ def main() -> int:
                   file=sys.stderr)
             rc = 1
 
+        # Canon-internal self-check (both modes) · every list category's
+        # count: MUST equal len(items) AND the counts: block mirror — the
+        # SEC-004 cascade landed with items=30/counts=29 and nothing
+        # screamed (the prose<->canon check matches ROWS, not counts).
+        for key, block in canon.items():
+            if isinstance(block, dict) and isinstance(block.get("items"), list) and "count" in block:
+                n_items = len(block["items"])
+                mirror = canon.get("counts", {}).get(key)
+                if not (n_items == block["count"] and (mirror is None or mirror == n_items)):
+                    print(f"showcase-projector · CANON SELF-CHECK · {key} · "
+                          f"items={n_items} count={block['count']} counts-block={mirror}",
+                          file=sys.stderr)
+                    rc = 1
+
         # Parity check (both modes) · the 05-errors.md prose table rows must
         # equal the canon registry (code + category + transient · the prose
         # stays human-authoritative · canon stays machine-SSOT · this binds them).

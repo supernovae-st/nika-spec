@@ -4,5 +4,5 @@ vars:
   data: {}
 tasks:
   - id: a
-    when: ${{ has(vars.data) }}
+    when: ${{ vars.name.matches('^a') }}
     infer: { prompt: "x" }
