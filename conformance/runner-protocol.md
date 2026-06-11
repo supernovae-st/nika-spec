@@ -75,8 +75,13 @@ conformance/tests/stdlib/    stdlib static surface · provider prefixes · extra
                              modes · builtin names (canon.yaml-derived)
 ```
 
-(`tests/runtime/` is reserved · behavioral fixtures land with the reference
-engine's vertical slice · [07](../spec/07-conformance.md#suite-status--v01-honest).)
+(`tests/runtime/` carries the behavioral CONTRACT today — fixture shape ·
+run.json invocation · expected-run.json assertions · determinism rules ·
+see [tests/runtime/README.md](tests/runtime/README.md) — the fixtures
+execute when the reference engine's vertical slice lands ·
+[07](../spec/07-conformance.md#suite-status--v01-honest). They use
+`input.nika.yaml`, NOT `input.yaml`, so the static `all` gate ignores
+them by construction.)
 
 Runner subcommands · `validate <file>` (one verdict JSON) · `run <dir>`
 (one tier) · `examples <dir>` (every example must validate) · **`all`**

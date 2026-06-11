@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: rt-always-pattern
+model: mock/echo
+tasks:
+  - id: work
+    invoke:
+      tool: "nika:assert"
+      args: { condition: "${{ 1 > 2 }}", message: "designed failure" }
+  - id: dependent
+    depends_on: [work]
+    infer: { prompt: "never runs" }
+  - id: record
+    depends_on: [work]
+    when: true
+    infer: { prompt: "the record lands" }
