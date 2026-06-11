@@ -12,6 +12,49 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added · rounds 5-10 cohort (2026-06-11 · the night-loop continuation)
+
+- **Behavioral conformance tier (contract-first)** — `tests/runtime/`
+  carries the execution-half contract BEFORE the engine: fixture shape
+  (`input.nika.yaml` + `run.json` + `expected-run.json` · named so the
+  static gate ignores them by construction), run-report assertion schema,
+  determinism rules, five areas, eleven fixtures — every input statically
+  valid today. Writing them locked a position: `tool:` is schema-static
+  (no expressions), so the static permits check is COMPLETE for the tools
+  category; the one runtime-only escape is a dynamic fetch host.
+- **`permits:` hardening pass** — PERMITS-FIT static check (the declared
+  boundary must contain the body · `NIKA-SEC-004` · deep tier) + two
+  flagship declarations (resume-screener: the sovereignty story — no net
+  category, PII cannot leave; human-gated-ship template: argv programs +
+  webhook host pinned).
+- **Run-sim gate field** — the DAG model emits `gate: default | when |
+  always` per task so consumers implement gate-based failure propagation
+  honestly (the website break-it beat is the first consumer).
+- **Registry growth** — `NIKA-VAR-009` (typed outputs validation · the
+  parity ratchet's first real catch) + `NIKA-SEC-004` (permits boundary) ·
+  registry at 30 codes · canon gains a count self-check (len(items) ==
+  count == the counts-block mirror · both projector modes).
+- **Eval routing arm** — `--condition routing/all`: the model picks the
+  template family from the routing table (scored against ground truth) and
+  authors without the template body.
+
+### Fixed · rounds 5-10 cohort (2026-06-11)
+
+- **resume-screener taught a hallucination** — the prompt asked the model
+  to quote evidence from a CV it never received (only the path). Fixed
+  with the read-zip-screen shape (glob → read fan-out with null recovery →
+  transpose → screen over `{path, text}`).
+- Header truth pass (14 files) — `on_finally` claims scoped to
+  started-tasks-only, resilient fan-outs credit `recover: null`,
+  release-radar names its `on_codes` scoping, run lines added to the six
+  root examples missing the convention.
+- Deep fixture 002 migrated `has()` → `matches()` (the CEL expansion
+  legalized `has` · `matches` stays the reserved unknown-function case).
+- QUICKSTART step 5 + header join the one-voice posture (check today via
+  the oracle · execution at the engine milestone).
+- Generated docs tables are MDX-escaped at emission (a bare brace in a
+  table cell parsed as a JSX expression and killed the docs build).
+
 ### Added · divergence audit + projection ring (2026-06-11)
 
 - **Gate-based failure propagation** — unrecovered failure no longer reads as
