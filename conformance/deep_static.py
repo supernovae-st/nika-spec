@@ -364,6 +364,29 @@ def deep_static_errors(doc: dict) -> list[dict]:
                                            "pure jq over the task's own raw output · shape the "
                                            "verb's INPUT with ${{ }} instead (04 §binding rules)"})
 
+    # BUILTIN-SHAPE · jq arg is `expression` · wait is duration XOR until
+    for t in tasks:
+        if not isinstance(t, dict):
+            continue
+        tid = t.get("id")
+        inv = t.get("invoke")
+        if not isinstance(inv, dict):
+            continue
+        args = inv.get("args")
+        if inv.get("tool") == "nika:jq" and isinstance(args, dict):
+            if "expression" not in args:
+                wrong = next((k for k in ("query", "expr", "program", "filter") if k in args), None)
+                hint = f" (found '{wrong}' — the arg is 'expression')" if wrong else ""
+                errs.append({"namespace": "NIKA-BUILTIN", "category": "validation_error",
+                             "detail": f"task '{tid}' · nika:jq requires expression:{hint} "
+                                       "(builtins-v0.1.md · one name everywhere)"})
+        if inv.get("tool") == "nika:wait" and isinstance(args, dict):
+            has_d, has_u = "duration" in args, "until" in args
+            if has_d == has_u:  # both or neither
+                errs.append({"namespace": "NIKA-BUILTIN", "category": "validation_error",
+                             "detail": f"task '{tid}' · nika:wait takes duration: XOR until: "
+                                       "(exactly one · builtins-v0.1.md)"})
+
     # BUILTIN-SHAPE · write needs content · done never stands alone
     for t in tasks:
         if not isinstance(t, dict):

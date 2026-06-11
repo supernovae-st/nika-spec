@@ -1,0 +1,7 @@
+nika: v1
+workflow: deep-011
+tasks:
+  - id: reshape
+    invoke:
+      tool: "nika:jq"
+      args: { input: [], query: "length" }

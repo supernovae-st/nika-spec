@@ -12,6 +12,67 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added · divergence audit + projection ring (2026-06-11)
+
+- **Gate-based failure propagation** — unrecovered failure no longer reads as
+  a blanket kill: in-flight tasks drain, a task with an explicit `when:`
+  still evaluates over terminal deps (the **always-pattern** — `when: true`
+  cleanup/notify works in a failing workflow), user-cancel stays a blanket
+  kill (05 §workflow-level semantics).
+- **`on_error.on_codes`** — catch-side code routing (mirror of
+  `retry.on_codes`); `on_error.skip` now preserves the original error at
+  `tasks.X.error` (downstream per-code routing).
+- **Defined-null reads** — a skipped/cancelled task's `.output` (and
+  bindings) read as `null`, never an error — the diamond-join idiom is
+  canonical (04 §defined-null).
+- **`for_each` closed semantics** — `timeout:`/`output:` bindings apply per
+  iteration; failed iterations contribute `null` placeholders at their index
+  (zip alignment survives partial failure); non-array collections are
+  `NIKA-VAR-006`.
+- **Concrete error registry** — 28 allocated codes (the normative floor a
+  second engine matches from the spec alone) + 2 additive categories
+  (`process_error` · `budget_error`); machine-readable in `canon.yaml`
+  (`error_codes:` · `error_categories:`); sub-namespace regex admits
+  underscore builtins (`NIKA-BUILTIN-JSON_MERGE_PATCH-001`).
+- **Agent-loop termination contract** — budget exhaustion is `failure`
+  (`NIKA-AGENT-001/002` · partial preserved in `error.details`); tool errors
+  feed back to the model EXCEPT `security_error`; `nika:done result:` arg
+  defined.
+- **`when:` boolean literals** — `when: true`/`false` (YAML booleans) are
+  legal; bare non-`${{ }}` strings are rejected; static shape rejection is
+  `NIKA-VAR-005`, eval type errors `NIKA-VAR-006` (the orphan
+  `NIKA-PARSE-WHEN-001` is gone).
+- **YAML profile** — anchors/aliases normative-yes; `<<:` merge keys
+  rejected (YAML 1.2 dropped them).
+- **Three horizon postures** — H17 caching/memoization · H18 matrix (the
+  jq-product idiom) · H19 value-conditioned polling (the jq-error+retry
+  pattern).
+- **`NIKA-DAG-004`** — `on_error.recover` referencing a task downstream of
+  the declaring task is a parse error (the recovery await would deadlock).
+- Oracle: bare-`when:`, `${{ }}`-in-bindings, `nika:write` content,
+  standalone `nika:done`, envelope `model:` all static now; 11 new fixtures.
+- Projector v5: the served `schema/workflow.json` + `errors/catalog.json`
+  (v3 · generated from the canon registry) are projection TARGETS with a
+  prose↔canon parity check — the drift class is structurally closed.
+
+### Fixed · divergence audit (2026-06-11)
+
+- `exec` `capture: structured` makes a non-zero exit **data** (`exit_code`),
+  not failure; default capture modes fail with `NIKA-EXEC-001`.
+- The spec's own examples tested `status == 'failed'` — the enum is
+  `failure`; corrected everywhere.
+- `${{ workflow_run_id }}` ghost identifier removed from the `on_finally`
+  example (it resolved against no namespace).
+- `secrets:` schema is source-discriminated (`vault`/`env` require `key:` ·
+  `file` requires `path:`); `mcp:` tool references require the slash; server
+  names admit kebab-case.
+- 06 §namespace-ownership claimed an `x-<vendor>:` third namespace while 02
+  closes the set at `nika:`/`mcp:` — resolved: engine-specific tools route
+  through `mcp:` (the engine hosts its own server); `x-` is reserved as a
+  possible future additive minor, non-existent in v0.1.
+- 07 documents the `deep/` fixture tier; `NIKA-DAG-004` + `NIKA-VAR-005`
+  added to the Core conformance contract.
+
 Pre-public hardening of the v0.1 draft (no adopters yet · free to perfect the
 pillars to their immutable-forever form). Every change below is **additive
 within the `nika: v1` contract** — the 5 pillars stay immutable; the stdlib

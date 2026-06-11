@@ -9,4 +9,4 @@ tasks:
       tool: "nika:jq"
       args:
         input: "${{ vars.payload }}"
-        expr: "map(select(.active)) | length"
+        expression: "map(select(.active)) | length"

@@ -12,6 +12,10 @@
 #               `{/* showcase:end */}` markers · prose around the block
 #               stays hand-crafted · the YAML inside is machine-owned)
 #   TARGET 2 · nika.sh     src/sections/usecases-yaml.generated.ts
+#   TARGET 5 · nika.sh     public/schema/workflow.json        byte-copy of schemas/
+#   TARGET 6 · nika.sh     public/errors/catalog.json         from canon.yaml registry
+#                          (+ parity check · spec/05-errors.md table rows == canon)
+#   TARGET 7 · nika-docs   reference/error-codes.mdx          managed tables from canon
 #              (slug → lean yaml string · fully generated module)
 #
 # « Lean » rendering · the SPDX header, the yaml-language-server hint
@@ -31,6 +35,8 @@ import os
 import re
 import sys
 from pathlib import Path
+
+import yaml
 
 try:
     import yaml
@@ -603,6 +609,156 @@ def main() -> int:
 
     if rc == 0 and not write:
         print(f"✓ showcase projection in sync · {len(workflows)} workflows")
+    # TARGET 5 · website served schema · byte-identical copy (D-N6 · the
+    # binary's `nika schema` and nika.sh/schema/v1.json must agree · the
+    # spec repo is the source · the website copy is a projection).
+    site_env = os.environ.get("NIKA_WEBSITE_ROOT")
+    site_root = Path(site_env) if site_env else SPEC_ROOT.parent / "website"
+    schema_src = SPEC_ROOT / "schemas" / "workflow.schema.json"
+    schema_dst = site_root / "public" / "schema" / "workflow.json"
+    if schema_dst.parent.is_dir():
+        src_text = schema_src.read_text()
+        if write:
+            schema_dst.write_text(src_text)
+            print("✓ wrote website schema copy · public/schema/workflow.json")
+        elif not schema_dst.is_file() or schema_dst.read_text() != src_text:
+            print("showcase-projector · DRIFT · website public/schema/workflow.json · run --write",
+                  file=sys.stderr)
+            rc = 1
+    else:
+        print("· website public/schema absent · skipped")
+
+    # TARGET 6 · website errors catalog · generated from the canon.yaml
+    # registry (error_namespaces + error_categories + error_codes) · v3.
+    catalog_dst = site_root / "public" / "errors" / "catalog.json"
+    if catalog_dst.parent.is_dir():
+        canon = yaml.safe_load((SPEC_ROOT / "canon.yaml").read_text())
+        ns_scopes = {
+            "NIKA-PARSE": "YAML parse + envelope validation",
+            "NIKA-DAG": "DAG topology · cycles · invalid deps",
+            "NIKA-VAR": "Variable resolution failures",
+            "NIKA-INFER": "infer: verb errors",
+            "NIKA-EXEC": "exec: verb errors",
+            "NIKA-INVOKE": "invoke: verb errors",
+            "NIKA-AGENT": "agent: verb errors",
+            "NIKA-PROVIDER": "Provider adapter errors",
+            "NIKA-BUILTIN": "Builtin tool errors · per-builtin sub-namespace",
+            "NIKA-MCP": "MCP client errors",
+            "NIKA-SEC": "Security policy violations (SSRF · blocklist)",
+            "NIKA-TIMEOUT": "Task or step timeouts",
+            "NIKA-CANCEL": "Task or workflow cancellation",
+            "NIKA-IMPL": "Engine internal errors",
+        }
+        catalog = {
+            "$schema": "https://nika.sh/schema/errors-catalog.json",
+            "version": 3,
+            "description": ("Nika error catalog · generated from nika-spec canon.yaml "
+                            "(spec/05-errors.md is the prose home · the registry is the "
+                            "v0.1 normative floor · engines may add codes within a "
+                            "namespace · never repurpose). Code format "
+                            "^NIKA-[A-Z]{2,9}(-[A-Z][A-Z0-9_]{1,15})?-[0-9]{3}$."),
+            "spec": "https://github.com/supernovae-st/nika-spec/blob/main/spec/05-errors.md",
+            "namespaces": {n: {"scope": ns_scopes.get(n, ""), "range": "001-099"}
+                           for n in canon["error_namespaces"]["items"]},
+            "categories": canon["error_categories"]["items"],
+            "codes": canon["error_codes"]["items"],
+        }
+        rendered_catalog = json.dumps(catalog, indent=1, ensure_ascii=False) + "\n"
+        if write:
+            catalog_dst.write_text(rendered_catalog)
+            print("✓ wrote website errors catalog · public/errors/catalog.json")
+        elif not catalog_dst.is_file() or catalog_dst.read_text() != rendered_catalog:
+            print("showcase-projector · DRIFT · website public/errors/catalog.json · run --write",
+                  file=sys.stderr)
+            rc = 1
+
+        # Parity check (both modes) · the 05-errors.md prose table rows must
+        # equal the canon registry (code + category + transient · the prose
+        # stays human-authoritative · canon stays machine-SSOT · this binds them).
+        prose = (SPEC_ROOT / "spec" / "05-errors.md").read_text()
+        rows = {}
+        for line in prose.splitlines():
+            if line.startswith("| `NIKA-") and line.count("|") >= 5:
+                cells = [c.strip() for c in line.strip("|").split("|")]
+                code = cells[0].strip("`")
+                cat = cells[2].strip("`")
+                trans = cells[3].replace("`", "").strip()
+                rows[code] = (cat, "engine-assessed" if "assessed" in trans else trans)
+        canon_rows = {e["code"]: (e["category"], e["transient"])
+                      for e in canon["error_codes"]["items"]}
+        if rows != canon_rows:
+            only_prose = sorted(set(rows) - set(canon_rows))
+            only_canon = sorted(set(canon_rows) - set(rows))
+            mismatch = sorted(k for k in set(rows) & set(canon_rows) if rows[k] != canon_rows[k])
+            print(f"showcase-projector · ERROR-REGISTRY PARITY · prose-only={only_prose} "
+                  f"canon-only={only_canon} field-mismatch={mismatch}", file=sys.stderr)
+            rc = 1
+
+    # TARGET 7 · docs error-codes page · managed tables from the canon registry.
+    err_page = docs_root / "reference" / "error-codes.mdx"
+    if err_page.is_file():
+        canon = yaml.safe_load((SPEC_ROOT / "canon.yaml").read_text())
+        cats = canon["error_categories"]["items"]
+        cat_meanings = {
+            "parse_error": "Workflow YAML is malformed or invalid",
+            "validation_error": "Workflow violates a spec rule (cycle · unknown field · …)",
+            "variable_error": "Reference to undefined variable or invalid path",
+            "provider_error": "LLM provider returned an error",
+            "network_error": "Network failure (DNS · TCP · TLS · timeout)",
+            "tool_error": "Builtin or MCP tool returned an error",
+            "process_error": "exec: subprocess failure (non-zero exit · spawn)",
+            "budget_error": "An agent: loop budget exhausted (max_turns · max_tokens_total)",
+            "security_error": "SSRF · blocklist · capability denied",
+            "timeout_error": "Task or step exceeded its timeout",
+            "cancelled": "Workflow or task cancelled",
+            "internal_error": "Engine bug · unexpected state",
+        }
+        cat_tbl = "| Category | Meaning |\n|---|---|\n" + "\n".join(
+            f"| `{c}` | {cat_meanings.get(c, '')} |" for c in cats)
+        code_tbl = "| Code | Failure | Category | `transient` |\n|---|---|---|---|\n" + "\n".join(
+            f"| `{e['code']}` | {e['failure']} | `{e['category']}` | {e['transient']} |"
+            for e in canon["error_codes"]["items"])
+        ns_scopes2 = {
+            "NIKA-PARSE": "YAML parse + envelope validation",
+            "NIKA-DAG": "DAG topology · cycles · invalid deps",
+            "NIKA-VAR": "Variable resolution failures",
+            "NIKA-INFER": "infer: verb errors",
+            "NIKA-EXEC": "exec: verb errors",
+            "NIKA-INVOKE": "invoke: verb errors",
+            "NIKA-AGENT": "agent: verb errors",
+            "NIKA-PROVIDER": "Provider adapter errors",
+            "NIKA-BUILTIN": "Builtin tool errors · per-builtin sub-namespace",
+            "NIKA-MCP": "MCP client errors",
+            "NIKA-SEC": "Security policy violations (SSRF · blocklist)",
+            "NIKA-TIMEOUT": "Task or step timeouts",
+            "NIKA-CANCEL": "Task or workflow cancellation",
+            "NIKA-IMPL": "Engine internal errors",
+        }
+        ns_tbl = "| Namespace | Scope | Range |\n|---|---|---|\n" + "\n".join(
+            f"| `{n}` | {ns_scopes2.get(n, '')} | 001-099 |"
+            for n in canon["error_namespaces"]["items"])
+        page_text = err_page.read_text()
+        new_text = page_text
+        for marker, body in (("errors-categories", cat_tbl),
+                             ("errors-codes", code_tbl),
+                             ("errors-namespaces", ns_tbl)):
+            begin = "{/* " + marker + ":begin */}"
+            end = "{/* " + marker + ":end */}"
+            if begin in new_text and end in new_text:
+                pre = new_text.split(begin)[0]
+                post = new_text.split(end)[1]
+                new_text = pre + begin + "\n" + body + "\n" + end + post
+        if new_text != page_text:
+            if write:
+                err_page.write_text(new_text)
+                print("✓ wrote docs error-codes tables")
+            else:
+                print("showcase-projector · DRIFT · docs reference/error-codes.mdx · run --write",
+                      file=sys.stderr)
+                rc = 1
+        elif write:
+            print("· docs error-codes already in sync")
+
     return rc
 
 
