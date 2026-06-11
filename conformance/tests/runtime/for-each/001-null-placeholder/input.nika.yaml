@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: rt-foreach-null-placeholder
+model: mock/echo
+vars:
+  items: ["alpha", "BOOM", "gamma"]
+tasks:
+  - id: work
+    for_each: ${{ vars.items }}
+    fail_fast: false
+    on_error:
+      recover: null
+    invoke:
+      tool: "nika:assert"
+      args: { condition: "${{ item != 'BOOM' }}", message: "designed per-item failure" }
+  - id: survivors
+    depends_on: [work]
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: ${{ tasks.work.output }}
+        expression: "[ .[] | select(. != null) ] | length"

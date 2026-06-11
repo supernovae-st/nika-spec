@@ -1,0 +1,13 @@
+{
+ "workflow_state": "success",
+ "tasks": {
+  "fetchish": {
+   "status": "success"
+  },
+  "reader": {
+   "status": "success",
+   "output": "cached title"
+  }
+ },
+ "note": "recover substitutes the raw output BEFORE binding extraction (05 §recovery × bindings) · consumers stay shape-stable"
+}

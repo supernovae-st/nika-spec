@@ -1,0 +1,14 @@
+{
+ "workflow_state": "success",
+ "tasks": {
+  "loop": {
+   "status": "skipped",
+   "error_code": "NIKA-AGENT-001"
+  },
+  "reader": {
+   "status": "success",
+   "output": "NIKA-AGENT-001"
+  }
+ },
+ "note": "max_turns exhaustion = typed failure (budget_error · partial in error.details) · here caught by skip · 02 §termination outcomes · mock harness: the mock provider always tool-calls when tools are granted"
+}

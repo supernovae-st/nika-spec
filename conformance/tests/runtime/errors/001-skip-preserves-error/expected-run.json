@@ -1,0 +1,14 @@
+{
+ "workflow_state": "success",
+ "tasks": {
+  "flaky": {
+   "status": "skipped",
+   "error_code": "NIKA-BUILTIN-ASSERT-001"
+  },
+  "router": {
+   "status": "success",
+   "output": "routed on the preserved error"
+  }
+ },
+ "note": "on_error.skip → status skipped WITH the original error readable (05 §Fields · the one state where both coexist)"
+}

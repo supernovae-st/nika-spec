@@ -1,0 +1,13 @@
+{
+ "workflow_state": "success",
+ "tasks": {
+  "work": {
+   "status": "success"
+  },
+  "survivors": {
+   "status": "success",
+   "output": "2"
+  }
+ },
+ "note": "a failed iteration recovers to null AT ITS INDEX (order preserved) · the fan-in filters · 03 §for_each"
+}

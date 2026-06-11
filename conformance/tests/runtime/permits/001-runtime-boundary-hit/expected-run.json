@@ -1,0 +1,13 @@
+{
+ "workflow_state": "failure",
+ "tasks": {
+  "pick": {
+   "status": "success"
+  },
+  "fetcher": {
+   "status": "failure",
+   "error_code": "NIKA-SEC-004"
+  }
+ },
+ "note": "a DYNAMIC fetch url escapes the static PERMITS-FIT host check (deep_static only sees literals) · the runtime boundary catches the resolved host at dispatch (01 §permits · static-then-runtime defense in depth) · tool: ids are always static (the schema forbids expressions there — no dynamic-tool escape exists)"
+}

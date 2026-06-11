@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: rt-foreach-empty-skips
+model: mock/echo
+vars:
+  items: []
+tasks:
+  - id: work
+    for_each: ${{ vars.items }}
+    infer: { prompt: "never runs" }
+  - id: reader
+    depends_on: [work]
+    when: ${{ tasks.work.output == null }}
+    infer: { prompt: "the empty branch" }

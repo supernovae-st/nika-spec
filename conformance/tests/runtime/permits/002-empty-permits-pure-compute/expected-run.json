@@ -1,0 +1,10 @@
+{
+ "workflow_state": "success",
+ "tasks": {
+  "think": {
+   "status": "success",
+   "output": "pure compute · no effects"
+  }
+ },
+ "note": "permits: {} = provably pure compute · infer (+ the model call) is NOT an effect category · 01 §permits"
+}

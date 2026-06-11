@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: rt-foreach-non-array
+model: mock/echo
+vars:
+  not_a_list: "just a string"
+tasks:
+  - id: work
+    for_each: ${{ vars.not_a_list }}
+    infer: { prompt: "never runs" }

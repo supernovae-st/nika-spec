@@ -1,0 +1,13 @@
+{
+ "workflow_state": "success",
+ "tasks": {
+  "work": {
+   "status": "skipped"
+  },
+  "reader": {
+   "status": "success",
+   "output": "the empty branch"
+  }
+ },
+ "note": "empty collection → skipped · a skipped task's .output reads as defined null (04 §defined-null)"
+}

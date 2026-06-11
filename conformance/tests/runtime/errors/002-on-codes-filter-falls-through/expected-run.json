@@ -1,0 +1,10 @@
+{
+ "workflow_state": "failure",
+ "tasks": {
+  "guarded": {
+   "status": "failure",
+   "error_code": "NIKA-BUILTIN-ASSERT-001"
+  }
+ },
+ "note": "on_codes lists only TIMEOUT · an ASSERT failure falls through to the default fail (05 §Fields)"
+}

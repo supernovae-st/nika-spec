@@ -1,0 +1,10 @@
+{
+ "workflow_state": "success",
+ "tasks": {
+  "loop": {
+   "status": "success",
+   "output_contains": "status"
+  }
+ },
+ "note": "nika:done result: becomes .output and schema: validates IT (02 §loop semantics) · mock harness: mock/echo invokes the first granted tool with schema-shaped args"
+}

@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: rt-skip-preserves-error
+model: mock/echo
+tasks:
+  - id: flaky
+    on_error: { skip: true }
+    invoke:
+      tool: "nika:assert"
+      args: { condition: "${{ 1 > 2 }}", message: "designed failure" }
+  - id: router
+    depends_on: [flaky]
+    when: ${{ tasks.flaky.error != null }}
+    infer: { prompt: "routed on the preserved error" }

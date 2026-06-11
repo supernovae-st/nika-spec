@@ -1,0 +1,10 @@
+{
+ "workflow_state": "failure",
+ "tasks": {
+  "work": {
+   "status": "failure",
+   "error_code": "NIKA-VAR-006"
+  }
+ },
+ "note": "for_each over a non-array is an evaluation type error (03 §for_each semantics)"
+}
