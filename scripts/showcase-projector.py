@@ -715,8 +715,13 @@ def main() -> int:
         }
         cat_tbl = "| Category | Meaning |\n|---|---|\n" + "\n".join(
             f"| `{c}` | {cat_meanings.get(c, '')} |" for c in cats)
+        def mdx_cell(text: str) -> str:
+            # MDX parses bare { } in table cells as JSX expressions — escape
+            # them as HTML entities (backtick spans would also work but the
+            # registry text mixes prose + glyphs · entities are uniform).
+            return text.replace("{", "&#123;").replace("}", "&#125;")
         code_tbl = "| Code | Failure | Category | `transient` |\n|---|---|---|---|\n" + "\n".join(
-            f"| `{e['code']}` | {e['failure']} | `{e['category']}` | {e['transient']} |"
+            f"| `{e['code']}` | {mdx_cell(e['failure'])} | `{e['category']}` | {e['transient']} |"
             for e in canon["error_codes"]["items"])
         ns_scopes2 = {
             "NIKA-PARSE": "YAML parse + envelope validation",
