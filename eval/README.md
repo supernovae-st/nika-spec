@@ -26,7 +26,9 @@ condition, [`run-eval.py`](run-eval.py):
 python3 eval/run-eval.py --model haiku --condition both --limit 4
 
 # full grid · then compare models — `<provider>/<name>` mirrors the
-# spec's own `model:` convention (bare name = claude provider)
+# spec's own `model:` convention — EXCEPT a bare name selects the local
+# `claude` CLI adapter (eval-harness convenience · the spec's `model:`
+# field itself always REQUIRES a canonical `<provider>/` prefix)
 python3 eval/run-eval.py --model haiku
 python3 eval/run-eval.py --model gemini/gemini-2.5-flash
 python3 eval/run-eval.py --model openai/gpt-4o-mini

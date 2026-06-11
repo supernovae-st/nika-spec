@@ -14,7 +14,7 @@ every load-bearing pattern: all 4 verbs · `depends_on` · `when` · `for_each`
 (+ `max_parallel` + `fail_fast`) · `retry` · `on_error` · `on_finally` ·
 `with` · `output:` jq binding · `schema:` structured output · the 5
 namespaces · `${{ item }}`/`${{ index }}` loop locals · tool refs. This is the
-**Phase L2 few-shot library** seed (per `nika/hq/blueprint/NIKA_EXECUTION_PHASES.md`):
+**Few-shot library** seed:
 the literal training signal that teaches an LLM to author Nika correctly.
 
 The remaining 19 distill **26 workflows from an earlier Nika prototype** — the

@@ -1,4 +1,0 @@
-{
-  "valid": true,
-  "note": "06-stdlib-contract.md §Namespace ownership · `x-<vendor>:*` is the canonical engine-specific namespace (OpenAPI `x-` extension pattern) · explicitly NOT portable · the schema accepts the shape."
-}

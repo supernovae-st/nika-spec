@@ -29,7 +29,7 @@ template matching the OUTER shape.
    Creativity belongs ONLY in prompts, jq expressions and paths —
    never in structure.
 4. **Check** · `nika check <file>` (engine) or
-   `python conformance/runner.py validate <file>` (spec oracle).
+   `python3 conformance/runner.py validate <file>` (spec oracle).
 5. **Repair** · every error names its rule — fix exactly that, nothing
    else. The recurring ones:
    - `NIKA-DAG-003` → you referenced `${{ tasks.X }}` without
