@@ -10,7 +10,8 @@
 #
 # Demonstrates ·
 #   - sovereignty by default · `ollama/…` because CVs are PII
-#   - `nika:glob` → `for_each` · the candidate pool is the filesystem
+#   - `nika:glob` → `for_each` + `recover: null` · an unreadable CV doesn't
+#     stop the batch · downstream gates by VALUE (`!= null`)
 #   - one rubric, schema-enforced · enums kill « kinda-strong » ratings
 #   - jq `sort_by` ranking · the ORDER is deterministic, not model mood
 #
