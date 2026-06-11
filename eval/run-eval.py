@@ -113,19 +113,34 @@ def _neutral_cwd() -> str:
     return _NEUTRAL_CWD
 
 
+# Strip ANSI/VT escape sequences. Some CLIs (ollama run) emit a progress
+# SPINNER to the pipe even when not a TTY — cursor-hide, line-clear, sync-
+# update + braille frames (^[[?25l ^[[K ^[[?2026h …). Left in, those bytes
+# corrupt the captured YAML (the confounded 0/12 local-model grid · 2026-06-10).
+# Covers CSI (^[[…), the ?-private modes (^[[?2026h), and OSC (^[]…BEL).
+_ANSI = re.compile(r"\x1b(?:\[[0-9;?]*[ -/]*[@-~]|\][^\x07]*\x07|[@-Z\\-_])")
+
+
+def _strip_ansi(s: str) -> str:
+    return _ANSI.sub("", s)
+
+
 def _run_cli(binary: str, argv: list[str], stdin_text: str | None,
-             cwd: str | None = None) -> str:
+             cwd: str | None = None, extra_env: dict | None = None) -> str:
     cli = shutil.which(binary)
     if not cli:
         print(f"env-error · `{binary}` CLI not on PATH — cannot run live eval", file=sys.stderr)
         sys.exit(2)
-    r = subprocess.run([cli, *argv], input=stdin_text, cwd=cwd,
+    import os
+    env = {**os.environ, **extra_env} if extra_env else None
+    r = subprocess.run([cli, *argv], input=stdin_text, cwd=cwd, env=env,
                        capture_output=True, text=True, timeout=CALL_TIMEOUT)
     if r.returncode != 0:
         # some CLIs report the failure on stdout (e.g. billing errors)
-        detail = (r.stderr.strip() or r.stdout.strip())[:200]
+        detail = (_strip_ansi(r.stderr).strip() or _strip_ansi(r.stdout).strip())[:200]
         raise RuntimeError(f"model call failed · exit {r.returncode} · {detail}")
-    return r.stdout
+    # Defensive strip on EVERY adapter — escape bytes are never valid YAML.
+    return _strip_ansi(r.stdout)
 
 
 def call_model(model: str, system: str, prompt: str) -> str:
@@ -145,8 +160,12 @@ def call_model(model: str, system: str, prompt: str) -> str:
         return _run_cli("openai", ["api", "chat.completions.create", "-m", name,
                                    "-g", "system", system, "-g", "user", prompt], None)
     if provider == "ollama":
-        # local · no key · no system slot → system prepended on stdin
-        return _run_cli("ollama", ["run", name], f"{system}\n\n{prompt}")
+        # local · no key · no system slot → system prepended on stdin.
+        # TERM=dumb + NO_COLOR suppress `ollama run`'s progress spinner (it
+        # writes VT escapes to the pipe even when not a TTY · verified
+        # 2026-06-11); _strip_ansi is the belt-and-suspenders backstop.
+        return _run_cli("ollama", ["run", name], f"{system}\n\n{prompt}",
+                        extra_env={"TERM": "dumb", "NO_COLOR": "1"})
     print(f"env-error · unknown provider '{provider}' · known: claude · gemini · openai · ollama",
           file=sys.stderr)
     sys.exit(2)
