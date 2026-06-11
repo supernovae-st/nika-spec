@@ -15,12 +15,22 @@
 #                repair loops needed (≤3 · each loop feeds the exact
 #                error list back) · final validity
 #
-# Model calls go through the `claude` CLI (claude -p · any installed
-# model) — swap MODEL_CMD for another provider's CLI to compare engines.
-# Without a CLI on PATH the harness exits 2 (env) — it never fakes data.
+# Model syntax mirrors the spec's own `model:` convention ·
+# `<provider>/<name>` — providers: claude · gemini · openai · ollama
+# (local). A bare name defaults to the claude provider. Each adapter
+# shells out to that provider's CLI; without it on PATH the harness
+# exits 2 (env) — it never fakes data. A non-zero CLI exit is recorded
+# as DATA (some CLIs print the error on stdout · both streams kept).
+#
+# Auth note (claude) · with ANTHROPIC_API_KEY exported, `claude -p`
+# bills the API key. To use your subscription login instead, strip it
+# at invocation · `env -u ANTHROPIC_API_KEY python3 eval/run-eval.py …`
+# — auth belongs to the caller, the harness never mutates it.
 #
 # Usage ·
 #   python3 eval/run-eval.py --model haiku --condition both [--limit N]
+#   python3 eval/run-eval.py --model ollama/llama3.2:3b
+#   python3 eval/run-eval.py --model gemini/gemini-2.5-flash
 #   python3 eval/run-eval.py --report eval/results/<file>.json
 #
 # Output · eval/results/<ts>-<model>.json + a markdown summary table.
@@ -79,17 +89,64 @@ Fix exactly what the errors name — nothing else. Reply with ONLY the
 corrected YAML file, inside one ```yaml fence."""
 
 
-def call_model(model: str, system: str, prompt: str) -> str:
-    cli = shutil.which("claude")
+CALL_TIMEOUT = 240  # seconds · override with --timeout (local models load slowly)
+
+# Agentic CLIs (claude · gemini) are NOT raw models — run from a repo they
+# load workspace context (CLAUDE.md cascade · tools) and act on it: ask
+# clarifying questions · read the tree · even EXECUTE the intent instead of
+# authoring the workflow (observed empirically · 2026-06-10 haiku grid ·
+# 19/24 replies were agent behavior, one cited « Based on the CLAUDE.md
+# context »). The benchmark measures the MODEL on the PROMPT, so those
+# adapters run context-free: neutral empty cwd · tools disabled · system
+# prompt REPLACED (append leaves the agent persona in charge).
+_NEUTRAL_CWD: str | None = None
+
+
+def _neutral_cwd() -> str:
+    global _NEUTRAL_CWD
+    if _NEUTRAL_CWD is None:
+        import tempfile
+        _NEUTRAL_CWD = tempfile.mkdtemp(prefix="nika-eval-neutral-")
+    return _NEUTRAL_CWD
+
+
+def _run_cli(binary: str, argv: list[str], stdin_text: str | None,
+             cwd: str | None = None) -> str:
+    cli = shutil.which(binary)
     if not cli:
-        print("env-error · `claude` CLI not on PATH — cannot run live eval", file=sys.stderr)
+        print(f"env-error · `{binary}` CLI not on PATH — cannot run live eval", file=sys.stderr)
         sys.exit(2)
-    r = subprocess.run(
-        [cli, "-p", "--model", model, "--append-system-prompt", system],
-        input=prompt, capture_output=True, text=True, timeout=240)
+    r = subprocess.run([cli, *argv], input=stdin_text, cwd=cwd,
+                       capture_output=True, text=True, timeout=CALL_TIMEOUT)
     if r.returncode != 0:
-        raise RuntimeError(f"model call failed · {r.stderr[:200]}")
+        # some CLIs report the failure on stdout (e.g. billing errors)
+        detail = (r.stderr.strip() or r.stdout.strip())[:200]
+        raise RuntimeError(f"model call failed · exit {r.returncode} · {detail}")
     return r.stdout
+
+
+def call_model(model: str, system: str, prompt: str) -> str:
+    provider, _, name = model.partition("/")
+    if not name:
+        provider, name = "claude", model
+    if provider == "claude":
+        # NO --bare · it skips credential loading (« Not logged in » · observed)
+        return _run_cli("claude", ["-p", "--model", name, "--tools", "",
+                                   "--system-prompt", system],
+                        prompt, cwd=_neutral_cwd())
+    if provider == "gemini":
+        # headless mode · no system slot → system prepended to the prompt
+        return _run_cli("gemini", ["-m", name, "-p", f"{system}\n\n{prompt}"],
+                        None, cwd=_neutral_cwd())
+    if provider == "openai":
+        return _run_cli("openai", ["api", "chat.completions.create", "-m", name,
+                                   "-g", "system", system, "-g", "user", prompt], None)
+    if provider == "ollama":
+        # local · no key · no system slot → system prepended on stdin
+        return _run_cli("ollama", ["run", name], f"{system}\n\n{prompt}")
+    print(f"env-error · unknown provider '{provider}' · known: claude · gemini · openai · ollama",
+          file=sys.stderr)
+    sys.exit(2)
 
 
 def extract_yaml(reply: str) -> str | None:
@@ -114,8 +171,9 @@ def validate(text: str, validator, canon) -> list[dict]:
 
 
 def fmt_errors(errors: list[dict]) -> str:
+    # 220 chars keeps the prescriptive tail (path + allowed keys) intact
     return "\n".join(
-        f"- {e.get('code') or e.get('namespace')}: {e.get('detail', '')[:160]}"
+        f"- {e.get('code') or e.get('namespace')}: {e.get('detail', '')[:220]}"
         for e in errors[:8])
 
 
@@ -131,7 +189,10 @@ def run_case(intent: dict, condition: str, model: str, validator, canon) -> dict
     text = extract_yaml(reply)
     for loop_n in range(4):  # first pass + up to 3 repairs
         if text is None:
-            record["loops"].append({"n": loop_n, "errors": ["no yaml fence in reply"]})
+            # keep the reply head — distinguishes a rambling model from a
+            # CLI that reported an error on stdout (limits · billing)
+            record["loops"].append({"n": loop_n, "errors": ["no yaml fence in reply"],
+                                    "reply_head": reply.strip()[:200]})
             break
         errors = validate(text, validator, canon)
         record["loops"].append({"n": loop_n, "error_count": len(errors),
@@ -147,6 +208,9 @@ def run_case(intent: dict, condition: str, model: str, validator, canon) -> dict
     record["first_pass_valid"] = bool(record["loops"]) and record["loops"][0].get("error_count") == 0
     record["final_valid"] = bool(record["loops"]) and record["loops"][-1].get("error_count") == 0
     record["repair_loops_used"] = max(0, len(record["loops"]) - 1)
+    if not record["final_valid"] and text:
+        # keep the failing artifact — clusters are named from evidence, not memory
+        record["final_yaml"] = text[:4000]
     return record
 
 
@@ -164,17 +228,54 @@ def summarize(results: list[dict]) -> str:
     return "\n".join(lines)
 
 
+def clusters(runs: list[dict]) -> str:
+    """Aggregate failure codes across runs · the README's feedback table input."""
+    agg: dict[str, dict] = {}
+    for run in runs:
+        for r in run["results"]:
+            seen_in_record = set()
+            for loop in r.get("loops", []):
+                for code in loop.get("errors", []):
+                    key = code if isinstance(code, str) else str(code)
+                    c = agg.setdefault(key, {"count": 0, "families": set(),
+                                             "conditions": set(), "models": set()})
+                    c["count"] += 1
+                    seen_in_record.add(key)
+            for key in seen_in_record:
+                agg[key]["families"].add(r["family"])
+                agg[key]["conditions"].add(r["condition"])
+                agg[key]["models"].add(run["model"])
+    if not agg:
+        return "(no failures · nothing to cluster)"
+    lines = ["| Code | Hits | Families | Conditions | Models |", "|---|---|---|---|---|"]
+    for code, c in sorted(agg.items(), key=lambda kv: -kv[1]["count"]):
+        lines.append(f"| {code} | {c['count']} | {' '.join(sorted(c['families']))} "
+                     f"| {' '.join(sorted(c['conditions']))} | {' '.join(sorted(c['models']))} |")
+    return "\n".join(lines)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="haiku")
     ap.add_argument("--condition", choices=["protocol", "freeform", "both"], default="both")
     ap.add_argument("--limit", type=int, default=None, help="run only the first N intents")
-    ap.add_argument("--report", help="re-print the summary of an existing results json")
+    ap.add_argument("--timeout", type=int, default=240,
+                    help="per-call timeout in seconds (raise for local models)")
+    ap.add_argument("--report", nargs="+",
+                    help="re-print summary of existing results json(s) · "
+                         "N files → per-model tables + the failure-cluster table")
     args = ap.parse_args()
+    global CALL_TIMEOUT
+    CALL_TIMEOUT = args.timeout
 
     if args.report:
-        data = json.loads(pathlib.Path(args.report).read_text())
-        print(summarize(data["results"]))
+        runs = [json.loads(pathlib.Path(p).read_text()) for p in args.report]
+        for run in runs:
+            print(f"\n## {run['model']}\n")
+            print(summarize(run["results"]))
+        if len(runs) > 1 or any(not r["final_valid"] for run in runs for r in run["results"]):
+            print("\n## failure clusters (codes → the fix lands per eval/README)\n")
+            print(clusters(runs))
         return 0
 
     intents = yaml.safe_load((HERE / "intents.yaml").read_text())["intents"]
@@ -199,8 +300,16 @@ def main() -> int:
     out_dir = HERE / "results"
     out_dir.mkdir(exist_ok=True)
     stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    out = out_dir / f"{stamp}-{args.model}.json"
-    out.write_text(json.dumps({"model": args.model, "results": results}, indent=2))
+    safe_model = re.sub(r"[^A-Za-z0-9._-]+", "-", args.model)
+    out = out_dir / f"{stamp}-{safe_model}.json"
+    oracle_sha = subprocess.run(["git", "-C", str(SPEC_ROOT), "rev-parse", "--short", "HEAD"],
+                                capture_output=True, text=True).stdout.strip() or "unknown"
+    dirty = bool(subprocess.run(["git", "-C", str(SPEC_ROOT), "status", "--porcelain",
+                                 "conformance/", "eval/run-eval.py"],
+                                capture_output=True, text=True).stdout.strip())
+    out.write_text(json.dumps({"model": args.model,
+                               "oracle": oracle_sha + ("-dirty" if dirty else ""),
+                               "results": results}, indent=2))
     print(f"\nwrote {out}\n")
     print(summarize(results))
     return 0

@@ -25,17 +25,24 @@ condition, [`run-eval.py`](run-eval.py):
 # pilot (4 intents × 2 conditions · ~16-24 model calls)
 python3 eval/run-eval.py --model haiku --condition both --limit 4
 
-# full grid · then compare models
+# full grid · then compare models — `<provider>/<name>` mirrors the
+# spec's own `model:` convention (bare name = claude provider)
 python3 eval/run-eval.py --model haiku
-python3 eval/run-eval.py --model sonnet
+python3 eval/run-eval.py --model gemini/gemini-2.5-flash
+python3 eval/run-eval.py --model openai/gpt-4o-mini
+python3 eval/run-eval.py --model ollama/llama3.2:3b   # local · no key
 
 # re-print a past run
 python3 eval/run-eval.py --report eval/results/<file>.json
 ```
 
-Model calls go through the `claude` CLI (`-p` print mode); swap the
-call in `call_model` for any other provider CLI to benchmark engines
-against each other. No CLI, no fabricated numbers — the harness exits.
+Adapters shell out to each provider's CLI (`claude` · `gemini` ·
+`openai` · `ollama`). No CLI, no fabricated numbers — the harness
+exits. A failed call is recorded as data (both output streams kept —
+some CLIs report billing errors on stdout). Auth belongs to the
+caller: with `ANTHROPIC_API_KEY` exported, `claude -p` bills the key;
+`env -u ANTHROPIC_API_KEY python3 eval/run-eval.py …` uses your
+subscription login instead.
 
 ## How the results feed back
 

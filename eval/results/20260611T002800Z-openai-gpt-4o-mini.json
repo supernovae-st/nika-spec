@@ -1,0 +1,755 @@
+{
+  "model": "openai/gpt-4o-mini",
+  "oracle": "44bf15f-dirty",
+  "results": [
+    {
+      "intent": "standup-from-jira",
+      "condition": "protocol",
+      "family": "chain",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": true,
+      "final_valid": true,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "standup-from-jira",
+      "condition": "freeform",
+      "family": "chain",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 14,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 4,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-DAG-003",
+            "NIKA-DAG-003"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 4,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-DAG-003",
+            "NIKA-DAG-003"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 2,
+          "errors": [
+            "NIKA-DAG-003",
+            "NIKA-DAG-003"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "nika: v1\nworkflow: read-jira-tickets-and-summarize\ntasks:\n  - id: read_jira_tickets\n    exec:\n      command: cat /path/to/jira_tickets.json\n  - id: summarize_tickets\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ tasks.read_jira_tickets.output }}\n        filter: '.tickets[] | {id: .id, summary: .summary}'\n  - id: write_summary\n    invoke:\n      tool: nika:write\n      args:\n        path: /path/to/standup_summary.md\n        content: |\n          # Standup Summary\n          ${{ tasks.summarize_tickets.output }}\n"
+    },
+    {
+      "intent": "blog-to-newsletter",
+      "condition": "protocol",
+      "family": "chain",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": true,
+      "final_valid": true,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "blog-to-newsletter",
+      "condition": "freeform",
+      "family": "chain",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 15,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 7,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-DAG-003",
+            "NIKA-VAR",
+            "NIKA-VAR"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 6,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-DAG-003",
+            "NIKA-VAR-001"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "nika: v1\nworkflow: newsletter-generation\ntasks:\n  - id: read_blog_post\n    invoke: \n      command: nika:fetch\n      output: \n        path: \"./blog-post.md\"\n  \n  - id: generate_newsletter\n    infer: \n      prompt: \"Create a newsletter-friendly version of the following blog post: ${{ read_blog_post.output }}\"\n    depends_on: \n      - read_blog_post\n  \n  - id: save_newsletter\n    invoke: \n      command: nika:write\n      output: \n        path: \"./newsletter.md\"\n        content: ${{ tasks.generate_newsletter.output }}\n"
+    },
+    {
+      "intent": "disk-space-alert",
+      "condition": "protocol",
+      "family": "gate-and-act",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": true,
+      "final_valid": true,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "disk-space-alert",
+      "condition": "freeform",
+      "family": "gate-and-act",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 15,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 7,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-DAG-003",
+            "NIKA-DAG-003"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": true,
+      "repair_loops_used": 3
+    },
+    {
+      "intent": "price-drop-ping",
+      "condition": "protocol",
+      "family": "gate-and-act",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": true,
+      "final_valid": true,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "price-drop-ping",
+      "condition": "freeform",
+      "family": "gate-and-act",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 9,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 3,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": true,
+      "repair_loops_used": 2
+    },
+    {
+      "intent": "screenshot-all-pages",
+      "condition": "protocol",
+      "family": "fanout",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": true,
+      "final_valid": true,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "screenshot-all-pages",
+      "condition": "freeform",
+      "family": "fanout",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 18,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 9,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-VAR-001",
+            "NIKA-VAR-001",
+            "NIKA-VAR-001"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 4,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-VAR-001",
+            "NIKA-VAR-001",
+            "NIKA-PROVIDER"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 3,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-DAG-003",
+            "NIKA-DAG-003"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "nika: v1\nworkflow: combined-digest\ntasks:\n  - id: fetch_sitemap\n    exec:\n      command: cat sitemap.txt\n\n  - id: parse_urls\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ tasks.fetch_sitemap.output }}\n        expression: '.urls[]'\n\n  - id: fetch_articles\n    agent:\n      prompt: \"Fetch the articles from the following URLs.\"\n      max_turns: 5\n      tools:\n        - id: fetch_url\n          invoke:\n            tool: nika:fetch\n            args:\n              url: ${{ tasks.parse_urls.output }}\n\n  - id: generate_digest\n    infer:\n      model: openai/gpt-3.5\n      prompt: \"Generate a combined digest of the fetched articles.\"\n      max_tokens: 300\n"
+    },
+    {
+      "intent": "summarize-support-tickets",
+      "condition": "protocol",
+      "family": "fanout",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": true,
+      "final_valid": true,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "summarize-support-tickets",
+      "condition": "freeform",
+      "family": "fanout",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 9,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 4,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 2,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PROVIDER"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-BUILTIN"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "nika: v1\nworkflow: summarize-tickets-weekly-report\ntasks:\n  - id: collect_ticket_files\n    exec: \n      command: ls /path/to/tickets/*.txt\n\n  - id: summarize_tickets\n    agent: \n      max_tokens_total: 1000\n      max_turns: 3\n      model: openai/gpt-3.5-turbo\n      prompt: \"Please summarize the following ticket content: ${{ ticket_content }}\"\n      temperature: 0.7\n      tools: []\n\n  - id: generate_weekly_report\n    invoke: \n      tool: nika:write\n      args: \n        summaries: ${{ merged_summaries }}\n"
+    },
+    {
+      "intent": "sync-new-invoices",
+      "condition": "protocol",
+      "family": "etl-state",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": true,
+      "final_valid": true,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "sync-new-invoices",
+      "condition": "freeform",
+      "family": "etl-state",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 11,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 6,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-VAR-001",
+            "NIKA-VAR"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 1,
+          "errors": [
+            "NIKA-VAR"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-VAR"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "nika: v1\nworkflow: fetch-new-invoices\ntasks:\n  - id: fetch_invoices\n    invoke:\n      tool: nika:fetch\n      args:\n        url: \"https://api.example.com/invoices\"\n\n  - id: filter_new_invoices\n    exec:\n      command: |\n        jq '[.invoices[] | select(.created_at > \"${{ last_run_time }}\")]' invoices.json > filtered_invoices.json\n\n  - id: process_invoices\n    agent:\n      prompt: \"Process the following invoices: ${{ file('filtered_invoices.json') }}\"\n"
+    },
+    {
+      "intent": "changelog-watcher",
+      "condition": "protocol",
+      "family": "etl-state",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": true,
+      "final_valid": true,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "changelog-watcher",
+      "condition": "freeform",
+      "family": "etl-state",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 18,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 6,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-VAR-001",
+            "NIKA-VAR-001"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 2,
+          "errors": [
+            "NIKA-VAR-001",
+            "NIKA-VAR-001"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 2,
+          "errors": [
+            "NIKA-DAG-003",
+            "NIKA-DAG-003"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "nika: v1\nworkflow: track-vendor-releases\ntasks:\n  - id: check_releases\n    invoke:\n      tool: nika:fetch\n      args:\n        url: \"https://vendor.example.com/releases\"\n      \n  - id: compare_releases\n    exec: \n      command: \"diff previous_releases.txt current_releases.txt\"\n    \n  - id: write_note\n    invoke:\n      tool: nika:write\n      args:\n        file: \"release_notes.txt\"\n        content: \"New releases detected:\\n${{ tasks.compare_releases.output }}\"\n  \n  - id: update_releases\n    invoke:\n      tool: nika:write\n      args:\n        file: \"previous_releases.txt\"\n        content: \"${{ tasks.check_releases.output }}\"\n"
+    },
+    {
+      "intent": "research-competitor",
+      "condition": "protocol",
+      "family": "agent-loop",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": true,
+      "final_valid": true,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "research-competitor",
+      "condition": "freeform",
+      "family": "agent-loop",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 13,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 5,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-VAR-001",
+            "NIKA-VAR-001"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 2,
+          "errors": [
+            "NIKA-DAG-003",
+            "NIKA-DAG-003"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": true,
+      "repair_loops_used": 3
+    },
+    {
+      "intent": "codebase-todo-audit",
+      "condition": "protocol",
+      "family": "agent-loop",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": true,
+      "final_valid": true,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "codebase-todo-audit",
+      "condition": "freeform",
+      "family": "agent-loop",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 7,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PROVIDER"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PROVIDER"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": true,
+      "repair_loops_used": 2
+    },
+    {
+      "intent": "deploy-with-approval",
+      "condition": "protocol",
+      "family": "human-gated-ship",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": true,
+      "final_valid": true,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "deploy-with-approval",
+      "condition": "freeform",
+      "family": "human-gated-ship",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 17,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 5,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-VAR"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": true,
+      "repair_loops_used": 2
+    },
+    {
+      "intent": "publish-docs-release",
+      "condition": "protocol",
+      "family": "human-gated-ship",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": true,
+      "final_valid": true,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "publish-docs-release",
+      "condition": "freeform",
+      "family": "human-gated-ship",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 15,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 2,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": true,
+      "repair_loops_used": 2
+    }
+  ]
+}

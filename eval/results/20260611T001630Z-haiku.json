@@ -1,0 +1,575 @@
+{
+  "model": "haiku",
+  "oracle": "44bf15f-dirty",
+  "results": [
+    {
+      "intent": "standup-from-jira",
+      "condition": "protocol",
+      "family": "chain",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": true,
+      "final_valid": true,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "standup-from-jira",
+      "condition": "freeform",
+      "family": "chain",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 24,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 13,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-VAR-001"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 7,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-VAR-001",
+            "NIKA-VAR-001",
+            "NIKA-VAR-001",
+            "NIKA-VAR-001",
+            "NIKA-VAR-001",
+            "NIKA-VAR"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "nika: v1\nworkflow: daily-jira-standup\n\ntasks:\n  - id: get_date\n    exec:\n      command: date +%Y-%m-%d\n\n  - id: fetch_jira_export\n    invoke:\n      tool: nika:fetch\n      args:\n        path: ${{ jira_export_path != '' ? jira_export_path : './jira-export.json' }}\n\n  - id: filter_open_tickets\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ fetch_jira_export.result }}\n        query: >\n          [.issues[] | \n           select(.fields.status.name as $s | \n                  $s == \"Open\" or $s == \"In Progress\" or $s == \"To Do\") |\n           {\n             key: .key,\n             summary: .fields.summary,\n             status: .fields.status.name,\n             assignee: (.fields.assignee.displayName // \"Unassigned\"),\n             priority: .fields.priority.name\n           }] |\n          group_by(.assignee) |\n          map({assignee: .[0].assignee, tickets: .})\n\n  - id: generate_standup\n    infer: |\n      Create a brief daily standup summary from these grouped Jira tickets:\n      \n      ${{ filter_open_tickets.result }}\n      \n      Format as markdown with:\n      - Header: \"Daily Standup - ${{ get_date.stdout }}\"\n      - Team members listed with their assigned tickets\n      - Each ticket: [KEY] Summary (Priority)\n      - Separate \"Blockers\" section for Critical/High priority items\n      - Keep under 200 words, suitable for quick standup reading\n      \n      Return only the markdown content, no additional commentary.\n\n  - id: save_standup\n    invoke:\n      tool: nika:write\n      args:\n        path: standup-${{ get_date.stdout }}.md\n        content: ${{ generate_standup.text }}\n"
+    },
+    {
+      "intent": "blog-to-newsletter",
+      "condition": "protocol",
+      "family": "chain",
+      "loops": [
+        {
+          "n": 0,
+          "errors": [
+            "no yaml fence in reply"
+          ],
+          "reply_head": "I'll create a Nika workflow for this, but I need a couple of clarifications first:\n\n1. **Input blog post file path**: Where is the blog post located? (e.g., `./blog-post.md`, `./content/posts/my-artic"
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "blog-to-newsletter",
+      "condition": "freeform",
+      "family": "chain",
+      "loops": [
+        {
+          "n": 0,
+          "errors": [
+            "no yaml fence in reply"
+          ],
+          "reply_head": "I need to clarify a few things before I proceed with this task:\n\n1. **Blog Post File**: What's the path to the blog post file you want me to convert? (or would you like to paste the content?)\n\n2. **Ne"
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "disk-space-alert",
+      "condition": "protocol",
+      "family": "gate-and-act",
+      "loops": [
+        {
+          "n": 0,
+          "errors": [
+            "no yaml fence in reply"
+          ],
+          "reply_head": "I'll help you create a Nika workflow to monitor disk usage and send webhook alerts. Before I author the workflow, I need a few details:\n\n1. **Disk usage endpoint**: What's the URL of your monitoring A"
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "disk-space-alert",
+      "condition": "freeform",
+      "family": "gate-and-act",
+      "loops": [
+        {
+          "n": 0,
+          "errors": [
+            "no yaml fence in reply"
+          ],
+          "reply_head": "I need some additional information to create a working Nika workflow for you:\n\n1. **Monitoring API endpoint**: What's the full URL to your disk usage endpoint? (e.g., `https://api.example.com/metrics/"
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "price-drop-ping",
+      "condition": "protocol",
+      "family": "gate-and-act",
+      "loops": [
+        {
+          "n": 0,
+          "errors": [
+            "no yaml fence in reply"
+          ],
+          "reply_head": "I need a few clarifications before generating your Nika workflow:\n\n1. **API Endpoint**: What's the URL of the product API you want to watch? (e.g., `https://api.example.com/product/12345`)\n\n2. **Price"
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "price-drop-ping",
+      "condition": "freeform",
+      "family": "gate-and-act",
+      "loops": [
+        {
+          "n": 0,
+          "errors": [
+            "no yaml fence in reply"
+          ],
+          "reply_head": "I need a few clarifications to create an effective monitoring workflow for you:\n\n1. **Product API Details**:\n   - What's the API endpoint URL?\n   - How is the price field accessed in the response? (e."
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "screenshot-all-pages",
+      "condition": "protocol",
+      "family": "fanout",
+      "loops": [
+        {
+          "n": 0,
+          "errors": [
+            "no yaml fence in reply"
+          ],
+          "reply_head": "I want to help you create a **Nika workflow** for this task using the fanout pattern. Before I author it, I need to clarify a few things:\n\n## \ud83d\udd34 Questions (Architecture)\n\n1. **Sitemap source**: Where i"
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "screenshot-all-pages",
+      "condition": "freeform",
+      "family": "fanout",
+      "loops": [
+        {
+          "n": 0,
+          "errors": [
+            "no yaml fence in reply"
+          ],
+          "reply_head": "I'd like to clarify a few things before I create a Nika workflow for this task:\n\n1. **Sitemap location**: What's the URL of your sitemap? (e.g., `https://example.com/sitemap.xml`)\n\n2. **\"Changed\" refe"
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "summarize-support-tickets",
+      "condition": "protocol",
+      "family": "fanout",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": true,
+      "final_valid": true,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "summarize-support-tickets",
+      "condition": "freeform",
+      "family": "fanout",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 16,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 13,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 6,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-VAR-001",
+            "NIKA-VAR-001",
+            "NIKA-VAR",
+            "NIKA-VAR",
+            "NIKA-VAR"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": true,
+      "repair_loops_used": 3
+    },
+    {
+      "intent": "sync-new-invoices",
+      "condition": "protocol",
+      "family": "etl-state",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": true,
+      "final_valid": true,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "sync-new-invoices",
+      "condition": "freeform",
+      "family": "etl-state",
+      "loops": [
+        {
+          "n": 0,
+          "errors": [
+            "no yaml fence in reply"
+          ],
+          "reply_head": "Looking at your request, I need to ask some clarifying questions before authoring the workflow. Following the **\ud83d\udd34 ASK** principle from your instructions:\n\n## Clarifications needed:\n\n1. **Which billing"
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "changelog-watcher",
+      "condition": "protocol",
+      "family": "etl-state",
+      "loops": [
+        {
+          "n": 0,
+          "errors": [
+            "no yaml fence in reply"
+          ],
+          "reply_head": "Looking at your request, I need to clarify a few details before instantiating the template to ensure the workflow matches your vendor setup exactly:\n\n1. **Vendor & Feed Source**\n   - Which vendor's re"
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "changelog-watcher",
+      "condition": "freeform",
+      "family": "etl-state",
+      "loops": [
+        {
+          "n": 0,
+          "errors": [
+            "no yaml fence in reply"
+          ],
+          "reply_head": "I need to ask a few clarifying questions before I write the workflow, as this affects the design:\n\n**\ud83d\udd34 Key Details Needed:**\n\n1. **The vendor's releases feed**: What's the feed URL? (RSS, GitHub relea"
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "research-competitor",
+      "condition": "protocol",
+      "family": "agent-loop",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": true,
+      "final_valid": true,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "research-competitor",
+      "condition": "freeform",
+      "family": "agent-loop",
+      "loops": [
+        {
+          "n": 0,
+          "errors": [
+            "no yaml fence in reply"
+          ],
+          "reply_head": "I need to clarify a few things before creating a Nika workflow for this task:\n\n1. **Which competitor?** (e.g., company name and/or specific product line)\n2. **Which quarter?** (You mentioned \"this qua"
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "codebase-todo-audit",
+      "condition": "protocol",
+      "family": "agent-loop",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": true,
+      "final_valid": true,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "codebase-todo-audit",
+      "condition": "freeform",
+      "family": "agent-loop",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 2,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 2,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": true,
+      "repair_loops_used": 2
+    },
+    {
+      "intent": "deploy-with-approval",
+      "condition": "protocol",
+      "family": "human-gated-ship",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": true,
+      "final_valid": true,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "deploy-with-approval",
+      "condition": "freeform",
+      "family": "human-gated-ship",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 14,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 5,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 8,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 2,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "nika: v1\nworkflow: test-deploy-notify\n\ntasks:\n  - id: run_tests\n    exec:\n      command: npm test\n\n  - id: run_linter\n    exec:\n      command: npm run lint\n\n  - id: confirm_deployment\n    infer:\n      prompt: \"Tests and linter have completed successfully. Do you want to proceed with the deployment?\"\n    depends_on:\n      - run_tests\n      - run_linter\n\n  - id: deploy\n    exec:\n      command: ./deploy.sh\n    depends_on: [confirm_deployment]\n\n  - id: notify_team_success\n    invoke:\n      tool: slack\n      args:\n        channel: team\n        message: \"\u2705 Deployment completed successfully!\"\n    depends_on: [deploy]\n\n  - id: notify_team_failure\n    invoke:\n      tool: slack\n      args:\n        channel: team\n        message: \"\u274c Deployment cancelled or failed. Manual review needed.\"\n    on_error:\n      skip: true\n"
+    },
+    {
+      "intent": "publish-docs-release",
+      "condition": "protocol",
+      "family": "human-gated-ship",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 0,
+          "errors": []
+        }
+      ],
+      "first_pass_valid": true,
+      "final_valid": true,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "publish-docs-release",
+      "condition": "freeform",
+      "family": "human-gated-ship",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 14,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 15,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 5,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-VAR-001"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "nika: v1\nworkflow: docs-build-publish-verify\nenv:\n  DOCS_LIVE_URL: https://docs.example.com\n\ntasks:\n  - id: build_docs\n    exec:\n      command: npm run build\n    on_error:\n      fail_workflow: true\n\n  - id: check_build_passed\n    exec:\n      command: test -d dist && echo \"\u2713 Build artifacts verified\"\n    on_error:\n      fail_workflow: true\n\n  - id: get_human_signoff\n    agent:\n      prompt: |\n        Build completed successfully and verified.\n        Build artifacts are ready for production deployment.\n        \n        Please review and confirm approval to publish.\n\n  - id: publish_docs\n    exec:\n      command: npm run deploy\n    on_error:\n      fail_workflow: true\n\n  - id: verify_live_version\n    invoke:\n      tool: nika:fetch\n      with:\n        url: ${{ env.DOCS_LIVE_URL }}\n        retryAttempts: 5\n        retryDelaySeconds: 10\n\n  - id: confirm_deployment_success\n    infer:\n      prompt: |\n        Deployment verification complete.\n        \n        Summary:\n        - Build: \u2713 Passed\n        - Review: \u2713 Approved\n        - Published: \u2713 Deployed\n        - Live verification: \u2713 Confirmed\n        \n        Docs site is now live and verified matching the build.\n"
+    }
+  ]
+}
