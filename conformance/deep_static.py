@@ -22,6 +22,15 @@
 #   SCHEMA-META   every `schema:` block (infer/agent · nika:validate arg)
 #                 must itself be a VALID JSON Schema (Draft 2020-12
 #                 check_schema)
+#   WHEN-FORM     `when:` must be a `${{ }}` CEL string OR a YAML boolean
+#                 (03-dag §when: shape rules) · a bare non-${{ }} string
+#                 is silently-never-an-expression · rejected
+#   OUTPUT-PURE   `output:` binding values are pure jq · `${{ }}` never
+#                 appears inside them (04 §binding rules)
+#   BUILTIN-SHAPE nika:write requires `content:` (a write with nothing to
+#                 write is an authoring bug) · nika:done is valid only
+#                 inside an agent tools whitelist · never a standalone
+#                 invoke (02 §loop semantics · NIKA-BUILTIN-DONE-001)
 #
 # Emitted errors reuse the canonical namespaces (NIKA-VAR for expression
 # surface · NIKA-PARSE for shape rules · runner-protocol.md matching).
@@ -320,5 +329,60 @@ def deep_static_errors(doc: dict) -> list[dict]:
         inv = t.get("invoke")
         if isinstance(inv, dict) and inv.get("tool") == "nika:validate":
             check_schema(f"task '{tid}' validate.schema", (inv.get("args") or {}).get("schema"))
+
+    # WHEN-FORM · ${{ }} string or YAML boolean · a bare string is never an expression
+    def check_when(where: str, w):
+        if w is None or isinstance(w, bool):
+            return
+        if isinstance(w, str) and not EXPR_BODY.search(w):
+            errs.append({"namespace": "NIKA-VAR", "category": "validation_error",
+                         "detail": f"{where} · when: must be a ${{{{ }}}} CEL expression "
+                                   f"or the YAML boolean true/false · bare string {w[:40]!r} "
+                                   "is never evaluated (03-dag §when: shape rules)"})
+
+    for t in tasks:
+        if not isinstance(t, dict):
+            continue
+        tid = t.get("id")
+        check_when(f"task '{tid}'", t.get("when"))
+        for i, step in enumerate(t.get("on_finally") or []):
+            if isinstance(step, dict):
+                check_when(f"task '{tid}' on_finally[{i}]", step.get("when"))
+
+    # OUTPUT-PURE · binding values are pure jq over the task's own raw output
+    for t in tasks:
+        if not isinstance(t, dict):
+            continue
+        tid = t.get("id")
+        out = t.get("output")
+        if isinstance(out, dict):
+            for name, expr in out.items():
+                if isinstance(expr, str) and EXPR_BODY.search(expr):
+                    errs.append({"namespace": "NIKA-VAR", "category": "validation_error",
+                                 "detail": f"task '{tid}' output.{name} · ${{{{ }}}} never "
+                                           "appears inside an output: binding · bindings are "
+                                           "pure jq over the task's own raw output · shape the "
+                                           "verb's INPUT with ${{ }} instead (04 §binding rules)"})
+
+    # BUILTIN-SHAPE · write needs content · done never stands alone
+    for t in tasks:
+        if not isinstance(t, dict):
+            continue
+        tid = t.get("id")
+        inv = t.get("invoke")
+        if not isinstance(inv, dict):
+            continue
+        tool = inv.get("tool")
+        args = inv.get("args")
+        if tool == "nika:write" and isinstance(args, dict) and "content" not in args:
+            errs.append({"namespace": "NIKA-BUILTIN", "category": "validation_error",
+                         "detail": f"task '{tid}' · nika:write requires a content: arg "
+                                   "(a write with nothing to write · builtins-v0.1.md)"})
+        if tool == "nika:done":
+            errs.append({"code": "NIKA-BUILTIN-DONE-001", "namespace": "NIKA-BUILTIN",
+                         "category": "validation_error",
+                         "detail": f"task '{tid}' · nika:done is the agent-loop completion "
+                                   "sentinel · valid ONLY inside an agent: tools whitelist · "
+                                   "never a standalone invoke (02 §loop semantics)"})
 
     return errs

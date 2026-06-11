@@ -107,6 +107,24 @@ def stdlib_surface_errors(doc: dict, canon: dict) -> list[dict]:
     - a `jq:` fetch argument is only valid with `mode: jq` (builtins-v0.1.md)
     Dynamic values (`${{ }}`) are skipped · runtime's job."""
     errs: list[dict] = []
+
+    def check_model(where: str, model):
+        if not _is_static(model):
+            return
+        prefix, sep, _name = model.partition("/")
+        if not sep or not _name:
+            errs.append({"namespace": "NIKA-PROVIDER", "category": "validation_error",
+                         "detail": f"{where} · model '{model}' is not '<provider>/<name>' · "
+                                   "the provider is the prefix (providers-v0.1.md)"})
+        elif prefix not in canon["providers"]:
+            valid = " · ".join(sorted(canon["providers"]))
+            errs.append({"namespace": "NIKA-PROVIDER", "category": "validation_error",
+                         "detail": f"{where} · unknown provider prefix '{prefix}' · "
+                                   f"canonical v0.1 prefixes: {valid} (canon.yaml)"})
+
+    # the ENVELOPE default model — the template slot every author fills first
+    check_model("(envelope) model", doc.get("model"))
+
     tasks = doc.get("tasks") or []
     if not isinstance(tasks, list):
         return errs
@@ -116,18 +134,8 @@ def stdlib_surface_errors(doc: dict, canon: dict) -> list[dict]:
         where = f"task '{t.get('id')}'"
         for verb in ("infer", "agent"):
             body = t.get(verb)
-            model = body.get("model") if isinstance(body, dict) else None
-            if not _is_static(model):
-                continue
-            prefix, sep, _name = model.partition("/")
-            if not sep or not _name:
-                errs.append({"namespace": "NIKA-PROVIDER", "category": "validation_error",
-                             "detail": f"{where} · model '{model}' is not '<provider>/<name>' · "
-                                       "the provider is the prefix (providers-v0.1.md)"})
-            elif prefix not in canon["providers"]:
-                errs.append({"namespace": "NIKA-PROVIDER", "category": "validation_error",
-                             "detail": f"{where} · unknown provider prefix '{prefix}' · "
-                                       "not a canonical stdlib v0.1 provider (canon.yaml)"})
+            if isinstance(body, dict):
+                check_model(f"{where} {verb}.model", body.get("model"))
         inv = t.get("invoke")
         if isinstance(inv, dict) and inv.get("tool") == "nika:fetch":
             args = inv.get("args")
@@ -311,15 +319,22 @@ def cross_ref_errors(doc: dict) -> list[dict]:
                              "detail": f"duplicate task id '{i}'"})
             seen.add(i)
 
+    # Non-string depends_on entries (a mapping · a number) are schema-layer
+    # violations · this layer must SURVIVE them (collected verdict · no crash).
+    def _deps(t: dict) -> list[str]:
+        raw = t.get("depends_on") or []
+        return [d for d in raw if isinstance(d, str)] if isinstance(raw, list) else []
+
     # NIKA-DAG-002 · depends_on references an undeclared task
     for t in tasks:
-        for dep in (t.get("depends_on") or []):
+        for dep in _deps(t):
             if dep not in idset:
                 errs.append({"code": "NIKA-DAG-002", "category": "validation_error",
                              "detail": f"task '{t.get('id')}' depends_on undeclared '{dep}'"})
 
     # NIKA-DAG-001 · cycle in depends_on (DFS)
-    graph = {t.get("id"): list(t.get("depends_on") or []) for t in tasks if isinstance(t, dict)}
+    graph = {t.get("id"): _deps(t) for t in tasks
+             if isinstance(t, dict) and isinstance(t.get("id"), str)}
     WHITE, GREY, BLACK = 0, 1, 2
     color = {n: WHITE for n in graph}
 
@@ -344,7 +359,7 @@ def cross_ref_errors(doc: dict) -> list[dict]:
     for t in tasks:
         if not isinstance(t, dict):
             continue
-        declared = set(t.get("depends_on") or [])
+        declared = set(_deps(t))
         refs: set[str] = set()
         for field in DAG_EDGE_FIELDS:
             refs |= _expr_task_refs(t.get(field))
@@ -355,14 +370,17 @@ def cross_ref_errors(doc: dict) -> list[dict]:
                                    f"without depends_on:[{r}]"})
 
     # NIKA-VAR-001 + unclosed-`${{` · resolve every `${{ }}` reference statically
-    vars_keys = set((doc.get("vars") or {}).keys())
-    env_keys = set((doc.get("env") or {}).keys())
-    secrets_keys = set((doc.get("secrets") or {}).keys())
+    def _keys(v) -> set:
+        return set(v.keys()) if isinstance(v, dict) else set()
+
+    vars_keys = _keys(doc.get("vars"))
+    env_keys = _keys(doc.get("env"))
+    secrets_keys = _keys(doc.get("secrets"))
     for t in tasks:
         if not isinstance(t, dict):
             continue
         scopes = {"vars": vars_keys, "env": env_keys, "secrets": secrets_keys,
-                  "tasks": idset, "with": set((t.get("with") or {}).keys()),
+                  "tasks": idset, "with": _keys(t.get("with")),
                   "in_for_each": "for_each" in t}
         where = f"task '{t.get('id')}'"
         errs.extend(_resolution_errors(t, scopes, where))
@@ -388,8 +406,36 @@ def validate_workflow(doc: dict, validator: Draft202012Validator,
     errs: list[dict] = []
     for e in validator.iter_errors(doc):
         # Schema violations are spec-rule violations · NIKA-PARSE / validation_error.
+        # The detail is prescriptive on purpose (repair loops converge on it) ·
+        # WHERE the violation sits + WHAT the schema allows there.
+        where = "".join(f"[{p}]" if isinstance(p, int) else f".{p}"
+                        for p in e.absolute_path).lstrip(".") or "(root)"
+        detail = f"{where} · {e.message}"
+        if e.validator == "pattern" and where.endswith(".id"):
+            detail = (f"{where} · {e.instance!r} is not snake_case · task ids match "
+                      "^[a-z][a-z0-9_]*$ (lowercase · digits · underscores · NO hyphens — "
+                      "a hyphen is CEL subtraction · 03-dag §id)")
+        elif e.validator == "type" and where.endswith(".timeout") and isinstance(e.instance, (int, float)):
+            detail = (f"{where} · timeout must be a QUOTED Go-duration string · "
+                      f"write \"{e.instance}s\" not {e.instance} (03-dag §timeout)")
+        elif e.validator == "additionalProperties" and isinstance(e.schema, dict):
+            allowed = sorted(e.schema.get("properties", {}))
+            if allowed:
+                detail += f" · allowed keys: {' · '.join(allowed)}"
+        elif e.validator in ("oneOf", "anyOf"):
+            # name the choice instead of dumping the instance · when every
+            # branch is a bare {required:[k]} the rule IS « exactly one of » ·
+            # the recurring case: a task must carry exactly one verb key
+            branches = e.validator_value if isinstance(e.validator_value, list) else []
+            keys = [b["required"][0] for b in branches
+                    if isinstance(b, dict) and list(b) == ["required"]
+                    and isinstance(b.get("required"), list) and len(b["required"]) == 1]
+            if len(keys) == len(branches) and keys:
+                got = " · ".join(sorted(e.instance)) if isinstance(e.instance, dict) else "?"
+                detail = (f"{where} · must carry exactly one of: {' · '.join(keys)} "
+                          f"(as a key) · got keys: {got}")
         errs.append({"namespace": "NIKA-PARSE", "category": "validation_error",
-                     "detail": e.message})
+                     "detail": detail})
     errs.extend(cross_ref_errors(doc))
     errs.extend(deep_static_errors(doc))
     if canon is not None:

@@ -1,0 +1,5 @@
+nika: v1
+workflow: core-mcp-no-slash
+tasks:
+  - id: q
+    invoke: { tool: "mcp:postgres", args: { sql: "SELECT 1" } }

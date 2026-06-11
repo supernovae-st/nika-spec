@@ -1,0 +1,19 @@
+# Adversarial shape · depends_on entries that are not strings (a mapping ·
+# a number). The schema layer flags them · every later layer must SURVIVE
+# them and still produce a collected verdict (oracle crash = conformance bug).
+nika: v1
+workflow: malformed-depends-on
+description: "non-string depends_on entries must not crash the oracle"
+
+tasks:
+  - id: gather
+    invoke:
+      tool: "nika:read"
+      args: { path: "./input.txt" }
+
+  - id: think
+    depends_on:
+      - { task: gather }
+      - 42
+    infer:
+      prompt: "Summarize · ${{ tasks.gather.output }}"

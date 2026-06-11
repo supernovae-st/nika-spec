@@ -1,0 +1,7 @@
+nika: v1
+workflow: core-secret-bad
+secrets:
+  api_key: {}
+tasks:
+  - id: go
+    infer: { prompt: "x" }
