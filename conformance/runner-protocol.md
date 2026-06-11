@@ -28,23 +28,72 @@ conformance/tests/<level>/<group>/<NNN-name>/
     { "code": "NIKA-DAG-001",            //   match by exact code when given …
       "category": "validation_error" }   //   … OR by namespace + category when only those are given
   ],
-  "mode": "strict",                      // optional · the engine mode this fixture asserts (default: strict · the test default)
   "note": "human-readable rationale"     // optional · documentation only · not asserted
 }
 ```
 
-An error entry matches an emitted engine error when ·
-- it has a `code` and the emitted error's code equals it, **OR**
-- it has a `namespace` and the emitted code starts with `<namespace>-`, and (if present) the `category` matches.
+(A `mode:` field appeared in early fixtures · it is **reserved, never
+asserted** by the reference runner — strict mode is the test default.)
+
+### The emitted wire shape
+
+A conformant validator emits ·
+
+```json
+{ "valid": false,
+  "errors": [
+    { "namespace": "NIKA-VAR", "category": "validation_error", "detail": "…" },
+    { "code": "NIKA-BUILTIN-DONE-001", "namespace": "NIKA-BUILTIN",
+      "category": "validation_error", "detail": "…" }
+  ] }
+```
+
+Each error carries `namespace` + `category` (+ `code` when an exact
+registered code applies) + a prescriptive `detail` (repair loops converge
+on it).
+
+### Matching rule (an expected entry vs the emitted set)
+
+An expected entry **matches** when ANY of ·
+- it has a `code` and an emitted error's `code` equals it;
+- it has a `namespace` and EITHER an emitted `code` starts with
+  `<namespace>-` OR an emitted `namespace` equals it (most static-layer
+  errors carry `namespace` without an exact `code` — `category` is
+  **advisory** on this path · asserted only via the category-only form
+  below);
+- it has ONLY a `category` and an emitted error's `category` equals it.
+
+## Suite layout · the tiers the reference runner executes
+
+```
+conformance/tests/core/      schema shape · DAG cross-refs · variables · errors
+conformance/tests/deep/      the deep-static layer · CEL EBNF parse · jq compile ·
+                             durations · schema-meta · when-form · binding purity ·
+                             builtin arg shapes (jq expression · wait XOR · write
+                             content · done placement)
+conformance/tests/stdlib/    stdlib static surface · provider prefixes · extract
+                             modes · builtin names (canon.yaml-derived)
+```
+
+(`tests/runtime/` is reserved · behavioral fixtures land with the reference
+engine's vertical slice · [07](../spec/07-conformance.md#suite-status--v01-honest).)
+
+Runner subcommands · `validate <file>` (one verdict JSON) · `run <dir>`
+(one tier) · `examples <dir>` (every example must validate) · **`all`**
+(the CI gate · core + stdlib + deep + examples + showcase + templates ·
+exit non-zero on any failure).
 
 ## Pass criteria (per fixture)
 
 1. Parse + statically validate `input.yaml`.
 2. If `expected.valid == true` · the engine MUST accept (zero errors).
-3. If `expected.valid == false` · the engine MUST reject, and **at least one**
-   emitted error MUST match **at least one** entry in `expected.errors`.
-4. Runtime/Stdlib fixtures additionally compare execution output (a future
-   `output.json` companion · uses the `mock` provider for determinism).
+3. If `expected.valid == false` · the engine MUST reject, and **EVERY
+   entry** in `expected.errors` MUST match the emitted set (per the
+   matching rule above) — a fixture listing two expected errors asserts
+   both.
+4. Stdlib BEHAVIORAL fixtures (post-announce) additionally compare
+   execution output (a future `output.json` companion · the `mock`
+   provider for determinism).
 
 The engine MUST exit non-zero if any fixture in the claimed level fails.
 

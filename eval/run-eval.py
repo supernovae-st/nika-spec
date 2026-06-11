@@ -62,9 +62,12 @@ instantiated, never invented.
    Creativity belongs ONLY in prompts, jq expressions and paths.
 3. Hard rules the validator enforces: one verb per task · snake_case
    task ids · kebab-case workflow: · every ${{ tasks.X }} reference
-   REQUIRES depends_on: [X] · when: must be a CEL boolean · size() is
-   the only CEL function · nika:write needs content: · nika:done only
-   inside agent.tools.
+   REQUIRES depends_on: [X] · when: is a ${{ }} CEL boolean or the
+   literal true/false (a bare string is rejected) · size() is the only
+   CEL function · nika:jq's arg is `expression:` (never query/expr) ·
+   nika:wait takes duration: XOR until: · nika:write needs content: ·
+   nika:done only inside agent.tools · output: bindings are pure jq
+   (never ${{ }} inside them) · timeout is a QUOTED Go-duration.
 
 Reply with ONLY the final YAML file, inside one ```yaml fence.
 
@@ -177,15 +180,38 @@ def fmt_errors(errors: list[dict]) -> str:
         for e in errors[:8])
 
 
+ROUTING_SYSTEM = """You author Nika workflows by the deterministic protocol — but FIRST
+you must ROUTE: pick the ONE canonical template family for the job from
+the routing table below, then instantiate it mentally (you know the 6
+skeleton shapes: chain · gate-and-act · fanout · etl-state · agent-loop ·
+human-gated-ship).
+
+ROUTING TABLE:
+{routing}
+
+Reply with the family name on the FIRST line (exactly one of the 6 ids),
+then the final YAML file inside one ```yaml fence."""
+
+
 def run_case(intent: dict, condition: str, model: str, validator, canon) -> dict:
     if condition == "protocol":
         template = TEMPLATES[intent["template_family"]].read_text()
         system = PROTOCOL_SYSTEM.replace("{template}", template)
+    elif condition == "routing":
+        # the routing arm · the model PICKS the family (scored vs ground
+        # truth) and authors WITHOUT the template body — measures the
+        # router half of the thesis that 'protocol' holds constant.
+        routing_table = (SPEC_ROOT / "templates" / "README.md").read_text()
+        system = ROUTING_SYSTEM.replace("{routing}", routing_table)
     else:
         system = FREEFORM_SYSTEM
     record = {"intent": intent["id"], "condition": condition,
               "family": intent["template_family"], "loops": []}
     reply = call_model(model, system, intent["prompt"])
+    if condition == "routing":
+        first_line = reply.strip().splitlines()[0].strip().strip("`").lower() if reply.strip() else ""
+        record["routed_family"] = first_line
+        record["routing_correct"] = first_line == intent["template_family"]
     text = extract_yaml(reply)
     for loop_n in range(4):  # first pass + up to 3 repairs
         if text is None:
@@ -217,14 +243,19 @@ def run_case(intent: dict, condition: str, model: str, validator, canon) -> dict
 def summarize(results: list[dict]) -> str:
     lines = ["| Condition | First-pass valid | Final valid | Avg repair loops |",
              "|---|---|---|---|"]
-    for cond in ("protocol", "freeform"):
+    for cond in ("protocol", "routing", "freeform"):
         rows = [r for r in results if r["condition"] == cond]
         if not rows:
             continue
         fp = sum(r["first_pass_valid"] for r in rows)
         fv = sum(r["final_valid"] for r in rows)
         avg = sum(r["repair_loops_used"] for r in rows) / len(rows)
-        lines.append(f"| {cond} | {fp}/{len(rows)} | {fv}/{len(rows)} | {avg:.1f} |")
+        cell = f"| {cond} | {fp}/{len(rows)} | {fv}/{len(rows)} | {avg:.1f} |"
+        routed = [r for r in rows if "routing_correct" in r]
+        if routed:
+            ok = sum(r["routing_correct"] for r in routed)
+            cell += f" routing {ok}/{len(routed)} |"
+        lines.append(cell)
     return "\n".join(lines)
 
 
@@ -257,7 +288,7 @@ def clusters(runs: list[dict]) -> str:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="haiku")
-    ap.add_argument("--condition", choices=["protocol", "freeform", "both"], default="both")
+    ap.add_argument("--condition", choices=["protocol", "routing", "freeform", "both", "all"], default="both")
     ap.add_argument("--limit", type=int, default=None, help="run only the first N intents")
     ap.add_argument("--timeout", type=int, default=240,
                     help="per-call timeout in seconds (raise for local models)")
@@ -281,7 +312,8 @@ def main() -> int:
     intents = yaml.safe_load((HERE / "intents.yaml").read_text())["intents"]
     if args.limit:
         intents = intents[:args.limit]
-    conditions = ["protocol", "freeform"] if args.condition == "both" else [args.condition]
+    conditions = {"both": ["protocol", "freeform"],
+                  "all": ["protocol", "routing", "freeform"]}.get(args.condition, [args.condition])
     validator, canon = load_schema(), load_canon()
 
     results = []
@@ -305,7 +337,8 @@ def main() -> int:
     oracle_sha = subprocess.run(["git", "-C", str(SPEC_ROOT), "rev-parse", "--short", "HEAD"],
                                 capture_output=True, text=True).stdout.strip() or "unknown"
     dirty = bool(subprocess.run(["git", "-C", str(SPEC_ROOT), "status", "--porcelain",
-                                 "conformance/", "eval/run-eval.py"],
+                                 "conformance/", "schemas/", "canon.yaml",
+                                 "templates/", "eval/"],
                                 capture_output=True, text=True).stdout.strip())
     out.write_text(json.dumps({"model": args.model,
                                "oracle": oracle_sha + ("-dirty" if dirty else ""),
