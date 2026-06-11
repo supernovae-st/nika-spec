@@ -135,17 +135,20 @@ parses exactly this grammar inside `${{ }}` (it is a strict subset of
 every expression below) ·
 
 ```ebnf
-expr     = or ;
+expr     = ternary ;
+ternary  = or , [ "?" , expr , ":" , ternary ] ;   (* conditional value · cond MUST be boolean ·
+                                                      right-associative · `a ? b : c ? d : e` =
+                                                      `a ? b : (c ? d : e)` · loosest precedence *)
 or       = and , { "||" , and } ;
 and      = rel , { "&&" , rel } ;
 rel      = unary , [ relop , unary ] ;        (* at most ONE relation · non-associative ·
                                                  `a < b < c` is a parse error *)
 relop    = "==" | "!=" | "<" | "<=" | ">" | ">=" | "in" ;
 unary    = { "!" } , postfix ;
-postfix  = primary , { "." , IDENT , [ "(" , ")" ]
+postfix  = primary , { "." , IDENT , [ "(" , [ expr ] , ")" ]
                      | "[" , expr , "]" } ;
 primary  = literal | list | call | IDENT | "(" , expr , ")" ;
-call     = "size" , "(" , expr , ")" ;
+call     = ( "size" | "has" ) , "(" , expr , ")" ;
 list     = "[" , [ expr , { "," , expr } ] , "]" ;
 literal  = INT | FLOAT | STRING | "true" | "false" | "null" ;
 
@@ -157,11 +160,21 @@ STRING   = /'([^'\\]|\\.)*'/ | /"([^"\\]|\\.)*"/ ;   (* escapes · \\ \' \" \n \
 
 **Side constraints (normative)** ·
 
-1. **The only callable is `size`** · free form `size(x)` (exactly 1 argument)
-   and method form `x.size()` (exactly 0 arguments). Any other call suffix is
-   a parse error (reserved for future minors).
+1. **The callables are a CLOSED set** · the free functions `size(x)` and
+   `has(x)` (each exactly 1 argument); the zero-arg method `x.size()`; and the
+   one-arg string methods `x.contains(s)` · `x.startsWith(s)` · `x.endsWith(s)`
+   (substring / prefix / suffix tests · case-sensitive · operands MUST be
+   strings). `has(x)` is the presence macro · `true` iff the reference `x`
+   resolves to a defined, non-`null` value (the safe way to test an optional
+   field before reading it · never raises `NIKA-VAR-001`). **No regex** —
+   `matches()` is reserved (ReDoS surface · a later minor). Any other call
+   suffix is a parse error.
 2. **Precedence** (tightest → loosest) · postfix (`.` `[]`) → `!` → relational
-   (`==` `!=` `<` `<=` `>` `>=` `in`) → `&&` → `||`. Parentheses override.
+   (`==` `!=` `<` `<=` `>` `>=` `in`) → `&&` → `||` → ternary (`?:`).
+   Parentheses override. The ternary `cond ? a : b` requires a **boolean**
+   `cond` (a non-boolean condition is `NIKA-VAR-006`) · `a` and `b` may be any
+   value and need not share a type — it is value-selection, not a relation, so
+   it does NOT count against the one-relation rule.
 3. **Relations do not chain** · `rel` admits at most one `relop`
    (non-associative) — `a == b == c` must be written `(a == b) == c` if that
    is really meant.
@@ -181,8 +194,20 @@ STRING   = /'([^'\\]|\\.)*'/ | /"([^"\\]|\\.)*"/ ;   (* escapes · \\ \' \" \n \
    root is `NIKA-VAR-001`.
 
 The grammar is versioned (`cel-subset/0.1`) · later minors may only ADD
-productions (arithmetic · macros · string functions) — never change the
-meaning of an expression that parses today.
+productions (arithmetic · `matches()` regex · further macros) — never change
+the meaning of an expression that parses today. The conditional `?:`, the
+`has()` macro, and the `contains`/`startsWith`/`endsWith` string tests are IN
+`cel-subset/0.1` (they are standard CEL · any full CEL parser accepts them).
+
+**Conditional value selection (the common shape)** · `?:` is what lets a
+*value* field branch without a `nika:jq` detour ·
+
+```yaml
+# pick a model / a path / a prompt by condition — anywhere a value is taken
+model:  ${{ vars.env == 'prod' ? 'anthropic/claude-sonnet-4-6' : 'ollama/llama3' }}
+prompt: ${{ has(vars.style) ? vars.style : 'be concise' }}
+when:   ${{ tasks.scan.output.contains('ERROR') }}      # branch on substring
+```
 
 **Namespaces are CEL variables** · the <!-- canon:namespaces -->5<!-- /canon --> namespaces (`vars` · `with` · `tasks`
 · `env` · `secrets`) are bound as top-level CEL variables. `tasks.<id>.status`
