@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: f006ok
+tasks:
+  - id: shards
+    for_each: [1, 2, 3]
+    timeout: 30s
+    exec: { command: "./process.sh" }

@@ -83,6 +83,14 @@ execute when the reference engine's vertical slice lands ·
 `input.nika.yaml`, NOT `input.yaml`, so the static `all` gate ignores
 them by construction.)
 
+`conformance/tests/lints/` is the **linter-conformance corpus** (the
+03-dag one-obvious-way table is « normative for linters ») · per case
+`input.yaml` + `expected-lints.json` (`{"lints": [{"rule", "task"}]}` ·
+exact ordered equality · fires/silent pairs pin the precision
+contract). Engines with a linter walk it (the reference engine's
+`lints_one_obvious_way` suite); the Python oracle ships no linter, so
+the static `all` gate does not run this tier.
+
 Runner subcommands · `validate <file>` (one verdict JSON) · `run <dir>`
 (one tier) · `examples <dir>` (every example must validate) · **`all`**
 (the CI gate · core + stdlib + deep + examples + showcase + templates ·

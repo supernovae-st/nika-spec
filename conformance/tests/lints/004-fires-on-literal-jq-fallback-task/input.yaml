@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: f004
+tasks:
+  - id: a
+    invoke:
+      tool: "nika:fetch"
+      args: { url: "https://example.com/data" }
+  - id: fallback
+    depends_on: [a]
+    when: "${{ tasks.a.status == 'failure' }}"
+    invoke:
+      tool: "nika:jq"
+      args: { input: { count: 0 }, expression: "." }

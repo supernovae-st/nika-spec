@@ -1,0 +1,8 @@
+{
+ "lints": [
+  {
+   "rule": "one-obvious-way/002",
+   "task": "a"
+  }
+ ]
+}

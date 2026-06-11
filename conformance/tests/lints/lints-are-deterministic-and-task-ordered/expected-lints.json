@@ -1,0 +1,12 @@
+{
+ "lints": [
+  {
+   "rule": "one-obvious-way/002",
+   "task": "a"
+  },
+  {
+   "rule": "one-obvious-way/006",
+   "task": "shards"
+  }
+ ]
+}

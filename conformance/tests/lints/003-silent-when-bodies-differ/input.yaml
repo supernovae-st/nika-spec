@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: f003diff
+tasks:
+  - id: a
+    invoke:
+      tool: "nika:fetch"
+      args: { url: "https://example.com/data" }
+  - id: report
+    depends_on: [a]
+    when: "${{ tasks.a.status == 'failure' }}"
+    invoke:
+      tool: "nika:notify"
+      args: { channel: webhook, target: "https://hooks.example.com", message: "a failed" }
