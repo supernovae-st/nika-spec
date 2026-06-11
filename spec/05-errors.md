@@ -100,6 +100,7 @@ these from this file alone.
 | `NIKA-SEC-001` | `exec:` blocklist hit | `security_error` | false |
 | `NIKA-SEC-002` | agent tool call outside the `tools:` whitelist | `security_error` | false |
 | `NIKA-SEC-003` | run-recursion bound — nested-run depth exceeded OR self-launching workflow | `security_error` | false |
+| `NIKA-SEC-004` | effect outside the declared `permits:` capability boundary (fs/net/exec/tool · [01 §permits](./01-envelope.md#permits--optional--the-declared-capability-boundary)) | `security_error` | false |
 | `NIKA-TIMEOUT-001` | task (or for_each iteration) exceeded `timeout:` | `timeout_error` | false |
 | `NIKA-CANCEL-001` | task cancelled (workflow failure gate · user cancellation) | `cancelled` | false |
 | `NIKA-BUILTIN-DONE-001` | `nika:done` invoked outside an `agent:` loop | `validation_error` | false |
