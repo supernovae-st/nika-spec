@@ -53,6 +53,8 @@ DAG_BEGIN = re.compile(r"\{/\* showcase:dag-begin ([a-z0-9-]+\.nika\.yaml) \*/\}
 DAG_END = "{/* showcase:dag-end */}"
 COVERAGE_BEGIN = "{/* showcase:coverage-begin */}"
 COVERAGE_END = "{/* showcase:coverage-end */}"
+TEMPLATE_BEGIN = re.compile(r"\{/\* template:begin ([a-z0-9-]+\.nika\.yaml) \*/\}")
+TEMPLATE_END = "{/* template:end */}"
 
 MERMAID_CLASSES = (
     "  classDef infer fill:#5b8cff22,stroke:#5b8cff,color:#5b8cff\n"
@@ -328,11 +330,16 @@ def build_dag(lean_text: str) -> dict:
         tid = t.get("id")
         verb = next((v for v in ("infer", "exec", "invoke", "agent") if v in t), "invoke")
         line0, line1 = ranges.get(tid, (0, 0))
+        when = t.get("when")
+        gate = ("always" if when is True
+                else "when" if when is not None
+                else "default")
         tasks_out.append({
             "id": tid,
             "verb": verb,
             "deps": list(t.get("depends_on") or []),
             "wave": wave_of(tid),
+            "gate": gate,
             "gloss": _gloss(t),
             "flags": _flags(t),
             "line0": line0,
@@ -383,6 +390,7 @@ def render_ts(workflows: dict[str, str]) -> str:
         "  verb: 'infer' | 'exec' | 'invoke' | 'agent'\n"
         "  deps: string[]\n"
         "  wave: number\n"
+        "  gate: 'default' | 'when' | 'always'\n"
         "  gloss: string\n"
         "  flags: string[]\n"
         "  line0: number\n"
@@ -425,7 +433,7 @@ def _replace_blocks(text: str, begin_re, end_marker: str, page_name: str,
     return "".join(out), dirty
 
 
-def project_docs_page(page: Path, workflows: dict[str, str], write: bool) -> bool:
+def project_docs_page(page: Path, workflows: dict[str, str], templates: dict[str, str], write: bool) -> bool:
     """Rewrite every managed block (yaml · dag mermaid · coverage matrix) in
     one docs page. True = in sync."""
     text = page.read_text()
@@ -444,12 +452,20 @@ def project_docs_page(page: Path, workflows: dict[str, str], write: bool) -> boo
             sys.exit(2)
         return f"\n```mermaid\n{render_mermaid(workflows[fname])}```\n"
 
+    def template_yaml_for(fname):
+        if fname not in templates:
+            print(f"showcase-projector · {page.name} references unknown template {fname}",
+                  file=sys.stderr)
+            sys.exit(2)
+        return f"\n```yaml {fname}\n{templates[fname]}```\n"
+
     text, d1 = _replace_blocks(text, BEGIN, END, page.name, yaml_for)
     text, d2 = _replace_blocks(text, DAG_BEGIN, DAG_END, page.name, dag_for)
+    text, d4 = _replace_blocks(text, TEMPLATE_BEGIN, TEMPLATE_END, page.name, template_yaml_for)
     cov_re = re.compile(re.escape(COVERAGE_BEGIN))
     text, d3 = _replace_blocks(text, cov_re, COVERAGE_END, page.name,
                                lambda _k: render_coverage(workflows))
-    dirty = d1 or d2 or d3
+    dirty = d1 or d2 or d3 or d4
     if dirty and write:
         page.write_text(text)
     return not dirty
@@ -511,6 +527,11 @@ def main() -> int:
         return 2
     write = mode == "--write"
     workflows = load_showcase()
+    templates = {}
+    tdir = SPEC_ROOT / "templates"
+    if tdir.is_dir():
+        for f in sorted(tdir.glob("*.nika.yaml")):
+            templates[f.name] = lean(f.read_text())
     rc = 0
 
     # TARGET 0 · in-repo versioned pack manifest
@@ -528,9 +549,15 @@ def main() -> int:
     docs_env = os.environ.get("NIKA_DOCS_ROOT")
     docs_root = Path(docs_env) if docs_env else SPEC_ROOT.parent / "docs"
     pages_dir = docs_root / "examples"
+    guides_dir = docs_root / "guides"
+    managed_pages = []
     if pages_dir.is_dir():
-        for page in sorted(pages_dir.glob("*.mdx")):
-            in_sync = project_docs_page(page, workflows, write)
+        managed_pages += sorted(pages_dir.glob("*.mdx"))
+    if guides_dir.is_dir():
+        managed_pages += sorted(guides_dir.glob("*.mdx"))
+    if pages_dir.is_dir():
+        for page in managed_pages:
+            in_sync = project_docs_page(page, workflows, templates, write)
             if in_sync:
                 continue
             if write:
