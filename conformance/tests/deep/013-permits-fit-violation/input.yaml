@@ -1,0 +1,9 @@
+nika: v1
+workflow: deep-013
+permits:
+  tools: ["nika:read"]
+tasks:
+  - id: save
+    invoke:
+      tool: "nika:write"
+      args: { path: "./out.md", content: "hi" }

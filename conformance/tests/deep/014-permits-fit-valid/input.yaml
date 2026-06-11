@@ -1,0 +1,15 @@
+nika: v1
+workflow: deep-014
+permits:
+  fs: { read: ["./data/**"], write: ["./out/**"] }
+  exec: ["git"]
+  tools: ["nika:read", "nika:write"]
+tasks:
+  - id: log_head
+    exec:
+      command: ["git", "log", "--oneline", "-1"]
+  - id: snapshot
+    depends_on: [log_head]
+    invoke:
+      tool: "nika:write"
+      args: { path: "./out/head.txt", content: "${{ tasks.log_head.output }}" }

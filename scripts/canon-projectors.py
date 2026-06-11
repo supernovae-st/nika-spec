@@ -119,6 +119,8 @@ def canon_fields(canon: dict) -> dict:
         "extractModeNames": canon["extract_modes"]["items"],
         "errorNamespaces": canon["error_namespaces"]["count"],
         "errorNamespaceNames": canon["error_namespaces"]["items"],
+        "errorCategories": canon["error_categories"]["count"],
+        "errorCodes": canon["error_codes"]["count"],
         "pillars": canon["pillars"]["count"],
     }
 

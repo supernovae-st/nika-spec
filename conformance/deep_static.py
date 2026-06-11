@@ -31,6 +31,11 @@
 #                 write is an authoring bug) · nika:done is valid only
 #                 inside an agent tools whitelist · never a standalone
 #                 invoke (02 §loop semantics · NIKA-BUILTIN-DONE-001)
+#   PERMITS-FIT   when a permits: block is present, the body must FIT it
+#                 (01 §permits · default-deny once present) · statically
+#                 checkable surface: invoke tools + agent whitelists vs
+#                 permits.tools globs · exec: presence/argv-program vs
+#                 permits.exec · static fetch hosts vs permits.net.http
 #
 # Emitted errors reuse the canonical namespaces (NIKA-VAR for expression
 # surface · NIKA-PARSE for shape rules · runner-protocol.md matching).
@@ -426,5 +431,70 @@ def deep_static_errors(doc: dict) -> list[dict]:
                          "detail": f"task '{tid}' · nika:done is the agent-loop completion "
                                    "sentinel · valid ONLY inside an agent: tools whitelist · "
                                    "never a standalone invoke (02 §loop semantics)"})
+
+    # PERMITS-FIT · the declared boundary must contain the body (01 §permits)
+    permits = doc.get("permits")
+    if isinstance(permits, dict):
+        import fnmatch
+        import urllib.parse
+
+        def tool_permitted(tool: str) -> bool:
+            pats = permits.get("tools")
+            if not isinstance(pats, list):
+                return False  # tools omitted → no invoke at all
+            return any(fnmatch.fnmatchcase(tool, pat) for pat in pats
+                       if isinstance(pat, str) and not pat.startswith("!"))
+
+        exec_rule = permits.get("exec", False)
+        net = permits.get("net") if isinstance(permits.get("net"), dict) else {}
+        hosts = net.get("http") if isinstance(net.get("http"), list) else None
+
+        for t in tasks:
+            if not isinstance(t, dict):
+                continue
+            tid = t.get("id")
+            if "exec" in t:
+                body = t.get("exec") or {}
+                cmd = body.get("command") if isinstance(body, dict) else None
+                if exec_rule is False or exec_rule is None:
+                    errs.append({"code": "NIKA-SEC-004", "namespace": "NIKA-SEC",
+                                 "category": "security_error",
+                                 "detail": f"task '{tid}' · exec: but permits.exec is "
+                                           "false/omitted (01 §permits · default-deny)"})
+                elif isinstance(exec_rule, list) and isinstance(cmd, list) and cmd \
+                        and isinstance(cmd[0], str) and not EXPR_BODY.search(cmd[0]) \
+                        and cmd[0] not in exec_rule:
+                    errs.append({"code": "NIKA-SEC-004", "namespace": "NIKA-SEC",
+                                 "category": "security_error",
+                                 "detail": f"task '{tid}' · argv program '{cmd[0]}' not in "
+                                           f"permits.exec allowlist {exec_rule}"})
+            inv = t.get("invoke")
+            if isinstance(inv, dict):
+                tool = inv.get("tool")
+                if isinstance(tool, str) and not EXPR_BODY.search(tool) \
+                        and not tool_permitted(tool):
+                    errs.append({"code": "NIKA-SEC-004", "namespace": "NIKA-SEC",
+                                 "category": "security_error",
+                                 "detail": f"task '{tid}' · invoke {tool} outside "
+                                           "permits.tools (01 §permits)"})
+                if tool == "nika:fetch" and hosts is not None:
+                    url = (inv.get("args") or {}).get("url")
+                    if isinstance(url, str) and not EXPR_BODY.search(url):
+                        host = urllib.parse.urlparse(url).hostname or ""
+                        if not any(fnmatch.fnmatchcase(host, h) for h in hosts
+                                   if isinstance(h, str)):
+                            errs.append({"code": "NIKA-SEC-004", "namespace": "NIKA-SEC",
+                                         "category": "security_error",
+                                         "detail": f"task '{tid}' · fetch host '{host}' not in "
+                                                   "permits.net.http allowlist"})
+            ag = t.get("agent")
+            if isinstance(ag, dict):
+                for w in (ag.get("tools") or []):
+                    if isinstance(w, str) and not w.startswith("!") \
+                            and not tool_permitted(w):
+                        errs.append({"code": "NIKA-SEC-004", "namespace": "NIKA-SEC",
+                                     "category": "security_error",
+                                     "detail": f"task '{tid}' · agent whitelist '{w}' outside "
+                                               "permits.tools (the agent cannot exceed the file)"})
 
     return errs
