@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: selector-arg-misuse
+tasks:
+  - id: get
+    invoke:
+      tool: "nika:fetch"
+      args:
+        url: "https://example.com/products"
+        mode: markdown
+        selector: "div.product-list"

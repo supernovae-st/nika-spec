@@ -105,6 +105,8 @@ def stdlib_surface_errors(doc: dict, canon: dict) -> list[dict]:
       (providers-v0.1.md · «the provider is the prefix») → NIKA-PROVIDER
     - `nika:fetch` `mode:` MUST be a canonical extract mode → NIKA-BUILTIN
     - a `jq:` fetch argument is only valid with `mode: jq` (builtins-v0.1.md)
+    - a `selector:` fetch argument is only valid with `mode: selector`
+      (extract-modes-v0.1.md · symmetric to the jq pairing)
     Dynamic values (`${{ }}`) are skipped · runtime's job."""
     errs: list[dict] = []
 
@@ -150,6 +152,10 @@ def stdlib_surface_errors(doc: dict, canon: dict) -> list[dict]:
                 errs.append({"namespace": "NIKA-BUILTIN", "category": "validation_error",
                              "detail": f"{where} · 'jq' argument is only valid with mode: jq "
                                        "(builtins-v0.1.md · nika:fetch)"})
+            if "selector" in args and args.get("mode") != "selector":
+                errs.append({"namespace": "NIKA-BUILTIN", "category": "validation_error",
+                             "detail": f"{where} · 'selector' argument is only valid with "
+                                       "mode: selector (extract-modes-v0.1.md · nika:fetch)"})
     return errs
 
 
