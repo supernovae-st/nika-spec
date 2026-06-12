@@ -122,22 +122,26 @@ builtins:
 providers:
   count: 14
   reference: stdlib/providers-v0.1.md
+  # Presentation order (operator lock 2026-06-12 · supernovae-alignment Rule 3) ·
+  # local/open-weight FIRST (sovereignty default) · then cloud with mistral (EU ·
+  # open-weight) leading · anthropic/openai never presented first. Projectors
+  # inherit this order · counts are order-independent.
   items:
-    cloud:
-      - anthropic
-      - openai
-      - gemini
-      - deepseek
-      - mistral
-      - xai
-      - groq
-      - openrouter
     local:
       - ollama
       - lmstudio
       - llamacpp
       - localai
       - vllm
+    cloud:
+      - mistral
+      - anthropic
+      - openai
+      - gemini
+      - deepseek
+      - xai
+      - groq
+      - openrouter
     test:
       - mock
 

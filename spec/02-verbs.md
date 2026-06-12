@@ -65,7 +65,7 @@ A single LLM call. The result is the model's response.
   infer:
     prompt: "Research Rust async runtimes 2026 in 5 paragraphs"
     system: "You are a senior software architect."
-    model: anthropic/claude-sonnet-4-6   # override default · <provider>/<name>
+    model: mistral/mistral-large         # override default · <provider>/<name>
     temperature: 0.3
     max_tokens: 2000
     schema:                            # optional · structured output
@@ -291,7 +291,7 @@ Run an agentic loop · the model + a set of tools · iterating until completion 
   agent:
     system: "You are a research assistant. Use tools to gather info."
     prompt: "Research the topic · ${{ vars.topic }} · and produce a markdown brief"
-    model: anthropic/claude-sonnet-4-6
+    model: mistral/mistral-large
     tools:                            # whitelist · default-deny (no tools if omitted)
       - "nika:fetch"
       - "nika:write"

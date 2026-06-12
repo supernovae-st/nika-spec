@@ -30,7 +30,7 @@ workflow: scrape-and-summarize          # required · kebab-case · unique withi
 description: "Fetch + summarize"         # optional · human-readable
 
 # Workflow-level default model · any task may override · <provider>/<name>
-model: anthropic/claude-sonnet-4-6      # optional · ollama/llama3.1 for local
+model: ollama/llama3.1            # optional · anthropic/claude-sonnet-4-6 for cloud
 
 # Inputs · available as ${{ vars.<name> }} · untyped OR typed
 vars:
@@ -148,8 +148,8 @@ listings + LSP hover hints.
 ### `model` · *optional · default model · `<provider>/<name>`*
 
 ```yaml
-model: anthropic/claude-sonnet-4-6      # cloud
-# model: ollama/llama3.1                # local · same shape
+model: ollama/llama3.1                  # local
+# model: anthropic/claude-sonnet-4-6    # cloud · same shape
 ```
 
 Default model for any `infer:` or `agent:` verb in this workflow, as a single
