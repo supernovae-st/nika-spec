@@ -12,6 +12,25 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added · the parse tier enters the registry (2026-06-12)
+
+- **`NIKA-PARSE-001..019` allocated** (18 codes · 016 retired) — the
+  structural/envelope failure class a beginner meets FIRST was emitted by
+  the reference checker but absent from the normative floor: a second
+  engine could not match parse-time behavior from the spec alone, and
+  `nika explain` had no row to teach. The registry now carries every
+  statically-emitted code: envelope (001-005) · task shape (006-012) ·
+  bindings/secrets/vars (013-015) · mapping/field/structural (017-019).
+- **`NIKA-PARSE-016` retirement documented** — folded into `NIKA-VAR-005`
+  at the deep-conformance registry remap; the allocation hole is
+  deliberate per the additive-never-repurposed rule.
+- **`NIKA-BUILTIN-001` allocated** — builtin `invoke:` arg-contract
+  violations (e.g. `nika:fetch` without `url:`) were emitted by the
+  checker but only the `nika:done` special case (`BUILTIN-DONE-001`) had
+  a row. The generic code joins the floor.
+- `error_codes` count 30 → 49 · canon + prose table + errors catalog +
+  docs tables re-projected in parity.
+
 ### Added · rounds 5-10 cohort (2026-06-11 · the night-loop continuation)
 
 - **Behavioral conformance tier (contract-first)** — `tests/runtime/`
