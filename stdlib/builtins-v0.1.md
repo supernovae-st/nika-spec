@@ -368,4 +368,4 @@ consolidation (42 → 26 → 22 · then +`compose` → 23) happened **pre-public
 
 ---
 
-🦋 *<!-- canon:builtins -->22<!-- /canon --> builtins canonical · jq = the data language · 5-layer Rams symmetry (fetch+extract · jq · convert · wait · inspect) · clear forever.*
+🦋 *<!-- canon:builtins -->23<!-- /canon --> builtins canonical · jq = the data language · 5-layer Rams symmetry (fetch+extract · jq · convert · wait · inspect) · clear forever.*
