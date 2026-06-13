@@ -236,7 +236,7 @@ See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md) for the canonical buil
 > grammar admits `nika:<group>/<tool>` (the `nika:connectome/recall`
 > illustration above is the reserved FUTURE shape) — but the v0.1 builtin
 > set contains only flat names · a grouped `nika:` path is rejected against
-> the closed 22 set today (`NIKA-INVOKE-001`). The seam exists so the
+> the closed 23 set today (`NIKA-INVOKE-001`). The seam exists so the
 > Connectome tools land additively · zero workflow-shape change.
 
 ### MCP call
@@ -335,6 +335,15 @@ sentinel has no meaning without a loop to terminate. `nika:done` accepts an
 optional **`result:`** arg (any JSON value) · when present the task's
 `.output` is that value (and `schema:` validates IT) · when absent `.output`
 is the final assistant message (string).
+
+The agent may also grant itself **`nika:compose`** — a second loop-only
+builtin (also valid ONLY inside an `agent:` whitelist · standalone is
+`NIKA-BUILTIN-COMPOSE-001`). It lets the model **self-check a workflow it is
+drafting**: pass a `workflow_yaml` string, get the full `nika check` verdict
+back (conformance + secret-flow + permits + the termination/cost certificate)
+as the tool result. It **never executes** the draft — verification yields an
+artifact + its certificate, and running it stays a separate, gated decision.
+See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md) §`nika:compose`.
 
 **Termination outcomes (normative)** ·
 

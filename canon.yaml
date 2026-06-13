@@ -41,7 +41,7 @@ schema_version: 1
 counts:
   verbs: 4
   namespaces: 5
-  builtins: 22
+  builtins: 23
   providers: 14
   extract_modes: 9
   error_namespaces: 14
@@ -90,10 +90,11 @@ namespaces:
 # Admission test · 3 razors · (1) NOT-expressible-in-jq+CEL+Schema · (2) canonical
 # interop format (RFC-6902/7396/9562 · etc.) · (3) cookbook-clarity.
 builtins:
-  count: 22
+  count: 23
   reference: stdlib/builtins-v0.1.md
   items:
     - assert
+    - compose
     - convert
     - date
     - done

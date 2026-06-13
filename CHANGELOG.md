@@ -12,6 +12,24 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added · `nika:compose` · the agent's self-check builtin (2026-06-13)
+
+- **`nika:compose` · the 23rd canonical builtin** (Introspection · stdlib
+  v0.1 builtins 22 → 23). The agent loop's self-verification intrinsic: the
+  model passes a `workflow_yaml` draft it wrote and gets the full `nika check`
+  verdict back as the tool result (conformance + secret-flow + permits + the
+  termination/cost certificate) — it **never executes** the draft
+  («generation is not permission»). Loop-only like `nika:done` (valid only
+  inside an `agent:` whitelist · standalone is `NIKA-BUILTIN-COMPOSE-001`).
+  Documented in `stdlib/builtins-v0.1.md` + `02-verbs.md` §agent · added to
+  the closed enum in `workflow.schema.json`.
+- **The tool-namespace closure is now enforced for agent whitelists.** The
+  namespace set was already CLOSED at `{nika:, mcp:}` for `invoke:`; the
+  `agent: tools:` whitelist now rejects a third namespace at parse too (an
+  engine that previously let a non-`nika:`/`mcp:` glob through was
+  spec-lax). This is what keeps `nika:compose` in the closed `nika:` set
+  rather than inventing an `agent:` namespace.
+
 ### Added · the parse tier enters the registry (2026-06-12)
 
 - **`NIKA-PARSE-001..019` allocated** (18 codes · 016 retired) — the
