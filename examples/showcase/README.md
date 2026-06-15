@@ -5,7 +5,7 @@
 > file passes the same conformance gate as the foundation examples
 > (`python conformance/runner.py all`) — schema + DAG cross-refs +
 > stdlib surface. Together with the foundation set they exercise
-> **all 22 builtins** (verified by the conformance + coverage sweep).
+> **all 23 builtins** (verified by the conformance + coverage sweep).
 
 The [foundation examples](../README.md) teach the *language*
 construct-by-construct. The showcase teaches the *life* — real jobs,
@@ -63,4 +63,4 @@ T4 EPIC        multi-stage pipelines · agents under budget · self-reporting ru
   explorer — projected, never hand-copied
   (`scripts/showcase-projector.py` · `--check` is the drift gate)
 
-🦋 *The showcase pack · 4 tiers · all 22 builtins exercised across the example corpus · manifest = the contract.*
+🦋 *The showcase pack · 4 tiers · all 23 builtins exercised across the example corpus · manifest = the contract.*
