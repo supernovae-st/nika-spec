@@ -121,7 +121,7 @@ If you want to implement Nika in your language ·
 [supernovae-st/nika](https://github.com/supernovae-st/nika) · the reference engine · Rust · AGPL-3.0-or-later.
 
 The reference impl (the Diamond rebuild · in flight · runnable end-to-end
-at its v0.81 milestone) ·
+at its 1.0 release) ·
 - Targets full v0.1 spec conformance (Stdlib level)
 - Will ship as `cargo install nika` (binary `nika` · self-contained ·
   embeds this spec + schema + examples)
