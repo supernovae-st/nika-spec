@@ -215,4 +215,4 @@ The reference implementation (separate repo) is AGPL-3.0-or-later.
 
 ---
 
-🦋 *Forever-v0.x · less but better · Rams principle 10.*
+🦋 *Quality over speed · less but better · Rams principle 10.*
