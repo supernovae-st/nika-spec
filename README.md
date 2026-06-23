@@ -125,8 +125,9 @@ at its 1.0 release) ·
 - Targets full v0.1 spec conformance (Stdlib level)
 - Will ship as `cargo install nika` (binary `nika` · self-contained ·
   embeds this spec + schema + examples)
-- Will expose the engine via MCP server (`nika mcp serve`) for harness
-  integration (Claude Code · Cursor · Hermes · etc.)
+- Exposes the engine's static oracle via MCP server (`nika mcp`) for harness
+  integration (Claude Code · Cursor · Hermes · etc.). The MCP surface is
+  read-only (`nika_check` · `nika_explain`); execution stays behind `nika run`.
 - Today · the [conformance oracle](./conformance/) in this repo validates
   any workflow statically (`python3 conformance/runner.py validate <file>`)
   — authoring and checking work NOW · execution lands with the engine
