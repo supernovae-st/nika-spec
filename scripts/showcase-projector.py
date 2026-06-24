@@ -637,8 +637,8 @@ def main() -> int:
     if rc == 0 and not write:
         print(f"✓ showcase projection in sync · {len(workflows)} workflows")
     # TARGET 5 · website served schema · byte-identical copy (D-N6 · the
-    # binary's `nika schema` and nika.sh/schema/v1.json must agree · the
-    # spec repo is the source · the website copy is a projection).
+    # binary's `nika schema` and nika.sh/spec/v1/workflow.schema.json must
+    # agree · the spec repo is the source · the website copy is a projection).
     site_env = os.environ.get("NIKA_WEBSITE_ROOT")
     site_root = Path(site_env) if site_env else SPEC_ROOT.parent / "website"
     schema_src = SPEC_ROOT / "schemas" / "workflow.schema.json"
