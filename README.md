@@ -96,7 +96,7 @@ nika-spec/
 ├── AGENTS.md                  ← the deterministic authoring protocol (agents start here)
 │
 └── stdlib/                    ← versioned independently
-    ├── providers-v0.1.md        14 providers canonical (anthropic · openrouter · …)
+    ├── providers-v0.1.md        14 providers canonical (ollama · llamacpp · vllm · mistral · …)
     ├── extract-modes-v0.1.md    9 extract modes (markdown · article · jq · …)
     └── builtins-v0.1.md         23 builtins curated (core · file · data · …)
 ```
@@ -120,18 +120,18 @@ If you want to implement Nika in your language ·
 
 [supernovae-st/nika](https://github.com/supernovae-st/nika) · the reference engine · Rust · AGPL-3.0-or-later.
 
-The reference impl (the Diamond rebuild · in flight · runnable end-to-end
-at its 1.0 release) ·
+The reference engine is installable and runs workflows end-to-end today ·
+`brew install supernovae-st/tap/nika` · then `nika check` + `nika run` ·
 - Targets full v0.1 spec conformance (Stdlib level)
-- Will ship as `cargo install nika` (binary `nika` · self-contained ·
-  embeds this spec + schema + examples)
+- Self-contained single binary (embeds this spec + schema + examples ·
+  `nika spec` / `nika schema` / `nika examples` work offline;
+  `cargo install nika` joins brew + curl as an install path at 1.0)
 - Exposes the engine's static oracle via MCP server (`nika mcp`) for harness
   integration (Claude Code · Cursor · Hermes · etc.). The MCP surface is
   read-only (`nika_check` · `nika_explain`); execution stays behind `nika run`.
-- Today · the [conformance oracle](./conformance/) in this repo validates
-  any workflow statically (`python3 conformance/runner.py validate <file>`)
-  — authoring and checking work NOW · execution lands with the engine
-  milestone
+- Engine-free alternative · the [conformance oracle](./conformance/) in this
+  repo validates any workflow statically
+  (`python3 conformance/runner.py validate <file>`)
 
 ---
 
@@ -182,7 +182,7 @@ CI failure, not a maybe).
 ## Status
 
 - v0.1.0-draft · spec drafted · 7 foundation + 20 showcase examples + 6 templates · workflow.schema.json · 83 static conformance fixtures across three tiers (core · deep · stdlib surface — `python3 conformance/runner.py all` is the live count) — every example gated in CI · runtime/behavioral conformance pending
-- v0.1.0 GA · target Q3 2026 (after spec review + examples +
+- v0.1.0 GA · target August 2026 (after spec review + examples +
   conformance suite + schemas)
 
 Forever after GA · the 5 pillars are locked. Stdlib evolves independently.
