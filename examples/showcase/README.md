@@ -51,9 +51,10 @@ T4 EPIC        multi-stage pipelines · agents under budget · self-reporting ru
 ## Conventions (same gate as the foundation set)
 
 - `# SPDX-License-Identifier: Apache-2.0` header + schema hint line
-- `mock/echo` wherever the file should run with zero keys · real
-  providers only where the job demands one (agents · thinking) ·
-  local (`ollama/…`) where the data is sensitive — sovereignty is a
+- `ollama/llama3.2:3b` is the showcase model: every file leads local,
+  zero key, recorded-as-run. Cloud providers appear only as per-task
+  overrides or swap hints, never as the envelope default. Where the
+  data is sensitive the local model is the point: sovereignty is a
   feature, show it
 - every file is a conformance input · `python conformance/runner.py all`
   MUST stay green · one verb per task · snake_case ids · every

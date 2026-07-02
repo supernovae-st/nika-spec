@@ -19,7 +19,7 @@ nika: v1
 workflow: incident-war-room
 description: "parallel evidence → typed timeline → settle + recheck → postmortem draft"
 
-model: mistral/mistral-large
+model: ollama/llama3.2:3b   # local default · the synthesis task below overrides to a stronger model
 
 vars:
   service: "checkout-api"

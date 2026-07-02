@@ -18,7 +18,7 @@ nika: v1
 workflow: localization-factory
 description: "glob docs → parallel read → parallel translate → mirror tree"
 
-model: mistral/mistral-large    # EU model for EU locales · pick yours
+model: ollama/llama3.2:3b   # local default · swap for mistral/mistral-large (EU model for EU locales)
 
 vars:
   lang: "fr"

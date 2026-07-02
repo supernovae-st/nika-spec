@@ -38,7 +38,7 @@ is at [supernovae-st/nika](https://github.com/supernovae-st/nika)
 nika: v1
 workflow: hello
 
-model: ollama/llama3.1   # local · zero key · swap for any of the 14 providers
+model: ollama/llama3.2:3b   # local · zero key · swap for any of the 14 providers
 
 tasks:
   - id: greet

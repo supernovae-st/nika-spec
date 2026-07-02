@@ -114,7 +114,7 @@ When these mature · they enter stdlib v0.x. The core language doesn't need to c
 
 ```yaml
 model: anthropic/claude-sonnet-4-6   # <provider>/<name> · see stdlib/providers-v0.1.md
-# model: ollama/llama3.1             # local · same shape
+# model: ollama/llama3.2:3b          # local · same shape
 ```
 
 ### Extract mode

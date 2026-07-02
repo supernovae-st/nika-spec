@@ -61,7 +61,7 @@ These 5 pillars are **locked forever** at `nika: v1`. Everything else (providers
 nika: v1
 workflow: hello
 
-model: ollama/llama3.1
+model: ollama/llama3.2:3b
 tasks:
   - id: greet
     infer:
