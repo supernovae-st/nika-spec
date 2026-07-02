@@ -22,13 +22,13 @@ foundation:
     sha256_16: 187904d14bb2e430
 templates:
   - file: templates/agent-loop.nika.yaml
-    sha256_16: 4de0e9cd94e9228a
+    sha256_16: 5c906b0da7452755
   - file: templates/chain.nika.yaml
-    sha256_16: 823f49b8fd3d3dbe
+    sha256_16: 850080f98e115a8b
   - file: templates/etl-state.nika.yaml
     sha256_16: d1b672d199505f56
   - file: templates/fanout.nika.yaml
-    sha256_16: 32a0c6a483339247
+    sha256_16: 11762d6f2a2d0f09
   - file: templates/gate-and-act.nika.yaml
     sha256_16: e8a0c5e7f60f5e60
   - file: templates/human-gated-ship.nika.yaml
