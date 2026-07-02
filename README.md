@@ -5,7 +5,7 @@
 >
 > **Status** · v0.1.0-draft (working) · **License** · Apache-2.0
 >
-> The language is locked at `nika: v1` — forever. That's the envelope you
+> The language is locked at `nika: v1`, forever. That's the envelope you
 > write in every workflow file; it evolves additively and never breaks (the
 > SQL / Dockerfile contract model). The reference engine versions separately.
 
@@ -58,11 +58,11 @@ nika run hello.nika.yaml
 
 ## The 5 pillars · immutable forever
 
-1. **Envelope** — one line · `nika: v1` + `workflow:` header (+ typed `vars` · `env` · `secrets`)
-2. **The 4 verbs** — `infer:` (LLM) · `exec:` (shell) · `invoke:` (tools/MCP) · `agent:` (autonomous loop)
-3. **DAG shape** — tasks + `depends_on` + `when` + `for_each` + output binding
-4. **Variables** — one `${{ ... }}` syntax · <!-- canon:namespaces -->5<!-- /canon --> namespaces (`vars` · `with` · `tasks` · `env` · `secrets`)
-5. **Error model** — `NIKA-<NS>-<NNN>` codes · retry semantics · structured output
+1. **Envelope**: one line · `nika: v1` + `workflow:` header (+ typed `vars` · `env` · `secrets`)
+2. **The 4 verbs**: `infer:` (LLM) · `exec:` (shell) · `invoke:` (tools/MCP) · `agent:` (autonomous loop)
+3. **DAG shape**: tasks + `depends_on` + `when` + `for_each` + output binding
+4. **Variables**: one `${{ ... }}` syntax · <!-- canon:namespaces -->5<!-- /canon --> namespaces (`vars` · `with` · `tasks` · `env` · `secrets`)
+5. **Error model**: `NIKA-<NS>-<NNN>` codes · retry semantics · structured output
 
 These 5 things never change. Everything else (providers · builtins ·
 extract modes · etc.) lives in the **stdlib** and evolves separately.
@@ -155,14 +155,14 @@ Nika is that for AI workflows.
 
 **Every spec version ships its pack.** [`examples/manifest.yaml`](examples/manifest.yaml)
 (generated · `pack_version` = the [`VERSION`](VERSION) file) lists every
-canonical workflow — foundation + showcase — with tier, constructs and a
+canonical workflow (foundation + showcase) with tier, constructs and a
 sha256 over the exact text every surface renders. The contract:
 
 - the **docs** and the **website** render projections of these files (never copies)
-- the **reference engine embeds the pack of its version** — `nika examples`
+- the **reference engine embeds the pack of its version**: `nika examples`
   / `nika docs` / `nika schema` work offline, and an installed binary always
   carries the canonical examples *of the language version it speaks*
-- the manifest hashes make the pack **verifiable end-to-end** — a tampered or
+- the manifest hashes make the pack **verifiable end-to-end**: a tampered or
   drifted example fails the check, anywhere it travels
 
 ## Tooling (deterministic mesh)
@@ -175,13 +175,13 @@ sha256 over the exact text every surface renders. The contract:
 | [`conformance/runner.py`](conformance/runner.py) | the static oracle · core + stdlib fixtures + every example as a conformance input (the CI gate) |
 | [`.pre-commit-hooks.yaml`](.pre-commit-hooks.yaml) | pre-commit hook ids for downstream engines consuming this spec |
 
-Prose counts carry `<!-- canon:X -->N<!-- /canon -->` markers — machine-updatable
+Prose counts carry `<!-- canon:X -->N<!-- /canon -->` markers, machine-updatable
 (the monorepo `canon-fix` gate rewrites them when canon.yaml moves · drift is a
 CI failure, not a maybe).
 
 ## Status
 
-- v0.1.0-draft · spec drafted · 7 foundation + 20 showcase examples + 6 templates · workflow.schema.json · 83 static conformance fixtures across three tiers (core · deep · stdlib surface — `python3 conformance/runner.py all` is the live count) — every example gated in CI · runtime/behavioral conformance pending
+- v0.1.0-draft · spec drafted · 7 foundation + 20 showcase examples + 6 templates · workflow.schema.json · 83 static conformance fixtures across three tiers (core · deep · stdlib surface; `python3 conformance/runner.py all` is the live count), every example gated in CI · runtime/behavioral conformance pending
 - v0.1.0 GA · target August 2026 (after spec review + examples +
   conformance suite + schemas)
 
