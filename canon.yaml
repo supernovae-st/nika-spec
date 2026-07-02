@@ -8,7 +8,7 @@
 #
 # Projectors · scripts/canon-projectors.py (in-repo · counts → docs+website) ·
 #   scripts/showcase-projector.py (examples → docs+website) · monorepo gate ·
-#   supernovae scripts/audit/nika-showcase-parity.sh + nika-canon-project.sh
+#   supernovae plumbing/scripts/audit/nika-showcase-parity.sh + nika-canon-project.sh
 # Architecture · projection-by-default (edit here once → projectors update
 #   every surface · drift is caught structurally at commit time). The .ttl is currently parallel-authored · in Phase 3
 #   it gets generated from this file.
