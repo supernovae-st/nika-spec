@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
 #
-# TEMPLATE · chain — gather facts → one model step → persist.
+# TEMPLATE · chain · gather facts → one model step → persist.
 # The default shape for « take real data, produce words, save them ».
 #
 # Instantiate (agents · deterministic) ·

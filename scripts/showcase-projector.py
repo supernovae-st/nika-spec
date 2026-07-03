@@ -137,7 +137,7 @@ def _gloss(task: dict) -> str:
     if "for_each" in task:
         g = "for each item · " + g
     if "when" in task:
-        g += " — only if its condition holds"
+        g += " · only if its condition holds"
     return g
 
 

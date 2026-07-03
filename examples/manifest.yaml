@@ -22,17 +22,17 @@ foundation:
     sha256_16: 187904d14bb2e430
 templates:
   - file: templates/agent-loop.nika.yaml
-    sha256_16: 5c906b0da7452755
+    sha256_16: 48976c5e6a0b7c6c
   - file: templates/chain.nika.yaml
     sha256_16: 850080f98e115a8b
   - file: templates/etl-state.nika.yaml
-    sha256_16: d1b672d199505f56
+    sha256_16: cba8dcdc952eedc0
   - file: templates/fanout.nika.yaml
     sha256_16: 11762d6f2a2d0f09
   - file: templates/gate-and-act.nika.yaml
     sha256_16: e8a0c5e7f60f5e60
   - file: templates/human-gated-ship.nika.yaml
-    sha256_16: 3b487f1da13cf918
+    sha256_16: 8a0675f074eecb75
 showcase:
   - file: examples/showcase/t1-meeting-actions.nika.yaml
     workflow: meeting-actions
