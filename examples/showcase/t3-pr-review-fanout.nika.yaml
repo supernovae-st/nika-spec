@@ -4,7 +4,7 @@
 # showcase · T3 fan-out · engineering
 #
 # A review SWARM · one mini-agent per changed file, each granted
-# read-only tools, all running in parallel — then jq flattens the
+# read-only tools, all running in parallel, then jq flattens the
 # findings and one model writes the summary a human actually reads.
 #
 # Demonstrates ·

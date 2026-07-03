@@ -4,12 +4,12 @@
 # showcase · T2 chain · SEO / content marketing
 #
 # A competitor's sitemap goes in. A ready-to-write content brief comes
-# out · title, angle, outline, keywords — grounded in what they actually
+# out · title, angle, outline, keywords: grounded in what they actually
 # published, not vibes.
 #
 # Demonstrates ·
 #   - `mode: sitemap` then `mode: article` · two fetch extractions chained
-#   - `output:` jq slice · `.urls[:5]` — bind just the top of a list
+#   - `output:` jq slice · `.urls[:5]`: bind just the top of a list
 #   - CEL indexing · `${{ tasks.map.top[0] }}` reaches into a binding
 #   - `infer.schema:` · the brief is typed, not a blob
 #

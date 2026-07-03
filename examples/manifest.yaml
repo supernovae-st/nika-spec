@@ -63,7 +63,7 @@ showcase:
     tier: T2
     description: "Local-model clause extraction \u2192 schema gate \u2192 risk memo"
     constructs: [local_model, outputs, schema, typed_vars]
-    sha256_16: daef023c70d6553d
+    sha256_16: 8e88657f06a10f13
   - file: examples/showcase/t2-etl-quarantine.nika.yaml
     workflow: etl-quarantine
     tier: T2
@@ -111,7 +111,7 @@ showcase:
     tier: T3
     description: "live config vs sanctioned baseline \u2192 typed drift \u2192 explained alert"
     constructs: [local_model, on_error, outputs, retry, secrets, typed_vars, when]
-    sha256_16: cce91fe356b07ec2
+    sha256_16: 20c0ee73e8d42310
   - file: examples/showcase/t3-localization-factory.nika.yaml
     workflow: localization-factory
     tier: T3
@@ -129,7 +129,7 @@ showcase:
     tier: T3
     description: "glob CVs \u2192 local-model rubric per candidate \u2192 deterministic shortlist"
     constructs: [fail_fast, for_each, local_model, max_parallel, on_error, outputs, schema, when, with]
-    sha256_16: df04fd8a71ae8fbd
+    sha256_16: 524a09c40c8a95b2
   - file: examples/showcase/t4-ceo-monday-brief.nika.yaml
     workflow: ceo-monday-brief
     tier: T4
@@ -147,10 +147,10 @@ showcase:
     tier: T4
     description: "parallel evidence \u2192 typed timeline \u2192 settle + recheck \u2192 postmortem draft"
     constructs: [capture, local_model, on_finally, outputs, retry, schema, secrets, thinking, when]
-    sha256_16: f44df136de7103a7
+    sha256_16: ea3838c93e19a3d8
   - file: examples/showcase/t4-release-train.nika.yaml
     workflow: release-train
     tier: T4
     description: "parallel gates \u2192 human GO \u2192 hold until the window \u2192 ship \u00b7 verify \u00b7 record"
     constructs: [capture, on_finally, outputs, retry, secrets, timeout, typed_vars, when]
-    sha256_16: b12de28f818a65af
+    sha256_16: 6c4324567481b8bb

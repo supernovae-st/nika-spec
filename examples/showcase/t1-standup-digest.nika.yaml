@@ -3,13 +3,13 @@
 #
 # showcase · T1 starter · engineering / any team
 #
-# Your standup note writes itself — from what you actually committed.
+# Your standup note writes itself, from what you actually committed.
 #
 # Demonstrates ·
 #   - implicit parallelism · `today` + `history` have no deps · they run together
 #   - `nika:date` · timestamps come from a builtin, not the model's imagination
 #   - `exec:` → `infer:` · the bread-and-butter chain (real data in, words out)
-#   - `nika:write` · ALWAYS pass `content:` — a write without content writes nothing
+#   - `nika:write` · ALWAYS pass `content:` (a write without content writes nothing)
 #
 # Run · nika run examples/showcase/t1-standup-digest.nika.yaml
 nika: v1

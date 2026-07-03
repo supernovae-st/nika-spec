@@ -11,7 +11,7 @@
 #   - `nika:glob` · the collection comes from the filesystem at runtime
 #   - chained `for_each` stages · read-all → translate-all → write-all
 #   - `nika:jq` `transpose` · zip two parallel arrays into [{path, text}]
-#   - `${{ item.path }}` · loop-locals are objects too — field access works
+#   - `${{ item.path }}` · loop-locals are objects too: field access works
 #
 # Run · nika run examples/showcase/t3-localization-factory.nika.yaml
 nika: v1
