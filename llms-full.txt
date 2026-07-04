@@ -52,9 +52,11 @@ tasks:
       prompt: "Say hello in French"
 ```
 
-Run it (with the reference engine) ·
+Run it — install to first output in under a minute ·
 
 ```bash
+brew install supernovae-st/tap/nika     # single static binary (Rust · no runtime deps)
+ollama pull llama3.2:3b                 # the local model above (once · or swap for a cloud provider)
 nika run hello.nika.yaml
 ```
 
@@ -154,6 +156,18 @@ A portable language means ·
 
 Standards work · SQL · GraphQL · OpenAPI · Dockerfile · GitHub Actions YAML.
 Nika is that for AI workflows.
+
+### Why not … ?
+
+| Instead of | The one-line difference |
+|---|---|
+| **GitHub Actions / Argo** | CI YAML orchestrates *repos and runners*; Nika's four verbs are *AI-native* (`infer` is a first-class primitive with providers, budgets, structured output — not a shell step calling curl). |
+| **Temporal / Inngest / Restate** | Those are durable-execution *runtimes* for long-lived distributed state; Nika is a finite single-run DAG *language* — no clusters, no event history, one file in, one run out. |
+| **LangGraph / framework code** | A Python/TS graph is code locked to its framework and runtime; a Nika file is portable text — any conformant engine runs it, and there is deliberately no importer/exporter chaining the language to others' semantics. |
+| **Prompting an agent directly** | A workflow is reviewable, diffable, re-runnable and statically checkable (`nika check` catches errors before any token is spent); a chat transcript is none of those. |
+
+The full boundary rationale (including proud non-goals) lives in
+[spec/08-out-of-scope.md](./spec/08-out-of-scope.md).
 
 ---
 
