@@ -102,7 +102,15 @@ this prose spec (kept in sync · the prose is normative on conflict).
 Editors (VS Code · Zed · JetBrains · Neovim) pick it up via the standard
 `yaml.schemas` association (or a `# yaml-language-server: $schema=…` modeline)
 to give **autocomplete + inline validation** as you type, the same DX as
-GitHub Actions and Docker Compose. This is also what makes a Nika file
+GitHub Actions and Docker Compose. A working modeline today:
+
+```yaml
+# yaml-language-server: $schema=https://raw.githubusercontent.com/supernovae-st/nika-spec/main/schemas/workflow.schema.json
+nika: v1
+```
+
+(The short `https://nika.sh/spec/v1/workflow.schema.json` form goes live
+with the site launch · both will resolve to the same schema.) This is also what makes a Nika file
 pleasant (and trap-free) for an AI to author: the schema constrains the shape
 before the engine ever runs. CEL expressions and jq expressions inside string
 fields are validated by the engine (Core level), not the JSON Schema.

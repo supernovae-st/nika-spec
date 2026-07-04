@@ -201,9 +201,9 @@ Forever after GA · the 5 pillars are locked. Stdlib evolves independently.
 ## Related
 
 - [supernovae-st/nika](https://github.com/supernovae-st/nika) · reference engine (Rust · AGPL-3.0-or-later)
-- [docs.nika.sh](https://docs.nika.sh) · end-user docs (source · [supernovae-st/nika-docs](https://github.com/supernovae-st/nika-docs))
+- [docs.nika.sh](https://docs.nika.sh) · end-user docs · goes live with the launch (source · [supernovae-st/nika-docs](https://github.com/supernovae-st/nika-docs))
 - [supernovae-st/nika-client](https://github.com/supernovae-st/nika-client) · TypeScript SDK
-- [nika.sh](https://nika.sh) · marketing landing
+- [nika.sh](https://nika.sh) · landing · goes live with the launch
 
 ---
 
