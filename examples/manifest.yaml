@@ -93,7 +93,7 @@ showcase:
     tier: T2
     description: "Competitor sitemap \u2192 top page \u2192 gap analysis \u2192 typed brief"
     constructs: [local_model, output, outputs, schema, typed_vars]
-    sha256_16: 9f0178f6dfcb84c0
+    sha256_16: 0d5f0230fe9fd77a
   - file: examples/showcase/t2-support-triage.nika.yaml
     workflow: support-triage
     tier: T2
@@ -105,7 +105,7 @@ showcase:
     tier: T3
     description: "Sitemap \u2192 parallel page reads \u2192 one competitive brief + ping"
     constructs: [fail_fast, for_each, local_model, max_parallel, on_error, output, outputs, retry, secrets, timeout]
-    sha256_16: d45263a21b26ca87
+    sha256_16: 810901774b8007cd
   - file: examples/showcase/t3-config-drift-sentinel.nika.yaml
     workflow: config-drift-sentinel
     tier: T3
