@@ -12,6 +12,32 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added · ADR-099 · durable-lite run resume (2026-07-05)
+
+- **`adr/` opens in this repo** with
+  [ADR-099](adr/adr-099-durable-lite-run-resume.md) · « durable-lite run
+  resume — the trace IS the checkpoint » (**proposed** · implementation
+  follows engine-side). `nika run --resume <trace>` re-executes a workflow
+  skipping every task whose (task-definition hash + resolved-input hash)
+  matches a `task.completed` record in the run's own NDJSON trace · each
+  skip is a **visible** `task.cache_hit` event (never silent) · `--from
+  <task_id>` forces re-run from a node. Rider · the durable human gate: a
+  non-interactive default-less `nika:prompt` journals `workflow.paused` +
+  exits cleanly · `--resume` re-arms it (H5's live-pause limitation
+  resolved · zero new syntax). Non-goals locked in the ADR · no
+  author-facing determinism constraints (side-effectful tasks re-run
+  unless hash-matched) · idempotency keys stay the NEXT deferral · zero
+  envelope change (CLI + trace/event vocabulary only · `paused` joins the
+  run-report workflow states additively) · no daemon.
+- **08-out-of-scope amended in step** · §checkpointing carries the
+  durable-lite lift note (the `checkpoint:`-block sketch REMAINS
+  deferred) · H1 marks the tier lifted-by-ADR and un-couples it from
+  idempotency keys · H5 points durable pause at ADR-099's `--resume` ·
+  §idempotency cross-links the interplay.
+- ADR numbering continues the shared Nika series (engine `docs/adr/`
+  keeps the registry · ADR-098 taken in-flight engine-side) ·
+  registration in the engine index follows with the implementation arc.
+
 ### Fixed · sitemap examples bound a phantom `.urls` wrapper (2026-07-05)
 
 - **`nika:fetch` `mode: sitemap` returns the ROOT ARRAY**
