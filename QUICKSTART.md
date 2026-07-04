@@ -91,6 +91,17 @@ tasks:
       prompt: "Translate to ${{ vars.target_lang }}: ${{ vars.text }}"
 ```
 
+Override any input at launch · `--var key=value` is repeatable ·
+
+```bash
+nika run translate-anything.nika.yaml --var target_lang="Japanese"
+```
+
+A `--var` value overrides the declared default · satisfies a
+`required: true` input (the typed form · see
+[spec/01-envelope.md](./spec/01-envelope.md#vars--optional--workflow-inputs--untyped-or-typed)) ·
+and an unknown key is refused before anything runs.
+
 There are 5 variable namespaces · `vars` · `with` · `tasks` · `env` ·
 `secrets`. See [spec/04-variables.md](./spec/04-variables.md).
 

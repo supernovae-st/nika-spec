@@ -199,6 +199,18 @@ An untyped object default that legitimately contains a `type` key
 (`config: { type: "custom" }` would be misread) MUST use the typed form
 explicitly · `config: { type: object, default: { type: "custom" } }`.
 
+**Supplying values at launch** · the caller provides inputs when starting
+the run; how is an engine CLI concern. The reference engine's surface ·
+`nika run flow.nika.yaml --var topic="Rust async 2026"` (repeatable · one
+`--var key=value` per input). A supplied value **overrides** a declared
+`default:` and **satisfies** a `required: true` var (conformance rule 5
+below · a missing required input rejects before execution). A value parses
+as JSON when it parses (`--var limit=5` is a number · `--var deep=true` a
+boolean) · else it rides as a string. An **unknown key is refused** before
+the run, with the declared set listed: a typo that silently did nothing
+would be the worst outcome. The file stays the contract · every input a
+caller can pass is declared in `vars:`.
+
 See [04-variables.md](./04-variables.md) for the full substitution grammar.
 
 ### `env` · *optional · non-sensitive runtime config*
