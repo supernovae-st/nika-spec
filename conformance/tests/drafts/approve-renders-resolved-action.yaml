@@ -1,0 +1,9 @@
+# EXPECT(v0.2): the approval surface renders `./deploy.sh prod` (the
+# RESOLVED argv) — never workflow-authored prose (ADR-101 WYAIWYE).
+# EXPECT(v0.1 engines): NIKA-PARSE-005 unknown field `approve`.
+nika: v1
+workflow: approve-positive
+tasks:
+  - id: ship
+    approve: true
+    exec: { command: ./deploy.sh prod }
