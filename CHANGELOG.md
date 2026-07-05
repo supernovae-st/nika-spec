@@ -16,8 +16,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - **`adr/` opens in this repo** with
   [ADR-099](adr/adr-099-durable-lite-run-resume.md) · « durable-lite run
-  resume — the trace IS the checkpoint » (**proposed** · implementation
-  follows engine-side). `nika run --resume <trace>` re-executes a workflow
+  resume — the trace IS the checkpoint » (**accepted** · implemented by
+  engine supernovae-st/nika#154). `nika run --resume <trace>` re-executes a workflow
   skipping every task whose (task-definition hash + resolved-input hash)
   matches a `task.completed` record in the run's own NDJSON trace · each
   skip is a **visible** `task.cache_hit` event (never silent) · `--from
@@ -36,7 +36,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   §idempotency cross-links the interplay.
 - ADR numbering continues the shared Nika series (engine `docs/adr/`
   keeps the registry · ADR-098 taken in-flight engine-side) ·
-  registration in the engine index follows with the implementation arc.
+  registered in the engine index with the implementation (64 ADRs valid).
 
 ### Fixed · sitemap examples bound a phantom `.urls` wrapper (2026-07-05)
 
