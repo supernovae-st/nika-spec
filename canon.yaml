@@ -43,7 +43,7 @@ counts:
   verbs: 4
   namespaces: 5
   builtins: 23
-  providers: 14
+  providers: 16
   extract_modes: 9
   error_namespaces: 14
   error_categories: 12
