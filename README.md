@@ -38,7 +38,7 @@ is at [supernovae-st/nika](https://github.com/supernovae-st/nika)
 nika: v1
 workflow: hello
 
-model: ollama/llama3.2:3b   # local · zero key · swap for any of the 14 providers
+model: ollama/qwen3.5:4b   # local · zero key · swap for any of the 14 providers
 
 tasks:
   - id: greet
@@ -50,7 +50,7 @@ Run it — install to first output in under a minute ·
 
 ```bash
 brew install supernovae-st/tap/nika     # single static binary (Rust · no runtime deps)
-ollama pull llama3.2:3b                 # the local model above (once · or swap for a cloud provider)
+ollama pull qwen3.5:4b                 # the local model above (once · or swap for a cloud provider)
 nika run hello.nika.yaml
 ```
 

@@ -32,7 +32,7 @@ python3 eval/run-eval.py --model haiku --condition both --limit 4
 python3 eval/run-eval.py --model haiku
 python3 eval/run-eval.py --model gemini/gemini-2.5-flash
 python3 eval/run-eval.py --model openai/gpt-4o-mini
-python3 eval/run-eval.py --model ollama/llama3.2:3b   # local · no key
+python3 eval/run-eval.py --model ollama/qwen3.5:4b   # local · no key
 
 # re-print a past run
 python3 eval/run-eval.py --report eval/results/<file>.json
