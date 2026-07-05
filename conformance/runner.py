@@ -178,7 +178,7 @@ def stdlib_surface_errors(doc: dict, canon: dict) -> list[dict]:
                 errs.append({"namespace": "NIKA-BUILTIN", "category": "validation_error",
                              "detail": f"{where} · 'save: false' is reserved in v0.1 — assets "
                                        "always land in output_dir (builtins-v0.1.md)"})
-            enums = {"provider": {"openai", "gemini", "mock"},
+            enums = {"provider": {"local", "openai", "gemini", "xai", "mock"},
                      "format": {"png", "jpeg", "jpg", "webp"},
                      "quality": {"auto", "low", "medium", "high", "ultra"},
                      "background": {"auto", "transparent", "opaque"},

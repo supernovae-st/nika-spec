@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "the `local` provider (v1.1 · 2026-07-05) is the sovereign image path — any OpenAI-images-compatible self-hosted server (LocalAI · Ollama · sd.cpp · SGLang · vLLM-Omni); the base URL is engine config, never workflow data. Model names are server-specific, so `local` is never inferred from `model:`."
+}

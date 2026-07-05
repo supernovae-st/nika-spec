@@ -12,6 +12,33 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed · `nika:image_generate` providers v1.1 — local-first + xai (2026-07-05)
+
+- The provider set opens per the sovereignty review (supernovae-alignment
+  Rule 3: the engine had 5 local LLM providers and ZERO sovereign image
+  path): **`local`** — any OpenAI-images-compatible self-hosted server
+  (LocalAI · Ollama · stable-diffusion.cpp `sd-server` · SGLang Diffusion ·
+  vLLM-Omni all speak `POST {base}/v1/images/generations` → `data[].b64_json`);
+  the base URL is ENGINE CONFIG (`NIKA_IMAGE_LOCAL_URL` · default LocalAI's
+  `http://localhost:8080` · optional `NIKA_IMAGE_LOCAL_API_KEY`), never
+  workflow data; model names are server-specific so `local` is never
+  inferred from `model:` · default local timeout 300s (CPU renders run
+  minutes). **`xai`** — the Imagine API (`grok-imagine-image` default ·
+  the `-quality` tier is the model knob · native `aspect_ratio` +
+  `resolution: 1k|2k` classes · `NIKA_XAI_API_KEY→XAI_API_KEY`).
+- **Result URLs are never fetched (normative)**: engines request
+  `response_format: b64_json` on url-capable wires and MUST refuse a
+  url-only response — fetching a provider-supplied URL would reopen the
+  SSRF surface the const-endpoint design closed.
+- Output + manifest gain **`endpoint_host`** (which server rendered the
+  asset — load-bearing once `local` makes the endpoint configurable), and
+  the warning vocabulary grows `count_shortfall:` (a provider returned
+  fewer than `n`) + `revised_prompt_clamped:` + `xai_size_class:` +
+  `aspect_remapped:` — silent degradation stays non-conformant.
+- Conformance: oracle learns the v1.1 provider enum · fixture
+  `stdlib/builtins/006` (valid `local` generation). Reference engine PR
+  pairs (supernovae-st/nika).
+
 ### Added · `nika:image_generate` — the 24th builtin · first §Media graduate (2026-07-05)
 
 - **`nika:image_generate`** joins the canonical stdlib (23 → 24 · the first
