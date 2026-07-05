@@ -12,6 +12,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added · content credentials — detect-and-preserve (2026-07-06)
+
+- Normative: engines MUST detect upstream C2PA signals (PNG `caBX` ·
+  JPEG APP11 JUMBF · RIFF `C2PA` · MP3 GEOB) before any in-file write,
+  MUST stand their own embeds down on signed payloads (hard bindings
+  hash byte ranges — an insert turns valid credentials into « tampered »),
+  and SHOULD surface `content_credentials` (detection labels, never
+  « verified ») + `watermark_declared` (provider facts, e.g. SynthID).
+  Proven against real gpt-image-2 bytes (caBX present in API responses).
+  EU AI Act Art. 50 (2026-08-02) makes mark preservation a compliance
+  surface. Reference engine PR pairs.
+
 ### Added · `nika:tts_generate` — the 25th builtin (stdlib §Audio · 2026-07-05)
 
 - Speech synthesis as a workflow citizen, sovereign-first: `local` (ONE
