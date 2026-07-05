@@ -38,7 +38,7 @@ is at [supernovae-st/nika](https://github.com/supernovae-st/nika)
 nika: v1
 workflow: hello
 
-model: ollama/qwen3.5:4b   # local · zero key · swap for any of the 14 providers
+model: ollama/qwen3.5:4b   # local · zero key · swap for any provider in the catalog
 
 tasks:
   - id: greet
@@ -98,7 +98,7 @@ nika-spec/
 ├── AGENTS.md                  ← the deterministic authoring protocol (agents start here)
 │
 └── stdlib/                    ← versioned independently
-    ├── providers-v0.1.md        14 providers canonical (ollama · llamacpp · vllm · mistral · …)
+    ├── providers-v0.1.md        16 providers canonical (ollama · llamacpp · vllm · mistral · …)
     ├── extract-modes-v0.1.md    9 extract modes (markdown · article · jq · …)
     └── builtins-v0.1.md         23 builtins curated (core · file · data · …)
 ```
