@@ -12,6 +12,24 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added · `nika:image_generate` polish — in-file provenance + honest cost (2026-07-05)
+
+- **Provenance travels IN the file (PNG)**: engines SHOULD embed the
+  deterministic provenance core (tool · engine version · provider · model ·
+  clamped prompt · seed — no timestamp, byte-determinism holds) as a `nika`
+  tEXt chunk — the ComfyUI/InvokeAI interchange practice; a sidecar manifest
+  stops answering « where does this come from? » the moment the file is
+  copied without it. JPEG/WebP are manifest-only, documented.
+- **Output contract gains `cost_usd`** (real spend when the provider
+  reports it exactly — xai bills `cost_in_usd_ticks`, 1 cent = 10⁸ ticks —
+  `null` otherwise, never an estimate dressed as truth) + the normative
+  **invoke-cost metering** rule: a tool whose structured output carries a
+  top-level numeric `cost_usd` reports real spend; engines SHOULD meter it
+  into the run's cost ledger.
+- Local prose rider: SD-family servers honor the `positive | negative`
+  split written directly inside `prompt:` (LocalAI pipe syntax) — no
+  separate arg.
+
 ### Changed · `nika:image_generate` providers v1.1 — local-first + xai (2026-07-05)
 
 - The provider set opens per the sovereignty review (supernovae-alignment

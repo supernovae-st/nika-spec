@@ -4575,7 +4575,7 @@ outputs** (no base64 in `tasks.X.output`, logs, or traces · normative).
 | Arg | Notes |
 |---|---|
 | `provider` | `local` · `openai` · `gemini` · `xai` · `mock` — optional when inferable from `model:` (`gpt-image*`→openai · `gemini-*`→gemini · `grok*`→xai · `mock*`→mock · `local` is NEVER inferred: its model names are server-specific) |
-| `model` | per-provider default (reference engine 2026-07: `stablediffusion` for local — the LocalAI convention · `gpt-image-2` · `gemini-3.1-flash-image` · `grok-imagine-image` — the `-quality` tier is the model knob · `mock-image-1`) |
+| `model` | per-provider default (reference engine 2026-07: `stablediffusion` for local — the LocalAI convention · SD-family servers also honor the `positive \| negative` split INSIDE `prompt:` (LocalAI pipe syntax) — no separate arg needed · `gpt-image-2` · `gemini-3.1-flash-image` · `grok-imagine-image` — the `-quality` tier is the model knob · `mock-image-1`) |
 | `prompt` | **required** · the creative brief · may use `${{ … }}` |
 | `mode` | `generate` (default) · `edit` is RESERVED (rejected loudly in v0.1 · media roadmap) |
 | `n` | 1..=10 variants (engines MAY satisfy n via sequential provider calls · documented per adapter) |
@@ -4610,9 +4610,15 @@ NEVER a credential: keys live a composition layer away by construction).
 prompt, revised_prompt, provider_text, created_at, count, images: [{ index,
 path, filename, mime_type, format, width, height, size_bytes, sha256,
 provider, model, seed, variant_id, warnings, metadata }], usage:
-{ input_tokens, output_tokens, total_tokens, thoughts_tokens }, warnings,
-manifest_path, output_dir }` — absent usage axes are `null`, never
-zero-that-looks-real.
+{ input_tokens, output_tokens, total_tokens, thoughts_tokens }, cost_usd,
+warnings, manifest_path, output_dir }` — absent usage axes are `null`,
+never zero-that-looks-real. `cost_usd` is the render's REAL spend when
+the provider reports it exactly (xai bills `cost_in_usd_ticks` in the
+response · 1 cent = 10⁸ ticks) and `null` otherwise — never an estimate
+dressed as truth. **Invoke-cost metering (normative)** · a tool whose
+structured output carries a top-level numeric `cost_usd` reports real
+spend; engines SHOULD meter it into the run's cost ledger through the
+same honest-spend channel `infer:` rides.
 
 **Security (engine MUST)** · provider endpoints are ENGINE-FIXED constants
 (never workflow data — the provider egress is engine transport, exactly like
@@ -4648,6 +4654,15 @@ provider-supplied result URL would reopen the SSRF/net-boundary surface
 the const-endpoint design closed. The provenance manifest and output
 carry `endpoint_host` (which server actually rendered the asset — load-
 bearing for `local`, where the endpoint is configurable).
+
+**Provenance travels IN the file (PNG)** · engines SHOULD embed the
+deterministic provenance core (tool · engine version · provider · model ·
+clamped prompt · seed — no timestamp, so byte-determinism holds) as a
+`nika` tEXt chunk in saved PNG renders — the ComfyUI/InvokeAI
+interchange practice: a sidecar manifest answers « where does this come
+from? » only until the file is copied without it. JPEG/WebP have no
+equally-universal text container and are documented as manifest-only,
+never silently faked.
 
 Throws · `NIKA-BUILTIN-IMAGE_GENERATE-001` invalid arguments (incl. the v0.1
 RESERVED options · `validation_error`) · `-002` provider unavailable
