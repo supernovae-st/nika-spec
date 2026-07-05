@@ -1,7 +1,7 @@
 ---
 id: ADR-100
 title: "Trace retention — bounded by default, never silently, never a pending gate"
-status: proposed
+status: accepted
 date: 2026-07-05
 phase: ""
 deciders: ["@ThibautMelen"]
@@ -22,10 +22,17 @@ timeline: ""
 follow_ups: ["register ADR-100 in the engine docs/adr index when the implementation arc opens"]
 ---
 
+<!-- accepted 2026-07-05 · implemented by the engine (feat/trace-retention · the D1 retention policy + D2 opportunistic gc at run start + D3 nika trace ls/rm + D4 NIKA_TRACE_* knobs reported by nika doctor + the 4 conformance fixtures as tests) -->
+
 # ADR-100 — Trace retention · bounded by default, never silently, never a pending gate
 
-- **Status**: Proposed (2026-07-05) — spec contract first · engine
-  implementation follows as a separate arc · flips to Accepted with it.
+- **Status**: Accepted (2026-07-05) — implemented by the engine
+  `feat/trace-retention` arc: the D1 policy (keep-10 · 30d · 256MB ·
+  paused + newest-per-workflow exempt) · D2 opportunistic GC at
+  `nika run` start (fail-open · exactly one stderr line · `--no-gc`) ·
+  D3 `nika trace ls|rm` (paused refuses without `--force` and names
+  the task) · D4 knobs on the `NIKA_TRACE_*` family, reported by
+  `nika doctor` · the 4 conformance fixtures as engine tests.
 - **Surface**: CLI + runtime housekeeping ONLY. Zero envelope change ·
   zero new YAML.
 - **Home**: this repo's `adr/` (shared Nika series · see
