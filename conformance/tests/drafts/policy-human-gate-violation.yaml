@@ -1,0 +1,10 @@
+# EXPECT(v0.2): check ERROR NIKA-POLICY-001 — `wipe` is an exec with no
+# approve: upstream while policy requires human_gate_before: [exec].
+# EXPECT(v0.1 engines): NIKA-PARSE-005 unknown field `policy`.
+nika: v1
+workflow: policy-negative
+policy:
+  human_gate_before: [exec]
+tasks:
+  - id: wipe
+    exec: { command: rm -rf ./dist }
