@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: og-hero
+tasks:
+  - id: hero
+    invoke:
+      tool: "nika:image_generate"
+      args:
+        provider: mock
+        prompt: "OG hero — a monarch butterfly over a nebula"
+        aspect_ratio: "16:9"
+        output_dir: "./assets/og"
+        filename_prefix: "launch-hero"

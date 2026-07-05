@@ -12,6 +12,31 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added · `nika:image_generate` — the 24th builtin · first §Media graduate (2026-07-05)
+
+- **`nika:image_generate`** joins the canonical stdlib (23 → 24 · the first
+  graduate of the deferred media class) · provider-backed image asset
+  generation as an *asset pipeline*: images are **saved under a declared
+  `output_dir:`** (rides `permits.fs` · `NIKA-SEC-004` gated per final path
+  before any I/O) and outputs/manifest carry **paths + dimensions + sha256 —
+  image bytes never ride workflow outputs**. Providers v0.1 · `openai`
+  (`gpt-image-2`) · `gemini` (`gemini-3.1-flash-image`) · `mock`
+  (deterministic · offline · zero keys). Normative surface in
+  [stdlib/builtins-v0.1.md §Media](stdlib/builtins-v0.1.md): closed arg
+  enums · size-vs-aspect_ratio resolution rule (exact size wins, loudly) ·
+  magic-bytes-are-the-authority decode validation (header-only · no pixel
+  decode) · the `{stem}-{provider}-{modelslug}-{index}-{sha8}.{ext}`
+  filename grammar (sanitized · traversal-free) · provenance manifest
+  (`manifest_version: 1`) · stable `code: message` warnings · error codes
+  `NIKA-BUILTIN-IMAGE_GENERATE-001..007`. The v0.1 boundaries are refused
+  loudly, never silently: `mode: edit` · `reference_images:` ·
+  `save: false` are RESERVED (media roadmap). Cascade · canon.yaml
+  builtins 24 · workflow.schema.json tool enum · conformance fixtures
+  `stdlib/builtins/004` (reserved `mode: edit` rejected) + `005` (valid
+  mock generation) · showcase `t1-og-images` (the OG-image pipeline ·
+  offline-runnable). Reference engine ships it as `nika-builtin`'s Media
+  module family behind the dispatcher's image plane.
+
 ### Added · ADR-099 · durable-lite run resume (2026-07-05)
 
 - **`adr/` opens in this repo** with

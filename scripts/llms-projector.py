@@ -43,7 +43,7 @@ LLMS_TXT = f"""# Nika
 
 > Intent as Code · a workflow language for AI. Four verbs (`infer` · `exec` ·
 > `invoke` · `agent`), a YAML envelope (`nika: v1` · forever), a closed
-> stdlib (23 builtins · 14 providers), and a conformance suite. Apache-2.0
+> stdlib (24 builtins · 16 providers), and a conformance suite. Apache-2.0
 > spec · AGPL-3.0 reference engine in Rust (single static binary).
 
 Workflow files are `*.nika.yaml`. The JSON Schema gives any editor
@@ -58,7 +58,7 @@ autocomplete + validation via a `yaml-language-server` modeline:
 - [DAG]({RAW}/spec/03-dag.md): task ordering · needs · fan-out · when-gates
 - [Variables]({RAW}/spec/04-variables.md): the five namespaces · CEL + jq expressions
 - [Errors]({RAW}/spec/05-errors.md): the NIKA-XXX code contract · 14 namespaces
-- [Stdlib contract]({RAW}/spec/06-stdlib-contract.md): 23 builtins · 14 providers · 9 extract modes
+- [Stdlib contract]({RAW}/spec/06-stdlib-contract.md): 24 builtins · 16 providers · 9 extract modes
 - [Conformance]({RAW}/spec/07-conformance.md): three levels · the fixture suite · editor tooling
 - [Out of scope]({RAW}/spec/08-out-of-scope.md): what Nika deliberately does not do
 
@@ -66,7 +66,7 @@ autocomplete + validation via a `yaml-language-server` modeline:
 
 - [Canonical registry]({RAW}/canon.yaml): the machine-readable single source of truth
 - [JSON Schema]({RAW}/schemas/workflow.schema.json): editor autocomplete + validation
-- [Builtins]({RAW}/stdlib/builtins-v0.1.md): the 23 canonical builtins
+- [Builtins]({RAW}/stdlib/builtins-v0.1.md): the 24 canonical builtins
 - [Providers]({RAW}/stdlib/providers-v0.1.md): the 14-provider catalog (local-first)
 - [Quickstart]({RAW}/QUICKSTART.md): author + check + run a first workflow
 
