@@ -46,9 +46,15 @@ Rules:
 """
 
 def ollama_generate(model: str, prompt: str, timeout: int = 600) -> str:
+    # think:false + a hard num_predict cap — measured 2026-07-05: with
+    # thinking ON, num_predict caps thinking+content TOGETHER and the
+    # reasoning devours the whole budget (7.5k thinking chars · content
+    # EMPTY · 103s); think:false yields the fenced yaml in 18s. The bench
+    # measures direct authoring; a thinking arm is a separate future
+    # column, not the default.
     body = json.dumps({
-        "model": model, "stream": False,
-        "options": {"temperature": 0.7, "num_ctx": 8192},
+        "model": model, "stream": False, "think": False,
+        "options": {"temperature": 0.7, "num_ctx": 8192, "num_predict": 1536},
         "messages": [{"role": "user", "content": prompt}],
     }).encode()
     req = urllib.request.Request(
