@@ -1,0 +1,18 @@
+# HF Community Evals registration (huggingface.co/blog/eee-community-evals)
+# · the dataset repo + this file auto-registers the bench → leaderboard +
+# scores on model cards + verified badges + Every-Eval-Ever cross-post.
+name: nika-authorability
+display_name: "Nika Authorability Bench"
+description: >
+  Can a model author a valid Nika workflow from a natural-language intent
+  and the spec docs alone? Mechanical judge: `nika check` (parse + static
+  ladder) as L1 · structural expect-blocks as L2 · pass^k scoring.
+dataset: tasks.jsonl
+metrics:
+  - name: parse_pass_rate
+    description: "L1 · nika check exits 0 (parse + static ladder)"
+  - name: structural_pass_rate
+    description: "L2 · expect-block satisfied (verbs · DAG bounds · constructs)"
+  - name: pass_at_k
+    description: "reliability over k=5 independent generations"
+license: apache-2.0
