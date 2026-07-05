@@ -42,11 +42,24 @@ from day 1 so anyone can reproduce or extend it.
 | `expect.constructs` | string[] | required constructs (schema · for_each · depends_on · retry · permits …) |
 | `reference` | string | path to one valid reference solution (not the only one) |
 
+## Grounding note (2026-07-05 fresh-sweep)
+
+Text2DSL (arXiv:2606.22586) confirms the in-context protocol class:
+grammar + vocabulary injected in context reaches 98.6-99.4% syntactic
+validity without fine-tuning — the docs-bundle arm of this bench is that
+arm, graduated (llms.txt index vs llms-full.txt).
+
 ## Baselines to publish (v1)
 
 Same protocol · same tasks · Nika vs LangGraph-Python vs raw-Python ·
 k=5 · a local open-weight (qwen3.5:9b) + one frontier model — the
 open-weight column is the sovereignty story.
+
+## Publishing (HF Community Evals)
+
+`eval.yaml` registers this bench in the Community Evals flow — the Hub
+turns the dataset repo into a leaderboard with per-model-card scores and
+verified badges. Publish = operator-gated (Hub org + baseline budget).
 
 ## License
 
