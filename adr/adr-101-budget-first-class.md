@@ -1,5 +1,5 @@
 ---
-id: ADR-100
+id: ADR-101
 title: "budget: first-class — declarative cost caps · statically aggregated"
 status: proposed
 date: 2026-07-05
@@ -24,7 +24,7 @@ follow_ups: ["flip the engine forward-compat test future_clause_budget_rejects_c
 
 > **Status · DRAFT-PROPOSAL (overnight 2026-07-05) · NOT canon until operator lock.**
 
-# ADR-100 · `budget:` first-class
+# ADR-101 · `budget:` first-class
 
 ## Context
 

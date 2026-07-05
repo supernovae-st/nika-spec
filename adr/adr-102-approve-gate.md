@@ -1,5 +1,5 @@
 ---
-id: ADR-101
+id: ADR-102
 title: "approve: gate — what you approve is what executes"
 status: proposed
 date: 2026-07-05
@@ -10,7 +10,7 @@ affects_crates: [nika-schema, nika-cli, nika-runtime]
 affects_layers: [L0, L2, L4]
 supersedes: []
 superseded_by: []
-related: [ADR-099, ADR-100]
+related: [ADR-099, ADR-101]
 requires: []
 enables: []
 amends: []
@@ -24,7 +24,7 @@ follow_ups: ["flip future_clause_approve_rejects_cleanly to a positive parse", "
 
 > **Status · DRAFT-PROPOSAL (overnight 2026-07-05) · NOT canon until operator lock.**
 
-# ADR-101 · `approve:` gate
+# ADR-102 · `approve:` gate
 
 ## Context
 
@@ -79,5 +79,5 @@ tasks:
 
 - The human-gated-ship template gains the clause form; the builtin form
   stays documented for free-form questions.
-- Agentproof-class static checks (ADR-102 `policy:`) can REQUIRE this
+- Agentproof-class static checks (ADR-103 `policy:`) can REQUIRE this
   clause before destructive verbs — the two seeds compose.

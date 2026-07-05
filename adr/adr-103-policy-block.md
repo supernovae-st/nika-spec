@@ -1,5 +1,5 @@
 ---
-id: ADR-102
+id: ADR-103
 title: "policy: block — named workflow-order rules · statically verified"
 status: proposed
 date: 2026-07-05
@@ -10,7 +10,7 @@ affects_crates: [nika-schema, nika-cli]
 affects_layers: [L0, L2]
 supersedes: []
 superseded_by: []
-related: [ADR-101, ADR-092]
+related: [ADR-102, ADR-092]
 requires: []
 enables: []
 amends: []
@@ -24,7 +24,7 @@ follow_ups: ["flip future_clause_policy_rejects_cleanly to a positive parse"]
 
 > **Status · DRAFT-PROPOSAL (overnight 2026-07-05) · NOT canon until operator lock.**
 
-# ADR-102 · `policy:` block
+# ADR-103 · `policy:` block
 
 ## Context
 
@@ -72,6 +72,6 @@ policy:
 ## Consequences
 
 - `nika check` grows a POLICY line in its ladder (GREEN/violations).
-- `human_gate_before` gives ADR-101 its enforcement teeth.
+- `human_gate_before` gives ADR-102 its enforcement teeth.
 - The conformance suite gains a policy fixture tier (drafts land with
   this ADR · promoted on lock).

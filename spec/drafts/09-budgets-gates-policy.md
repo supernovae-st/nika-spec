@@ -1,5 +1,5 @@
 > **Status · DRAFT-PROPOSAL (overnight 2026-07-05) · NOT canon until the
-> operator locks ADR-100/101/102. This chapter lives in `spec/drafts/`
+> operator locks ADR-101/102/103. This chapter lives in `spec/drafts/`
 > and moves to `spec/09-budgets-gates-policy.md` on lock.**
 
 # 09 · Budgets · Gates · Policy (the v0.2 accountability clauses)
@@ -60,13 +60,13 @@ tasks:
   resumed run re-presents the gate.
 - `approve:` × DAG — the gate is a barrier; `nika check` PLAN renders it.
 - `policy.human_gate_before` × `approve:` — the policy rule is the static
-  ENFORCER of the gate clause (ADR-101 gets teeth from ADR-102).
+  ENFORCER of the gate clause (ADR-102 gets teeth from ADR-103).
 - `for_each:` × `budget:` — iterations share the task budget.
 - `agent:` budgets (`max_turns` · `max_tokens_total`) — unchanged ·
   count toward the task cap.
 
 ## Full rationale
 
-ADR-100 (budget) · ADR-101 (approve · WYAIWYE) · ADR-102 (policy) — each
+ADR-101 (budget) · ADR-102 (approve · WYAIWYE) · ADR-103 (policy) — each
 carries its research grounding (arXiv:2606.04056 · 2606.02668 ·
 2603.20356) and its 2040 rationale.

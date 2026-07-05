@@ -1,4 +1,4 @@
-# Draft fixtures · v0.2 seed clauses (ADR-100/101/102)
+# Draft fixtures · v0.2 seed clauses (ADR-101/102/103)
 
 NOT run by the conformance runner (this directory is outside the
 core/deep/stdlib tiers). Promoted into the real tiers when the operator

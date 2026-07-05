@@ -1,5 +1,5 @@
 # EXPECT(v0.2): check ERROR — task `research` has no computable ceiling
-# under a budgeted workflow (ADR-100 static semantics).
+# under a budgeted workflow (ADR-101 static semantics).
 # EXPECT(v0.1 engines): NIKA-PARSE-005 unknown field `budget`.
 nika: v1
 workflow: budget-negative
