@@ -1,7 +1,7 @@
 ---
 id: ADR-099
 title: "Durable-lite run resume — the trace IS the checkpoint"
-status: proposed
+status: accepted
 date: 2026-07-05
 phase: ""
 deciders: ["@ThibautMelen"]
@@ -21,6 +21,8 @@ nika_codes: []
 timeline: ""
 follow_ups: ["register ADR-099 in the engine docs/adr index when the implementation arc opens"]
 ---
+
+<!-- accepted 2026-07-05 · implemented by the engine (supernovae-st/nika#154 · nika run --resume + durable pause + the 3 conformance fixtures as e2e tests) -->
 
 # ADR-099 — Durable-lite run resume · the trace IS the checkpoint
 
