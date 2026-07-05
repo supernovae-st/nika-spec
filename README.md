@@ -100,7 +100,7 @@ nika-spec/
 └── stdlib/                    ← versioned independently
     ├── providers-v0.1.md        16 providers canonical (ollama · llamacpp · vllm · mistral · …)
     ├── extract-modes-v0.1.md    9 extract modes (markdown · article · jq · …)
-    └── builtins-v0.1.md         23 builtins curated (core · file · data · …)
+    └── builtins-v0.1.md         24 builtins curated (core · file · data · …)
 ```
 
 ---

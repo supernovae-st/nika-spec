@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: image-edit-reserved
+tasks:
+  - id: edit_attempt
+    invoke:
+      tool: "nika:image_generate"
+      args:
+        prompt: "replace the sky"
+        output_dir: "./assets"
+        mode: edit

@@ -1,0 +1,5 @@
+{
+  "valid": false,
+  "errors": [{ "category": "validation_error" }],
+  "note": "`mode: edit` is RESERVED in stdlib v0.1 (media roadmap) · the v0.1 boundary is refused loudly at check time, never silently ignored (stdlib/builtins-v0.1.md §nika:image_generate)."
+}

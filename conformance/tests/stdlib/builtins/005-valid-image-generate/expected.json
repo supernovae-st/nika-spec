@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "nika:image_generate is the 24th canonical builtin (stdlib §Media · first graduate 2026-07-05) · mock provider is deterministic + offline · assets land on disk, outputs carry paths + sha256, never base64."
+}

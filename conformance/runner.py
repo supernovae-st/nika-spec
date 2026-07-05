@@ -28,7 +28,10 @@
 #                  (canon.yaml `providers:` · the provider is the prefix)
 #   NIKA-BUILTIN   a literal `nika:fetch` `mode:` outside the canonical extract
 #                  modes (canon.yaml `extract_modes:` + the implicit `raw`) ·
-#                  a `jq:` argument without `mode: jq` (builtins-v0.1.md)
+#                  a `jq:` argument without `mode: jq` (builtins-v0.1.md) ·
+#                  the `nika:image_generate` static contracts (v0.1 reserved
+#                  options · closed enums · ranges · size grammar ·
+#                  transparent×jpeg — builtins-v0.1.md §nika:image_generate)
 # The stdlib surface lists come from canon.yaml (the SSOT) · NEVER hardcoded.
 # Behavioral Runtime/Stdlib fixtures (execution · mock provider) are separate
 # (see 07-conformance.md §Suite status).
@@ -156,6 +159,55 @@ def stdlib_surface_errors(doc: dict, canon: dict) -> list[dict]:
                 errs.append({"namespace": "NIKA-BUILTIN", "category": "validation_error",
                              "detail": f"{where} · 'selector' argument is only valid with "
                                        "mode: selector (extract-modes-v0.1.md · nika:fetch)"})
+        if isinstance(inv, dict) and inv.get("tool") == "nika:image_generate":
+            args = inv.get("args")
+            if not isinstance(args, dict):
+                continue
+            # v0.1 RESERVED options are refused loudly, never silently
+            # (builtins-v0.1.md §nika:image_generate).
+            mode = args.get("mode")
+            if _is_static(mode) and mode != "generate":
+                errs.append({"namespace": "NIKA-BUILTIN", "category": "validation_error",
+                             "detail": f"{where} · mode '{mode}' is reserved in v0.1 — "
+                                       "'generate' only (builtins-v0.1.md §nika:image_generate)"})
+            if "reference_images" in args:
+                errs.append({"namespace": "NIKA-BUILTIN", "category": "validation_error",
+                             "detail": f"{where} · 'reference_images' is reserved in v0.1 "
+                                       "(media roadmap · builtins-v0.1.md §nika:image_generate)"})
+            if args.get("save") is False:
+                errs.append({"namespace": "NIKA-BUILTIN", "category": "validation_error",
+                             "detail": f"{where} · 'save: false' is reserved in v0.1 — assets "
+                                       "always land in output_dir (builtins-v0.1.md)"})
+            enums = {"provider": {"openai", "gemini", "mock"},
+                     "format": {"png", "jpeg", "jpg", "webp"},
+                     "quality": {"auto", "low", "medium", "high", "ultra"},
+                     "background": {"auto", "transparent", "opaque"},
+                     "aspect_ratio": {"1:1", "16:9", "9:16", "4:3", "3:4",
+                                      "3:2", "2:3", "21:9"}}
+            for key, allowed in enums.items():
+                v = args.get(key)
+                if _is_static(v) and v not in allowed:
+                    errs.append({"namespace": "NIKA-BUILTIN", "category": "validation_error",
+                                 "detail": f"{where} · {key} '{v}' is not in the closed set "
+                                           f"(builtins-v0.1.md §nika:image_generate)"})
+            for key, lo, hi in (("n", 1, 10), ("compression", 0, 100),
+                                ("timeout_ms", 1_000, 600_000)):
+                v = args.get(key)
+                if isinstance(v, int) and not isinstance(v, bool) and not lo <= v <= hi:
+                    errs.append({"namespace": "NIKA-BUILTIN", "category": "validation_error",
+                                 "detail": f"{where} · {key} {v} is out of range {lo}..={hi} "
+                                           "(builtins-v0.1.md §nika:image_generate)"})
+            size = args.get("size")
+            if _is_static(size) and size != "auto":
+                w, sep, h = size.partition("x")
+                if not sep or not w.isdigit() or not h.isdigit():
+                    errs.append({"namespace": "NIKA-BUILTIN", "category": "validation_error",
+                                 "detail": f"{where} · size '{size}' must be WIDTHxHEIGHT or "
+                                           "'auto' (builtins-v0.1.md §nika:image_generate)"})
+            if args.get("background") == "transparent" and args.get("format") in ("jpeg", "jpg"):
+                errs.append({"namespace": "NIKA-BUILTIN", "category": "validation_error",
+                             "detail": f"{where} · background: transparent needs an "
+                                       "alpha-capable format — png or webp (builtins-v0.1.md)"})
     return errs
 
 
