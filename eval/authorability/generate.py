@@ -21,11 +21,17 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 SPEC_ROOT = ROOT.parent.parent
 
-def docs_bundle() -> str:
-    # The graduated in-context arm (Text2DSL-class): the curated index +
-    # the two chapters a generator actually needs + one worked example.
+ARMS = {
+    # The graduated in-context arms (Text2DSL-class · the DELTA between
+    # arms is the measurable value of docs-in-context).
+    "index": ["llms.txt", "templates/chain.nika.yaml"],
+    "chapters": ["llms.txt", "spec/02-verbs.md", "spec/04-variables.md",
+                 "stdlib/builtins-v0.1.md", "templates/chain.nika.yaml"],
+}
+
+def docs_bundle(arm: str) -> str:
     parts = []
-    for rel in ["llms.txt", "templates/chain.nika.yaml"]:
+    for rel in ARMS[arm]:
         p = SPEC_ROOT / rel
         if p.is_file():
             parts.append(f"\n=== {rel} ===\n" + p.read_text(encoding="utf-8"))
@@ -93,6 +99,7 @@ def main() -> int:
     ap.add_argument("--model", default="qwen3.5:9b")
     ap.add_argument("--k", type=int, default=3)
     ap.add_argument("--tasks", default="")
+    ap.add_argument("--docs", default="index", choices=["index", "chapters"])
     args = ap.parse_args()
 
     tasks = [json.loads(l) for l in (ROOT / "tasks.jsonl").open()]
@@ -101,9 +108,9 @@ def main() -> int:
         tasks = [t for t in tasks if t["id"] in keep]
 
     stamp = time.strftime("%Y%m%d-%H%M%S")
-    out = ROOT / "runs" / f"{args.model.replace(':','_').replace('/','_')}-k{args.k}-{stamp}"
+    out = ROOT / "runs" / f"{args.model.replace(':','_').replace('/','_')}-{args.docs}-k{args.k}-{stamp}"
     out.mkdir(parents=True)
-    docs = docs_bundle()
+    docs = docs_bundle(args.docs)
     verdicts = []
 
     for t in tasks:
@@ -136,7 +143,7 @@ def main() -> int:
     for v in verdicts:
         if "task" in v:
             by.setdefault(v["task"], []).append(v)
-    lines = [f"# Run summary · {args.model} · k={args.k} · {stamp}", "",
+    lines = [f"# Run summary · {args.model} · docs={args.docs} · k={args.k} · {stamp}", "",
              "| task | L1 pass | L1+L2 pass | pass^k (any) |", "|---|---|---|---|"]
     tot1 = tot12 = n = 0
     for tid, vs in by.items():
