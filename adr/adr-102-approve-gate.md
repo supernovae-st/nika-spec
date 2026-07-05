@@ -75,6 +75,14 @@ tasks:
 - `nika run --resume` (ADR-099) composes: a run paused at an approval
   resumes THROUGH the same gate — approvals are never cached as hits.
 
+## Risks (fresh-sweep 2026-07-05)
+
+Oversight has a CAPACITY (arXiv:2606.08919): approval is a finite human
+resource — reviewer fatigue and gate-flooding make an over-escalating
+system LESS safe (inverted-U). `approve:` must stay SCOPED (the
+irreversible acts · policy names them) and composes with `budget:` —
+never a blanket gate on every task.
+
 ## Consequences
 
 - The human-gated-ship template gains the clause form; the builtin form

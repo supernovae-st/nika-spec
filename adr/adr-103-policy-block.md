@@ -39,6 +39,12 @@ verified sub-second at 5k nodes — on their bench 27% of workflows carry
 structural defects and 55% violate the human-gate property. `nika check`
 is already the pre-token audit ladder; this is its natural next rung.
 
+AgentFlow (arXiv:2607.01640 · 2026-07-02 · the first static analysis of
+imperative agent programs) proves the asymmetry by contrast: extracting
+a dependency graph from LangGraph-class Python requires a heavyweight
+analyzer; a declarative DSL hands the same graph to the checker for
+free — the whole `policy:` layer costs Nika a parse.
+
 The 2040 rationale: policy is organizational LAW encoded next to the
 workflow — the accountability layer's third pillar (resources → budget ·
 authority → approve · law → policy).
