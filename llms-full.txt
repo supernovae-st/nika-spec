@@ -44,7 +44,7 @@ is at [supernovae-st/nika](https://github.com/supernovae-st/nika)
 nika: v1
 workflow: hello
 
-model: ollama/llama3.2:3b   # local · zero key · swap for any of the 14 providers
+model: ollama/qwen3.5:4b   # local · zero key · swap for any of the 14 providers
 
 tasks:
   - id: greet
@@ -56,7 +56,7 @@ Run it — install to first output in under a minute ·
 
 ```bash
 brew install supernovae-st/tap/nika     # single static binary (Rust · no runtime deps)
-ollama pull llama3.2:3b                 # the local model above (once · or swap for a cloud provider)
+ollama pull qwen3.5:4b                 # the local model above (once · or swap for a cloud provider)
 nika run hello.nika.yaml
 ```
 
@@ -261,7 +261,7 @@ Two header lines + one task ·
 nika: v1
 workflow: hello
 
-model: ollama/llama3.2:3b
+model: ollama/qwen3.5:4b
 
 tasks:
   - id: greet
@@ -275,8 +275,8 @@ tasks:
 - one task · `infer:` calls the model.
 
 > **Model note** · every step on this page runs local on
-> `ollama/llama3.2:3b` · zero key, nothing leaves your machine
-> (`ollama pull llama3.2:3b` first · or `lmstudio/…` · `llamacpp/…` ·
+> `ollama/qwen3.5:4b` · zero key, nothing leaves your machine
+> (`ollama pull qwen3.5:4b` first · or `lmstudio/…` · `llamacpp/…` ·
 > `vllm/…`). Prefer cloud? Swap the one `model:` line for any of the
 > <!-- canon:providers -->14<!-- /canon --> providers ·
 > `mistral/mistral-small` · `anthropic/claude-haiku-4-5` ·
@@ -293,7 +293,7 @@ graph · `${{ tasks.<id>.output }}` reads a prior task's result ·
 nika: v1
 workflow: summarize-and-translate
 
-model: ollama/llama3.2:3b
+model: ollama/qwen3.5:4b
 
 tasks:
   - id: summarize
@@ -325,13 +325,24 @@ vars:
   text: "Hello, world"
   target_lang: "French"
 
-model: ollama/llama3.2:3b
+model: ollama/qwen3.5:4b
 
 tasks:
   - id: translate
     infer:
       prompt: "Translate to ${{ vars.target_lang }}: ${{ vars.text }}"
 ```
+
+Override any input at launch · `--var key=value` is repeatable ·
+
+```bash
+nika run translate-anything.nika.yaml --var target_lang="Japanese"
+```
+
+A `--var` value overrides the declared default · satisfies a
+`required: true` input (the typed form · see
+[spec/01-envelope.md](./spec/01-envelope.md#vars--optional--workflow-inputs--untyped-or-typed)) ·
+and an unknown key is refused before anything runs.
 
 There are 5 variable namespaces · `vars` · `with` · `tasks` · `env` ·
 `secrets`. See [spec/04-variables.md](./spec/04-variables.md).
@@ -350,7 +361,7 @@ Everything else (fetching a URL, querying a DB, writing a file) is a
 nika: v1
 workflow: fetch-and-summarize
 
-model: ollama/llama3.2:3b
+model: ollama/qwen3.5:4b
 
 tasks:
   - id: fetch_page
@@ -512,7 +523,7 @@ These 5 pillars are **locked forever** at `nika: v1`. Everything else (providers
 nika: v1
 workflow: hello
 
-model: ollama/llama3.2:3b
+model: ollama/qwen3.5:4b
 tasks:
   - id: greet
     infer:
@@ -638,7 +649,7 @@ workflow: scrape-and-summarize          # required · kebab-case · unique withi
 description: "Fetch + summarize"         # optional · human-readable
 
 # Workflow-level default model · any task may override · <provider>/<name>
-model: ollama/llama3.2:3b         # optional · anthropic/claude-sonnet-4-6 for cloud
+model: ollama/qwen3.5:4b         # optional · anthropic/claude-sonnet-4-6 for cloud
 
 # Inputs · available as ${{ vars.<name> }} · untyped OR typed
 vars:
@@ -757,7 +768,7 @@ listings + LSP hover hints.
 ### `model` · *optional · default model · `<provider>/<name>`*
 
 ```yaml
-model: ollama/llama3.2:3b               # local
+model: ollama/qwen3.5:4b               # local
 # model: anthropic/claude-sonnet-4-6    # cloud · same shape
 ```
 
@@ -806,6 +817,18 @@ one of the closed enum (`string` · `number` · `integer` · `boolean` · `array
 An untyped object default that legitimately contains a `type` key
 (`config: { type: "custom" }` would be misread) MUST use the typed form
 explicitly · `config: { type: object, default: { type: "custom" } }`.
+
+**Supplying values at launch** · the caller provides inputs when starting
+the run; how is an engine CLI concern. The reference engine's surface ·
+`nika run flow.nika.yaml --var topic="Rust async 2026"` (repeatable · one
+`--var key=value` per input). A supplied value **overrides** a declared
+`default:` and **satisfies** a `required: true` var (conformance rule 5
+below · a missing required input rejects before execution). A value parses
+as JSON when it parses (`--var limit=5` is a number · `--var deep=true` a
+boolean) · else it rides as a string. An **unknown key is refused** before
+the run, with the declared set listed: a typo that silently did nothing
+would be the worst outcome. The file stays the contract · every input a
+caller can pass is declared in `vars:`.
 
 See [04-variables.md](./04-variables.md) for the full substitution grammar.
 
@@ -1843,7 +1866,7 @@ the meaning of an expression that parses today. The conditional `?:`, the
 
 ```yaml
 # pick a model / a path / a prompt by condition — anywhere a value is taken
-model:  ${{ vars.env == 'prod' ? 'mistral/mistral-large' : 'ollama/llama3' }}
+model:  ${{ vars.env == 'prod' ? 'mistral/mistral-large' : 'ollama/qwen3.5:9b' }}
 prompt: ${{ has(vars.style) ? vars.style : 'be concise' }}
 when:   ${{ tasks.scan.output.contains('ERROR') }}      # branch on substring
 ```
@@ -2084,6 +2107,12 @@ sleeps · wall-clock). If exceeded · the task fails with a typed timeout error
 (recover/skip like any failure) but never retryable (`transient: false` · the
 timeout already covered the retries by definition).
 
+On an `infer:`/`agent:` task the declared `timeout:` also **governs the
+provider HTTP deadline** — and when none is declared the default is per
+provider class (local ≥300s · cloud 30s · 600s transport ceiling on a
+fully-silent connection). One place specs it ·
+[stdlib/providers-v0.1.md §Transport deadline](../stdlib/providers-v0.1.md#transport-deadline--the-task-timeout-governs-the-provider-call).
+
 **Format · Go-duration / Kubernetes-style string** `[0-9]+(\.[0-9]+)?(ns|us|µs|ms|s|m|h)`.
 
 ```yaml
@@ -2283,7 +2312,7 @@ tasks:
         url: "https://example.com/sitemap.xml"
         mode: sitemap
     output:
-      pages: ".urls[]"
+      pages: "map(.loc)"   # sitemap output IS the root array of {loc, …} · a binding is single-valued, so collect the URLs into one array
 
   - id: summarize
     depends_on: [discover]
@@ -2518,6 +2547,13 @@ tasks:
     infer:
       prompt: "Research · ${{ vars.topic }}"
 ```
+
+To supply or override an input at launch ·
+`nika run flow.nika.yaml --var topic="CEL subsets in 2026"` (repeatable ·
+engine CLI concern). A `--var` value overrides the declared default and
+satisfies a `required: true` var · an undeclared key is refused before the
+run. See [01-envelope.md](./01-envelope.md#vars--optional--workflow-inputs--untyped-or-typed)
+for the launch contract.
 
 ### `${{ with.X }}` · task-level scope
 
@@ -3415,7 +3451,7 @@ When these mature · they enter stdlib v0.x. The core language doesn't need to c
 
 ```yaml
 model: anthropic/claude-sonnet-4-6   # <provider>/<name> · see stdlib/providers-v0.1.md
-# model: ollama/llama3.2:3b          # local · same shape
+# model: ollama/qwen3.5:4b          # local · same shape
 ```
 
 ### Extract mode
@@ -3942,6 +3978,14 @@ checkpoint:
 
 **Why deferred** · persistence is an engine-runtime concern. A conformant engine handles this internally · workflows don't declare it.
 
+> **Lifted at the durable-lite tier · [ADR-099](../adr/adr-099-durable-lite-run-resume.md) (proposed · 2026-07-05)** ·
+> `nika run --resume <trace>` re-executes from the run's own NDJSON trace
+> (content-addressed per-task skip · every skip a **visible** `task.cache_hit`
+> event · `--from <task_id>` override) — the trace IS the checkpoint · CLI +
+> trace format only. The `checkpoint:`-block sketch above **REMAINS deferred**
+> exactly as written: a workflow never declares persistence · the language
+> surface is unchanged.
+
 ### Workflow versioning / migration
 
 If a workflow needs to be re-runnable across spec versions · use a version
@@ -3965,7 +4009,10 @@ resumption** (retries that survive a process restart), which is itself deferred
 task handles its own dedup via its tool args. Idempotency lands in v0.2
 together with the durable-execution waypoint · NOT before. *(2025-2026 SOTA
 gap-check · the only near-universal capability v1 lacks · and it is correctly
-durable-class, not finite-DAG-class.)*
+durable-class, not finite-DAG-class.)* *(The resumption half now has a
+durable-lite design · [ADR-099](../adr/adr-099-durable-lite-run-resume.md) ·
+resume shrinks the re-run window · at-least-once dedup stays THIS section's
+deferral, at the full waypoint.)*
 
 ---
 
@@ -4126,11 +4173,11 @@ or a non-goal, with the line that says whose job it is.
 
 | # | Horizon | Posture | The one-paragraph answer |
 |---|---|---|---|
-| H1 | Durable execution (checkpoint · resume · replay) | **OUT** | A v0.1 run is a single OS process with in-memory state · crash = re-run from the top · `retry:` is in-process only. Checkpoint/resumption + idempotency keys land TOGETHER at the durable-execution waypoint (§Persistence · v0.2+) · until then durability is the **host's responsibility** (run under a supervisor · make side-effecting tools idempotent via their own args). |
+| H1 | Durable execution (checkpoint · resume · replay) | **OUT · durable-lite tier lifted by ADR-099 (proposed)** | A v0.1 run is a single OS process with in-memory state · crash = re-run from the top · `retry:` is in-process only. The **durable-lite tier** (crash-resume + re-run-from-a-node from the run's own trace · visible `task.cache_hit` · zero author-facing determinism constraints) is lifted by [ADR-099](../adr/adr-099-durable-lite-run-resume.md) · CLI + trace only. Idempotency keys + the full durable-execution waypoint (retries that survive a restart · at-least-once dedup) stay deferred (§Persistence · v0.2+) · until then durability beyond `--resume` is the **host's responsibility** (run under a supervisor · make side-effecting tools idempotent via their own args). |
 | H2 | Streaming between tasks | **OUT** | Tasks are synchronous · a dependent reads the **final assembled value** (§Streaming). Engines MAY stream provider tokens internally/to the user. A between-task stream changes what an *edge* delivers: a future additive edge semantic, never a verb ([02 closure](./02-verbs.md#the-closure-argument--why-no-case-forces-a-5th-verb)). Pub/sub listeners · NEVER in the finite-DAG v1. |
 | H3 | Multimodal artifacts (typed image/audio/video) | **PARTIAL** | v0.1 values are strings · JSON values · and **opaque bytes pass-through** (tool-determined · [02 §invoke output](./02-verbs.md#what--tasksidoutput--holds--per-verb) · `infer.vision` takes file/url refs). No typed media payloads · no content-addressing in the language. Both arrive with the deferred media builtins (stdlib v0.x · §Tooling extensibility). Addressing (e.g. blake3) is engine detail, not language surface. |
 | H4 | Agent-of-agents (sub-agents · budget propagation · trust inheritance) | **PARTIAL** | The `agent:` verb is a **single loop** with per-task budgets (`max_turns` · `max_tokens_total` · normative · [02 §agent](./02-verbs.md)) and a default-deny tool whitelist. Budgets do NOT propagate across tasks (each declares its own). Multi-agent topology · §Advanced agent features (expressible today as multiple `agent:` tasks + explicit `with:` hand-off). Run-recursion is bounded by the §composition recursion guard. |
-| H5 | Human-in-the-loop (approval gates) | **IN** | `nika:prompt` (blocking confirm with `default:` for non-interactive mode) plus `nika:notify` (fire-and-forget). Pause-state is **live** (the run keeps a process while blocked · durable pauses arrive with H1) · time-bound it with the task-level `timeout:`. ONE construct · a tool under `invoke:` · forever. |
+| H5 | Human-in-the-loop (approval gates) | **IN** | `nika:prompt` (blocking confirm with `default:` for non-interactive mode) plus `nika:notify` (fire-and-forget). Pause-state is **live** (the run keeps a process while blocked) · **durable pause ships with [ADR-099](../adr/adr-099-durable-lite-run-resume.md)'s `--resume`** (proposed · a non-interactive default-less blocked `nika:prompt` journals `workflow.paused` + exits cleanly · resume re-arms it) · time-bound it with the task-level `timeout:`. ONE construct · a tool under `invoke:` · forever. |
 | H6 | Evals in-language (asserts · LLM-judge · golden runs) | **PARTIAL** | v0.1 ships the pieces · `schema:` (per-task structured-output gate · auto-retry) · `nika:assert` (fail-fast CEL guard) · `nika:validate` (JSON Schema over data). An LLM-judge is an `infer:` task with a verdict `schema:`, no dedicated builtin needed. Golden-run testing reuses the conformance fixture shape (input + expected output on `mock/`). Declarative in-file eval blocks · deferred. |
 | H7 | Cost governance (budgets in €/tokens) | **PARTIAL** | Reading IS in-language · `nika:inspect view: cost` (running cost). Enforcement is NOT · hard caps are engine config (§Observability · `budget:` blocks deferred v0.2). The `agent:` budgets (`max_tokens_total`) are the one normative in-language cap today. |
 | H8 | Model routing / fallback chains | **PARTIAL** | The language surface is ONE field · explicit `model:` per task (+ `vars` parameterization: one workflow, any backend). Provider-side routing exists TODAY via `openrouter/…` (gateway fallback). Declarative capability-based routing in YAML ("any vision model under $X") · deferred · it must not create a second way to pick a model. |
@@ -4559,7 +4606,7 @@ separate `provider:` field** · the provider is the prefix.
 
 ```yaml
 infer:
-  model: ollama/llama3.1                 # local · no key
+  model: ollama/qwen3.5:9b                 # local · no key
   prompt: "..."
 
 infer:
@@ -4571,15 +4618,15 @@ infer:
 fields let you write the silent-nonsense combination `provider: anthropic` +
 `model: gpt-4o`. One `<provider>/<name>` string is atomic, self-documenting,
 trivially swappable, and the industry standard. The same open model served by
-different backends disambiguates cleanly · `groq/llama-3.1-70b` vs
-`ollama/llama-3.1-70b`.
+different backends disambiguates cleanly · `groq/qwen3.5-32b` vs
+`ollama/qwen3.5:27b`.
 
 **Parameterize it** · combine with typed inputs to run one workflow
 against any backend ·
 
 ```yaml
 vars:
-  model: { type: string, default: "ollama/llama3.1" }
+  model: { type: string, default: "ollama/qwen3.5:9b" }
 tasks:
   - id: x
     infer: { model: "${{ vars.model }}", prompt: "..." }
@@ -4632,7 +4679,7 @@ mock/…                                                 → TEST  · determinis
 ```
 
 Sovereignty · **local-first** · nothing leaves the machine unless a
-cloud provider is *explicitly* selected. `ollama/llama3.1` makes a sovereign,
+cloud provider is *explicitly* selected. `ollama/qwen3.5:9b` makes a sovereign,
 zero-cloud run trivial.
 
 All 5 local providers are external **HTTP servers** (OpenAI-compatible API · the
@@ -4641,6 +4688,46 @@ engine talks to them over localhost). They are NOT the in-process GGUF runtime
 the host). It re-enters stdlib v0.x when a candle/llama.cpp binding stabilizes +
 30-day crash-free cohort + cross-platform conformance. **The named local
 providers are ergonomic shortcuts; the long tail uses the escape hatch.**
+
+## Transport deadline · the task `timeout:` governs the provider call
+
+The task-level [`timeout:`](../spec/03-dag.md#timeout--optional--task-level-timeout-go-duration-string)
+(Go-duration string) **governs the provider HTTP deadline**: a task
+declaring `timeout: "7m"` gives the provider round-trip those 7 minutes.
+A fixed internal HTTP default MUST NOT undercut the declared budget.
+
+When NO `timeout:` is declared, the default deadline is per provider
+**class** ·
+
+```
+LOCAL  (ollama · lmstudio · llamacpp · localai · vllm)               ≥ 300s
+CLOUD  (mistral · anthropic · openai · openrouter · groq ·             30s
+        deepseek · gemini · xai)
+```
+
+A local model routinely needs minutes for ONE completion on consumer
+hardware — a 14B model cannot answer a real prompt in 30s, and a
+30s-everywhere default silently kills every serious local-first workflow
+(408 before the model finishes thinking). Local-first only works when the
+defaults respect local reality. The class is keyed on the **canonical
+provider id** (the table above) · a `base_url` override never flips it.
+
+Two honest bounds (reference-engine values · pinned by its wire tests) ·
+
+- **600s transport ceiling on a fully-silent connection** · a
+  non-streaming completion delivers ZERO bytes while the model computes,
+  so the transport cannot tell *thinking* from *dead*. A connection that
+  has delivered nothing is reaped at 600s: a `timeout:` longer than the
+  ceiling still bounds the task, but only a connection that starts
+  delivering can use it.
+- **Streaming carries only an EXPLICIT budget** · an SSE generation
+  legitimately outlives any fixed total deadline. A declared `timeout:`
+  rides the streaming request; when none is declared, the idle-read guard
+  reaps a STALLED stream instead of capping a healthy one.
+
+The task clock stays authoritative: `timeout:` bounds the **whole task**
+(retries + backoff included · [03-dag](../spec/03-dag.md#timeout--optional--task-level-timeout-go-duration-string)) ·
+this section defines what the provider leg of that budget does.
 
 ## The `openai` escape hatch · any OpenAI-compatible server
 
@@ -4679,7 +4766,7 @@ Every provider supports ·
 infer:
   prompt: "..."                # required
   system: "..."                # optional
-  model: <provider>/<name>     # one field · e.g. ollama/llama3.1
+  model: <provider>/<name>     # one field · e.g. ollama/qwen3.5:9b
   temperature: 0.0 to 2.0      # optional
   max_tokens: <int>            # optional
   schema: { ... }              # optional · structured output
@@ -4697,13 +4784,13 @@ Errors map to `NIKA-PROVIDER-NNN` codes with the provider-specific status.
 
 ```yaml
 infer:
-  model: ollama/llama3.1                 # or any pulled Ollama model
+  model: ollama/qwen3.5:9b                 # or any pulled Ollama model
   prompt: "..."
 ```
 
 **Backend** · the Ollama daemon (`http://localhost:11434`) · OpenAI-compatible API · the engine talks to it over HTTP.
 
-**Models** · any model pulled into Ollama (`llama3.1` · `qwen2.5` · `mistral` · `gemma2` · etc.) · pass-through.
+**Models** · any model pulled into Ollama (`qwen3.5:9b` · `qwen2.5` · `mistral` · `gemma2` · etc.) · pass-through.
 
 **Auth** · none (localhost).
 
@@ -4981,7 +5068,7 @@ When using the same workflow with different providers ·
 - The **structured output** uses JSON Schema (engine adapts to provider's native mechanism · JSON mode · function calling · etc.)
 - The **vision input** is provider-agnostic in the workflow · the engine adapts
 
-A workflow can switch providers with one line change (`model: ollama/llama3.1` → `model: mistral/mistral-large`, or any other `<provider>/<name>`) for most use cases.
+A workflow can switch providers with one line change (`model: ollama/qwen3.5:9b` → `model: mistral/mistral-large`, or any other `<provider>/<name>`) for most use cases.
 
 ---
 

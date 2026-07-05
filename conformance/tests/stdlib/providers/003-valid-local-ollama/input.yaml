@@ -4,5 +4,5 @@ workflow: local-sovereign
 tasks:
   - id: ask
     infer:
-      model: ollama/llama3.1
+      model: ollama/qwen3.5:9b
       prompt: "hello"

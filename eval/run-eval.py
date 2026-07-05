@@ -29,7 +29,7 @@
 #
 # Usage ·
 #   python3 eval/run-eval.py --model haiku --condition both [--limit N]
-#   python3 eval/run-eval.py --model ollama/llama3.2:3b
+#   python3 eval/run-eval.py --model ollama/qwen3.5:4b
 #   python3 eval/run-eval.py --model gemini/gemini-2.5-flash
 #   python3 eval/run-eval.py --report eval/results/<file>.json
 #
