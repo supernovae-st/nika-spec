@@ -119,10 +119,10 @@ builtins:
     - write
 
 # ---------------------------------------------------------------- providers
-# 8 cloud + 5 local + 1 test = 14 (openrouter promoted D-2026-06-10-N2). stdlib/providers-v0.1.md is the prose home.
+# 10 cloud + 5 local + 1 test = 16 (openrouter promoted D-2026-06-10-N2 · huggingface + nvidia promoted 2026-07-05 per the same precedent · ADR-104). stdlib/providers-v0.1.md is the prose home.
 # Sovereignty · 5 local providers (sovereignty Rule 1 · zero-cloud default path).
 providers:
-  count: 14
+  count: 16
   reference: stdlib/providers-v0.1.md
   # Presentation order (operator lock 2026-06-12 · supernovae-alignment Rule 3) ·
   # local/open-weight FIRST (sovereignty default) · then cloud with mistral (EU ·
@@ -144,6 +144,8 @@ providers:
       - xai
       - groq
       - openrouter
+      - huggingface
+      - nvidia
     test:
       - mock
 
