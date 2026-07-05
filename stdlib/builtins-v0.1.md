@@ -22,6 +22,12 @@
 > LocalAI · Ollama · sd.cpp · SGLang · vLLM-Omni) · openai `gpt-image-2` ·
 > gemini `gemini-3.1-flash-image` · xai `grok-imagine-image` · `mock` for
 > offline runs · assets land on disk, never inline base64.
+> Step 5 (24 → 25 · 2026-07-05) · `nika:tts_generate` · the SECOND
+> Media-class graduate (stdlib §Audio) · sovereign-first — `local` (any
+> OpenAI-speech-compatible server: LocalAI · Kokoro-FastAPI · Speaches ·
+> openedai-speech) · openai `gpt-4o-mini-tts` · elevenlabs · `mock` (a
+> real deterministic WAV · offline CI) · ONE audio file on disk, never
+> inline bytes.
 
 ---
 
@@ -34,10 +40,10 @@
 | Data | 8 | `jq` (THE data language) + 7 capabilities jq can't express (json_diff · validate · json_merge_patch · convert · uuid · date · hash) |
 | Introspection | 2 | Self-awareness · `inspect` (runtime state · 4 views) · `compose` (static check of a drafted workflow · agent loops only) |
 | Network | 2 | fetch (HTTP+extraction) · notify (alerts out) |
-| Media | 1 | `image_generate` (the first §Media graduate · 2026-07-05) — the REST of the media class stays deferred to stdlib v0.x |
-| **Total v0.1** | **24** | |
+| Media | 2 | `image_generate` (§Media · 2026-07-05) · `tts_generate` (§Audio · same day) — the REST of the media class stays deferred to stdlib v0.x |
+| **Total v0.1** | **25** | |
 
-A Stdlib v0.1-compliant engine MUST ship these 24.
+A Stdlib v0.1-compliant engine MUST ship these 25.
 
 ---
 
@@ -451,6 +457,60 @@ mismatch · dimension/byte bounds · `tool_error`). Plus the boundary
 `NIKA-SEC-004` (an `output_dir:` outside `permits.fs.write`).
 
 ---
+
+### `nika:tts_generate` · provider-backed speech synthesis (§Audio)
+
+```yaml
+- id: narrate
+  invoke:
+    tool: "nika:tts_generate"
+    args:
+      provider: local              # sovereign first — or openai · elevenlabs · mock
+      text: "Bienvenue — the launch is live."
+      voice: "alloy"
+      output_dir: "./assets/audio"
+```
+
+The image family's contract, applied to audio: ONE audio file lands under
+`output_dir:` (permit-gated per final path BEFORE I/O · atomic write ·
+content-hash-named `{stem}-{provider}-{model}-{sha8}.{ext}` so identical
+re-runs are idempotent), the output carries `{ provider, model, voice,
+created_at, endpoint_host, audio: { path, filename, format, mime_type,
+size_bytes, sha256, duration_ms }, cost_usd, warnings, manifest_path,
+output_dir }` — **audio bytes NEVER ride outputs**, and a sidecar
+provenance manifest (`manifest: true` default) echoes the resolved
+request.
+
+| Arg | Contract |
+|---|---|
+| `provider` | REQUIRED-or-inferred · closed: `local` (any OpenAI-speech-compatible self-hosted server — LocalAI · Kokoro-FastAPI · Speaches · openedai-speech · ONE wire: `POST {base}/v1/audio/speech` → raw bytes · base URL is ENGINE CONFIG `NIKA_TTS_LOCAL_URL`, default `http://localhost:8080`, never workflow data · never inferred) · `openai` · `elevenlabs` · `mock` (a REAL deterministic WAV · zero network/keys). Inference: `eleven*` → elevenlabs · `gpt-*`/`tts-*` → openai · `mock*` → mock. |
+| `model` | per-provider default (reference engine 2026-07: `tts-1` local convention · `gpt-4o-mini-tts` · `eleven_multilingual_v2` · `mock-tts-1`) |
+| `text` | REQUIRED · non-empty · ≤4096 chars (the strictest documented wire cap, held portably — fan longer scripts out with `for_each`) |
+| `voice` | provider voice id · defaults: `alloy` (openai/local) · Rachel's public id (elevenlabs — ids are path components, so engines MUST restrict them to the id alphabet) · `sine` (mock) |
+| `format` | `mp3 \| wav \| auto` (default auto = provider-native) — the saved EXTENSION follows the sniffed bytes (magic authority), never the ask; a lossy fold is a `format_mismatch:` warning |
+| `speed` | 0.25–4.0 (openai/local native) — warned-dropped (`speed_unsupported:`) where the wire has no knob |
+| `output_dir` · `filename_prefix` · `metadata` · `manifest` | as `image_generate` (stem falls back to `metadata.page_slug`, then `speech`) |
+| `timeout_ms` | default 120000 · local 300000 (CPU synthesis) · max 600000 |
+
+**Validation (engine MUST)** · the payload is sniffed (WAV `RIFF…WAVE` ·
+MP3 `ID3`/frame-sync) — a non-audio payload is a hard `-007`; WAV
+`duration_ms` is exact header math, MP3 duration is honestly `null`
+(never a guess). Empty payloads are `-004`.
+
+**Security (engine MUST)** · endpoints are engine-fixed constants (the
+`local` base URL is engine config at the composition root — the same
+sanction as `image_generate` and `infer:`) · keys are engine-configured
+(`OPENAI_API_KEY` · `ELEVENLABS_API_KEY` · `NIKA_TTS_LOCAL_API_KEY` or
+the `NIKA_`-prefixed forms), never workflow args, never logged · a
+verbose local server reflecting the Bearer into an error body MUST be
+scrubbed (the image family's rule).
+
+Throws · `NIKA-BUILTIN-TTS_GENERATE-001` invalid arguments
+(`validation_error`) · `-002` provider unavailable (`validation_error`) ·
+`-003` request failed (`network_error` · `transient: true` for
+5xx/408/429 + timeout/connection) · `-004` empty audio · `-005` content
+policy · `-006` save failed · `-007` payload validation (all
+`runtime_error` unless noted).
 
 ## What jq subsumes (cut from v0.1)
 

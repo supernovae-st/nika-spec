@@ -12,6 +12,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added · `nika:tts_generate` — the 25th builtin (stdlib §Audio · 2026-07-05)
+
+- Speech synthesis as a workflow citizen, sovereign-first: `local` (ONE
+  OpenAI-speech-compatible wire — LocalAI · Kokoro-FastAPI · Speaches ·
+  openedai-speech · base URL is engine config `NIKA_TTS_LOCAL_URL`) ·
+  `openai` (`gpt-4o-mini-tts`) · `elevenlabs` (voice ids are path
+  components — engines MUST restrict them to the id alphabet) · `mock`
+  (a REAL deterministic WAV · offline CI).
+- The image family's contract applied to audio: assets-not-blobs ·
+  magic-byte authority (wav `duration_ms` = exact header math · mp3
+  honestly null) · content-hash filenames · permit-gated atomic saves ·
+  provenance manifest · honest warnings · `cost_usd` null-honest.
+- Oracle: builtins count 24→25 · fixture `007-valid-tts-generate-local`.
+  Reference engine PR pairs.
+
 ### Added · `nika:image_generate` polish — in-file provenance + honest cost (2026-07-05)
 
 - **Provenance travels IN the file (PNG)**: engines SHOULD embed the
