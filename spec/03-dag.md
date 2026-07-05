@@ -445,6 +445,12 @@ sleeps · wall-clock). If exceeded · the task fails with a typed timeout error
 (recover/skip like any failure) but never retryable (`transient: false` · the
 timeout already covered the retries by definition).
 
+On an `infer:`/`agent:` task the declared `timeout:` also **governs the
+provider HTTP deadline** — and when none is declared the default is per
+provider class (local ≥300s · cloud 30s · 600s transport ceiling on a
+fully-silent connection). One place specs it ·
+[stdlib/providers-v0.1.md §Transport deadline](../stdlib/providers-v0.1.md#transport-deadline--the-task-timeout-governs-the-provider-call).
+
 **Format · Go-duration / Kubernetes-style string** `[0-9]+(\.[0-9]+)?(ns|us|µs|ms|s|m|h)`.
 
 ```yaml
@@ -644,7 +650,7 @@ tasks:
         url: "https://example.com/sitemap.xml"
         mode: sitemap
     output:
-      pages: ".urls[]"
+      pages: "map(.loc)"   # sitemap output IS the root array of {loc, …} · a binding is single-valued, so collect the URLs into one array
 
   - id: summarize
     depends_on: [discover]

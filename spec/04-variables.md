@@ -85,6 +85,13 @@ tasks:
       prompt: "Research · ${{ vars.topic }}"
 ```
 
+To supply or override an input at launch ·
+`nika run flow.nika.yaml --var topic="CEL subsets in 2026"` (repeatable ·
+engine CLI concern). A `--var` value overrides the declared default and
+satisfies a `required: true` var · an undeclared key is refused before the
+run. See [01-envelope.md](./01-envelope.md#vars--optional--workflow-inputs--untyped-or-typed)
+for the launch contract.
+
 ### `${{ with.X }}` · task-level scope
 
 Declared per-task · resolves at task dispatch time · often references upstream task outputs ·

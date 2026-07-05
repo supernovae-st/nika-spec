@@ -12,6 +12,33 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed · sitemap examples bound a phantom `.urls` wrapper (2026-07-05)
+
+- **`nika:fetch` `mode: sitemap` returns the ROOT ARRAY**
+  `[{loc, changefreq, priority}, …]` · but t2-seo-content-brief sliced
+  `.urls[:5]`, t3-competitor-radar `.urls[:8]`, and the 03-dag fan-out
+  snippet taught `pages: ".urls[]"` (phantom wrapper AND a stream binding
+  where a binding is single-valued). Every user copying the examples hit
+  `NIKA-VAR-004` at the first sitemap task (F5 field report 2026-07-04).
+  Fixed to `.[:5] | map(.loc)` / `.[:8] | map(.loc)` / `map(.loc)` ·
+  `examples/manifest.yaml` sha256_16 regenerated. This repo is the SSOT
+  the engine vendors (`sync-pack.sh`) · mirrors engine `a8c2acaa4`.
+
+### Added · launch inputs + provider transport deadline (2026-07-05)
+
+- **`nika run --var key=value` documented** (repeatable · overrides a
+  declared `default:` · satisfies `required: true` · JSON-when-it-parses
+  else string · unknown key refused pre-run) at the contract home
+  (01-envelope §vars) · cross-linked from 04-variables `vars.X`,
+  QUICKSTART §3 and the templates README `NIKA-VAR-001` repair row. The
+  7 required-var example `# Run` lines now carry the `--var` they need.
+- **§Transport deadline** (stdlib/providers-v0.1.md) · the task
+  `timeout:` governs the provider HTTP deadline · per-class defaults
+  when unset (local ≥300s · cloud 30s) · 600s ceiling on a fully-silent
+  connection · streaming rides only an explicit budget (the idle-read
+  guard reaps stalls). One cross-link from 03-dag §timeout · no
+  duplicated prose.
+
 ### Added · `nika:compose` · the agent's self-check builtin (2026-06-13)
 
 - **`nika:compose` · the 23rd canonical builtin** (Introspection · stdlib

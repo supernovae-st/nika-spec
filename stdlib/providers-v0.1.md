@@ -99,6 +99,46 @@ the host). It re-enters stdlib v0.x when a candle/llama.cpp binding stabilizes +
 30-day crash-free cohort + cross-platform conformance. **The named local
 providers are ergonomic shortcuts; the long tail uses the escape hatch.**
 
+## Transport deadline · the task `timeout:` governs the provider call
+
+The task-level [`timeout:`](../spec/03-dag.md#timeout--optional--task-level-timeout-go-duration-string)
+(Go-duration string) **governs the provider HTTP deadline**: a task
+declaring `timeout: "7m"` gives the provider round-trip those 7 minutes.
+A fixed internal HTTP default MUST NOT undercut the declared budget.
+
+When NO `timeout:` is declared, the default deadline is per provider
+**class** ·
+
+```
+LOCAL  (ollama · lmstudio · llamacpp · localai · vllm)               ≥ 300s
+CLOUD  (mistral · anthropic · openai · openrouter · groq ·             30s
+        deepseek · gemini · xai)
+```
+
+A local model routinely needs minutes for ONE completion on consumer
+hardware — a 14B model cannot answer a real prompt in 30s, and a
+30s-everywhere default silently kills every serious local-first workflow
+(408 before the model finishes thinking). Local-first only works when the
+defaults respect local reality. The class is keyed on the **canonical
+provider id** (the table above) · a `base_url` override never flips it.
+
+Two honest bounds (reference-engine values · pinned by its wire tests) ·
+
+- **600s transport ceiling on a fully-silent connection** · a
+  non-streaming completion delivers ZERO bytes while the model computes,
+  so the transport cannot tell *thinking* from *dead*. A connection that
+  has delivered nothing is reaped at 600s: a `timeout:` longer than the
+  ceiling still bounds the task, but only a connection that starts
+  delivering can use it.
+- **Streaming carries only an EXPLICIT budget** · an SSE generation
+  legitimately outlives any fixed total deadline. A declared `timeout:`
+  rides the streaming request; when none is declared, the idle-read guard
+  reaps a STALLED stream instead of capping a healthy one.
+
+The task clock stays authoritative: `timeout:` bounds the **whole task**
+(retries + backoff included · [03-dag](../spec/03-dag.md#timeout--optional--task-level-timeout-go-duration-string)) ·
+this section defines what the provider leg of that budget does.
+
 ## The `openai` escape hatch · any OpenAI-compatible server
 
 Most local servers (and many cloud gateways · Together · Fireworks · etc.)

@@ -13,7 +13,7 @@
 #   - `nika:assert` · the fail-fast guard (vs `when:` · the skip-guard)
 #   - belt-and-braces · schema at infer time + validate + assert downstream
 #
-# Run · nika run examples/showcase/t2-contract-guard.nika.yaml
+# Run · nika run examples/showcase/t2-contract-guard.nika.yaml --var contract_path=./contract.md
 nika: v1
 workflow: contract-guard
 description: "Local-model clause extraction → schema gate → risk memo"
