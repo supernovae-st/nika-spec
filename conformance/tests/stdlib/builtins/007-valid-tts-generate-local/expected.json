@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "the `local` TTS provider (v1 · 2026-07-05) is the sovereign speech path — any OpenAI-speech-compatible self-hosted server (LocalAI · Kokoro-FastAPI · Speaches · openedai-speech); the base URL is engine config, never workflow data. `local` is never inferred from `model:`."
+}

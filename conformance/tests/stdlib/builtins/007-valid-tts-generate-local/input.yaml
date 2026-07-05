@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: narrate-sovereign
+tasks:
+  - id: narrate
+    invoke:
+      tool: "nika:tts_generate"
+      args:
+        provider: local
+        text: "Bienvenue — the launch is live."
+        output_dir: "./assets/audio"
