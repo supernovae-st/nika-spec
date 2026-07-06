@@ -98,6 +98,10 @@ def self_check(canon: dict) -> None:
     actual = sum(len(v) for v in p["items"].values())
     if p["count"] != actual:
         die("providers", p["count"], actual)
+    for sub in ("tools", "protocol_versions"):
+        m = canon["mcp"][sub]
+        if m["count"] != len(m["items"]):
+            die(f"mcp.{sub}", m["count"], len(m["items"]))
 
 
 MARKER_RE = re.compile(r"(<!-- canon:([a-z_]+) -->)([^<]*)(<!-- /canon -->)")
@@ -115,6 +119,8 @@ def marker_values(canon: dict) -> dict:
         "error_categories": canon["error_categories"]["count"],
         "error_codes": canon["error_codes"]["count"],
         "pillars": canon["pillars"]["count"],
+        "mcp_tools": canon["mcp"]["tools"]["count"],
+        "mcp_versions": canon["mcp"]["protocol_versions"]["count"],
     }
 
 
@@ -186,6 +192,10 @@ def canon_fields(canon: dict) -> dict:
         "providerIdsTest": providers["test"],
         "extractModes": canon["extract_modes"]["count"],
         "extractModeNames": canon["extract_modes"]["items"],
+        "mcpTools": canon["mcp"]["tools"]["count"],
+        "mcpToolNames": canon["mcp"]["tools"]["items"],
+        "mcpProtocolVersions": canon["mcp"]["protocol_versions"]["items"],
+        "mcpLatestProtocol": canon["mcp"]["protocol_versions"]["latest"],
         "errorNamespaces": canon["error_namespaces"]["count"],
         "errorNamespaceNames": canon["error_namespaces"]["items"],
         "errorCategories": canon["error_categories"]["count"],
@@ -195,10 +205,19 @@ def canon_fields(canon: dict) -> dict:
 
 
 def render_object_body(f: dict) -> str:
-    """The literal `{ ... }` body shared by the MDX and TS emitters."""
+    """The literal `{ ... }` body shared by the MDX and TS emitters.
+
+    String scalars are quoted — a bare `2026-07-28` is a strict-mode
+    octal SyntaxError in MDX/acorn and a silent arithmetic 1991 in TS
+    (caught live by the docs mint gate · 2026-07-06)."""
     lines = []
     for key, value in f.items():
-        rendered = js_str_list(value) if isinstance(value, list) else str(value)
+        if isinstance(value, list):
+            rendered = js_str_list(value)
+        elif isinstance(value, str):
+            rendered = f'"{value}"'
+        else:
+            rendered = str(value)
         lines.append(f"  {key}: {rendered},")
     return "{\n" + "\n".join(lines) + "\n}"
 
