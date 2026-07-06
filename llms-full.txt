@@ -136,7 +136,7 @@ The reference engine is installable and runs workflows end-to-end today ·
   `cargo install nika` joins brew + curl as an install path at 1.0)
 - Exposes the engine's static oracle via MCP server (`nika mcp`) for harness
   integration (Claude Code · Cursor · Hermes · etc.). The MCP surface is
-  read-only — 8 tools (`nika_check` · `nika_explain` · `nika_schema` ·
+  read-only — <!-- canon:mcp_tools -->8<!-- /canon --> tools (`nika_check` · `nika_explain` · `nika_schema` ·
   `nika_examples` · `nika_template` · `nika_canon` · `nika_catalog` ·
   `nika_tools`); execution stays behind `nika run`.
 - Engine-free alternative · the [conformance oracle](./conformance/) in this
