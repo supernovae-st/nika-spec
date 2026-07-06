@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "`mode: edit` with a source `image:` path is valid (M2.2 · 2026-07-06). The source is READ, so `permits.fs.read` must cover it — the mirror of the save boundary (edit reads what generate writes). `image:` XOR `images:` · a `mask:` is refused on instruction-only providers (gemini/xai)."
+}

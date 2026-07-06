@@ -357,7 +357,9 @@ outputs** (no base64 in `tasks.X.output`, logs, or traces · normative).
 | `provider` | `local` · `openai` · `gemini` · `xai` · `mock` — optional when inferable from `model:` (`gpt-image*`→openai · `gemini-*`→gemini · `grok*`→xai · `mock*`→mock · `local` is NEVER inferred: its model names are server-specific) |
 | `model` | per-provider default (reference engine 2026-07: `stablediffusion` for local — the LocalAI convention · SD-family servers also honor the `positive \| negative` split INSIDE `prompt:` (LocalAI pipe syntax) — no separate arg needed · `gpt-image-2` · `gemini-3.1-flash-image` · `grok-imagine-image` — the `-quality` tier is the model knob · `mock-image-1`) |
 | `prompt` | **required** · the creative brief · may use `${{ … }}` |
-| `mode` | `generate` (default) · `edit` is RESERVED (rejected loudly in v0.1 · media roadmap) |
+| `mode` | `generate` (default · text→image) · `edit` (source image(s) + instruction → image · M2.2 · 2026-07-06) |
+| `image` / `images` | mode:edit source · one path (`image:`) XOR many (`images:` · capped per provider: openai 16 · gemini 14 · xai 3) · **read + permit-gated** (`permits.fs.read` must cover them — the mirror of the save boundary) |
+| `mask` | mode:edit optional pixel-mask path · openai/local only — a mask on an instruction-only provider (gemini/xai) is REFUSED loudly, never silently dropped (the output would be wrong outside the region) |
 | `n` | 1..=10 variants (engines MAY satisfy n via sequential provider calls · documented per adapter) |
 | `aspect_ratio` | closed set `1:1 · 16:9 · 9:16 · 4:3 · 3:4 · 3:2 · 2:3 · 21:9` |
 | `size` | exact `WIDTHxHEIGHT` or `auto` · an exact size WINS over `aspect_ratio:` (with a warning) · providers that render size CLASSES fold it (loudly) |
