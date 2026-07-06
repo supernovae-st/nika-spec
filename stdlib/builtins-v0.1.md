@@ -528,9 +528,10 @@ scrubbed (the image family's rule).
 Throws · `NIKA-BUILTIN-TTS_GENERATE-001` invalid arguments
 (`validation_error`) · `-002` provider unavailable (`validation_error`) ·
 `-003` request failed (`network_error` · `transient: true` for
-5xx/408/429 + timeout/connection) · `-004` empty audio · `-005` content
-policy · `-006` save failed · `-007` payload validation (all
-`runtime_error` unless noted).
+5xx/408/429 + timeout/connection) · `-004` empty audio (`tool_error`) ·
+`-005` content policy (`security_error` · never transient) · `-006` save
+failed (`tool_error`) · `-007` payload validation (`tool_error`) — the
+image twin's category ladder, code for code.
 
 ## What jq subsumes (cut from v0.1)
 
