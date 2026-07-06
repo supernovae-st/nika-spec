@@ -180,7 +180,7 @@ sorted by `(path, line)`. `pattern:` is a **Rust-regex-class** expression
 ```yaml
 invoke: { tool: "nika:jq", args: { expression: ".items | map(.price) | add", input: "${{ tasks.X.output }}" } }
 ```
-Run a jq expression. **The single data-transform-and-extraction language**: map · filter · select · group_by · reshape · string-interpolation `"\(.x)"` · `@base64`/`@base64d`/`@csv` encoders · array `flatten` · `leaf_paths`/`getpath`/`setpath`. The same jq used in `output:` bindings (see `04-variables.md`).
+Run a jq expression. **The single data-transform-and-extraction language**: map · filter · select · group_by · reshape · string-interpolation `"\(.x)"` · `@base64`/`@base64d` encoders (the embedded jaq has NO `@csv`/`@tsv` — use `nika:convert to: csv`) · array `flatten` · `leaf_paths`/`getpath`/`setpath`. The same jq used in `output:` bindings (see `04-variables.md`).
 
 **`input` is any JSON value**: a single ref (`input: "${{ tasks.X.output }}"`) OR a **constructed array for multi-input ops**. Recursive merge of two objects (this is exactly why `json_merge` is NOT a builtin · jaq's `*` does it) ·
 ```yaml
@@ -232,7 +232,7 @@ Universal format converter · 4 formats v0.1 (`json` · `yaml` · `toml` · `csv
 
 Pattern · `fetch+extract` symmetry · single super-powerful builtin · `from`/`to` mode parameters · all bidirectional pairs canonical · no per-direction builtin slot.
 
-Replaces · legacy `nika:csv_to_json` (cut per ADR-086 · D-2026-05-27 Rams sweep · the « less but better » builtin-by-builtin review that cut the canonical set to 22). The reverse direction (JSON→CSV) is ALSO covered here · jq's `@csv` filter is the in-jq alternative for that specific direction · `nika:convert` is the canonical multi-format builtin.
+Replaces · legacy `nika:csv_to_json` (cut per ADR-086 · D-2026-05-27 Rams sweep · the « less but better » builtin-by-builtin review that cut the canonical set to 22). The reverse direction (JSON→CSV) is ALSO covered here · `nika:convert` is the canonical multi-format builtin for BOTH directions (the embedded jaq has no `@csv`/`@tsv` filter, so there is no in-jq alternative — `nika:convert to: csv` is the one path).
 
 Reference implementation · `serde_transcode` 1.1+ orchestrator (zero-allocation walk · serde-ecosystem canonical · 15M+ downloads · sfackler) + format-specific crates · `serde_json` (JSON · already nika dep) · `serde_yaml_bw` 2.5+ (YAML · modern + maintained 2026) · `toml` 1.1+ (TOML · spec 1.1.0 compliant) · `csv` 1.4+ (CSV · quoting-aware).
 
@@ -550,7 +550,7 @@ keep ONE data language (« no two ways to transform data »). Canonical recipes 
 | `nika:unflatten` | `reduce to_entries[] as $e (.; setpath($e.key/"."; $e.value))` |
 | `nika:inject` (template) | `"Hello \(.name), age \(.age)"` (string interpolation) |
 | `nika:base64_encode` / `_decode` | `@base64` / `@base64d` |
-| `nika:json_to_csv` | `@csv` |
+| `nika:json_to_csv` | `nika:convert to: csv` (NOT jq — the embedded jaq has no `@csv` filter) |
 | `nika:json_merge` (recursive `*`) | `.[0] * .[1]` on a `[base, overlay]` input (jaq `obj_merge` · source-verified 2026-05-27) |
 
 Also cut · `nika:task_status` (use `${{ tasks.X.status }}`) · `nika:orchestrate`
