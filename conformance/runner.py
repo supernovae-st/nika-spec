@@ -501,6 +501,46 @@ def cross_ref_errors(doc: dict) -> list[dict]:
     return errs
 
 
+class _UniqueKeyLoader(yaml.SafeLoader):
+    """A SafeLoader that REFUSES duplicate mapping keys instead of silently
+    keeping the last one. `yaml.safe_load` drops the earlier value with no
+    signal — but which key wins is exactly what NIKA-PARSE-017 (05-errors ·
+    "no silent last-wins") forbids leaving ambiguous, so the oracle must
+    reject the document, not quietly resolve it (a false green otherwise:
+    a shadowed `permits:` / `exec:` would sail through)."""
+
+
+def _no_duplicate_keys(loader, node, deep=False):
+    seen = set()
+    for key_node, _ in node.value:
+        key = loader.construct_object(key_node, deep=deep)
+        if key in seen:
+            raise yaml.constructor.ConstructorError(
+                "while constructing a mapping", node.start_mark,
+                f"duplicate mapping key {key!r}", key_node.start_mark)
+        seen.add(key)
+    return yaml.SafeLoader.construct_mapping(loader, node, deep)
+
+
+_UniqueKeyLoader.add_constructor(
+    yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, _no_duplicate_keys)
+
+
+def validate_text(text: str, validator: Draft202012Validator,
+                  canon: dict | None = None) -> dict:
+    """Parse a workflow under test — rejecting duplicate mapping keys per
+    NIKA-PARSE-017 — then validate. The only entry point the runner uses for
+    documents under test; canon.yaml (trusted) still loads via safe_load."""
+    try:
+        doc = yaml.load(text, Loader=_UniqueKeyLoader)
+    except yaml.constructor.ConstructorError as e:
+        return {"valid": False, "errors": [{
+            "code": "NIKA-PARSE-017", "namespace": "NIKA-PARSE",
+            "category": "validation_error",
+            "detail": f"{e.problem} — no silent last-wins (NIKA-PARSE-017)"}]}
+    return validate_workflow(doc, validator, canon)
+
+
 def validate_workflow(doc: dict, validator: Draft202012Validator,
                       canon: dict | None = None) -> dict:
     """Combined verdict · {valid, errors:[{code|namespace, category, detail}]}.
@@ -577,8 +617,7 @@ def run_fixtures(fixtures_dir: pathlib.Path, validator: Draft202012Validator,
     for inp in inputs:
         rel = inp.parent.relative_to(fixtures_dir.parent)
         exp = json.loads((inp.parent / "expected.json").read_text())
-        doc = yaml.safe_load(inp.read_text())
-        verdict = validate_workflow(doc, validator, canon)
+        verdict = validate_text(inp.read_text(), validator, canon)
         ok = verdict["valid"] == exp["valid"]
         if ok and not exp["valid"]:
             # at least one expected error must match an emitted one
@@ -600,7 +639,7 @@ def run_examples(examples_dir: pathlib.Path, validator: Draft202012Validator,
     static level (Core cross-refs + Stdlib surface) · the moat-proof gate."""
     bad = 0
     for f in sorted(examples_dir.glob("*.nika.yaml")):
-        v = validate_workflow(yaml.safe_load(f.read_text()), validator, canon)
+        v = validate_text(f.read_text(), validator, canon)
         print(f"{'PASS' if v['valid'] else 'FAIL'}  {f.name}")
         if not v["valid"]:
             for e in v["errors"]:
@@ -613,8 +652,7 @@ def main(argv: list[str]) -> int:
     validator = load_schema()
     canon = load_canon()
     if len(argv) >= 2 and argv[1] == "validate" and len(argv) == 3:
-        doc = yaml.safe_load(pathlib.Path(argv[2]).read_text())
-        v = validate_workflow(doc, validator, canon)
+        v = validate_text(pathlib.Path(argv[2]).read_text(), validator, canon)
         print(json.dumps(v, indent=2))
         return 0 if v["valid"] else 1
     if len(argv) >= 2 and argv[1] == "run":

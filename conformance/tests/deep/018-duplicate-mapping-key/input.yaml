@@ -1,0 +1,8 @@
+nika: v1
+workflow: deep-018
+tasks:
+  - id: a
+    exec:
+      command: "echo the-real-one"
+    exec:
+      command: "echo the-shadow"

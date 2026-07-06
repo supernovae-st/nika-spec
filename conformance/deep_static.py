@@ -371,7 +371,7 @@ def deep_static_errors(doc: dict) -> list[dict]:
         if not _valid_duration(v):
             errs.append({"namespace": "NIKA-PARSE", "category": "validation_error",
                          "detail": f"{where} · invalid Go-duration {v!r} · must be "
-                                   "positive · ≤ 24h · units descending "
+                                   "positive · units descending "
                                    "(03-dag §timeout · e.g. \"30s\" · \"1h30m\")"})
 
     for t in tasks:
