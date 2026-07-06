@@ -4518,6 +4518,8 @@ invoke: { tool: "nika:notify", args: { channel: webhook, target: "https://hooks.
 ```
 Send notifications · `channel:` enum (`webhook`/`slack`/`email`/`discord`/`sms` · one builtin not 5). The 1.0 engine MUST support `webhook` · others MAY be feature-gated. `data:` (OPTIONAL · any JSON value) carries structured context alongside the human `message`: the webhook payload is `{ message, severity, data? }` (the key is absent when not given · receivers branch on machine fields, never parse the message). Returns `null` on accepted delivery. Throws · `NIKA-BUILTIN-NOTIFY-001` (channel unconfigured · `validation_error`) · `-002` (delivery failed · `network_error` · transient engine-assessed).
 
+**Injection defense (normative)** · the `webhook` payload is JSON-encoded, so the `message` cannot break its transport (serde escaping neutralizes `"`/newlines). A channel that renders the `message` into a DIFFERENT medium MUST neutralize that medium's injection surface when implemented · **email** MUST reject/strip CR/LF in any header-bound field (`target:`/subject) against RFC 5322 header injection · **slack**/**discord** MUST treat the `message` as text, never a trusted mrkdwn/mention control string · **sms** MUST bound length to the carrier segment limit. The `webhook target:` rides the same SSRF boundary as `nika:fetch` (private-network / cloud-metadata rejected). Same discipline as the `nika:fetch` SSRF requirement · an output channel that reaches an interpreter neutralizes that interpreter's control surface.
+
 ---
 
 ## Introspection builtins (2)
