@@ -1,5 +1,5 @@
 {
   "valid": false,
   "errors": [{ "category": "validation_error" }],
-  "note": "`mode: edit` is RESERVED in stdlib v0.1 (media roadmap) · the v0.1 boundary is refused loudly at check time, never silently ignored (stdlib/builtins-v0.1.md §nika:image_generate)."
+  "note": "`mode: edit` (2026-07-06 · M2.2) requires a source: `image:` (one path) or `images:` (paths). An edit with neither is refused loudly at check time — the mode PARSES, but its shape does not (stdlib/builtins-v0.1.md §nika:image_generate edit-block)."
 }

@@ -12,6 +12,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added · `nika:image_generate` mode: edit (2026-07-06)
+
+- `mode: edit` — an input image (or images) + an instruction → a new
+  image. Source paths (`image:` XOR `images:`, capped per provider) are
+  READ, so `permits.fs.read` must cover them (the mirror of the save
+  boundary — edit reads what generate writes). A `mask:` is refused
+  loudly on instruction-only providers (gemini/xai) rather than silently
+  dropped. The manifest carries `mode: edit` + `source_images` (the
+  provenance chain). Conformance: fixture `008-valid-image-edit` +
+  `004` re-expressed (edit-without-source is refused for its SHAPE, not
+  the mode). Reference engine ships M-A (mock) with wire adapters
+  following.
+
 ### Added · content credentials — detect-and-preserve (2026-07-06)
 
 - Normative: engines MUST detect upstream C2PA signals (PNG `caBX` ·

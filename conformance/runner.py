@@ -163,13 +163,29 @@ def stdlib_surface_errors(doc: dict, canon: dict) -> list[dict]:
             args = inv.get("args")
             if not isinstance(args, dict):
                 continue
-            # v0.1 RESERVED options are refused loudly, never silently
-            # (builtins-v0.1.md §nika:image_generate).
+            # `mode:` — generate (default) or edit (M2.2 · 2026-07-06). An
+            # edit REQUIRES a source (`image:` XOR `images:`); a non-mode is
+            # a loud error; edit-only keys are refused in generate mode
+            # (builtins-v0.1.md §nika:image_generate edit-block).
             mode = args.get("mode")
-            if _is_static(mode) and mode != "generate":
+            is_edit = _is_static(mode) and mode == "edit"
+            if _is_static(mode) and mode not in ("generate", "edit"):
                 errs.append({"namespace": "NIKA-BUILTIN", "category": "validation_error",
-                             "detail": f"{where} · mode '{mode}' is reserved in v0.1 — "
-                                       "'generate' only (builtins-v0.1.md §nika:image_generate)"})
+                             "detail": f"{where} · mode '{mode}' is not a mode — one of "
+                                       "generate · edit (builtins-v0.1.md §nika:image_generate)"})
+            elif is_edit:
+                if "image" not in args and "images" not in args:
+                    errs.append({"namespace": "NIKA-BUILTIN", "category": "validation_error",
+                                 "detail": f"{where} · mode: edit requires a source · image: "
+                                           "(one path) or images: (paths)"})
+                if "image" in args and "images" in args:
+                    errs.append({"namespace": "NIKA-BUILTIN", "category": "validation_error",
+                                 "detail": f"{where} · image: and images: are mutually exclusive"})
+            else:
+                for key in ("image", "images", "mask"):
+                    if key in args:
+                        errs.append({"namespace": "NIKA-BUILTIN", "category": "validation_error",
+                                     "detail": f"{where} · '{key}:' requires mode: edit"})
             if "reference_images" in args:
                 errs.append({"namespace": "NIKA-BUILTIN", "category": "validation_error",
                              "detail": f"{where} · 'reference_images' is reserved in v0.1 "
