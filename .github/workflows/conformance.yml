@@ -33,6 +33,13 @@ jobs:
       - name: Install runner deps
         run: pip install pyyaml jsonschema
 
+      # jq is the oracle's compile check for workflow-supplied jq expressions
+      # (nika:jq · fetch.jq · output bindings). Absent, those go UNVERIFIED and
+      # the runner warns — so the gate installs it explicitly rather than lean
+      # on the runner image shipping it.
+      - name: Ensure jq (workflow jq-expression compile check)
+        run: jq --version || sudo apt-get update && sudo apt-get install -y jq
+
       - name: Run the static conformance gate
         run: python conformance/runner.py all
 

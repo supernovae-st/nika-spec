@@ -1,0 +1,6 @@
+nika: v1
+workflow: deep-015
+tasks:
+  - id: a
+    timeout: "0s"
+    exec: { command: "echo hi" }

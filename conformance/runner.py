@@ -567,6 +567,12 @@ def _matches(expected_err: dict, emitted: list[dict]) -> bool:
 def run_fixtures(fixtures_dir: pathlib.Path, validator: Draft202012Validator,
                  canon: dict | None = None) -> int:
     inputs = sorted(fixtures_dir.rglob("input.yaml"))
+    if not inputs:
+        # A tier that finds zero fixtures must NOT report "0/0 passed · exit 0":
+        # a renamed or emptied directory would sail through the CI gate having
+        # proven nothing. An absent tier fails loudly.
+        print(f"FAIL  {fixtures_dir} · no fixtures found (0 inputs)")
+        return 1
     passed = failed = 0
     for inp in inputs:
         rel = inp.parent.relative_to(fixtures_dir.parent)

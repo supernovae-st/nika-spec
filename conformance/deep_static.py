@@ -44,12 +44,51 @@ from __future__ import annotations
 import re
 import shutil
 import subprocess
+import sys
 
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import SchemaError
 
 EXPR_BODY = re.compile(r"(?<!\\)\$\{\{(.*?)\}\}", re.DOTALL)
-DURATION_RE = re.compile(r"^([0-9]+(\.[0-9]+)?(ns|us|µs|ms|s|m|h))+$")
+
+# The NIKA duration string is STRICTER than Go's ParseDuration (03-dag §timeout
+# lines 466-468): positive (> 0) and units combined in strictly DESCENDING
+# order without repeats (`1h30m` ✓ · `30m1h` ✗ · `5s5s` ✗). Go accepts `0` and
+# any order; the language does not. The JSON Schema `timeout` pattern only
+# proves SHAPE (a `${{ }}` template may stand in for a literal), so these
+# well-formedness rules are proven HERE — a shape-only regex was a false green
+# on `0s` and `30m1h`.
+#
+# The spec's "Maximum · 24h" is NOT enforced here: it is scoped to task-level
+# `timeout:` (its heading + rationale "tasks needing longer should split into a
+# workflow chain"), yet this same check also governs `nika:wait` holds — and
+# the spec itself uses `48h` as a VALID example one line below the cap (line
+# 468). That inconsistency + the task-only scope means a blanket 24h reject
+# would false-RED a legitimate 48h release hold. Flagged for the operator to
+# resolve in the prose; the oracle stays on the unambiguous rules.
+_DUR_SHAPE = re.compile(r"^([0-9]+(\.[0-9]+)?(ns|us|µs|ms|s|m|h))+$")
+_DUR_TOKEN = re.compile(r"([0-9]+(?:\.[0-9]+)?)(ns|us|µs|ms|s|m|h)")
+_DUR_RANK = {"ns": 0, "us": 1, "µs": 1, "ms": 2, "s": 3, "m": 4, "h": 5}
+
+
+def _valid_duration(v: str) -> bool:
+    """A well-formed NIKA duration string: positive, units strictly descending
+    without repeats (03-dag §timeout · the well-formedness half of
+    NIKA-PARSE-010 · the 24h cap is task-scoped prose, see note above)."""
+    if not _DUR_SHAPE.match(v):
+        return False
+    had_token = False
+    last_rank = 99  # each unit's rank must be strictly < the previous (descend)
+    for num, unit in _DUR_TOKEN.findall(v):
+        rank = _DUR_RANK[unit]
+        if rank >= last_rank:  # a repeat or an ascending unit → 30m1h ✗ · 5s5s ✗
+            return False
+        last_rank = rank
+        if float(num) > 0:
+            had_token = True
+    return had_token  # positive · at least one non-zero component
+
+
 JQ_BIN = shutil.which("jq")
 
 # ---------------------------------------------------------------- CEL parser
@@ -302,19 +341,37 @@ def deep_static_errors(doc: dict) -> list[dict]:
                 jq_exprs.append((f"task '{tid}' fetch.jq", args["jq"]))
     if JQ_BIN:
         for where, expr in jq_exprs:
-            r = subprocess.run([JQ_BIN, expr], input="null", capture_output=True, text=True)
+            # `--` ends jq's option parsing so a leading-dash "expression" is
+            # the PROGRAM, not a flag: bare `jq '-n'` is silently `--null-input`
+            # and a non-compiling expression slipped through as a valid flag
+            # (verified). `timeout=` bounds a workflow-supplied program that
+            # compiles then runs forever (`repeat(.)` would hang the trust
+            # root's CI); a timeout means it got PAST compilation, so it is
+            # NOT a compile error and is left accepted (same as runtime errs).
+            try:
+                r = subprocess.run([JQ_BIN, "--", expr], input="null",
+                                   capture_output=True, text=True, timeout=5)
+            except subprocess.TimeoutExpired:
+                continue
             if r.returncode == 3:  # compile error · runtime errors (5) accepted
                 msg = (r.stderr.strip().splitlines() or ["jq compile error"])[0]
                 errs.append({"namespace": "NIKA-VAR", "category": "validation_error",
                              "detail": f"{where} · jq does not compile · {msg[:90]}"})
+    elif jq_exprs:
+        # jq absent, but the workflow carries jq to prove. A silent skip is an
+        # environment-dependent false green — surface it so a mis-provisioned
+        # CI is visible (the spec CI installs jq before running the oracle).
+        print(f"warning: jq not on PATH — {len(jq_exprs)} jq expression(s) left "
+              "UNVERIFIED (install jq to close this gap)", file=sys.stderr)
 
     # DURATION · task timeout · nika:wait duration/timeout
     def check_duration(where: str, v):
         if not isinstance(v, str) or not _is_static(v):
             return
-        if not DURATION_RE.match(v):
+        if not _valid_duration(v):
             errs.append({"namespace": "NIKA-PARSE", "category": "validation_error",
-                         "detail": f"{where} · invalid Go-duration {v!r} "
+                         "detail": f"{where} · invalid Go-duration {v!r} · must be "
+                                   "positive · ≤ 24h · units descending "
                                    "(03-dag §timeout · e.g. \"30s\" · \"1h30m\")"})
 
     for t in tasks:
