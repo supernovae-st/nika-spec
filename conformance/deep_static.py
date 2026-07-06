@@ -499,8 +499,15 @@ def deep_static_errors(doc: dict) -> list[dict]:
             pats = permits.get("tools")
             if not isinstance(pats, list):
                 return False  # tools omitted → no invoke at all
-            return any(fnmatch.fnmatchcase(tool, pat) for pat in pats
-                       if isinstance(pat, str) and not pat.startswith("!"))
+            strs = [p for p in pats if isinstance(p, str)]
+            # Negation (`!prefix`) is a spec feature (02-verbs §permits · e.g.
+            # `["mcp:browser/*", "!mcp:browser/navigate"]`): a tool is permitted
+            # iff it matches an allow pattern AND matches no `!`-deny pattern.
+            # The deny was previously filtered out and never applied — an
+            # author's explicit `!nika:write` was silently ignored (false green).
+            allowed = any(fnmatch.fnmatchcase(tool, p) for p in strs if not p.startswith("!"))
+            denied = any(fnmatch.fnmatchcase(tool, p[1:]) for p in strs if p.startswith("!"))
+            return allowed and not denied
 
         exec_rule = permits.get("exec", False)
         net = permits.get("net") if isinstance(permits.get("net"), dict) else {}

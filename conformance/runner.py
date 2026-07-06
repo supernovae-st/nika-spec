@@ -494,6 +494,13 @@ def cross_ref_errors(doc: dict) -> list[dict]:
                   "tasks": idset, "with": set(), "in_for_each": False}
     errs.extend(_resolution_errors(doc.get("outputs"), out_scopes, "outputs:"))
     errs.extend(_unclosed_expr_errors(doc.get("outputs"), "outputs:"))
+    # The envelope `model:` is the template slot every author fills first — a
+    # `${{ }}` template is legal there (schema-permissive), so an unresolved
+    # ref must be caught the same as one in a task body. It was not: a typo'd
+    # `model: "${{ vars.nope }}"` sailed through while the identical ref inside
+    # a task raised NIKA-VAR-001 (04-variables §Resolution order).
+    errs.extend(_resolution_errors(doc.get("model"), out_scopes, "(envelope) model:"))
+    errs.extend(_unclosed_expr_errors(doc.get("model"), "(envelope) model:"))
 
     # NIKA-VAR-003 · static binding validation vs declared schema: (04)
     errs.extend(_schema_path_errors(doc))
