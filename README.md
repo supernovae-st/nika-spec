@@ -130,7 +130,9 @@ The reference engine is installable and runs workflows end-to-end today ·
   `cargo install nika` joins brew + curl as an install path at 1.0)
 - Exposes the engine's static oracle via MCP server (`nika mcp`) for harness
   integration (Claude Code · Cursor · Hermes · etc.). The MCP surface is
-  read-only (`nika_check` · `nika_explain`); execution stays behind `nika run`.
+  read-only — 8 tools (`nika_check` · `nika_explain` · `nika_schema` ·
+  `nika_examples` · `nika_template` · `nika_canon` · `nika_catalog` ·
+  `nika_tools`); execution stays behind `nika run`.
 - Engine-free alternative · the [conformance oracle](./conformance/) in this
   repo validates any workflow statically
   (`python3 conformance/runner.py validate <file>`)
@@ -174,7 +176,7 @@ sha256 over the exact text every surface renders. The contract:
 
 - the **docs** and the **website** render projections of these files (never copies)
 - the **reference engine embeds the pack of its version**: `nika examples`
-  / `nika docs` / `nika schema` work offline, and an installed binary always
+  / `nika spec` / `nika schema` work offline, and an installed binary always
   carries the canonical examples *of the language version it speaks*
 - the manifest hashes make the pack **verifiable end-to-end**: a tampered or
   drifted example fails the check, anywhere it travels

@@ -35,3 +35,9 @@ jobs:
 
       - name: Run the static conformance gate
         run: python conformance/runner.py all
+
+      - name: Projection gates · in-repo canon markers + pack manifest + llms files
+        run: |
+          python scripts/canon-projectors.py --check
+          python scripts/showcase-projector.py --check
+          python scripts/llms-projector.py --check

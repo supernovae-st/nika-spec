@@ -136,7 +136,9 @@ The reference engine is installable and runs workflows end-to-end today ·
   `cargo install nika` joins brew + curl as an install path at 1.0)
 - Exposes the engine's static oracle via MCP server (`nika mcp`) for harness
   integration (Claude Code · Cursor · Hermes · etc.). The MCP surface is
-  read-only (`nika_check` · `nika_explain`); execution stays behind `nika run`.
+  read-only — 8 tools (`nika_check` · `nika_explain` · `nika_schema` ·
+  `nika_examples` · `nika_template` · `nika_canon` · `nika_catalog` ·
+  `nika_tools`); execution stays behind `nika run`.
 - Engine-free alternative · the [conformance oracle](./conformance/) in this
   repo validates any workflow statically
   (`python3 conformance/runner.py validate <file>`)
@@ -180,7 +182,7 @@ sha256 over the exact text every surface renders. The contract:
 
 - the **docs** and the **website** render projections of these files (never copies)
 - the **reference engine embeds the pack of its version**: `nika examples`
-  / `nika docs` / `nika schema` work offline, and an installed binary always
+  / `nika spec` / `nika schema` work offline, and an installed binary always
   carries the canonical examples *of the language version it speaks*
 - the manifest hashes make the pack **verifiable end-to-end**: a tampered or
   drifted example fails the check, anywhere it travels
@@ -278,7 +280,7 @@ tasks:
 > `ollama/qwen3.5:4b` · zero key, nothing leaves your machine
 > (`ollama pull qwen3.5:4b` first · or `lmstudio/…` · `llamacpp/…` ·
 > `vllm/…`). Prefer cloud? Swap the one `model:` line for any of the
-> <!-- canon:providers -->14<!-- /canon --> providers ·
+> <!-- canon:providers -->16<!-- /canon --> providers ·
 > `mistral/mistral-small` · `anthropic/claude-haiku-4-5` ·
 > `openai/gpt-5.2` · the rest of the file doesn't change.
 
@@ -450,7 +452,7 @@ a caller receives).
 - **[templates/](./templates/)**: writing your own? Instantiate a
   skeleton (6 valid, slot-marked) instead of starting blank, the
   deterministic path agents follow ([protocol](AGENTS.md))
-- **[stdlib/](./stdlib/)**: the <!-- canon:providers -->14<!-- /canon --> providers · <!-- canon:extract_modes -->9<!-- /canon --> extract modes · <!-- canon:builtins -->24<!-- /canon --> builtins
+- **[stdlib/](./stdlib/)**: the <!-- canon:providers -->16<!-- /canon --> providers · <!-- canon:extract_modes -->9<!-- /canon --> extract modes · <!-- canon:builtins -->25<!-- /canon --> builtins
 - **[examples/](./examples/)**: 7 foundation + 20 showcase workflows, all shipped and CI-gated
 - **[README.md](./README.md)**: why a language · repo layout · governance
 
@@ -585,7 +587,7 @@ outputs:                              # what the workflow returns · symmetric t
 | [07 conformance](./07-conformance.md) | What « v0.1-compliant » means |
 | [08 out of scope](./08-out-of-scope.md) | Explicit defer list (memory · macros · etc.) |
 
-**Stdlib** (versioned independently · not a spec section) · [stdlib/](../stdlib/): **<!-- canon:providers -->14<!-- /canon --> providers · <!-- canon:extract_modes -->9<!-- /canon --> extract modes · <!-- canon:builtins -->24<!-- /canon --> builtins** (6 core · 5 file · 8 data · 1 introspection · 2 network · post ADR-086/087/088 Rams sweep 2026-05-27).
+**Stdlib** (versioned independently · not a spec section) · [stdlib/](../stdlib/): **<!-- canon:providers -->16<!-- /canon --> providers · <!-- canon:extract_modes -->9<!-- /canon --> extract modes · <!-- canon:builtins -->25<!-- /canon --> builtins** (6 core · 5 file · 8 data · 2 network · 2 introspection · 2 media).
 
 ---
 
@@ -1444,7 +1446,7 @@ spec minor. It never appears silently.
       path: "./config.yaml"
 ```
 
-See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md) for the canonical builtin list (<!-- canon:builtins -->24<!-- /canon --> builtins in v0.1).
+See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md) for the canonical builtin list (<!-- canon:builtins -->25<!-- /canon --> builtins in v0.1).
 
 > **Grouped paths are grammar-legal · v0.1 ships none.** The reference
 > grammar admits `nika:<group>/<tool>` (the `nika:connectome/recall`
@@ -3381,9 +3383,9 @@ Three reasons ·
 
 The stdlib has **independent versioning** ·
 
-- `stdlib/providers-v0.1.md`, the <!-- canon:providers -->14<!-- /canon --> canonical providers for v0.1
+- `stdlib/providers-v0.1.md`, the <!-- canon:providers -->16<!-- /canon --> canonical providers for v0.1
 - `stdlib/extract-modes-v0.1.md`, the <!-- canon:extract_modes -->9<!-- /canon --> canonical extract modes for v0.1
-- `stdlib/builtins-v0.1.md`, the <!-- canon:builtins -->24<!-- /canon --> canonical builtins for v0.1
+- `stdlib/builtins-v0.1.md`, the <!-- canon:builtins -->25<!-- /canon --> canonical builtins for v0.1
 
 When the stdlib evolves to v0.2 · those files become `*-v0.2.md` and new versions are published. The core language contract (`nika: v1`) is unchanged.
 
@@ -3525,7 +3527,7 @@ See [07-conformance.md](./07-conformance.md). In summary ·
 |---|---|
 | Core | None · only parse + DAG + variable + error · no execution needed |
 | Runtime | Must execute the 4 verbs · provider/tool implementations engine's choice |
-| Stdlib v0.1 | Must ship the <!-- canon:providers -->14<!-- /canon --> providers + <!-- canon:extract_modes -->9<!-- /canon --> extract modes + <!-- canon:builtins -->24<!-- /canon --> builtins |
+| Stdlib v0.1 | Must ship the <!-- canon:providers -->16<!-- /canon --> providers + <!-- canon:extract_modes -->9<!-- /canon --> extract modes + <!-- canon:builtins -->25<!-- /canon --> builtins |
 | Stdlib v0.1+media | RESERVED · enumerated when the media set publishes (stdlib v0.x · the 24 names are not yet normative) |
 
 A v0.1-compliant engine for a workflow author depends on which level they need.
@@ -3570,7 +3572,7 @@ Three nested levels · increasing scope ·
 |---|---|---|
 | **Core** | Parse + validate · DAG semantics · variable resolution · error structure | Linters · spec editors · static analyzers |
 | **Runtime** | Core + verb execution | Working engine (with own provider/tool impls) |
-| **Stdlib v0.1** | Runtime + the <!-- canon:providers -->14<!-- /canon --> providers + <!-- canon:extract_modes -->9<!-- /canon --> extract modes + <!-- canon:builtins -->24<!-- /canon --> builtins | Full reference-impl-equivalent engine |
+| **Stdlib v0.1** | Runtime + the <!-- canon:providers -->16<!-- /canon --> providers + <!-- canon:extract_modes -->9<!-- /canon --> extract modes + <!-- canon:builtins -->25<!-- /canon --> builtins | Full reference-impl-equivalent engine |
 
 A higher level **includes** the lower levels.
 
@@ -4226,7 +4228,7 @@ This is the spec's structural protection against feature creep · Rams principle
 
 # Stdlib v0.1 · Builtins
 
-> **<!-- canon:builtins -->24<!-- /canon --> canonical builtins** shipped with Stdlib v0.1-compliant engines.
+> **<!-- canon:builtins -->25<!-- /canon --> canonical builtins** shipped with Stdlib v0.1-compliant engines.
 > Invoked via `invoke: tool: "nika:<name>"`. Plus the remaining media
 > builtins deferred to stdlib v0.x (opt-in feature flag).
 >
@@ -4557,7 +4559,7 @@ Throws · `NIKA-BUILTIN-INSPECT-001` if `view:` value not in the canonical enum.
 
 ---
 
-## Media builtins (1)
+## Media builtins (2)
 
 ### `nika:image_generate` · provider-backed image asset generation
 
@@ -4812,13 +4814,13 @@ external users · before the forever-clock).
 
 ---
 
-🦋 *<!-- canon:builtins -->24<!-- /canon --> builtins canonical · jq = the data language · 5-layer Rams symmetry (fetch+extract · jq · convert · wait · inspect) · assets land on disk, never inline · clear forever.*
+🦋 *<!-- canon:builtins -->25<!-- /canon --> builtins canonical · jq = the data language · 5-layer Rams symmetry (fetch+extract · jq · convert · wait · inspect) · assets land on disk, never inline · clear forever.*
 
 <!-- ═══ stdlib/providers-v0.1.md ═══ -->
 
 # Stdlib v0.1 · Providers
 
-> The canonical <!-- canon:providers -->14<!-- /canon --> providers shipped with v0.1-compliant engines. Each
+> The canonical <!-- canon:providers -->16<!-- /canon --> providers shipped with v0.1-compliant engines. Each
 > provider implements the same interface (LLM chat completion + optional
 > streaming + vision + structured output) against a different backend.
 > You select one with a single `model: <provider>/<name>` field.
@@ -5388,7 +5390,7 @@ The reference engine implements `provider_options:` as best-effort pass-through.
 
 ---
 
-🦋 *<!-- canon:providers -->14<!-- /canon --> providers · 1 contract · sovereignty preserved.*
+🦋 *<!-- canon:providers -->16<!-- /canon --> providers · 1 contract · sovereignty preserved.*
 
 <!-- ═══ stdlib/extract-modes-v0.1.md ═══ -->
 

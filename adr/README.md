@@ -17,4 +17,6 @@ supersessions update both files in the same commit.
 
 | # | Title | Status | Date |
 |---|-------|--------|------|
-| [ADR-099](adr-099-durable-lite-run-resume.md) | Durable-lite run resume · the trace IS the checkpoint | Proposed | 2026-07-05 |
+| [ADR-099](adr-099-durable-lite-run-resume.md) | Durable-lite run resume · the trace IS the checkpoint | Accepted | 2026-07-05 |
+| [ADR-100](adr-100-trace-retention.md) | Trace retention · bounded by default, never silently, never a pending gate | Accepted | 2026-07-05 |
+| [ADR-104](adr-104-provider-catalog-16.md) | Provider catalog 14 → 16 (huggingface + nvidia) | Accepted | 2026-07-05 |

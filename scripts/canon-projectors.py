@@ -6,6 +6,7 @@
 # the PUBLIC consumer surfaces (renamed from docs-canon-snippet.py ·
 # 2026-06-10 · multi-target):
 #
+#   TARGET 0 · this repo    <!-- canon:KEY -->N<!-- /canon --> markers in *.md
 #   TARGET 1 · nika-docs   snippets/_canon.mdx       (Mintlify · import { CANON })
 #   TARGET 2 · nika.sh     src/canon.generated.ts    (website · import { CANON })
 #
@@ -26,10 +27,16 @@
 #   python3 scripts/canon-projectors.py --write   # regenerate all targets
 #   python3 scripts/canon-projectors.py --check   # drift gate (exit 1 on diff)
 #
+# Both modes always cover TARGET 0 (in-repo markers) · external siblings
+# are covered when present. History note · the in-repo markers were
+# hand-maintained until 2026-07-06 and drifted 14/24 vs canon 16/25 across
+# 12 sites while every external projection stayed green — hence TARGET 0.
+#
 # Exit codes · 0 in-sync/written · 1 drift (--check) · 2 environment or
-# intra-canon error (counts != len(items) · missing files · bad schema).
+# intra-canon error (counts != len(items) · unknown marker key · bad schema).
 
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -91,6 +98,68 @@ def self_check(canon: dict) -> None:
     actual = sum(len(v) for v in p["items"].values())
     if p["count"] != actual:
         die("providers", p["count"], actual)
+
+
+MARKER_RE = re.compile(r"(<!-- canon:([a-z_]+) -->)([^<]*)(<!-- /canon -->)")
+
+
+def marker_values(canon: dict) -> dict:
+    """TARGET 0 vocabulary · every `<!-- canon:KEY -->` maps to one canon count."""
+    return {
+        "verbs": canon["verbs"]["count"],
+        "builtins": canon["builtins"]["count"],
+        "providers": canon["providers"]["count"],
+        "extract_modes": canon["extract_modes"]["count"],
+        "namespaces": canon["namespaces"]["count"],
+        "error_namespaces": canon["error_namespaces"]["count"],
+        "error_categories": canon["error_categories"]["count"],
+        "error_codes": canon["error_codes"]["count"],
+        "pillars": canon["pillars"]["count"],
+    }
+
+
+def project_repo_markers(canon: dict, write: bool) -> bool:
+    """TARGET 0 · rewrite (or check) every in-repo marker against canon.yaml.
+
+    Returns True when drift was found. Unknown marker keys exit 2 — a typo'd
+    key is a silent-drift hole, not a soft warning.
+    """
+    values = marker_values(canon)
+    drift = False
+    for path in sorted(SPEC_ROOT.rglob("*.md")):
+        rel = path.relative_to(SPEC_ROOT)
+        if any(part.startswith(".") for part in rel.parts):
+            continue
+        text = path.read_text()
+        stale: list[str] = []
+
+        def sub(m: re.Match) -> str:
+            key = m.group(2)
+            if key not in values:
+                print(
+                    f"canon-projectors · unknown marker canon:{key} in {rel} · "
+                    "add it to marker_values() or fix the typo",
+                    file=sys.stderr,
+                )
+                sys.exit(2)
+            expected = str(values[key])
+            if m.group(3) != expected:
+                stale.append(f"canon:{key} {m.group(3)!r} → {expected}")
+                return m.group(1) + expected + m.group(4)
+            return m.group(0)
+
+        rewritten = MARKER_RE.sub(sub, text)
+        if stale:
+            drift = True
+            if write:
+                path.write_text(rewritten)
+                print(f"✓ reprojected {rel} · " + " · ".join(stale))
+            else:
+                print(
+                    f"canon-projectors · DRIFT · {rel} · " + " · ".join(stale),
+                    file=sys.stderr,
+                )
+    return drift
 
 
 def js_str_list(items: list) -> str:
@@ -173,11 +242,13 @@ def main() -> int:
     if website is not None:
         targets.append(("website", website, render_ts(fields)))
 
-    if not targets:
-        print("canon-projectors · no sibling targets found · nothing to project")
-        return 0
+    drift = project_repo_markers(canon, write=(mode == "--write"))
+    if not drift and mode == "--check":
+        print("✓ repo markers in sync (TARGET 0)")
 
-    drift = False
+    if not targets:
+        print("canon-projectors · no sibling targets found · external projection skipped")
+        return 1 if (drift and mode == "--check") else 0
     for name, path, rendered in targets:
         if mode == "--write":
             path.write_text(rendered)
@@ -199,7 +270,7 @@ def main() -> int:
             f"  verbs={c['verbs']} builtins={c['builtins']} providers={c['providers']} "
             f"extract_modes={c['extractModes']} error_namespaces={c['errorNamespaces']}"
         )
-    return 1 if drift else 0
+    return 1 if (drift and mode == "--check") else 0
 
 
 if __name__ == "__main__":
