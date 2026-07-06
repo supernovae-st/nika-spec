@@ -18,6 +18,12 @@
 import sys
 from pathlib import Path
 
+try:
+    import yaml
+except ImportError:
+    print("llms-projector · pyyaml required (pip install pyyaml)", file=sys.stderr)
+    sys.exit(2)
+
 ROOT = Path(__file__).resolve().parent.parent
 RAW = "https://raw.githubusercontent.com/supernovae-st/nika-spec/main"
 
@@ -39,11 +45,27 @@ FULL_ORDER = [
     "stdlib/extract-modes-v0.1.md",
 ]
 
-LLMS_TXT = f"""# Nika
+def load_counts() -> dict:
+    """Counts interpolated into llms.txt come from canon.yaml — never
+    hand-typed here. (The 2026-07-06 audit caught this template carrying
+    24 builtins / 14 providers while every marker surface was already
+    reprojected · the template was the last hand-written count site.)"""
+    with (ROOT / "canon.yaml").open(encoding="utf-8") as f:
+        canon = yaml.safe_load(f)
+    return {
+        "builtins": canon["builtins"]["count"],
+        "providers": canon["providers"]["count"],
+        "extract_modes": canon["extract_modes"]["count"],
+        "error_namespaces": canon["error_namespaces"]["count"],
+    }
+
+
+def build_llms_txt(c: dict) -> str:
+    return f"""# Nika
 
 > Intent as Code · a workflow language for AI. Four verbs (`infer` · `exec` ·
 > `invoke` · `agent`), a YAML envelope (`nika: v1` · forever), a closed
-> stdlib (24 builtins · 16 providers), and a conformance suite. Apache-2.0
+> stdlib ({c["builtins"]} builtins · {c["providers"]} providers), and a conformance suite. Apache-2.0
 > spec · AGPL-3.0 reference engine in Rust (single static binary).
 
 Workflow files are `*.nika.yaml`. The JSON Schema gives any editor
@@ -57,8 +79,8 @@ autocomplete + validation via a `yaml-language-server` modeline:
 - [Verbs]({RAW}/spec/02-verbs.md): the four closed verbs · infer · exec · invoke · agent
 - [DAG]({RAW}/spec/03-dag.md): task ordering · needs · fan-out · when-gates
 - [Variables]({RAW}/spec/04-variables.md): the five namespaces · CEL + jq expressions
-- [Errors]({RAW}/spec/05-errors.md): the NIKA-XXX code contract · 14 namespaces
-- [Stdlib contract]({RAW}/spec/06-stdlib-contract.md): 24 builtins · 16 providers · 9 extract modes
+- [Errors]({RAW}/spec/05-errors.md): the NIKA-XXX code contract · {c["error_namespaces"]} namespaces
+- [Stdlib contract]({RAW}/spec/06-stdlib-contract.md): {c["builtins"]} builtins · {c["providers"]} providers · {c["extract_modes"]} extract modes
 - [Conformance]({RAW}/spec/07-conformance.md): three levels · the fixture suite · editor tooling
 - [Out of scope]({RAW}/spec/08-out-of-scope.md): what Nika deliberately does not do
 
@@ -66,13 +88,13 @@ autocomplete + validation via a `yaml-language-server` modeline:
 
 - [Canonical registry]({RAW}/canon.yaml): the machine-readable single source of truth
 - [JSON Schema]({RAW}/schemas/workflow.schema.json): editor autocomplete + validation
-- [Builtins]({RAW}/stdlib/builtins-v0.1.md): the 24 canonical builtins
-- [Providers]({RAW}/stdlib/providers-v0.1.md): the 14-provider catalog (local-first)
+- [Builtins]({RAW}/stdlib/builtins-v0.1.md): the {c["builtins"]} canonical builtins
+- [Providers]({RAW}/stdlib/providers-v0.1.md): the {c["providers"]}-provider catalog (local-first)
 - [Quickstart]({RAW}/QUICKSTART.md): author + check + run a first workflow
 
 ## Optional
 
-- [Extract modes]({RAW}/stdlib/extract-modes-v0.1.md): the 9 `nika:extract` modes
+- [Extract modes]({RAW}/stdlib/extract-modes-v0.1.md): the {c["extract_modes"]} `nika:extract` modes
 - [Changelog]({RAW}/CHANGELOG.md): spec evolution log
 - [Reference engine](https://github.com/supernovae-st/nika): Rust · AGPL-3.0 · `brew install supernovae-st/tap/nika`
 """
@@ -97,7 +119,7 @@ def build_full() -> str:
 def main() -> int:
     check = "--check" in sys.argv[1:]
     targets = {
-        ROOT / "llms.txt": LLMS_TXT,
+        ROOT / "llms.txt": build_llms_txt(load_counts()),
         ROOT / "llms-full.txt": build_full(),
     }
     dirty = []

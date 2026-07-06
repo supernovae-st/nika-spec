@@ -488,7 +488,7 @@ def render_manifest(workflows: dict[str, str]) -> str:
         "# from VERSION + examples/ + examples/showcase/ — the versioned pack",
         "# contract. DO NOT EDIT · regenerate: python3 scripts/showcase-projector.py --write",
         "# Consumers · the reference engine embeds this pack (nika examples ·",
-        "# nika docs) · docs + website render projections of the same files.",
+        "# nika spec) · docs + website render projections of the same files.",
         f"pack_version: {version}",
         f"workflow_count: {len(foundation) + len(workflows)}",
         "foundation:",
