@@ -43,6 +43,7 @@ FULL_ORDER = [
     "stdlib/builtins-v0.1.md",
     "stdlib/providers-v0.1.md",
     "stdlib/extract-modes-v0.1.md",
+    "registry/registry-v0.1.md",
 ]
 
 def load_counts() -> dict:
@@ -95,6 +96,7 @@ autocomplete + validation via a `yaml-language-server` modeline:
 ## Optional
 
 - [Extract modes]({RAW}/stdlib/extract-modes-v0.1.md): the {c["extract_modes"]} `nika:extract` modes
+- [Registry contract]({RAW}/registry/registry-v0.1.md): how artifacts are shared — entries, trust model, advisories
 - [Changelog]({RAW}/CHANGELOG.md): spec evolution log
 - [Reference engine](https://github.com/supernovae-st/nika): Rust · AGPL-3.0 · `brew install supernovae-st/tap/nika`
 """

@@ -97,10 +97,13 @@ nika-spec/
 ├── canon.yaml                 ← machine-readable counts + registries (THE source)
 ├── AGENTS.md                  ← the deterministic authoring protocol (agents start here)
 │
-└── stdlib/                    ← versioned independently
-    ├── providers-v0.1.md        16 providers canonical (ollama · llamacpp · vllm · mistral · …)
-    ├── extract-modes-v0.1.md    9 extract modes (markdown · article · jq · …)
-    └── builtins-v0.1.md         24 builtins curated (core · file · data · …)
+├── stdlib/                    ← versioned independently
+│   ├── providers-v0.1.md        the canonical providers (ollama · llamacpp · vllm · mistral · …)
+│   ├── extract-modes-v0.1.md    the fetch extract modes (markdown · article · jq · …)
+│   └── builtins-v0.1.md         the curated builtins (counts live in canon.yaml)
+│
+└── registry/                  ← the sharing contract (versioned independently)
+    └── registry-v0.1.md         entries · trust model · advisories · machine surfaces
 ```
 
 ---
