@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "the bounded same-origin crawl (fetch vNext · 2026-07-07) — crawl is an intention, fetch is the primitive (no nika:crawl); the certificate counts max_pages + 1 robots probe."
+}

@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "namespace": "NIKA-BUILTIN", "category": "validation_error" }
+  ],
+  "note": "traverse: owns the whole surface — the crawl emits the fixed page-digest shape; mode/selector/jq/body/form/multipart are excluded (builtins-v0.1.md §nika:fetch · traverse)."
+}

@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "namespace": "NIKA-BUILTIN", "category": "validation_error" }
+  ],
+  "note": "max_pages is the crawl bound — 1..=25 (the certificate's effect ceiling; an unbounded crawl would undercount the audit)."
+}
