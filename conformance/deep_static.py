@@ -294,6 +294,19 @@ def _is_static(s: str) -> bool:
     return not EXPR_BODY.search(s)
 
 
+def _as_dict(value) -> dict:
+    """`value` when it is a dict, else `{}`. The oracle inspects untrusted,
+    possibly schema-invalid workflows (it runs BEFORE + regardless of schema
+    validation), so `args:`/`exec:` may be a list, string, or int. The old
+    `inv.get("args") or {}` idiom crashed on a NON-EMPTY list/string (truthy →
+    `.get` on a non-dict → AttributeError), turning a malformed workflow into a
+    traceback instead of a verdict — a crash-on-input DoS on the trust root a
+    registry runs over untrusted submissions. This makes every `.get` access
+    total: a non-dict shape simply carries no fields to check here, and the
+    schema layer still reports the type error."""
+    return value if isinstance(value, dict) else {}
+
+
 def deep_static_errors(doc: dict) -> list[dict]:
     errs: list[dict] = []
     if not isinstance(doc, dict):
@@ -332,7 +345,7 @@ def deep_static_errors(doc: dict) -> list[dict]:
                     jq_exprs.append((f"task '{tid}' output.{name}", expr))
         inv = t.get("invoke")
         if isinstance(inv, dict):
-            args = inv.get("args") or {}
+            args = _as_dict(inv.get("args"))
             if inv.get("tool") == "nika:jq" and isinstance(args.get("expression"), str) \
                     and _is_static(args["expression"]):
                 jq_exprs.append((f"task '{tid}' nika:jq", args["expression"]))
@@ -381,7 +394,7 @@ def deep_static_errors(doc: dict) -> list[dict]:
         check_duration(f"task '{tid}' timeout", t.get("timeout"))
         inv = t.get("invoke")
         if isinstance(inv, dict) and inv.get("tool") == "nika:wait":
-            args = inv.get("args") or {}
+            args = _as_dict(inv.get("args"))
             check_duration(f"task '{tid}' wait.duration", args.get("duration"))
             check_duration(f"task '{tid}' wait.timeout", args.get("timeout"))
         for step in (t.get("on_finally") or []):
@@ -409,7 +422,7 @@ def deep_static_errors(doc: dict) -> list[dict]:
                 check_schema(f"task '{tid}' {verb}.schema", body.get("schema"))
         inv = t.get("invoke")
         if isinstance(inv, dict) and inv.get("tool") == "nika:validate":
-            check_schema(f"task '{tid}' validate.schema", (inv.get("args") or {}).get("schema"))
+            check_schema(f"task '{tid}' validate.schema", _as_dict(inv.get("args")).get("schema"))
 
     # WHEN-FORM · ${{ }} string or YAML boolean · a bare string is never an expression
     def check_when(where: str, w):
@@ -542,7 +555,7 @@ def deep_static_errors(doc: dict) -> list[dict]:
                                  "detail": f"task '{tid}' · invoke {tool} outside "
                                            "permits.tools (01 §permits)"})
                 if tool == "nika:fetch" and hosts is not None:
-                    url = (inv.get("args") or {}).get("url")
+                    url = _as_dict(inv.get("args")).get("url")
                     if isinstance(url, str) and not EXPR_BODY.search(url):
                         host = urllib.parse.urlparse(url).hostname or ""
                         if not any(fnmatch.fnmatchcase(host, h) for h in hosts
