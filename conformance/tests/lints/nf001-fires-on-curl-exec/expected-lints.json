@@ -1,0 +1,8 @@
+{
+ "lints": [
+  {
+   "rule": "native-first/001",
+   "task": "crawl"
+  }
+ ]
+}

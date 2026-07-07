@@ -1,0 +1,8 @@
+{
+ "lints": [
+  {
+   "rule": "native-first/005",
+   "task": "upload"
+  }
+ ]
+}
