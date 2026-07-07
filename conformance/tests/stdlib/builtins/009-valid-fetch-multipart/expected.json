@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "the native upload path (fetch vNext · 2026-07-07) — multipart file parts ride the permits.fs READ boundary; auth rides a masked secrets header; the mode/jq pairing extracts the response URL. The exec-helper this replaces is the native-first/005 class."
+}

@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "namespace": "NIKA-BUILTIN", "category": "validation_error" }
+  ],
+  "note": "form: (and multipart:) need a body-bearing method — the default GET carries no body (builtins-v0.1.md §nika:fetch · payload exclusivity)."
+}

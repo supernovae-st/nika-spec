@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: bad-part
+tasks:
+  - id: upload
+    invoke:
+      tool: "nika:fetch"
+      args:
+        url: "https://api.example.com/upload"
+        method: POST
+        multipart:
+          - { name: file, value: "x", path: "./y.png" }

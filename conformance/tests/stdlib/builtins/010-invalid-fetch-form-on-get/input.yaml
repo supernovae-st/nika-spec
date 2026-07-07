@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: form-on-get
+tasks:
+  - id: submit
+    invoke:
+      tool: "nika:fetch"
+      args:
+        url: "https://api.example.com/search"
+        form: { q: "nika", page: 1 }

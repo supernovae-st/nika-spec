@@ -2454,6 +2454,34 @@ trap. The reference validator ships these as warnings (`one-obvious-way/001`
 …`/007` · table order), never hard errors (the discouraged forms are legal ·
 just not canonical).
 
+## Native-first · preference rules (normative for lints)
+
+The sibling ruleset for the VERB choice: `exec:` is the escape hatch,
+never the default path. An `exec:` whose literal command a stdlib
+builtin (or an MCP tool) covers trades portability, the capability
+boundary and the audit certificate for a subprocess. A conformant
+linter (the reference `native-first` rule set) warns on each class ·
+
+| Rule | Fires on (literal command head/fragments) | The native path |
+|---|---|---|
+| `native-first/001 exec-http` | `curl` · `wget` · `xh` · `http(s)` · an interpreter one-liner around `fetch(`/`axios`/`http.request` | `nika:fetch` (uploads · `multipart:` · crawls · `traverse:`) |
+| `native-first/002 exec-file` | `cat` · `tee` · `cp` · `mv` · `mkdir` · `touch` · `head` · `tail` · `ls` | `nika:read` / `nika:write` (`create_dirs: true`) / `nika:glob` |
+| `native-first/003 exec-data` | `jq` · `sed` · `awk` | `nika:jq` (or an `output:` binding) for JSON · `nika:edit` for in-place literal file edits |
+| `native-first/004 exec-media` | an image/speech provider endpoint in the command (`images/generations` · `/v1/audio/speech` · …) | `nika:image_generate` / `nika:tts_generate` |
+| `native-first/005 exec-helper` | an interpreter (`node` · `python` · `sh` · …) running a script file | inventory the helper · HTTP→`nika:fetch` · files→`nika:read`/`nika:write` · JSON→`nika:jq` · a product API→an MCP server (`mcp:<server>/<tool>`) · keep only a genuine subprocess, recorded in the exec ledger |
+
+Rules are DETERMINISTIC on literal fragments (a templated command head
+makes no claim) · at most one warning per task, most specific first
+(helper ≻ media ≻ http ≻ file ≻ data) · `nika run …` nesting and
+genuine subprocesses (`cargo` · `git` · `make` · a product CLI with no
+MCP surface yet) stay silent. Warnings, never hard errors — but a
+STRICT authoring posture (a CI gate · an agent's final check) MAY
+promote them to failures; the reference engine ships that posture as
+`nika check --native-strict`. When an `exec:` legitimately remains,
+the author records it in the **exec ledger** (task · command · why no
+native path · the unlock that would remove it) — the workflow header
+comment is the conventional home.
+
 ## Forward-compat
 
 v1 ships with these task fields · `id` · `depends_on` · `when` · `for_each` · `max_parallel` · `fail_fast` · `retry` · `on_error` · `timeout` · `on_finally` · `with` · `output` · plus the verb selector. Additional fields may be added in minor bumps (additive only). (Output *shape* is per-verb · not a task field · see [02-verbs.md](./02-verbs.md#what--tasksidoutput--holds--per-verb).)
@@ -4507,9 +4535,32 @@ invoke: { tool: "nika:fetch", args: { url: "https://example.com/article", mode: 
 |---|---|
 | `url` | required · may use `${{ ... }}` |
 | `method` | `GET` (default) · `POST` · `PUT` · `DELETE` · `PATCH` · `HEAD` |
-| `headers` · `body` | extra headers · body (objects auto-JSON) |
+| `headers` · `body` | extra headers · body (objects auto-JSON) · auth rides `headers` (`x-api-key: "${{ secrets.KEY }}"` · masked) |
+| `form` | `application/x-www-form-urlencoded` object of scalar fields (string · number · boolean — nesting refused · reshape with `nika:jq`) · body-bearing method required |
+| `multipart` | `multipart/form-data` parts array · `{name, value}` text XOR `{name, path, filename?, content_type?}` file · every `path` rides the `permits.fs` READ boundary (`NIKA-SEC-004` on escape) · ≤64 parts · ≤32 MiB total · body-bearing method required |
 | `mode` | extraction mode · see `extract-modes-v0.1.md` · default `markdown` |
 | `jq` | a jq expression · only with `mode: jq` (structured JSON extraction · replaces the former JSONPath mode) |
+| `traverse` | bounded same-origin crawl · `{ max_pages: 1..=25 (required), respect_robots?: bool (default true) }` · GET only · excludes `mode`/`selector`/`jq`/`body`/`form`/`multipart` |
+
+**Payload exclusivity (normative)** · at most ONE of `body` · `form` ·
+`multipart`; `form`/`multipart` require a body-bearing method (`POST` ·
+`PUT` · `PATCH`) and OWN their `content-type` (a user-supplied
+`content-type` header alongside them is a refused conflict).
+
+**`traverse` semantics (normative)** · same-origin BFS from `url` ·
+fragment-stripped dedup · per-page output is the fixed page digest
+`{url, status, title, description, headings ≤16, links ≤30, images ≤24,
+colors ≤20, text ≤4000}` · crawl output is `{url, page_count, pages[],
+assets: {images ≤40, colors ≤30}}` · `robots.txt` honored by default
+(RFC 9309 group semantics · `User-agent: *` `Disallow` prefixes · a
+missing/unreadable robots.txt is allow-all · a disallowed ROOT is a loud
+failure · disallowed descendants are silently skipped) · every hop rides
+the engine's SSRF defense · a failing descendant page becomes an honest
+`{url, status|error}` entry and the crawl continues · the effect
+certificate counts `max_pages` page requests (+1 robots probe unless
+`respect_robots: false` is literal) — a bounded crawl is auditable
+before a request is spent. `crawl`/`http`/`website` are intentions, not
+tools — they all route HERE (no `nika:crawl`).
 
 **Non-2xx is failure (normative)** · a non-2xx response throws
 `NIKA-BUILTIN-FETCH-001` (`category: network_error` · `transient: true` for

@@ -102,6 +102,97 @@ def _is_static(value) -> bool:
     return isinstance(value, str) and not EXPR_OPEN.search(value)
 
 
+def _fetch_payload_errors(where: str, args: dict) -> list[dict]:
+    """fetch vNext payload families (builtins-v0.1.md §nika:fetch · payload
+    exclusivity) · body ⊥ form ⊥ multipart · form/multipart need a
+    body-bearing method · form is a flat object · the multipart part shape
+    is CLOSED. Templated values are skipped (runtime's job)."""
+    errs: list[dict] = []
+    err = lambda detail: errs.append({"namespace": "NIKA-BUILTIN",
+                                      "category": "validation_error",
+                                      "detail": f"{where} · {detail}"})
+    declared = [k for k in ("body", "form", "multipart") if k in args]
+    if len(declared) > 1:
+        err("at most one of body · form · multipart (builtins-v0.1.md §nika:fetch)")
+    wants_payload = "form" in args or "multipart" in args
+    method = args.get("method")
+    if wants_payload:
+        if method is None:
+            err("form:/multipart: need method: POST (or PUT/PATCH) — the default GET carries no body")
+        elif _is_static(method) and str(method).upper() not in ("POST", "PUT", "PATCH"):
+            err(f"form:/multipart: need a body-bearing method — '{method}' carries no body")
+        headers = args.get("headers")
+        if isinstance(headers, dict) and any(k.lower() == "content-type" for k in headers):
+            err("form:/multipart: own their content-type — drop the headers: entry")
+    form = args.get("form")
+    if form is not None and not isinstance(form, dict) and _is_static(form):
+        err("form: must be an object of scalar fields (builtins-v0.1.md §nika:fetch)")
+    if isinstance(form, dict):
+        for k, v in form.items():
+            if not isinstance(v, (str, int, float, bool)):
+                err(f"form.{k}: must be a string, number or boolean — reshape nested data with nika:jq")
+    parts = args.get("multipart")
+    if parts is not None and not isinstance(parts, list) and _is_static(parts):
+        err("multipart: must be an array of parts (builtins-v0.1.md §nika:fetch)")
+    if isinstance(parts, list):
+        if not parts:
+            err("multipart: needs at least one part")
+        for i, part in enumerate(parts):
+            if not isinstance(part, dict):
+                err(f"multipart part {i} must be an object")
+                continue
+            unknown = [k for k in part if k not in ("name", "value", "path", "filename", "content_type")]
+            if unknown:
+                err(f"multipart part {i}: unknown key '{unknown[0]}' — the shape is "
+                    "{name, value} or {name, path, filename?, content_type?}")
+            if "name" not in part:
+                err(f"multipart part {i} needs a name:")
+            has_value, has_path = "value" in part, "path" in part
+            if has_value == has_path:
+                err(f"multipart part {i}: exactly one of value: (text) | path: (file)")
+            elif has_value and ("filename" in part or "content_type" in part):
+                err(f"multipart part {i}: filename:/content_type: belong to file parts (path:)")
+    return errs
+
+
+def _fetch_traverse_errors(where: str, args: dict) -> list[dict]:
+    """fetch vNext traverse (builtins-v0.1.md §nika:fetch · traverse) ·
+    the crawl owns the whole arg surface: excludes the single-fetch
+    extraction/payload families · GET only · closed spec shape ·
+    max_pages 1..=25 required. Templated values are skipped."""
+    errs: list[dict] = []
+    err = lambda detail: errs.append({"namespace": "NIKA-BUILTIN",
+                                      "category": "validation_error",
+                                      "detail": f"{where} · {detail}"})
+    for key in ("mode", "selector", "jq", "body", "form", "multipart"):
+        if key in args:
+            err(f"traverse: excludes {key}: — the crawl emits the fixed page-digest "
+                "shape (builtins-v0.1.md §nika:fetch · traverse)")
+    method = args.get("method")
+    if method is not None and _is_static(method) and str(method).upper() != "GET":
+        err(f"traverse: crawls with GET only — drop method: {method}")
+    spec = args.get("traverse")
+    if _is_static(spec) and not isinstance(spec, dict):
+        err("traverse: must be an object — { max_pages: N, respect_robots?: bool }")
+        return errs
+    if not isinstance(spec, dict):
+        return errs
+    unknown = [k for k in spec if k not in ("max_pages", "respect_robots")]
+    if unknown:
+        err(f"traverse.{unknown[0]}: is not a traverse field — the shape is closed")
+    pages = spec.get("max_pages")
+    if pages is None:
+        err("traverse.max_pages: is required — an integer 1..=25 (the crawl bound)")
+    elif isinstance(pages, bool) or (not isinstance(pages, int) and _is_static(pages)):
+        err("traverse.max_pages: must be an integer 1..=25")
+    elif isinstance(pages, int) and not 1 <= pages <= 25:
+        err(f"traverse.max_pages: {pages} out of range — 1..=25")
+    robots = spec.get("respect_robots")
+    if robots is not None and not isinstance(robots, bool) and _is_static(robots):
+        err("traverse.respect_robots: must be a boolean")
+    return errs
+
+
 def stdlib_surface_errors(doc: dict, canon: dict) -> list[dict]:
     """Stdlib v0.1 STATIC surface (names + shapes · no execution) ·
     - `model:` MUST be `<provider>/<name>` with a canonical provider prefix
@@ -110,6 +201,11 @@ def stdlib_surface_errors(doc: dict, canon: dict) -> list[dict]:
     - a `jq:` fetch argument is only valid with `mode: jq` (builtins-v0.1.md)
     - a `selector:` fetch argument is only valid with `mode: selector`
       (extract-modes-v0.1.md · symmetric to the jq pairing)
+    - fetch payload exclusivity: at most one of `body`/`form`/`multipart`;
+      `form`/`multipart` need a body-bearing method (POST · PUT · PATCH) ·
+      the multipart part shape is closed (builtins-v0.1.md §nika:fetch)
+    - fetch `traverse:` owns its surface (excludes mode/selector/jq/body/
+      form/multipart · GET only · closed spec · max_pages 1..=25 required)
     Dynamic values (`${{ }}`) are skipped · runtime's job."""
     errs: list[dict] = []
 
@@ -159,6 +255,9 @@ def stdlib_surface_errors(doc: dict, canon: dict) -> list[dict]:
                 errs.append({"namespace": "NIKA-BUILTIN", "category": "validation_error",
                              "detail": f"{where} · 'selector' argument is only valid with "
                                        "mode: selector (extract-modes-v0.1.md · nika:fetch)"})
+            errs.extend(_fetch_payload_errors(where, args))
+            if "traverse" in args:
+                errs.extend(_fetch_traverse_errors(where, args))
         if isinstance(inv, dict) and inv.get("tool") == "nika:image_generate":
             args = inv.get("args")
             if not isinstance(args, dict):

@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: upload-asset
+secrets:
+  API_KEY:
+    source: env
+    key: QRCODE_AI_API_KEY
+    egress:
+      - to: "nika:fetch"
+tasks:
+  - id: upload
+    invoke:
+      tool: "nika:fetch"
+      args:
+        url: "https://api.example.com/upload"
+        method: POST
+        headers:
+          x-api-key: "${{ secrets.API_KEY }}"
+        multipart:
+          - { name: directory, value: "assets" }
+          - { name: file, path: "./out/background.png", content_type: "image/png" }
+        mode: jq
+        jq: ".url"

@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: site-crawl
+tasks:
+  - id: crawl
+    invoke:
+      tool: "nika:fetch"
+      args:
+        url: "https://example.com"
+        traverse: { max_pages: 5 }

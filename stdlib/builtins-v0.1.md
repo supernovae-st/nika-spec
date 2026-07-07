@@ -276,9 +276,32 @@ invoke: { tool: "nika:fetch", args: { url: "https://example.com/article", mode: 
 |---|---|
 | `url` | required · may use `${{ ... }}` |
 | `method` | `GET` (default) · `POST` · `PUT` · `DELETE` · `PATCH` · `HEAD` |
-| `headers` · `body` | extra headers · body (objects auto-JSON) |
+| `headers` · `body` | extra headers · body (objects auto-JSON) · auth rides `headers` (`x-api-key: "${{ secrets.KEY }}"` · masked) |
+| `form` | `application/x-www-form-urlencoded` object of scalar fields (string · number · boolean — nesting refused · reshape with `nika:jq`) · body-bearing method required |
+| `multipart` | `multipart/form-data` parts array · `{name, value}` text XOR `{name, path, filename?, content_type?}` file · every `path` rides the `permits.fs` READ boundary (`NIKA-SEC-004` on escape) · ≤64 parts · ≤32 MiB total · body-bearing method required |
 | `mode` | extraction mode · see `extract-modes-v0.1.md` · default `markdown` |
 | `jq` | a jq expression · only with `mode: jq` (structured JSON extraction · replaces the former JSONPath mode) |
+| `traverse` | bounded same-origin crawl · `{ max_pages: 1..=25 (required), respect_robots?: bool (default true) }` · GET only · excludes `mode`/`selector`/`jq`/`body`/`form`/`multipart` |
+
+**Payload exclusivity (normative)** · at most ONE of `body` · `form` ·
+`multipart`; `form`/`multipart` require a body-bearing method (`POST` ·
+`PUT` · `PATCH`) and OWN their `content-type` (a user-supplied
+`content-type` header alongside them is a refused conflict).
+
+**`traverse` semantics (normative)** · same-origin BFS from `url` ·
+fragment-stripped dedup · per-page output is the fixed page digest
+`{url, status, title, description, headings ≤16, links ≤30, images ≤24,
+colors ≤20, text ≤4000}` · crawl output is `{url, page_count, pages[],
+assets: {images ≤40, colors ≤30}}` · `robots.txt` honored by default
+(RFC 9309 group semantics · `User-agent: *` `Disallow` prefixes · a
+missing/unreadable robots.txt is allow-all · a disallowed ROOT is a loud
+failure · disallowed descendants are silently skipped) · every hop rides
+the engine's SSRF defense · a failing descendant page becomes an honest
+`{url, status|error}` entry and the crawl continues · the effect
+certificate counts `max_pages` page requests (+1 robots probe unless
+`respect_robots: false` is literal) — a bounded crawl is auditable
+before a request is spent. `crawl`/`http`/`website` are intentions, not
+tools — they all route HERE (no `nika:crawl`).
 
 **Non-2xx is failure (normative)** · a non-2xx response throws
 `NIKA-BUILTIN-FETCH-001` (`category: network_error` · `transient: true` for

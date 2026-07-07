@@ -16,6 +16,9 @@
 | « only what changed since last run » / « survive bad input » | [`etl-state`](etl-state.nika.yaml) | state read→diff→write · `on_error: recover:` quarantine |
 | « research / review / open-ended » | [`agent-loop`](agent-loop.nika.yaml) | plan-then-execute · default-deny tools · budgets · typed final message |
 | « anything irreversible (deploy · send · publish) » | [`human-gated-ship`](human-gated-ship.nika.yaml) | parallel gates · assert · `nika:prompt` GO · `on_finally` record |
+| « understand a site (domain · theme · assets) from a URL » | [`website-brief`](website-brief.nika.yaml) | fetch `traverse:` crawl · one typed infer · explicit persist · zero exec |
+| « generate image/audio assets from a brief » | [`media-asset-pack`](media-asset-pack.nika.yaml) | `nika:image_generate` · `nika:jq` manifest · local/mock provider first |
+| « call a product API: upload a file, then create from it » | [`api-upload-and-create`](api-upload-and-create.nika.yaml) | fetch `multipart:` upload · masked secrets header · mode/jq extraction |
 
 Composite jobs compose templates: a fanout whose merge feeds a
 human-gated-ship, an etl-state whose delta fans out. Start from the

@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "namespace": "NIKA-BUILTIN", "category": "validation_error" }
+  ],
+  "note": "a multipart part is {name, value} text XOR {name, path, filename?, content_type?} file — never both (builtins-v0.1.md §nika:fetch)."
+}
