@@ -89,7 +89,7 @@ def self_check(canon: dict) -> None:
         )
         sys.exit(2)
 
-    for cat in ("verbs", "builtins", "extract_modes", "error_namespaces", "pillars"):
+    for cat in ("verbs", "builtins", "extract_modes", "templates", "error_namespaces", "pillars"):
         count = canon[cat]["count"]
         actual = len(canon[cat]["items"])
         if count != actual:
@@ -114,6 +114,7 @@ def marker_values(canon: dict) -> dict:
         "builtins": canon["builtins"]["count"],
         "providers": canon["providers"]["count"],
         "extract_modes": canon["extract_modes"]["count"],
+        "templates": canon["templates"]["count"],
         "namespaces": canon["namespaces"]["count"],
         "error_namespaces": canon["error_namespaces"]["count"],
         "error_categories": canon["error_categories"]["count"],
@@ -192,6 +193,8 @@ def canon_fields(canon: dict) -> dict:
         "providerIdsTest": providers["test"],
         "extractModes": canon["extract_modes"]["count"],
         "extractModeNames": canon["extract_modes"]["items"],
+        "templates": canon["templates"]["count"],
+        "templateNames": canon["templates"]["items"],
         "mcpTools": canon["mcp"]["tools"]["count"],
         "mcpToolNames": canon["mcp"]["tools"]["items"],
         "mcpProtocolVersions": canon["mcp"]["protocol_versions"]["items"],
