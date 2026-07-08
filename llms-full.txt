@@ -967,6 +967,12 @@ DEFAULT-DENY unless listed** ·
 | `exec` | `false` = no shells · `true` = any (still blocklist-gated) · array = only those program names (argv `command[0]`) | treated as `false` · **no** `exec:` |
 | `tools` | only the matching `nika:` / `mcp:` ids (globs ok) | **no** `invoke:` of any tool |
 
+**A program allowlist verifies the argv form only** (normative) · when
+`exec:` is an array of program names, a task whose `command:` is a shell
+STRING is refused under that allowlist — at check and at run. A
+leading-token heuristic is unsound (`"git log; rm -rf /"` leads with `git`);
+the array `command:` form is the shape an allowlist can actually verify.
+
 So `permits: {}` is a workflow provably limited to pure compute (`infer:` +
 CEL + `nika:jq`): zero fs, zero net, zero shell, zero tools. That property
 is checkable BEFORE the run.
@@ -2228,6 +2234,15 @@ deps are terminal, whatever their status · `true` → run (the always-pattern �
 `when: true` literally) · `false` → `skipped`. Workflow-failure interaction ·
 [05 §workflow-level semantics](./05-errors.md#workflow-level-error-semantics).
 
+**A gate that fails to EVALUATE is a task failure — outside `on_error`
+scope** (normative) · the gate decides IF the task runs; `on_error` governs
+the run itself. A `when:` expression whose evaluation errors (an
+unresolvable root · a cross-type compare · any `NIKA-VAR` evaluation error)
+settles the task `failure` — its `on_error` is NOT consulted — and
+downstream reads `status: "failure"`. Contrast · the same evaluation error
+in a verb-body position (`args:` · `prompt:` · …) is task-stage work and IS
+recoverable by that task's `on_error`.
+
 > **`depends_on` IS the success-gate.** Do NOT write
 > `when: ${{ tasks.X.status == 'success' }}` as a plain gate: it is **redundant**
 > (`depends_on` already requires success). Use `when:` ONLY for conditions BEYOND
@@ -2914,6 +2929,16 @@ infer:
 ```
 
 (Note · YAML escaping of backslash · `\\` in double-quoted strings · `\` in single-quoted or block scalars.)
+
+**Backslash runs (normative)** · the escape counts the CONTIGUOUS backslash
+run immediately before `${{` · an **odd** run escapes the opener (the island
+is literal text; the escaping backslash is consumed) · an **even** run
+(including zero) leaves the island **live**. Within that run, each remaining
+backslash PAIR renders as one literal backslash; backslashes anywhere else
+are ordinary characters (there is no general backslash processing). So
+`\${{ x }}` renders the literal `${{ x }}` · `\\${{ x }}` renders one `\`
+followed by the RESOLVED island · `\\\${{ x }}` renders one `\` + the
+literal `${{ x }}`.
 
 An **unclosed `${{`** (an unescaped opener with no closing `}}`) is rejected at
 parse time · `NIKA-VAR-008` · `validation_error`: the substitution surface belongs
