@@ -44,7 +44,7 @@ Three reasons ·
 
 The stdlib has **independent versioning** ·
 
-- `stdlib/providers-v0.1.md`, the <!-- canon:providers -->14<!-- /canon --> canonical providers for v0.1
+- `stdlib/providers-v0.1.md`, the <!-- canon:providers -->16<!-- /canon --> canonical providers for v0.1
 - `stdlib/extract-modes-v0.1.md`, the <!-- canon:extract_modes -->9<!-- /canon --> canonical extract modes for v0.1
 - `stdlib/builtins-v0.1.md`, the <!-- canon:builtins -->23<!-- /canon --> canonical builtins for v0.1
 
@@ -187,7 +187,7 @@ See [07-conformance.md](./07-conformance.md). In summary ·
 |---|---|
 | Core | None · only parse + DAG + variable + error · no execution needed |
 | Runtime | Must execute the 4 verbs · provider/tool implementations engine's choice |
-| Stdlib v0.1 | Must ship the <!-- canon:providers -->14<!-- /canon --> providers + <!-- canon:extract_modes -->9<!-- /canon --> extract modes + <!-- canon:builtins -->23<!-- /canon --> builtins |
+| Stdlib v0.1 | Must ship the <!-- canon:providers -->16<!-- /canon --> providers + <!-- canon:extract_modes -->9<!-- /canon --> extract modes + <!-- canon:builtins -->23<!-- /canon --> builtins |
 | Stdlib v0.1+media | RESERVED · enumerated when the media set publishes (stdlib v0.x · the 24 names are not yet normative) |
 
 A v0.1-compliant engine for a workflow author depends on which level they need.
