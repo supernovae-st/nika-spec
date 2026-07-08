@@ -1,0 +1,11 @@
+# Expected: NIKA-VAR-001 at CHECK.
+nika: v1
+workflow: e19-var-unresolved
+# INTENT: NIKA-VAR-001 — reference to undeclared vars key
+# No vars block declared, so vars.nonexistent_key is undefined
+tasks:
+  - id: step
+    invoke:
+      tool: "nika:log"
+      args:
+        message: "${{ vars.nonexistent_key }}"

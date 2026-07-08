@@ -1,0 +1,16 @@
+# C16 · matches() regex is RESERVED (not in cel-subset/0.1) → parse reject.
+# Spec: 03-dag side-constraint 1: "No regex — matches() is reserved (ReDoS surface
+# · a later minor). Any other call suffix is a parse error." call = (size|has) only.
+# Expected: NIKA-VAR-005 (unknown function) at CHECK.
+nika: v1
+workflow: c16-matches-reserved
+
+vars:
+  s: "hello"
+
+tasks:
+  - id: gate
+    when: "${{ vars.s.matches('h.*o') }}"        # matches() reserved → parse error
+    invoke:
+      tool: "nika:write"
+      args: { path: "./out/cel/c16-ran.json", content: { ran: true }, create_dirs: true }

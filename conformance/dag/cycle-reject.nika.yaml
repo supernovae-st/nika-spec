@@ -1,0 +1,13 @@
+# Expected: NIKA-DAG-001 at CHECK.
+nika: v1
+workflow: e07-dag-cycle
+# INTENT: trigger NIKA-DAG-001 (cycle in depends_on: a->b->a)
+tasks:
+  - id: step_a
+    depends_on: [step_b]
+    exec:
+      command: "echo a"
+  - id: step_b
+    depends_on: [step_a]
+    exec:
+      command: "echo b"

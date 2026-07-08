@@ -1,0 +1,51 @@
+# Expected: exit 0 — nika:extract over inline HTML (offline).
+# r12 · mock/echo chain: verify DAG wiring, output bindings, no LLM cost
+# Tests: mock/echo with output: bindings, chaining mock outputs into prompt
+nika: v1
+workflow: mock-extract-chain
+
+model: mock/echo
+
+vars:
+  article_content: "Rust 1.87 introduces async closures, improved error messages, and const generics stabilization."
+
+tasks:
+  - id: echo_content
+    invoke:
+      tool: nika:jq
+      args:
+        input:
+          data:
+            title: "Mock Article Title"
+            body: "${{ vars.article_content }}"
+        expression: ".data"
+    output:
+      title: ".title"
+      body: ".body"
+
+  - id: build_prompt_data
+    depends_on: [echo_content]
+    invoke:
+      tool: nika:jq
+      args:
+        input:
+          title: ${{ tasks.echo_content.title }}
+          body: ${{ tasks.echo_content.body }}
+          word_count: 20
+        expression: |
+          {
+            title: .title,
+            body: .body,
+            word_count: .word_count,
+            has_title: (.title | type) == "string",
+            has_body: (.body | type) == "string"
+          }
+
+  - id: save
+    depends_on: [build_prompt_data]
+    invoke:
+      tool: nika:write
+      args:
+        path: "./out/research/r12-mock-chain.json"
+        content: "${{ tasks.build_prompt_data.output }}"
+        create_dirs: true

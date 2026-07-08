@@ -1,0 +1,17 @@
+# Expected: check-reject (gate verdict). PERMITS: absolute write path outside the declared write globs.
+nika: v1
+workflow: sec07-permits-fs-escape-absolute
+description: "ATTACK: fs.write to /etc/passwd outside declared permit — expect NIKA-SEC-004 at check"
+
+permits:
+  fs:
+    write: ["./out/security/**"]
+  tools: ["nika:write"]
+
+tasks:
+  - id: attack
+    invoke:
+      tool: nika:write
+      args:
+        path: /etc/passwd
+        content: "root:hacked:0:0::/root:/bin/sh"

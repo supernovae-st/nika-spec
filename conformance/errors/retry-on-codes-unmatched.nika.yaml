@@ -1,0 +1,15 @@
+# Expected: NIKA-EXEC-001 at RUN. on_codes unmatched → exactly 1 attempt (03_attempts.log = 1 line).
+nika: v1
+workflow: retry-oncodes-nomatch
+# SPEC 05 §Retry: on_codes present but does NOT list the actual error code
+# → the code falls through → NO retry (only listed codes retry when on_codes set).
+# exec exit1 = NIKA-EXEC-001; on_codes lists a DIFFERENT code → 1 attempt only.
+# Marker: 03_attempts.log has exactly 1 line.
+tasks:
+  - id: flaky
+    exec:
+      command: "echo a >> ./out/ctrlflow/03_attempts.log; exit 1"
+    retry:
+      max_attempts: 4
+      backoff_ms: 1
+      on_codes: [NIKA-TIMEOUT-001]

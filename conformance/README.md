@@ -1,132 +1,63 @@
-# Conformance · test suite for any implementation
+# Conformance corpus v0.1
 
-> The conformance suite is the **machine-checkable definition** of
-> « v0.1-compliant ». Any engine that passes the suite may claim
-> conformance. Three levels · Core · Runtime · Stdlib v0.1 (see [`../spec/07-conformance.md`](../spec/07-conformance.md)).
+Prove an engine implements **`nika: v1`** without reading the reference
+implementation: run every workflow here through YOUR engine and match each
+file's **declared intent**. 95 files across the 5 pillars —
+`envelope/` (28) · `variables/` (19) · `verbs/` (17) · `errors/` (17) ·
+`dag/` (14) — all runnable offline (`mock/*` models only · no keys · no
+network · deterministic).
 
----
-
-## Status · the full STATIC suite is shipped · behavioral fixtures post-announce
-
-Three populated surfaces today (run the runner for the live counts · counts in
-prose drift · the suite is the source) ·
-
-1. **Core fixtures** (`tests/core/` · envelope · verbs-shape · dag-topology ·
-   variables · errors) — the machine-checkable parse + validate + DAG +
-   variable layer, the part that needs NO engine to define. Each is an
-   `input.yaml` + `expected.json` pair (see
-   [`runner-protocol.md`](./runner-protocol.md) for the contract). They lock
-   every rule hardened in the v1 language reviews (incl. the `outputs:` block ·
-   agent `schema:` · the `when→depends_on` rule · the three tool namespaces).
-
-2. **Stdlib static-surface fixtures** (`tests/stdlib/` · providers · builtins ·
-   extract-modes) — the stdlib **names + shapes** layer · provider prefixes
-   (`model: <provider>/<name>` · the provider is the prefix) · the closed
-   `nika:*` builtin set · the canonical extract modes · the `jq:`/`mode: jq`
-   coupling. The canonical lists derive from [`canon.yaml`](../canon.yaml)
-   (the SSOT) — the runner never hardcodes them.
-
-3. **Examples as conformance inputs** (`../examples/*.nika.yaml`) — every
-   shipped example is executed by the `all` gate and MUST validate at the full
-   static level. An example that drifts from the spec breaks CI.
-
-**Behavioral** Runtime + Stdlib fixtures (verb execution · provider/builtin
-behavior · mock-driven) are **post-announce** — they require an executing
-engine and land with the reference engine's vertical slice (see
-[`../spec/07-conformance.md`](../spec/07-conformance.md) §Suite status).
-
-### Run it today · the reference static runner
-
-[`runner.py`](./runner.py) is the **reference oracle** for the static layer
-(JSON Schema + the cross-reference rules + the stdlib surface) with **no LLM
-engine required** ·
-
-```bash
-python conformance/runner.py all                       # THE static gate · core + stdlib + examples
-python conformance/runner.py run                       # core fixtures only
-python conformance/runner.py run conformance/tests/stdlib   # stdlib surface fixtures
-python conformance/runner.py validate flow.nika.yaml   # validate one workflow → JSON verdict
-python conformance/runner.py examples examples         # assert every example is valid
+```sh
+conformance/run.sh /path/to/your-engine   # PASS / DRIFT / BUG / DIVERGENT
 ```
 
-A language engine in any language re-implements the same checks; this
-reference runner proves the suite is self-consistent and is the canonical
-static-layer oracle.
+The reference runner is intentionally small POSIX sh — the CONTRACT is the
+header grammar below, not the runner; re-implement it in anything.
 
-## Structure
+## Headers — the intent grammar
 
-```
-conformance/
-├── tests/
-│   ├── core/                     Core conformance (parse + validate + DAG + variables + errors)
-│   │   ├── envelope/
-│   │   │   ├── 001-valid-minimal/
-│   │   │   │   ├── input.yaml
-│   │   │   │   └── expected.json
-│   │   │   └── ...
-│   │   ├── verbs-shape/
-│   │   ├── dag-topology/
-│   │   ├── variables/
-│   │   └── errors/
-│   │
-│   ├── stdlib/                    Stdlib v0.1 · static surface (populated) + behavioral (post-announce)
-│   │   ├── providers/             prefix discipline · canon.yaml-driven
-│   │   ├── builtins/              closed nika:* set · namespace ownership
-│   │   └── extract-modes/         canonical modes · jq/mode coupling
-│   │
-│   └── runtime/                   Runtime conformance (verb execution + task fields) · post-announce
-│       ├── infer/
-│       ├── exec/
-│       ├── invoke/
-│       ├── agent/
-│       └── workflow-lifecycle/
-│
-├── runner.py                      the reference static oracle (Core + stdlib surface + examples)
-├── runner-protocol.md             how to run the suite against an engine
-└── README.md                      this file
-```
+Every file's first comment block declares its outcome. The `# Expected:`
+line is normative for the file; other comments are context.
 
-## Test format
+| header | meaning |
+|---|---|
+| `# Expected: NIKA-XXX-NNN at CHECK.` | negative · the static check MUST refuse with that code |
+| `# Expected: NIKA-XXX-NNN at RUN.` | negative · check passes, the run MUST fail with that code |
+| `# Expected: NIKA-XXX-NNN (check or run).` | negative · either stage may catch it (a stricter check is conformant) |
+| `# Expected: check-reject (gate verdict).` | negative · the static check MUST refuse (nonzero exit) — no specific wire code required. Used for the permits/secrets/tools boundary gates, which report a human verdict (`✖ PERMITS …` / `✖ SECRETS …` / `✖ TOOLS …`) rather than a NIKA code. An engine that additionally surfaces a wire code (e.g. `NIKA-SEC-004` per spec 05) is equally conformant. |
+| `# Expected: exit 0 — …` | positive · the workflow completes clean (includes the *recovered* class: an internal error recovered via `on_error` — workflow-level success) |
 
-Each test is a directory with ·
+Runner contract beyond headers: create `out/<family>/` sink dirs before the
+loop (files write only under `./out/` · `run.sh` does this) and export the
+corpus's single env secret `FAKE_API_KEY_FOR_TEST` (any dummy value — used by
+`envelope/secrets-infer-egress-sanctioned` per spec 01 §secrets `source: env`).
 
-- `input.yaml` — the workflow to feed to the engine
-- `expected.json` — the expected output or error structure
-- `description.md` — (optional) human description of what's being tested
-- `env.json` — (optional) environment variables to provide to the engine
+Verdicts: **PASS** (outcome matches intent) · **DRIFT** (failed as declared
+but with a different code — a code-mapping bug) · **BUG** (outcome
+contradicts intent) · **DIVERGENT** (below).
 
-The runner pipes `input.yaml` to the engine · captures the structured
-output · compares against `expected.json`.
+## The divergence policy (honesty by construction)
 
-## Runner protocol (planned)
+This corpus asserts the **spec**, never the reference implementation. When
+the reference engine itself diverges from the normative spec text, the case
+is still IN the corpus, marked `DIVERGENCE` in its header, and reports
+`DIVERGENT` — visible pressure, never a silent green.
 
-```bash
-# Generic runner
-conformance-runner --engine "nika run --input -" --tests ./tests/core/
+v0.1 carries one: `errors/recover-task-ref-no-edge.nika.yaml` — spec 05
+§recover requires awaiting a no-edge referent's terminal state; the
+reference engine currently raises `NIKA-VAR-001`
+([supernovae-st/nika#291](https://github.com/supernovae-st/nika/issues/291)).
+An engine that follows the spec turns this file green — and is MORE
+conformant than the reference on that row.
 
-# Output
-PASS  core/envelope/001-valid-minimal
-PASS  core/envelope/002-missing-envelope
-FAIL  core/dag-topology/001-cycle-detection (expected NIKA-DAG-001, got NIKA-PARSE-007)
-...
+## Scope + coverage
 
-Summary · 245/247 passed · 2 failed
-```
+`coverage-matrix.tsv` maps pillar × error-namespace × stage to the covering
+file — empty cells are the honest v0.2 backlog (notably: no mock
+`NIKA-INFER` exemplar yet · `NIKA-AGENT` run-fail needs a mock port ·
+self-contained file-builtin positives).
 
-A v0.1-compliant engine MUST exit with non-zero if any test in the
-claimed level fails.
-
-## Adoption by other engines
-
-When non-SuperNovae engines are written (Python · Go · TS impls of Nika),
-they can run this suite to validate conformance. Open a PR on
-[supernovae-st/nika-spec](https://github.com/supernovae-st/nika-spec) to be
-listed in `CONFORMANT_IMPLEMENTATIONS.md`.
-
-## Mock-driven determinism
-
-Many tests use the `mock` provider and HTTP mocks for · (a) determinism · (b) zero cost · (c) CI-friendly. The mock provider is part of stdlib v0.1 (see [`../stdlib/providers-v0.1.md`](../stdlib/providers-v0.1.md)).
-
----
-
-🦋 *Core + stdlib-surface fixtures + every example · one static gate (`runner.py all`) · behavioral fixtures land with the engine · machine-checkable forever.*
+Curated 2026-07-08 from the reference engine's private e2e lab (475
+workflows → 95 by per-cell best-file selection; provider-locked,
+network-dependent, and fixture-coupled files excluded). Apache-2.0, like
+the spec.

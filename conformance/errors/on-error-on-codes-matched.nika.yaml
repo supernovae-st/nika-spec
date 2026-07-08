@@ -1,0 +1,25 @@
+# Expected: exit 0 — NIKA-EXEC-001 fires internally, recovered via on_error (on_codes filter matched).
+nika: v1
+workflow: e27-on-error-on-codes-filter
+# INTENT: on_error.on_codes filter — recover only on NIKA-EXEC-001
+permits:
+  exec: ["false"]
+  tools: ["nika:write"]
+  fs:
+    write:
+      - "./out/errors/**"
+tasks:
+  - id: fail_step
+    exec:
+      command: ["false"]
+    on_error:
+      on_codes: [NIKA-EXEC-001]
+      recover: "recovered_via_on_codes"
+
+  - id: write_result
+    depends_on: [fail_step]
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/errors/e27-result.txt"
+        content: "${{ tasks.fail_step.output }}"

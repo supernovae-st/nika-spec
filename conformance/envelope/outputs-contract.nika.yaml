@@ -1,0 +1,28 @@
+# Expected: exit 0 — outputs: contract resolves and prints (spec 01-envelope §outputs).
+nika: v1
+workflow: outputs-basic
+
+# Export — the typed callable-contract return (outputs:). Question under test:
+# does `nika run` PRINT the outputs object? (spec 01-envelope:378 says it does.)
+vars:
+  base:
+    type: integer
+    default: 10
+
+tasks:
+  - id: compute
+    invoke:
+      tool: nika:jq
+      args:
+        input: { nums: [10, 20, 30] }
+        expression: "{ total: (.nums|add), n: (.nums|length) }"
+
+outputs:
+  total:
+    value: ${{ tasks.compute.output.total }}
+    type: integer
+    description: "Sum of the inputs"
+  count:
+    value: ${{ tasks.compute.output.n }}
+    type: integer
+    description: "How many inputs"

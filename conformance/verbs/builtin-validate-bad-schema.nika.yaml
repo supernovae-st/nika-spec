@@ -1,0 +1,30 @@
+# Expected: NIKA-BUILTIN-VALIDATE-001 at RUN. The schema itself is malformed; check cannot know statically.
+# W37: nika:validate — NIKA-BUILTIN-VALIDATE-001: invalid JSON Schema
+# The schema itself is malformed (unknown type value)
+# Tests: NIKA-BUILTIN-VALIDATE-001 fires at runtime
+# nika check: might pass (schema validity is hard to check statically)
+# nika run: should fail with NIKA-BUILTIN-VALIDATE-001
+nika: v1
+workflow: w37-validate-bad-schema
+
+vars:
+  doc:
+    name: "Alice"
+
+tasks:
+  - id: validate_bad_schema
+    invoke:
+      tool: "nika:validate"
+      args:
+        data: ${{ vars.doc }}
+        schema:
+          type: not_a_real_json_schema_type
+
+  - id: write_result
+    depends_on: [validate_bad_schema]
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/data-validation/w37-validate-bad-schema.json"
+        content: ${{ tasks.validate_bad_schema.output }}
+        create_dirs: true

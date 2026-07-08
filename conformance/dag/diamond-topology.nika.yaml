@@ -1,0 +1,47 @@
+# Expected: exit 0 — diamond fan-out/fan-in topology completes.
+nika: v1
+workflow: diamond-dag
+# COVERS: diamond DAG A -> {B, C} -> D join. B and C run in parallel after A;
+# D depends on BOTH and aggregates. Assert D's output == B+C combined over A's seed.
+# (NOTE: with: uses BLOCK style — flow-mapping `{ s: ${{...}} }` collides with the ${{}} braces.)
+tasks:
+  - id: a
+    invoke:
+      tool: nika:jq
+      args: { input: { seed: 10 }, expression: ".seed" }
+
+  - id: b
+    depends_on: [a]
+    with:
+      s: ${{ tasks.a.output }}
+    invoke:
+      tool: nika:jq
+      args: { input: { s: "${{ with.s }}" }, expression: "(.s * 2)" }   # 20
+
+  - id: c
+    depends_on: [a]
+    with:
+      s: ${{ tasks.a.output }}
+    invoke:
+      tool: nika:jq
+      args: { input: { s: "${{ with.s }}" }, expression: "(.s + 5)" }   # 15
+
+  - id: d
+    depends_on: [b, c]
+    with:
+      bv: ${{ tasks.b.output }}
+      cv: ${{ tasks.c.output }}
+    invoke:
+      tool: nika:jq
+      args:
+        input: { b: "${{ with.bv }}", c: "${{ with.cv }}" }
+        expression: "{ b: .b, c: .c, joined: (.b + .c) }"   # {20,15,35}
+
+  - id: persist
+    depends_on: [d]
+    invoke:
+      tool: nika:write
+      args:
+        path: "./out/fanout/26_diamond_dag.json"
+        content: ${{ tasks.d.output }}
+        create_dirs: true

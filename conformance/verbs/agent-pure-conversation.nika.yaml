@@ -1,0 +1,13 @@
+# Expected: exit 0 — agent verb on a mock model with empty tools whitelist (pure conversation, default-deny).
+nika: v1
+workflow: sec16-agent-no-tools-whitelist
+description: "SANCTIONED: agent with no tools: list (pure conversation, default-deny) — expect ALLOWED at check"
+
+permits:
+  tools: []
+
+tasks:
+  - id: agent_pure
+    agent:
+      model: mock/echo
+      prompt: "What is 2 + 2?"

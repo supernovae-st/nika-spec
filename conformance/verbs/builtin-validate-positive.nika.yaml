@@ -1,0 +1,43 @@
+# Expected: exit 0 — nika:validate passes a valid object.
+# W01: validate a well-formed object — PASS case
+# Tests: nika:validate with required fields + type constraints
+nika: v1
+workflow: w01-validate-valid-object
+
+vars:
+  doc:
+    name: "Alice"
+    age: 30
+
+tasks:
+  - id: validate_doc
+    invoke:
+      tool: "nika:validate"
+      args:
+        data: ${{ vars.doc }}
+        schema:
+          type: object
+          required: [name, age]
+          properties:
+            name:
+              type: string
+            age:
+              type: integer
+              minimum: 0
+
+  - id: assert_valid
+    depends_on: [validate_doc]
+    invoke:
+      tool: "nika:assert"
+      args:
+        condition: "${{ tasks.validate_doc.output.valid == true }}"
+        message: "Expected valid:true but got false"
+
+  - id: write_result
+    depends_on: [validate_doc]
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/data-validation/w01-validate-valid-object.json"
+        content: ${{ tasks.validate_doc.output }}
+        create_dirs: true

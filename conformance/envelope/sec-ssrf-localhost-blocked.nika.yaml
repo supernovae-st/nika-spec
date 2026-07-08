@@ -1,0 +1,16 @@
+# Expected: NIKA-SEC-005 at RUN.
+nika: v1
+workflow: sec01-ssrf-localhost
+description: "ATTACK: SSRF to http://127.0.0.1 — expect BLOCKED"
+
+permits:
+  net:
+    http: ["127.0.0.1"]
+  tools: ["nika:fetch"]
+
+tasks:
+  - id: attack
+    invoke:
+      tool: nika:fetch
+      args:
+        url: "http://127.0.0.1/api/internal"

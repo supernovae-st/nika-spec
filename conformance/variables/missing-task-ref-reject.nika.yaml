@@ -1,0 +1,16 @@
+# Expected: NIKA-VAR-001 at CHECK.
+# C10 · referencing tasks.X where X does not EXIST → NIKA-VAR-001 at CHECK.
+# Spec: 04-variables "an unresolvable root is NIKA-VAR-001". The missing-TASK case
+# is VAR-001 (unresolvable root); the missing-EDGE case (task exists · no
+# depends_on) is NIKA-DAG-003 — that split is covered by c27. Empirically
+# confirmed 2026-07-02 (engine emits VAR-001 here · DAG-003 in c27).
+# We assert it is REJECTED, not silently null.
+nika: v1
+workflow: c10-missing-task-ref-no-edge
+
+tasks:
+  - id: gate
+    when: "${{ tasks.nonexistent.status == 'success' }}"   # no depends_on, task absent
+    invoke:
+      tool: "nika:write"
+      args: { path: "./out/cel/c10-ran.json", content: { ran: true }, create_dirs: true }

@@ -1,0 +1,20 @@
+# Expected: exit 0 — when:false skips the task; workflow completes clean.
+nika: v1
+workflow: when-false-skip
+# SPEC 03 §when: runtime-false → task SKIPPED (not failed); downstream sees it completed.
+# A downstream with plain depends_on a skipped task → default gate (success|skipped) satisfied → RUNS.
+# Markers: 13_gated.json ABSENT (when false → skipped);
+#          13_down.json present (depends_on a skipped task still runs).
+vars:
+  flag: { type: boolean, default: false }
+tasks:
+  - id: gated
+    when: ${{ vars.flag == true }}
+    invoke:
+      tool: nika:write
+      args: { path: "./out/ctrlflow/13_gated.json", content: "gated-ran" }
+  - id: down
+    depends_on: [gated]
+    invoke:
+      tool: nika:write
+      args: { path: "./out/ctrlflow/13_down.json", content: "down-ran:${{ tasks.gated.status }}" }

@@ -1,0 +1,13 @@
+# Expected: NIKA-TIMEOUT-001 at RUN.
+nika: v1
+workflow: timeout-basic
+# COVERS: per-task timeout: -> NIKA-TIMEOUT-001 when exceeded (spec 03 L433, 05 L122).
+# nika:wait 5s under a 200ms timeout fails fast (does NOT block the full 5s).
+# Assert (event stream): task_failed with NIKA-TIMEOUT-001.
+tasks:
+  - id: slow
+    timeout: "200ms"
+    invoke:
+      tool: nika:wait
+      args:
+        duration: "5s"

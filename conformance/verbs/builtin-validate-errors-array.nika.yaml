@@ -1,0 +1,39 @@
+# Expected: exit 0 — nika:validate surfaces valid:false + errors array without failing the task.
+nika: v1
+workflow: validate-invalid-report
+description: "nika:validate on DELIBERATELY-invalid data → must return { valid:false, errors:[...] } as a REPORT, not fail the task"
+model: mock/echo
+
+vars:
+  # severity is not in the schema enum + category is the wrong type → should be reported invalid
+  bad_record: { category: 12345, severity: "EXPLODING" }
+
+tasks:
+  - id: validate
+    invoke:
+      tool: "nika:validate"
+      args:
+        data: "${{ vars.bad_record }}"
+        format: json
+        schema:
+          type: object
+          required: [category, severity]
+          properties:
+            category: { type: string, enum: [billing, bug, how-to, account, other] }
+            severity: { type: string, enum: [low, medium, high, critical] }
+
+  - id: report
+    depends_on: [validate]
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: "${{ tasks.validate.output }}"
+        expression: '{ valid: .valid, has_errors: ((.errors | length) > 0) } | tojson'
+
+  - id: write_out
+    depends_on: [report]
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/support/21-validate-invalid-report.json"
+        content: "${{ tasks.report.output }}"

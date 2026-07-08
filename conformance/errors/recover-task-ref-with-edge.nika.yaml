@@ -1,0 +1,23 @@
+# Expected: exit 0 — NIKA-EXEC-001 fires internally, recovered via on_error (recover: task ref resolvable thanks to the declared depends_on edge).
+nika: v1
+workflow: recover-b-edge
+tasks:
+  - id: source
+    invoke:
+      tool: nika:jq
+      args:
+        input: { v: 99 }
+        expression: ".v"
+  - id: risky
+    depends_on: [source]
+    exec:
+      command: "exit 1"
+    on_error:
+      recover: ${{ tasks.source.output }}
+  - id: sink
+    depends_on: [risky]
+    invoke:
+      tool: nika:write
+      args:
+        path: ./out/errors/recover-b.json
+        content: ${{ tasks.risky.output }}

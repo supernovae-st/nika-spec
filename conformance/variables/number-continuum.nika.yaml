@@ -1,0 +1,37 @@
+# Expected: exit 0 — int and double are one number domain (1 == 1.0 · 2 < 2.5 · 3 in [1,2,3]).
+# C01 · number continuity (the recent continuous-number-line fix)
+# Spec: 03-dag §grammar "No implicit coercion · strongly typed per CEL".
+# CEL standard: int and double are a single number domain → 1 == 1.0 is TRUE,
+# 2 < 2.5 TRUE, 3 in [1,2,3] TRUE, 1.0 in [1] TRUE.
+# Each assert that PASSES proves the exact boolean is true.
+nika: v1
+workflow: c01-number-continuum
+
+vars:
+  one_int: 1
+  two_int: 2
+  nine_float: 9.0
+
+tasks:
+  - id: int_eq_float
+    invoke: { tool: "nika:assert", args: { condition: "${{ vars.one_int == 1.0 }}", message: "1 == 1.0" } }
+  - id: float_eq_int
+    depends_on: [int_eq_float]
+    invoke: { tool: "nika:assert", args: { condition: "${{ vars.nine_float == 9 }}", message: "9.0 == 9" } }
+  - id: int_lt_float
+    depends_on: [float_eq_int]
+    invoke: { tool: "nika:assert", args: { condition: "${{ vars.two_int < 2.5 }}", message: "2 < 2.5" } }
+  - id: int_in_float_list
+    depends_on: [int_lt_float]
+    invoke: { tool: "nika:assert", args: { condition: "${{ vars.one_int in [1.0, 2.0, 3.0] }}", message: "1 in [1.0,2.0,3.0]" } }
+  - id: float_in_int_list
+    depends_on: [int_in_float_list]
+    invoke: { tool: "nika:assert", args: { condition: "${{ 1.0 in [1, 2, 3] }}", message: "1.0 in [1,2,3]" } }
+  - id: float_neq_other
+    depends_on: [float_in_int_list]
+    invoke: { tool: "nika:assert", args: { condition: "${{ vars.nine_float != 9.5 }}", message: "9.0 != 9.5" } }
+  - id: sink
+    depends_on: [float_neq_other]
+    invoke:
+      tool: "nika:write"
+      args: { path: "./out/cel/c01.json", content: { all_number_continuum: true }, create_dirs: true }

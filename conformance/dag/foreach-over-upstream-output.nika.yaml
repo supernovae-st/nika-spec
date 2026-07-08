@@ -1,0 +1,36 @@
+# Expected: exit 0 — for_each over an upstream task output array.
+nika: v1
+workflow: foreach-over-upstream-output
+# COVERS: for_each over a PRIOR TASK's array output (runtime-computed collection),
+# not a static vars list (spec 03 L317, L638 — the discover->summarize pattern).
+# discover emits an array; map runs once per element; count must match.
+tasks:
+  - id: discover
+    invoke:
+      tool: nika:jq
+      args:
+        input: { raw: "p,q,r,s" }
+        # split into an array of 4
+        expression: "(.raw | split(\",\"))"
+
+  - id: process
+    depends_on: [discover]
+    for_each: ${{ tasks.discover.output }}
+    max_parallel: 2
+    with:
+      tok: ${{ item }}
+      i: ${{ index }}
+    invoke:
+      tool: nika:jq
+      args:
+        input: { tok: "${{ with.tok }}", i: "${{ with.i }}" }
+        expression: "{ i: .i, upper: (.tok | ascii_upcase) }"
+
+  - id: persist
+    depends_on: [process]
+    invoke:
+      tool: nika:write
+      args:
+        path: "./out/fanout/32_foreach_over_upstream_output.json"
+        content: ${{ tasks.process.output }}
+        create_dirs: true
