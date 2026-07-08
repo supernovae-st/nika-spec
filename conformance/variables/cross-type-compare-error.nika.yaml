@@ -1,0 +1,19 @@
+# Expected: NIKA-VAR-006 (check or run).
+# C02 · cross-TYPE compare must ERROR, not silently be false.
+# Spec: 03-dag §grammar side-constraint 4: "comparing values of different types
+# (42 == "42") is an evaluation error (NIKA-VAR · variable_error) · not false."
+# This is a `when:` gate so the expr is boolean-shaped (passes parse shape check)
+# but resolves cross-type at eval → expected NIKA-VAR-006 at RUN.
+nika: v1
+workflow: c02-string-vs-number-coercion
+
+vars:
+  num: 42
+  str: "42"
+
+tasks:
+  - id: gate
+    when: "${{ vars.num == vars.str }}"          # 42 == "42" → cross-type → NIKA-VAR-006 expected
+    invoke:
+      tool: "nika:write"
+      args: { path: "./out/cel/c02-ran.json", content: { gate_passed: true }, create_dirs: true }

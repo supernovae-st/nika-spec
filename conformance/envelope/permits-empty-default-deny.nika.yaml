@@ -1,0 +1,14 @@
+# Expected: check-reject (gate verdict). PERMITS: empty permits block = total default-deny.
+nika: v1
+workflow: sec30-permits-empty-total-deny
+description: "ATTACK: permits: {} (empty block) then use a tool — expect NIKA-SEC-004 (total default-deny)"
+
+permits: {}
+
+tasks:
+  - id: attack
+    invoke:
+      tool: nika:jq
+      args:
+        input: {x: 1}
+        expression: "."

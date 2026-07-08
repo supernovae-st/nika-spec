@@ -1,0 +1,19 @@
+# Expected: NIKA-VAR-009 at RUN. Declared outputs.result type string, actual value is a number.
+# W36: typed outputs: — value violates declared type → NIKA-VAR-009
+# A workflow with typed outputs: where the actual value returned doesn't match
+# Tests: NIKA-VAR-009 — typed output value mismatch at run end
+nika: v1
+workflow: w36-typed-outputs-mismatch
+
+tasks:
+  - id: produce_number
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: { value: 42 }
+        expression: ".value"
+
+outputs:
+  result:
+    value: ${{ tasks.produce_number.output }}
+    type: string

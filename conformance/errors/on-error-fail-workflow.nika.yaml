@@ -1,0 +1,12 @@
+# Expected: NIKA-EXEC-001 at RUN. on_error.fail_workflow:true — explicit fail.
+nika: v1
+workflow: e35-on-error-fail-workflow
+# INTENT: on_error.fail_workflow:true — explicit fail
+permits:
+  exec: ["false"]
+tasks:
+  - id: fail_step
+    exec:
+      command: ["false"]
+    on_error:
+      fail_workflow: true

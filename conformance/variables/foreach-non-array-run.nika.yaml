@@ -1,0 +1,14 @@
+# Expected: NIKA-VAR-006 at RUN.
+nika: v1
+workflow: foreach-non-array-error
+# COVERS: for_each over a NON-ARRAY collection -> NIKA-VAR-006 (spec 03 L401, 05 L104).
+# The collection here is an OBJECT -> evaluation error.
+# Assert (event stream): task_failed (or workflow_failed) carrying NIKA-VAR-006.
+vars:
+  not_a_list: { a: 1, b: 2 }
+tasks:
+  - id: loop
+    for_each: ${{ vars.not_a_list }}
+    invoke:
+      tool: nika:jq
+      args: { input: "${{ item }}", expression: "." }

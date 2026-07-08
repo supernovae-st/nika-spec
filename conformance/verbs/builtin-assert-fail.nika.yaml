@@ -1,0 +1,13 @@
+# Expected: NIKA-BUILTIN-ASSERT-001 at RUN.
+nika: v1
+workflow: e22-builtin-assert-fail
+# INTENT: NIKA-BUILTIN-ASSERT-001 — assert condition is false
+vars:
+  value: 5
+tasks:
+  - id: assert_step
+    invoke:
+      tool: "nika:assert"
+      args:
+        condition: ${{ vars.value > 100 }}
+        message: "value must be > 100"

@@ -1,0 +1,11 @@
+# Expected: NIKA-PARSE-007 at CHECK.
+nika: v1
+workflow: e05-parse-duplicate-id
+# INTENT: trigger NIKA-PARSE-007 (duplicate task id)
+tasks:
+  - id: step
+    exec:
+      command: "echo first"
+  - id: step
+    exec:
+      command: "echo second"

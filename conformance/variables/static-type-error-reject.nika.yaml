@@ -1,0 +1,16 @@
+# Expected: NIKA-VAR-005 at CHECK.
+nika: v1
+workflow: e20-var-type-error
+# INTENT (corrected): a bare non-boolean-shaped when: root is rejected STATICALLY (spec 03 §when shape rules) → NIKA-VAR-005 at check, never reaches runtime VAR-006.
+# when: ${{ vars.count }} is a bare ref - should be NIKA-VAR-005 at parse time
+vars:
+  count: 5
+tasks:
+  - id: step
+    exec:
+      command: "echo hello"
+  - id: conditional
+    depends_on: [step]
+    when: ${{ vars.count }}
+    exec:
+      command: "echo should not reach"

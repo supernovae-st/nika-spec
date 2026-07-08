@@ -1,0 +1,17 @@
+# Expected: NIKA-VAR-006 (check or run).
+# C15 · string method on a NON-string operand must error.
+# Spec: 03-dag side-constraint 1: x.contains(s)/startsWith/endsWith "operands MUST
+# be strings". Calling .contains on a number → type error (NIKA-VAR-006 family).
+# when: boolean-shaped (the method returns bool by shape) → eval error expected.
+nika: v1
+workflow: c15-string-method-type-mismatch
+
+vars:
+  n: 12345
+
+tasks:
+  - id: gate
+    when: "${{ vars.n.contains('23') }}"         # .contains on a number → type error
+    invoke:
+      tool: "nika:write"
+      args: { path: "./out/cel/c15-ran.json", content: { ran: true }, create_dirs: true }

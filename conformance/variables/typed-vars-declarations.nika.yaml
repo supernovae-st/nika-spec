@@ -1,0 +1,52 @@
+# Expected: exit 0 — typed vars: declarations (type + default) resolve.
+# W18: typed vars — string/number/boolean declarations
+# Tests: typed vars (string/number/boolean) accessible in CEL
+nika: v1
+workflow: w18-typed-vars
+
+vars:
+  username:
+    type: string
+    default: "alice"
+  score:
+    type: number
+    default: 99.5
+  enabled:
+    type: boolean
+    default: true
+
+tasks:
+  - id: check_string
+    invoke:
+      tool: "nika:assert"
+      args:
+        condition: "${{ vars.username == 'alice' }}"
+        message: "username must be alice"
+
+  - id: check_number
+    depends_on: [check_string]
+    invoke:
+      tool: "nika:assert"
+      args:
+        condition: "${{ vars.score > 90 }}"
+        message: "score must be > 90"
+
+  - id: check_boolean
+    depends_on: [check_number]
+    invoke:
+      tool: "nika:assert"
+      args:
+        condition: "${{ vars.enabled == true }}"
+        message: "enabled must be true"
+
+  - id: write_result
+    depends_on: [check_boolean]
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/data-validation/w18-typed-vars.json"
+        content:
+          username: "${{ vars.username }}"
+          score: ${{ vars.score }}
+          enabled: ${{ vars.enabled }}
+        create_dirs: true

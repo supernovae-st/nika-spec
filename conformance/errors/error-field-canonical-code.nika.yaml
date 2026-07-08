@@ -1,0 +1,33 @@
+# Expected: exit 0 — NIKA-VAR-006 fires internally at args-stage, recovered via on_error (skip); tasks.fail_var.error carries the canonical wire code (spec 05 §errors).
+# C26 · does tasks.X.error (the SPEC-named surface) carry the canonical code or
+# the leaked internal NIKA-1702/1703? Spec 05-errors lines 142-144 name tasks.X.error
+# explicitly as a surface that MUST carry the canonical form, not an internal code.
+# `fail_var` triggers a cross-type compare (VAR-006) IN ITS ARGS (task-stage) and
+# recovers via on_error.skip so its .error stays readable; downstream serializes it.
+# NOTE (2026-07-02 empirical): a `when:` GATE eval error does NOT route through
+# on_error (task → failure · workflow fails) — the gate is outside the task's work.
+# Spec gap: 03-dag §gate doesn't state this. Trigger must therefore be args-stage.
+nika: v1
+workflow: c26-error-field-surface
+
+vars:
+  num: 42
+  str: "42"
+
+tasks:
+  - id: fail_var
+    invoke:
+      tool: "nika:assert"
+      args: { condition: "${{ vars.num == vars.str }}", message: "cross-type → VAR-006 at args eval" }
+    on_error:
+      skip: true
+  - id: capture
+    depends_on: [fail_var]
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/cel/c26-error.json"
+        content:
+          status: "${{ tasks.fail_var.status }}"
+          error_code: "${{ tasks.fail_var.error.code }}"
+        create_dirs: true

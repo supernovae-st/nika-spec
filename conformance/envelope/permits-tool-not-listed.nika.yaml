@@ -1,0 +1,17 @@
+# Expected: check-reject (gate verdict). PERMITS: tool not in permits.tools.
+nika: v1
+workflow: sec25-tool-not-permitted
+description: "ATTACK: invoke a tool not in permits.tools — expect NIKA-SEC-004 at check"
+
+permits:
+  tools: ["nika:jq"]
+  fs:
+    write: ["./out/security/**"]
+
+tasks:
+  - id: attack
+    invoke:
+      tool: nika:write
+      args:
+        path: ./out/security/attack.txt
+        content: "writing without permission"

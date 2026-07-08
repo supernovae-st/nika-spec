@@ -1,0 +1,24 @@
+# Expected: check-reject (gate verdict). PERMITS: net egress with no permits.net grant.
+nika: v1
+workflow: sec24-net-no-permit
+description: "ATTACK: fetch with permits block present but net omitted (default-deny) — expect NIKA-SEC-004 at check"
+
+permits:
+  fs:
+    write: ["./out/security/**"]
+  tools: ["nika:fetch", "nika:write"]
+
+tasks:
+  - id: attack
+    invoke:
+      tool: nika:fetch
+      args:
+        url: "https://api.example.com/data"
+
+  - id: sink
+    depends_on: [attack]
+    invoke:
+      tool: nika:write
+      args:
+        path: ./out/security/data.json
+        content: ${{ tasks.attack.output }}

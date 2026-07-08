@@ -1,0 +1,20 @@
+# Expected: NIKA-EXEC-001 at RUN. Parent fails after the batch (fail_fast: false); marker files prove a,c,d all ran.
+nika: v1
+workflow: foreach-failfast-false
+# SPEC 03 §fail_fast false: iteration errors collected, REMAINING iterations keep running,
+# parent → failure ONLY after all complete. fail_fast:false + max_parallel:1.
+# Per-iteration program chosen by CEL ternary (shell-free): FAILHERE → /usr/bin/false
+# (exit 1, no marker); others → /usr/bin/touch (marker written).
+# Markers: 10_iter_a + 10_iter_c + 10_iter_d present (all non-failing ran despite the
+# failure in the middle); FAILHERE marker absent. Parent fails (exit!=0) AFTER all complete.
+vars:
+  items: { type: array, default: ["a", "FAILHERE", "c", "d"] }
+tasks:
+  - id: mapped
+    for_each: ${{ vars.items }}
+    max_parallel: 1
+    fail_fast: false
+    exec:
+      command:
+        - "${{ item == 'FAILHERE' ? '/usr/bin/false' : '/usr/bin/touch' }}"
+        - "./out/ctrlflow/10_iter_${{ item }}.json"

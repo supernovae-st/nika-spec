@@ -1,0 +1,55 @@
+# Expected: exit 0 — nika:diff over inline documents.
+nika: v1
+workflow: competitor-json-diff
+description: "Use nika:json_diff to detect changes in competitor feature set"
+
+model: mock/echo
+
+tasks:
+  - id: previous_snapshot
+    invoke:
+      tool: "nika:jq"
+      args:
+        input:
+          features: ["auth", "api", "dashboard", "export"]
+          pricing_tiers: 3
+          last_updated: "2026-01-01"
+        expression: "."
+
+  - id: current_snapshot
+    invoke:
+      tool: "nika:jq"
+      args:
+        input:
+          features: ["auth", "api", "dashboard", "export", "ai-assistant"]
+          pricing_tiers: 4
+          last_updated: "2026-06-15"
+        expression: "."
+
+  - id: diff
+    depends_on: [previous_snapshot, current_snapshot]
+    invoke:
+      tool: "nika:json_diff"
+      args:
+        before: "${{ tasks.previous_snapshot.output }}"
+        after: "${{ tasks.current_snapshot.output }}"
+
+  - id: analyze_diff
+    depends_on: [diff]
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: "${{ tasks.diff.output }}"
+        expression: "{ change_count: length, operations: [.[].op] | unique, has_additions: (map(select(.op == \"add\")) | length > 0) }"
+
+  - id: save
+    depends_on: [analyze_diff]
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/competitor/16-json-diff.json"
+        content: "${{ tasks.analyze_diff.output }}"
+        create_dirs: true
+
+outputs:
+  diff_report: ${{ tasks.analyze_diff.output }}

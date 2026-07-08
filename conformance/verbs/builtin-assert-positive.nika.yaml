@@ -1,0 +1,25 @@
+# Expected: exit 0 — nika:assert true condition.
+# W05: nika:assert — CEL condition true → pass
+# Tests: nika:assert with a numeric equality condition
+nika: v1
+workflow: w05-assert-cel-true
+
+vars:
+  x: 42
+
+tasks:
+  - id: check_x
+    invoke:
+      tool: "nika:assert"
+      args:
+        condition: "${{ vars.x == 42 }}"
+        message: "x must equal 42"
+
+  - id: write_result
+    depends_on: [check_x]
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/data-validation/w05-assert-cel-true.json"
+        content: { passed: true, x: 42 }
+        create_dirs: true

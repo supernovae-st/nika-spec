@@ -1,0 +1,8 @@
+# Expected: NIKA-PARSE-003 at CHECK.
+nika: v2
+workflow: e03-parse-bad-version
+# INTENT: trigger NIKA-PARSE-003 (version marker not exactly v1)
+tasks:
+  - id: step
+    exec:
+      command: "echo hello"

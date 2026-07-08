@@ -1,0 +1,14 @@
+# Expected: NIKA-VAR-006 (check or run).
+nika: v1
+workflow: foreach-nonarray
+# SPEC 03 §for_each semantics: "A non-array collection (object · string · number · null)
+# is an evaluation error (NIKA-VAR-006)". Here for_each over a NUMBER.
+# Expect: clean error NIKA-VAR-006 (or rejected at check). No iterations. exit!=0.
+# Markers: 11_iter_*.json ABSENT.
+vars:
+  not_a_list: { type: integer, default: 42 }
+tasks:
+  - id: mapped
+    for_each: ${{ vars.not_a_list }}
+    exec:
+      command: 'echo x > ./out/ctrlflow/11_iter_${{ index }}.json'

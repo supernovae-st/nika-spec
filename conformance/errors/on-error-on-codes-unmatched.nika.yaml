@@ -1,0 +1,20 @@
+# Expected: NIKA-EXEC-001 at RUN. on_codes filter unmatched → recover does not apply.
+nika: v1
+workflow: onerror-oncodes-filter
+# SPEC 05 §on_error on_codes filter: action applies ONLY when final code is listed;
+# an UNLISTED code falls through to default (fail).
+# exec exit1 = NIKA-EXEC-001. on_error filters on a DIFFERENT code (NIKA-TIMEOUT-001)
+# → recover does NOT apply → task FAILS → workflow fails, exit!=0.
+# downstream cancelled. Markers: 07_after.json ABSENT; exit!=0; code NIKA-EXEC-001.
+tasks:
+  - id: fails
+    exec:
+      command: "exit 1"
+    on_error:
+      on_codes: [NIKA-TIMEOUT-001]
+      recover: "should-not-apply"
+  - id: after
+    depends_on: [fails]
+    invoke:
+      tool: nika:write
+      args: { path: "./out/ctrlflow/07_after.json", content: "ran" }

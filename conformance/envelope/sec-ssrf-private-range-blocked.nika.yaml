@@ -1,0 +1,16 @@
+# Expected: NIKA-SEC-005 at RUN.
+nika: v1
+workflow: sec04-ssrf-private-192
+description: "ATTACK: SSRF to private RFC-1918 range 192.168.x.x — expect BLOCKED"
+
+permits:
+  net:
+    http: ["192.168.1.1"]
+  tools: ["nika:fetch"]
+
+tasks:
+  - id: attack
+    invoke:
+      tool: nika:fetch
+      args:
+        url: "http://192.168.1.1/admin/config"

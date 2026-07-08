@@ -1,0 +1,15 @@
+# Expected: NIKA-EXEC-001 at RUN. on_codes forces retry → 02_attempts.log = 4 lines; still fails after exhaustion.
+nika: v1
+workflow: retry-oncodes-match
+# SPEC 05 §Retry: on_codes whitelist → retry ONLY listed codes (overrides transient gate).
+# exec exit1 = NIKA-EXEC-001. on_codes lists NIKA-EXEC-001 → SHOULD retry max_attempts times
+# EVEN THOUGH transient:false (on_codes present overrides the transient-only rule).
+# Marker: count lines in 02_attempts.log == max_attempts (4) if on_codes forces retry.
+tasks:
+  - id: flaky
+    exec:
+      command: "echo a >> ./out/ctrlflow/02_attempts.log; exit 1"
+    retry:
+      max_attempts: 4
+      backoff_ms: 1
+      on_codes: [NIKA-EXEC-001]

@@ -1,0 +1,24 @@
+# Expected: exit 0 — NIKA-EXEC-001 fires internally, recovered via on_error.
+nika: v1
+workflow: e14-on-error-recover-literal
+# INTENT: on_error.recover with a literal value — workflow should SUCCEED
+permits:
+  exec: ["false"]
+  tools: ["nika:write"]
+  fs:
+    write:
+      - "./out/errors/**"
+tasks:
+  - id: fail_step
+    exec:
+      command: ["false"]
+    on_error:
+      recover: "default_value"
+
+  - id: write_result
+    depends_on: [fail_step]
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/errors/e14-result.txt"
+        content: "${{ tasks.fail_step.output }}"

@@ -1,0 +1,16 @@
+# Expected: NIKA-SEC-005 at RUN.
+nika: v1
+workflow: sec03-ssrf-aws-metadata
+description: "ATTACK: SSRF to AWS IMDSv1 169.254.169.254 — expect BLOCKED"
+
+permits:
+  net:
+    http: ["169.254.169.254"]
+  tools: ["nika:fetch"]
+
+tasks:
+  - id: attack
+    invoke:
+      tool: nika:fetch
+      args:
+        url: "http://169.254.169.254/latest/meta-data/iam/security-credentials/"

@@ -1,0 +1,24 @@
+# Expected: NIKA-EXEC-001 at RUN. Parent fails by design; BOTH on_finally markers present (cleanup runs on success AND failure paths).
+nika: v1
+workflow: onfinally-both-paths
+# SPEC 03 §on_finally: ALWAYS runs for a STARTED task (success AND failure path).
+# Cleanup errors are LOGGED but DO NOT propagate (parent status = main verb outcome only).
+# ok_task succeeds → its on_finally writes 18_finally_ok.json.
+# fail_task fails → its on_finally STILL writes 18_finally_fail.json (before error propagates).
+# Markers: BOTH 18_finally_ok.json AND 18_finally_fail.json present. Workflow exit!=0 (fail_task).
+tasks:
+  - id: ok_task
+    invoke:
+      tool: nika:write
+      args: { path: "./out/ctrlflow/18_ok.json", content: "ok" }
+    on_finally:
+      - invoke:
+          tool: nika:write
+          args: { path: "./out/ctrlflow/18_finally_ok.json", content: "finally-ok" }
+  - id: fail_task
+    exec:
+      command: "exit 1"
+    on_finally:
+      - invoke:
+          tool: nika:write
+          args: { path: "./out/ctrlflow/18_finally_fail.json", content: "finally-fail" }
