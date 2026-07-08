@@ -42,3 +42,6 @@ intents:
   - id: publish-docs-release
     template_family: human-gated-ship
     prompt: "Build the docs site, check the build passed, get a human sign-off, then publish and verify the live version matches."
+  - id: docker-health-brief
+    template_family: docker-report
+    prompt: "Read my Docker daemon's containers and disk usage with pinned commands, have a local model write a short health report, and save it as a markdown file."
