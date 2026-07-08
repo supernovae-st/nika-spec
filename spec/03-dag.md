@@ -561,6 +561,15 @@ deps are terminal, whatever their status · `true` → run (the always-pattern �
 `when: true` literally) · `false` → `skipped`. Workflow-failure interaction ·
 [05 §workflow-level semantics](./05-errors.md#workflow-level-error-semantics).
 
+**A gate that fails to EVALUATE is a task failure — outside `on_error`
+scope** (normative) · the gate decides IF the task runs; `on_error` governs
+the run itself. A `when:` expression whose evaluation errors (an
+unresolvable root · a cross-type compare · any `NIKA-VAR` evaluation error)
+settles the task `failure` — its `on_error` is NOT consulted — and
+downstream reads `status: "failure"`. Contrast · the same evaluation error
+in a verb-body position (`args:` · `prompt:` · …) is task-stage work and IS
+recoverable by that task's `on_error`.
+
 > **`depends_on` IS the success-gate.** Do NOT write
 > `when: ${{ tasks.X.status == 'success' }}` as a plain gate: it is **redundant**
 > (`depends_on` already requires success). Use `when:` ONLY for conditions BEYOND
