@@ -32,9 +32,10 @@ INTENT ──route──▶ TEMPLATE ──fill──▶ DRAFT ──check──
                    invent structure)                   names its fix
 ```
 
-1. **Route** · `templates/README.md` maps intent → one of the 6
-   canonical skeletons (chain · gate-and-act · fanout · etl-state ·
-   agent-loop · human-gated-ship). Composite jobs compose templates.
+1. **Route** · `templates/README.md` maps intent → a canonical
+   skeleton (its routing table IS the list — never enumerate it here:
+   a hand-typed count went stale the day the shelf grew). Composite
+   jobs compose templates.
 2. **Instantiate** · copy the template · fill every `# SLOT:` line ·
    creativity ONLY in prompts, jq and paths — never in structure.
 3. **Check** · `python conformance/runner.py validate <file>` (this
