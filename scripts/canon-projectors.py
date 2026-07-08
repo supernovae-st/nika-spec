@@ -133,9 +133,19 @@ def project_repo_markers(canon: dict, write: bool) -> bool:
     """
     values = marker_values(canon)
     drift = False
+    # Nested git worktrees (a directory carrying a `.git` FILE pointer) hold
+    # ANOTHER branch's tree — their markers are that branch's business, not
+    # this checkout's drift. Observed 2026-07-08: a wt-*/ worktree parked
+    # inside the checkout red-flagged the whole mesh with its behind-main
+    # markers and blocked an unrelated monorepo push.
+    nested_worktrees = {
+        p.parent for p in SPEC_ROOT.rglob(".git") if p.is_file() and p.parent != SPEC_ROOT
+    }
     for path in sorted(SPEC_ROOT.rglob("*.md")):
         rel = path.relative_to(SPEC_ROOT)
         if any(part.startswith(".") for part in rel.parts):
+            continue
+        if any(wt in path.parents for wt in nested_worktrees):
             continue
         text = path.read_text()
         stale: list[str] = []
