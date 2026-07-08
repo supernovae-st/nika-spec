@@ -27,6 +27,8 @@ templates:
     sha256_16: 11bf108efc4f6880
   - file: templates/chain.nika.yaml
     sha256_16: 8f4cfd3538943b22
+  - file: templates/docker-report.nika.yaml
+    sha256_16: b4ae2ca559888e0e
   - file: templates/etl-state.nika.yaml
     sha256_16: cba8dcdc952eedc0
   - file: templates/fanout.nika.yaml

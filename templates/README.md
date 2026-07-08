@@ -19,6 +19,7 @@
 | « understand a site (domain · theme · assets) from a URL » | [`website-brief`](website-brief.nika.yaml) | fetch `traverse:` crawl · one typed infer · explicit persist · zero exec |
 | « generate image/audio assets from a brief » | [`media-asset-pack`](media-asset-pack.nika.yaml) | `nika:image_generate` · `nika:jq` manifest · local/mock provider first |
 | « call a product API: upload a file, then create from it » | [`api-upload-and-create`](api-upload-and-create.nika.yaml) | fetch `multipart:` upload · masked secrets header · mode/jq extraction |
+| « read a system's state (docker · kubectl · gh), explain it, keep the report » | [`docker-report`](docker-report.nika.yaml) | argv-array exec (provable allowlist) · parallel reads · exec ledger · one artifact |
 
 Composite jobs compose templates: a fanout whose merge feeds a
 human-gated-ship, an etl-state whose delta fans out. Start from the
