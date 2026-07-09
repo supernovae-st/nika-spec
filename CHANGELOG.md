@@ -14,6 +14,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- `nika:chart` — the 27th builtin (stdlib §Media graduate #4 ·
+  deterministic chart artifacts: rows + semantic spec → byte-identical
+  SVG, sha256 into the trace chain · closed type vocabulary bar | line |
+  area_band | scatter | heatmap · `out:` must end in `.svg` (the
+  attestation surface) · `compile_to: vega_lite` writes the `.vl.json`
+  sibling · conformance pair `018-valid-chart` +
+  `019-invalid-chart-tool-typo`).
 - `nika:image_fx` — the 26th builtin (stdlib §Media graduate #3 · the
   `image editing` deferred row · deterministic artistic effects — dither ·
   palette · duotone · pixelate · halftone · grain · vignette ·

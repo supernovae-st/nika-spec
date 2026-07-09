@@ -1,0 +1,4 @@
+{
+  "valid": false,
+  "note": "`nika:charts` is not in the closed `nika:*` builtin enum (the canonical name is `nika:chart`) — the schema's tool oneOf rejects typo'd builtin names, the same law 017 proves for `nika:imagefx`."
+}
