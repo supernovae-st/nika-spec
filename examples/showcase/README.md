@@ -37,6 +37,7 @@ T4 EPIC        multi-stage pipelines · agents under budget · self-reporting ru
 | `t2-support-triage` | customer support | the overnight queue triaged before coffee | schema-over-list · jq post-filter · `nika:uuid` |
 | `t2-contract-guard` | legal / compliance | the contract **never leaves the machine** (local model) | `ollama/…` · `nika:validate` + `nika:assert` |
 | `t2-etl-quarantine` | data engineering | bad batches degrade to quarantine · the pipeline lives | `on_error: recover:` · `nika:validate` · jq group_by |
+| `t2-model-bench` | engineering / model selection | the same question, three local models, one MEASURED table | per-task `infer.model:` · `duration_ms` as data · jq fan-in |
 | `t2-release-radar` | devops / dependencies | only the NEW ships reach you | `mode: feed` · state-file diff · RFC 6902 |
 | `t3-competitor-radar` | strategy / PMM | everything they shipped last week, one brief | `for_each` · `max_parallel` · retry · fan-in |
 | `t3-localization-factory` | product / i18n | the whole docs tree translated, voice intact | chained fan-outs · jq `transpose` zip |
