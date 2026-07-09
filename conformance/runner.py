@@ -660,7 +660,7 @@ def validate_text(text: str, validator: Draft202012Validator,
                 break
         return {"valid": False, "errors": [{
             "code": "NIKA-PARSE-001", "namespace": "NIKA-PARSE",
-            "category": "validation_error", "detail": detail}]}
+            "category": "parse_error", "detail": detail}]}
     return validate_workflow(doc, validator, canon)
 
 

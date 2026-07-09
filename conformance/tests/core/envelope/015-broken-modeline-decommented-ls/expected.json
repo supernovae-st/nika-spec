@@ -6,5 +6,6 @@
       "category": "validation_error"
     }
   ],
-  "note": "The same class, valid-YAML form: without its `#` the `yaml-language-server:` line PARSES as a top-level mapping key — it must land as an unknown envelope field (strict mode), and the teaching suggestion names the modeline fix (restore the `# ` prefix or delete the line), never a did-you-mean workflow field. The healthy commented form is exercised by every fixture carrying a modeline."
+  "note": "The same class, valid-YAML form: without its `#` the `yaml-language-server:` line PARSES as a top-level mapping key — it must land as an unknown envelope field (strict mode), and the teaching suggestion names the modeline fix (restore the `# ` prefix or delete the line), never a did-you-mean workflow field. The healthy commented form is exercised by every fixture carrying a modeline.",
+  "mode": "strict"
 }
