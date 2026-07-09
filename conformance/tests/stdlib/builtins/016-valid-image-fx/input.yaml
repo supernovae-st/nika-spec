@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: image-fx-valid
+permits:
+  fs:
+    read: ["./out/**"]
+    write: ["./out/**"]
+  tools: ["nika:image_fx"]
+tasks:
+  - id: style
+    invoke:
+      tool: "nika:image_fx"
+      args:
+        input: "./out/hero.png"
+        out: "./out/hero-styled.png"
+        seed: 42
+        ops:
+          - resize: { width: 320 }
+          - dither: { mode: floyd_steinberg, palette: gameboy }
+          - grain: { intensity: 32 }
+          - scanlines: { strength: 110, period: 4 }
+          - vignette: { strength: 140 }

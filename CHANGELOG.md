@@ -12,6 +12,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- `nika:image_fx` — the 26th builtin (stdlib §Media graduate #3 · the
+  `image editing` deferred row · deterministic artistic effects — dither ·
+  palette · duotone · pixelate · halftone · grain · vignette ·
+  chromatic_aberration · scanlines · glitch · ascii · byte-identical
+  artifacts · recipe-in-chunk `image_fx/v1` · typed
+  `NIKA-BUILTIN-IMAGE_FX-001..006`).
+
 ### Added · `nika:image_generate` mode: edit (2026-07-06)
 
 - `mode: edit` — an input image (or images) + an instruction → a new
