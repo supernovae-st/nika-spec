@@ -69,9 +69,9 @@ The reference engine provides these elements behind strict quality gates. Other 
 
 ## What's IN stdlib v0.1
 
-### Providers (14)
+### Providers (16)
 
-`ollama` · `lmstudio` · `llamacpp` · `localai` · `vllm` (5 local) · `mistral` · `anthropic` · `openai` · `openrouter` · `groq` · `deepseek` · `gemini` · `xai` (8 cloud) · `mock` (test)
+`ollama` · `lmstudio` · `llamacpp` · `localai` · `vllm` (5 local) · `mistral` · `anthropic` · `openai` · `openrouter` · `groq` · `deepseek` · `gemini` · `xai` · `huggingface` · `nvidia` (10 cloud) · `mock` (test)
 
 Selected via a single `model: <provider>/<name>` field. Any other OpenAI-compatible local/remote server routes through the `openai` + `base_url` escape hatch (no new provider name). See [stdlib/providers-v0.1.md](../stdlib/providers-v0.1.md).
 
