@@ -1,0 +1,4 @@
+{
+  "valid": false,
+  "note": "`nika:imagefx` is not in the closed `nika:*` builtin enum (the canonical name is `nika:image_fx`) — the schema's tool oneOf rejects typo'd builtin names. Engine-level laws that the free-form `args` schema cannot see (e.g. `ascii` must be the LAST op) are enforced by the static ops-shape ladder + runtime `NIKA-BUILTIN-IMAGE_FX-001`."
+}

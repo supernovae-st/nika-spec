@@ -1,4 +1,0 @@
-{
-  "valid": false,
-  "note": "`ascii` MUST be the LAST op — it changes the artifact type (png → txt/ans). Statically rejected by the ops-shape rule; at runtime the same pipeline is `NIKA-BUILTIN-IMAGE_FX-001`."
-}

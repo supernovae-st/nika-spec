@@ -1,4 +1,4 @@
 {
   "valid": true,
-  "note": "The cookbook pipeline (§Media graduate #3 · 2026-07-09): ordered single-key op maps over the closed 15-op vocabulary · `input:` READ + `out:` WRITE both ride permits.fs · seeded, so the artifact is byte-deterministic (recipe `image_fx/v1` rides the PNG tEXt chunk)."
+  "note": "The cookbook pipeline (§Media graduate #3 · 2026-07-09): ordered single-key op maps over the closed 15-op vocabulary · `input:` READ + `out:` WRITE both ride permits.fs · seeded, so the artifact is byte-deterministic (recipe `image_fx/v1` rides the PNG tEXt chunk). Engine-owned laws beyond the schema: `ascii` must be the LAST op · unknown op parameters are rejected (`-001`)."
 }

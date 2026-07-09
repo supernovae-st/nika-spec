@@ -1,18 +1,17 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: image-fx-ascii-not-last
+workflow: image-fx-tool-typo
 permits:
   fs:
     read: ["./out/**"]
     write: ["./out/**"]
-  tools: ["nika:image_fx"]
+  tools: ["nika:imagefx"]
 tasks:
   - id: style
     invoke:
-      tool: "nika:image_fx"
+      tool: "nika:imagefx"
       args:
         input: "./out/hero.png"
-        out: "./out/hero.txt"
+        out: "./out/hero-styled.png"
         ops:
-          - ascii: { cols: 80, emit: text }
           - grayscale: {}
