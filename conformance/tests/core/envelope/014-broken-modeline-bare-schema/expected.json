@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "validation_error"
+    }
+  ],
+  "note": "The copy-fidelity class (engine #323): a weak copier strips the `#` from the editor modeline and the bare `$schema=…` line becomes a YAML document scalar — the whole file fails to parse. The DIAGNOSTIC CONTRACT (normative for engines with cause-naming): point at the modeline line (line 1 here), never at the first mapping line (the symptom, `nika: v1`) — a symptom-pointing error sends repair loops to the wrong line forever (0/13 measured on a 14B local-model grid). The reference engine names the cause verbatim: restore the `# yaml-language-server: $schema=…` prefix or delete the line."
+}

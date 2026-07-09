@@ -644,6 +644,23 @@ def validate_text(text: str, validator: Draft202012Validator,
             "code": "NIKA-PARSE-017", "namespace": "NIKA-PARSE",
             "category": "validation_error",
             "detail": f"{e.problem} — no silent last-wins (NIKA-PARSE-017)"}]}
+    except yaml.YAMLError as e:
+        # A document that fails to SCAN is a rejection, never an oracle crash
+        # (found by the broken-modeline fixtures · engine #323). When an early
+        # line is a de-commented editor modeline, name the CAUSE — the raw
+        # scanner error points at the first mapping line (the symptom) and
+        # repair loops chase the wrong line forever.
+        detail = str(getattr(e, "problem", None) or e)
+        for i, line in enumerate(text.splitlines()[:8], start=1):
+            if line.lstrip().startswith("$schema="):
+                detail = (f"a bare `$schema=` line (line {i}) is a broken editor "
+                          "modeline — restore the `# yaml-language-server: "
+                          "$schema=…` comment prefix (or delete the line; it is "
+                          "editor-only)")
+                break
+        return {"valid": False, "errors": [{
+            "code": "NIKA-PARSE-001", "namespace": "NIKA-PARSE",
+            "category": "validation_error", "detail": detail}]}
     return validate_workflow(doc, validator, canon)
 
 
