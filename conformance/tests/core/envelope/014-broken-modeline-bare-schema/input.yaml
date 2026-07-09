@@ -1,0 +1,6 @@
+$schema=https://nika.sh/schema/v1/workflow.schema.json
+nika: v1
+workflow: hello
+tasks:
+  - id: a
+    exec: { command: "true" }
