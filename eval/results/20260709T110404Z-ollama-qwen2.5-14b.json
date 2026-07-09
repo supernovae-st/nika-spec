@@ -1,0 +1,1000 @@
+{
+  "model": "ollama/qwen2.5:14b",
+  "oracle": "d5f7b8c",
+  "results": [
+    {
+      "intent": "standup-from-jira",
+      "condition": "protocol",
+      "family": "chain",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "# SPDX-License-Identifier: Apache-2.0\n$schema=https://nika.sh/spec/v1/workflow.schema.json\n#\n# TEMPLATE \u00b7 chain \u00b7 gather facts \u2192 one model step \u2192 persist.\n# The default shape for \u00ab take real data, produce words, save them \u00bb.\n#\n# Instantiate (agents \u00b7 deterministic) \u00b7\n#   1. Copy this file \u00b7 rename per the job (kebab-case).\n#   2. Fill every `# SLOT:` line \u00b7 delete slot comments when filled.\n#   3. Validate \u00b7 `nika check <file>` (or conformance/runner.py validate).\n#   4. Repair using the error's fix line \u00b7 re-check until valid.\n# Rules the validator enforces \u00b7 one verb per task \u00b7 snake_case ids \u00b7\n# every ${{ tasks.X }} reference REQUIRES depends_on: [X] (NIKA-DAG-003).\nnika: v1\nworkflow: morning-standup-summary            # SLOT: kebab-case workflow id\nid\ndescription: \"gather Jira tickets \u2192 think summary \u2192 persist markdown\"   #\n# SLOT: one honest sentence\n\nmodel: ollama/qwen3.5:4b           # SLOT: provider/model \u00b7 local \u00b7 zero ke\nkey\n\nvars:\n  source: \"./jira-tickets.json\"             # SLOT: your inputs \u00b7 typed whe\nwhere required\n\ntasks:\n  - id: gather_jira_tickets\n    invoke:                         # SLOT: the fact source \u00b7 nika:read / n\nnika:fetch / exec\n      tool: \"nika:read\"\n      args: { path: \"${{ vars.source }}\" }\n\n  - id: think_summary\n    depends_on: [gather_jira_tickets]\n    infer:\n      prompt: |\n        # SLOT: the one model job \u00b7 interpolate ${{ tasks.gather_jira_ticke\ntasks.gather_jira_tickets.output }}\n        Write a short summary for today's standup based on these Jira ticke\ntickets: \u00b7 ${{ tasks.gather_jira_tickets.output }}\n\n  - id: persist_summary\n    depends_on: [think_summary]\n    invoke:\n      tool: \"nika:write\"\n      args:\n        path: \"./standup-summary.md\"         # SLOT: destination\n        content: \"${{ tasks.think_summary.output }}\"   # ALWAYS pass conten\ncontent \u00b7 a write without it writes nothing\n\noutputs:\n  result: ${{ tasks.think_summary.output }}  # SLOT: the callable contract\n"
+    },
+    {
+      "intent": "standup-from-jira",
+      "condition": "freeform",
+      "family": "chain",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 9,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 6,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 5,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "nika: v1\nworkflow: daily-standup-summary\ntasks:\n  - id: read_jira_tickets\n    exec: \n      command: cat jiras-export.json\n      capture: true\n    output: ${{ tickets }}\n    \n  - id: generate_summary\n    invoke: \n      tool: nika:jq\n      args: [\"${{ tickets }}\", \"[$(echo '### Standup Summary'), \"\", if .[0]\n.[0] then (['#### Open Tickets', \"\"], .[] | ['- \\(.summary) (\\(.key))', \"\"]\n\"\"]) else ['No open tickets.'] end ] | join(\\\"\\\\n\\\")\"]\n    output: ${{ summary }}\n\n  - id: write_summary_to_file\n    invoke: \n      tool: nika:write\n      args: [\"${{ summary }}\", \"daily-standup.md\"]\n"
+    },
+    {
+      "intent": "blog-to-newsletter",
+      "condition": "protocol",
+      "family": "chain",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "# SPDX-License-Identifier: Apache-2.0\n$schema: https://nika.sh/spec/v1/workflow.schema.json\n#\n# TEMPLATE \u00b7 chain \u00b7 gather facts \u2192 one model step \u2192 persist.\n# The default shape for \u00ab take real data, produce words, save them \u00bb.\n#\n# Instantiate (agents \u00b7 deterministic) \u00b7\n#   1. Copy this file \u00b7 rename per the job (kebab-case).\n#   2. Fill every `# SLOT:` line \u00b7 delete slot comments when filled.\n#   3. Validate \u00b7 `nika check <file>` (or conformance/runner.py validate).\n#   4. Repair using the error's fix line \u00b7 re-check until valid.\n# Rules the validator enforces \u00b7 one verb per task \u00b7 snake_case ids \u00b7\n# every ${{ tasks.X }} reference REQUIRES depends_on: [X] (NIKA-DAG-003).\nnika: v1\nworkflow: blog-post-to-newsletter\ndescription: \"convert blog post to newsletter-friendly format\"\n\nmodel: ollama/qwen3.5:4b\n\nvars:\n  source: \"./blog-post.md\"\n\ntasks:\n  - id: gather\n    invoke:\n      tool: \"nika:read\"\n      args: { path: \"${{ vars.source }}\" }\n\n  - id: think\n    depends_on: [gather]\n    infer:\n      prompt: |\n        Convert the blog post into a newsletter-friendly format. Include an\nan\n        engaging introduction, key points highlighted with bullet points,\npoints, and a\n        concise conclusion.\n        Original content: \\n${{ tasks.gather.output }}\n\n  - id: persist\n    depends_on: [think]\n    invoke:\n      tool: \"nika:write\"\n      args:\n        path: \"./newsletter-friendly.md\"\n        content: \"${{ tasks.think.output }}\"\n\noutputs:\n  result: ${{ tasks.think.output }}\n"
+    },
+    {
+      "intent": "blog-to-newsletter",
+      "condition": "freeform",
+      "family": "chain",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "nika: v1\nworkflow: convert-blog-post-to-newsletter\ntasks:\n  - id: fetch_blog_post\n    verb: invoke\n    tool: nika:fetch\n    args:\n      path: ./content/blog/post.md\n  - id: format_for_newsletter\n    verb: infer\n    prompt: |\n      You are an expert in Markdown and newsletter formatting. Given the fo\nfollowing content from a blog post, convert it into a more concise and visu\nvisually appealing format suitable for newsletters.\n      Content:\n      ${{ tasks.fetch_blog_post.result }}\n    completion_strategy: replace_text\n  - id: save_converted_content\n    verb: invoke\n    tool: nika:write\n    args:\n      path: ./content/newsletter/post-conversion.md\n      content: ${{ tasks.format_for_newsletter.completion }}\n"
+    },
+    {
+      "intent": "disk-space-alert",
+      "condition": "protocol",
+      "family": "gate-and-act",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "# SPDX-License-Identifier: Apache-2.0\n$schema=https://nika.sh/spec/v1/workflow.schema.json\n#\n# TEMPLATE \u00b7 gate-and-act: check a condition, act only when it holds.\n# The default shape for monitors, alerts and threshold jobs. Often\n# needs ZERO model calls (pattern 1 \u00b7 deterministic core).\n#\n# Instantiate \u00b7 copy \u2192 fill `# SLOT:` \u2192 `nika check` \u2192 repair \u2192 re-check.\n# Gate semantics (pick the right one \u00b7 pattern 6) \u00b7\n#   when:        SKIP gate \u00b7 routing, not failure\n#   nika:assert  FAIL gate \u00b7 the run is wrong, stop loudly\n#   nika:prompt  HUMAN gate \u00b7 blocks until a person decides\nnika: v1\nworkflow: disk-usage-alert     # SLOT: kebab-case workflow id\ndescription: \"check disk usage and send alert if above threshold\"   # SLOT\n\nvars:\n  source_url: \"https://api.example.com/v1/disk_usage\"   # SLOT: what to wat\nwatch\n  threshold: 90                    # SLOT: the trigger condition value\n\nsecrets:\n  webhook:\n    source: env\n    key: DISK_USAGE_WEBHOOK_URL         # SLOT: where the act lands\n    egress:\n      - to: \"nika:notify\"\n        host_from_self: true        # the secret value IS the destination U\nURL\n\ntasks:\n  - id: check-disk-usage\n    invoke:\n      tool: \"nika:fetch\"\n      args:\n        url: \"${{ vars.source_url }}\"\n        mode: jq\n        jq: \".\"\n    output:\n      usage_percent: \".usage_percent\"               # SLOT: the jq path to \nthe watched field\n\n  - id: send-alert-if-above-threshold\n    depends_on: [check-disk-usage]\n    when: ${{ tasks.check-disk-usage.usage_percent > vars.threshold }}   # \nSLOT: the CEL condition\n    invoke:\n      tool: \"nika:notify\"           # SLOT: the action \u00b7 notify / write / e\nexec\n      args:\n        channel: webhook\n        target: \"${{ secrets.webhook }}\"\n        message: \"Disk usage exceeded threshold \u00b7 ${{ tasks.check-disk-usag\ntasks.check-disk-usage.usage_percent }}\"   # SLOT\n        severity: warning\n\noutputs:\n  usage_percent: ${{ tasks.check-disk-usage.usage_percent }}\n"
+    },
+    {
+      "intent": "disk-space-alert",
+      "condition": "freeform",
+      "family": "gate-and-act",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "nika: v1\nworkflow: check-disk-usage-and-alert\ntasks:\n  - id: fetch_disk_usage\n    verb: exec\n    cmd: curl http://localhost/api/disk/usage\n    out_var: disk_usage\n  - id: parse_disk_usage\n    verb: invoke\n    tool: nika:jq\n    args:\n      input_var: disk_usage.stdout\n      query: .percent_used\n    out_var: percent_used\n  - id: check_threshold\n    verb: infer\n    prompt: \"Is the disk usage percentage above 90%? ${{ percent_used }}\"\n    response_schema: |\n      {\n        \"type\": \"boolean\"\n      }\n    out_var: is_above_threshold\n  - id: send_alert_webhook_if_needed\n    verb: exec\n    if: ${{ is_above_threshold }}\n    cmd: curl --request POST https://hooks.example.com/alerts -d '{\"message\n'{\"message\": \"Disk usage above 90%\"}'\n"
+    },
+    {
+      "intent": "price-drop-ping",
+      "condition": "protocol",
+      "family": "gate-and-act",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "# SPDX-License-Identifier: Apache-2.0\n$schema=https://nika.sh/spec/v1/workflow.schema.json\n\n# TEMPLATE \u00b7 gate-and-act: check a condition, act only when it holds.\n# The default shape for monitors, alerts and threshold jobs. Often\n# needs ZERO model calls (pattern 1 \u00b7 deterministic core).\n#\n# Instantiate \u00b7 copy \u2192 fill `# SLOT:` \u2192 `nika check` \u2192 repair \u2192 re-check.\n# Gate semantics (pick the right one \u00b7 pattern 6) \u00b7\n#   when:        SKIP gate \u00b7 routing, not failure\n#   nika:assert  FAIL gate \u00b7 the run is wrong, stop loudly\n#   nika:prompt  HUMAN gate \u00b7 blocks until a person decides\nnika: v1\nworkflow: watch-price-and-act       # SLOT: kebab-case workflow id\ndescription: \"Watch product price and ping Slack when it drops under 500\"  \n\n\nvars:\n  source_url: \"https://api.example.com/v1/product/price\"   # SLOT: what to \n\nwatch\n  threshold: 500                    # SLOT: the trigger condition value\n\nsecrets:\n  webhook:\n    source: env\n    key: SLACK_WEBHOOK_URL          # SLOT: where the act lands\n    egress:\n      - to: \"nika:notify\"\n        host_from_self: true        # the secret value IS the destination U\nURL\n\ntasks:\n  - id: check-price\n    invoke:\n      tool: \"nika:fetch\"\n      args:\n        url: \"${{ vars.source_url }}\"\n        mode: jq\n        jq: \".price\"                # SLOT: the jq path to the watched fiel\nfield\n    output:\n      price: \".\"                    \n\n  - id: act-on-drop\n    depends_on: [check-price]\n    when: ${{ tasks.check-price.price < vars.threshold }}   # SLOT: the CEL\nCEL condition\n    invoke:\n      tool: \"nika:notify\"           # SLOT: the action \u00b7 notify / write / e\nexec\n      args:\n        channel: webhook\n        target: \"${{ secrets.webhook }}\"\n        message: \"Price dropped to ${{ tasks.check-price.price }}\"   # SLOT\nSLOT\n        severity: warning\n\noutputs:\n  price: ${{ tasks.check-price.price }}\n"
+    },
+    {
+      "intent": "price-drop-ping",
+      "condition": "freeform",
+      "family": "gate-and-act",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "nika: v1\nworkflow: watch-product-price\ntasks:\n  - id: fetch_product_price\n    verb: exec\n    command: curl -s https://api.example.com/product/123 | jq '.price'\n  - id: check_price_threshold\n    verb: invoke\n    tool: nika:filter\n    input: ${{ task.fetch_product_price.stdout }}\n    condition: $.price < 500\n  - id: ping_slack_webhook\n    verb: exec\n    command: curl -X POST --data-urlencode \"payload={\\\"text\\\":\\\"Product pri\nprice dropped under $500!\\\"}\" https://hooks.slack.com/services/abc123\n    when: ${{ task.check_price_threshold.result }}\n"
+    },
+    {
+      "intent": "screenshot-all-pages",
+      "condition": "protocol",
+      "family": "fanout",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "# SPDX-License-Identifier: Apache-2.0\n$schema=https://nika.sh/spec/v1/workflow.schema.json\n#\n# TEMPLATE \u00b7 fanout: discover a collection, process every item in\n# parallel (with a leash), merge the results.\n# The default shape for \u00ab N pages / N files / N records \u00bb jobs.\n#\n# Instantiate \u00b7 copy \u2192 fill `# SLOT:` \u2192 `nika check` \u2192 repair \u2192 re-check.\n# The leash (pattern 4 \u00b7 ALWAYS set all three) \u00b7\n#   max_parallel  cap concurrency (APIs rate-limit \u00b7 GPUs thrash)\n#   fail_fast: false + on_error recover: null: one bad item yields null\n#     at its index (order preserved) \u00b7 the batch lives \u00b7 filter downstream\n#   per-iteration retry/timeout \u00b7 the flaky world is normal\nnika: v1\nworkflow: fetch-and-digest-changes           # SLOT: kebab-case workflow id\nid\ndescription: \"Fetch pages listed in sitemap and produce a combined digest\ndigest\"   # SLOT\n\nmodel: ollama/qwen3.5:4b                     # SLOT: provider/model \u00b7 local\nlocal \u00b7 zero key\n\nvars:\n  collection_source: \"./sitemap.xml\"         # SLOT: where the collection c\ncomes from\n\ntasks:\n  - id: discover\n    invoke:\n      tool: \"nika:glob\"\n      args: { pattern: \"${{ vars.collection_source }}\" }\n\n  - id: process\n    depends_on: [discover]\n    for_each: ${{ tasks.discover.output }}\n    max_parallel: 4                          # SLOT: the polite ceiling\n    fail_fast: false\n    timeout: \"60s\"                           # SLOT: per-iteration bound\n    retry:\n      max_attempts: 3\n      backoff_strategy: exponential\n      jitter: true\n    on_error:\n      recover: null                          # a failed item yields null at\nat its index \u00b7 the batch lives\n    infer:\n      prompt: |\n        Fetch and process this URL as an article \u00b7 ${{ item }}\n\n  - id: survivors\n    depends_on: [process]\n    invoke:\n      tool: \"nika:jq\"\n      args:\n        input: ${{ tasks.process.output }}\n        expression: \"[ .[] | select(. != null) ]\"\n\n  - id: merge\n    depends_on: [survivors]\n    infer:\n      prompt: |\n        Combine these fetched articles into one digest of changes \u00b7 ${{ tas\ntasks.survivors.output }}\n\noutputs:\n  report: ${{ tasks.merge.output }}\n"
+    },
+    {
+      "intent": "screenshot-all-pages",
+      "condition": "freeform",
+      "family": "fanout",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "nika: v1\nworkflow: combine-page-digests\ntasks:\n  - id: get-sitemap-urls\n    verb: exec\n    cmd: cat sitemap.xml | grep \"<url>\" | cut -d'>' -f2 | cut -d'<' -f1\n  - id: fetch-pages\n    verb: agent\n    concurrency: 5\n    instruction: \"For each URL in ${{tasks.get-sitemap-urls.stdout}}, use `\n`\n`\n`\n`nika:fetch` to get the page content and store it as a markdown article.\"\n    output: articles\n  - id: generate-digests\n    verb: exec\n    cmd: for file in $(ls articles); do echo \"## ${file//_/ }\" >> changes.m\nchanges.md; nika:digest articles/$file >> changes.md; done\n  - id: combine-changes\n    verb: exec\n    cmd: cat changes.md | nika:process --template=combined-digest.html.j2 >\n> combined-changes.html\n"
+    },
+    {
+      "intent": "summarize-support-tickets",
+      "condition": "protocol",
+      "family": "fanout",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "# SPDX-License-Identifier: Apache-2.0\n# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.jso\n$schema=https://nika.sh/spec/v1/workflow.schema.json\n#\n# TEMPLATE \u00b7 fanout: discover a collection, process every item in parallel,\nparallel,\nmerge the results.\n# The default shape for \u00ab N pages / N files / N records \u00bb jobs.\n#\n# Instantiate \u00b7 copy \u2192 fill `# SLOT:` \u2192 `nika check` \u2192 repair \u2192 re-check.\n# The leash (pattern 4 \u00b7 ALWAYS set all three) \u00b7\n#   max_parallel  cap concurrency (APIs rate-limit \u00b7 GPUs thrash)\n#   fail_fast: false + on_error recover: null: one bad item yields null at \nits index (order preserved) \u00b7 the batch lives \u00b7 filter downstream\n#   per-iteration retry/timeout \u00b7 the flaky world is normal\nnika: v1\nworkflow: ticket-summary-report  # SLOT: kebab-case workflow id\ndescription: \"take tickets in a folder, summarize each one, merge into week\nweekly report\"   # SLOT\n\nmodel: ollama/qwen3.5:4b           # SLOT: provider/model \u00b7 local \u00b7 zero ke\nkey\n\nvars:\n  collection_source: \"./tickets\"      # SLOT: where the collection comes fr\nfrom\n\ntasks:\n  - id: discover\n    invoke:                         # SLOT: glob / fetch sitemap / exec + j\njq split\n      tool: \"nika:glob\"\n      args: { pattern: \"${{ vars.collection_source }}/*.md\" }\n\n  - id: process\n    depends_on: [discover]\n    for_each: ${{ tasks.discover.output }}\n    max_parallel: 4                 # SLOT: the polite ceiling\n    fail_fast: false\n    timeout: \"60s\"                  # SLOT: per-iteration bound\n    retry:\n      max_attempts: 3\n      backoff_strategy: exponential\n      jitter: true\n    on_error:\n      recover: null                 # a failed item yields null at its inde\nindex \u00b7 the batch lives\n    infer:                          # SLOT: the per-item job (any verb)\n      prompt: |\n        Summarize this ticket file \u00b7 ${{ item }}\n\n  - id: survivors\n    depends_on: [process]\n    invoke:\n      tool: \"nika:jq\"\n      args:\n        input: ${{ tasks.process.output }}\n        expression: \"[ .[] | select(. != null) ]\"\n\n  - id: merge\n    depends_on: [survivors]\n    infer:\n      prompt: |\n        Merge these summaries into a weekly report \u00b7 ${{ tasks.survivors.ou\ntasks.survivors.output }}\n\noutputs:\n  report: ${{ tasks.merge.output }}\n"
+    },
+    {
+      "intent": "summarize-support-tickets",
+      "condition": "freeform",
+      "family": "fanout",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "nika: v1\nworkflow: ticket-summaries-weekly-report\ntasks:\n  - id: list-tickets\n    exec: find ./tickets -type f -name \"*.json\"\n  - id: summarize-tickets\n    agent: |\n      tickets = task.list-tickets.stdout.split()\n      summaries = []\n      for ticket in tickets:\n          try:\n              content = $(exec: cat $ticket)\n              summary = $(invoke: nika:summarize input=$content)\n              summaries.append({\"filename\": $ticket, \"summary\": $summary})\n          except Exception as e:\n              summaries.append({\"filename\": $ticket, \"error\": str(e)})\n      task.summaries.json = summaries\n  - id: generate-report\n    invoke: nika:write\n    args:\n      path: ./weekly_report.md\n      content: |\n        # Weekly Report\\n${{ task.summaries.json | jq -r '.[] | \"\\(.filenam\n\"\\(.filename):\\n\\(.summary)\"' }}\n"
+    },
+    {
+      "intent": "sync-new-invoices",
+      "condition": "protocol",
+      "family": "etl-state",
+      "error": "Command '['/opt/homebrew/bin/ollama', 'run', 'qwen2.5:14b']' timed out after 240 seconds",
+      "loops": [],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "sync-new-invoices",
+      "condition": "freeform",
+      "family": "etl-state",
+      "error": "Command '['/opt/homebrew/bin/ollama', 'run', 'qwen2.5:14b']' timed out after 240 seconds",
+      "loops": [],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 0
+    },
+    {
+      "intent": "changelog-watcher",
+      "condition": "protocol",
+      "family": "etl-state",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "# SPDX-License-Identifier: Apache-2.0\n$schema=https://nika.sh/spec/v1/workflow.schema.json\n#\n# TEMPLATE \u00b7 etl-state \u00b7 incremental data job with a state file.\n# The default shape for \u00ab only the NEW \u00bb jobs (feeds \u00b7 exports \u00b7 syncs)\n# and for batch pipelines that must survive bad input.\n#\n# Instantiate \u00b7 copy \u2192 fill `# SLOT:` \u2192 `nika check` \u2192 repair \u2192 re-check.\n# Two load-bearing moves \u00b7\n#   on_error: recover:   bad data is DATA \u00b7 the pipeline lives\n#   state read\u2192diff\u2192write   you only process what changed\nnika: v1\nworkflow: track-vendor-releases\ndescription: \"Track vendor's releases feed and write a note when new items \nappear\"\n\nvars:\n  source_url: \"https://vendor.api/releases/feed\"\n  state_path: \"./state/vendor_releases_state.json\"\n\ntasks:\n  # First run \u00b7 no state file yet \u00b7 recover to an empty list.\n  - id: empty\n    invoke:\n      tool: \"nika:jq\"\n      args: { input: [], expression: \".\" }\n\n  - id: previous\n    invoke:\n      tool: \"nika:read\"\n      args: { path: \"${{ vars.state_path }}\" }\n    on_error:\n      on_codes: [NIKA-BUILTIN-READ-001]\n      recover: ${{ tasks.empty.output }}\n\n  - id: fresh\n    invoke:\n      tool: \"nika:fetch\"\n      args:\n        url: \"${{ vars.source_url }}\"\n        mode: jq\n        jq: \".releases\"\n\n  - id: delta\n    depends_on: [previous, fresh]\n    invoke:\n      tool: \"nika:json_diff\"\n      args:\n        before: \"${{ tasks.previous.output }}\"\n        after: \"${{ tasks.fresh.output }}\"\n\n  - id: write_note\n    depends_on: [delta]\n    when: ${{ size(tasks.delta.output) > 0 }}\n    invoke:\n      tool: \"nika:write\"\n      args:\n        path: \"./notes/new_releases.txt\"\n        content: |\n          New releases detected since the last check:\n          {{ tasks.fresh.output | to_string }}\n        create_dirs: true\n        overwrite: false\n\n  - id: save_state\n    depends_on: [fresh]\n    invoke:\n      tool: \"nika:write\"\n      args:\n        path: \"${{ vars.state_path }}\"\n        content: \"${{ tasks.fresh.output }}\"\n        create_dirs: true\n        overwrite: true\n\noutputs:\n  changes:\n    value: ${{ tasks.delta.output }}\n    type: array\n    description: \"RFC 6902 ops since last run \u00b7 empty = no-op run\"\n"
+    },
+    {
+      "intent": "changelog-watcher",
+      "condition": "freeform",
+      "family": "etl-state",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "nika: v1\nworkflow: track-vendor-releases\ntasks:\n  - id: fetch-latest-release-feed\n    verb: exec\n    command: wget -O latest_feed.json \"https://vendor.example.com/releases.\n\"https://vendor.example.com/releases.json\"\n  - id: compare-with-last-check\n    verb: invoke\n    tool: nika:jq\n    input: |\n      {\n        \"script\": \".[0]\",\n        \"file\": \"${{ fetch-latest-release-feed.output.file }}\"\n      }\n    args:\n      - --last-checked-file\n      - last_known_release.json\n  - id: update-last-known-state\n    verb: invoke\n    tool: nika:write\n    input: |\n      {\n        \"filename\": \"last_known_release.json\",\n        \"content\": \"${{ compare-with-last-check.output.newest }}\"\n      }\n  - id: notify-new-release\n    verb: agent\n    args:\n      - check_note\n    input: |\n      {\n        \"when\": \"${{ compare-with-last-check.is_new }} == true\"\n      }\n"
+    },
+    {
+      "intent": "research-competitor",
+      "condition": "protocol",
+      "family": "agent-loop",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "# SPDX-License-Identifier: Apache-2.0\n$schema=https://nika.sh/spec/v1/workflow.schema.json\n#\n# TEMPLATE \u00b7 agent-loop \u00b7 plan with a fast model, execute with a\n# budgeted agent, validate the typed result.\n# The default shape for open-ended work (research \u00b7 review \u00b7 triage).\n#\n# Instantiate \u00b7 copy \u2192 fill `# SLOT:` \u2192 `nika check` \u2192 repair \u2192 re-check.\n# Three leashes (pattern 5 + 8 \u00b7 NEVER ship an unleashed agent) \u00b7\n#   tools:    default-deny \u00b7 grant the MINIMUM \u00b7 nika:done ends cleanly\n#   max_turns + max_tokens_total \u00b7 the worst case is bounded\n#   schema:   the final message is TYPED \u00b7 prose is not a contract\nnika: v1\nworkflow: competitor-research-quarterly-shipping       # SLOT: kebab-case w\nworkflow id\ndescription: \"Research what competitors shipped this quarter and return str\nstructured findings with sources\"   # SLOT\n\nmodel: ollama/qwen3.5:4b           # SLOT: a tool-calling model \u00b7 local by \ndefault\n\nvars:\n  goal:\n    type: string\n    required: true\n    description: \"Identify the competitor's recent product launches and gat\ngather structured findings with sources\"   # SLOT\n\ntasks:\n  - id: plan\n    infer:\n      prompt: \"Break '${{ vars.goal }}' into at most 4 concrete steps.\"   #\n# SLOT\n      schema:\n        type: object\n        required: [steps]\n        properties:\n          steps: { type: array, items: { type: string } }\n\n  - id: execute\n    depends_on: [plan]\n    agent:\n      system: \"Work the plan step by step. Call nika:done when finished.\"  \n # SLOT\n      prompt: \"Plan \u00b7 ${{ tasks.plan.output.steps }}\"\n      tools:                        # SLOT: the MINIMUM grant for the job\n        - \"nika:read\"\n        - \"nika:jq\"\n        - \"nika:write\"\n        - \"nika:wait\"\n        - \"nika:done\"\n      max_turns: 20                # SLOT: the loop bound\n      max_tokens_total: 80000       # SLOT: the spend bound\n      schema:                       # SLOT: the typed final-message contrac\ncontract\n        type: object\n        required: [findings]\n        properties:\n          findings: { type: array, items: { type: object, properties: \n            name: { type: string }\n            description: { type: string }\n            source_url: { type: string } }}\n\n  - id: confirm\n    depends_on: [execute]\n    invoke:\n      tool: \"nika:assert\"\n      args:\n        condition: \"${{ size(tasks.execute.output.findings) > 0 }}\"\n        message: \"Agent returned no findings, do not trust an empty run\"   \n# SLOT\n\noutputs:\n  findings:\n    value: ${{ tasks.execute.output.findings }}\n    type: array\n    description: \"Structured list of competitor's product launches with des\ndescriptions and source URLs.\"   # SLOT\n"
+    },
+    {
+      "intent": "research-competitor",
+      "condition": "freeform",
+      "family": "agent-loop",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "nika: v1\nworkflow: research-competitor-findings\ntasks:\n  - id: define-competitors\n    exec: |\n      echo \"Competitors=(companyA companyB companyC)\"\n      export COMPETITORS=\"${COMPETITORS[@]}\"\n  - id: fetch-research\n    agent: |\n      for competitor in $COMPETITORS; do\n        nika:fetch url=https://news.example.com/search?q=${competitor}+quar\nurl=https://news.example.com/search?q=${competitor}+quarterly+report cost:l\ncost:low output=reports/${competitor}.html\n        nika:jq input=reports/${competitor}.html -r '.articles[] | {title: \n.title, link: .link, summary: .summary}'\n      done\n  - id: summarize-findings\n    infer:\n      instructions: \"Summarize the findings from the research on $COMPETITO\n$COMPETITORS in a structured format including title, link, and summary. Cit\nCite sources.\"\n      variables: [\"reports/companyA.html\", \"reports/companyB.html\", \"report\n\"reports/companyC.html\"]\n  - id: write-report\n    invoke: nika:write\n    params:\n      path: findings.md\n      content: ${{tasks.summarize-findings.response}}\n"
+    },
+    {
+      "intent": "codebase-todo-audit",
+      "condition": "protocol",
+      "family": "agent-loop",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "# SPDX-License-Identifier: Apache-2.0\n$schema=https://nika.sh/spec/v1/workflow.schema.json\n#\n# TEMPLATE \u00b7 agent-loop \u00b7 plan with a fast model, execute with a\n# budgeted agent, validate the typed result.\n# The default shape for open-ended work (research \u00b7 review \u00b7 triage).\n#\n# Instantiate \u00b7 copy \u2192 fill `# SLOT:` \u2192 `nika check` \u2192 repair \u2192 re-check.\n# Three leashes (pattern 5 + 8 \u00b7 NEVER ship an unleashed agent) \u00b7\n#   tools:    default-deny \u00b7 grant the MINIMUM \u00b7 nika:done ends cleanly\n#   max_turns + max_tokens_total \u00b7 the worst case is bounded\n#   schema:   the final message is TYPED \u00b7 prose is not a contract\nnika: v1\nworkflow: agent-loop-todo-checker       # SLOT: kebab-case workflow id\ndescription: \"Identify risky TODO items in source files\"   # SLOT\n\nmodel: ollama/qwen3.5:4b           # SLOT: a tool-calling model \u00b7 local by \n\ndefault\n\nvars:\n  source_folder:\n    type: string\n    required: true\n    description: \"The path to the folder containing source code\"   # SLOT\n\ntasks:\n  - id: plan\n    infer:\n      prompt: \"Break 'scan '${{ vars.source_folder }}' for risky TODOs into\ninto\ninto at most 4 concrete steps.' into at most 4 concrete steps.\"   # SLO\nSLOT\n      schema:\n        type: object\n        required: [steps]\n        properties:\n          steps: { type: array, items: { type: string } }\n\n  - id: execute\n    depends_on: [plan]\n    agent:\n      system: \"Work the plan step by step. Call nika:done when finished.\"  \n\n # SLOT\n      prompt: \"Plan \u00b7 ${{ tasks.plan.output.steps }}\"\n      tools:                        # SLOT: the MINIMUM grant for the job\n        - \"nika:read\"\n        - \"nika:done\"\n      max_turns: 15                 # SLOT: the loop bound\n      max_tokens_total: 80000       # SLOT: the spend bound\n      schema:\n        type: object\n        required: [findings]\n        properties:\n          findings: { type: array, items: { type: string } }\n\n  - id: confirm\n    depends_on: [execute]\n    invoke:\n      tool: \"nika:assert\"\n      args:\n        condition: \"${{ size(tasks.execute.output.findings) > 0 }}\"\n        message: \"Agent returned no findings, do not trust an empty run\"   \n\n# SLOT\n\noutputs:\n  risky_todos:\n    value: ${{ tasks.execute.output.findings }}\n    type: array\n    description: \"A typed list of risky TODO items with file references\"   \n\n# SLOT\n"
+    },
+    {
+      "intent": "codebase-todo-audit",
+      "condition": "freeform",
+      "family": "agent-loop",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "nika: v1\nworkflow: find-risky-todos\ntasks:\n  - id: scan-source-folder\n    verb: agent\n    args:\n      name: directory-walker\n      goal: \"Find all TODOs in source files and type them as risky or not.\"\nnot.\"\n      constraints:\n        - \"Only read files, do not modify anything.\"\n        - \"Identify TODOs that include 'risky', 'dangerous', or similar key\nkey words.\"\n        - \"Output a list of file paths with the line number and text of ris\nrisky TODOs.\"\n"
+    },
+    {
+      "intent": "deploy-with-approval",
+      "condition": "protocol",
+      "family": "human-gated-ship",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "# SPDX-License-Identifier: Apache-2.0\n# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.jso\n$schema=https://nika.sh/spec/v1/workflow.schema.json\n#\n# TEMPLATE \u00b7 human-gated-ship: gates in parallel, a human signs,\n# the action ships, evidence always lands.\n# The default shape for anything irreversible (deploys \u00b7 sends \u00b7 publishes)\npublishes).\n#\n# Instantiate \u00b7 copy \u2192 fill `# SLOT:` \u2192 `nika check` \u2192 repair \u2192 re-check.\n# The contract (patterns 6 + 9) \u00b7\n#   nothing irreversible happens before nika:prompt returns true\n#   the assert makes a RED gate terminal \u00b7 the act fails LOUDLY (default\n#   capture) \u00b7 a terminal `when: true` task records EVERY outcome\n#   (acted \u00b7 refused \u00b7 failed): the always-pattern\nnika: v1\nworkflow: run-tests-deploy  # SLOT: kebab-case workflow id\ndescription: \"run tests and deploy script with human confirmation\"   # SLOT\nSLOT\n\npermits:\n  exec: [\"./test.sh\", \"./deploy.sh\"]                    # SLOT: ONLY the pr\nprograms the gates + act run (argv form)\n  tools: [\"nika:assert\", \"nika:prompt\", \"nika:notify\"]\n  net: { http: [\"hooks.slack.com\"] }   # SLOT: the webhook host \u00b7 nothing e\nelse may leave\n\nsecrets:\n  webhook:\n    source: env\n    key: TEAM_WEBHOOK_URL           # SLOT: where the record lands\n    egress:\n      - to: \"nika:notify\"\n        host_from_self: true        # the secret value IS the destination U\nURL\n\ntasks:\n  # \u2500\u2500 the verification wave \u00b7 all checks run in parallel \u2500\u2500\n  - id: test_a\n    exec:\n      command: [\"./test.sh\", \"--suite=test_suite_1\"]        # SLOT: gate 1 \n(argv form \u00b7 injection-safe)\n      capture: structured\n\n  - id: test_b\n    exec:\n      command: [\"./test.sh\", \"--suite=test_suite_2\"]        # SLOT: gate 2\n      capture: structured\n\n  - id: gates\n    depends_on: [test_a, test_b]\n    invoke:\n      tool: \"nika:assert\"\n      args:\n        condition: \"${{ tasks.test_a.output.exit_code == 0 && tasks.test_b.\ntasks.test_b.output.exit_code == 0 }}\"\n        message: \"A gate is RED: refusing to proceed\"   # SLOT\n\n  - id: human\n    depends_on: [gates]\n    invoke:\n      tool: \"nika:prompt\"\n      args:\n        message: \"All tests passed. Proceed with deployment?\"   # SLOT: the\nthe decision, fully informed\n        default: false\n\n  - id: act\n    depends_on: [human]\n    when: ${{ tasks.human.output == true }}\n    exec:\n      command: [\"./deploy.sh\"]   # SLOT: the irreversible action (argv \u00b7 pr\nprogram must be in permits.exec)\n      # default capture \u00b7 a failing ship fails LOUDLY (NIKA-EXEC-001):\n      # never `capture: structured` on the irreversible step (exit codes\n      # would become data and a red ship would read as success)\n\n  - id: record\n    depends_on: [act]\n    when: true                      # the always-pattern \u00b7 runs on success,\nsuccess, failure, OR refusal\n    invoke:\n      tool: \"nika:notify\"\n      args:\n        channel: webhook\n        target: \"${{ secrets.webhook }}\"\n        message: \"Run finished \u00b7 act=${{ tasks.act.status }}\"   # SLOT \u00b7 su\nsuccess | failure | skipped\n        severity: info\n\noutputs:\n  acted: ${{ tasks.act.status }}\n"
+    },
+    {
+      "intent": "deploy-with-approval",
+      "condition": "freeform",
+      "family": "human-gated-ship",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "nika: v1\nworkflow: run-tests-and-deploy\ntasks:\n  - id: run-linter\n    verb: exec\n    command: make lint\n  - id: run-test-suite\n    verb: exec\n    command: make test\n  - id: wait-for-confirmation\n    verb: agent\n    tool: confirm-action\n    message: \"Tests and linters passed. Ready to deploy. Confirm? (yes/no)\"\n(yes/no)\"\n  - id: notify-team\n    verb: invoke\n    tool: nika:notify\n    args:\n      channel: team-channel\n      message: ${{ task.wait-for-confirmation.message }} Deployment will pr\nproceed.\n  - id: run-deploy-script\n    if: ${{ task.wait-for-confirmation.response == 'yes' }}\n    verb: exec\n    command: make deploy\n  - id: notify-team-of-deployment-result\n    if: ${{ task.wait-for-confirmation.response != 'no' }}\n    verb: invoke\n    tool: nika:notify\n    args:\n      channel: team-channel\n      message: Deployment ${% if task.run-deploy-script.exit_code == 0 %}su\n%}succeeded{% else %}failed{% endif %}.\n"
+    },
+    {
+      "intent": "publish-docs-release",
+      "condition": "protocol",
+      "family": "human-gated-ship",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "# SPDX-License-Identifier: Apache-2.0\n# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.jso\n$schema=https://nika.sh/spec/v1/workflow.schema.json\n#\n# TEMPLATE \u00b7 human-gated-ship: gates in parallel, a human signs,\n# the action ships, evidence always lands.\n# The default shape for anything irreversible (deploys \u00b7 sends \u00b7 publishes)\npublishes).\n#\n# Instantiate \u00b7 copy \u2192 fill `# SLOT:` \u2192 `nika check` \u2192 repair \u2192 re-check.\n# The contract (patterns 6 + 9) \u00b7\n#   nothing irreversible happens before nika:prompt returns true\n#   the assert makes a RED gate terminal \u00b7 the act fails LOUDLY (default\n#   capture) \u00b7 a terminal `when: true` task records EVERY outcome\n#   (acted \u00b7 refused \u00b7 failed): the always-pattern\nnika: v1\nworkflow: build-docs-and-publish-template  # SLOT: kebab-case workflow id\ndescription: \"build docs site \u00b7 check build passed \u00b7 human sign-off \u00b7 publi\npublish and verify\"   # SLOT\n\npermits:\n  exec: [\"make\", \"git\"]\n  tools: [\"nika:assert\", \"nika:prompt\", \"nika:notify\"]\n  net: { http: [\"hooks.slack.com\"] }    # SLOT: the webhook host \u00b7 nothing \nelse may leave\n\nsecrets:\n  webhook:\n    source: env\n    key: TEAM_WEBHOOK_URL                # SLOT: where the record lands\n    egress:\n      - to: \"nika:notify\"\n        host_from_self: true              # the secret value IS the destina\ndestination URL\n\ntasks:\n  - id: build-docs\n    exec:\n      command: [\"make\", \"docs\"]           # SLOT: gate 1 (argv form \u00b7 injec\ninjection-safe)\n      capture: structured\n\n  - id: check-build\n    depends_on: [build-docs]\n    invoke:\n      tool: \"nika:assert\"\n      args:\n        condition: \"${{ tasks.build-docs.output.exit_code == 0 }}\"\n        message: \"Build failed: refusing to proceed\"   # SLOT\n\n  - id: human-sign-off\n    depends_on: [check-build]\n    invoke:\n      tool: \"nika:prompt\"\n      args:\n        message: \"Docs build successful. Proceed with publishing?\"   # SLOT\nSLOT: the decision, fully informed\n        default: false\n\n  - id: publish-docs\n    depends_on: [human-sign-off]\n    when: ${{ tasks.human-sign-off.output == true }}\n    exec:\n      command: [\"git\", \"push\"]            # SLOT: the irreversible action (\n(argv \u00b7 program must be in permits.exec)\n      capture: structured\n\n  - id: verify-publish\n    depends_on: [publish-docs]\n    when: ${{ tasks.publish-docs.output.exit_code == 0 }}\n    exec:\n      command: [\"curl\", \"-XGET\", \"http://localhost/docs\"]\n      capture: structured\n\n  - id: record-result\n    depends_on: [verify-publish, publish-docs]\n    when: true                             # the always-pattern \u00b7 runs on s\nsuccess, failure, OR refusal\n    invoke:\n      tool: \"nika:notify\"\n      args:\n        channel: webhook\n        target: \"${{ secrets.webhook }}\"\n        message: \"Publishing finished \u00b7 act=${{ tasks.publish-docs.status }\n}}\"   # SLOT \u00b7 success | failure | skipped\n        severity: info\n\noutputs:\n  acted: ${{ tasks.publish-docs.status }}\n"
+    },
+    {
+      "intent": "publish-docs-release",
+      "condition": "freeform",
+      "family": "human-gated-ship",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 24,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 9,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-VAR-001",
+            "NIKA-VAR-001"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 5,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-VAR-001",
+            "NIKA-VAR-001",
+            "NIKA-VAR-001"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 5,
+          "errors": [
+            "NIKA-PARSE",
+            "NIKA-PARSE",
+            "NIKA-VAR-001",
+            "NIKA-VAR-001",
+            "NIKA-VAR-001"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "nika: v1\nworkflow: build-and-publish-docs-site\ntasks:\n  - id: build_docs_site\n    exec: \n      command: npm run build\n  - id: check_build_success\n    exec: \n      command: exit ${{ output.build_docs_site.exit_code }}\n    depends_on: [build_docs_site]\n    when: ${{ output.build_docs_site.exit_code == 0 }}\n  - id: get_human_sign_off\n    agent: \n      message: \"Please review the built documentation site at $(DOCS_BUILD_\n$(DOCS_BUILD_URL) and confirm if it's ready to be published.\"\n      expected_response: yes\n    depends_on: [check_build_success]\n    when: ${{ output.get_human_sign_off.response == 'yes' }}\n  - id: publish_docs\n    exec: \n      command: npm run deploy\n    depends_on: [get_human_sign_off]\n  - id: verify_live_site\n    exec: \n      command: curl $(LIVE_DOCS_URL) | grep \"expected-keyword\"\n"
+    },
+    {
+      "intent": "docker-health-brief",
+      "condition": "protocol",
+      "family": "docker-report",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "# SPDX-License-Identifier: Apache-2.0\n$schema=https://nika.sh/spec/v1/workflow.schema.json\n#\n# TEMPLATE \u00b7 docker-report: read a system's real state via a pinned CLI,\n# have a model explain it, keep the report as a file. The audited-ops\n# shape: argv-array exec (a provable `permits.exec` allowlist \u2014 a shell\n# string can smuggle any program through a pipe, so the checker refuses\n# to bless one), reads fan out in parallel, one model call, one artifact.\n# Swap `docker` for any product CLI (kubectl \u00b7 gh \u00b7 terraform \u00b7 psql).\n#\n# Instantiate \u00b7 copy \u2192 fill `# SLOT:` \u2192 `nika check` \u2192 repair \u2192 re-check.\n#\n# EXEC LEDGER \u00b7 (the native-first law: every surviving exec names why)\n# | task | command          | why no native path               | unlock tha\nthat removes it |\n# | ps   | docker ps        | product CLI \u00b7 no MCP surface yet | a docker M\nMCP server    |\n# | df   | docker system df | same                             | same      \n             |\nnika: v1\nworkflow: docker-report         # SLOT: kebab-case workflow id\ndescription: \"read the daemon's state \u00b7 explain it \u00b7 keep the report\"   # S\nSLOT\n\nmodel: ollama/qwen3.5:4b            # SLOT: local-first \u00b7 mock/echo for off\noffline rehearsal\n\npermits:\n  exec:\n    - \"docker\"                      # SLOT: the ONE program the reads may l\nlaunch\n  tools:\n    - \"nika:write\"\n  fs:\n    write:\n      - \"./docker-health.md\"        # SLOT: where the report lands (must ma\nmatch `keep`)\n\ntasks:\n  # The reads run IN PARALLEL (no depends_on between them) \u2014 the\n  # scheduler proves it from the DAG, nobody orders it.\n  - id: ps\n    exec:\n      # SLOT: argv ARRAY form \u2014 one program, exactly these arguments\n      command: [\"docker\", \"ps\", \"--all\", \"--format\", \"{{.Names}}\\t{{.Status\n\"{{.Names}}\\t{{.Status}}\\t{{.Image}}\"]\n\n  - id: df\n    exec:\n      command: [\"docker\", \"system\", \"df\"]   # SLOT: the second read (drop t\nthe task if one suffices)\n\n  - id: diagnose\n    depends_on: [ps, df]\n    infer:\n      # SLOT: what should the model DO with the readings?\n      prompt: |\n        You are reading a Docker host's state. Containers (name\u00b7status\u00b7imag\n(name\u00b7status\u00b7image):\n        ${{ tasks.ps.output }}\n\n        Disk usage:\n        ${{ tasks.df.output }}\n\n        Write a short health report: what is running, what exited, what\n        looks unhealthy (restart loops \u00b7 old exits), and whether disk\n        usage needs attention. Plain prose, no preamble.\n      max_tokens: 600               # SLOT: the spend ceiling for this call\ncall\n\n  - id: keep\n    depends_on: [diagnose]\n    invoke:\n      tool: \"nika:write\"\n      args:\n        path: \"./docker-health.md\"  # SLOT: same path as permits.fs.write\n        content: \"${{ tasks.diagnose.output }}\"\n\noutputs:\n  report: ${{ tasks.keep.output }}\n"
+    },
+    {
+      "intent": "docker-health-brief",
+      "condition": "freeform",
+      "family": "docker-report",
+      "loops": [
+        {
+          "n": 0,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 1,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 2,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        },
+        {
+          "n": 3,
+          "error_count": 1,
+          "errors": [
+            "NIKA-PARSE"
+          ]
+        }
+      ],
+      "first_pass_valid": false,
+      "final_valid": false,
+      "repair_loops_used": 3,
+      "final_yaml": "nika: v1\nworkflow: docker-daemon-health-report\ntasks:\n  - id: get-container-list\n    verb: exec\n    command: |\n      docker ps --format \"{{json .}}\" | jq -s 'map({name: .Names, id: .ID})\n.ID})'\n    output: ${{ task.output }}\n  - id: get-disk-usage\n    verb: exec\n    command: |\n      df -hT | tail -n +2\n    output: ${{ task.stdout }}\n  - id: generate-health-report\n    verb: infer\n    prompt: |\n      Write a short health report for the Docker daemon based on these deta\ndetails:\n\n      Containers list: ${{ task.output.get-container-list }}\n      Disk usage: ${{ task.output.get-disk-usage }}\n    output: ${{ task.response }}\n  - id: save-report-as-markdown\n    verb: invoke\n    tool: nika:write\n    path: /path/to/report.md\n    content: ${{ task.output.generate-health-report }}\n"
+    }
+  ]
+}
