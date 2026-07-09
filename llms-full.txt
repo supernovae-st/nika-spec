@@ -464,7 +464,7 @@ a caller receives).
 - **[templates/](./templates/)**: writing your own? Instantiate a
   skeleton (6 valid, slot-marked) instead of starting blank, the
   deterministic path agents follow ([protocol](AGENTS.md))
-- **[stdlib/](./stdlib/)**: the <!-- canon:providers -->16<!-- /canon --> providers · <!-- canon:extract_modes -->9<!-- /canon --> extract modes · <!-- canon:builtins -->25<!-- /canon --> builtins
+- **[stdlib/](./stdlib/)**: the <!-- canon:providers -->16<!-- /canon --> providers · <!-- canon:extract_modes -->9<!-- /canon --> extract modes · <!-- canon:builtins -->27<!-- /canon --> builtins
 - **[examples/](./examples/)**: 7 foundation + 20 showcase workflows, all shipped and CI-gated
 - **[README.md](./README.md)**: why a language · repo layout · governance
 
@@ -599,7 +599,7 @@ outputs:                              # what the workflow returns · symmetric t
 | [07 conformance](./07-conformance.md) | What « v0.1-compliant » means |
 | [08 out of scope](./08-out-of-scope.md) | Explicit defer list (memory · macros · etc.) |
 
-**Stdlib** (versioned independently · not a spec section) · [stdlib/](../stdlib/): **<!-- canon:providers -->16<!-- /canon --> providers · <!-- canon:extract_modes -->9<!-- /canon --> extract modes · <!-- canon:builtins -->25<!-- /canon --> builtins** (6 core · 5 file · 8 data · 2 network · 2 introspection · 2 media).
+**Stdlib** (versioned independently · not a spec section) · [stdlib/](../stdlib/): **<!-- canon:providers -->16<!-- /canon --> providers · <!-- canon:extract_modes -->9<!-- /canon --> extract modes · <!-- canon:builtins -->27<!-- /canon --> builtins** (6 core · 5 file · 8 data · 2 network · 2 introspection · 4 media).
 
 ---
 
@@ -1464,7 +1464,7 @@ spec minor. It never appears silently.
       path: "./config.yaml"
 ```
 
-See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md) for the canonical builtin list (<!-- canon:builtins -->25<!-- /canon --> builtins in v0.1).
+See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md) for the canonical builtin list (<!-- canon:builtins -->27<!-- /canon --> builtins in v0.1).
 
 > **Grouped paths are grammar-legal · v0.1 ships none.** The reference
 > grammar admits `nika:<group>/<tool>` (the `nika:connectome/recall`
@@ -3042,7 +3042,7 @@ Error codes follow the format `NIKA-<NAMESPACE>-<NNN>` where namespace is 2-9 up
 | `NIKA-INVOKE` | `invoke:` verb errors | 001-099 |
 | `NIKA-AGENT` | `agent:` verb errors | 001-099 |
 | `NIKA-PROVIDER` | Provider adapter errors | 001-099 per provider |
-| `NIKA-BUILTIN-<BUILTIN>` | Builtin tool errors · per-builtin sub-namespace (`NIKA-BUILTIN-WAIT-001` · `NIKA-BUILTIN-NOTIFY-001` · `NIKA-BUILTIN-INSPECT-001` · `NIKA-BUILTIN-IMAGE_GENERATE-001..007` — the §Media builtin's seven planes, stdlib page normative · `NIKA-BUILTIN-FETCH-001` — `nika:fetch`'s network/extraction errors, whose instances carry `category: network_error` though the namespace is the uniform `NIKA-BUILTIN`) | 001-099 per builtin |
+| `NIKA-BUILTIN-<BUILTIN>` | Builtin tool errors · per-builtin sub-namespace (`NIKA-BUILTIN-WAIT-001` · `NIKA-BUILTIN-NOTIFY-001` · `NIKA-BUILTIN-INSPECT-001` · `NIKA-BUILTIN-IMAGE_GENERATE-001..007` + `NIKA-BUILTIN-IMAGE_FX-001..006` — the §Media builtins' planes, stdlib page normative · `NIKA-BUILTIN-FETCH-001` — `nika:fetch`'s network/extraction errors, whose instances carry `category: network_error` though the namespace is the uniform `NIKA-BUILTIN`) | 001-099 per builtin |
 | `NIKA-MCP` | MCP client errors | 001-099 |
 | `NIKA-SEC` | Security policy violations (SSRF · blocklist) | 001-099 |
 | `NIKA-TIMEOUT` | Task or step timeouts | 001-099 |
@@ -3450,7 +3450,7 @@ The stdlib has **independent versioning** ·
 
 - `stdlib/providers-v0.1.md`, the <!-- canon:providers -->16<!-- /canon --> canonical providers for v0.1
 - `stdlib/extract-modes-v0.1.md`, the <!-- canon:extract_modes -->9<!-- /canon --> canonical extract modes for v0.1
-- `stdlib/builtins-v0.1.md`, the <!-- canon:builtins -->25<!-- /canon --> canonical builtins for v0.1
+- `stdlib/builtins-v0.1.md`, the <!-- canon:builtins -->27<!-- /canon --> canonical builtins for v0.1
 
 When the stdlib evolves to v0.2 · those files become `*-v0.2.md` and new versions are published. The core language contract (`nika: v1`) is unchanged.
 
@@ -3485,15 +3485,15 @@ Selected via a single `model: <provider>/<name>` field. Any other OpenAI-compati
 
 See [stdlib/extract-modes-v0.1.md](../stdlib/extract-modes-v0.1.md).
 
-### Builtins (24)
+### Builtins (26)
 
 6 core (log · emit · assert · prompt · done · wait)
 + 5 file (read · write · edit · glob · grep)
 + 8 data (jq · json_diff · validate · json_merge_patch · convert · uuid · date · hash)
 + 2 introspection (inspect · view-discriminated · 4 views cost/records/dag_info/threads · compose · agent-loop self-check)
 + 2 network (fetch · notify)
-+ 1 media (image_generate · the first §Media graduate · 2026-07-05)
-= **24 canonical builtins** (Stdlib v0.1 · consolidated · was 42 · `jq` subsumes 13 data builtins · validators merged into `validate` · `task_status`/`orchestrate`/`locale_lookup` cut · `sleep`+`wait_until` merged into unified `nika:wait` per ADR-087 · `cost`+`records`+`dag_info`+`threads` merged into unified `nika:inspect` per ADR-088 · ZERO capability loss)
++ 3 media (image_generate · graduate #1 · 2026-07-05 · tts_generate · §Audio · sovereign-first · 2026-07-05 · image_fx · graduate #3 · deterministic artistic effects · 2026-07-09)
+= **26 canonical builtins** (Stdlib v0.1 · consolidated · was 42 · `jq` subsumes 13 data builtins · validators merged into `validate` · `task_status`/`orchestrate`/`locale_lookup` cut · `sleep`+`wait_until` merged into unified `nika:wait` per ADR-087 · `cost`+`records`+`dag_info`+`threads` merged into unified `nika:inspect` per ADR-088 · ZERO capability loss)
 (+ the remaining media class · **deferred** to stdlib v0.x · NOT in the v0.1 count)
 
 See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md).
@@ -3592,7 +3592,7 @@ See [07-conformance.md](./07-conformance.md). In summary ·
 |---|---|
 | Core | None · only parse + DAG + variable + error · no execution needed |
 | Runtime | Must execute the 4 verbs · provider/tool implementations engine's choice |
-| Stdlib v0.1 | Must ship the <!-- canon:providers -->16<!-- /canon --> providers + <!-- canon:extract_modes -->9<!-- /canon --> extract modes + <!-- canon:builtins -->25<!-- /canon --> builtins |
+| Stdlib v0.1 | Must ship the <!-- canon:providers -->16<!-- /canon --> providers + <!-- canon:extract_modes -->9<!-- /canon --> extract modes + <!-- canon:builtins -->27<!-- /canon --> builtins |
 | Stdlib v0.1+media | RESERVED · enumerated when the media set publishes (stdlib v0.x · the 24 names are not yet normative) |
 
 A v0.1-compliant engine for a workflow author depends on which level they need.
@@ -3637,7 +3637,7 @@ Three nested levels · increasing scope ·
 |---|---|---|
 | **Core** | Parse + validate · DAG semantics · variable resolution · error structure | Linters · spec editors · static analyzers |
 | **Runtime** | Core + verb execution | Working engine (with own provider/tool impls) |
-| **Stdlib v0.1** | Runtime + the <!-- canon:providers -->16<!-- /canon --> providers + <!-- canon:extract_modes -->9<!-- /canon --> extract modes + <!-- canon:builtins -->25<!-- /canon --> builtins | Full reference-impl-equivalent engine |
+| **Stdlib v0.1** | Runtime + the <!-- canon:providers -->16<!-- /canon --> providers + <!-- canon:extract_modes -->9<!-- /canon --> extract modes + <!-- canon:builtins -->27<!-- /canon --> builtins | Full reference-impl-equivalent engine |
 
 A higher level **includes** the lower levels.
 
@@ -3775,7 +3775,7 @@ An engine claims « Stdlib v0.1-compliant » if it satisfies Runtime conformance
 
 1. **Ships all 14 canonical providers** (per [stdlib/providers-v0.1.md](../stdlib/providers-v0.1.md))
 2. **Ships all 9 canonical extract modes** (per [stdlib/extract-modes-v0.1.md](../stdlib/extract-modes-v0.1.md))
-3. **Ships at least all 24 canonical builtins** (core 6 + file 5 + data 8 + network 2 + introspection 2 + media 1 · the remaining deferred media builtins are optional)
+3. **Ships at least all 26 canonical builtins** (core 6 + file 5 + data 8 + network 2 + introspection 2 + media 3 · the remaining deferred media builtins are optional · `nika:image_fx`'s byte-determinism clause is part of the bar — an engine that cannot honor it is not conformant, no waiver)
 4. **Passes** all tests in `conformance/tests/stdlib/`
 
 A Stdlib-compliant engine is functionally equivalent to the reference implementation for any workflow that uses only the canonical stdlib elements.
@@ -4293,7 +4293,7 @@ This is the spec's structural protection against feature creep · Rams principle
 
 # Stdlib v0.1 · Builtins
 
-> **<!-- canon:builtins -->25<!-- /canon --> canonical builtins** shipped with Stdlib v0.1-compliant engines.
+> **<!-- canon:builtins -->27<!-- /canon --> canonical builtins** shipped with Stdlib v0.1-compliant engines.
 > Invoked via `invoke: tool: "nika:<name>"`. Plus the remaining media
 > builtins deferred to stdlib v0.x (opt-in feature flag).
 >
@@ -4333,10 +4333,10 @@ This is the spec's structural protection against feature creep · Rams principle
 | Data | 8 | `jq` (THE data language) + 7 capabilities jq can't express (json_diff · validate · json_merge_patch · convert · uuid · date · hash) |
 | Introspection | 2 | Self-awareness · `inspect` (runtime state · 4 views) · `compose` (static check of a drafted workflow · agent loops only) |
 | Network | 2 | fetch (HTTP+extraction) · notify (alerts out) |
-| Media | 2 | `image_generate` (§Media · 2026-07-05) · `tts_generate` (§Audio · same day) — the REST of the media class stays deferred to stdlib v0.x |
-| **Total v0.1** | **25** | |
+| Media | 3 | `chart` (§Media #3 · deterministic/attested · 2026-07-09) · `image_generate` (§Media · 2026-07-05) · `tts_generate` (§Audio · same day) — the REST of the media class stays deferred to stdlib v0.x |
+| **Total v0.1** | **26** | |
 
-A Stdlib v0.1-compliant engine MUST ship these 25.
+A Stdlib v0.1-compliant engine MUST ship these 26.
 
 ---
 
@@ -4657,7 +4657,43 @@ Throws · `NIKA-BUILTIN-INSPECT-001` if `view:` value not in the canonical enum.
 
 ---
 
-## Media builtins (2)
+## Media builtins (4)
+
+
+### `nika:chart` · deterministic chart artifacts (§Media graduate #4)
+
+```yaml
+invoke:
+  tool: "nika:chart"
+  args:
+    data: "${{ steps.metrics.output }}"   # rows · array of flat objects (strings + numbers) · or { path: <json file> }
+    semantics: { period: timestamp, cost: usd, provider: category }
+    chart:
+      type: line                          # bar | line | area_band | scatter | heatmap (closed)
+      x: period                           # field names · y_lo/y_hi = area_band bounds · y2 = actual overlay
+      y: cost                             # color = series split (heatmap: the value field)
+      title: "Cost over time"
+    out: report/cost-over-time.svg        # .svg REQUIRED — SVG is the attestation surface
+    compile_to: vega_lite                 # optional · also writes the .vl.json sibling
+```
+
+Pure compute + ONE permit-gated write (`out:` rides `permits.fs.write` ·
+a `data.path` source rides `permits.fs.read`). No network, no clock, no
+keys — identical `(spec, data)` produce **byte-identical SVG** on every
+platform, re-runs are idempotent (hash-equal artifacts are never
+rewritten), and `outputs:` carries the receipts: `path · sha256 ·
+data_sha256 · width · height · bytes · wrote · warnings`.
+
+The semantic map drives presentation (`usd` money grain · `duration_ms`
+humanized · `tokens` k/M · `delta` ⇒ diverging palette anchored at 0 ·
+`percent` · `timestamp` · `count` · `category` — closed set). Encoding
+honesty is built in: bars always anchor zero · **predictions are dashed,
+observations solid** (area_band) · decimation (LTTB) keeps extremes and
+warns — the DATA hash still covers every row.
+
+Errors are `NIKA-BUILTIN-CHART-001..008` (001 empty data · 002 unknown
+field · 003 non-finite · 004 invalid spec/closed-enum · 005 domain
+collapsed · 006 type mismatch · 007 too many points · 008 I/O).
 
 ### `nika:image_generate` · provider-backed image asset generation
 
@@ -4804,6 +4840,86 @@ mismatch · dimension/byte bounds · `tool_error`). Plus the boundary
 
 ---
 
+### `nika:image_fx` · deterministic artistic image effects
+
+```yaml
+invoke:
+  tool: "nika:image_fx"
+  args:
+    input: out/hero-openai-gptimage2-0-a1b2c3d4.png   # source PNG (read-gated)
+    out: out/hero-styled.png                          # artifact path (write-gated)
+    seed: 42                                          # optional · default 0
+    ops:                                              # ordered · single-key op maps
+      - resize: { width: 320 }                        # linear-light · auto|nearest|bilinear
+      - dither: { mode: floyd_steinberg, palette: gameboy }
+      - grain: { intensity: 32 }
+      - scanlines: { strength: 110, period: 4 }
+      - vignette: { strength: 140 }
+```
+
+The §Media graduate #3 (the `image editing` deferred row) — the
+DETERMINISTIC sibling of `image_generate`: pure pixel transform, NO
+provider, NO network, NO clock. **Byte-identical output forever** for
+identical `(input bytes, args)` — the artifact's sha256 joins the
+hash-chained trace, re-render IS the tamper check, and the full recipe
+(contract tag `image_fx/v1` · input sha256 · seed · ops) rides the artifact itself
+as a PNG `nika` tEXt chunk (no timestamp — determinism holds).
+Identical bytes already at `out:` = idempotent skip (`skipped_existing`).
+
+| Arg | Contract |
+|---|---|
+| `input` | REQUIRED · source path · **PNG v1** (depth 8 · gray/RGB/RGBA · no Adam7) — non-PNG fails `-003` with the honest hint (produce PNG upstream via `image_generate format: png`) · read rides `permits.fs.read` · decoded-pixel budget gated from the header BEFORE any decompression (`-005`) |
+| `out` | REQUIRED · artifact path · extension must match the pipeline (`.png` · `.txt`/`.ans` for ascii text/ansi emits) · write rides `permits.fs.write` |
+| `ops` | REQUIRED · 1..=32 ordered single-key maps over the closed v1 vocabulary: `resize {width,height,filter}` · `crop {x,y,width,height}` · `levels {brightness,contrast}` · `grayscale` · `palette_map {palette}` · `dither {mode: bayer2\|bayer4\|bayer8\|blue_noise\|ign\|floyd_steinberg\|atkinson\|jjn, palette}` · `duotone {dark,light}` · `pixelate {block}` · `halftone {cell, angle: 0\|15\|45\|75}` · `grain {intensity}` · `vignette {strength}` · `chromatic_aberration {shift}` · `scanlines {strength,period}` · `glitch {line_shift,channel_shift,blocks}` · `ascii {cols, emit: png\|text\|ansi}` (ascii MUST be last — it changes the artifact type). Branching/fan-out is the WORKFLOW's job (`depends_on` · `for_each`) — `ops` is a linear pipeline by design · unknown op parameters are rejected (`-001` — no silent style lies) |
+| `palette` (in ops) | preset (`bw` · `gray4` · `gameboy` · `cga` · `okabe_ito`) or inline list of `#rrggbb` / `[r,g,b]` (2..=256 colors) · nearest-color mapping is perceptual (Oklab distance) |
+| `seed` | stochastic-op seed (`grain` · `glitch`) · default 0 · **the seed IS the style** — same seed, same bytes |
+
+Per-op defaults + acceptance ranges (NORMATIVE — for a byte-deterministic
+builtin the defaults ARE the wire contract; a second engine choosing other
+defaults emits different bytes for the same YAML) ·
+
+| Op | Defaults | Ranges |
+|---|---|---|
+| `resize` | `filter: auto` | width/height 1..=16384 (≥1 required) |
+| `crop` | `x: 0` · `y: 0` | width/height ≥1 · rect inside image |
+| `levels` | `brightness: 0` · `contrast: 0` | brightness −255..=255 · contrast −128..=128 |
+| `dither` | `mode: floyd_steinberg` · `palette: bw` | palette 2..=256 colors |
+| `palette_map` | `palette: bw` | palette 2..=256 colors |
+| `pixelate` | — | block 2..=256 |
+| `halftone` | `cell: 8` · `angle: 45` | cell 3..=64 |
+| `grain` | `intensity: 48` | 0..=128 |
+| `vignette` | `strength: 160` | 0..=255 |
+| `chromatic_aberration` | `shift: 4` | 1..=16 |
+| `scanlines` | `strength: 96` · `period: 4` | strength 0..=255 · period 2..=64 |
+| `glitch` | all 0 | line_shift ≤64 · channel_shift ≤16 · blocks ≤64 · ≥1 non-zero |
+| `ascii` | `cols: 96` · `emit: png` | cols 2..=1024 |
+
+Input caps (normative) · per-dimension ≤16384 · decoded pixels ≤2^26
+(gated from the header BEFORE any decompression · `-005`).
+
+Output · `{ input, input_sha256, path, sha256, size_bytes, width, height,
+format, ops_applied, seed, skipped_existing }` — artifact bytes NEVER
+ride outputs (the disk law, inherited verbatim). Text artifacts (ascii
+`text`/`ansi` emits) report `width`/`height` `0` and `format` `txt`/`ans`.
+
+Determinism contract (normative) · no wall-clock · no randomness beyond
+the seeded stream · no float transcendentals · integer/fixed-point pixel
+math · identical `(input, args)` MUST produce byte-identical artifacts
+across platforms and releases within a stdlib major (the recipe carries
+the stable contract tag `image_fx/v1`, never the engine build). An
+engine that cannot honor this is not conformant (07-conformance §3).
+
+Throws · `NIKA-BUILTIN-IMAGE_FX-001` invalid arguments (unknown op ·
+out-of-range param · extension mismatch · `validation_error`) · `-002`
+input read failed (`tool_error`) · `-003` unsupported input format
+(non-PNG · exotic depth/interlace · `validation_error`) · `-004` decode
+failed (structural corruption · CRC/Adler mismatch · `tool_error`) ·
+`-005` decoded-pixel budget exceeded (`security_error` · never
+transient) · `-006` artifact save failed (`tool_error`). Plus the
+boundary `NIKA-SEC-004` (paths outside `permits.fs`).
+
+---
+
 ### `nika:tts_generate` · provider-backed speech synthesis (§Audio)
 
 ```yaml
@@ -4887,8 +5003,10 @@ Also cut · `nika:task_status` (use `${{ tasks.X.status }}`) · `nika:orchestrat
 
 ## Media builtins · the REST stays DEFERRED (stdlib v0.x)
 
-`image_generate` graduated 2026-07-05 (above). The remaining media class
-(pdf_extract · svg_render · chart · phash · provenance · image *editing* ·
+`image_generate` graduated 2026-07-05 · `tts_generate` same arc ·
+`image_fx` graduated 2026-07-09 (the image *editing* row · §Media #3) ·
+`chart` graduated 2026-07-09 (above · §Media #4). The remaining media class
+(pdf_extract · svg_render · phash · provenance ·
 …) is NOT enumerated in v0.1 (feature-flag in the reference engine · MAY
 graduate builtin-by-builtin per the 3-razor admission test). Deliberate
 « less but better » (Rams 10).
@@ -4913,7 +5031,7 @@ external users · before the forever-clock).
 
 ---
 
-🦋 *<!-- canon:builtins -->25<!-- /canon --> builtins canonical · jq = the data language · 5-layer Rams symmetry (fetch+extract · jq · convert · wait · inspect) · assets land on disk, never inline · clear forever.*
+🦋 *<!-- canon:builtins -->27<!-- /canon --> builtins canonical · jq = the data language · 5-layer Rams symmetry (fetch+extract · jq · convert · wait · inspect) · assets land on disk, never inline · clear forever.*
 
 <!-- ═══ stdlib/providers-v0.1.md ═══ -->
 

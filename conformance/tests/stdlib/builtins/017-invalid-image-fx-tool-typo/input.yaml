@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: image-fx-tool-typo
+permits:
+  fs:
+    read: ["./out/**"]
+    write: ["./out/**"]
+  tools: ["nika:imagefx"]
+tasks:
+  - id: style
+    invoke:
+      tool: "nika:imagefx"
+      args:
+        input: "./out/hero.png"
+        out: "./out/hero-styled.png"
+        ops:
+          - grayscale: {}

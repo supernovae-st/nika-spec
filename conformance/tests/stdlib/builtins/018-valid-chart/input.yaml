@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: chart-valid
+permits:
+  fs:
+    read: ["./out/**"]
+    write: ["./report/**"]
+  tools: ["nika:chart"]
+tasks:
+  - id: render
+    invoke:
+      tool: "nika:chart"
+      args:
+        data: { path: "./out/metrics.json" }
+        semantics: { period: timestamp, cost: usd, provider: category }
+        chart:
+          type: line
+          x: period
+          y: cost
+          color: provider
+          title: "Cost over time"
+        out: report/cost-over-time.svg
+        compile_to: vega_lite
