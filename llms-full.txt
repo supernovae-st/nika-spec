@@ -947,6 +947,31 @@ egress clears the **send**, not the **capture**: a sanctioned `exec:`/tool can
 still embed the secret in its captured output, so that output stays tainted and
 re-leaks if it reaches an unsanctioned sink downstream.
 
+**The workflow boundary is a sink too — `to: "outputs"`.** Because the
+capture stays tainted, the return value of an authenticated call
+(`tasks.<id>.output` of a fetch that sent an API key) taints every
+`outputs:` entry it reaches — and `outputs:` is where a result LEAVES the
+run, so the check reports it as an egress. That over-approximation is
+deliberate (the provider saw the key; its response is not provably
+clean), and so is the release valve: the secret's owner declassifies the
+workflow boundary itself, in-file, exactly like any other sink —
+
+```yaml
+secrets:
+  API_KEY:
+    source: env
+    key: EXAMPLE_API_KEY
+    egress:
+      - to: "nika:fetch"   # the send
+      - to: "outputs"      # the return value derived from the response
+```
+
+`to: "outputs"` is sink-only (no `host:` — the workflow boundary has no
+address) and as SPECIFIC as every other rule: it clears the `outputs:`
+report for taints originating from THIS secret and nothing else — it
+never authorizes a send, and a `nika:fetch` clearance never authorizes
+the boundary. Absent the rule, the report stands (default-deny).
+
 The general untrusted→decision integrity lattice (full taint of attacker-controlled
 inputs into security decisions) is a documented follow-up; the static guards
 above cover the main injection / laundering vectors with the existing analysis.
