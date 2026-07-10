@@ -382,11 +382,17 @@ is checkable BEFORE the run.
 1. **Statically** (`nika check`) · a `nika:write ./etc/x` outside `fs.write`,
    a `nika:fetch` to an unlisted host, an `exec:` under `exec: false`, an
    `invoke:` of an unlisted tool → a **lint error** (the run is refused
-   before it starts).
+   before it starts). The SSRF floor is checked statically too: a literal
+   URL — or a `net.http` entry — naming a target the floor always refuses
+   (loopback · private · link-local/metadata · `NIKA-SEC-005` · 05-errors)
+   is flagged at `check`, with or without a `permits:` block; no grant can
+   admit such a target, so blessing it would be a false green (the run
+   could never succeed).
 2. **At runtime** · any effect escaping the declared set fails the task
    `NIKA-SEC-004` (`security_error` · never fed back to an `agent:` model:
    a capability boundary is not negotiation material). This catches the
-   dynamic cases a static check cannot (a host computed at run time).
+   dynamic cases a static check cannot (a host computed at run time —
+   including one that resolves to a floor-blocked address, `NIKA-SEC-005`).
 
 `permits.net.http` and the agent `tools:` whitelist compose: the agent
 whitelist scopes ONE task's tools; `permits.tools` scopes the WHOLE workflow
