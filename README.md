@@ -12,7 +12,6 @@
 <p align="center"><strong>A declarative YAML language for orchestrating AI workflows.<br>
 Sovereign · multi-provider · local-first.</strong></p>
 
->
 > **Status** · v0.1.0-draft (working) · **License** · Apache-2.0
 >
 > The language is locked at `nika: v1`, forever. That's the envelope you
