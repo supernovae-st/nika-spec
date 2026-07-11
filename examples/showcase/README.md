@@ -65,6 +65,13 @@ T4 EPIC        multi-stage pipelines · agents under budget · self-reporting ru
   overrides or swap hints, never as the envelope default. Where the
   data is sensitive the local model is the point: sovereignty is a
   feature, show it
+- the offline story, honestly: `nika check` needs zero network on every
+  file, and any `infer:` showcase dry-runs with `--model mock/echo`
+  (deterministic, zero model). The `agent:` showcases
+  (`t3-pr-review-fanout` · `t4-deep-research-brief`) are the exception —
+  mock echoes text and never *calls* a tool, so the ReAct loop does zero
+  rounds under it: exercising the agent needs a real tool-calling model
+  (the pinned local `qwen3.5` qualifies)
 - every file is a conformance input · `python conformance/runner.py all`
   MUST stay green · one verb per task · snake_case ids · every
   `${{ tasks.X }}` reference backed by `depends_on`
