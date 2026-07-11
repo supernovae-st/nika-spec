@@ -4,7 +4,7 @@
 # Consumers · the reference engine embeds this pack (nika examples ·
 # nika spec) · docs + website render projections of the same files.
 pack_version: 0.1.0-draft
-workflow_count: 32
+workflow_count: 33
 foundation:
   - file: examples/01-hello.nika.yaml
     sha256_16: 91fc4a92dfeedafb
@@ -42,6 +42,12 @@ templates:
   - file: templates/website-brief.nika.yaml
     sha256_16: 9f00bc97aa37b7da
 showcase:
+  - file: examples/showcase/t1-image-fx-batch.nika.yaml
+    workflow: image-fx-batch
+    tier: T1
+    description: "Folder of PNGs \u2192 deterministic art (grayscale \u00b7 dither \u00b7 pixelate) \u00b7 offline batch"
+    constructs: [for_each, max_parallel, outputs]
+    sha256_16: 5e2677422f14aa75
   - file: examples/showcase/t1-meeting-actions.nika.yaml
     workflow: meeting-actions
     tier: T1
