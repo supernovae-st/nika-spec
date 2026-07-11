@@ -5,7 +5,7 @@
 > file passes the same conformance gate as the foundation examples
 > (`python conformance/runner.py all`) — schema + DAG cross-refs +
 > stdlib surface. Together with the foundation set they exercise
-> **all 24 builtins** (verified by the conformance + coverage sweep).
+> **every stdlib builtin** (verified by the conformance + coverage sweep).
 
 The [foundation examples](../README.md) teach the *language*
 construct-by-construct. The showcase teaches the *life* — real jobs,
@@ -31,6 +31,8 @@ T4 EPIC        multi-stage pipelines · agents under budget · self-reporting ru
 | `t1-meeting-actions` | every office | transcript → tracker-ready typed action items | `infer.schema:` · typed vars |
 | `t1-price-watch` | e-commerce / personal | a price alert with **zero** model calls | `output:` jq · CEL `when:` · secrets |
 | `t1-social-repurpose` | marketing / creators | one post → thread + LinkedIn + newsletter, in parallel | diamond DAG · `with:` aliasing |
+| `t1-og-images` | marketing / content | brief in → OG PNG + provenance manifest out, one task | `nika:image_generate` · provenance |
+| `t1-image-fx-batch` | creators / media | a folder of photos → deterministic art, byte-identical forever | `nika:glob` · `for_each` · `nika:image_fx` ops chain |
 | `t2-release-notes` | engineering / devrel | git log → typed notes → CHANGELOG edited in place | `nika:edit` · schema · notify |
 | `t2-seo-content-brief` | SEO / content | a brief that beats the competitor's best page | chained fetch modes · CEL indexing |
 | `t2-invoice-chaser` | finance / freelance | overdue reminders drafted · NOTHING sent without a yes | `nika:convert` · `nika:prompt` gate · `size()` |
@@ -39,6 +41,9 @@ T4 EPIC        multi-stage pipelines · agents under budget · self-reporting ru
 | `t2-etl-quarantine` | data engineering | bad batches degrade to quarantine · the pipeline lives | `on_error: recover:` · `nika:validate` · jq group_by |
 | `t2-model-bench` | engineering / model selection | the same question, three local models, one MEASURED table | per-task `infer.model:` · `duration_ms` as data · jq fan-in |
 | `t2-release-radar` | devops / dependencies | only the NEW ships reach you | `mode: feed` · state-file diff · RFC 6902 |
+| `t2-csv-chart-report` | data → picture | paste the spreadsheet, get the slide — offline, deterministic | `nika:convert` · jq group_by · `nika:chart` |
+| `t2-transcript-shownotes` | podcasts / meetings | raw transcript → typed show-notes, ONE bounded infer | `infer.schema:` strict · typed→markdown |
+| `t2-bookmark-triage` | personal / research | the bookmark pile triaged — dead links survive the batch | `mode: metadata` · resilient `for_each` · recover |
 | `t3-competitor-radar` | strategy / PMM | everything they shipped last week, one brief | `for_each` · `max_parallel` · retry · fan-in |
 | `t3-localization-factory` | product / i18n | the whole docs tree translated, voice intact | chained fan-outs · jq `transpose` zip |
 | `t3-config-drift-sentinel` | SRE / platform | only UNSANCTIONED prod drift wakes anyone | RFC 7396 merge + RFC 6902 diff · blake3 |
@@ -53,6 +58,9 @@ T4 EPIC        multi-stage pipelines · agents under budget · self-reporting ru
 
 - `# SPDX-License-Identifier: Apache-2.0` header + schema hint line
 - `ollama/qwen3.5:4b` is the showcase model: every file leads local,
+  with one deliberate exception class — strict-schema showcases pick a
+  NON-thinking model (`ollama/llama3.2:3b`): a thinking model can burn
+  the whole `max_tokens` in its think block before the JSON (engine#428).
   zero key, recorded-as-run. Cloud providers appear only as per-task
   overrides or swap hints, never as the envelope default. Where the
   data is sensitive the local model is the point: sovereignty is a
@@ -65,4 +73,4 @@ T4 EPIC        multi-stage pipelines · agents under budget · self-reporting ru
   explorer — projected, never hand-copied
   (`scripts/showcase-projector.py` · `--check` is the drift gate)
 
-🦋 *The showcase pack · 4 tiers · all 24 builtins exercised across the example corpus · manifest = the contract.*
+🦋 *The showcase pack · 4 tiers · every stdlib builtin exercised across the example corpus · manifest = the contract.*
