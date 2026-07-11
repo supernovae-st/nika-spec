@@ -4,7 +4,7 @@
 # Consumers · the reference engine embeds this pack (nika examples ·
 # nika spec) · docs + website render projections of the same files.
 pack_version: 0.1.0-draft
-workflow_count: 30
+workflow_count: 31
 foundation:
   - file: examples/01-hello.nika.yaml
     sha256_16: 91fc4a92dfeedafb
@@ -126,6 +126,12 @@ showcase:
     description: "Ticket queue \u2192 typed triage \u2192 urgent escalation \u2192 triage board"
     constructs: [local_model, outputs, schema, secrets, when]
     sha256_16: dc4243685c90c3e7
+  - file: examples/showcase/t2-transcript-shownotes.nika.yaml
+    workflow: transcript-shownotes
+    tier: T2
+    description: "Raw transcript \u2192 typed show-notes (chapters \u00b7 quotes \u00b7 summary) \u00b7 one bounded infer"
+    constructs: [local_model, outputs, schema]
+    sha256_16: d78d3526e93eb3f3
   - file: examples/showcase/t3-competitor-radar.nika.yaml
     workflow: competitor-radar
     tier: T3
