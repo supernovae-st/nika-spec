@@ -56,12 +56,19 @@ COVERAGE_END = "{/* showcase:coverage-end */}"
 TEMPLATE_BEGIN = re.compile(r"\{/\* template:begin ([a-z0-9-]+\.nika\.yaml) \*/\}")
 TEMPLATE_END = "{/* template:end */}"
 
-MERMAID_CLASSES = (
-    "  classDef infer fill:#5b8cff22,stroke:#5b8cff,color:#5b8cff\n"
-    "  classDef exec fill:#ff7a3c22,stroke:#ff7a3c,color:#ff7a3c\n"
-    "  classDef invoke fill:#22d3ee22,stroke:#22d3ee,color:#22d3ee\n"
-    "  classDef agent fill:#b07bff22,stroke:#b07bff,color:#b07bff"
-)
+def _mermaid_classes() -> str:
+    """Verb classDefs from design/tokens.yaml — the shared visual vocabulary
+    SSOT (scripts/design-projector.py owns its schema gate). fill = color +
+    the mermaid_fill_alpha suffix, derived here, never stored per verb."""
+    tokens = yaml.safe_load((SPEC_ROOT / "design" / "tokens.yaml").read_text())
+    alpha = tokens["rules"]["mermaid_fill_alpha"]
+    return "\n".join(
+        f"  classDef {name} fill:{v['color']}{alpha},stroke:{v['color']},color:{v['color']}"
+        for name, v in tokens["verbs"].items()
+    )
+
+
+MERMAID_CLASSES = _mermaid_classes()
 
 
 def lean(yaml_text: str) -> str:
