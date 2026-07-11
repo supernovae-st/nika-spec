@@ -5,6 +5,10 @@
 > `conformance/runner.py all` on every push) with `# SLOT:` markers at
 > every decision point. The path from intent to a correct file is
 > mechanical: route → copy → fill slots → check → repair → re-check.
+>
+> Browse this pack as a register: <https://nika.sh/templates> (one page
+> per skeleton, sha256-pinned copies) · machine catalog:
+> <https://nika.sh/templates/catalog.json>.
 
 ## Intent → template routing (deterministic)
 
