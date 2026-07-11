@@ -76,6 +76,16 @@ def load_tokens() -> dict:
             print(f"design-projector · severity.{k} missing or malformed",
                   file=sys.stderr)
             sys.exit(2)
+    status = tokens.get("status", {})
+    if tuple(status.keys()) != ("running", "retrying", "muted"):
+        print("design-projector · status must be exactly (running, retrying, "
+              f"muted) in order, got {tuple(status.keys())}", file=sys.stderr)
+        sys.exit(2)
+    for k, v in status.items():
+        if not HEX_RE.match(v or ""):
+            print(f"design-projector · status.{k} missing or malformed",
+                  file=sys.stderr)
+            sys.exit(2)
     color = tokens.get("brand", {}).get("color", {})
     for k in ("bg", "accent", "accent_strong", "accent_bright"):
         if not HEX_RE.match(color.get(k, "")):
@@ -111,6 +121,7 @@ def render_ts(tokens: dict) -> str:
     """The ONE generated-module shape both website and vscode consume."""
     verbs = tokens["verbs"]
     sev = tokens["severity"]
+    st = tokens["status"]
     c = tokens["brand"]["color"]
 
     def vmap(key):  # deterministic canon order
@@ -141,6 +152,13 @@ def render_ts(tokens: dict) -> str:
         f"export const NIKA_VERB_ICON = {{ {vmap('icon')} }} as const",
         "",
         f"export const NIKA_SEVERITY = {{ ok: '{sev['ok']}', fail: '{sev['fail']}' }} as const",
+        "",
+        "/** the LIVE run-state palette — done/failed ARE severity (one storage,",
+        " *  aliased here); running deliberately equals the infer hue. The vscode",
+        " *  EDITOR skin stays theme-driven (LOCK-005) — its NIKA skin pins these. */",
+        f"export const NIKA_STATUS = {{ running: '{st['running']}', "
+        f"done: '{sev['ok']}', failed: '{sev['fail']}', "
+        f"retrying: '{st['retrying']}', muted: '{st['muted']}' }} as const",
         "",
         "export const NIKA_BRAND = {",
         f"  bg: '{c['bg']}',",
@@ -248,7 +266,7 @@ def main() -> int:
         print("· docs root absent · skipped")
 
     if ok:
-        print("✓ design tokens in sync · 4 verbs · severity · brand core")
+        print("✓ design tokens in sync · 4 verbs · severity · status · brand core")
     return 0 if ok else 1
 
 
