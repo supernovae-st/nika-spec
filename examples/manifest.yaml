@@ -4,7 +4,7 @@
 # Consumers · the reference engine embeds this pack (nika examples ·
 # nika spec) · docs + website render projections of the same files.
 pack_version: 0.1.0-draft
-workflow_count: 31
+workflow_count: 32
 foundation:
   - file: examples/01-hello.nika.yaml
     sha256_16: 91fc4a92dfeedafb
@@ -72,6 +72,12 @@ showcase:
     description: "Read yesterday's commits, write today's standup note"
     constructs: [local_model, outputs]
     sha256_16: 7eb94164ea5e1930
+  - file: examples/showcase/t2-bookmark-triage.nika.yaml
+    workflow: bookmark-triage
+    tier: T2
+    description: "URL list \u2192 per-page metadata fan-out (dead links survive) \u2192 one markdown triage table"
+    constructs: [fail_fast, for_each, max_parallel, on_error, outputs, typed_vars]
+    sha256_16: b17b77869fd07e2b
   - file: examples/showcase/t2-contract-guard.nika.yaml
     workflow: contract-guard
     tier: T2
