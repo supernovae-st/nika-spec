@@ -26,9 +26,10 @@ follow_ups: ["register ADR-099 in the engine docs/adr index when the implementat
 
 # ADR-099 — Durable-lite run resume · the trace IS the checkpoint
 
-- **Status**: Proposed (2026-07-05) — spec contract first · engine
-  implementation follows as a separate arc · status flips to Accepted
-  with that arc.
+- **Status**: Accepted (2026-07-05) — spec contract first · the engine
+  implementation landed as its own arc (supernovae-st/nika#154 ·
+  `nika run --resume` + durable pause + the 3 conformance fixtures as
+  e2e tests).
 - **Surface**: CLI + trace/event vocabulary ONLY. Zero envelope change ·
   zero new YAML · the 4-verbs and `nika: v1` locks are untouched.
 - **Home**: first entry of this repo's `adr/` (language-surface
