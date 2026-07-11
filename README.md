@@ -55,7 +55,7 @@ tasks:
       prompt: "Say hello in French"
 ```
 
-Run it — install to first output in under a minute ·
+Run it: install to first output in under a minute ·
 
 ```bash
 brew install supernovae-st/tap/nika     # single static binary (Rust · no runtime deps)
@@ -142,7 +142,7 @@ The reference engine is installable and runs workflows end-to-end today ·
   `cargo install nika` joins brew + curl as an install path at 1.0)
 - Exposes the engine's static oracle via MCP server (`nika mcp`) for harness
   integration (Claude Code · Cursor · Hermes · etc.). The MCP surface is
-  read-only — <!-- canon:mcp_tools -->8<!-- /canon --> tools (`nika_check` · `nika_explain` · `nika_schema` ·
+  read-only, <!-- canon:mcp_tools -->8<!-- /canon --> tools (`nika_check` · `nika_explain` · `nika_schema` ·
   `nika_examples` · `nika_template` · `nika_canon` · `nika_catalog` ·
   `nika_tools`); execution stays behind `nika run`.
 - Engine-free alternative · the [conformance oracle](./conformance/) in this
@@ -169,9 +169,9 @@ Nika is that for AI workflows.
 
 | Instead of | The one-line difference |
 |---|---|
-| **GitHub Actions / Argo** | CI YAML orchestrates *repos and runners*; Nika's four verbs are *AI-native* (`infer` is a first-class primitive with providers, budgets, structured output — not a shell step calling curl). |
-| **Temporal / Inngest / Restate** | Those are durable-execution *runtimes* for long-lived distributed state; Nika is a finite single-run DAG *language* — no clusters, no event history, one file in, one run out. |
-| **LangGraph / framework code** | A Python/TS graph is code locked to its framework and runtime; a Nika file is portable text — any conformant engine runs it, and there is deliberately no importer/exporter chaining the language to others' semantics. |
+| **GitHub Actions / Argo** | CI YAML orchestrates *repos and runners*; Nika's four verbs are *AI-native* (`infer` is a first-class primitive with providers, budgets, structured output, not a shell step calling curl). |
+| **Temporal / Inngest / Restate** | Those are durable-execution *runtimes* for long-lived distributed state; Nika is a finite single-run DAG *language*, no clusters, no event history, one file in, one run out. |
+| **LangGraph / framework code** | A Python/TS graph is code locked to its framework and runtime; a Nika file is portable text: any conformant engine runs it, and there is deliberately no importer/exporter chaining the language to others' semantics. |
 | **Prompting an agent directly** | A workflow is reviewable, diffable, re-runnable and statically checkable (`nika check` catches errors before any token is spent); a chat transcript is none of those. |
 
 The full boundary rationale (including proud non-goals) lives in
@@ -228,7 +228,7 @@ Forever after GA · the 5 pillars are locked. Stdlib evolves independently.
 
 ## Related
 
-- **Every door in one page** — install paths, IDEs, agents, skills, MCP, CI, SDKs: [docs.nika.sh/integrations/everywhere](https://docs.nika.sh/integrations/everywhere)
+- **Every door in one page**: install paths, IDEs, agents, skills, MCP, CI, SDKs: [docs.nika.sh/integrations/everywhere](https://docs.nika.sh/integrations/everywhere)
 - [supernovae-st/nika](https://github.com/supernovae-st/nika) · reference engine (Rust · AGPL-3.0-or-later)
 - [docs.nika.sh](https://docs.nika.sh) · end-user docs · goes live with the launch (source · [supernovae-st/nika-docs](https://github.com/supernovae-st/nika-docs))
 - [supernovae-st/nika-client](https://github.com/supernovae-st/nika-client) · TypeScript SDK
