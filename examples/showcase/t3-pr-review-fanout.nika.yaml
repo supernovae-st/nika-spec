@@ -55,7 +55,7 @@ tasks:
     on_error:
       recover: null                    # a budget-exhausted review yields null · the swarm lives
     agent:
-      system: "You are a precise code reviewer. Read the file, then finish with ONLY the schema'd object ({file, findings: [{severity, message, line}]}), then call nika:done."
+      system: "You are a precise code reviewer. Read the file, then finish with ONLY the schema'd object ({file, findings: [{severity, message, line}]} · severity exactly one of blocker|high|med|low), then call nika:done."
       prompt: "Review ${{ item }} · bugs first, then risky patterns. Read it before judging."
       tools:
         - "nika:read"                  # read-only swarm · least privilege
