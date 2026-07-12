@@ -1,0 +1,120 @@
+# SPDX-License-Identifier: Apache-2.0
+#
+# verb-starters-v0.1.yaml — the per-verb task-body starters · SSOT.
+#
+# One canonical answer to « I typed `infer:` — now what? » per verb ·
+# grounded on spec/02-verbs.md (each body is that chapter's Minimal/Full
+# shapes, cut to the idiomatic gesture). Editors surface these above the
+# verb line; the website's verb pages and `nika new` may render the same
+# rows. Values change HERE first, consumers re-project — never fork a
+# starter in a consumer repo.
+#
+# Contract per starter ·
+#   id     kebab-case · unique across the file
+#   label  ≤ 40 chars · the picker row
+#   hint   one sentence · the picker detail (teaches the WHY)
+#   body   the verb block, UNINDENTED (first line is `<verb>:`) ·
+#          `# SLOT:` marks the lines an author fills (template convention) ·
+#          each body is PROVEN by scripts/starters-projector.py against the
+#          conformance oracle (scaffolded · validate_text · must be valid)
+#
+# Projection ·
+#   python3 scripts/starters-projector.py --check   # CI drift gate
+#   python3 scripts/starters-projector.py --write   # re-project consumers
+
+starters_version: 1
+
+verbs:
+  infer:
+    - id: infer-prompt
+      label: "prompt → text"
+      hint: "The minimal LLM call — the task's output is the model's response."
+      body: |
+        infer:
+          prompt: "Say hello in French"   # SLOT: the one model job
+    - id: infer-typed
+      label: "prompt → typed JSON"
+      hint: "schema: validates the response — type-safe extraction, no prose parsing."
+      body: |
+        infer:
+          prompt: "Extract the key facts from: ${{ vars.input }}"   # SLOT: what to extract
+          schema:                # the response MUST match — structured output
+            type: object
+            required: [summary]
+            properties:
+              summary: { type: string }
+    - id: infer-tuned
+      label: "system + model + tuning"
+      hint: "A voice, a model override (<provider>/<name> · local-first) and sampling bounds."
+      body: |
+        infer:
+          system: "You are a senior software architect."   # SLOT: the voice
+          prompt: "Research the topic: ${{ vars.topic }}"  # SLOT: the job
+          model: ollama/qwen3.5:4b   # SLOT: override · local runs unpriced, never free
+          temperature: 0.3
+          max_tokens: 2000
+
+  exec:
+    - id: exec-shell
+      label: "shell command"
+      hint: "String form runs via the OS shell — pipes and redirects work."
+      body: |
+        exec:
+          command: "cargo test --workspace --lib"   # SLOT: the command
+    - id: exec-argv
+      label: "argv · no shell"
+      hint: "Array form is direct execve — the one obvious way to carry interpolated or untrusted values."
+      body: |
+        exec:
+          command: ["echo", "${{ vars.message }}"]   # SLOT: program + args · each element substituted independently
+    - id: exec-captured
+      label: "capture structured"
+      hint: "cwd + structured capture — stdout, stderr and the exit code become fields."
+      body: |
+        exec:
+          command: "git status --short"   # SLOT: the command
+          cwd: "."                        # SLOT: working directory
+          capture: structured
+
+  invoke:
+    - id: invoke-builtin
+      label: "builtin tool"
+      hint: "nika:<tool> — pick from the embedded catalog; args are tool-specific."
+      body: |
+        invoke:
+          tool: "nika:read"       # SLOT: pick from the catalog
+          args:
+            path: "./README.md"   # SLOT: args are tool-specific
+    - id: invoke-mcp
+      label: "MCP tool"
+      hint: "mcp:<server>/<tool> — the server comes from the engine's MCP registry."
+      body: |
+        invoke:
+          tool: "mcp:browser/navigate"   # SLOT: mcp:<server>/<tool>
+          args:
+            url: "https://example.com"   # SLOT
+
+  agent:
+    - id: agent-tools
+      label: "agent + tools"
+      hint: "The multi-turn loop — tools are default-deny, grant the least set explicitly."
+      body: |
+        agent:
+          system: "You are a research assistant."           # SLOT: the voice
+          prompt: "Research the topic: ${{ vars.topic }}"   # SLOT: the mission
+          tools: ["nika:fetch"]   # SLOT: default-deny · least privilege
+          max_turns: 10
+    - id: agent-typed
+      label: "agent → typed final"
+      hint: "schema: validates the FINAL message — name the contract in the prompt so the loop lands on it."
+      body: |
+        agent:
+          system: "You are a meticulous analyst."
+          prompt: "Produce findings for: ${{ vars.topic }}"   # SLOT: the mission · name the contract + done condition
+          tools: ["nika:fetch", "nika:read"]   # SLOT: least privilege
+          max_turns: 12
+          schema:                # the final message MUST match
+            type: object
+            required: [findings]
+            properties:
+              findings: { type: array, items: { type: string } }
