@@ -48,4 +48,5 @@ jobs:
           python scripts/canon-projectors.py --check
           python scripts/showcase-projector.py --check
           python scripts/llms-projector.py --check
+          python scripts/starters-projector.py --check
           python scripts/design-projector.py --check
