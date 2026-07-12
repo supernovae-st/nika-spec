@@ -31,7 +31,7 @@ tasks:
   - id: review
     agent:
       model: mistral/mistral-large
-      system: "You are a senior Rust reviewer. Read the diff, then write findings."
+      system: "You are a senior Rust reviewer. Read the diff, then finish with ONLY your findings as the schema'd object (a `findings` array of {severity, message}), then call nika:done."
       prompt: "Review the code under · ${{ vars.pr_path }} · and report bugs + style issues."
       tools:                       # default-deny · these are the ONLY tools the agent may call
         - "nika:read"              # read source files
