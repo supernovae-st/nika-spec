@@ -14,6 +14,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- `skills:` on the `agent:` verb — the engine becomes an
+  [Agent Skills](https://agentskills.io) **consumer** (the format
+  `nika init` already produces): explicit static `SKILL.md` paths (no
+  globs · no `${{ }}` · the permits explicitness law), loaded at
+  compose time, injected as ONE deterministic `## Skills` section
+  (source order · name + description + body · normative bytes in
+  02 §Agent Skills) · check≡run via `NIKA-AGENT-003` (path does not
+  resolve) + `NIKA-AGENT-004` (not a valid Agent Skill) · the skill
+  text joins the referencing task's resume identity (an edited skill
+  re-runs) · error codes 50 → 52 (05 + canon + JSON schema).
 - `nika:chart` — the 27th builtin (stdlib §Media graduate #4 ·
   deterministic chart artifacts: rows + semantic spec → byte-identical
   SVG, sha256 into the trace chain · closed type vocabulary bar | line |
