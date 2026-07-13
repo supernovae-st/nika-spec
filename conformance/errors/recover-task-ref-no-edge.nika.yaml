@@ -17,7 +17,7 @@ tasks:
         expression: ".v"
   - id: risky
     exec:
-      command: "exit 1"
+      command: ["exit", "1"]
     on_error:
       recover: ${{ tasks.source.output }}
   - id: sink

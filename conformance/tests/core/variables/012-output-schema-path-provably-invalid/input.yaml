@@ -20,4 +20,4 @@ tasks:
   - id: report
     depends_on: [extract]
     exec:
-      command: "report ${{ tasks.extract.output.entitties }}"
+      command: ["report", "${{ tasks.extract.output.entitties }}"]

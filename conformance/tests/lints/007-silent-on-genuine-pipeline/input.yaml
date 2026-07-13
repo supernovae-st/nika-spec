@@ -3,10 +3,10 @@ nika: v1
 workflow: f007pipe
 tasks:
   - id: fetch
-    exec: { command: "./fetch.sh" }
+    exec: { command: ["./fetch.sh"] }
   - id: parse
     depends_on: [fetch]
-    exec: { command: "./parse.sh --strict input.json" }
+    exec: { command: ["./parse.sh", "--strict", "input.json"] }
   - id: report
     depends_on: [parse]
-    exec: { command: "./report.sh" }
+    exec: { command: ["./report.sh"] }

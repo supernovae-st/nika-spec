@@ -55,24 +55,24 @@ verbs:
           max_tokens: 2000
 
   exec:
-    - id: exec-shell
-      label: "shell command"
-      hint: "String form runs via the OS shell — pipes and redirects work."
-      body: |
-        exec:
-          command: "cargo test --workspace --lib"   # SLOT: the command
     - id: exec-argv
-      label: "argv · no shell"
-      hint: "Array form is direct execve — the one obvious way to carry interpolated or untrusted values."
+      label: "command · argv"
+      hint: "The default: execve, no shell — an interpolated value can never break out of its argument."
       body: |
         exec:
-          command: ["echo", "${{ vars.message }}"]   # SLOT: program + args · each element substituted independently
+          command: ["cargo", "test", "--workspace", "--lib"]   # SLOT: program + args · each element substituted independently
+    - id: exec-shell
+      label: "shell · the explicit door"
+      hint: "One /bin/sh line — pipes · redirects · globs. The blocklist applies here; own your interpolations."
+      body: |
+        exec:
+          shell: "git log --oneline | head -20"   # SLOT: the shell line (pipes/redirects live HERE)
     - id: exec-captured
       label: "capture structured"
       hint: "cwd + structured capture — stdout, stderr and the exit code become fields."
       body: |
         exec:
-          command: "git status --short"   # SLOT: the command
+          command: ["git", "status", "--short"]   # SLOT: program + args
           cwd: "."                        # SLOT: working directory
           capture: structured
 

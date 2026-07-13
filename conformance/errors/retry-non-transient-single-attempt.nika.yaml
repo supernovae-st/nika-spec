@@ -9,7 +9,7 @@ workflow: retry-exhaust
 tasks:
   - id: flaky
     exec:
-      command: "echo attempt >> ./out/ctrlflow/01_attempts.log; exit 1"
+      shell: "echo attempt >> ./out/ctrlflow/01_attempts.log; exit 1"
     retry:
       max_attempts: 4
       backoff_ms: 1

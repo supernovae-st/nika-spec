@@ -7,11 +7,11 @@ workflow: e30-dag-recover-downstream
 tasks:
   - id: step_a
     exec:
-      command: "exit 1"
+      command: ["exit", "1"]
     on_error:
       recover: ${{ tasks.step_b.output }}
 
   - id: step_b
     depends_on: [step_a]
     exec:
-      command: "echo downstream"
+      command: ["echo", "downstream"]

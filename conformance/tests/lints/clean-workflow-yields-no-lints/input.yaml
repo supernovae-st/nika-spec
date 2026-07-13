@@ -14,4 +14,4 @@ tasks:
     for_each: "${{ tasks.fetch.output.items }}"
     max_parallel: 4
     timeout: 60s
-    exec: { command: "./process.sh" }
+    exec: { command: ["./process.sh"] }

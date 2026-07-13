@@ -19,8 +19,8 @@ tasks:
           meta:
             type: object
   - id: fetch_raw
-    exec: { command: "./dump.sh" }
+    exec: { command: ["./dump.sh"] }
   - id: report
     depends_on: [extract, fetch_raw]
     exec:
-      command: "report ${{ tasks.extract.output.entities }} ${{ tasks.extract.output.meta.anything }} ${{ tasks.extract.output.maybe_extra }} ${{ tasks.fetch_raw.output.whatever }}"
+      command: ["report", "${{ tasks.extract.output.entities }}", "${{ tasks.extract.output.meta.anything }}", "${{ tasks.extract.output.maybe_extra }}", "${{ tasks.fetch_raw.output.whatever }}"]

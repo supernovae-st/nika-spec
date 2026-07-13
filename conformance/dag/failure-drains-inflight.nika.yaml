@@ -10,7 +10,7 @@ workflow: diamond-inflight-drain
 tasks:
   - id: fast_fail
     exec:
-      command: "exit 1"
+      command: ["exit", "1"]
   - id: slow_sibling
     invoke:
       tool: nika:wait

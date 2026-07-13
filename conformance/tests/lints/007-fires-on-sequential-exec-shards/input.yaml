@@ -3,10 +3,10 @@ nika: v1
 workflow: f007
 tasks:
   - id: shard1
-    exec: { command: "./process.sh part1" }
+    exec: { command: ["./process.sh", "part1"] }
   - id: shard2
     depends_on: [shard1]
-    exec: { command: "./process.sh part2" }
+    exec: { command: ["./process.sh", "part2"] }
   - id: shard3
     depends_on: [shard2]
-    exec: { command: "./process.sh part3" }
+    exec: { command: ["./process.sh", "part3"] }

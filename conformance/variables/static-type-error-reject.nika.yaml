@@ -8,9 +8,9 @@ vars:
 tasks:
   - id: step
     exec:
-      command: "echo hello"
+      command: ["echo", "hello"]
   - id: conditional
     depends_on: [step]
     when: ${{ vars.count }}
     exec:
-      command: "echo should not reach"
+      command: ["echo", "should", "not", "reach"]

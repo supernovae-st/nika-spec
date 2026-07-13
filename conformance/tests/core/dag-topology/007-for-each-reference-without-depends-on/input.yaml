@@ -8,4 +8,4 @@ tasks:
       args: { pattern: "*.md" }
   - id: process
     for_each: ${{ tasks.discover.output }}
-    exec: { command: "process ${{ item }}" }
+    exec: { command: ["process", "${{ item }}"] }

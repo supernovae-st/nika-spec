@@ -6,8 +6,8 @@ tasks:
   - id: step_a
     depends_on: [step_b]
     exec:
-      command: "echo a"
+      command: ["echo", "a"]
   - id: step_b
     depends_on: [step_a]
     exec:
-      command: "echo b"
+      command: ["echo", "b"]

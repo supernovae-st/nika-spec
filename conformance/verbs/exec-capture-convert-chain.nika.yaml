@@ -6,7 +6,7 @@ description: "Generate CSV-like content, use nika:convert to transform CSV→JSO
 tasks:
   - id: csv_data
     exec:
-      command: "printf 'name,role,score\\nAlice,writer,9\\nBob,editor,7\\nCarol,reviewer,8\\n'"
+      command: ["printf", "'name,role,score\\nAlice,writer,9\\nBob,editor,7\\nCarol,reviewer,8\\n'"]
       capture: stdout
 
   - id: to_json

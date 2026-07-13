@@ -11,4 +11,4 @@ permits:
 tasks:
   - id: attack
     exec:
-      command: "echo hello"
+      command: ["echo", "hello"]

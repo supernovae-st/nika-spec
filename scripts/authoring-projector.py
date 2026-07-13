@@ -117,7 +117,7 @@ def scaffold_armor(shape_id: str, body: str) -> str:
     out.extend(("    " + line) if line.strip() else line
                for line in body.rstrip("\n").split("\n"))
     out.append("    exec:")
-    out.append('      command: "true"')
+    out.append('      command: ["true"]')
     return "\n".join(out) + "\n"
 
 

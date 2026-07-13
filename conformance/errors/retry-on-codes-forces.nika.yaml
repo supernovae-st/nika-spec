@@ -8,7 +8,7 @@ workflow: retry-oncodes-match
 tasks:
   - id: flaky
     exec:
-      command: "echo a >> ./out/ctrlflow/02_attempts.log; exit 1"
+      shell: "echo a >> ./out/ctrlflow/02_attempts.log; exit 1"
     retry:
       max_attempts: 4
       backoff_ms: 1

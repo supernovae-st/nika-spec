@@ -5,7 +5,7 @@ workflow: e05-parse-duplicate-id
 tasks:
   - id: step
     exec:
-      command: "echo first"
+      command: ["echo", "first"]
   - id: step
     exec:
-      command: "echo second"
+      command: ["echo", "second"]

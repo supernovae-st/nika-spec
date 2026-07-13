@@ -11,7 +11,7 @@ tasks:
   - id: risky
     depends_on: [source]
     exec:
-      command: "exit 1"
+      command: ["exit", "1"]
     on_error:
       recover: ${{ tasks.source.output }}
   - id: sink
