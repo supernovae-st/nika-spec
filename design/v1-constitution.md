@@ -1,9 +1,13 @@
 # The v1 constitution — surface tournament (RFC)
 
-> **Status · DRAFT — pending final operator ruling.** Nothing in this document
-> changes the grammar. It exists so that the ONE deep rewrite of the `nika: v1`
-> surface (per the [pre-1.0 stability contract](../spec/00-overview.md)) is
-> decided once, against evidence, before any breaking window opens.
+> **Status · RATIFIED — operator ruling 2026-07-13.** Candidate A is the ONLY
+> canonical public surface of nika v1; B's tagged-record elegance is absorbed
+> into the internal IR (the verb key promotes to a tag at lowering); C is
+> rejected as a normative surface and survives only as a possible
+> sugar-by-lowering hypothesis post-1.0, never a second semantics. The four
+> forms are ratified under the hierarchy **three atomic calls and one bounded
+> controller** (§11). Nothing in this document changes the grammar yet — the
+> breaking windows open only after the W0 exit gates are green.
 >
 > Method · three candidate surfaces, each expressing the SAME fixed semantic
 > model, each written out in full on the SAME seven witness workflows, scored
@@ -71,11 +75,19 @@ are not re-litigated here:
    are their projection.
 10. **Agents are bounded** (turns · time · spend); unproven bounds stay
     Unknown, never fake-Exact. **Unknown ≠ 0 · Unpriced ≠ Free.**
-11. **The four verbs stay**: `infer` · `exec` · `invoke` · `agent`. Everything
-    callable is a tool under `invoke`; everything about ordering is a DAG
-    construct. No fifth verb — auditable decisions are a pure builtin
-    (`nika:decide`) over typed evidence, and the LLM never decides: it emits
-    closed, cited facts.
+11. **The four forms are ratified — not inherited** (the old freeze predates
+    the pre-1.0 stability contract, so W0 re-ratifies them) under the
+    hierarchy **three atomic calls and one bounded controller**:
+    `infer` = one logical model call (no tools, no loop — probabilistic by
+    nature, which is why `invoke` never absorbs it) · `invoke` = one
+    application of a **typed, statically identifiable callable** ·
+    `exec` = one explicit host-process call under a capability boundary ·
+    `agent` = a **bounded controller** over a closed set of pre-approved
+    calls (its IR is composition, not a peer atomic). Everything
+    request-response and typable belongs to `invoke`; everything about
+    ordering is a DAG construct; auditable decisions are a pure callable
+    (`nika:decide`), and the LLM never decides: it emits closed, cited
+    facts. No fifth verb — ever.
 12. **`assert:` states workflow-level properties** (secret egress · eventual
     states · ordering · resource ceilings) with honest proof levels.
 
@@ -1385,7 +1397,7 @@ surface forever.
 
 ## 8 · Decision (normative once ruled)
 
-**Recommendation (DRAFT — the operator ruling makes this normative): Candidate A, verb-keyed typed dataflow.**
+**RULED (operator lock 2026-07-13 · normative): Candidate A, verb-keyed typed dataflow — with B's IR lift absorbed under the hood and C rejected as a normative surface (sugar-by-lowering stays a post-1.0 hypothesis only).**
 
 - **B is rejected as the surface** — its genuine wins (structurally
   unstateable two-op tasks; surface≈IR) are reproduced at near-zero cost in
@@ -1459,7 +1471,106 @@ Classes A leaves to the CHECKER (with precise teachings — the accepted trade):
 
 ---
 
-## 10 · Open decision points feeding the next chapters
+## 10 · The callable layer (ratified with the surface)
+
+The ruling extends the constitution below the surface: `invoke` is the
+universal door to everything callable, and one contract feeds every judge.
+
+### 10.1 `invoke` — a tagged union, never a magic builtin
+
+`invoke` carries **exactly one** target field plus `args`:
+
+```yaml
+invoke:
+  tool: nika:fetch          # catalogue capability (nika: · mcp:)
+  args: { url: "…" }
+```
+
+```yaml
+invoke:
+  workflow: ./flows/risk-review.nika.yaml   # composable child · static literal
+  args: { diff: "…" }
+```
+
+The field carries the semantics (the `command:`/`shell:` law generalized):
+the parser knows structurally whether it resolves a catalogue capability or
+a composable child. Hiding the child behind a generic `nika:workflow` tool
+whose target lives in `args` is REJECTED — it would bury the output type,
+the effects and the composition graph inside an argument value, show a
+generic builtin in permits instead of the child's identity, and hand agents
+a path-shaped power. In the IR both arms are one tagged `CallableRef`
+(`Tool | Workflow`); a single-string `target:` spelling is likewise rejected
+(prefix-parsing a string to recover semantics is the defect `command:`
+strings had).
+
+### 10.2 The CallableContract — one truth for every judge
+
+Every invoke target (builtin · MCP tool · local child · registry child ·
+pure decision · human interaction) exposes the same abstract contract:
+
+```
+Callable<I, O, E, ε, ρ, δ>
+   I inputs · O output · E errors · ε effects · ρ resources ·
+   δ determinism/idempotence
+```
+
+One **Callable Catalog** serves that contract to the checker, the runtime,
+the agent loop, the LSP, the MCP oracle, the registry and the lockfile —
+never per-surface partial views. A child workflow's contract is **derived**
+from its body (inputs from its public surface · output from its outputs
+contract · errors from its unrecovered terminals · effects/resources from
+its reachable tasks · determinism from its operations); no manual
+annotation can claim purity the body does not prove.
+
+### 10.3 Composition laws (bind W-COMP)
+
+1. **Static target** — local path is a literal; registry ref is resolved and
+   hash-pinned in the lockfile; no expression-built targets.
+2. **Typed call** — args satisfy the child's input contract (missing ·
+   unknown · type-mismatch · unmapped-secret = findings).
+3. **No implicit power** — the child receives nothing automatically:
+   `Authority(child) ⊆ Authority(parent) ∩ DeclaredAuthority(child)`.
+4. **Effect containment** — `RequiredEffects(child) ⊆ PermittedEffects(parent)`;
+   calling can never widen the parent.
+5. **Resource composition** — child costs/tokens/calls/artifacts sum into
+   the parent certificate.
+6. **Inherited deadlines & budgets** — the child never receives more than
+   the parent's remaining budget or deadline.
+7. **Acyclic call graph** — statically rejected cycles; a runtime depth cap
+   is defense-in-depth, not the rule.
+8. **Trace forest** — the child keeps its own hash-chained trace; the
+   parent records its semantic hash, plan hash, trace id, chain head and
+   outcome.
+9. **Composed receipts** — child receipt roots Merkle into the parent's;
+   one altered child breaks the parent's proof.
+10. **Semantic cache** — child check memoization keys on
+    (semantic hash · locked deps · input contract), never on file path.
+
+### 10.4 Cross-cutting operation laws
+
+- **Payload ⊥ Telemetry ⊥ Provenance** — a tool result separates the three;
+  billing signals never ride business fields (reading a payload `cost_usd`
+  as engine spend is a defect, not a feature).
+- **Definition snapshots** — MCP definitions used at check time are
+  captured, hashed and locked; a differing runtime definition refuses or
+  re-resolves, never silently executes a different contract.
+- **Agent capability closure** — agents choose among pre-approved
+  capabilities only: public surface `tools:` and `workflows:` allowlists
+  (globs resolve to exact sets in the lockfile); IR-side one tagged
+  `CapabilitySet`; no path-shaped or dynamic targets.
+- **Parallel safety** — concurrent calls require proven effect independence
+  (read/write set disjointness; idempotence/commutativity for external
+  effects) or they serialize; no optimistic invisible parallelism.
+- **Value-dependent effects** — literal arg = exact effect · closed enum =
+  finite union · unknown dynamic = widened effect or finding · never
+  silently dropped.
+- **Guarantee levels** — every displayed property carries its honest level:
+  `statically_proven · runtime_enforced · best_effort · observed · unknown`
+  (a shell blocklist is best_effort; a cycle rejection is statically_proven).
+
+---
+
+## 11 · Open decision points feeding the next chapters
 
 These are surfaced by the tournament and ruled separately (each becomes a
 normative spec section when locked):
@@ -1491,3 +1602,10 @@ normative spec section when locked):
 
 - 2026-07-13 · RFC skeleton + fixed semantic model + witnesses + candidate A ·
   candidates B/C and scoring land in this same PR before review.
+- 2026-07-13 (same evening) · **RATIFIED by operator ruling** — A locked as the
+  sole canonical surface (B = IR lift under the hood · C = post-1.0
+  sugar-by-lowering hypothesis only) · the four forms re-ratified as three
+  atomic calls + one bounded controller · §10 callable layer added (invoke
+  tagged union tool|workflow · CallableContract · composition laws ·
+  guarantee levels) · 02-verbs.md forward-compat prose reconciled in the
+  same window.
