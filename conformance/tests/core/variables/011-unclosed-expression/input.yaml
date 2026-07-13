@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: hello
+workflow:
+  id: hello
 vars:
   topic: "Rust"
 tasks:
-  - id: a
+  a:
     infer: { prompt: "Research ${{ vars.topic" }

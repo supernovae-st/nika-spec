@@ -1,12 +1,13 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: f007pipe
+workflow:
+  id: f007pipe
 tasks:
-  - id: fetch
+  fetch:
     exec: { command: ["./fetch.sh"] }
-  - id: parse
+  parse:
     depends_on: [fetch]
     exec: { command: ["./parse.sh", "--strict", "input.json"] }
-  - id: report
+  report:
     depends_on: [parse]
     exec: { command: ["./report.sh"] }

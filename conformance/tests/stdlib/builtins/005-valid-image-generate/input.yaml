@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: og-hero
+workflow:
+  id: og-hero
 tasks:
-  - id: hero
+  hero:
     invoke:
       tool: "nika:image_generate"
       args:

@@ -3,14 +3,15 @@
 # Tests: using a reserved name (output/status/error) in output: block → NIKA-PARSE-013 at check
 # Detail: reserved binding name rejected at parse.
 nika: v1
-workflow: w33-reserved-binding-name
+workflow:
+  id: w33-reserved-binding-name
 
 vars:
   data:
     value: 42
 
 tasks:
-  - id: bad_binding
+  bad_binding:
     invoke:
       tool: "nika:jq"
       args:
@@ -19,7 +20,7 @@ tasks:
     output:
       status: ".value"
 
-  - id: write_result
+  write_result:
     depends_on: [bad_binding]
     invoke:
       tool: "nika:write"

@@ -1,11 +1,12 @@
 # Expected: exit 0 — item + index bindings resolve per iteration.
 nika: v1
-workflow: foreach-index-binding
+workflow:
+  id: foreach-index-binding
 # COVERS: ${{ index }} 0-based positional binding aligns exactly with input order.
 vars:
   items: ["zero", "one", "two", "three", "four"]
 tasks:
-  - id: loop
+  loop:
     for_each: ${{ vars.items }}
     with:
       name: ${{ item }}
@@ -17,7 +18,7 @@ tasks:
         # echo the index so we can assert .[k].i == k
         expression: "{ i: .i, name: .name }"
 
-  - id: persist
+  persist:
     depends_on: [loop]
     invoke:
       tool: nika:write

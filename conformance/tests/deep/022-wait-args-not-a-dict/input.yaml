@@ -1,7 +1,8 @@
 nika: v1
-workflow: deep-022
+workflow:
+  id: deep-022
 tasks:
-  - id: a
+  a:
     invoke:
       tool: "nika:wait"
       args: "30s"

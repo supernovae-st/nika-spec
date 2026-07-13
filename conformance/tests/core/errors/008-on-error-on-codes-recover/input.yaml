@@ -1,7 +1,8 @@
 nika: v1
-workflow: core-on-codes
+workflow:
+  id: core-on-codes
 tasks:
-  - id: slow_fetch
+  slow_fetch:
     invoke: { tool: "nika:fetch", args: { url: "https://slow.example.com" } }
     timeout: "30s"
     on_error:

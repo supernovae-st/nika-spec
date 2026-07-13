@@ -1,6 +1,7 @@
 nika: v1
-workflow: stdlib-envelope-provider
+workflow:
+  id: stdlib-envelope-provider
 model: gpt-4o/latest
 tasks:
-  - id: greet
+  greet:
     infer: { prompt: "hello" }

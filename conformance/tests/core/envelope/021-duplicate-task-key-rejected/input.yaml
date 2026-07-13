@@ -1,0 +1,10 @@
+nika: v1
+workflow:
+  id: twin-keys
+tasks:
+  hello:
+    exec:
+      command: ["true"]
+  hello:
+    exec:
+      command: ["false"]

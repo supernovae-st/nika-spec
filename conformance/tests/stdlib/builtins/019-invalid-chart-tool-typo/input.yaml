@@ -1,13 +1,14 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: chart-tool-typo
+workflow:
+  id: chart-tool-typo
 permits:
   fs:
     read: ["./out/**"]
     write: ["./report/**"]
   tools: ["nika:charts"]
 tasks:
-  - id: render
+  render:
     invoke:
       tool: "nika:charts"
       args:

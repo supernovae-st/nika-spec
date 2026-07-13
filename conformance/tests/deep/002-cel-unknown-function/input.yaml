@@ -1,8 +1,9 @@
 nika: v1
-workflow: deep-002
+workflow:
+  id: deep-002
 vars:
   data: {}
 tasks:
-  - id: a
+  a:
     when: ${{ vars.name.matches('^a') }}
     infer: { prompt: "x" }

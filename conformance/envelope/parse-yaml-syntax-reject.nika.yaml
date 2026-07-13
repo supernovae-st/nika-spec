@@ -1,10 +1,11 @@
 # Expected: NIKA-PARSE-001 at CHECK.
 nika: v1
-workflow: e01-parse-syntax
+workflow:
+  id: e01-parse-syntax
 # INTENT: trigger NIKA-PARSE-001 (YAML syntax error)
 # This file is intentionally malformed YAML — it must fail at parse time
 tasks:
-  - id: broken
+  broken:
     exec:
       command: ["echo", "hello"]
   bad yaml here: [unclosed

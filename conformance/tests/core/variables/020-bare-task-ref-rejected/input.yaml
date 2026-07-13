@@ -2,13 +2,14 @@
 # D2 (breaking-window #75): the task result is a record — unprojected
 # access is ill-typed. Pick .output (the value) or .status/.error/.duration_ms.
 nika: v1
-workflow: hello
+workflow:
+  id: hello
 tasks:
-  - id: gather
+  gather:
     invoke:
       tool: "nika:read"
       args: { path: "./README.md" }
-  - id: think
+  think:
     depends_on: [gather]
     infer:
       prompt: "Summarize ${{ tasks.gather }}"

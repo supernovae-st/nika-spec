@@ -4,21 +4,22 @@
 # This workflow uses an invalid jq expression that the parser might not catch statically.
 # Detail: jq on a missing key legally yields null (no jq error); the failure surfaces downstream when nika:write rejects null content (NIKA-BUILTIN-WRITE-001). check passes — the gap is real, the code is WRITE-001.
 nika: v1
-workflow: w24-check-vs-runtime-gap
+workflow:
+  id: w24-check-vs-runtime-gap
 
 vars:
   data:
     value: 42
 
 tasks:
-  - id: bad_jq
+  bad_jq:
     invoke:
       tool: "nika:jq"
       args:
         input: ${{ vars.data }}
         expression: ".nonexistent_key | .nested_path"
 
-  - id: write_result
+  write_result:
     depends_on: [bad_jq]
     invoke:
       tool: "nika:write"

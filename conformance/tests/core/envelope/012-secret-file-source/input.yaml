@@ -1,9 +1,10 @@
 nika: v1
-workflow: core-secret-file
+workflow:
+  id: core-secret-file
 secrets:
   signing_pem:
     source: file
     path: ~/.keys/signing.pem
 tasks:
-  - id: sign
+  sign:
     exec: { command: ["./sign.sh"], env: { PEM: "${{ secrets.signing_pem }}" } }

@@ -1,9 +1,10 @@
 # Expected: NIKA-DAG-002 at CHECK.
 nika: v1
-workflow: e08-dag-undeclared-dep
+workflow:
+  id: e08-dag-undeclared-dep
 # INTENT: trigger NIKA-DAG-002 (depends_on references undeclared task)
 tasks:
-  - id: step
+  step:
     depends_on: [nonexistent_task]
     exec:
       command: ["echo", "hello"]

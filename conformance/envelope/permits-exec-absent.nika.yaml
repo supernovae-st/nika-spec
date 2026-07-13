@@ -1,7 +1,8 @@
 # Expected: check-reject (gate verdict). PERMITS: exec task under a boundary with no exec grant.
 nika: v1
-workflow: sec14-exec-no-permit
-description: "ATTACK: exec with permits block but exec omitted (default-deny) — expect NIKA-SEC-004"
+workflow:
+  id: sec14-exec-no-permit
+  description: "ATTACK: exec with permits block but exec omitted (default-deny) — expect NIKA-SEC-004"
 
 permits:
   fs:
@@ -9,6 +10,6 @@ permits:
   tools: ["nika:write"]
 
 tasks:
-  - id: attack
+  attack:
     exec:
       command: ["echo", "hello"]

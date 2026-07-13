@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: bad-part
+workflow:
+  id: bad-part
 tasks:
-  - id: upload
+  upload:
     invoke:
       tool: "nika:fetch"
       args:

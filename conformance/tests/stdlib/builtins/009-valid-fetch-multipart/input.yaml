@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: upload-asset
+workflow:
+  id: upload-asset
 secrets:
   API_KEY:
     source: env
@@ -8,7 +9,7 @@ secrets:
     egress:
       - to: "nika:fetch"
 tasks:
-  - id: upload
+  upload:
     invoke:
       tool: "nika:fetch"
       args:

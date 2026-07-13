@@ -1,9 +1,10 @@
 nika: v1
-workflow: core-when-true
+workflow:
+  id: core-when-true
 tasks:
-  - id: build
+  build:
     exec: { command: ["./build.sh"] }
-  - id: notify
+  notify:
     depends_on: [build]
     when: true
     invoke: { tool: "nika:notify", args: { message: "done either way" } }

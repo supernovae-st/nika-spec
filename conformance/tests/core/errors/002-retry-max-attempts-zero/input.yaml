@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: hello
+workflow:
+  id: hello
 tasks:
-  - id: flaky
+  flaky:
     retry:
       max_attempts: 0
     exec: { command: ["curl", "https://flaky.example.com"] }

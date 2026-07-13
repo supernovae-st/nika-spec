@@ -1,6 +1,7 @@
 # Expected: exit 0 — NIKA-EXEC-001 fires internally, recovered via on_error (skip: true); downstream sees status=skipped.
 nika: v1
-workflow: e15-on-error-skip
+workflow:
+  id: e15-on-error-skip
 # INTENT: on_error.skip:true — workflow SUCCEEDS, downstream sees status=skipped
 permits:
   exec: ["false"]
@@ -9,13 +10,13 @@ permits:
     write:
       - "./out/errors/**"
 tasks:
-  - id: optional_step
+  optional_step:
     exec:
       command: ["false"]
     on_error:
       skip: true
 
-  - id: check_status
+  check_status:
     depends_on: [optional_step]
     when: ${{ tasks.optional_step.status == 'skipped' }}
     invoke:

@@ -1,10 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: f002
+workflow:
+  id: f002
 tasks:
-  - id: a
+  a:
     exec: { command: ["./a.sh"] }
     on_error: { skip: true }
-  - id: b
+  b:
     depends_on: [a]
     exec: { command: ["./b.sh"] }

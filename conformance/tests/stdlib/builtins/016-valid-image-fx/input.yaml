@@ -1,13 +1,14 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: image-fx-valid
+workflow:
+  id: image-fx-valid
 permits:
   fs:
     read: ["./out/**"]
     write: ["./out/**"]
   tools: ["nika:image_fx"]
 tasks:
-  - id: style
+  style:
     invoke:
       tool: "nika:image_fx"
       args:

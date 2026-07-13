@@ -1,9 +1,10 @@
 nika: v1
-workflow: deep-001
+workflow:
+  id: deep-001
 tasks:
-  - id: a
+  a:
     infer: { prompt: "x" }
-  - id: b
+  b:
     depends_on: [a]
     when: ${{ tasks.a.status == 'success' == true }}
     infer: { prompt: "y" }

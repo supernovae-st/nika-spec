@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: hello
+workflow:
+  id: hello
 tasks:
-  - id: test
+  test:
     exec: { command: ["cargo", "test"] }
-  - id: deploy
+  deploy:
     when: ${{ tasks.test.status == 'success' }}
     exec: { command: ["./deploy.sh"] }

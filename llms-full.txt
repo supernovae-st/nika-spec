@@ -51,12 +51,13 @@ is at [supernovae-st/nika](https://github.com/supernovae-st/nika)
 
 ```yaml
 nika: v1
-workflow: hello
+workflow:
+  id: hello
 
 model: ollama/qwen3.5:4b   # local · zero key · swap for any provider in the catalog
 
 tasks:
-  - id: greet
+  greet:
     infer:
       prompt: "Say hello in French"
 ```
@@ -300,12 +301,13 @@ Two header lines + one task ·
 
 ```yaml
 nika: v1
-workflow: hello
+workflow:
+  id: hello
 
 model: ollama/qwen3.5:4b
 
 tasks:
-  - id: greet
+  greet:
     infer:
       prompt: "Say hello in French"
 ```
@@ -332,16 +334,17 @@ graph · `${{ tasks.<id>.output }}` reads a prior task's result ·
 
 ```yaml
 nika: v1
-workflow: summarize-and-translate
+workflow:
+  id: summarize-and-translate
 
 model: ollama/qwen3.5:4b
 
 tasks:
-  - id: summarize
+  summarize:
     infer:
       prompt: "Summarize in one sentence: Nika is a declarative YAML language for AI workflows."
 
-  - id: translate
+  translate:
     depends_on: [summarize]
     infer:
       prompt: "Translate to French: ${{ tasks.summarize.output }}"
@@ -360,7 +363,8 @@ inside) ·
 
 ```yaml
 nika: v1
-workflow: translate-anything
+workflow:
+  id: translate-anything
 
 vars:
   text: "Hello, world"
@@ -369,7 +373,7 @@ vars:
 model: ollama/qwen3.5:4b
 
 tasks:
-  - id: translate
+  translate:
     infer:
       prompt: "Translate to ${{ vars.target_lang }}: ${{ vars.text }}"
 ```
@@ -400,24 +404,25 @@ Everything else (fetching a URL, querying a DB, writing a file) is a
 
 ```yaml
 nika: v1
-workflow: fetch-and-summarize
+workflow:
+  id: fetch-and-summarize
 
 model: ollama/qwen3.5:4b
 
 tasks:
-  - id: fetch_page
+  fetch_page:
     invoke:
       tool: "nika:fetch"        # fetch is a builtin tool, not a verb
       args:
         url: "https://example.com"
         mode: article           # extract readable article text
 
-  - id: summarize
+  summarize:
     depends_on: [fetch_page]
     infer:
       prompt: "Summarize: ${{ tasks.fetch_page.output }}"
 
-  - id: save
+  save:
     depends_on: [summarize]
     invoke:
       tool: "nika:write"        # a stdlib builtin (nika: namespace)
@@ -600,11 +605,12 @@ additive and feature-detected, exactly as the pillars section states.
 
 ```yaml
 nika: v1
-workflow: hello
+workflow:
+  id: hello
 
 model: ollama/qwen3.5:4b
 tasks:
-  - id: greet
+  greet:
     infer:
       prompt: "Say hello in French"
 ```
@@ -615,25 +621,26 @@ tasks:
 
 ```yaml
 nika: v1
-workflow: scrape-and-summarize
+workflow:
+  id: scrape-and-summarize
 
 model: mistral/mistral-large
 tasks:
-  - id: fetch_page
+  fetch_page:
     invoke:
       tool: "nika:fetch"        # fetching is a TOOL, not a verb (4-verb taxonomy)
       args:
         url: "https://example.com/article"
         mode: article          # readability extraction
 
-  - id: summarize
+  summarize:
     depends_on: [fetch_page]
     with:
       content: ${{ tasks.fetch_page.output }}
     infer:
       prompt: "Summarize in 3 bullets · ${{ with.content }}"
 
-  - id: write_file
+  write_file:
     depends_on: [summarize]
     with:
       summary: ${{ tasks.summarize.output }}
@@ -708,15 +715,16 @@ In practice · we expect `nika: v1` to last 10+ years.
 
 ```yaml
 nika: v1
-workflow: my-workflow-id
+workflow:
+  id: my-workflow-id
 
 tasks:
-  - id: ...
+  my_task:
     ...
 ```
 
-Two required lines (`nika:` + `workflow:`) and a non-empty `tasks:`. That's
-the **whole minimum** to be a valid Nika workflow.
+The `nika:` header, a `workflow:` object with an `id`, and a non-empty
+`tasks:` map. That's the **whole minimum** to be a valid Nika workflow.
 
 ---
 
@@ -724,8 +732,9 @@ the **whole minimum** to be a valid Nika workflow.
 
 ```yaml
 nika: v1                                # required · language + contract version
-workflow: scrape-and-summarize          # required · kebab-case · unique within file
-description: "Fetch + summarize"         # optional · human-readable
+workflow:                               # required · the workflow object (W1: the map)
+  id: scrape-and-summarize              #   required · kebab-case · unique within file
+  description: "Fetch + summarize"      #   optional · human-readable
 
 # Workflow-level default model · any task may override · <provider>/<name>
 model: ollama/qwen3.5:4b         # optional · anthropic/claude-sonnet-4-6 for cloud
@@ -754,9 +763,9 @@ permits:
   fs:   { write: ["./output/**"] }       # no reads · writes only under ./output
   exec: false                            # this workflow runs zero shells
 
-# Tasks (the DAG)
+# Tasks (the DAG) · map keyed by task id
 tasks:
-  - id: ...
+  some_task:
     ...
 
 # What this workflow returns · ${{ tasks.<id>.output }} refs · untyped OR typed
@@ -819,30 +828,31 @@ engine version.)
 > stays `https://nika.sh/spec/v1` for RDF / conformance tooling, but
 > the author never types a URL.
 
-### `workflow` · **required · kebab-case · unique within file**
+### `workflow` · **required · an OBJECT · `{id, description}`**
 
 ```yaml
-workflow: scrape-and-summarize
+workflow:
+  id: scrape-and-summarize
+  description: "Fetch article, summarize in 3 bullets, write to disk"
 ```
 
-A stable identifier for the workflow. Kebab-case. Used in journal events,
-traces, and error messages.
+The workflow object — a stable home for the file's identity and metadata.
+
+- **`id`** · required · kebab-case (`^[a-z][a-z0-9-]*$`) · unique within
+  file · used in journal events, traces and error messages.
+- **`description`** · optional · free-form text · not used by the engine
+  for execution · useful for `nika ls` listings + LSP hover hints.
 
 The presence of `workflow:` is also the **document-type discriminator**:
 it marks this file as a workflow. Future Nika document types (if any ever
 ship) would use their own top-level key; there is no separate `kind:`
 field in v1.
 
-Must match · `^[a-z][a-z0-9-]*$`.
-
-### `description` · *optional · human-readable*
-
-```yaml
-description: "Fetch article, summarize in 3 bullets, write to disk"
-```
-
-Free-form text. Not used by the engine for execution. Useful for `nika ls`
-listings + LSP hover hints.
+**Dead forms (rejected with a migration teaching · W1 « the map »)** ·
+a scalar `workflow: some-id` is `NIKA-PARSE-020`; a top-level
+`description:` is `NIKA-PARSE-021` — both moved INTO the object. No alias
+survives: the old spellings left the parser in the same window that
+introduced the object.
 
 ### `model` · *optional · default model · `<provider>/<name>`*
 
@@ -1119,17 +1129,24 @@ is checkable BEFORE the run.
 whitelist scopes ONE task's tools; `permits.tools` scopes the WHOLE workflow
 (the union ceiling). An agent may never be granted a tool outside `permits`.
 
-### `tasks` · **required · non-empty**
+### `tasks` · **required · a non-empty MAP · the key IS the identity**
 
 ```yaml
 tasks:
-  - id: task_1
+  task_1:
     ...
-  - id: task_2
+  task_2:
     ...
 ```
 
-The DAG. See [03-dag.md](./03-dag.md) for the task model.
+The DAG. Each key names one task (snake_case · `^[a-z][a-z0-9_]*$` ·
+CEL-safe); duplicate keys are rejected loudly at parse. Source order is
+**presentation only** — the graph alone determines scheduling. See
+[03-dag.md](./03-dag.md) for the task model.
+
+**Dead forms (rejected with a migration teaching · W1 « the map »)** ·
+a `tasks:` SEQUENCE is `NIKA-PARSE-022`; an `id:` field inside a task is
+`NIKA-PARSE-023` — the map key replaced both. No alias survives.
 
 ### `outputs` · *optional · the workflow's return value · untyped OR typed*
 
@@ -1240,10 +1257,11 @@ these files) should quote-by-default for the four ambiguous-scalar cases above.
 
 ```yaml
 nika: v1
-workflow: hello
+workflow:
+  id: hello
 
 tasks:
-  - id: greet
+  greet:
     infer:
       prompt: "Hello"
       model: anthropic/claude-haiku-4-5
@@ -1253,8 +1271,9 @@ tasks:
 
 ```yaml
 nika: v1
-workflow: research-pipeline
-description: "Research a topic and write a markdown brief"
+workflow:
+  id: research-pipeline
+  description: "Research a topic and write a markdown brief"
 
 model: anthropic/claude-sonnet-4-6
 vars:
@@ -1267,11 +1286,11 @@ vars:
     default: "./brief.md"
 
 tasks:
-  - id: research
+  research:
     infer:
       prompt: "Research the topic · ${{ vars.topic }} · in 5 paragraphs"
 
-  - id: write
+  write:
     depends_on: [research]
     with:
       content: ${{ tasks.research.output }}
@@ -1406,33 +1425,33 @@ A single LLM call. The result is the model's response.
 ### Minimal
 
 ```yaml
-- id: greet
-  infer:
-    prompt: "Say hello in French"
+greet:
+    infer:
+      prompt: "Say hello in French"
 ```
 
 ### Full
 
 ```yaml
-- id: research
-  infer:
-    prompt: "Research Rust async runtimes 2026 in 5 paragraphs"
-    system: "You are a senior software architect."
-    model: mistral/mistral-large         # override default · <provider>/<name>
-    temperature: 0.3
-    max_tokens: 2000
-    schema:                            # optional · structured output
-      type: object
-      required: [summary, paragraphs]
-      properties:
-        summary: { type: string }
-        paragraphs: { type: array, items: { type: string } }
-    thinking:                          # optional · extended thinking
-      enabled: true
-      budget_tokens: 4000
-    vision:                            # optional · vision input
-      - source: file
-        path: "./diagram.png"
+research:
+    infer:
+      prompt: "Research Rust async runtimes 2026 in 5 paragraphs"
+      system: "You are a senior software architect."
+      model: mistral/mistral-large         # override default · <provider>/<name>
+      temperature: 0.3
+      max_tokens: 2000
+      schema:                            # optional · structured output
+        type: object
+        required: [summary, paragraphs]
+        properties:
+          summary: { type: string }
+          paragraphs: { type: array, items: { type: string } }
+      thinking:                          # optional · extended thinking
+        enabled: true
+        budget_tokens: 4000
+      vision:                            # optional · vision input
+        - source: file
+          path: "./diagram.png"
 ```
 
 ### Fields
@@ -1466,23 +1485,23 @@ Run a shell command. The result is the command's stdout (default) or a structure
 ### Minimal
 
 ```yaml
-- id: build
-  exec:
-    command: ["cargo", "build", "--release"]
+build:
+    exec:
+      command: ["cargo", "build", "--release"]
 ```
 
 ### Full
 
 ```yaml
-- id: test
-  timeout: "60s"                   # task-level (applies to any verb · Go duration · see 03-dag)
-  exec:
-    command: ["cargo", "test", "--workspace", "--lib"]
-    cwd: "./engine"
-    env:
-      RUST_LOG: "debug"
-    stdin: "${{ vars.input_data }}"
-    capture: structured            # stdout | stderr | structured | combined
+test:
+    timeout: "60s"                   # task-level (applies to any verb · Go duration · see 03-dag)
+    exec:
+      command: ["cargo", "test", "--workspace", "--lib"]
+      cwd: "./engine"
+      env:
+        RUST_LOG: "debug"
+      stdin: "${{ vars.input_data }}"
+      capture: structured            # stdout | stderr | structured | combined
 ```
 
 ### Fields
@@ -1577,11 +1596,11 @@ spec minor. It never appears silently.
 ### Builtin call
 
 ```yaml
-- id: read_config
-  invoke:
-    tool: "nika:read"
-    args:
-      path: "./config.yaml"
+read_config:
+    invoke:
+      tool: "nika:read"
+      args:
+        path: "./config.yaml"
 ```
 
 See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md) for the canonical builtin list (<!-- canon:builtins -->27<!-- /canon --> builtins in v0.1).
@@ -1596,12 +1615,12 @@ See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md) for the canonical buil
 ### MCP call
 
 ```yaml
-- id: query_db
-  invoke:
-    tool: "mcp:postgres/query"
-    args:
-      sql: "SELECT * FROM users WHERE id = $1"
-      params: ["${{ vars.user_id }}"]
+query_db:
+    invoke:
+      tool: "mcp:postgres/query"
+      args:
+        sql: "SELECT * FROM users WHERE id = $1"
+        params: ["${{ vars.user_id }}"]
 ```
 
 The MCP server `postgres` must be configured in the engine's MCP server registry.
@@ -1631,35 +1650,35 @@ Run an agentic loop · the model + a set of tools · iterating until completion 
 ### Minimal
 
 ```yaml
-- id: research
-  agent:
-    system: "You are a research assistant."
-    prompt: "Research the topic · ${{ vars.topic }}"
-    tools: ["nika:fetch"]             # default-deny · grant explicitly
+research:
+    agent:
+      system: "You are a research assistant."
+      prompt: "Research the topic · ${{ vars.topic }}"
+      tools: ["nika:fetch"]             # default-deny · grant explicitly
 ```
 
 ### Full
 
 ```yaml
-- id: research
-  agent:
-    system: "You are a research assistant. Use tools to gather info."
-    prompt: "Research the topic · ${{ vars.topic }} · and produce a markdown brief"
-    model: mistral/mistral-large
-    tools:                            # whitelist · default-deny (no tools if omitted)
-      - "nika:fetch"
-      - "nika:write"
-      - "mcp:browser/*"               # all tools from browser MCP server
-    skills:                           # Agent Skills · SKILL.md paths (agentskills.io shape)
-      - ".agents/skills/nika-authoring/SKILL.md"
-    max_turns: 20
-    max_tokens_total: 100000
-    temperature: 0.3
-    schema:                           # optional · validate the final message as structured output
-      type: object
-      required: [findings]
-      properties:
-        findings: { type: array, items: { type: string } }
+research:
+    agent:
+      system: "You are a research assistant. Use tools to gather info."
+      prompt: "Research the topic · ${{ vars.topic }} · and produce a markdown brief"
+      model: mistral/mistral-large
+      tools:                            # whitelist · default-deny (no tools if omitted)
+        - "nika:fetch"
+        - "nika:write"
+        - "mcp:browser/*"               # all tools from browser MCP server
+      skills:                           # Agent Skills · SKILL.md paths (agentskills.io shape)
+        - ".agents/skills/nika-authoring/SKILL.md"
+      max_turns: 20
+      max_tokens_total: 100000
+      temperature: 0.3
+      schema:                           # optional · validate the final message as structured output
+        type: object
+        required: [findings]
+        properties:
+          findings: { type: array, items: { type: string } }
 ```
 
 ### Fields
@@ -1755,14 +1774,14 @@ frontmatter keys (`license` · `metadata` · client-specific fields) are the
 skill author's surface — a consumer MUST tolerate them.
 
 ```yaml
-- id: review
-  agent:
-    system: "You are a code reviewer."
-    prompt: "Review the diff · ${{ tasks.diff.output }}"
-    skills:
-      - ".agents/skills/code-review/SKILL.md"
-      - "docs/skills/security-pass/SKILL.md"
-    tools: ["nika:read"]
+review:
+    agent:
+      system: "You are a code reviewer."
+      prompt: "Review the diff · ${{ tasks.diff.output }}"
+      skills:
+        - ".agents/skills/code-review/SKILL.md"
+        - "docs/skills/security-pass/SKILL.md"
+      tools: ["nika:read"]
 ```
 
 **Resolution (normative)** · paths are **static** — no globs, no
@@ -1879,11 +1898,11 @@ Engine config picks which mode.
 
 ```yaml
 tasks:
-  - id: a
+  a:
     infer:
       prompt: "First"
 
-  - id: b
+  b:
     depends_on: [a]
     infer:
       prompt: "Second, after a"
@@ -1896,7 +1915,7 @@ tasks:
 ## Task shape · full
 
 ```yaml
-- id: my_task                   # required · snake_case · unique within workflow
+my_task:                        # the map KEY is the identity · snake_case · unique
   depends_on: [task_a, task_b]  # optional · default []
   when: ${{ tasks.task_a.status == 'success' }}  # optional · conditional execution
   for_each: ${{ tasks.list.output }}  # optional · map this task over a collection
@@ -1920,14 +1939,19 @@ tasks:
 
 ## Field-by-field
 
-### `id` · **required · snake_case · unique**
+### the task key · **the identity · snake_case · unique**
 
 ```yaml
-- id: research_topic
+tasks:
+  research_topic:
+    ...
 ```
 
-Match · `^[a-z][a-z0-9_]*$` (snake_case · no hyphens). Must be unique within
-the workflow file.
+Since W1 « the map », a task's identity IS its map key — there is no `id:`
+field (a lingering one is `NIKA-PARSE-023`; a `tasks:` sequence is
+`NIKA-PARSE-022`). Keys match `^[a-z][a-z0-9_]*$` (snake_case · no hyphens);
+a duplicate key is refused by the YAML layer itself (PARSE-007 mechanics).
+Source order is presentation only — the graph alone schedules.
 
 **Why snake_case, not kebab** · task ids are referenced in CEL expressions as
 `tasks.<id>.output`. In CEL (and almost every expression language) a hyphen is
@@ -1939,8 +1963,8 @@ it is a resource name, never referenced inside an expression.)
 ### `depends_on` · *optional · default `[]`*
 
 ```yaml
-- id: c
-  depends_on: [a, b]
+c:
+    depends_on: [a, b]
 ```
 
 A list of task ids this task depends on. The engine MUST not start this task until ALL deps have completed (successfully OR with a recovered error via `on_error:`).
@@ -1952,11 +1976,11 @@ A list of task ids this task depends on. The engine MUST not start this task unt
 ### `when` · *optional · conditional execution*
 
 ```yaml
-- id: notify
-  depends_on: [build]                    # the success-gate — depends_on already requires it
-  when: ${{ tasks.build.output.warnings == 0 }}   # when: is for conditions BEYOND success
-  exec:
-    command: ["./notify.sh"]
+notify:
+    depends_on: [build]                    # the success-gate — depends_on already requires it
+    when: ${{ tasks.build.output.warnings == 0 }}   # when: is for conditions BEYOND success
+    exec:
+      command: ["./notify.sh"]
 ```
 
 #### Expression language · a documented subset of CEL
@@ -2093,15 +2117,15 @@ infer the edge (a verb-body reference is an edge too · no invisible edges).
 
 ```yaml
 # ❌ REJECTED at parse — `when:` reads tasks.test but no depends_on
-- id: deploy
-  when: ${{ tasks.test.status == 'success' }}
-  exec: { command: ["./deploy.sh"] }
+deploy:
+    when: ${{ tasks.test.status == 'success' }}
+    exec: { command: ["./deploy.sh"] }
 
 # ✅ CORRECT — the reference is backed by an explicit edge
-- id: deploy
-  depends_on: [test]
-  when: ${{ tasks.test.status == 'success' }}
-  exec: { command: ["./deploy.sh"] }
+deploy:
+    depends_on: [test]
+    when: ${{ tasks.test.status == 'success' }}
+    exec: { command: ["./deploy.sh"] }
 ```
 
 **Why explicit, not inferred** · an inferred edge is an invisible edge: it
@@ -2143,10 +2167,10 @@ when: ${{ !(tasks.test.status == 'failure') }}
 ### `when:` shape rules · boolean-only · one rule, two enforcement times
 
 ```yaml
-- id: send_alert
-  depends_on: [check]
-  when: ${{ tasks.check.alert_count > 0 }}     # CEL expression evaluating to bool
-  invoke: { ... }
+send_alert:
+    depends_on: [check]
+    when: ${{ tasks.check.alert_count > 0 }}     # CEL expression evaluating to bool
+    invoke: { ... }
 ```
 
 `when:` accepts exactly two forms · a **`${{ }}` CEL expression** (the general
@@ -2180,15 +2204,15 @@ when: ${{ size(vars.items) > 0 }}              # collection size check
 ### `for_each` · *optional · map a task over a collection*
 
 ```yaml
-- id: scrape_all
-  for_each: ${{ vars.urls }}                  # a static list OR a prior task's array output
-  max_parallel: 5                              # optional · cap concurrent iterations · default unbounded
-  fail_fast: false                             # optional · false = keep going on errors · default true
-  with:
-    page: ${{ item }}                          # ${{ item }} = the current element
-  invoke:
-    tool: nika:fetch
-    args: { url: "${{ with.page }}" }
+scrape_all:
+    for_each: ${{ vars.urls }}                  # a static list OR a prior task's array output
+    max_parallel: 5                              # optional · cap concurrent iterations · default unbounded
+    fail_fast: false                             # optional · false = keep going on errors · default true
+    with:
+      page: ${{ item }}                          # ${{ item }} = the current element
+    invoke:
+      tool: nika:fetch
+      args: { url: "${{ with.page }}" }
 ```
 
 `for_each` runs the task **once per element** of the collection. Inside the
@@ -2206,11 +2230,11 @@ This is **different from Python's sequential `for` loop**. If you need
 sequential iteration · set `max_parallel: 1` ·
 
 ```yaml
-- id: process_in_order
-  for_each: ${{ vars.items }}
-  max_parallel: 1                              # iterations run one-at-a-time, in order
-  exec:
-    command: ["process", "${{ item }}"]
+process_in_order:
+    for_each: ${{ vars.items }}
+    max_parallel: 1                              # iterations run one-at-a-time, in order
+    exec:
+      command: ["process", "${{ item }}"]
 ```
 
 #### `max_parallel:` · *optional · cap concurrent iterations*
@@ -2299,10 +2323,10 @@ without statically enumerating tasks.
 ### `timeout` · *optional · task-level timeout (Go duration string)*
 
 ```yaml
-- id: long_task
-  timeout: "5m"             # 5 minutes
-  exec:
-    command: ["./long-running.sh"]
+long_task:
+    timeout: "5m"             # 5 minutes
+    exec:
+      command: ["./long-running.sh"]
 ```
 
 Hard timeout for the entire task (including any retries and their backoff
@@ -2344,15 +2368,15 @@ timeout: "2.5s"            # fractional · 2500 ms
 ### `with` · *optional · variable scope injection*
 
 ```yaml
-- id: summarize
-  depends_on: [research]
-  with:
-    content: ${{ tasks.research.output }}   # task output reference
-    style: "concise"                        # literal value
-    config:                           # nested object
-      max_words: 100
-  infer:
-    prompt: "Summarize · style ${{ with.style }} · ${{ with.content }}"
+summarize:
+    depends_on: [research]
+    with:
+      content: ${{ tasks.research.output }}   # task output reference
+      style: "concise"                        # literal value
+      config:                           # nested object
+        max_words: 100
+    infer:
+      prompt: "Summarize · style ${{ with.style }} · ${{ with.content }}"
 ```
 
 Injects variables into the task's scope. The variables are referenced
@@ -2371,16 +2395,16 @@ See [05-errors.md](./05-errors.md).
 ### `output` · *optional · output binding*
 
 ```yaml
-- id: api_call
-  invoke:
-    tool: "nika:fetch"
-    args:
-      url: "https://api.example.com/data"
-      mode: raw
-  output:
-    user_count: ".data.users | length"
-    first_user: ".data.users[0]"
-    raw: "."
+api_call:
+    invoke:
+      tool: "nika:fetch"
+      args:
+        url: "https://api.example.com/data"
+        mode: raw
+    output:
+      user_count: ".data.users | length"
+      first_user: ".data.users[0]"
+      raw: "."
 ```
 
 Defines named bindings extracted from the verb's raw response via a jq expression. These bindings are available downstream as `${{ tasks.task_id.user_count }}`, `${{ tasks.task_id.first_user }}`, etc.
@@ -2462,13 +2486,13 @@ recoverable by that task's `on_error`.
 
 ```yaml
 tasks:
-  - id: a
+  a:
     infer: { prompt: "Step 1" }
-  - id: b
+  b:
     depends_on: [a]
     infer: { prompt: "Step 2 · prev was ${{ with.prev }}" }
     with: { prev: ${{ tasks.a.output }} }
-  - id: c
+  c:
     depends_on: [b]
     infer: { prompt: "Step 3 · prev was ${{ with.prev }}" }
     with: { prev: ${{ tasks.b.output }} }
@@ -2478,18 +2502,18 @@ tasks:
 
 ```yaml
 tasks:
-  - id: setup
+  setup:
     exec: { command: ["./prepare.sh"] }
-  - id: analyze_a
+  analyze_a:
     depends_on: [setup]
     infer: { prompt: "Analyze A" }
-  - id: analyze_b
+  analyze_b:
     depends_on: [setup]
     infer: { prompt: "Analyze B" }
-  - id: analyze_c
+  analyze_c:
     depends_on: [setup]
     infer: { prompt: "Analyze C" }
-  - id: merge
+  merge:
     depends_on: [analyze_a, analyze_b, analyze_c]
     with:
       a: ${{ tasks.analyze_a.output }}
@@ -2505,20 +2529,20 @@ tasks:
 
 ```yaml
 tasks:
-  - id: check
+  check:
     exec: { command: ["./check-env.sh"], capture: structured }
 
-  - id: build_prod
+  build_prod:
     depends_on: [check]
     when: ${{ tasks.check.output.env == 'production' }}
     exec: { command: ["./build.sh", "--release"] }
 
-  - id: build_dev
+  build_dev:
     depends_on: [check]
     when: ${{ tasks.check.output.env != 'production' }}
     exec: { command: ["./build.sh", "--debug"] }
 
-  - id: deploy
+  deploy:
     depends_on: [build_prod, build_dev]
     exec: { command: ["./deploy.sh"] }
 ```
@@ -2529,7 +2553,7 @@ Exactly one of `build_prod` or `build_dev` runs · the other is skipped · `depl
 
 ```yaml
 tasks:
-  - id: discover
+  discover:
     invoke:
       tool: "nika:fetch"
       args:
@@ -2538,7 +2562,7 @@ tasks:
     output:
       pages: "map(.loc)"   # sitemap output IS the root array of {loc, …} · a binding is single-valued, so collect the URLs into one array
 
-  - id: summarize
+  summarize:
     depends_on: [discover]
     for_each: ${{ tasks.discover.pages }}
     with:
@@ -2549,7 +2573,7 @@ tasks:
         url: ${{ with.page }}
         mode: article
 
-  - id: digest
+  digest:
     depends_on: [summarize]
     with:
       summaries: ${{ tasks.summarize.output }}      # array of per-page outputs
@@ -2583,15 +2607,15 @@ single source prevents).
 ### `on_finally` · *optional · cleanup hook · ALWAYS runs*
 
 ```yaml
-- id: process
-  exec:
-    shell: "./process.sh > /tmp/output.json"   # redirect → the explicit shell door
-  on_finally:                                  # runs always · success/fail/timeout/cancel
-    - exec:
-        command: ["rm", "-f", "/tmp/output.json"]
-    - invoke:
-        tool: nika:emit
-        args: { event: "task_completed", task_id: "process" }
+process:
+    exec:
+      shell: "./process.sh > /tmp/output.json"   # redirect → the explicit shell door
+    on_finally:                                  # runs always · success/fail/timeout/cancel
+      - exec:
+          command: ["rm", "-f", "/tmp/output.json"]
+      - invoke:
+          tool: nika:emit
+          args: { event: "task_completed", task_id: "process" }
 ```
 
 `on_finally:` declares **cleanup tasks** that run after the parent task
@@ -2858,14 +2882,15 @@ schema generation for callable workflows · see [01-envelope.md](./01-envelope.m
 
 ```yaml
 nika: v1
-workflow: research-pipeline
+workflow:
+  id: research-pipeline
 
 vars:
   topic: "Rust async runtimes 2026"    # untyped · value is the default
   output_dir: "./output"
 
 tasks:
-  - id: research
+  research:
     infer:
       prompt: "Research · ${{ vars.topic }}"
 ```
@@ -2888,13 +2913,13 @@ Declared per-task · resolves at task dispatch time · often references upstream
 > skip it when a direct `${{ tasks.X.output }}` is clearer.
 
 ```yaml
-- id: summarize
-  depends_on: [research]
-  with:
-    content: ${{ tasks.research.output }}
-    style: "concise"
-  infer:
-    prompt: "Summarize in ${{ with.style }} style · ${{ with.content }}"
+summarize:
+    depends_on: [research]
+    with:
+      content: ${{ tasks.research.output }}
+      style: "concise"
+    infer:
+      prompt: "Summarize in ${{ with.style }} style · ${{ with.content }}"
 ```
 
 ### `${{ tasks.X.output }}` · task output reference
@@ -2902,11 +2927,11 @@ Declared per-task · resolves at task dispatch time · often references upstream
 Reference any upstream task's output (or status · error · duration_ms) ·
 
 ```yaml
-- id: deploy
-  depends_on: [build, test]
-  when: ${{ tasks.test.status == 'success' && tasks.test.output.coverage > 80 }}
-  exec:
-    command: ["./deploy.sh", "${{ tasks.build.output.artifact_path }}"]
+deploy:
+    depends_on: [build, test]
+    when: ${{ tasks.test.status == 'success' && tasks.test.output.coverage > 80 }}
+    exec:
+      command: ["./deploy.sh", "${{ tasks.build.output.artifact_path }}"]
 ```
 
 `tasks.X` is the task **result record**: a CEL object, NOT the bare output
@@ -2940,13 +2965,13 @@ a JSON value (jq's `select(. != null)` filters it). This makes the
 takes whichever ran ·
 
 ```yaml
-- id: pick
-  depends_on: [build_prod, build_dev]      # exactly one ran · the other is skipped (null)
-  invoke:
-    tool: nika:jq
-    args:
-      input: [ "${{ tasks.build_prod.output }}", "${{ tasks.build_dev.output }}" ]
-      expression: "[ .[] | select(. != null) ] | first"
+pick:
+    depends_on: [build_prod, build_dev]      # exactly one ran · the other is skipped (null)
+    invoke:
+      tool: nika:jq
+      args:
+        input: [ "${{ tasks.build_prod.output }}", "${{ tasks.build_dev.output }}" ]
+        expression: "[ .[] | select(. != null) ] | first"
 ```
 
 **One obvious way · no bare alias.** `${{ tasks.X }}` is the whole result
@@ -3053,26 +3078,26 @@ masked references in `secrets`.
 Use `output:` to define **named bindings** extracted from a task's raw response via a **jq expression** (the one data language). These bindings appear in the task's typed output and are referenced as `${{ tasks.X.<name> }}` ·
 
 ```yaml
-- id: api_call
-  invoke:
-    tool: "nika:fetch"
-    args:
-      url: "https://api.example.com/v1/users"   # returns JSON · output: jq extracts
-  output:
-    user_count: ".data.users | length"
-    first_user: ".data.users[0]"
-    user_emails: "[.data.users[].email]"   # [...] collects the stream into an array
+api_call:
+    invoke:
+      tool: "nika:fetch"
+      args:
+        url: "https://api.example.com/v1/users"   # returns JSON · output: jq extracts
+    output:
+      user_count: ".data.users | length"
+      first_user: ".data.users[0]"
+      user_emails: "[.data.users[].email]"   # [...] collects the stream into an array
 ```
 
 Downstream ·
 
 ```yaml
-- id: notify
-  depends_on: [api_call]
-  infer:
-    prompt: |
-      We have ${{ tasks.api_call.user_count }} users.
-      Emails · ${{ tasks.api_call.user_emails }}
+notify:
+    depends_on: [api_call]
+    infer:
+      prompt: |
+        We have ${{ tasks.api_call.user_count }} users.
+        Emails · ${{ tasks.api_call.user_emails }}
 ```
 
 #### Raw output vs named bindings · dual-accessible
@@ -3081,13 +3106,13 @@ When a task has an `output:` block defining named bindings · downstream
 access is **dual-accessible** ·
 
 ```yaml
-- id: api_call
-  invoke:
-    tool: nika:fetch
-    args: { url: "..." }
-  output:
-    body: .body
-    http_status: .status     # NOT `status:` — that name is reserved (the task's own .status)
+api_call:
+    invoke:
+      tool: nika:fetch
+      args: { url: "..." }
+    output:
+      body: .body
+      http_status: .status     # NOT `status:` — that name is reserved (the task's own .status)
 ```
 
 Downstream ·
@@ -3349,6 +3374,10 @@ these from this file alone.
 | `NIKA-PARSE-017` | duplicate mapping key — no silent last-wins | `validation_error` | false |
 | `NIKA-PARSE-018` | missing required field in a verb body (`infer.prompt` · `exec.command` · `invoke.tool`) | `validation_error` | false |
 | `NIKA-PARSE-019` | generic structural validation — wrong YAML shape for a field | `validation_error` | false |
+| `NIKA-PARSE-020` | validation_error | no | `workflow:` is a scalar — the envelope became an object (`workflow:` then `id:`) |
+| `NIKA-PARSE-021` | validation_error | no | top-level `description:` — it moved into `workflow.description` |
+| `NIKA-PARSE-022` | validation_error | no | `tasks:` is a sequence — it became a map keyed by task id |
+| `NIKA-PARSE-023` | validation_error | no | a task carries an `id:` field — the map key IS the identity |
 | `NIKA-DAG-001` | cycle in `depends_on` (incl. self-dependency) | `validation_error` | false |
 | `NIKA-DAG-002` | `depends_on` references an undeclared task | `validation_error` | false |
 | `NIKA-DAG-003` | a `${{ tasks.X }}` reference with no declared edge | `validation_error` | false |
@@ -3441,20 +3470,20 @@ A task MAY declare a `retry:` block. Retries apply to **transient** errors only 
 ### Syntax
 
 ```yaml
-- id: flaky_api
-  invoke:
-    tool: "nika:fetch"
-    args:
-      url: "https://flaky.example.com/data"
-  retry:
-    max_attempts: 5              # default 1 (no retry)
-    backoff_ms: 1000             # initial backoff
-    backoff_strategy: exponential  # fixed | linear | exponential
-    backoff_max_ms: 30000        # cap on backoff (default 60000)
-    jitter: true                 # randomize backoff (default true · anti-thundering-herd)
-    on_codes:                    # optional · whitelist of codes to retry
-      - NIKA-BUILTIN-FETCH-001
-      - NIKA-PROVIDER-001
+flaky_api:
+    invoke:
+      tool: "nika:fetch"
+      args:
+        url: "https://flaky.example.com/data"
+    retry:
+      max_attempts: 5              # default 1 (no retry)
+      backoff_ms: 1000             # initial backoff
+      backoff_strategy: exponential  # fixed | linear | exponential
+      backoff_max_ms: 30000        # cap on backoff (default 60000)
+      jitter: true                 # randomize backoff (default true · anti-thundering-herd)
+      on_codes:                    # optional · whitelist of codes to retry
+        - NIKA-BUILTIN-FETCH-001
+        - NIKA-PROVIDER-001
 ```
 
 ### Fields
@@ -3498,18 +3527,18 @@ A task MAY declare an `on_error:` block to recover from non-transient errors (or
 ### Syntax
 
 ```yaml
-- id: api_call
-  invoke:
-    tool: "nika:fetch"
-    args:
-      url: "https://api.example.com/data"
-  retry: { max_attempts: 3 }
-  on_error:
-    recover: ${{ tasks.cached_data.output }}    # recovery output · a ${{ }} ref OR a literal
-    # OR
-    # skip: true                          # skip · downstream sees status = skipped
-    # OR
-    # fail_workflow: true                 # explicit · same as no on_error
+api_call:
+    invoke:
+      tool: "nika:fetch"
+      args:
+        url: "https://api.example.com/data"
+    retry: { max_attempts: 3 }
+    on_error:
+      recover: ${{ tasks.cached_data.output }}    # recovery output · a ${{ }} ref OR a literal
+      # OR
+      # skip: true                          # skip · downstream sees status = skipped
+      # OR
+      # fail_workflow: true                 # explicit · same as no on_error
 ```
 
 ### Fields · exactly ONE action + an optional code filter
@@ -3526,12 +3555,12 @@ A task MAY declare an `on_error:` block to recover from non-transient errors (or
 
 ```yaml
 # Catch-side routing · recover ONLY on timeout · any other code still fails
-- id: slow_fetch
-  invoke: { tool: "nika:fetch", args: { url: "https://slow.example.com" } }
-  timeout: "30s"
-  on_error:
-    on_codes: [NIKA-TIMEOUT-001]
-    recover: { stale: true, items: [] }
+slow_fetch:
+    invoke: { tool: "nika:fetch", args: { url: "https://slow.example.com" } }
+    timeout: "30s"
+    on_error:
+      on_codes: [NIKA-TIMEOUT-001]
+      recover: { stale: true, items: [] }
 ```
 
 ### `recover:` reference resolution (normative)
@@ -3574,28 +3603,28 @@ fetch-chain pattern · a local `nika:read` beside a live fetch).
 
 ```yaml
 # Use cached data on API failure
-- id: api_call
-  invoke: { tool: "nika:fetch", args: { url: "https://api.example.com/data" } }
-  on_error:
-    recover: ${{ tasks.cached_data.output }}   # a ${{ }} ref
+api_call:
+    invoke: { tool: "nika:fetch", args: { url: "https://api.example.com/data" } }
+    on_error:
+      recover: ${{ tasks.cached_data.output }}   # a ${{ }} ref
 
 # Use a default on error
-- id: get_count
-  invoke:
-    tool: "mcp:db/count_users"
-  on_error:
-    recover: 0                                 # a literal
+get_count:
+    invoke:
+      tool: "mcp:db/count_users"
+    on_error:
+      recover: 0                                 # a literal
 
 # Skip on error · downstream may handle
-- id: optional_step
-  exec: { command: ["./optional.sh"] }
-  on_error:
-    skip: true
+optional_step:
+    exec: { command: ["./optional.sh"] }
+    on_error:
+      skip: true
 
-- id: next
-  depends_on: [optional_step]
-  when: ${{ tasks.optional_step.status == 'success' }}   # only run if not skipped
-  exec: { command: ["..."] }
+next:
+    depends_on: [optional_step]
+    when: ${{ tasks.optional_step.status == 'success' }}   # only run if not skipped
+    exec: { command: ["..."] }
 ```
 
 ---
@@ -3610,23 +3639,23 @@ engine-configurable: the SAME rule as [02 §infer conformance](./02-verbs.md#con
 (MAY · engine choice · the two sections state one contract).
 
 ```yaml
-- id: extract
-  infer:
-    prompt: "Extract entities from · ${{ vars.text }}"
-    schema:
-      type: object
-      required: [entities]
-      properties:
-        entities:
-          type: array
-          items:
-            type: object
-            properties:
-              name: { type: string }
-              type: { type: string, enum: [person, place, organization] }
-  retry:
-    max_attempts: 3            # retry on transient errors
-  # validation failures may be retried internally · engine choice
+extract:
+    infer:
+      prompt: "Extract entities from · ${{ vars.text }}"
+      schema:
+        type: object
+        required: [entities]
+        properties:
+          entities:
+            type: array
+            items:
+              type: object
+              properties:
+                name: { type: string }
+                type: { type: string, enum: [person, place, organization] }
+    retry:
+      max_attempts: 3            # retry on transient errors
+    # validation failures may be retried internally · engine choice
 ```
 
 ---
@@ -4190,15 +4219,15 @@ tasks: ...
 
 ```yaml
 # NOT supported in v0.1
-- id: sub
-  workflow: ./subroutine.nika.yaml
+sub:
+    workflow: ./subroutine.nika.yaml
 
 # Also deferred · the nika:run builtin (previously proposed)
-- id: sub
-  invoke:
-    tool: "nika:run"
-    args:
-      workflow: ./subroutine.nika.yaml
+sub:
+    invoke:
+      tool: "nika:run"
+      args:
+        workflow: ./subroutine.nika.yaml
 ```
 
 **Why deferred** · subroutine calling needs scope/binding rules that need thought · plus risks of stack overflow (recursion) and scheduler complexity. The proposed `nika:run` builtin is therefore deferred from v0.1 · use `exec: shell: "nika run subroutine.yaml"` as the workaround.
@@ -4228,9 +4257,9 @@ a sub-workflow call is the dispatch-and-await model · never a verb).
 macro retry_with_backoff:
   retry: { max_attempts: 5, backoff_ms: 1000 }
 
-- id: task
-  use_macro: retry_with_backoff
-  invoke: { tool: "nika:fetch", ... }
+task:
+    use_macro: retry_with_backoff
+    invoke: { tool: "nika:fetch", ... }
 ```
 
 **Why deferred** · macros are a powerful but dangerous primitive (expansion order · debugging · drift). Most needs are met by `with:` scope + structured retry. Revisit only if empirical demand emerges.
@@ -4247,10 +4276,10 @@ macro retry_with_backoff:
 
 ```yaml
 # NOT supported in v1 — unbounded iteration
-- id: poll_until
-  while: ${{ tasks.check.output.ready == false }}
-  exec:
-    command: ["./check.sh"]
+poll_until:
+    while: ${{ tasks.check.output.ready == false }}
+    exec:
+      command: ["./check.sh"]
 ```
 
 **Why deferred** · unbounded loops break the « acyclic » guarantee of the DAG
@@ -4275,12 +4304,12 @@ Never supported. Anti-pattern.
 
 ```yaml
 # NOT supported in v0.1
-- id: stream_chat
-  infer:
-    prompt: "..."
-    stream: true
-  output:
-    chunks: .stream                 # not in v0.1
+stream_chat:
+    infer:
+      prompt: "..."
+      stream: true
+    output:
+      chunks: .stream                 # not in v0.1
 ```
 
 **Why deferred** · streaming semantics in a YAML/DAG model are tricky · tasks are nominally synchronous. Engines MAY stream internally as an implementation detail · workflows see the final assembled response.
@@ -4289,8 +4318,8 @@ Never supported. Anti-pattern.
 
 ```yaml
 # NOT supported in v0.1
-- id: listen
-  subscribe: "events://orders.created"
+listen:
+    subscribe: "events://orders.created"
 ```
 
 **Why deferred** · v0.1 is finite-DAG. Long-running event listeners belong in the daemon layer or external orchestrators.
@@ -4346,9 +4375,9 @@ pin in the envelope (`nika: v1` already does this for the language contract). Pe
 
 ```yaml
 # NOT supported in v0.1
-- id: charge
-  idempotency_key: "${{ vars.order_id }}"   # dedup retried side effects
-  invoke: { tool: "mcp:stripe/charge", args: { ... } }
+charge:
+    idempotency_key: "${{ vars.order_id }}"   # dedup retried side effects
+    invoke: { tool: "mcp:stripe/charge", args: { ... } }
 ```
 
 **Why deferred** · idempotency keys are **table-stakes for the durable-execution
@@ -4373,12 +4402,12 @@ deferral, at the full waypoint.)*
 
 ```yaml
 # The CAPABILITY is deferred (engine waypoint) · the SHAPE is already decided
-- id: recall
-  invoke:
-    tool: "nika:connectome/recall"
-    args:
-      query: "Previous conversations about · ${{ vars.topic }}"
-      top_k: 5
+recall:
+    invoke:
+      tool: "nika:connectome/recall"
+      args:
+        query: "Previous conversations about · ${{ vars.topic }}"
+        top_k: 5
 ```
 
 **No 6th verb, ever.** When the Connectome (the engine's cognitive subsystem)
@@ -4418,9 +4447,9 @@ agents:
 
 ```yaml
 # NOT supported in v0.1
-- id: ongoing
-  agent:
-    persistent_state_id: "user-123"
+ongoing:
+    agent:
+      persistent_state_id: "user-123"
 ```
 
 **Why deferred** · ties into memory subsystem.
@@ -5201,14 +5230,14 @@ boundary `NIKA-SEC-004` (paths outside `permits.fs`).
 ### `nika:tts_generate` · provider-backed speech synthesis (§Audio)
 
 ```yaml
-- id: narrate
-  invoke:
-    tool: "nika:tts_generate"
-    args:
-      provider: local              # sovereign first — or openai · elevenlabs · mock
-      text: "Bienvenue — the launch is live."
-      voice: "alloy"
-      output_dir: "./assets/audio"
+narrate:
+    invoke:
+      tool: "nika:tts_generate"
+      args:
+        provider: local              # sovereign first — or openai · elevenlabs · mock
+        text: "Bienvenue — the launch is live."
+        voice: "alloy"
+        output_dir: "./assets/audio"
 ```
 
 The image family's contract, applied to audio: ONE audio file lands under
@@ -5353,7 +5382,7 @@ against any backend ·
 vars:
   model: { type: string, default: "ollama/qwen3.5:9b" }
 tasks:
-  - id: x
+  x:
     infer: { model: "${{ vars.model }}", prompt: "..." }
 # nika run flow.yaml --var model=mistral/mistral-large   ← same workflow, cloud
 ```

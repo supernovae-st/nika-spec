@@ -1,13 +1,14 @@
 # Expected: NIKA-VAR-005 at CHECK.
 nika: v1
-workflow: when-bare-ref-reject
+workflow:
+  id: when-bare-ref-reject
 # SPEC 03 §when shape rules: a statically-non-boolean-SHAPED root (bare reference, no
 # relation/boolean operator) MUST be rejected at parse time NIKA-VAR-005.
 # `when: ${{ vars.threshold }}` is a bare reference → check should FAIL with NIKA-VAR-005.
 vars:
   threshold: { type: integer, default: 5 }
 tasks:
-  - id: t
+  t:
     when: ${{ vars.threshold }}
     invoke:
       tool: nika:write

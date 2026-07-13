@@ -3,10 +3,11 @@
 # Spec: 04-variables §escaping: "An unclosed ${{ ... is rejected at parse time ·
 # NIKA-VAR-008 · validation_error". This is in a prompt-position string.
 nika: v1
-workflow: c17-unclosed-and-empty
+workflow:
+  id: c17-unclosed-and-empty
 
 tasks:
-  - id: t
+  t:
     invoke:
       tool: "nika:write"
       args:

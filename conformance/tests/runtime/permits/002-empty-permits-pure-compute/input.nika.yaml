@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: rt-permits-pure-compute
+workflow:
+  id: rt-permits-pure-compute
 model: mock/echo
 permits: {}
 tasks:
-  - id: think
+  think:
     infer: { prompt: "pure compute · no effects" }

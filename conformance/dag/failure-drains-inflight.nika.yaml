@@ -1,6 +1,7 @@
 # Expected: NIKA-EXEC-001 at RUN. Parent fails by design (drain semantics); marker proves the unrelated sibling completed.
 nika: v1
-workflow: diamond-inflight-drain
+workflow:
+  id: diamond-inflight-drain
 # SPEC 05 §workflow-level: in-flight tasks DRAIN — an engine MUST NOT abort an UNRELATED
 # running task because a sibling failed. fast_fail fails immediately; slow_sibling (no dep
 # on fast_fail) sleeps then writes. The unrelated sibling must COMPLETE (drain), not be killed.
@@ -8,10 +9,10 @@ workflow: diamond-inflight-drain
 # Markers: 21_slow.json PRESENT (unrelated sibling drained to completion);
 #          21_join.json ABSENT (join cancelled by failed dep). Workflow exit!=0.
 tasks:
-  - id: fast_fail
+  fast_fail:
     exec:
       command: ["exit", "1"]
-  - id: slow_sibling
+  slow_sibling:
     invoke:
       tool: nika:wait
       args: { duration: "300ms" }
@@ -19,7 +20,7 @@ tasks:
       - invoke:
           tool: nika:write
           args: { path: "./out/ctrlflow/21_slow.json", content: "slow-drained" }
-  - id: join
+  join:
     depends_on: [fast_fail, slow_sibling]
     invoke:
       tool: nika:write

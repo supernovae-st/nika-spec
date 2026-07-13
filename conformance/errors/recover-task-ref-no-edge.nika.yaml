@@ -7,20 +7,21 @@
 # When the runtime implements the await, flip this header to: exit 0,
 # recover-a.json == 99. Pair: recover-b-edge (WITH the edge) recovers today.
 nika: v1
-workflow: recover-a-noedge
+workflow:
+  id: recover-a-noedge
 tasks:
-  - id: source
+  source:
     invoke:
       tool: nika:jq
       args:
         input: { v: 99 }
         expression: ".v"
-  - id: risky
+  risky:
     exec:
       command: ["exit", "1"]
     on_error:
       recover: ${{ tasks.source.output }}
-  - id: sink
+  sink:
     depends_on: [risky]
     invoke:
       tool: nika:write

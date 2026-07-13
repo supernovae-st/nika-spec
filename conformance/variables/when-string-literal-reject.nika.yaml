@@ -3,10 +3,11 @@
 # Tests: "when: \"literal string\"" should be rejected at parse/check time
 # Detail: bare string literal in when: is statically non-boolean-shaped (spec 03 §when shape rules).
 nika: v1
-workflow: w32-when-string-literal-rejected
+workflow:
+  id: w32-when-string-literal-rejected
 
 tasks:
-  - id: bad_when
+  bad_when:
     when: "literal string"
     invoke:
       tool: "nika:assert"
@@ -14,7 +15,7 @@ tasks:
         condition: "${{ true }}"
         message: "This should never run"
 
-  - id: write_result
+  write_result:
     depends_on: [bad_when]
     invoke:
       tool: "nika:write"

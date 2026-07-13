@@ -1,15 +1,16 @@
 # Expected: exit 0 — exec stdout captured, then nika:convert csv→json.
 nika: v1
-workflow: c22-convert-builtin
-description: "Generate CSV-like content, use nika:convert to transform CSV→JSON"
+workflow:
+  id: c22-convert-builtin
+  description: "Generate CSV-like content, use nika:convert to transform CSV→JSON"
 
 tasks:
-  - id: csv_data
+  csv_data:
     exec:
       command: ["printf", "'name,role,score\\nAlice,writer,9\\nBob,editor,7\\nCarol,reviewer,8\\n'"]
       capture: stdout
 
-  - id: to_json
+  to_json:
     depends_on: [csv_data]
     invoke:
       tool: "nika:convert"
@@ -19,7 +20,7 @@ tasks:
         to: json
         has_header: true
 
-  - id: result
+  result:
     depends_on: [to_json]
     invoke:
       tool: "nika:write"

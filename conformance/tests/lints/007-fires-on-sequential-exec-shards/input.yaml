@@ -1,12 +1,13 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: f007
+workflow:
+  id: f007
 tasks:
-  - id: shard1
+  shard1:
     exec: { command: ["./process.sh", "part1"] }
-  - id: shard2
+  shard2:
     depends_on: [shard1]
     exec: { command: ["./process.sh", "part2"] }
-  - id: shard3
+  shard3:
     depends_on: [shard2]
     exec: { command: ["./process.sh", "part3"] }

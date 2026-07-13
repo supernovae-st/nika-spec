@@ -1,7 +1,8 @@
 # Expected: exit 0 — nika:validate surfaces valid:false + errors array without failing the task.
 nika: v1
-workflow: validate-invalid-report
-description: "nika:validate on DELIBERATELY-invalid data → must return { valid:false, errors:[...] } as a REPORT, not fail the task"
+workflow:
+  id: validate-invalid-report
+  description: "nika:validate on DELIBERATELY-invalid data → must return { valid:false, errors:[...] } as a REPORT, not fail the task"
 model: mock/echo
 
 vars:
@@ -9,7 +10,7 @@ vars:
   bad_record: { category: 12345, severity: "EXPLODING" }
 
 tasks:
-  - id: validate
+  validate:
     invoke:
       tool: "nika:validate"
       args:
@@ -22,7 +23,7 @@ tasks:
             category: { type: string, enum: [billing, bug, how-to, account, other] }
             severity: { type: string, enum: [low, medium, high, critical] }
 
-  - id: report
+  report:
     depends_on: [validate]
     invoke:
       tool: "nika:jq"
@@ -30,7 +31,7 @@ tasks:
         input: "${{ tasks.validate.output }}"
         expression: '{ valid: .valid, has_errors: ((.errors | length) > 0) } | tojson'
 
-  - id: write_out
+  write_out:
     depends_on: [report]
     invoke:
       tool: "nika:write"

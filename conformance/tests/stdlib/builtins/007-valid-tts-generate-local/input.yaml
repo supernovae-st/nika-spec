@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: narrate-sovereign
+workflow:
+  id: narrate-sovereign
 tasks:
-  - id: narrate
+  narrate:
     invoke:
       tool: "nika:tts_generate"
       args:

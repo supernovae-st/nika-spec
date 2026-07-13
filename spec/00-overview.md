@@ -97,11 +97,12 @@ additive and feature-detected, exactly as the pillars section states.
 
 ```yaml
 nika: v1
-workflow: hello
+workflow:
+  id: hello
 
 model: ollama/qwen3.5:4b
 tasks:
-  - id: greet
+  greet:
     infer:
       prompt: "Say hello in French"
 ```
@@ -112,25 +113,26 @@ tasks:
 
 ```yaml
 nika: v1
-workflow: scrape-and-summarize
+workflow:
+  id: scrape-and-summarize
 
 model: mistral/mistral-large
 tasks:
-  - id: fetch_page
+  fetch_page:
     invoke:
       tool: "nika:fetch"        # fetching is a TOOL, not a verb (4-verb taxonomy)
       args:
         url: "https://example.com/article"
         mode: article          # readability extraction
 
-  - id: summarize
+  summarize:
     depends_on: [fetch_page]
     with:
       content: ${{ tasks.fetch_page.output }}
     infer:
       prompt: "Summarize in 3 bullets · ${{ with.content }}"
 
-  - id: write_file
+  write_file:
     depends_on: [summarize]
     with:
       summary: ${{ tasks.summarize.output }}

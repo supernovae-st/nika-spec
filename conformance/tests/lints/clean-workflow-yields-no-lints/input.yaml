@@ -1,15 +1,16 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: fclean
+workflow:
+  id: fclean
 tasks:
-  - id: fetch
+  fetch:
     invoke:
       tool: "nika:fetch"
       args: { url: "https://example.com/data" }
     retry: { max_attempts: 3 }
     on_error:
       recover: { items: [] }
-  - id: process
+  process:
     depends_on: [fetch]
     for_each: "${{ tasks.fetch.output.items }}"
     max_parallel: 4

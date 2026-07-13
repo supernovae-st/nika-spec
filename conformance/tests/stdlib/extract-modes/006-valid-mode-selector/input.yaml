@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: read-selector
+workflow:
+  id: read-selector
 tasks:
-  - id: get
+  get:
     invoke:
       tool: "nika:fetch"
       args:

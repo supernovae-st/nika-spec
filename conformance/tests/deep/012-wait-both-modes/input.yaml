@@ -1,7 +1,8 @@
 nika: v1
-workflow: deep-012
+workflow:
+  id: deep-012
 tasks:
-  - id: pause
+  pause:
     invoke:
       tool: "nika:wait"
       args: { duration: "5s", until: "2026-12-01T00:00:00Z" }

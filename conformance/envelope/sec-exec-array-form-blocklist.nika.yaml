@@ -7,13 +7,14 @@
 # argv form is NOT a blanket bypass — it's a DIFFERENT, structural gate.
 # Empirically confirmed 2026-07-02 (program "sudo" blocked at the exec floor).
 nika: v1
-workflow: sec36b-exec-array-identity-floor
-description: "argv-form sudo IS blocked (program-identity floor · spec §163 · NIKA-SEC-001)"
+workflow:
+  id: sec36b-exec-array-identity-floor
+  description: "argv-form sudo IS blocked (program-identity floor · spec §163 · NIKA-SEC-001)"
 
 permits:
   exec: true
 
 tasks:
-  - id: sudo_argv_blocked
+  sudo_argv_blocked:
     exec:
       command: ["sudo", "rm", "-rf", "/tmp/x"]

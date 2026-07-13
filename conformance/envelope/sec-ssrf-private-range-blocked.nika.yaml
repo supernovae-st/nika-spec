@@ -1,8 +1,9 @@
 # Expected: NIKA-SEC-005 at CHECK (static literal — the floor-parity
 # lint · 01-envelope §permits) AND at RUN for the dynamic form.
 nika: v1
-workflow: sec04-ssrf-private-192
-description: "ATTACK: SSRF to private RFC-1918 range 192.168.x.x — expect BLOCKED"
+workflow:
+  id: sec04-ssrf-private-192
+  description: "ATTACK: SSRF to private RFC-1918 range 192.168.x.x — expect BLOCKED"
 
 permits:
   net:
@@ -10,7 +11,7 @@ permits:
   tools: ["nika:fetch"]
 
 tasks:
-  - id: attack
+  attack:
     invoke:
       tool: nika:fetch
       args:

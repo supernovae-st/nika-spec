@@ -1,6 +1,7 @@
 # Expected: NIKA-EXEC-001 at RUN. Parent fails (fail_fast default true); marker files prove a,b ran and d aborted.
 nika: v1
-workflow: foreach-failfast-true
+workflow:
+  id: foreach-failfast-true
 # SPEC 03 §fail_fast default true: first iteration error aborts remaining iterations;
 # parent → failure immediately. max_parallel:1 (sequential, in order).
 # Per-iteration program chosen by CEL ternary (shell-free): the FAILHERE item runs
@@ -10,7 +11,7 @@ workflow: foreach-failfast-true
 vars:
   items: { type: array, default: ["a", "b", "FAILHERE", "d"] }
 tasks:
-  - id: mapped
+  mapped:
     for_each: ${{ vars.items }}
     max_parallel: 1
     exec:

@@ -78,6 +78,16 @@ LOOP_LOCALS = {"item", "index"}  # for_each-scoped locals · 04-variables.md §5
 DAG_EDGE_FIELDS = ("when", "with", "for_each", "infer", "exec", "invoke", "agent")
 
 
+
+def iter_tasks(doc):
+    """W1 'the map': tasks is an ordered MAP keyed by task id. Returns
+    [(tid, task_dict)] pairs - the single accessor every rule reads through."""
+    tasks = doc.get("tasks")
+    if not isinstance(tasks, dict):
+        return []
+    return [(k, v) for k, v in tasks.items() if isinstance(v, dict)]
+
+
 def load_schema() -> Draft202012Validator:
     return Draft202012Validator(json.loads(SCHEMA_PATH.read_text()))
 
@@ -226,13 +236,9 @@ def stdlib_surface_errors(doc: dict, canon: dict) -> list[dict]:
     # the ENVELOPE default model — the template slot every author fills first
     check_model("(envelope) model", doc.get("model"))
 
-    tasks = doc.get("tasks") or []
-    if not isinstance(tasks, list):
-        return errs
-    for t in tasks:
-        if not isinstance(t, dict):
-            continue
-        where = f"task '{t.get('id')}'"
+    tasks = iter_tasks(doc)
+    for tid, t in tasks:
+        where = f"task '{tid}'"
         for verb in ("infer", "agent"):
             body = t.get(verb)
             if isinstance(body, dict):
@@ -453,26 +459,20 @@ def _schema_path_errors(doc: dict) -> list[dict]:
     """NIKA-VAR-003 · static binding validation (04 §Static binding
     validation) · only provably-invalid paths are rejected (sound)."""
     errs: list[dict] = []
-    tasks = doc.get("tasks") or []
-    if not isinstance(tasks, list):
-        return errs
+    tasks = iter_tasks(doc)
     schemas = {}
-    for t in tasks:
-        if not isinstance(t, dict):
-            continue
+    for tid, t in tasks:
         for verb in ("infer", "agent"):
             body = t.get(verb)
             if isinstance(body, dict) and isinstance(body.get("schema"), dict):
-                schemas[t.get("id")] = body["schema"]
+                schemas[tid] = body["schema"]
     if not schemas:
         return errs
-    for t in tasks:
-        if not isinstance(t, dict):
-            continue
+    for tid, t in tasks:
         for body in _expr_bodies(t):
             for m in OUTPUT_PATH.finditer(body):
-                tid, trail = m.group(1), m.group(2)
-                schema = schemas.get(tid)
+                ref_id, trail = m.group(1), m.group(2)
+                schema = schemas.get(ref_id)
                 if schema is None:
                     continue  # dynamic producer · never rejected
                 steps = []
@@ -496,20 +496,12 @@ def _schema_path_errors(doc: dict) -> list[dict]:
 def cross_ref_errors(doc: dict) -> list[dict]:
     """The engine-parse cross-reference rules (beyond JSON Schema)."""
     errs: list[dict] = []
-    tasks = doc.get("tasks") or []
-    if not isinstance(tasks, list):
-        return errs  # schema layer already rejected this
-    ids = [t.get("id") for t in tasks if isinstance(t, dict)]
-    idset = {i for i in ids if isinstance(i, str)}
-
-    # NIKA-PARSE · duplicate task id (03-dag.md · id unique within workflow)
-    seen: set[str] = set()
-    for i in ids:
-        if isinstance(i, str):
-            if i in seen:
-                errs.append({"namespace": "NIKA-PARSE", "category": "validation_error",
-                             "detail": f"duplicate task id '{i}'"})
-            seen.add(i)
+    tasks = iter_tasks(doc)
+    if not tasks:
+        return errs  # schema layer already rejected a non-map tasks:
+    idset = {tid for tid, _ in tasks}
+    # duplicate task identity is now a duplicate MAP KEY — the YAML loader
+    # itself rejects it before this layer (PARSE-007 mechanics · W1).
 
     # Non-string depends_on entries (a mapping · a number) are schema-layer
     # violations · this layer must SURVIVE them (collected verdict · no crash).
@@ -518,15 +510,14 @@ def cross_ref_errors(doc: dict) -> list[dict]:
         return [d for d in raw if isinstance(d, str)] if isinstance(raw, list) else []
 
     # NIKA-DAG-002 · depends_on references an undeclared task
-    for t in tasks:
+    for tid, t in tasks:
         for dep in _deps(t):
             if dep not in idset:
                 errs.append({"code": "NIKA-DAG-002", "category": "validation_error",
-                             "detail": f"task '{t.get('id')}' depends_on undeclared '{dep}'"})
+                             "detail": f"task '{tid}' depends_on undeclared '{dep}'"})
 
     # NIKA-DAG-001 · cycle in depends_on (DFS)
-    graph = {t.get("id"): _deps(t) for t in tasks
-             if isinstance(t, dict) and isinstance(t.get("id"), str)}
+    graph = {tid: _deps(t) for tid, t in tasks}
     WHITE, GREY, BLACK = 0, 1, 2
     color = {n: WHITE for n in graph}
 
@@ -548,9 +539,7 @@ def cross_ref_errors(doc: dict) -> list[dict]:
 
     # NIKA-DAG-003 · a `${{ tasks.X }}` reference from when:/with:/for_each:/any
     # verb body without depends_on:[X] (03-dag.md · the edge is never inferred)
-    for t in tasks:
-        if not isinstance(t, dict):
-            continue
+    for tid, t in tasks:
         declared = set(_deps(t))
         refs: set[str] = set()
         for field in DAG_EDGE_FIELDS:
@@ -576,10 +565,7 @@ def cross_ref_errors(doc: dict) -> list[dict]:
             stack.extend(graph.get(n, []))
         return seen
 
-    for t in tasks:
-        if not isinstance(t, dict):
-            continue
-        tid = t.get("id")
+    for tid, t in tasks:
         on_error = t.get("on_error")
         if not isinstance(on_error, dict) or not isinstance(tid, str):
             continue
@@ -599,13 +585,11 @@ def cross_ref_errors(doc: dict) -> list[dict]:
     vars_keys = _keys(doc.get("vars"))
     env_keys = _keys(doc.get("env"))
     secrets_keys = _keys(doc.get("secrets"))
-    for t in tasks:
-        if not isinstance(t, dict):
-            continue
+    for tid, t in tasks:
         scopes = {"vars": vars_keys, "env": env_keys, "secrets": secrets_keys,
                   "tasks": idset, "with": _keys(t.get("with")),
                   "in_for_each": "for_each" in t}
-        where = f"task '{t.get('id')}'"
+        where = f"task '{tid}'"
         errs.extend(_resolution_errors(t, scopes, where))
         errs.extend(_unclosed_expr_errors(t, where))
         errs.extend(_bare_envelope_errors(t, where))

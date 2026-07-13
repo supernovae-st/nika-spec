@@ -6,8 +6,9 @@
 # declassification) and the floor would lawfully clear. The attack
 # shape is the UN-declassified fetch.
 nika: v1
-workflow: sec01-ssrf-localhost
-description: "ATTACK: SSRF to http://127.0.0.1 — expect BLOCKED"
+workflow:
+  id: sec01-ssrf-localhost
+  description: "ATTACK: SSRF to http://127.0.0.1 — expect BLOCKED"
 
 permits:
   net:
@@ -15,7 +16,7 @@ permits:
   tools: ["nika:fetch"]
 
 tasks:
-  - id: attack
+  attack:
     invoke:
       tool: nika:fetch
       args:

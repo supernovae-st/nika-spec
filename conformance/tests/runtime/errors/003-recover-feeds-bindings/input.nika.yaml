@@ -1,11 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: rt-recover-feeds-bindings
+workflow:
+  id: rt-recover-feeds-bindings
 model: mock/echo
 vars:
   fallback: { data: { title: "cached title" } }
 tasks:
-  - id: fetchish
+  fetchish:
     on_error:
       recover: ${{ vars.fallback }}
     output:
@@ -13,6 +14,6 @@ tasks:
     invoke:
       tool: "nika:assert"
       args: { condition: "${{ 1 > 2 }}", message: "the live call dies" }
-  - id: reader
+  reader:
     depends_on: [fetchish]
     infer: { prompt: "${{ tasks.fetchish.title }}" }

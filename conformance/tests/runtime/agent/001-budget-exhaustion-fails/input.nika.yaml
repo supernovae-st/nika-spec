@@ -1,15 +1,16 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: rt-agent-budget-failure
+workflow:
+  id: rt-agent-budget-failure
 model: mock/echo
 tasks:
-  - id: loop
+  loop:
     on_error: { skip: true }
     agent:
       prompt: "loop forever"
       tools: ["nika:wait"]
       max_turns: 2
-  - id: reader
+  reader:
     depends_on: [loop]
     when: ${{ tasks.loop.error != null }}
     infer: { prompt: "${{ tasks.loop.error.code }}" }

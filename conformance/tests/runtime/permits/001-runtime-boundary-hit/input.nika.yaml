@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: rt-permits-runtime-hit
+workflow:
+  id: rt-permits-runtime-hit
 model: mock/echo
 permits:
   net: { http: ["api.example.com"] }
@@ -8,11 +9,11 @@ permits:
 vars:
   hosts: ["https://forbidden.example.org/data"]
 tasks:
-  - id: pick
+  pick:
     invoke:
       tool: "nika:jq"
       args: { input: "${{ vars.hosts }}", expression: ".[0]" }
-  - id: fetcher
+  fetcher:
     depends_on: [pick]
     invoke:
       tool: "nika:fetch"

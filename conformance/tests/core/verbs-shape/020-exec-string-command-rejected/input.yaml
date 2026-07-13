@@ -3,8 +3,9 @@
 # string form (the old implicit shell) is rejected; the shell door is
 # the explicit `shell:` field.
 nika: v1
-workflow: hello
+workflow:
+  id: hello
 tasks:
-  - id: run
+  run:
     exec:
       command: "echo hello | wc -l"

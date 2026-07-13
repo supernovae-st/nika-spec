@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: f006plain
+workflow:
+  id: f006plain
 tasks:
-  - id: one
+  one:
     exec: { command: ["timeout", "30", "./process.sh"] }

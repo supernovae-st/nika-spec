@@ -1,0 +1,8 @@
+nika: v1
+workflow:
+  id: desc-misplaced
+description: I used to live at the top level
+tasks:
+  hello:
+    exec:
+      command: ["true"]

@@ -2,7 +2,8 @@
 # r12 · mock/echo chain: verify DAG wiring, output bindings, no LLM cost
 # Tests: mock/echo with output: bindings, chaining mock outputs into prompt
 nika: v1
-workflow: mock-extract-chain
+workflow:
+  id: mock-extract-chain
 
 model: mock/echo
 
@@ -10,7 +11,7 @@ vars:
   article_content: "Rust 1.87 introduces async closures, improved error messages, and const generics stabilization."
 
 tasks:
-  - id: echo_content
+  echo_content:
     invoke:
       tool: nika:jq
       args:
@@ -23,7 +24,7 @@ tasks:
       title: ".title"
       body: ".body"
 
-  - id: build_prompt_data
+  build_prompt_data:
     depends_on: [echo_content]
     invoke:
       tool: nika:jq
@@ -41,7 +42,7 @@ tasks:
             has_body: (.body | type) == "string"
           }
 
-  - id: save
+  save:
     depends_on: [build_prompt_data]
     invoke:
       tool: nika:write

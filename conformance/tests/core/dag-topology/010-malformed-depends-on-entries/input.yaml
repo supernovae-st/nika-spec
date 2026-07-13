@@ -2,16 +2,17 @@
 # a number). The schema layer flags them · every later layer must SURVIVE
 # them and still produce a collected verdict (oracle crash = conformance bug).
 nika: v1
-workflow: malformed-depends-on
-description: "non-string depends_on entries must not crash the oracle"
+workflow:
+  id: malformed-depends-on
+  description: "non-string depends_on entries must not crash the oracle"
 
 tasks:
-  - id: gather
+  gather:
     invoke:
       tool: "nika:read"
       args: { path: "./input.txt" }
 
-  - id: think
+  think:
     depends_on:
       - { task: gather }
       - 42

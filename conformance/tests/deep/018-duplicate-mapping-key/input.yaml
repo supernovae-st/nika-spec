@@ -1,7 +1,8 @@
 nika: v1
-workflow: deep-018
+workflow:
+  id: deep-018
 tasks:
-  - id: a
+  a:
     exec:
       command: ["echo", "the-real-one"]
     exec:

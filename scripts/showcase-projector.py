@@ -199,19 +199,18 @@ def render_mermaid(lean_text: str) -> str:
     """The docs DAG diagram · GENERATED from the same yaml (drift-proof) ·
     canonical verb palette · conditional edges dashed with the when label."""
     doc = yaml.safe_load(lean_text)
-    tasks = doc.get("tasks") or []
+    tasks_map = doc.get("tasks") or {}
+    tasks = list(tasks_map.items()) if isinstance(tasks_map, dict) else []
     # ≤7 tasks read naturally left-to-right · bigger DAGs squash at page
     # width — top-down keeps every node label legible (derived · no hand pick)
     lines = ["flowchart LR" if len(tasks) <= 7 else "flowchart TD"]
     verbs = {}
-    for t in tasks:
-        tid = t.get("id")
+    for tid, t in tasks:
         verb = next((v for v in ("infer", "exec", "invoke", "agent") if v in t), "invoke")
         verbs[tid] = verb
         label = _node_label(t, tid).replace('"', "'")
         lines.append(f'  {tid}["{label}"]:::{verb}')
-    for t in tasks:
-        tid = t.get("id")
+    for tid, t in tasks:
         arrow = "-.->" if "when" in t else "-->"
         for d in (t.get("depends_on") or []):
             lines.append(f"  {d} {arrow} {tid}")
@@ -246,7 +245,8 @@ CONSTRUCTS = [
 
 def _constructs_of(lean_text: str) -> set[str]:
     doc = yaml.safe_load(lean_text)
-    tasks = doc.get("tasks") or []
+    tasks_map = doc.get("tasks") or {}
+    tasks = list(tasks_map.items()) if isinstance(tasks_map, dict) else []
     found: set[str] = set()
     model = doc.get("model") or ""
     if isinstance(model, str) and model.split("/")[0] in ("ollama", "lmstudio", "llamacpp", "localai", "vllm"):
@@ -258,7 +258,7 @@ def _constructs_of(lean_text: str) -> set[str]:
     for v in (doc.get("vars") or {}).values():
         if isinstance(v, dict) and "type" in v:
             found.add("typed_vars")
-    for t in tasks:
+    for tid, t in tasks:
         for k in ("for_each", "max_parallel", "fail_fast", "when", "retry",
                   "timeout", "on_finally", "on_error", "with", "output"):
             if k in t:
@@ -322,7 +322,8 @@ def build_dag(lean_text: str) -> dict:
     ranges = _task_lines(lean_text)
     tasks_out = []
     waves: dict[str, int] = {}
-    tasks = doc.get("tasks") or []
+    tasks_map = doc.get("tasks") or {}
+    tasks = list(tasks_map.items()) if isinstance(tasks_map, dict) else []
 
     def wave_of(tid: str, seen=()) -> int:
         if tid in waves:
@@ -333,7 +334,7 @@ def build_dag(lean_text: str) -> dict:
         waves[tid] = w
         return w
 
-    for t in tasks:
+    for tid, t in tasks:
         tid = t.get("id")
         verb = next((v for v in ("infer", "exec", "invoke", "agent") if v in t), "invoke")
         line0, line1 = ranges.get(tid, (0, 0))

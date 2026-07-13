@@ -1,12 +1,13 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: f004real
+workflow:
+  id: f004real
 tasks:
-  - id: a
+  a:
     invoke:
       tool: "nika:fetch"
       args: { url: "https://primary.example.com" }
-  - id: mirror
+  mirror:
     depends_on: [a]
     when: "${{ tasks.a.status == 'failure' }}"
     invoke:
