@@ -98,8 +98,13 @@ def _task_lines(lean_text: str) -> dict[str, tuple[int, int]]:
     highlight)."""
     lines = lean_text.splitlines()
     starts: list[tuple[str, int]] = []
+    in_tasks = False
     for i, line in enumerate(lines):
-        m = re.match(r"^  - id: ([a-z][a-z0-9_]*)\s*$", line)
+        if re.match(r"^[A-Za-z0-9_-]+\s*:", line):
+            in_tasks = line.startswith("tasks:")
+        # W1 « the map »: a task opens at its indent-2 key — bare or with
+        # an inline flow body on the same line
+        m = re.match(r"^  ([a-z][a-z0-9_]*):(?:\s*(?:\{.*)?)?(?:\s*#.*)?$", line) if in_tasks else None
         if m:
             starts.append((m.group(1), i))
     ranges: dict[str, tuple[int, int]] = {}
@@ -127,7 +132,8 @@ def _gloss(task: dict) -> str:
             g += " · thinking budget"
     elif "exec" in task:
         body = task["exec"] or {}
-        cmd = (body.get("command", "") if isinstance(body, dict) else str(body)).strip()
+        raw = (body.get("command") or body.get("shell") or "") if isinstance(body, dict) else body
+        cmd = (" ".join(str(p) for p in raw) if isinstance(raw, list) else str(raw)).strip()
         head = cmd.split()[0] if cmd.split() else "a command"
         g = f"run `{head}`"
     elif "invoke" in task:
@@ -177,7 +183,10 @@ def _node_label(task: dict, tid: str) -> str:
     if "invoke" in task and isinstance(task["invoke"], dict):
         detail = task["invoke"].get("tool", "")
     elif "exec" in task and isinstance(task["exec"], dict):
-        cmd = (task["exec"].get("command") or "").strip()
+        # command is argv (list) or the explicit shell: string (0.103 law)
+        raw = task["exec"].get("command") or task["exec"].get("shell") or ""
+        cmd = " ".join(str(p) for p in raw) if isinstance(raw, list) else str(raw)
+        cmd = cmd.strip()
         detail = cmd.split()[0] if cmd.split() else ""
     elif "infer" in task and isinstance(task["infer"], dict):
         if task["infer"].get("schema"):
@@ -328,14 +337,13 @@ def build_dag(lean_text: str) -> dict:
     def wave_of(tid: str, seen=()) -> int:
         if tid in waves:
             return waves[tid]
-        task = next((t for t in tasks if t.get("id") == tid), None)
+        task = next((body for key, body in tasks if key == tid), None)
         deps = [d for d in (task.get("depends_on") or []) if d not in seen] if task else []
         w = 0 if not deps else 1 + max(wave_of(d, (*seen, tid)) for d in deps)
         waves[tid] = w
         return w
 
     for tid, t in tasks:
-        tid = t.get("id")
         verb = next((v for v in ("infer", "exec", "invoke", "agent") if v in t), "invoke")
         line0, line1 = ranges.get(tid, (0, 0))
         when = t.get("when")
