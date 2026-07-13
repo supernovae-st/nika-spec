@@ -32,7 +32,6 @@ schemas/
 ├── workflow.schema.json         ✅ envelope + tasks + 4 verbs ($defs) · 7 examples ⊨ · negative-control verified
 ├── verb-infer.schema.json       # infer: action shape
 ├── verb-exec.schema.json        # exec: action shape
-├── verb-fetch.schema.json       # fetch: action shape
 ├── verb-invoke.schema.json      # invoke: action shape
 ├── verb-agent.schema.json       # agent: action shape
 ├── stdlib-providers.schema.json # providers v0.1 enum
@@ -45,7 +44,8 @@ schemas/
 ```yaml
 # yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
 nika: v1
-workflow: my-workflow
+workflow:
+  id: my-workflow
 ...
 ```
 
