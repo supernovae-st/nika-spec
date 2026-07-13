@@ -30,6 +30,7 @@
 import json
 import os
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -193,14 +194,43 @@ def render_ts(tokens: dict) -> str:
     return "\n".join(lines)
 
 
+def _origin_main_text(dest: Path) -> str | None:
+    """The sibling REPO's truth for dest (origin/main blob · offline · local ref).
+
+    A sibling working tree is arbitrary local state — another session's WIP,
+    a stale checkout, a mid-rebase tree. Judging it as if it were the repo
+    produced the F13 false positive (2026-07-13: a 112-commit-stale website
+    checkout read as DRIFT while origin/main was in sync). None = not a git
+    repo / no origin/main / path absent there; caller falls back to the
+    working-tree verdict.
+    """
+    try:
+        top = subprocess.run(
+            ["git", "-C", str(dest.parent), "rev-parse", "--show-toplevel"],
+            capture_output=True, text=True, check=True,
+        ).stdout.strip()
+        rel = dest.resolve().relative_to(Path(top).resolve())
+        blob = subprocess.run(
+            ["git", "-C", top, "show", f"origin/main:{rel.as_posix()}"],
+            capture_output=True, text=True, check=True,
+        )
+        return blob.stdout
+    except (subprocess.CalledProcessError, FileNotFoundError, ValueError):
+        return None
+
+
 def project_ts(dest: Path, rendered: str, write: bool, label: str) -> bool:
-    """True = in sync."""
+    """True = in sync (repo truth · origin/main outranks a stale working tree)."""
     current = dest.read_text() if dest.exists() else None
     if current == rendered:
         return True
     if write:
         dest.write_text(rendered)
         print(f"✓ wrote {label} · {dest}")
+        return True
+    if _origin_main_text(dest) == rendered:
+        print(f"· {label} checkout stale ({dest.name} behind origin/main, "
+              f"which IS in sync) · pull the sibling · not a repo drift")
         return True
     print(f"design-projector · DRIFT · {label} {dest.name} · run --write",
           file=sys.stderr)
