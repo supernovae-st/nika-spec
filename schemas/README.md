@@ -45,7 +45,8 @@ schemas/
 ```yaml
 # yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
 nika: v1
-workflow: my-workflow
+workflow:
+  id: my-workflow
 ...
 ```
 
