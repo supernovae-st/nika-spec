@@ -30,3 +30,14 @@ v0 scope = today's grammar subset the generator emits. Extensions land
 wave by wave (typed edges · returns/decoders · outcome causes · callables
 and composition · decision/abstention), each with its own generator blocks
 and differential gate before the corresponding breaking window opens.
+
+## W2 draft (pipelined inside the W1 window · merges when W2 opens)
+
+`semantics_w2.py` + `selftest_w2.py` model the W2 delta from the LOCKED
+rulings only (G11 edge roles · gate algebra v2 · after predicates · when
+post-gate · depends_on dies): 25 self-tests green without any binary.
+Three named witnesses are exposed for the W2 window — W2-Q1 the
+depends_on ≢ after:succeeded migration gap on a skipped producer (the
+codemod's equivalence-or-stop STOP case), W2-Q2 cancelled ∈ terminal,
+W2-Q3 the skipped-producer value absence (#75-D5). The differential
+runner joins once a W2 engine exists — the model leads (law §0.10).
