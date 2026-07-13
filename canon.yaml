@@ -53,7 +53,7 @@ counts:
   templates: 10
   error_namespaces: 14
   error_categories: 12
-  error_codes: 50
+  error_codes: 53
   pillars: 5
   # ---- extended v0.2 · 2026-05-27 · lifecycle + diamond + steal + severity
   lifecycle_product: 4

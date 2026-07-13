@@ -89,7 +89,7 @@ def self_check(canon: dict) -> None:
         )
         sys.exit(2)
 
-    for cat in ("verbs", "builtins", "extract_modes", "templates", "error_namespaces", "pillars"):
+    for cat in ("verbs", "builtins", "extract_modes", "templates", "error_namespaces", "pillars", "error_codes"):
         count = canon[cat]["count"]
         actual = len(canon[cat]["items"])
         if count != actual:
@@ -102,6 +102,25 @@ def self_check(canon: dict) -> None:
         m = canon["mcp"][sub]
         if m["count"] != len(m["items"]):
             die(f"mcp.{sub}", m["count"], len(m["items"]))
+
+    # The top-level counts: row is a PROJECTION of its category block — it must
+    # never drift on its own (the 50-vs-53 error_codes drift class, 2026-07-13).
+    counts = canon["counts"]
+    derived = {
+        "verbs": len(canon["verbs"]["items"]),
+        "builtins": len(canon["builtins"]["items"]),
+        "extract_modes": len(canon["extract_modes"]["items"]),
+        "templates": len(canon["templates"]["items"]),
+        "error_namespaces": len(canon["error_namespaces"]["items"]),
+        "pillars": len(canon["pillars"]["items"]),
+        "error_codes": len(canon["error_codes"]["items"]),
+        "providers": sum(len(v) for v in canon["providers"]["items"].values()),
+        "mcp_tools": len(canon["mcp"]["tools"]["items"]),
+        "mcp_protocol_versions": len(canon["mcp"]["protocol_versions"]["items"]),
+    }
+    for key, actual in derived.items():
+        if counts.get(key) != actual:
+            die(f"counts.{key}", counts.get(key), actual)
 
 
 MARKER_RE = re.compile(r"(<!-- canon:([a-z_]+) -->)([^<]*)(<!-- /canon -->)")
