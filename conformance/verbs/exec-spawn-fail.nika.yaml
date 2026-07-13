@@ -6,4 +6,4 @@ workflow: e11-exec-spawn-fail
 tasks:
   - id: no_such_cmd
     exec:
-      command: "/usr/local/bin/nika_test_nonexistent_xyzzy_404"
+      command: ["/usr/local/bin/nika_test_nonexistent_xyzzy_404"]

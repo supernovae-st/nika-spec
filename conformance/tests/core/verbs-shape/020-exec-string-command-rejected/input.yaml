@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+# D1 (breaking-window #75): semantics never fork on a YAML type — the
+# string form (the old implicit shell) is rejected; the shell door is
+# the explicit `shell:` field.
+nika: v1
+workflow: hello
+tasks:
+  - id: run
+    exec:
+      command: "echo hello | wc -l"

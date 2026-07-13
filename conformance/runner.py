@@ -350,6 +350,25 @@ def _expr_task_refs(value) -> set[str]:
     return {ref for body in _expr_bodies(value) for ref in TASK_REF.findall(body)}
 
 
+BARE_TASK_REF = re.compile(
+    r"\btasks\.([a-z][a-z0-9_]*)(?![a-z0-9_])(?!\s*[.\[])")
+
+
+def _bare_envelope_errors(value, where: str) -> list[dict]:
+    """D2 (#75 - 0.103): bare `tasks.X` is the ENVELOPE, not a value - the
+    projection set (.output/.status/.error/.duration_ms) is closed and
+    required. Fires when a `tasks.X` root carries no projection."""
+    errs = []
+    for body in _expr_bodies(value):
+        for m in BARE_TASK_REF.finditer(body):
+            errs.append({"code": "NIKA-VAR-020", "namespace": "NIKA-VAR",
+                         "category": "validation_error",
+                         "detail": f"{where} - bare `tasks.{m.group(1)}` is the envelope, "
+                                   "not a value - pick `.output` (or .status/.error/"
+                                   ".duration_ms - 04 namespaces - closed projection set)"})
+    return errs
+
+
 def _unclosed_expr_errors(value, where: str) -> list[dict]:
     """NIKA-VAR validation_error · an unescaped `${{` with no closing `}}` (04)."""
     errs: list[dict] = []
@@ -589,10 +608,12 @@ def cross_ref_errors(doc: dict) -> list[dict]:
         where = f"task '{t.get('id')}'"
         errs.extend(_resolution_errors(t, scopes, where))
         errs.extend(_unclosed_expr_errors(t, where))
+        errs.extend(_bare_envelope_errors(t, where))
     out_scopes = {"vars": vars_keys, "env": env_keys, "secrets": secrets_keys,
                   "tasks": idset, "with": set(), "in_for_each": False}
     errs.extend(_resolution_errors(doc.get("outputs"), out_scopes, "outputs:"))
     errs.extend(_unclosed_expr_errors(doc.get("outputs"), "outputs:"))
+    errs.extend(_bare_envelope_errors(doc.get("outputs"), "outputs:"))
     # The envelope `model:` is the template slot every author fills first — a
     # `${{ }}` template is legal there (schema-permissive), so an unresolved
     # ref must be caught the same as one in a task body. It was not: a typo'd

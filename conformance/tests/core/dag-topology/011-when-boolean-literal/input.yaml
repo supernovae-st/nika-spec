@@ -2,7 +2,7 @@ nika: v1
 workflow: core-when-true
 tasks:
   - id: build
-    exec: { command: "./build.sh" }
+    exec: { command: ["./build.sh"] }
   - id: notify
     depends_on: [build]
     when: true

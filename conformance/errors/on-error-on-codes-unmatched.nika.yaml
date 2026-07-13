@@ -9,7 +9,7 @@ workflow: onerror-oncodes-filter
 tasks:
   - id: fails
     exec:
-      command: "exit 1"
+      command: ["exit", "1"]
     on_error:
       on_codes: [NIKA-TIMEOUT-001]
       recover: "should-not-apply"

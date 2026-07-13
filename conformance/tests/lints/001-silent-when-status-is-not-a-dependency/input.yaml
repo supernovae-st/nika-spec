@@ -3,10 +3,10 @@ nika: v1
 workflow: f001nodep
 tasks:
   - id: a
-    exec: { command: "./a.sh" }
+    exec: { command: ["./a.sh"] }
   - id: c
-    exec: { command: "./c.sh" }
+    exec: { command: ["./c.sh"] }
   - id: b
     depends_on: [a, c]
     when: "${{ tasks.a.status == 'failure' }}"
-    exec: { command: "./b.sh" }
+    exec: { command: ["./b.sh"] }

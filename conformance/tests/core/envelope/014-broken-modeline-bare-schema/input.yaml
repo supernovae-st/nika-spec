@@ -3,4 +3,4 @@ nika: v1
 workflow: hello
 tasks:
   - id: a
-    exec: { command: "true" }
+    exec: { command: ["true"] }

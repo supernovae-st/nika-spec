@@ -3,8 +3,8 @@ nika: v1
 workflow: f001r
 tasks:
   - id: a
-    exec: { command: "./a.sh" }
+    exec: { command: ["./a.sh"] }
   - id: b
     depends_on: [a]
     when: "${{ 'success' == tasks.a.status }}"
-    exec: { command: "./b.sh" }
+    exec: { command: ["./b.sh"] }

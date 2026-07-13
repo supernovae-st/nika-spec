@@ -330,14 +330,14 @@ fetch-chain pattern · a local `nika:read` beside a live fetch).
 
 # Skip on error · downstream may handle
 - id: optional_step
-  exec: { command: "./optional.sh" }
+  exec: { command: ["./optional.sh"] }
   on_error:
     skip: true
 
 - id: next
   depends_on: [optional_step]
   when: ${{ tasks.optional_step.status == 'success' }}   # only run if not skipped
-  exec: { command: "..." }
+  exec: { command: ["..."] }
 ```
 
 ---

@@ -8,7 +8,7 @@ workflow: onerror-recover-downstream
 tasks:
   - id: fails
     exec:
-      command: "exit 2"
+      command: ["exit", "2"]
     on_error:
       recover: "fallback"
   - id: down

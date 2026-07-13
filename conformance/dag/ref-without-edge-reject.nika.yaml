@@ -5,9 +5,9 @@ workflow: e09-dag-ref-no-edge
 tasks:
   - id: producer
     exec:
-      command: "echo hello"
+      command: ["echo", "hello"]
 
   - id: consumer
     # Missing: depends_on: [producer]
     exec:
-      command: "echo ${{ tasks.producer.output }}"
+      command: ["echo", "${{ tasks.producer.output }}"]

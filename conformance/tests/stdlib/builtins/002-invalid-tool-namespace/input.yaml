@@ -6,4 +6,4 @@ tasks:
     invoke:
       tool: "shell:run"
       args:
-        command: "ls"
+        command: ["ls"]

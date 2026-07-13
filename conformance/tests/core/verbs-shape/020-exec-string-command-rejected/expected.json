@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "validation_error"
+    }
+  ],
+  "note": "02-verbs.md · D1: command is argv-only · a string command is the old implicit-shell form · pipes/redirects live in `shell:`."
+}

@@ -3,4 +3,4 @@ nika: v1
 workflow: hello
 tasks:
   - id: a
-    exec: { command: "curl -H 'Authorization: Bearer ${{ secrets.api_key }}' https://api.example.com" }
+    exec: { command: ["curl", "-H", "Authorization: Bearer ${{ secrets.api_key }}", "https://api.example.com"] }

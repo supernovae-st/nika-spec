@@ -3,7 +3,7 @@ nika: v1
 workflow: diamond
 tasks:
   - id: a
-    exec: { command: "./prepare.sh" }
+    exec: { command: ["./prepare.sh"] }
   - id: b
     depends_on: [a]
     infer: { prompt: "Analyze branch B" }

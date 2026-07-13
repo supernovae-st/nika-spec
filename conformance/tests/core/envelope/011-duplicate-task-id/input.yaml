@@ -3,6 +3,6 @@ nika: v1
 workflow: hello
 tasks:
   - id: build
-    exec: { command: "make" }
+    exec: { command: ["make"] }
   - id: build
-    exec: { command: "make again" }
+    exec: { command: ["make", "again"] }

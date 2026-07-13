@@ -1430,7 +1430,7 @@ Run a shell command. The result is the command's stdout (default) or a structure
 ```yaml
 - id: build
   exec:
-    command: "cargo build --release"
+    command: ["cargo", "build", "--release"]
 ```
 
 ### Full
@@ -1439,7 +1439,7 @@ Run a shell command. The result is the command's stdout (default) or a structure
 - id: test
   timeout: "60s"                   # task-level (applies to any verb · Go duration · see 03-dag)
   exec:
-    command: "cargo test --workspace --lib"
+    command: ["cargo", "test", "--workspace", "--lib"]
     cwd: "./engine"
     env:
       RUST_LOG: "debug"
@@ -1451,7 +1451,8 @@ Run a shell command. The result is the command's stdout (default) or a structure
 
 | Field | Required | Type | Notes |
 |---|---|---|---|
-| `command` | yes | string \| array | **String** → run via the OS shell (`/bin/sh -c`) · pipes/redirects work · the shell blocklist applies. **Array** (`["prog", "arg", …]`) → direct `execve`, **NO shell** · each element substituted independently · the one-obvious-way for any command carrying interpolated or untrusted values (see Security). May use `${{ ... }}`. |
+| `command` | one of | array | **argv** — `["prog", "arg", …]` → direct `execve`, **NO shell** · each element substituted independently — an interpolated `${{ }}` value can never break out of its argument (see Security). Exactly one of `command` \| `shell`. |
+| `shell` | one of | string | **The explicit shell door** — one line run via `/bin/sh -c` · pipes · redirects · globs. The blocklist applies HERE; interpolating untrusted values here is the author's own risk, visibly. Exactly one of `command` \| `shell`. *(D1 · #75: semantics never fork on a YAML type — the field name carries the meaning. The old string `command:` is rejected at parse.)* |
 | `cwd` | no | string | Working directory · default = engine's cwd |
 | `env` | no | object | OS environment variables for **this subprocess** · key→value map |
 | `stdin` | no | string | Stdin data · may use `${{ ... }}` |
@@ -1469,15 +1470,15 @@ Run a shell command. The result is the command's stdout (default) or a structure
 
 A v0.1-compliant engine MUST ·
 
-- **Honor the two `command` forms** · a **string** runs through `/bin/sh -c` (the shell-feature path · pipes · redirects); an **array** runs through `execve` with NO shell: `command[0]` is the program, the rest are argv passed verbatim, each element substituted independently.
-- Implement a shell **blocklist** for dangerous commands on the STRING form (see reference impl `nika-policy` for canonical list · 100+ patterns including `rm -rf /` · `chmod 777` · `curl … | sh` · etc.)
+- **Honor the two exec bodies** · `command:` (array) runs through `execve` with NO shell: `command[0]` is the program, the rest are argv passed verbatim, each element substituted independently. `shell:` (string) runs through `/bin/sh -c` — the shell-feature path (pipes · redirects · globs). **Exactly one** of the two; a string `command:` (the pre-0.103 implicit-shell form) is rejected at parse (`NIKA-PARSE` · `validation_error`).
+- Implement a shell **blocklist** for dangerous commands on `shell:` (see reference impl `nika-policy` for canonical list · 100+ patterns including `rm -rf /` · `chmod 777` · `curl … | sh` · etc.)
 - Reject blocklist matches with a clear error
 - Honor `timeout` with a hard kill (Go-duration string · see 03-dag)
 - Sandbox `cwd` if configured (engine-specific)
 
 > **The argv form is the STRUCTURAL fix for command injection: prefer it.**
 > A `${{ }}`-interpolated value in the STRING form is shell-parsed:
-> `command: "process ${{ item }}"` with `item == "; rm -rf /"` is a classic
+> `shell: "process ${{ item }}"` with `item == "; rm -rf /"` is a classic
 > injection, and the blocklist is a *detector* (best-effort), not a guarantee.
 > The ARRAY form removes the shell entirely: `command: ["process", "${{ item }}"]`
 > passes `item` as ONE argv element no matter what it contains; there is no
@@ -1917,7 +1918,7 @@ A list of task ids this task depends on. The engine MUST not start this task unt
   depends_on: [build]                    # the success-gate — depends_on already requires it
   when: ${{ tasks.build.output.warnings == 0 }}   # when: is for conditions BEYOND success
   exec:
-    command: "./notify.sh"
+    command: ["./notify.sh"]
 ```
 
 #### Expression language · a documented subset of CEL
@@ -2056,13 +2057,13 @@ infer the edge (a verb-body reference is an edge too · no invisible edges).
 # ❌ REJECTED at parse — `when:` reads tasks.test but no depends_on
 - id: deploy
   when: ${{ tasks.test.status == 'success' }}
-  exec: { command: "./deploy.sh" }
+  exec: { command: ["./deploy.sh"] }
 
 # ✅ CORRECT — the reference is backed by an explicit edge
 - id: deploy
   depends_on: [test]
   when: ${{ tasks.test.status == 'success' }}
-  exec: { command: "./deploy.sh" }
+  exec: { command: ["./deploy.sh"] }
 ```
 
 **Why explicit, not inferred** · an inferred edge is an invisible edge: it
@@ -2171,7 +2172,7 @@ sequential iteration · set `max_parallel: 1` ·
   for_each: ${{ vars.items }}
   max_parallel: 1                              # iterations run one-at-a-time, in order
   exec:
-    command: "process ${{ item }}"
+    command: ["process", "${{ item }}"]
 ```
 
 #### `max_parallel:` · *optional · cap concurrent iterations*
@@ -2263,7 +2264,7 @@ without statically enumerating tasks.
 - id: long_task
   timeout: "5m"             # 5 minutes
   exec:
-    command: "./long-running.sh"
+    command: ["./long-running.sh"]
 ```
 
 Hard timeout for the entire task (including any retries and their backoff
@@ -2398,9 +2399,19 @@ downstream reads `status: "failure"`. Contrast · the same evaluation error
 in a verb-body position (`args:` · `prompt:` · …) is task-stage work and IS
 recoverable by that task's `on_error`.
 
-> **`depends_on` IS the success-gate.** Do NOT write
-> `when: ${{ tasks.X.status == 'success' }}` as a plain gate: it is **redundant**
-> (`depends_on` already requires success). Use `when:` ONLY for conditions BEYOND
+> **The gate algebra (normative).** The three gate forms PROPAGATE
+> differently — the pattern `when: ${{ tasks.X.status == 'success' }}`
+> is never a no-op, it is a propagation CHOICE:
+>
+> | upstream X ends | plain `depends_on` (default gate) | `when: ${{ tasks.X.status == 'success' }}` |
+> |---|---|---|
+> | `success` | run | run |
+> | `skipped` | **run** (skipped passes the default gate) | **skipped** (the anti-skip choice · [05 §skip-interaction](./05-errors.md)) |
+> | `failure` / `cancelled` | **cancelled** — and the hard stop cascades downstream | **skipped** — and downstream's default gate passes on skipped: **the chain continues** |
+>
+> Choose knowingly: the default gate is the hard-stop cascade; the
+> status-comparison converts a failure into skip-once-then-continue.
+> Use `when:` for conditions BEYOND
 > the default gate · a value check (`tasks.X.output.coverage > 80`) · an env check
 > · or to **exclude a skipped** upstream (`when: status == 'success'` is meaningful
 > only when X may be `skipped` via `on_error: skip`).
@@ -2430,7 +2441,7 @@ tasks:
 ```yaml
 tasks:
   - id: setup
-    exec: { command: "./prepare.sh" }
+    exec: { command: ["./prepare.sh"] }
   - id: analyze_a
     depends_on: [setup]
     infer: { prompt: "Analyze A" }
@@ -2457,21 +2468,21 @@ tasks:
 ```yaml
 tasks:
   - id: check
-    exec: { command: "./check-env.sh", capture: structured }
+    exec: { command: ["./check-env.sh"], capture: structured }
 
   - id: build_prod
     depends_on: [check]
     when: ${{ tasks.check.output.env == 'production' }}
-    exec: { command: "./build.sh --release" }
+    exec: { command: ["./build.sh", "--release"] }
 
   - id: build_dev
     depends_on: [check]
     when: ${{ tasks.check.output.env != 'production' }}
-    exec: { command: "./build.sh --debug" }
+    exec: { command: ["./build.sh", "--debug"] }
 
   - id: deploy
     depends_on: [build_prod, build_dev]
-    exec: { command: "./deploy.sh" }
+    exec: { command: ["./deploy.sh"] }
 ```
 
 Exactly one of `build_prod` or `build_dev` runs · the other is skipped · `deploy` runs after both (one success + one skipped).
@@ -2536,10 +2547,10 @@ single source prevents).
 ```yaml
 - id: process
   exec:
-    command: "./process.sh > /tmp/output.json"
+    shell: "./process.sh > /tmp/output.json"   # redirect → the explicit shell door
   on_finally:                                  # runs always · success/fail/timeout/cancel
     - exec:
-        command: "rm -f /tmp/output.json"
+        command: ["rm", "-f", "/tmp/output.json"]
     - invoke:
         tool: nika:emit
         args: { event: "task_completed", task_id: "process" }
@@ -2578,7 +2589,7 @@ completes · REGARDLESS of outcome (success · failure · timeout · cancel).
 ```yaml
 # 1 · cleanup temp files (scratch_dir declared in envelope vars:)
 on_finally:
-  - exec: { command: "rm -rf ${{ vars.scratch_dir }}" }
+  - exec: { command: ["rm", "-rf", "${{ vars.scratch_dir }}"] }   # argv: the var cannot break out
 
 # 2 · always-emit completion event
 on_finally:
@@ -2768,12 +2779,22 @@ DSL. See [03-dag.md](./03-dag.md#expression-language--a-documented-subset-of-cel
 ```
 ${{ vars.X }}             workflow inputs               (declared in envelope `vars:` · untyped or typed)
 ${{ with.X }}             task-level scope               (declared per-task `with:` block)
-${{ tasks.X.output }}      task output reference          (or .status · .error · .duration_ms)
+${{ tasks.X.output }}      task output reference          (or .status · .error · .duration_ms · the CLOSED projection set)
 ${{ env.X }}              environment variable           (non-sensitive runtime config)
 ${{ secrets.X }}          masked secret reference        (vault-backed · never in logs)
 ```
 
 Five namespaces. That's it.
+
+> **Bare `tasks.X` is not a value (normative · D2 · #75).** The task
+> result is a record; its observable projections are the CLOSED set
+> `.output` (the value) · `.status` (terminal enum) · `.error` ·
+> `.duration_ms` — additions are a spec minor. An UNPROJECTED
+> `${{ tasks.X }}` in any value position is a `validation_error`
+> (`NIKA-VAR` · « the envelope is not a value — pick `.output` »):
+> before 0.103 it silently denoted the whole envelope, the source of
+> the golden-drift trap engine#524 had to teach around. No aliases —
+> one meaning per spelling.
 
 > **Loop-locals are not a 6th namespace.** Inside a `for_each` task body, two
 > extra identifiers are in scope: `${{ item }}` (the current element) and
@@ -2847,7 +2868,7 @@ Reference any upstream task's output (or status · error · duration_ms) ·
   depends_on: [build, test]
   when: ${{ tasks.test.status == 'success' && tasks.test.output.coverage > 80 }}
   exec:
-    command: "./deploy.sh ${{ tasks.build.output.artifact_path }}"
+    command: ["./deploy.sh", "${{ tasks.build.output.artifact_path }}"]
 ```
 
 `tasks.X` is the task **result record**: a CEL object, NOT the bare output
@@ -3528,14 +3549,14 @@ fetch-chain pattern · a local `nika:read` beside a live fetch).
 
 # Skip on error · downstream may handle
 - id: optional_step
-  exec: { command: "./optional.sh" }
+  exec: { command: ["./optional.sh"] }
   on_error:
     skip: true
 
 - id: next
   depends_on: [optional_step]
   when: ${{ tasks.optional_step.status == 'success' }}   # only run if not skipped
-  exec: { command: "..." }
+  exec: { command: ["..."] }
 ```
 
 ---
@@ -4141,9 +4162,9 @@ tasks: ...
       workflow: ./subroutine.nika.yaml
 ```
 
-**Why deferred** · subroutine calling needs scope/binding rules that need thought · plus risks of stack overflow (recursion) and scheduler complexity. The proposed `nika:run` builtin is therefore deferred from v0.1 · use `exec: command: "nika run subroutine.yaml"` as the workaround.
+**Why deferred** · subroutine calling needs scope/binding rules that need thought · plus risks of stack overflow (recursion) and scheduler complexity. The proposed `nika:run` builtin is therefore deferred from v0.1 · use `exec: shell: "nika run subroutine.yaml"` as the workaround.
 
-Workaround in v0.1 · use `exec: command: "nika run subroutine.yaml --output json"` to launch a sibling workflow process: `--output json` (engine CLI) prints the sub-workflow's typed `outputs:` as JSON on stdout · the parent binds it back with `capture: stdout` + a jq `output:` (the typed contract survives the process boundary).
+Workaround in v0.1 · use `exec: shell: "nika run subroutine.yaml --output json"` to launch a sibling workflow process: `--output json` (engine CLI) prints the sub-workflow's typed `outputs:` as JSON on stdout · the parent binds it back with `capture: stdout` + a jq `output:` (the typed contract survives the process boundary).
 
 **Recursion guard (normative TODAY · even for the workaround)** · a run that
 launches runs (through the workaround now, through `nika:run` when it lands)
@@ -4190,7 +4211,7 @@ macro retry_with_backoff:
 - id: poll_until
   while: ${{ tasks.check.output.ready == false }}
   exec:
-    command: "./check.sh"
+    command: ["./check.sh"]
 ```
 
 **Why deferred** · unbounded loops break the « acyclic » guarantee of the DAG

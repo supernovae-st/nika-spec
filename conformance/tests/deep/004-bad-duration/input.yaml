@@ -3,4 +3,4 @@ workflow: deep-004
 tasks:
   - id: a
     timeout: "2d"
-    exec: { command: "echo hi" }
+    exec: { command: ["echo", "hi"] }

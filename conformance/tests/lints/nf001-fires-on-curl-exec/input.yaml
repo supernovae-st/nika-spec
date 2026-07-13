@@ -3,4 +3,4 @@ nika: v1
 workflow: curl-crawl
 tasks:
   - id: crawl
-    exec: { command: "curl -s https://example.com -o out/site.html" }
+    exec: { command: ["curl", "-s", "https://example.com", "-o", "out/site.html"] }

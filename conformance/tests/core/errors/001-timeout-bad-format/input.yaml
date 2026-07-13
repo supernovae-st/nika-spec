@@ -4,4 +4,4 @@ workflow: hello
 tasks:
   - id: a
     timeout: "5w"
-    exec: { command: "echo hi" }
+    exec: { command: ["echo", "hi"] }

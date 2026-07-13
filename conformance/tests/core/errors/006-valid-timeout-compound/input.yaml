@@ -4,4 +4,4 @@ workflow: hello
 tasks:
   - id: long_task
     timeout: "1h30m"
-    exec: { command: "./long-running.sh" }
+    exec: { command: ["./long-running.sh"] }

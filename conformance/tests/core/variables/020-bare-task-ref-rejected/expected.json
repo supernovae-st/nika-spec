@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-VAR",
+      "category": "validation_error"
+    }
+  ],
+  "note": "04-variables.md · D2: bare tasks.X is the envelope, not a value · pick .output (or .status/.error/.duration_ms)."
+}

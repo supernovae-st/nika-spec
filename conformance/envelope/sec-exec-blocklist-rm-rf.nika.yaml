@@ -9,4 +9,4 @@ permits:
 tasks:
   - id: attack
     exec:
-      command: "rm -rf /tmp/nonexistent-xyz-nika-test"
+      command: ["rm", "-rf", "/tmp/nonexistent-xyz-nika-test"]

@@ -17,7 +17,7 @@ tasks:
           args: { path: "./out/ctrlflow/18_finally_ok.json", content: "finally-ok" }
   - id: fail_task
     exec:
-      command: "exit 1"
+      command: ["exit", "1"]
     on_finally:
       - invoke:
           tool: nika:write

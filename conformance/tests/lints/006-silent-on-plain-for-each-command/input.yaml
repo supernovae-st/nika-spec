@@ -5,4 +5,4 @@ tasks:
   - id: shards
     for_each: [1, 2, 3]
     timeout: 30s
-    exec: { command: "./process.sh" }
+    exec: { command: ["./process.sh"] }

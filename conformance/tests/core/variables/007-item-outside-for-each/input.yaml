@@ -3,4 +3,4 @@ nika: v1
 workflow: hello
 tasks:
   - id: process
-    exec: { command: "process ${{ item }}" }
+    exec: { command: ["process", "${{ item }}"] }

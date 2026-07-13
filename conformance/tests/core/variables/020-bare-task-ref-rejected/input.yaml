@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+# D2 (breaking-window #75): the task result is a record — unprojected
+# access is ill-typed. Pick .output (the value) or .status/.error/.duration_ms.
+nika: v1
+workflow: hello
+tasks:
+  - id: gather
+    invoke:
+      tool: "nika:read"
+      args: { path: "./README.md" }
+  - id: think
+    depends_on: [gather]
+    infer:
+      prompt: "Summarize ${{ tasks.gather }}"

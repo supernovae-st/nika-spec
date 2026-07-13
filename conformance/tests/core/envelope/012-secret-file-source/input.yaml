@@ -6,4 +6,4 @@ secrets:
     path: ~/.keys/signing.pem
 tasks:
   - id: sign
-    exec: { command: "./sign.sh", env: { PEM: "${{ secrets.signing_pem }}" } }
+    exec: { command: ["./sign.sh"], env: { PEM: "${{ secrets.signing_pem }}" } }

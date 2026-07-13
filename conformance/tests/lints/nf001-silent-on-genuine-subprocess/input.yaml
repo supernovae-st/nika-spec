@@ -3,7 +3,7 @@ nika: v1
 workflow: build
 tasks:
   - id: test
-    exec: { command: "cargo test --workspace --lib" }
+    exec: { command: ["cargo", "test", "--workspace", "--lib"] }
   - id: nested
     depends_on: [test]
-    exec: { command: "nika run subroutine.nika.yaml" }
+    exec: { command: ["nika", "run", "subroutine.nika.yaml"] }

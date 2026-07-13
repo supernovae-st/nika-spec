@@ -7,4 +7,4 @@ secrets:
     key: prod/api-key
 tasks:
   - id: call
-    exec: { command: "curl -H 'Authorization: Bearer ${{ secrets.api_key }}' https://api.example.com" }
+    exec: { command: ["curl", "-H", "Authorization: Bearer ${{ secrets.api_key }}", "https://api.example.com"] }

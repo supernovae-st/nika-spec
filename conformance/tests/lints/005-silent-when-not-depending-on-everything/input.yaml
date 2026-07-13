@@ -3,10 +3,10 @@ nika: v1
 workflow: f005partial
 tasks:
   - id: a
-    exec: { command: "./a.sh" }
+    exec: { command: ["./a.sh"] }
   - id: b
-    exec: { command: "./b.sh" }
+    exec: { command: ["./b.sh"] }
   - id: c
     depends_on: [a]
     when: "${{ tasks.a.status in ['success', 'failure'] }}"
-    exec: { command: "./c.sh" }
+    exec: { command: ["./c.sh"] }
