@@ -55,6 +55,44 @@ These 5 pillars are **locked forever** at `nika: v1`. Everything else (providers
 
 ---
 
+## Pre-1.0 stability contract
+
+> **`nika: v1` names the first stable family of the language. Its public
+> stability begins at engine 1.0.0 — not before.**
+
+Until the reference engine ships 1.0.0, the v1 grammar is **pre-stable** ·
+
+- **0.x releases may break the grammar.** Surface spellings — task shape ·
+  dependency syntax · namespace names · field names — can be rewritten
+  deeply while the binary is `0.x`. The 5 pillars above are locked as
+  **concepts**; their surface spellings are pre-stable like everything else
+  until 1.0. What would actually be unclean is freezing ambiguities now and
+  then spending years building checkers, editors and migrations to
+  compensate for them.
+- **No syntax compatibility is promised before 1.0.** No aliases · no
+  deprecation cycles · no dual forms. When a form dies it leaves the parser
+  entirely, in the same release that introduces its replacement.
+- **Every break lands as ONE atomic window** · the spec changes first → the
+  conformance oracle changes → engines re-vendor the pack → parser and
+  runtime change → the whole example/template/conformance corpus migrates →
+  LSP · MCP · editors · docs follow → the old form is gone. A release never
+  ships two worlds.
+- **Consumers pin exact spec commits** (`SPEC_PIN`) — never a moving branch.
+  Cross-repo coherence is judged by pinned re-proof, not by compatibility
+  layers.
+- **Machine contracts version independently** of the language family ·
+  `graph_format` · check `report_version` · run `plan_version` · trace ·
+  lock · receipt formats each carry their own explicit integer and evolve
+  by their own rules.
+- **The meta-principle** · when tooling effort reveals a language defect,
+  the spec changes first and the tooling teaches second. A client-side
+  workaround is never permanent.
+
+At engine 1.0.0 the grammar freezes · from then on `v1` changes are
+additive and feature-detected, exactly as the pillars section states.
+
+---
+
 ## Hello world
 
 ```yaml
