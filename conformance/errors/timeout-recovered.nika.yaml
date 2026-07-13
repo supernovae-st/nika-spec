@@ -1,6 +1,7 @@
 # Expected: exit 0 — NIKA-TIMEOUT-001 fires internally, recovered via on_error.
 nika: v1
-workflow: e28-on-error-timeout-recover
+workflow:
+  id: e28-on-error-timeout-recover
 # INTENT: timeout is catchable by on_error — recover on NIKA-TIMEOUT-001
 permits:
   exec: ["sleep"]
@@ -9,7 +10,7 @@ permits:
     write:
       - "./out/errors/**"
 tasks:
-  - id: slow_fetch
+  slow_fetch:
     timeout: "1s"
     exec:
       command: ["sleep", "5"]
@@ -17,7 +18,7 @@ tasks:
       on_codes: [NIKA-TIMEOUT-001]
       recover: "stale_fallback_data"
 
-  - id: write_result
+  write_result:
     depends_on: [slow_fetch]
     invoke:
       tool: "nika:write"

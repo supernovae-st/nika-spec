@@ -1,9 +1,10 @@
 # Expected: NIKA-EXEC-001 at RUN.
 nika: v1
-workflow: e11-exec-spawn-fail
+workflow:
+  id: e11-exec-spawn-fail
 # INTENT (corrected): command-not-found via the STRING form → NIKA-EXEC-001, not EXEC-002.
 # A string command runs through /bin/sh -c (spec 02-verbs §Security) — sh spawns fine and returns 127 (non-zero exit). A true spawn failure (NIKA-EXEC-002) needs the ARRAY form.
 tasks:
-  - id: no_such_cmd
+  no_such_cmd:
     exec:
       command: ["/usr/local/bin/nika_test_nonexistent_xyzzy_404"]

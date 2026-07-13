@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: rt-agent-done-result
+workflow:
+  id: rt-agent-done-result
 model: mock/echo
 tasks:
-  - id: loop
+  loop:
     agent:
       prompt: "call nika:done with the result"
       tools: ["nika:done"]

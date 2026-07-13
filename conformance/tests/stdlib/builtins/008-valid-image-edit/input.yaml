@@ -1,13 +1,14 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: image-edit-valid
+workflow:
+  id: image-edit-valid
 permits:
   fs:
     read: ["./assets/**"]
     write: ["./out/**"]
   tools: ["nika:image_generate"]
 tasks:
-  - id: edit
+  edit:
     invoke:
       tool: "nika:image_generate"
       args:

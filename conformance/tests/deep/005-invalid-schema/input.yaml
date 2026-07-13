@@ -1,7 +1,8 @@
 nika: v1
-workflow: deep-005
+workflow:
+  id: deep-005
 tasks:
-  - id: a
+  a:
     infer:
       prompt: "x"
       schema:

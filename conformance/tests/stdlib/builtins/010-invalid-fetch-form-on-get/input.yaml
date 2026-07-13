@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: form-on-get
+workflow:
+  id: form-on-get
 tasks:
-  - id: submit
+  submit:
     invoke:
       tool: "nika:fetch"
       args:

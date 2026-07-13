@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: bad-namespace
+workflow:
+  id: bad-namespace
 tasks:
-  - id: run
+  run:
     invoke:
       tool: "shell:run"
       args:

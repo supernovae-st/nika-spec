@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: vendor-tool
+workflow:
+  id: vendor-tool
 tasks:
-  - id: research
+  research:
     invoke:
       tool: "x-superclever:research"
       args:

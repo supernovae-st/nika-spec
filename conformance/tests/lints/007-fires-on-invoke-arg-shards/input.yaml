@@ -1,17 +1,18 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: f007invoke
+workflow:
+  id: f007invoke
 tasks:
-  - id: page1
+  page1:
     invoke:
       tool: "nika:fetch"
       args: { url: "https://example.com/page/1" }
-  - id: page2
+  page2:
     depends_on: [page1]
     invoke:
       tool: "nika:fetch"
       args: { url: "https://example.com/page/2" }
-  - id: page3
+  page3:
     depends_on: [page2]
     invoke:
       tool: "nika:fetch"

@@ -2,10 +2,11 @@
 # Spec 05 §errors maps unknown tool to NIKA-INVOKE-001; the reference check
 # refuses with the TOOLS gate verdict without surfacing the wire code — see FINDINGS.md.
 nika: v1
-workflow: e21-invoke-unknown-tool
+workflow:
+  id: e21-invoke-unknown-tool
 # INTENT: NIKA-INVOKE-001 (unknown tool)
 tasks:
-  - id: step
+  step:
     invoke:
       tool: "nika:nonexistent_builtin_xyzzy"
       args:

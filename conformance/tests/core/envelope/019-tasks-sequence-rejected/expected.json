@@ -1,0 +1,11 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "validation_error"
+    }
+  ],
+  "note": "Dead form (W1): a tasks: SEQUENCE is NIKA-PARSE-022 engine-side — tasks became a map keyed by task id; drop `- id:`, the key IS the identity.",
+  "mode": "strict"
+}

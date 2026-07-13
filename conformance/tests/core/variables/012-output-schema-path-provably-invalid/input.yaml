@@ -4,9 +4,10 @@
 # the downstream reference path `entitties` is a misspelling the schema
 # provably forbids → NIKA-VAR-003 at parse time.
 nika: v1
-workflow: schema-path-invalid
+workflow:
+  id: schema-path-invalid
 tasks:
-  - id: extract
+  extract:
     infer:
       prompt: "Extract entities"
       schema:
@@ -17,7 +18,7 @@ tasks:
           entities:
             type: array
             items: { type: string }
-  - id: report
+  report:
     depends_on: [extract]
     exec:
       command: ["report", "${{ tasks.extract.output.entitties }}"]

@@ -1,13 +1,14 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: forder
+workflow:
+  id: forder
 tasks:
-  - id: a
+  a:
     exec: { command: ["./a.sh"] }
     on_error: { skip: true }
-  - id: b
+  b:
     depends_on: [a]
     exec: { command: ["./b.sh"] }
-  - id: shards
+  shards:
     for_each: [1, 2]
     exec: { command: ["timeout", "5", "./p.sh"] }

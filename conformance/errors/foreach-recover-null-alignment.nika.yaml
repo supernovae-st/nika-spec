@@ -1,13 +1,14 @@
 # Expected: exit 0 — NIKA-BUILTIN-JQ-001 fires internally on iterations 1 and 4, recovered via on_error (recover: null keeps positional alignment).
 nika: v1
-workflow: onerror-recover-null
+workflow:
+  id: onerror-recover-null
 # COVERS: per-iteration on_error: { recover: null } -> failed iters become null at index.
 # Then a fan-in aggregator partitions good vs null (the locales pattern).
 # items 0..5, indices 1 and 4 fail -> null. Assert: good count 4, null count 2.
 vars:
   items: [0, 1, 2, 3, 4, 5]
 tasks:
-  - id: loop
+  loop:
     for_each: ${{ vars.items }}
     max_parallel: 3
     with: { v: "${{ item }}" }
@@ -19,7 +20,7 @@ tasks:
         input: { v: "${{ with.v }}" }
         expression: "if (.v == 1 or .v == 4) then error(\"boom\") else .v end"
 
-  - id: partition
+  partition:
     depends_on: [loop]
     invoke:
       tool: nika:jq
@@ -27,7 +28,7 @@ tasks:
         input: ${{ tasks.loop.output }}
         expression: "{ total: length, good: (map(select(. != null)) | length), nulls: (map(select(. == null)) | length), good_vals: (map(select(. != null))) }"
 
-  - id: persist
+  persist:
     depends_on: [partition]
     invoke:
       tool: nika:write

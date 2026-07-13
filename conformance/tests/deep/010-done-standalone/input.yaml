@@ -1,7 +1,8 @@
 nika: v1
-workflow: deep-010
+workflow:
+  id: deep-010
 tasks:
-  - id: finish
+  finish:
     invoke:
       tool: "nika:done"
       args: {}

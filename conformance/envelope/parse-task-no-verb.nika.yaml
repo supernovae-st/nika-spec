@@ -1,7 +1,8 @@
 # Expected: NIKA-PARSE-008 at CHECK.
 nika: v1
-workflow: e06-parse-no-verb
+workflow:
+  id: e06-parse-no-verb
 # INTENT: trigger NIKA-PARSE-008 (task declares no verb)
 tasks:
-  - id: step
+  step:
     timeout: "10s"

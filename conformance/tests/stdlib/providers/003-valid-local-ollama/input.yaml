@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: local-sovereign
+workflow:
+  id: local-sovereign
 tasks:
-  - id: ask
+  ask:
     infer:
       model: ollama/qwen3.5:9b
       prompt: "hello"

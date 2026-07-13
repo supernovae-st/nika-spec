@@ -1,18 +1,19 @@
 # Expected: exit 0 — offline jq→write chain; minimal valid workflow (absent permits = engine floor).
 nika: v1
-workflow: f01-builtins-sink
+workflow:
+  id: f01-builtins-sink
 
 # Offline foundation smoke — exercises the run loop with zero API:
 # nika:jq (typed structured output) -> binding -> nika:write (serialize) sink.
 tasks:
-  - id: compute
+  compute:
     invoke:
       tool: nika:jq
       args:
         input: { items: [1, 2, 3, 4], label: "sum" }
         expression: "{ total: (.items | add), count: (.items | length), label: .label }"
 
-  - id: sink
+  sink:
     depends_on: [compute]
     invoke:
       tool: nika:write

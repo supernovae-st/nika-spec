@@ -4,9 +4,10 @@
 # legal · (b) a schema-less producer (exec) is fully dynamic · (c) a
 # declared property path is of course valid. The engine MUST accept.
 nika: v1
-workflow: schema-path-open
+workflow:
+  id: schema-path-open
 tasks:
-  - id: extract
+  extract:
     infer:
       prompt: "Extract entities"
       schema:
@@ -18,9 +19,9 @@ tasks:
             items: { type: string }
           meta:
             type: object
-  - id: fetch_raw
+  fetch_raw:
     exec: { command: ["./dump.sh"] }
-  - id: report
+  report:
     depends_on: [extract, fetch_raw]
     exec:
       command: ["report", "${{ tasks.extract.output.entities }}", "${{ tasks.extract.output.meta.anything }}", "${{ tasks.extract.output.maybe_extra }}", "${{ tasks.fetch_raw.output.whatever }}"]

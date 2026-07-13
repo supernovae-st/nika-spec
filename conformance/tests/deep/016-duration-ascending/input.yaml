@@ -1,6 +1,7 @@
 nika: v1
-workflow: deep-016
+workflow:
+  id: deep-016
 tasks:
-  - id: a
+  a:
     timeout: "30m1h"
     exec: { command: ["echo", "hi"] }

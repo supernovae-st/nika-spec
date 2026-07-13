@@ -1,0 +1,8 @@
+nika: v1
+workflow:
+  id: id-field-lingers
+tasks:
+  hello:
+    id: hello
+    exec:
+      command: ["true"]

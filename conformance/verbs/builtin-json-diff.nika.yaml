@@ -1,12 +1,13 @@
 # Expected: exit 0 — nika:diff over inline documents.
 nika: v1
-workflow: competitor-json-diff
-description: "Use nika:json_diff to detect changes in competitor feature set"
+workflow:
+  id: competitor-json-diff
+  description: "Use nika:json_diff to detect changes in competitor feature set"
 
 model: mock/echo
 
 tasks:
-  - id: previous_snapshot
+  previous_snapshot:
     invoke:
       tool: "nika:jq"
       args:
@@ -16,7 +17,7 @@ tasks:
           last_updated: "2026-01-01"
         expression: "."
 
-  - id: current_snapshot
+  current_snapshot:
     invoke:
       tool: "nika:jq"
       args:
@@ -26,7 +27,7 @@ tasks:
           last_updated: "2026-06-15"
         expression: "."
 
-  - id: diff
+  diff:
     depends_on: [previous_snapshot, current_snapshot]
     invoke:
       tool: "nika:json_diff"
@@ -34,7 +35,7 @@ tasks:
         before: "${{ tasks.previous_snapshot.output }}"
         after: "${{ tasks.current_snapshot.output }}"
 
-  - id: analyze_diff
+  analyze_diff:
     depends_on: [diff]
     invoke:
       tool: "nika:jq"
@@ -42,7 +43,7 @@ tasks:
         input: "${{ tasks.diff.output }}"
         expression: "{ change_count: length, operations: [.[].op] | unique, has_additions: (map(select(.op == \"add\")) | length > 0) }"
 
-  - id: save
+  save:
     depends_on: [analyze_diff]
     invoke:
       tool: "nika:write"

@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: image-edit-no-source
+workflow:
+  id: image-edit-no-source
 tasks:
-  - id: edit_attempt
+  edit_attempt:
     invoke:
       tool: "nika:image_generate"
       args:

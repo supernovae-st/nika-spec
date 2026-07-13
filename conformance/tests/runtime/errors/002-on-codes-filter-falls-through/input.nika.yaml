@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: rt-on-codes-fall-through
+workflow:
+  id: rt-on-codes-fall-through
 model: mock/echo
 tasks:
-  - id: guarded
+  guarded:
     on_error:
       on_codes: [NIKA-TIMEOUT-001]
       recover: "stale-ok"

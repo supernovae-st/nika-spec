@@ -1,13 +1,14 @@
 # Expected: NIKA-DAG-003 at CHECK.
 nika: v1
-workflow: e09-dag-ref-no-edge
+workflow:
+  id: e09-dag-ref-no-edge
 # INTENT: trigger NIKA-DAG-003 (tasks.X ref without depends_on edge)
 tasks:
-  - id: producer
+  producer:
     exec:
       command: ["echo", "hello"]
 
-  - id: consumer
+  consumer:
     # Missing: depends_on: [producer]
     exec:
       command: ["echo", "${{ tasks.producer.output }}"]

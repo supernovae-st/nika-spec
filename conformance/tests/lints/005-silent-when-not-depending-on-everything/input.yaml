@@ -1,12 +1,13 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: f005partial
+workflow:
+  id: f005partial
 tasks:
-  - id: a
+  a:
     exec: { command: ["./a.sh"] }
-  - id: b
+  b:
     exec: { command: ["./b.sh"] }
-  - id: c
+  c:
     depends_on: [a]
     when: "${{ tasks.a.status in ['success', 'failure'] }}"
     exec: { command: ["./c.sh"] }

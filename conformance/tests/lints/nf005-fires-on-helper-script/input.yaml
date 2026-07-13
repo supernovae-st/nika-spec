@@ -1,7 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: helper
+workflow:
+  id: helper
 tasks:
-  - id: upload
+  upload:
     exec:
       command: ["node", "workflows/site/bin/helper.mjs", "upload", "--file", "out/bg.png"]

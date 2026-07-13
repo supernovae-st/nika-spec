@@ -1,18 +1,19 @@
 # Expected: exit 0 — empty collection skips the for_each task; downstream default gate satisfied.
 nika: v1
-workflow: foreach-empty
+workflow:
+  id: foreach-empty
 # SPEC 03 §for_each semantics: "If the collection is empty · the task is skipped".
 # A skipped for_each → downstream default gate satisfied → downstream RUNS.
 # Markers: 08_iter_*.json ABSENT (no iterations ran); 08_after.json present.
 vars:
   empty_list: { type: array, default: [] }
 tasks:
-  - id: mapped
+  mapped:
     for_each: ${{ vars.empty_list }}
     invoke:
       tool: nika:write
       args: { path: "./out/ctrlflow/08_iter_${{ index }}.json", content: "${{ item }}" }
-  - id: after
+  after:
     depends_on: [mapped]
     invoke:
       tool: nika:write

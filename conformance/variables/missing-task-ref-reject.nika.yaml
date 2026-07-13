@@ -6,10 +6,11 @@
 # confirmed 2026-07-02 (engine emits VAR-001 here · DAG-003 in c27).
 # We assert it is REJECTED, not silently null.
 nika: v1
-workflow: c10-missing-task-ref-no-edge
+workflow:
+  id: c10-missing-task-ref-no-edge
 
 tasks:
-  - id: gate
+  gate:
     when: "${{ tasks.nonexistent.status == 'success' }}"   # no depends_on, task absent
     invoke:
       tool: "nika:write"

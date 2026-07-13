@@ -1,10 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: review
+workflow:
+  id: review
 vars:
   pr: { type: string, required: true }
 tasks:
-  - id: review
+  review:
     agent:
       prompt: "Review ${{ vars.pr }}"
       tools: ["nika:read", "nika:done"]

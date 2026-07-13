@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: hello
+workflow:
+  id: hello
 tasks:
-  - id: run
+  run:
     exec:
       command: ["echo", "hi"]
       shell: "echo hi"

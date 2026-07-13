@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: f009
+workflow:
+  id: f009
 tasks:
-  - id: fetch
+  fetch:
     invoke: { tool: "nika:read", args: { path: "users.json" } }
     output:
       emails: ".users[]"

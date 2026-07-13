@@ -1,13 +1,14 @@
 # Expected: exit 0 — NIKA-EXEC-001 fires internally (3 attempts), recovered via on_error.
 nika: v1
-workflow: retry-then-onerror
+workflow:
+  id: retry-then-onerror
 # SPEC 05 §on_error: "recover from ... retried-and-still-failing transient errors".
 # Order = retry FIRST, then on_error. Here exec fails (NIKA-EXEC-001), on_codes forces
 # retries to exhaust, THEN on_error.recover fires → task SUCCEEDS with recover value.
 # downstream depends_on it → should RUN (recover → status success).
 # Markers: 04_attempts.log = 3 lines (retries ran); 04_after.json present (downstream ran).
 tasks:
-  - id: flaky
+  flaky:
     exec:
       shell: "echo a >> ./out/ctrlflow/04_attempts.log; exit 1"
     retry:
@@ -16,7 +17,7 @@ tasks:
       on_codes: [NIKA-EXEC-001]
     on_error:
       recover: "recovered-value"
-  - id: after
+  after:
     depends_on: [flaky]
     invoke:
       tool: nika:write

@@ -1,7 +1,8 @@
 nika: v1
-workflow: deep-017
+workflow:
+  id: deep-017
 tasks:
-  - id: a
+  a:
     invoke:
       tool: "nika:jq"
       args:

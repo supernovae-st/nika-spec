@@ -3,14 +3,15 @@
 # templates)"; 03-dag §grammar lists NO arithmetic operators; reserved per line 124.
 # Expected: NIKA-VAR-005 (static expression violation) at CHECK time.
 nika: v1
-workflow: c03-arithmetic-rejected
+workflow:
+  id: c03-arithmetic-rejected
 
 vars:
   a: 2
   b: 3
 
 tasks:
-  - id: gate
+  gate:
     when: "${{ vars.a + vars.b > 4 }}"           # `+` is not in the grammar → parse reject
     invoke:
       tool: "nika:write"

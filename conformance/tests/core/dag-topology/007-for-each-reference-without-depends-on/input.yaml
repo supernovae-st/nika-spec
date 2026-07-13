@@ -1,11 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: hello
+workflow:
+  id: hello
 tasks:
-  - id: discover
+  discover:
     invoke:
       tool: nika:glob
       args: { pattern: "*.md" }
-  - id: process
+  process:
     for_each: ${{ tasks.discover.output }}
     exec: { command: ["process", "${{ item }}"] }

@@ -1,9 +1,10 @@
 nika: v1
-workflow: deep-007
+workflow:
+  id: deep-007
 tasks:
-  - id: check
+  check:
     exec: { command: ["./check.sh"] }
-  - id: deploy
+  deploy:
     depends_on: [check]
     when: "tasks.check.status == 'success'"
     exec: { command: ["./deploy.sh"] }

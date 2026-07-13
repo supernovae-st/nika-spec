@@ -1,9 +1,10 @@
 nika: v1
-workflow: deep-020
+workflow:
+  id: deep-020
 permits:
   tools: ["nika:*", "!nika:write"]
 tasks:
-  - id: a
+  a:
     invoke:
       tool: "nika:write"
       args: { path: "out.txt", content: "x" }

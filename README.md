@@ -45,12 +45,13 @@ is at [supernovae-st/nika](https://github.com/supernovae-st/nika)
 
 ```yaml
 nika: v1
-workflow: hello
+workflow:
+  id: hello
 
 model: ollama/qwen3.5:4b   # local · zero key · swap for any provider in the catalog
 
 tasks:
-  - id: greet
+  greet:
     infer:
       prompt: "Say hello in French"
 ```

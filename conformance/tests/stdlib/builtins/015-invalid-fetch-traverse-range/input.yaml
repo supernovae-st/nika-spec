@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: crawl-unbounded
+workflow:
+  id: crawl-unbounded
 tasks:
-  - id: crawl
+  crawl:
     invoke:
       tool: "nika:fetch"
       args:

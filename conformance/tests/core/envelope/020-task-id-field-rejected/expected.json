@@ -1,0 +1,11 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "validation_error"
+    }
+  ],
+  "note": "Dead form (W1): an id: field inside a task is NIKA-PARSE-023 engine-side — the map key is the identity, the field is gone (strict mode: unknown task field).",
+  "mode": "strict"
+}

@@ -2,7 +2,8 @@
 # W01: validate a well-formed object — PASS case
 # Tests: nika:validate with required fields + type constraints
 nika: v1
-workflow: w01-validate-valid-object
+workflow:
+  id: w01-validate-valid-object
 
 vars:
   doc:
@@ -10,7 +11,7 @@ vars:
     age: 30
 
 tasks:
-  - id: validate_doc
+  validate_doc:
     invoke:
       tool: "nika:validate"
       args:
@@ -25,7 +26,7 @@ tasks:
               type: integer
               minimum: 0
 
-  - id: assert_valid
+  assert_valid:
     depends_on: [validate_doc]
     invoke:
       tool: "nika:assert"
@@ -33,7 +34,7 @@ tasks:
         condition: "${{ tasks.validate_doc.output.valid == true }}"
         message: "Expected valid:true but got false"
 
-  - id: write_result
+  write_result:
     depends_on: [validate_doc]
     invoke:
       tool: "nika:write"

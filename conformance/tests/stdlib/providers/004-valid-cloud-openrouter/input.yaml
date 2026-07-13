@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: gateway
+workflow:
+  id: gateway
 tasks:
-  - id: ask
+  ask:
     infer:
       model: openrouter/anthropic/claude-sonnet-4-6
       prompt: "hello"

@@ -1,17 +1,18 @@
 # Expected: exit 0 — NIKA-EXEC-001 fires internally, recovered via on_error; downstream runs.
 nika: v1
-workflow: onerror-recover-downstream
+workflow:
+  id: onerror-recover-downstream
 # SPEC 05 §on_error: recover → status success, downstream runs normally.
 # KNOWN-NUANCED: recover WITH depends_on. failing task recovers; a task that depends_on it
 # should run (recovered = success → default gate satisfied).
 # Markers: 05_down.json present (downstream ran after recovery).
 tasks:
-  - id: fails
+  fails:
     exec:
       command: ["exit", "2"]
     on_error:
       recover: "fallback"
-  - id: down
+  down:
     depends_on: [fails]
     invoke:
       tool: nika:write

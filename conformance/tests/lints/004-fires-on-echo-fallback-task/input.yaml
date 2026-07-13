@@ -1,10 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: f004echo
+workflow:
+  id: f004echo
 tasks:
-  - id: a
+  a:
     exec: { command: ["./a.sh"] }
-  - id: fallback
+  fallback:
     depends_on: [a]
     when: "${{ tasks.a.status == 'failure' }}"
     exec: { command: ["echo", "default-value"] }

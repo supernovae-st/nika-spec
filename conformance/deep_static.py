@@ -71,6 +71,16 @@ _DUR_TOKEN = re.compile(r"([0-9]+(?:\.[0-9]+)?)(ns|us|µs|ms|s|m|h)")
 _DUR_RANK = {"ns": 0, "us": 1, "µs": 1, "ms": 2, "s": 3, "m": 4, "h": 5}
 
 
+
+def iter_tasks(doc):
+    """W1 'the map': tasks is an ordered MAP keyed by task id. Returns
+    [(tid, task_dict)] pairs - the single accessor every rule reads through."""
+    tasks = doc.get("tasks")
+    if not isinstance(tasks, dict):
+        return []
+    return [(k, v) for k, v in tasks.items() if isinstance(v, dict)]
+
+
 def _valid_duration(v: str) -> bool:
     """A well-formed NIKA duration string: positive, units strictly descending
     without repeats (03-dag §timeout · the well-formedness half of
@@ -311,9 +321,7 @@ def deep_static_errors(doc: dict) -> list[dict]:
     errs: list[dict] = []
     if not isinstance(doc, dict):
         return errs
-    tasks = doc.get("tasks") or []
-    if not isinstance(tasks, list):
-        return errs
+    tasks = iter_tasks(doc)
 
     # CEL-PARSE · every expression body everywhere · boolean shape on when:
     for path, s in _walk(doc):
@@ -334,10 +342,7 @@ def deep_static_errors(doc: dict) -> list[dict]:
 
     # JQ-COMPILE · output: bindings + nika:jq expression + nika:fetch jq arg
     jq_exprs: list[tuple[str, str]] = []
-    for t in tasks:
-        if not isinstance(t, dict):
-            continue
-        tid = t.get("id")
+    for tid, t in tasks:
         out = t.get("output")
         if isinstance(out, dict):
             for name, expr in out.items():
@@ -387,10 +392,7 @@ def deep_static_errors(doc: dict) -> list[dict]:
                                    "positive · units descending "
                                    "(03-dag §timeout · e.g. \"30s\" · \"1h30m\")"})
 
-    for t in tasks:
-        if not isinstance(t, dict):
-            continue
-        tid = t.get("id")
+    for tid, t in tasks:
         check_duration(f"task '{tid}' timeout", t.get("timeout"))
         inv = t.get("invoke")
         if isinstance(inv, dict) and inv.get("tool") == "nika:wait":
@@ -412,10 +414,7 @@ def deep_static_errors(doc: dict) -> list[dict]:
                          "detail": f"{where} · schema: is not a valid JSON Schema · "
                                    f"{e.message[:90]}"})
 
-    for t in tasks:
-        if not isinstance(t, dict):
-            continue
-        tid = t.get("id")
+    for tid, t in tasks:
         for verb in ("infer", "agent"):
             body = t.get(verb)
             if isinstance(body, dict):
@@ -434,20 +433,14 @@ def deep_static_errors(doc: dict) -> list[dict]:
                                    f"or the YAML boolean true/false · bare string {w[:40]!r} "
                                    "is never evaluated (03-dag §when: shape rules)"})
 
-    for t in tasks:
-        if not isinstance(t, dict):
-            continue
-        tid = t.get("id")
+    for tid, t in tasks:
         check_when(f"task '{tid}'", t.get("when"))
         for i, step in enumerate(t.get("on_finally") or []):
             if isinstance(step, dict):
                 check_when(f"task '{tid}' on_finally[{i}]", step.get("when"))
 
     # OUTPUT-PURE · binding values are pure jq over the task's own raw output
-    for t in tasks:
-        if not isinstance(t, dict):
-            continue
-        tid = t.get("id")
+    for tid, t in tasks:
         out = t.get("output")
         if isinstance(out, dict):
             for name, expr in out.items():
@@ -459,10 +452,7 @@ def deep_static_errors(doc: dict) -> list[dict]:
                                            "verb's INPUT with ${{ }} instead (04 §binding rules)"})
 
     # BUILTIN-SHAPE · jq arg is `expression` · wait is duration XOR until
-    for t in tasks:
-        if not isinstance(t, dict):
-            continue
-        tid = t.get("id")
+    for tid, t in tasks:
         inv = t.get("invoke")
         if not isinstance(inv, dict):
             continue
@@ -482,10 +472,7 @@ def deep_static_errors(doc: dict) -> list[dict]:
                                        "(exactly one · builtins-v0.1.md)"})
 
     # BUILTIN-SHAPE · write needs content · done never stands alone
-    for t in tasks:
-        if not isinstance(t, dict):
-            continue
-        tid = t.get("id")
+    for tid, t in tasks:
         inv = t.get("invoke")
         if not isinstance(inv, dict):
             continue
@@ -526,10 +513,7 @@ def deep_static_errors(doc: dict) -> list[dict]:
         net = permits.get("net") if isinstance(permits.get("net"), dict) else {}
         hosts = net.get("http") if isinstance(net.get("http"), list) else None
 
-        for t in tasks:
-            if not isinstance(t, dict):
-                continue
-            tid = t.get("id")
+        for tid, t in tasks:
             if "exec" in t:
                 body = t.get("exec") or {}
                 cmd = body.get("command") if isinstance(body, dict) else None

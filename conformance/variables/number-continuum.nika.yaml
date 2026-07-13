@@ -5,7 +5,8 @@
 # 2 < 2.5 TRUE, 3 in [1,2,3] TRUE, 1.0 in [1] TRUE.
 # Each assert that PASSES proves the exact boolean is true.
 nika: v1
-workflow: c01-number-continuum
+workflow:
+  id: c01-number-continuum
 
 vars:
   one_int: 1
@@ -13,24 +14,24 @@ vars:
   nine_float: 9.0
 
 tasks:
-  - id: int_eq_float
+  int_eq_float:
     invoke: { tool: "nika:assert", args: { condition: "${{ vars.one_int == 1.0 }}", message: "1 == 1.0" } }
-  - id: float_eq_int
+  float_eq_int:
     depends_on: [int_eq_float]
     invoke: { tool: "nika:assert", args: { condition: "${{ vars.nine_float == 9 }}", message: "9.0 == 9" } }
-  - id: int_lt_float
+  int_lt_float:
     depends_on: [float_eq_int]
     invoke: { tool: "nika:assert", args: { condition: "${{ vars.two_int < 2.5 }}", message: "2 < 2.5" } }
-  - id: int_in_float_list
+  int_in_float_list:
     depends_on: [int_lt_float]
     invoke: { tool: "nika:assert", args: { condition: "${{ vars.one_int in [1.0, 2.0, 3.0] }}", message: "1 in [1.0,2.0,3.0]" } }
-  - id: float_in_int_list
+  float_in_int_list:
     depends_on: [int_in_float_list]
     invoke: { tool: "nika:assert", args: { condition: "${{ 1.0 in [1, 2, 3] }}", message: "1.0 in [1,2,3]" } }
-  - id: float_neq_other
+  float_neq_other:
     depends_on: [float_in_int_list]
     invoke: { tool: "nika:assert", args: { condition: "${{ vars.nine_float != 9.5 }}", message: "9.0 != 9.5" } }
-  - id: sink
+  sink:
     depends_on: [float_neq_other]
     invoke:
       tool: "nika:write"

@@ -2,6 +2,6 @@
 nika: v1
 # INTENT: trigger NIKA-PARSE-002 (missing required envelope field: workflow:)
 tasks:
-  - id: step
+  step:
     exec:
       command: ["echo", "hello"]

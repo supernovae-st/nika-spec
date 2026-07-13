@@ -1,7 +1,8 @@
 nika: v1
-workflow: core-on-codes-underscore
+workflow:
+  id: core-on-codes-underscore
 tasks:
-  - id: merge
+  merge:
     invoke: { tool: "nika:json_merge_patch", args: { target: {}, patch: {} } }
     retry:
       max_attempts: 3

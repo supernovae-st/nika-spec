@@ -3,13 +3,14 @@
 # · a later minor). Any other call suffix is a parse error." call = (size|has) only.
 # Expected: NIKA-VAR-005 (unknown function) at CHECK.
 nika: v1
-workflow: c16-matches-reserved
+workflow:
+  id: c16-matches-reserved
 
 vars:
   s: "hello"
 
 tasks:
-  - id: gate
+  gate:
     when: "${{ vars.s.matches('h.*o') }}"        # matches() reserved → parse error
     invoke:
       tool: "nika:write"

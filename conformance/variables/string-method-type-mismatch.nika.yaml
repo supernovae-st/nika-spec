@@ -4,13 +4,14 @@
 # be strings". Calling .contains on a number → type error (NIKA-VAR-006 family).
 # when: boolean-shaped (the method returns bool by shape) → eval error expected.
 nika: v1
-workflow: c15-string-method-type-mismatch
+workflow:
+  id: c15-string-method-type-mismatch
 
 vars:
   n: 12345
 
 tasks:
-  - id: gate
+  gate:
     when: "${{ vars.n.contains('23') }}"         # .contains on a number → type error
     invoke:
       tool: "nika:write"

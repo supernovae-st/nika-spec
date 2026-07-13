@@ -1,10 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: v1
-workflow: dag-recover-independent
+workflow:
+  id: dag-recover-independent
 tasks:
-  - id: cached
+  cached:
     invoke: { tool: "nika:read", args: { path: "./fixtures/cached.json" } }
-  - id: fetch
+  fetch:
     invoke: { tool: "nika:fetch", args: { url: "https://api.example.com" } }
     on_error:
       recover: ${{ tasks.cached.output }}
