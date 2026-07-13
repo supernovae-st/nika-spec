@@ -686,7 +686,7 @@ See [`08-out-of-scope.md`](./08-out-of-scope.md) for the explicit list.
 
 ## Frozen language envelope
 
-The **language** envelope is frozen at `nika: v1` forever. The 5 pillars are locked at the `nika: v1` contract · minor language additions are additive only (feature-detected · no minor version in the file) · breaking changes would ship as a new contract (`nika: v2`) with its own spec, and the envelope being frozen, that is effectively never. (This is the **language** version, independent of any engine version: the reference engine ships its own semver toward a 1.0 release, which does not touch `nika: v1`.)
+The **language** envelope is frozen at `nika: v1` forever. **There is no `nika: v2` — ever.** The version marker names the one language family; deep grammar changes happen INSIDE `v1` while the reference engine is pre-1.0 (per the [pre-1.0 stability contract](#pre-10-stability-contract) above), and after engine 1.0.0 changes are additive only (feature-detected · no minor version in the file). (This is the **language** version, independent of any engine version: the reference engine ships its own semver toward a 1.0 release, which does not touch `nika: v1`.)
 
 In practice · we expect `nika: v1` to last 10+ years.
 
