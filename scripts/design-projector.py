@@ -102,6 +102,14 @@ def load_tokens() -> dict:
         print("design-projector · rules.mermaid_fill_alpha must be 2 hex digits",
               file=sys.stderr)
         sys.exit(2)
+    order = tokens.get("presentation", {}).get("providers_order", [])
+    if not order or len(set(order)) != len(order) or not all(
+        re.match(r"^[a-z][a-z0-9]*$", p or "") for p in order
+    ):
+        print("design-projector · presentation.providers_order must be a "
+              "non-empty list of unique lowercase provider slugs",
+              file=sys.stderr)
+        sys.exit(2)
     return tokens
 
 
@@ -169,6 +177,17 @@ def render_ts(tokens: dict) -> str:
         f"  markGlow: '{c['mark']['glow']}',",
         f"  markInk: '{c['mark']['ink']}',",
         "} as const",
+        "",
+        "/** The provider PRESENTATION order (operator lock 2026-06-12):",
+        " *  local & open-weight lead, cloud incumbents never the first",
+        " *  suggestion. Providers absent here rank after, alphabetically.",
+        " *  Binds the TEACHING surface (pickers · docs), never adapters. */",
+        "export const NIKA_PROVIDERS_ORDER: readonly string[] = [",
+    ]
+    for p in tokens["presentation"]["providers_order"]:
+        lines.append(f"  '{p}',")
+    lines += [
+        "] as const",
         "",
     ]
     return "\n".join(lines)

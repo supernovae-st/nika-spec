@@ -1,0 +1,106 @@
+# SPDX-License-Identifier: Apache-2.0
+#
+# authoring-shapes-v0.1.yaml — the guided-edit shape registers · SSOT.
+#
+# Two registers editors offer as one-gesture inserts, sibling of
+# verb-starters-v0.1.yaml (same contract, same projection law) ·
+#
+#   schema_shapes  the typed-unit register — proven `schema:` blocks an
+#                  editor appends to an infer:/agent: (the language's
+#                  hardest hand-written block, spec/02-verbs.md). Every
+#                  shape is a top-level object: the portable structured-
+#                  output form on every provider.
+#   armor_shapes   the resilience register — the spec's three error
+#                  walls (spec/05-errors.md): retry absorbs TRANSIENT
+#                  failures; on_error catches what retries couldn't
+#                  (recover with a fallback · skip and keep the error
+#                  readable); timeout bounds the wait.
+#
+# Contract per shape ·
+#   id     kebab-case · unique across the file
+#   label  ≤ 40 chars · the picker row
+#   hint   one sentence ≤ 120 chars · the picker detail (teaches the WHY)
+#   key    armor only · the task-level key the shape writes
+#          (`retry` · `on_error` · `timeout`)
+#   body   the block, UNINDENTED (first line names the key) ·
+#          `# SLOT:` marks the lines an author fills · every body is
+#          PROVEN by scripts/authoring-projector.py against the
+#          conformance oracle (grafted onto a minimal workflow ·
+#          validate_text · must be valid). Unproven shapes never project.
+#
+# Projection ·
+#   python3 scripts/authoring-projector.py --check   # CI drift gate
+#   python3 scripts/authoring-projector.py --write   # re-project consumers
+
+authoring_version: 1
+
+schema_shapes:
+  - id: fields
+    label: "named fields"
+    hint: "The workhorse — an object whose required fields ARE the contract."
+    body: |
+      schema:                # the response MUST match — structured output
+        type: object
+        required: [summary]   # SLOT: the fields you demand
+        properties:
+          summary: { type: string }
+  - id: list
+    label: "a list"
+    hint: "items: an array field — extraction, findings, batch results."
+    body: |
+      schema:
+        type: object
+        required: [items]
+        properties:
+          items:
+            type: array
+            items: { type: string }   # SLOT: the element shape
+  - id: verdict
+    label: "a verdict"
+    hint: "boolean + reason — the judge shape gates and goldens consume."
+    body: |
+      schema:
+        type: object
+        required: [verdict, reason]
+        properties:
+          verdict: { type: boolean }
+          reason: { type: string }
+  - id: grade
+    label: "a grade"
+    hint: "enum: the closed set — the model cannot invent a fifth answer."
+    body: |
+      schema:
+        type: object
+        required: [grade]
+        properties:
+          grade: { type: string, enum: [A, B, C] }   # SLOT: the closed set
+
+armor_shapes:
+  - id: retry
+    key: retry
+    label: "retry transient failures"
+    hint: "rate limits · network — retries fire on transient errors only; exponential backoff + jitter are the defaults"
+    body: |
+      retry:
+        max_attempts: 3      # total tries · transient errors only
+        backoff_ms: 1000     # exponential + jitter by default
+  - id: recover
+    key: on_error
+    label: "recover with a fallback"
+    hint: "when it still fails, substitute a value — downstream sees success, shape-stable"
+    body: |
+      on_error:
+        recover: ""   # SLOT: a literal — or ${{ tasks.<id>.output }}
+  - id: skip
+    key: on_error
+    label: "skip on error"
+    hint: "let the DAG continue — status: skipped, the original error stays readable at tasks.<id>.error"
+    body: |
+      on_error:
+        skip: true   # downstream sees skipped · the error stays readable
+  - id: timeout
+    key: timeout
+    label: "bound its time"
+    hint: "a Go duration (30s · 5m) — the task fails NIKA-TIMEOUT instead of hanging the run"
+    body: |
+      timeout: "60s"   # SLOT: Go duration — 30s · 5m · 1h
