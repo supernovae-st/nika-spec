@@ -173,4 +173,31 @@ t = wf(
 )
 check("W2-Q2 witness · terminal admits past cancelled (model's answer)", status(t, "cleanup") == "success")
 
+# --- PROPERTIES over generated workflows (seeded · no binary needed) ----------
+# gate soundness + cancel witness + determinism, over 300 random W2 DAGs.
+
+import generate_w2  # noqa: E402
+
+SEEDS = 300
+for seed in range(SEEDS):
+    text = generate_w2.generate(seed)
+    model = w2.parse(text)
+    r1, r2 = w2.evaluate(model), w2.evaluate(model)
+    assert r1 == r2, f"seed {seed}: non-deterministic"
+    incoming = {tid: [] for tid in model["order"]}
+    for producer, consumer, _role, ok in model["edges"]:
+        incoming[consumer].append((producer, ok))
+    for tid, res in r1.items():
+        held = [r1[p]["status"] in ok for p, ok in incoming[tid]]
+        if res["status"] == "cancelled":
+            # CANCEL-WITNESS: a cancelled task names at least one dead edge
+            assert not all(held), f"seed {seed}: {tid} cancelled with every edge held"
+        else:
+            # GATE-SOUNDNESS: a task that settled any other way passed every edge
+            assert all(held), f"seed {seed}: {tid} ran with a dead edge"
+        if res["status"] == "skipped" and res["attempts"] == 0:
+            # when=false settles POST-gate: the gate must have passed
+            assert all(held), f"seed {seed}: {tid} when-skipped without a passing gate"
+check(f"properties · {SEEDS} seeds: gate-soundness + cancel-witness + determinism", True)
+
 print(f"\nALL {PASS} GREEN — laws hold · witnesses exposed (W2-Q1..Q3 in semantics_w2.py header)")
