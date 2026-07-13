@@ -990,7 +990,8 @@ Explicit bindings remain REQUIRED for: a second upstream · any non-adjacent rea
 
 ```yaml
 nika: v1
-workflow: research-report
+workflow:
+  id: research-report
 
 types:
   Article:
@@ -1055,7 +1056,8 @@ assert:
 
 ```yaml
 nika: v1
-workflow: locale-fanout
+workflow:
+  id: locale-fanout
 
 types:
   Translation:
@@ -1099,7 +1101,8 @@ outputs:
 
 ```yaml
 nika: v1
-workflow: bounded-research
+workflow:
+  id: bounded-research
 
 types:
   ResearchLog:
