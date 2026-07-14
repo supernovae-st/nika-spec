@@ -2,15 +2,21 @@
 """The reference type core (spec 09-types.md) — the SECOND evaluator.
 
 Parses the closed v1 type grammar, checks the static rules
-(NIKA-TYPE-001..005 · NIKA-PARSE-025), lowers to JSON Schema 2020-12 and
-decides the subtype lattice. Deliberately small and readable: an engine
-in any language re-implements the same judgments; this module proves the
-fixtures are self-consistent and gives the conformance runner its
-type-rule layer.
+(NIKA-TYPE-001..006 · NIKA-PARSE-025), lowers to JSON Schema 2020-12 and
+decides the three relations of 09 §the relations:
 
-Soundness stance (mirrors the runner's other layers): every refusal here
-is provable from the document alone; anything uncertain stays silent —
-the reference runner never refuses a valid program.
+- ``subtype``    · A ⊑ B  — a PARTIAL ORDER on known types (reflexive ·
+  transitive · antisymmetric · ``Unknown`` comparable only to itself ·
+  ``Never`` is bottom).
+- ``consistent`` · A ~ B  — gradual consistency (reflexive · symmetric ·
+  NOT transitive · ``Unknown ~ T`` · structural elsewhere).
+- ``assignable`` · A ⊑~ B — consistent subtyping (Siek-Taha): what every
+  static judge consumes (the walk · TYPE-004 · the static fit).
+
+Independence stance: this file is written BY HAND against the spec prose
+— never generated from, nor generating, the Rust implementation. The
+differential (``type_differential.py``) is the bridge; a shared bug
+would have to be born twice.
 """
 
 from __future__ import annotations
@@ -19,14 +25,25 @@ import re
 
 PRIMITIVES = {
     "null", "bool", "integer", "number", "string", "bytes",
-    "uri", "path", "duration", "money", "timestamp",
+    "uri", "path", "duration", "timestamp",
 }
-RESERVED = {"result", "artifact", "secret"}  # named now · semantics land W4/W5
+STRING_NEWTYPES = {"uri", "path", "duration", "timestamp"}
+# named now · landing with their waves (spec 09 §reserved)
+RESERVED = {
+    "result": "outcomes (W5)",
+    "artifact": "artifact lanes (W5)",
+    "secret": "the authority wave (W4)",
+    "money": "the decision core (W-DEC) — fixed-point + ISO-4217, never binary floats",
+}
 TYPE_NAME = re.compile(r"^[A-Z][A-Za-z0-9]*$")
 COMPOSITE_KEYS = {
     "array", "map", "object", "union", "optional", "enum",
     "integer", "number", "string",
 }
+NEVER = {"never": True}   # internal bottom — no value inhabits it · never authorable
+UNKNOWN = {"unknown": True}  # gradual — absence of static information
+
+MAX_PATTERN_LEN = 512
 
 
 class TypeError_(Exception):
@@ -43,11 +60,106 @@ def err(code: str, detail: str) -> dict:
     return {"code": code, "category": category, "detail": detail}
 
 
+# ── the regex dialect (spec 09 §the regex dialect · locked whitelist) ────
+
+def regex_dialect_violation(pattern: str) -> str | None:
+    """None when the pattern is inside the locked dialect · else the
+    offending construct (the NIKA-TYPE-006 detail). A hand scanner —
+    NEVER the host regex engine's own parser (both evaluators must
+    accept/refuse identically)."""
+    if len(pattern) > MAX_PATTERN_LEN:
+        return f"pattern longer than {MAX_PATTERN_LEN} chars"
+    i, n = 0, len(pattern)
+    in_class = False
+    prev_quantifiable = False
+    while i < n:
+        c = pattern[i]
+        if in_class:
+            if c == "\\":
+                if i + 1 >= n:
+                    return "trailing backslash"
+                nxt = pattern[i + 1]
+                if nxt in "dDwWsS\\.^$+*?()[]{}|/-nrt":
+                    i += 2
+                    continue
+                return f"escape \\{nxt} (out of dialect)"
+            if c == "]":
+                in_class = False
+            i += 1
+            continue
+        if c == "\\":
+            if i + 1 >= n:
+                return "trailing backslash"
+            nxt = pattern[i + 1]
+            if nxt.isdigit():
+                return f"backreference \\{nxt}"
+            if nxt in ("b", "B"):
+                return f"word boundary \\{nxt}"
+            if nxt in ("p", "P"):
+                return "unicode property class \\p{…}"
+            if nxt in ("x", "u"):
+                return f"hex/unicode escape \\{nxt} (out of dialect)"
+            if nxt in "dDwWsS\\.^$+*?()[]{}|/-nrt":
+                prev_quantifiable = True
+                i += 2
+                continue
+            return f"escape \\{nxt} (out of dialect)"
+        if c == "(":
+            if pattern.startswith("(?:", i):
+                i += 3
+                prev_quantifiable = False
+                continue
+            if pattern.startswith("(?", i):
+                return f"group construct {pattern[i:i+4]!r} (only (…) and (?:…) are in dialect)"
+            i += 1
+            prev_quantifiable = False
+            continue
+        if c == "[":
+            in_class = True
+            i += 1
+            if i < n and pattern[i] == "^":
+                i += 1
+            prev_quantifiable = True
+            # a class counts as one quantifiable unit once closed; the
+            # flag is set on ']' exit — handled by the in_class branch
+            continue
+        if c in "*+?":
+            if not prev_quantifiable:
+                return f"quantifier {c!r} with nothing to repeat"
+            if i + 1 < n and pattern[i + 1] in "?+":
+                return f"lazy/possessive quantifier {pattern[i:i+2]!r}"
+            prev_quantifiable = False
+            i += 1
+            continue
+        if c == "{":
+            m = re.match(r"\{[0-9]+(,[0-9]*)?\}", pattern[i:])
+            if not m:
+                return "malformed {m,n} quantifier"
+            if not prev_quantifiable:
+                return "quantifier {…} with nothing to repeat"
+            end = i + m.end()
+            if end < n and pattern[end] in "?+":
+                return f"lazy/possessive quantifier {pattern[i:end+1]!r}"
+            prev_quantifiable = False
+            i = end
+            continue
+        # plain char · . · | · ^ · $ · ] · } (literal when unmatched)
+        prev_quantifiable = c not in "|^$"
+        i += 1
+    if in_class:
+        return "unterminated character class"
+    return None
+
+
 # ── parse ────────────────────────────────────────────────────────────────
 
 def parse_type(expr, names: set[str], where: str) -> dict:
-    """Type expression → normalized internal form. Raises TypeError_ on a
-    grammar violation the JSON Schema layer cannot see (unknown name)."""
+    """Type expression → normalized internal form. `{ optional: T }` is
+    a FIELD-PRESENCE modifier and is refused here — only the object
+    parser accepts it, at field positions (spec 09 §optional is
+    presence, not null)."""
+    if expr is None:
+        return {"prim": "null"}   # the bare YAML null scalar spells the null type
     if isinstance(expr, str):
         if expr in PRIMITIVES:
             return {"prim": expr}
@@ -58,47 +170,76 @@ def parse_type(expr, names: set[str], where: str) -> dict:
                 raise TypeError_("NIKA-TYPE-001",
                                  f"{where} · unknown type name {expr!r}{hint}")
             return {"ref": expr}
-        if expr in RESERVED or expr.split("<")[0] in RESERVED:
+        base = expr.split("<")[0]
+        if base in RESERVED:
             raise TypeError_("NIKA-TYPE-001",
-                             f"{where} · {expr!r} is reserved (its wave has not landed)")
+                             f"{where} · {expr!r} is reserved — lands with {RESERVED[base]}")
         raise TypeError_("NIKA-TYPE-001", f"{where} · not a type: {expr!r}")
     if isinstance(expr, dict):
         keys = set(expr) - {"additional"}
+        if keys == {"optional"}:
+            raise TypeError_("NIKA-TYPE-001",
+                             f"{where} · optional is a field-presence modifier — for a "
+                             "nullable value write union: [T, null]")
         if len(keys) != 1 or not keys <= COMPOSITE_KEYS:
             raise TypeError_("NIKA-TYPE-001",
                              f"{where} · not a v1 type constructor: {sorted(expr)}")
         (k,) = keys
         v = expr[k]
-        if k == "array" or k == "map" or k == "optional":
-            inner = parse_type(v, names, f"{where}.{k}")
-            if k == "optional":
-                return _norm_union([inner, {"prim": "null"}])
-            return {k: inner}
+        if k in ("array", "map"):
+            return {k: parse_type(v, names, f"{where}.{k}")}
         if k == "object":
-            if not isinstance(v, dict):
-                raise TypeError_("NIKA-TYPE-001", f"{where}.object · fields must be a map")
-            fields = {fk: parse_type(fv, names, f"{where}.object.{fk}")
-                      for fk, fv in v.items()}
-            out = {"object": fields}
-            if expr.get("additional") is True:
-                out["additional"] = True
-            return out
+            return _parse_object(expr, v, names, where)
         if k == "union":
             if not isinstance(v, list) or len(v) < 2:
                 raise TypeError_("NIKA-TYPE-001", f"{where}.union · needs ≥ 2 members")
-            return _norm_union([parse_type(m, names, f"{where}.union") for m in v])
+            return norm_union([parse_type(m, names, f"{where}.union") for m in v])
         if k == "enum":
             if not isinstance(v, list) or not v or not all(isinstance(x, str) for x in v):
                 raise TypeError_("NIKA-TYPE-001", f"{where}.enum · non-empty string list")
             return {"enum": sorted(set(v))}
-        # refined numerics / string — the constructor name doubles as the base
+        # refined numerics / string
         if not isinstance(v, dict):
             raise TypeError_("NIKA-TYPE-001", f"{where}.{k} · refinement must be a map")
+        if k == "string":
+            bad = set(v) - {"pattern", "min_len", "max_len"}
+            if bad:
+                raise TypeError_("NIKA-TYPE-001",
+                                 f"{where}.string · not a refinement: {sorted(bad)}")
+            pat = v.get("pattern")
+            if pat is not None:
+                if not isinstance(pat, str):
+                    raise TypeError_("NIKA-TYPE-001", f"{where}.string.pattern · not a string")
+                offense = regex_dialect_violation(pat)
+                if offense:
+                    raise TypeError_("NIKA-TYPE-006",
+                                     f"{where}.string.pattern · out of the locked dialect: {offense}")
+            return {"refined": "string", "bounds": dict(v)}
+        bad = set(v) - {"min", "max"}
+        if bad:
+            raise TypeError_("NIKA-TYPE-001", f"{where}.{k} · not a refinement: {sorted(bad)}")
         return {"refined": k, "bounds": dict(v)}
     raise TypeError_("NIKA-TYPE-001", f"{where} · not a type: {type(expr).__name__}")
 
 
-def _norm_union(members: list[dict]) -> dict:
+def _parse_object(expr: dict, fields_raw, names: set[str], where: str) -> dict:
+    if not isinstance(fields_raw, dict):
+        raise TypeError_("NIKA-TYPE-001", f"{where}.object · fields must be a map")
+    fields: dict[str, dict] = {}
+    for fk, fv in fields_raw.items():
+        optional = False
+        if isinstance(fv, dict) and set(fv) == {"optional"}:
+            optional = True
+            fv = fv["optional"]
+        fields[fk] = {"ty": parse_type(fv, names, f"{where}.object.{fk}"),
+                      "opt": optional}
+    out = {"object": fields}
+    if expr.get("additional") is True:
+        out["additional"] = True
+    return out
+
+
+def norm_union(members: list[dict]) -> dict:
     flat: list[dict] = []
     for m in members:
         flat.extend(m["union"] if "union" in m else [m])
@@ -111,6 +252,14 @@ def _norm_union(members: list[dict]) -> dict:
     if len(uniq) == 1:
         return uniq[0]
     return {"union": sorted(uniq, key=repr)}
+
+
+def admits_null(t: dict) -> bool:
+    if t == {"prim": "null"} or t == UNKNOWN:
+        return True
+    if "union" in t:
+        return any(admits_null(m) for m in t["union"])
+    return False
 
 
 def _closest(name: str, names: set[str]) -> str | None:
@@ -142,9 +291,7 @@ def type_core_errors(doc: dict) -> list[dict]:
     raw_types = doc.get("types")
     names: set[str] = set(raw_types) if isinstance(raw_types, dict) else set()
 
-    parsed: dict[str, dict] = {}
     if isinstance(raw_types, dict):
-        # acyclicity over the NAME graph first (parse would recurse forever)
         graph = {n: _name_refs(v) & names for n, v in raw_types.items()}
         state: dict[str, int] = {}
 
@@ -165,7 +312,7 @@ def type_core_errors(doc: dict) -> list[dict]:
             if n in cyclic:
                 continue
             try:
-                parsed[n] = parse_type(v, names, f"types.{n}")
+                parse_type(v, names, f"types.{n}")
             except TypeError_ as e:
                 errs.append(err(e.code, e.detail))
 
@@ -179,28 +326,25 @@ def type_core_errors(doc: dict) -> list[dict]:
         vbody = t.get(verb) if isinstance(t.get(verb), dict) else {}
         ret = t.get("returns")
         if ret is not None:
+            rt = None
             try:
                 rt = parse_type(ret, names, f"tasks.{tid}.returns")
             except TypeError_ as e:
                 errs.append(err(e.code, e.detail))
-                rt = None
-            # TYPE-003 · one contract, one spelling
             if isinstance(vbody, dict) and "schema" in vbody:
                 errs.append(err("NIKA-TYPE-003",
                                 f"tasks.{tid} · returns: and {verb}.schema: are two spellings "
                                 "of one contract — keep returns: (the typed door) or the "
                                 "schema: hatch, never both"))
-            # TYPE-004 · returns unreachable from the declared decode
             if verb == "exec" and rt is not None:
                 decode = vbody.get("decode", "text")
                 capture = vbody.get("capture", "stdout")
-                if capture != "structured" and isinstance(decode, str):
-                    if not _decodable(rt, decode):
-                        errs.append(err("NIKA-TYPE-004",
-                                        f"tasks.{tid} · returns: cannot come out of decode: "
-                                        f"{decode} — an object/array contract needs decode: "
-                                        "json or jsonl"))
-        # PARSE-025 · decode ⊥ capture: structured
+                if capture != "structured" and isinstance(decode, str) \
+                        and not _decodable(rt, decode):
+                    errs.append(err("NIKA-TYPE-004",
+                                    f"tasks.{tid} · returns: cannot come out of decode: "
+                                    f"{decode} — an object/array contract needs decode: "
+                                    "json or jsonl"))
         if verb == "exec" and isinstance(vbody, dict) and "decode" in vbody \
                 and vbody.get("capture") == "structured":
             errs.append({"code": "NIKA-PARSE-025", "category": "validation_error",
@@ -224,19 +368,16 @@ def _name_refs(expr) -> set[str]:
 
 
 def _decodable(t: dict, decode: str) -> bool:
-    """Can a value of type t come out of the given decode? (conservative:
-    unions are decodable when ANY member is)."""
     if "union" in t:
         return any(_decodable(m, decode) for m in t["union"])
     if "ref" in t:
-        return True  # resolved shape unknown HERE · engine judges post-resolve
+        return True
     if decode == "bytes":
         return t == {"prim": "bytes"}
     if decode in ("json", "jsonl"):
-        return True  # JSON can produce any shape
-    # decode: text → a string-family value
+        return True
     if "prim" in t:
-        return t["prim"] in {"string", "uri", "path", "duration", "money", "timestamp"}
+        return t["prim"] in {"string"} | STRING_NEWTYPES
     if "enum" in t or t.get("refined") == "string":
         return True
     return False
@@ -246,7 +387,12 @@ def _decodable(t: dict, decode: str) -> bool:
 
 def lower(t: dict, named: dict[str, dict]) -> dict:
     if "ref" in t:
-        return lower(named[t["ref"]], named)
+        r = named.get(t["ref"])
+        return lower(r, named) if r is not None else {}
+    if t == UNKNOWN:
+        return {}
+    if t == NEVER:
+        return {"not": {}}   # the empty type · JSON Schema's honest bottom
     if "prim" in t:
         p = t["prim"]
         return {
@@ -261,11 +407,10 @@ def lower(t: dict, named: dict[str, dict]) -> dict:
             "duration": {"type": "string",
                          "pattern": r"^[0-9]+(\.[0-9]+)?(ns|us|µs|ms|s|m|h)([0-9]+(\.[0-9]+)?(ns|us|µs|ms|s|m|h))*$"},
             "timestamp": {"type": "string", "format": "date-time"},
-            "money": {"type": "string"},
         }[p]
     if "enum" in t:
         return {"type": "string", "enum": t["enum"]}
-    if t.get("refined") == "integer" or t.get("refined") == "number":
+    if t.get("refined") in ("integer", "number"):
         out = {"type": t["refined"]}
         b = t["bounds"]
         if "min" in b:
@@ -289,9 +434,9 @@ def lower(t: dict, named: dict[str, dict]) -> dict:
         return {"type": "object", "additionalProperties": lower(t["map"], named)}
     if "object" in t:
         props, required = {}, []
-        for k, v in t["object"].items():
-            props[k] = lower(_strip_null(v) if _is_optional(v) else v, named)
-            if not _is_optional(v):
+        for k, f in t["object"].items():
+            props[k] = lower(f["ty"], named)
+            if not f["opt"]:
                 required.append(k)
         out = {"type": "object", "properties": props}
         if required:
@@ -304,93 +449,203 @@ def lower(t: dict, named: dict[str, dict]) -> dict:
     raise AssertionError(f"unloworable: {t}")
 
 
-def _is_optional(t: dict) -> bool:
-    return "union" in t and {"prim": "null"} in t["union"]
-
-
-def _strip_null(t: dict) -> dict:
-    members = [m for m in t["union"] if m != {"prim": "null"}]
-    return members[0] if len(members) == 1 else {"union": members}
-
-
-# ── the lattice · A ⊑ B ──────────────────────────────────────────────────
+# ── the three relations (spec 09 §the relations) ─────────────────────────
 
 def subtype(a: dict, b: dict, named: dict[str, dict]) -> bool:
+    """A ⊑ B — the PARTIAL ORDER. Unknown is comparable only to itself;
+    Never is bottom. Reflexive · transitive · antisymmetric."""
+    if a == NEVER:
+        return True
+    if a == UNKNOWN or b == UNKNOWN:
+        return a == b
+    return _sub(a, b, named, gradual=False)
+
+
+def consistent(a: dict, b: dict, named: dict[str, dict]) -> bool:
+    """A ~ B — gradual consistency. Symmetric · NOT transitive ·
+    Unknown ~ everything · structural elsewhere (same-shape modulo
+    Unknown — subsumption does NOT ride here)."""
+    if a == UNKNOWN or b == UNKNOWN:
+        return True
     if "ref" in a:
-        return subtype(named[a["ref"]], b, named)
+        ra = named.get(a["ref"])
+        return ra is not None and consistent(ra, b, named)
     if "ref" in b:
-        return subtype(a, named[b["ref"]], named)
+        rb = named.get(b["ref"])
+        return rb is not None and consistent(a, rb, named)
+    if "union" in a or "union" in b:
+        ams = a["union"] if "union" in a else [a]
+        bms = b["union"] if "union" in b else [b]
+        # consistent unions: every a-member consistent with some b-member
+        # and vice versa (shape compatibility both ways — symmetric).
+        return all(any(consistent(x, y, named) for y in bms) for x in ams) \
+            and all(any(consistent(x, y, named) for x in ams) for y in bms)
+    if "array" in a and "array" in b:
+        return consistent(a["array"], b["array"], named)
+    if "map" in a and "map" in b:
+        return consistent(a["map"], b["map"], named)
+    if "object" in a and "object" in b:
+        fa, fb = a["object"], b["object"]
+        common = set(fa) & set(fb)
+        return all(consistent(fa[k]["ty"], fb[k]["ty"], named) for k in common)
+    return a == b
+
+
+def assignable(a: dict, b: dict, named: dict[str, dict]) -> bool:
+    """A ⊑~ B — consistent subtyping (Siek-Taha): subtyping with Unknown
+    accepting at the leaves. THE relation every static judge consumes."""
+    if a == NEVER or a == UNKNOWN or b == UNKNOWN:
+        return True
+    return _sub(a, b, named, gradual=True)
+
+
+def _sub(a: dict, b: dict, named: dict[str, dict], gradual: bool) -> bool:
+    rec = (lambda x, y: assignable(x, y, named)) if gradual \
+        else (lambda x, y: subtype(x, y, named))
+    if "ref" in a:
+        ra = named.get(a["ref"])
+        return ra is not None and rec(ra, b)
+    if "ref" in b:
+        rb = named.get(b["ref"])
+        return rb is not None and rec(a, rb)
+    if "union" in a:
+        return all(rec(m, b) for m in a["union"])
+    if "union" in b:
+        return any(rec(a, m) for m in b["union"])
     if a == b:
         return True
-    # unions
-    if "union" in a:
-        return all(subtype(m, b, named) for m in a["union"])
-    if "union" in b:
-        return any(subtype(a, m, named) for m in b["union"])
-    # numeric widening + refinements
-    if a == {"prim": "integer"} and b == {"prim": "number"}:
+    if a.get("prim") == "integer" and b.get("prim") == "number":
+        return True
+    if a.get("prim") in STRING_NEWTYPES and b == {"prim": "string"}:
         return True
     if "enum" in a:
         if b == {"prim": "string"}:
             return True
-        if "enum" in b:
-            return set(a["enum"]) <= set(b["enum"])
-        return False
+        return "enum" in b and set(a["enum"]) <= set(b["enum"])
     if a.get("refined") in ("integer", "number"):
         base = a["refined"]
         if b == {"prim": base} or (base == "integer" and b == {"prim": "number"}):
             return True
-        if b.get("refined") == base:
+        if b.get("refined") == base or (base == "integer" and b.get("refined") == "number"):
             ab, bb = a["bounds"], b["bounds"]
             lo = "min" not in bb or ("min" in ab and ab["min"] >= bb["min"])
             hi = "max" not in bb or ("max" in ab and ab["max"] <= bb["max"])
             return lo and hi
         return False
+    if a.get("prim") == "integer" and b.get("refined") in ("integer", "number"):
+        bb = b["bounds"]
+        return "min" not in bb and "max" not in bb
+    if a.get("prim") == "number" and b.get("refined") == "number":
+        bb = b["bounds"]
+        return "min" not in bb and "max" not in bb
     if a.get("refined") == "string":
         if b == {"prim": "string"}:
             return True
         if b.get("refined") == "string":
             ab, bb = a["bounds"], b["bounds"]
             if "pattern" in bb and ab.get("pattern") != bb["pattern"]:
-                return False  # syntactic equality only — honest
+                return False
             lo = "min_len" not in bb or ab.get("min_len", -1) >= bb["min_len"]
             hi = "max_len" not in bb or ("max_len" in ab and ab["max_len"] <= bb["max_len"])
             return lo and hi
         return False
-    # string newtypes narrow string
-    if a.get("prim") in ("uri", "path", "duration", "timestamp", "money") \
-            and b == {"prim": "string"}:
-        return True
     if "array" in a and "array" in b:
-        return subtype(a["array"], b["array"], named)
+        return rec(a["array"], b["array"])
     if "map" in a and "map" in b:
-        return subtype(a["map"], b["map"], named)
+        return rec(a["map"], b["map"])
     if "object" in a and "object" in b:
-        af, bf = a["object"], b["object"]
-        for k, bt in bf.items():
-            if _is_optional(bt):
-                if k in af and not subtype(af[k], bt, named):
+        fa, fb = a["object"], b["object"]
+        for k, bf in fb.items():
+            af = fa.get(k)
+            if af is None:
+                if not bf["opt"]:
                     return False
-            else:
-                if k not in af or not subtype(af[k], bt, named):
-                    return False
-        if not b.get("additional"):
-            if any(k not in bf for k in af):
+                continue
+            # a required a-field may serve an optional b-slot; an
+            # optional a-field cannot serve a REQUIRED b-slot (it may
+            # be absent).
+            if af["opt"] and not bf["opt"]:
                 return False
+            if not rec(af["ty"], bf["ty"]):
+                return False
+        if not b.get("additional") and any(k not in fb for k in fa):
+            return False
         return True
     return False
+
+
+# ── join and meet (spec 09 · honest three-way meet) ──────────────────────
+
+def join(a: dict, b: dict) -> dict:
+    """A ⊔ B — the language has unions, so the join is always expressible."""
+    return norm_union([a, b])
+
+
+def meet(a: dict, b: dict, named: dict[str, dict]):
+    """A ⊓ B — EXACT when computable · NEVER when provably disjoint ·
+    None when not computed (never guessed · spec 09 §meet)."""
+    if a == UNKNOWN or b == UNKNOWN:
+        return None          # insufficient information ≠ impossibility
+    if a == NEVER or b == NEVER:
+        return NEVER
+    if subtype(a, b, named):
+        return a
+    if subtype(b, a, named):
+        return b
+    if "enum" in a and "enum" in b:
+        inter = sorted(set(a["enum"]) & set(b["enum"]))
+        return {"enum": inter} if inter else NEVER
+    ra, rb = a.get("refined"), b.get("refined")
+    if ra in ("integer", "number") and rb in ("integer", "number"):
+        lo = max(a["bounds"].get("min", float("-inf")), b["bounds"].get("min", float("-inf")))
+        hi = min(a["bounds"].get("max", float("inf")), b["bounds"].get("max", float("inf")))
+        if lo > hi:
+            return NEVER
+        base = "integer" if "integer" in (ra, rb) else "number"
+        bounds = {}
+        if lo != float("-inf"):
+            bounds["min"] = lo
+        if hi != float("inf"):
+            bounds["max"] = hi
+        return {"refined": base, "bounds": bounds}
+    # provably disjoint primitive families → Never (impossibility, named)
+    if _family(a) is not None and _family(b) is not None and _family(a) != _family(b):
+        return NEVER
+    return None
+
+
+def _family(t: dict) -> str | None:
+    if t.get("prim") in ("integer", "number") or t.get("refined") in ("integer", "number"):
+        return "numeric"
+    if t.get("prim") in {"string"} | STRING_NEWTYPES or "enum" in t \
+            or t.get("refined") == "string":
+        return "textual"
+    if t.get("prim") == "bool":
+        return "bool"
+    if t.get("prim") == "null":
+        return "null"
+    if "array" in t:
+        return "array"
+    if "map" in t or "object" in t:
+        return "objectish"
+    return None
+
 
 # ── runtime fit · does a decoded VALUE inhabit a type? (spec 09) ─────────
 
 def fits(value, t: dict, named: dict[str, dict]) -> bool:
-    """value ∈ T — the run-time half of the contract (`NIKA-TYPE-101`
-    when an exec/invoke decoded value escapes its returns:). String
-    newtypes check the FAMILY only (the format is the static contract);
-    refined-string patterns are static-only here (no regex engine
-    dependency — documented honest gap, both evaluators agree)."""
+    """value ∈ T — the run-time half (`NIKA-TYPE-101`). Optional is a
+    FIELD-PRESENCE fact judged by the object arm (absent → ok when
+    optional; PRESENT null is refused unless T admits null). String
+    newtypes check the family (formats are the static contract);
+    refined-string patterns are static-only here."""
     if "ref" in t:
         rt = named.get(t["ref"])
         return rt is not None and fits(value, rt, named)
+    if t == UNKNOWN:
+        return True
+    if t == NEVER:
+        return False
     if t == {"prim": "null"}:
         return value is None
     if "union" in t:
@@ -398,12 +653,11 @@ def fits(value, t: dict, named: dict[str, dict]) -> bool:
     if t.get("prim") == "bool":
         return isinstance(value, bool)
     if t.get("prim") == "integer":
-        return isinstance(value, int) and not isinstance(value, bool) or (
+        return (isinstance(value, int) and not isinstance(value, bool)) or (
             isinstance(value, float) and value.is_integer())
     if t.get("prim") == "number":
         return isinstance(value, (int, float)) and not isinstance(value, bool)
-    if t.get("prim") in ("string", "uri", "path", "duration", "money",
-                         "timestamp", "bytes"):
+    if t.get("prim") in {"string", "bytes"} | STRING_NEWTYPES:
         return isinstance(value, str)
     if "enum" in t:
         return isinstance(value, str) and value in t["enum"]
@@ -414,12 +668,14 @@ def fits(value, t: dict, named: dict[str, dict]) -> bool:
                 isinstance(value, int) or float(value).is_integer()):
             return False
         b = t["bounds"]
-        return ("min" not in b or value >= b["min"]) and                ("max" not in b or value <= b["max"])
+        return ("min" not in b or value >= b["min"]) and \
+               ("max" not in b or value <= b["max"])
     if t.get("refined") == "string":
         if not isinstance(value, str):
             return False
         b = t["bounds"]
-        return ("min_len" not in b or len(value) >= b["min_len"]) and                ("max_len" not in b or len(value) <= b["max_len"])
+        return ("min_len" not in b or len(value) >= b["min_len"]) and \
+               ("max_len" not in b or len(value) <= b["max_len"])
     if "array" in t:
         return isinstance(value, list) and all(fits(v, t["array"], named) for v in value)
     if "map" in t:
@@ -429,13 +685,13 @@ def fits(value, t: dict, named: dict[str, dict]) -> bool:
         if not isinstance(value, dict):
             return False
         fields = t["object"]
-        for k, ft in fields.items():
+        for k, f in fields.items():
             if k in value:
-                if not fits(value[k], ft, named):
+                if not fits(value[k], f["ty"], named):
                     return False
-            elif not _is_optional(ft):
+            elif not f["opt"]:
                 return False
         if not t.get("additional") and any(k not in fields for k in value):
             return False
         return True
-    return True  # Unknown-class · gradual
+    return True

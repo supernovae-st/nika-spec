@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: t
+types:
+  Slug: { string: { pattern: "^[a-z][a-z0-9-]{1,30}$", max_len: 32 } }
+tasks:
+  s:
+    infer: { prompt: "x" }
+    returns: Slug

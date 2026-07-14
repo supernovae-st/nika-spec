@@ -53,7 +53,7 @@ counts:
   templates: 10
   error_namespaces: 15
   error_categories: 12
-  error_codes: 68
+  error_codes: 69
   pillars: 5
   # ---- extended v0.2 · 2026-05-27 · lifecycle + diamond + steal + severity
   lifecycle_product: 4
@@ -250,7 +250,7 @@ error_categories:
 # check binds the prose table to it (same row set · same fields).
 # transient · false | engine-assessed
 error_codes:
-  count: 68
+  count: 69
   reference: spec/05-errors.md
   items:
     - { code: NIKA-PARSE-001, category: parse_error, transient: "false", failure: "the YAML itself does not parse (syntax error)" }
@@ -295,6 +295,7 @@ error_codes:
     - { code: NIKA-TYPE-003, category: validation_error, transient: "false", failure: "returns: and schema: on the same task — one contract, one spelling" }
     - { code: NIKA-TYPE-004, category: validation_error, transient: "false", failure: "returns: type unreachable from the declared decode: (an object contract over decode: text · …)" }
     - { code: NIKA-TYPE-005, category: security_error, transient: "false", failure: "a secret-carrying type in a lowered position (reserved with secret<T> · W4)" }
+    - { code: NIKA-TYPE-006, category: validation_error, transient: "false", failure: "regex pattern outside the locked dialect (backreference · lookaround · named group · inline flags · lazy/possessive · \\b · \\p — spec 09 §the regex dialect)" }
     - { code: NIKA-TYPE-101, category: validation_error, transient: "false", failure: "run-time contract violation — the decoded value does not fit returns: (exec:/invoke: lane)" }
     - { code: NIKA-VAR-001, category: variable_error, transient: "false", failure: "unresolved reference (unknown namespace entry · undeclared env/vars key)" }
     - { code: NIKA-VAR-002, category: variable_error, transient: "false", failure: "binding cardinality — a jq binding emitted zero or multiple values" }

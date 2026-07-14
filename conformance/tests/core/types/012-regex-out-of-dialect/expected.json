@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-TYPE-006",
+      "category": "validation_error"
+    }
+  ],
+  "note": "09-types.md \u00a7the regex dialect \u00b7 lookaround is out of the locked whitelist \u2014 both evaluators refuse identically."
+}
