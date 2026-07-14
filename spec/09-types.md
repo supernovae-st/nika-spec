@@ -121,12 +121,28 @@ types:
 
 ### Normalization (normative)
 
-Two type expressions are compared **after normalization** ·
+Two type expressions are compared **after normalization** — and the
+canonical forms are what make `⊑` antisymmetric **as equality**: two
+types that admit the same values normalize to the same form.
 
 1. Unions flatten (`union` inside `union`), deduplicate structurally,
    and order canonically (member order never carries meaning).
 2. A one-member union collapses to its member.
-3. Field optionality is **not** a type — it lives on the field slot and
+3. A union member **subsumed** by another member collapses away:
+   `union: [integer, number]` **is** `number`, `union: [Enum, string]`
+   where every enum is a string **is** `string`. (Named references are
+   nominal at normalization time — a reference never subsumes and is
+   never subsumed; it resolves only in the relations.)
+4. A union with an `Unknown` member **absorbs to `Unknown`** — joining
+   with no information is no information. (`Unknown` has no authorable
+   surface; this arises only from inference joins.)
+5. An **unbounded refinement is its primitive**: `{ integer: {} }` is
+   `integer`, `{ number: {} }` is `number`, `{ string: {} }` is
+   `string`. Bounds must be numbers with `min ≤ max` (lengths:
+   non-negative integers with `min_len ≤ max_len`) — an empty range is
+   refused at parse (`NIKA-TYPE-001`), never silently inhabited by
+   nothing.
+6. Field optionality is **not** a type — it lives on the field slot and
    never rewrites into the value type (§optional is presence, not null).
 
 ## The relations · `⊑` (subtyping) · `~` (consistency) · `⊑~` (assignability) (normative)
@@ -160,10 +176,15 @@ DIAGNOSTICS (refusals), never a type.
 - `uri ⊑ string` · `path ⊑ string` · `duration ⊑ string` ·
   `timestamp ⊑ string` (the newtypes narrow strings; nothing else) ·
 - `array/map`: covariant in the element type ·
-- objects: **width + depth** — `A ⊑ B` iff every required field of B
-  exists in A with the field type in `⊑`; a closed B admits no A field
-  outside B's declared fields; `additional: true` on B lifts that
-  restriction ·
+- objects: **width + depth + openness** — `A ⊑ B` iff every required
+  field of B exists (required) in A with the field type in `⊑`, and an
+  optional B field declared in A nests in `⊑` (an optional A field
+  never serves a REQUIRED B slot — it may be absent); a closed B admits
+  no A field outside B's declared fields (`additional: true` on B lifts
+  that restriction); and an **open A** (`additional: true`) — whose
+  inhabitants carry undeclared keys with ANY value — fits only an open
+  B that declares **no field A leaves free** (`F_B ⊆ F_A`). An open
+  object is never below a closed one ·
 - unions: `A ⊑ union U` iff `A ⊑` some member; `union U ⊑ B` iff
   **every** member `⊑ B` ·
 - `Unknown ⊑ Unknown` only — in the ORDER, `Unknown` is comparable to

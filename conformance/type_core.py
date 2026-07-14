@@ -214,10 +214,29 @@ def parse_type(expr, names: set[str], where: str) -> dict:
                 if offense:
                     raise TypeError_("NIKA-TYPE-006",
                                      f"{where}.string.pattern · out of the locked dialect: {offense}")
+            for lk in ("min_len", "max_len"):
+                lv = v.get(lk)
+                if lv is not None and (isinstance(lv, bool) or not isinstance(lv, int) or lv < 0):
+                    raise TypeError_("NIKA-TYPE-001",
+                                     f"{where}.string.{lk} · must be a non-negative integer")
+            if v.get("min_len") is not None and v.get("max_len") is not None \
+                    and v["min_len"] > v["max_len"]:
+                raise TypeError_("NIKA-TYPE-001",
+                                 f"{where}.string · empty range: min_len > max_len")
+            if not v:
+                return {"prim": "string"}   # unbounded refinement IS its primitive
             return {"refined": "string", "bounds": dict(v)}
         bad = set(v) - {"min", "max"}
         if bad:
             raise TypeError_("NIKA-TYPE-001", f"{where}.{k} · not a refinement: {sorted(bad)}")
+        for bk in ("min", "max"):
+            bv = v.get(bk)
+            if bk in v and (isinstance(bv, bool) or not isinstance(bv, (int, float))):
+                raise TypeError_("NIKA-TYPE-001", f"{where}.{k}.{bk} · must be a number")
+        if "min" in v and "max" in v and v["min"] > v["max"]:
+            raise TypeError_("NIKA-TYPE-001", f"{where}.{k} · empty range: min > max")
+        if not v:
+            return {"prim": k}   # unbounded refinement IS its primitive
         return {"refined": k, "bounds": dict(v)}
     raise TypeError_("NIKA-TYPE-001", f"{where} · not a type: {type(expr).__name__}")
 
@@ -239,19 +258,57 @@ def _parse_object(expr: dict, fields_raw, names: set[str], where: str) -> dict:
     return out
 
 
+def canon_key(t: dict) -> str:
+    """The canonical sort/dedup key of a normalized member — canonical
+    JSON of the INTERNAL form (sorted keys · no spaces · raw UTF-8).
+    Cross-language: the Rust core emits the same key byte-for-byte, so
+    both evaluators agree on the canonical union order."""
+    import json as _json
+    return _json.dumps(t, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+
+
 def norm_union(members: list[dict]) -> dict:
+    """Flatten · dedup · ABSORB Unknown · COLLAPSE subsumed ref-free
+    members · sort by canon_key. Canonical forms make ⊑ antisymmetric
+    AS EQUALITY: two types admitting the same values normalize to the
+    same form (`union: [integer, number]` IS `number`)."""
     flat: list[dict] = []
     for m in members:
         flat.extend(m["union"] if "union" in m else [m])
+    # a union with an Unknown member knows NOTHING more than Unknown —
+    # joining with no information is no information (absorption)
+    if any(m == UNKNOWN for m in flat):
+        return UNKNOWN
     seen, uniq = set(), []
     for m in flat:
-        key = repr(sorted(m.items(), key=str))
+        key = canon_key(m)
         if key not in seen:
             seen.add(key)
             uniq.append(m)
-    if len(uniq) == 1:
-        return uniq[0]
-    return {"union": sorted(uniq, key=repr)}
+    # subsumption collapse — drop m when some OTHER member already
+    # admits every m-value. Ref-free only: a ref is nominal here (no
+    # env at normalization time), it never subsumes nor is subsumed.
+    kept = [m for i, m in enumerate(uniq)
+            if not (_ref_free(m)
+                    and any(j != i and _ref_free(n) and subtype(m, n, {})
+                            for j, n in enumerate(uniq)))]
+    if len(kept) == 1:
+        return kept[0]
+    return {"union": sorted(kept, key=canon_key)}
+
+
+def _ref_free(t: dict) -> bool:
+    if "ref" in t:
+        return False
+    if "union" in t:
+        return all(_ref_free(m) for m in t["union"])
+    if "array" in t:
+        return _ref_free(t["array"])
+    if "map" in t:
+        return _ref_free(t["map"])
+    if "object" in t:
+        return all(_ref_free(f["ty"]) for f in t["object"].values())
+    return True
 
 
 def admits_null(t: dict) -> bool:
@@ -532,12 +589,6 @@ def _sub(a: dict, b: dict, named: dict[str, dict], gradual: bool) -> bool:
             hi = "max" not in bb or ("max" in ab and ab["max"] <= bb["max"])
             return lo and hi
         return False
-    if a.get("prim") == "integer" and b.get("refined") in ("integer", "number"):
-        bb = b["bounds"]
-        return "min" not in bb and "max" not in bb
-    if a.get("prim") == "number" and b.get("refined") == "number":
-        bb = b["bounds"]
-        return "min" not in bb and "max" not in bb
     if a.get("refined") == "string":
         if b == {"prim": "string"}:
             return True
@@ -555,6 +606,11 @@ def _sub(a: dict, b: dict, named: dict[str, dict], gradual: bool) -> bool:
         return rec(a["map"], b["map"])
     if "object" in a and "object" in b:
         fa, fb = a["object"], b["object"]
+        a_open, b_open = bool(a.get("additional")), bool(b.get("additional"))
+        # an OPEN a leaves undeclared keys carrying ANY value — only an
+        # open b that adds no constraint of its own can admit that
+        if a_open and (not b_open or any(k not in fa for k in fb)):
+            return False
         for k, bf in fb.items():
             af = fa.get(k)
             if af is None:
@@ -568,7 +624,7 @@ def _sub(a: dict, b: dict, named: dict[str, dict], gradual: bool) -> bool:
                 return False
             if not rec(af["ty"], bf["ty"]):
                 return False
-        if not b.get("additional") and any(k not in fb for k in fa):
+        if not b_open and any(k not in fb for k in fa):
             return False
         return True
     return False
