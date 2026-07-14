@@ -499,7 +499,7 @@ a caller receives).
 - **[templates/](./templates/)**: writing your own? Instantiate a
   skeleton (6 valid, slot-marked) instead of starting blank, the
   deterministic path agents follow ([protocol](AGENTS.md))
-- **[stdlib/](./stdlib/)**: the <!-- canon:providers -->16<!-- /canon --> providers · <!-- canon:extract_modes -->9<!-- /canon --> extract modes · <!-- canon:builtins -->27<!-- /canon --> builtins
+- **[stdlib/](./stdlib/)**: the <!-- canon:providers -->16<!-- /canon --> providers · <!-- canon:extract_modes -->9<!-- /canon --> extract modes · <!-- canon:builtins -->28<!-- /canon --> builtins
 - **[examples/](./examples/)**: 7 foundation + 20 showcase workflows, all shipped and CI-gated
 - **[README.md](./README.md)**: why a language · repo layout · governance
 
@@ -673,8 +673,9 @@ outputs:                              # what the workflow returns · symmetric t
 | [08 out of scope](./08-out-of-scope.md) | Explicit defer list (memory · macros · etc.) |
 | [09 types](./09-types.md) | The decidable type core · `types:` · `returns:` · `decode:` · the lattice · JSON-Schema lowering |
 | [10 authority](./10-authority.md) | The authority system · the effect vocabulary · `policy:` (named workflow law) · secret-flow codes · `certificate.effects` |
+| [11 decision](./11-decision.md) | The decision contract · portable Decision Bundle · Evidence IR (two lattices) · Belnap logic · fixed-point Decision IR · abstention · `nika:decide` |
 
-**Stdlib** (versioned independently · not a spec section) · [stdlib/](../stdlib/): **<!-- canon:providers -->16<!-- /canon --> providers · <!-- canon:extract_modes -->9<!-- /canon --> extract modes · <!-- canon:builtins -->27<!-- /canon --> builtins** (6 core · 5 file · 8 data · 2 network · 2 introspection · 4 media).
+**Stdlib** (versioned independently · not a spec section) · [stdlib/](../stdlib/): **<!-- canon:providers -->16<!-- /canon --> providers · <!-- canon:extract_modes -->9<!-- /canon --> extract modes · <!-- canon:builtins -->28<!-- /canon --> builtins** (6 core · 5 file · 8 data · 2 network · 2 introspection · 4 media).
 
 ---
 
@@ -1628,7 +1629,7 @@ read_config:
         path: "./config.yaml"
 ```
 
-See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md) for the canonical builtin list (<!-- canon:builtins -->27<!-- /canon --> builtins in v0.1).
+See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md) for the canonical builtin list (<!-- canon:builtins -->28<!-- /canon --> builtins in v0.1).
 
 > **Grouped paths are grammar-legal · v0.1 ships none.** The reference
 > grammar admits `nika:<group>/<tool>` (the `nika:connectome/recall`
@@ -3842,6 +3843,8 @@ these from this file alone.
 | `NIKA-SEC-005` | SSRF block — a `nika:fetch`/`nika:notify` URL resolves to a loopback/private/link-local/metadata target (the always-on engine floor · independent of `permits:`, with ONE carve-out: an exact loopback literal in `permits.net.http` declassifies the floor for that host only · [01 §permits](./01-envelope.md#permits--optional--the-declared-capability-boundary)) | `security_error` | false |
 | `NIKA-SEC-006` | secret flow — a `secrets.<name>` value reaches an unsanctioned sink (an `exec:` argument · an `invoke:` payload · an `infer:`/`agent:` prompt) · the diagnostic carries the **taint path** + the exact `egress:` clause that would sanction it ([10 §secret flow](./10-authority.md#secret-flow-refusals-carry-their-codes-normative) · rules in [01 §egress](./01-envelope.md#egress--optional--sanctioned-destinations-declassification)) | `security_error` | false |
 | `NIKA-SEC-007` | secret egress — a tainted value reaches the workflow boundary (`outputs:` · where a result leaves the run) · the diagnostic carries the taint path ([10 §secret flow](./10-authority.md#secret-flow-refusals-carry-their-codes-normative)) | `security_error` | false |
+| `NIKA-DECIDE-001` | the decision bundle is malformed or violates its own laws (float weight · undeclared evidence key in rules · identity key feeding a technical dimension · missing contradictory fixture · monotonicity violated by the bundle's own fixtures · [11 §nika:decide](./11-decision.md#nikadecide--the-deterministic-kernel-as-a-builtin)) | `validation_error` | false |
+| `NIKA-DECIDE-002` | the evidence snapshot does not satisfy the bundle's evidence schema (type misfit · unauthorized source · integrity below the declared floor · undeclared key · [11 §evidence IR](./11-decision.md#evidence-ir-normative--g14)) | `validation_error` | false |
 | `NIKA-POLICY-001` | a hard `policy:` rule is violated (`require.human_gate_before` · `forbid.exec_after` · `allow.providers` · `limits.max_tasks`) — the diagnostic names rule + task + witness · check-time, before any token ([10 §policy](./10-authority.md#the-policy-block--optional--named-workflow-law)) | `security_error` | false |
 | `NIKA-TIMEOUT-001` | task (or for_each iteration) exceeded `timeout:` | `timeout_error` | false |
 | `NIKA-CANCEL-001` | task cancelled (workflow failure gate · user cancellation) | `cancelled` | false |
@@ -4194,7 +4197,7 @@ The stdlib has **independent versioning** ·
 
 - `stdlib/providers-v0.1.md`, the <!-- canon:providers -->16<!-- /canon --> canonical providers for v0.1
 - `stdlib/extract-modes-v0.1.md`, the <!-- canon:extract_modes -->9<!-- /canon --> canonical extract modes for v0.1
-- `stdlib/builtins-v0.1.md`, the <!-- canon:builtins -->27<!-- /canon --> canonical builtins for v0.1
+- `stdlib/builtins-v0.1.md`, the <!-- canon:builtins -->28<!-- /canon --> canonical builtins for v0.1
 
 When the stdlib evolves to v0.2 · those files become `*-v0.2.md` and new versions are published. The core language contract (`nika: v1`) is unchanged.
 
@@ -4336,7 +4339,7 @@ See [07-conformance.md](./07-conformance.md). In summary ·
 |---|---|
 | Core | None · only parse + DAG + variable + error · no execution needed |
 | Runtime | Must execute the 4 verbs · provider/tool implementations engine's choice |
-| Stdlib v0.1 | Must ship the <!-- canon:providers -->16<!-- /canon --> providers + <!-- canon:extract_modes -->9<!-- /canon --> extract modes + <!-- canon:builtins -->27<!-- /canon --> builtins |
+| Stdlib v0.1 | Must ship the <!-- canon:providers -->16<!-- /canon --> providers + <!-- canon:extract_modes -->9<!-- /canon --> extract modes + <!-- canon:builtins -->28<!-- /canon --> builtins |
 | Stdlib v0.1+media | RESERVED · enumerated when the media set publishes (stdlib v0.x · the 24 names are not yet normative) |
 
 A v0.1-compliant engine for a workflow author depends on which level they need.
@@ -4381,7 +4384,7 @@ Three nested levels · increasing scope ·
 |---|---|---|
 | **Core** | Parse + validate · DAG semantics · variable resolution · error structure | Linters · spec editors · static analyzers |
 | **Runtime** | Core + verb execution | Working engine (with own provider/tool impls) |
-| **Stdlib v0.1** | Runtime + the <!-- canon:providers -->16<!-- /canon --> providers + <!-- canon:extract_modes -->9<!-- /canon --> extract modes + <!-- canon:builtins -->27<!-- /canon --> builtins | Full reference-impl-equivalent engine |
+| **Stdlib v0.1** | Runtime + the <!-- canon:providers -->16<!-- /canon --> providers + <!-- canon:extract_modes -->9<!-- /canon --> extract modes + <!-- canon:builtins -->28<!-- /canon --> builtins | Full reference-impl-equivalent engine |
 
 A higher level **includes** the lower levels.
 
@@ -5459,7 +5462,7 @@ at once. This chapter's grammar binds `types:` and `returns:` today.
 
 # Stdlib v0.1 · Builtins
 
-> **<!-- canon:builtins -->27<!-- /canon --> canonical builtins** shipped with Stdlib v0.1-compliant engines.
+> **<!-- canon:builtins -->28<!-- /canon --> canonical builtins** shipped with Stdlib v0.1-compliant engines.
 > Invoked via `invoke: tool: "nika:<name>"`. Plus the remaining media
 > builtins deferred to stdlib v0.x (opt-in feature flag).
 >
@@ -5500,9 +5503,9 @@ at once. This chapter's grammar binds `types:` and `returns:` today.
 | Introspection | 2 | Self-awareness · `inspect` (runtime state · 4 views) · `compose` (static check of a drafted workflow · agent loops only) |
 | Network | 2 | fetch (HTTP+extraction) · notify (alerts out) |
 | Media | 4 | `chart` (§Media #4 · deterministic/attested · 2026-07-09) · `image_generate` (§Media · 2026-07-05) · `image_fx` (§Media #3 · deterministic ops chain · 2026-07-09) · `tts_generate` (§Audio · 2026-07-05) — the REST of the media class stays deferred to stdlib v0.x |
-| **Total v0.1** | **<!-- canon:builtins -->27<!-- /canon -->** | |
+| **Total v0.1** | **<!-- canon:builtins -->28<!-- /canon -->** | |
 
-A Stdlib v0.1-compliant engine MUST ship these <!-- canon:builtins -->27<!-- /canon -->.
+A Stdlib v0.1-compliant engine MUST ship these <!-- canon:builtins -->28<!-- /canon -->.
 
 ---
 
@@ -5708,6 +5711,16 @@ Reference implementation · `serde_transcode` 1.1+ orchestrator (zero-allocation
 invoke: { tool: "nika:uuid", args: { version: v7 } }   # v7 default (timestamped/sortable · RFC 9562) | v4 (random)
 ```
 Generate a UUID. (Generators are not jq · jq is pure transform.) Returns the canonical lowercase-hyphenated string. No failure codes.
+
+### `nika:decide`
+```yaml
+invoke:
+  tool: "nika:decide"
+  args:
+    bundle: "./decisions/pr-triage.bundle.json"   # path OR inline bundle object
+    evidence: "${{ tasks.collect.output }}"       # the EvidenceSnapshot { t, evidence: [...] }
+```
+The deterministic decision kernel (spec [11-decision.md](../spec/11-decision.md)) · evaluates a portable **Decision Bundle** against an **EvidenceSnapshot** and returns the full Decision Receipt (outcome ∈ {recommend · defer · human_required · opted_out · overridden} · per-dimension term-by-term contributions · intervals · conflicts+witnesses · determination provenance). PURE compute — zero required effects (a `bundle:` path reads like any declared `fs.read`; an inline object needs no filesystem) · zero floats (fixed-point basis-points) · same inputs, same bytes, both evaluators (the stdlib-Python reference interpreter is the conformance oracle — byte-equal canonical JSON). **The LLM never decides**: `infer:` produces closed cited facts; this kernel applies the rubric. Throws · `NIKA-DECIDE-001` (the bundle violates its own laws) · `NIKA-DECIDE-002` (the snapshot does not satisfy the evidence schema) · both `validation_error`, deterministic.
 
 ### `nika:date`
 ```yaml
@@ -6197,7 +6210,7 @@ external users · before the forever-clock).
 
 ---
 
-🦋 *<!-- canon:builtins -->27<!-- /canon --> builtins canonical · jq = the data language · 5-layer Rams symmetry (fetch+extract · jq · convert · wait · inspect) · assets land on disk, never inline · clear forever.*
+🦋 *<!-- canon:builtins -->28<!-- /canon --> builtins canonical · jq = the data language · 5-layer Rams symmetry (fetch+extract · jq · convert · wait · inspect) · assets land on disk, never inline · clear forever.*
 
 <!-- ═══ stdlib/providers-v0.1.md ═══ -->
 

@@ -44,6 +44,7 @@ jobs:
         run: |
           python conformance/runner.py all
           python conformance/type_core_selftest.py
+          python conformance/decision_core_selftest.py
 
       # The committed corpus must be BYTE-exact against type_core.py (a
       # drifted corpus makes the Rust differential judge stale verdicts)
