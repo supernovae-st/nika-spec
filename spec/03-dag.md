@@ -180,7 +180,7 @@ already bind through `with:` is meaningful ONLY if it *tightens* the gate
 (`after: {x: succeeded}` + a value edge = run on `success` only, excluding
 the skipped-`null` case). A non-tightening restatement (`after: {x: terminal}`
 next to a value edge) changes nothing and the reference linter warns
-(`one-obvious-way/008`).
+(`one-obvious-way/010`).
 
 ### `depends_on` · **dead — the teaching survives**
 
@@ -1036,7 +1036,7 @@ discouraged form ·
 
 | Rule | Intent | ✅ The one way | ❌ Discouraged · why |
 |---|---|---|---|
-| `/008` | « B consumes A's output » | a `with:` binding — the data IS the edge | adding a non-tightening `after:` entry next to it (`after: {a: terminal}` beside a value edge changes nothing) |
+| `/010` | « B consumes A's output » | a `with:` binding — the data IS the edge | adding a non-tightening `after:` entry next to it (`after: {a: terminal}` beside a value edge changes nothing) |
 | `/002` | « depend on a skippable producer » | decide the skip path: `after: {a: succeeded}` (skip cancels me) or read the value (`with:` · skip passes as `null`) | an `on_error: { skip: true }` producer whose dependents never acknowledge the skip either way |
 | `/003` | « retry on transient failure » | `retry:` · the ONE retry shape (`max_attempts` · `backoff_*` · `on_codes`) | an `after: {a: failed}` duplicate of the failing task · a self-referencing recovery chain |
 | `/004` | « provide a fallback value » | `on_error: { recover: … }` · the route stays *in the failing task* | a second task `after: {a: failed}` for a mere value · use a task only when real *work* runs on failure |
