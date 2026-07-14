@@ -92,7 +92,7 @@ Run `nika graph <file>` on any workflow and paste the output; it renders on GitH
 
 1. **Envelope**: one line · `nika: v1` + `workflow:` header (+ typed `vars` · `env` · `secrets`)
 2. **The 4 verbs**: `infer:` (LLM) · `exec:` (shell) · `invoke:` (tools/MCP) · `agent:` (autonomous loop)
-3. **DAG shape**: tasks + `depends_on` + `when` + `for_each` + output binding
+3. **DAG shape**: tasks + `with:` data edges + `after:` control + `when` + `for_each`
 4. **Variables**: one `${{ ... }}` syntax · <!-- canon:namespaces -->5<!-- /canon --> namespaces (`vars` · `with` · `tasks` · `env` · `secrets`)
 5. **Error model**: `NIKA-<NS>-<NNN>` codes · retry semantics · structured output
 
@@ -111,7 +111,7 @@ nika-spec/
 │   ├── 00-overview.md           one-page vision
 │   ├── 01-envelope.md           nika: v1 + workflow + typed vars/env/secrets
 │   ├── 02-verbs.md              the 4 verbs · signatures + semantics
-│   ├── 03-dag.md                tasks · depends_on · when · for_each · output
+│   ├── 03-dag.md                tasks · with/after edges · when · for_each
 │   ├── 04-variables.md          ${{ }} · 5 namespaces · vars/with/tasks/env/secrets
 │   ├── 05-errors.md             error codes · retry · structured output
 │   ├── 06-stdlib-contract.md    how the stdlib versions independently

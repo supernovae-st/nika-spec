@@ -15,7 +15,8 @@ tasks:
       on_codes: [NIKA-TIMEOUT-001]
       recover: "should-not-apply"
   after:
-    depends_on: [fails]
+    after:
+      fails: succeeded
     invoke:
       tool: nika:write
       args: { path: "./out/ctrlflow/07_after.json", content: "ran" }

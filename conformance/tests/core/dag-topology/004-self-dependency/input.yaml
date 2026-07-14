@@ -4,5 +4,5 @@ workflow:
   id: hello
 tasks:
   a:
-    depends_on: [a]
+    after: { a: succeeded }
     infer: { prompt: "a" }

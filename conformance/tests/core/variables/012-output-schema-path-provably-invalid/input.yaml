@@ -19,6 +19,7 @@ tasks:
             type: array
             items: { type: string }
   report:
-    depends_on: [extract]
+    with:
+      extract_entitties: ${{ tasks.extract.output.entitties }}
     exec:
-      command: ["report", "${{ tasks.extract.output.entitties }}"]
+      command: ["report", "${{ with.extract_entitties }}"]

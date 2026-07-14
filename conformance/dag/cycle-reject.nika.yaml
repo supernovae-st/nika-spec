@@ -1,14 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
 # Expected: NIKA-DAG-001 at CHECK.
 nika: v1
 workflow:
   id: e07-dag-cycle
-# INTENT: trigger NIKA-DAG-001 (cycle in depends_on: a->b->a)
+# INTENT: trigger NIKA-DAG-001 (control cycle in after: a->b->a)
 tasks:
   step_a:
-    depends_on: [step_b]
+    after: { step_b: succeeded }
     exec:
       command: ["echo", "a"]
   step_b:
-    depends_on: [step_a]
+    after: { step_a: succeeded }
     exec:
       command: ["echo", "b"]

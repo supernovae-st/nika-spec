@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Seeded workflow generator for the differential harness (W0 · v0 subset).
+"""Seeded W2 workflow generator (DRAFT · joins the differential when a W2
+engine exists — until then it feeds the model's own property tests).
 
-Emits small valid workflows in the W1 grammar (workflow object · task
-map) using only deterministic
-building blocks: exec argv [true] / [false], depends_on edges, retry and
-on_error armor. Every emitted file is (a) evaluable by the reference model
-and (b) runnable by the real engine offline with zero providers.
+Emits small valid workflows in the W2 grammar: task map · with bindings
+(.output / .status / .error refs → value / terminal-observation /
+failure-observation edges) · after predicates · when literals · exec argv
+[true]/[false] · retry and on_error armor. No depends_on — W2 kills it.
 Determinism: same seed → same bytes.
 """
 
@@ -13,23 +13,41 @@ from __future__ import annotations
 
 import random
 
+FIELDS = ["output", "output", "output", "status", "error"]  # value-biased mix
+PREDICATES = ["succeeded", "failed", "skipped", "terminal"]
+
 
 def generate(seed: int) -> str:
     rng = random.Random(seed)
     n = rng.randint(3, 9)
-    lines = ["nika: v1", "workflow:", f"  id: gen-{seed}", "tasks:"]
+    lines = ["nika: v1", "workflow:", f"  id: gen-w2-{seed}", "tasks:"]
     for i in range(n):
         tid = f"t{i}"
-        deps = sorted(rng.sample(range(i), k=min(i, rng.randint(0, 2)))) if i else []
-        fails = rng.random() < 0.35
         lines.append(f"  {tid}:")
-        if deps:
-            lines.append(f"    depends_on: [{', '.join(f't{d}' for d in deps)}]")
+        # incoming edges: producers only among earlier tasks (acyclic by construction)
+        producers = sorted(rng.sample(range(i), k=min(i, rng.randint(0, 2)))) if i else []
+        withs, afters = [], []
+        for p in producers:
+            if rng.random() < 0.65:
+                field = rng.choice(FIELDS)
+                withs.append((f"b{p}", f"${{{{ tasks.t{p}.{field} }}}}"))
+            else:
+                afters.append((f"t{p}", rng.choice(PREDICATES)))
+        if withs:
+            lines.append("    with:")
+            for name, expr in withs:
+                lines.append(f"      {name}: '{expr}'")
+        if afters:
+            lines.append("    after:")
+            for producer, pred in afters:
+                lines.append(f"      {producer}: {pred}")
+        if rng.random() < 0.10:
+            lines.append("    when: false")
+        fails = rng.random() < 0.35
         lines.append("    exec:")
         lines.append(f"      command: [\"{'false' if fails else 'true'}\"]")
         if fails:
-            r = rng.random()
-            if r < 0.20:
+            if rng.random() < 0.20:
                 lines.append("    retry:")
                 lines.append(f"      max_attempts: {rng.randint(1, 2)}")
             armor = rng.random()

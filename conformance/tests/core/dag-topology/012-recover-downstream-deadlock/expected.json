@@ -1,1 +1,10 @@
-{"valid": false, "errors": [{"code": "NIKA-DAG-004"}], "note": "05 \u00a7recover resolution \u00b7 the recovery source transitively depends on the failing task \u2014 the await deadlocks (the 2026-06-11 round-1 rule \u00b7 first implemented here)"}
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-DAG-004",
+      "category": "validation_error"
+    }
+  ],
+  "note": "05 §recover resolution · the recovery source transitively depends on the failing task through G_p · the recovery-time await would deadlock · rejected at parse."
+}

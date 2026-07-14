@@ -21,10 +21,11 @@ tasks:
       status: ".value"
 
   write_result:
-    depends_on: [bad_binding]
+    with:
+      bad_binding: ${{ tasks.bad_binding.output }}
     invoke:
       tool: "nika:write"
       args:
         path: "./out/data-validation/w33-reserved-binding-name.json"
-        content: ${{ tasks.bad_binding.output }}
+        content: ${{ with.bad_binding }}
         create_dirs: true

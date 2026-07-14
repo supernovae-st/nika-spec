@@ -11,20 +11,22 @@ tasks:
       capture: stdout
 
   to_json:
-    depends_on: [csv_data]
+    with:
+      csv_data: ${{ tasks.csv_data.output }}
     invoke:
       tool: "nika:convert"
       args:
-        input: "${{ tasks.csv_data.output }}"
+        input: "${{ with.csv_data }}"
         from: csv
         to: json
         has_header: true
 
   result:
-    depends_on: [to_json]
+    with:
+      to_json: ${{ tasks.to_json.output }}
     invoke:
       tool: "nika:write"
       args:
         path: "./out/content/c22-result.json"
-        content: "${{ tasks.to_json.output }}"
+        content: "${{ with.to_json }}"
         create_dirs: true

@@ -17,7 +17,8 @@ tasks:
         message: "x must equal 42"
 
   write_result:
-    depends_on: [check_x]
+    after:
+      check_x: succeeded
     invoke:
       tool: "nika:write"
       args:

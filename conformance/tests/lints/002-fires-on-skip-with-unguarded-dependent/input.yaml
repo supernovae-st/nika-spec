@@ -7,5 +7,6 @@ tasks:
     exec: { command: ["./a.sh"] }
     on_error: { skip: true }
   b:
-    depends_on: [a]
-    exec: { command: ["./b.sh"] }
+    with:
+      data: "${{ tasks.a.output }}"
+    exec: { command: ["./b.sh", "${{ with.data }}"] }

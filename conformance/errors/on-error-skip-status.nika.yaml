@@ -17,8 +17,7 @@ tasks:
       skip: true
 
   check_status:
-    depends_on: [optional_step]
-    when: ${{ tasks.optional_step.status == 'skipped' }}
+    after: { optional_step: skipped }
     invoke:
       tool: "nika:write"
       args:

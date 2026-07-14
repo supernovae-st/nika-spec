@@ -7,8 +7,9 @@ tasks:
     exec: { command: ["./a.sh"] }
     on_error: { skip: true }
   b:
-    depends_on: [a]
-    exec: { command: ["./b.sh"] }
+    with:
+      data: "${{ tasks.a.output }}"
+    exec: { command: ["./b.sh", "${{ with.data }}"] }
   shards:
     for_each: [1, 2]
     exec: { command: ["timeout", "5", "./p.sh"] }

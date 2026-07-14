@@ -15,9 +15,10 @@ tasks:
       tool: "nika:assert"
       args: { condition: "${{ item != 'BOOM' }}", message: "designed per-item failure" }
   survivors:
-    depends_on: [work]
+    with:
+      work: ${{ tasks.work.output }}
     invoke:
       tool: "nika:jq"
       args:
-        input: ${{ tasks.work.output }}
+        input: ${{ with.work }}
         expression: "[ .[] | select(. != null) ] | length"

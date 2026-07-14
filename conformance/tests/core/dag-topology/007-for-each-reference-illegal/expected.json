@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-VAR-021",
+      "category": "validation_error"
+    }
+  ],
+  "note": "03-dag.md §for_each · the collection crosses the boundary through with: (with: { files: ${{ tasks.discover.output }} } · for_each: ${{ with.files }})."
+}

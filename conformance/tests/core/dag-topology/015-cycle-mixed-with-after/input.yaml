@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: hello
+tasks:
+  a:
+    with:
+      b_out: ${{ tasks.b.output }}
+    infer: { prompt: "a · ${{ with.b_out }}" }
+  b:
+    after: { a: succeeded }
+    infer: { prompt: "b" }

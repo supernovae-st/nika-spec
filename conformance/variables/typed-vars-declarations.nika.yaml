@@ -25,7 +25,8 @@ tasks:
         message: "username must be alice"
 
   check_number:
-    depends_on: [check_string]
+    after:
+      check_string: succeeded
     invoke:
       tool: "nika:assert"
       args:
@@ -33,7 +34,8 @@ tasks:
         message: "score must be > 90"
 
   check_boolean:
-    depends_on: [check_number]
+    after:
+      check_number: succeeded
     invoke:
       tool: "nika:assert"
       args:
@@ -41,7 +43,8 @@ tasks:
         message: "enabled must be true"
 
   write_result:
-    depends_on: [check_boolean]
+    after:
+      check_boolean: succeeded
     invoke:
       tool: "nika:write"
       args:

@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: f008noedge
+tasks:
+  a:
+    exec: { command: ["./a.sh"] }
+  b:
+    after: { a: terminal }
+    exec: { command: ["./b.sh"] }

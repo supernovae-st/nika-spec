@@ -6,6 +6,5 @@ tasks:
   a:
     exec: { command: ["./a.sh"] }
   fallback:
-    depends_on: [a]
-    when: "${{ tasks.a.status == 'failure' }}"
+    after: { a: failed }
     exec: { command: ["echo", "default-value"] }

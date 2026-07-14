@@ -28,28 +28,32 @@ tasks:
         expression: "."
 
   diff:
-    depends_on: [previous_snapshot, current_snapshot]
+    with:
+      previous_snapshot: ${{ tasks.previous_snapshot.output }}
+      current_snapshot: ${{ tasks.current_snapshot.output }}
     invoke:
       tool: "nika:json_diff"
       args:
-        before: "${{ tasks.previous_snapshot.output }}"
-        after: "${{ tasks.current_snapshot.output }}"
+        before: "${{ with.previous_snapshot }}"
+        after: "${{ with.current_snapshot }}"
 
   analyze_diff:
-    depends_on: [diff]
+    with:
+      diff: ${{ tasks.diff.output }}
     invoke:
       tool: "nika:jq"
       args:
-        input: "${{ tasks.diff.output }}"
+        input: "${{ with.diff }}"
         expression: "{ change_count: length, operations: [.[].op] | unique, has_additions: (map(select(.op == \"add\")) | length > 0) }"
 
   save:
-    depends_on: [analyze_diff]
+    with:
+      analyze_diff: ${{ tasks.analyze_diff.output }}
     invoke:
       tool: "nika:write"
       args:
         path: "./out/competitor/16-json-diff.json"
-        content: "${{ tasks.analyze_diff.output }}"
+        content: "${{ with.analyze_diff }}"
         create_dirs: true
 
 outputs:

@@ -8,12 +8,14 @@ tasks:
       tool: "nika:fetch"
       args: { url: "https://example.com/page/1" }
   page2:
-    depends_on: [page1]
+    after:
+      page1: succeeded
     invoke:
       tool: "nika:fetch"
       args: { url: "https://example.com/page/2" }
   page3:
-    depends_on: [page2]
+    after:
+      page2: succeeded
     invoke:
       tool: "nika:fetch"
       args: { url: "https://example.com/page/3" }

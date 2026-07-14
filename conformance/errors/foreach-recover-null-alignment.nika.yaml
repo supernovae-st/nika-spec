@@ -21,18 +21,20 @@ tasks:
         expression: "if (.v == 1 or .v == 4) then error(\"boom\") else .v end"
 
   partition:
-    depends_on: [loop]
+    with:
+      loop: ${{ tasks.loop.output }}
     invoke:
       tool: nika:jq
       args:
-        input: ${{ tasks.loop.output }}
+        input: ${{ with.loop }}
         expression: "{ total: length, good: (map(select(. != null)) | length), nulls: (map(select(. == null)) | length), good_vals: (map(select(. != null))) }"
 
   persist:
-    depends_on: [partition]
+    with:
+      partition: ${{ tasks.partition.output }}
     invoke:
       tool: nika:write
       args:
         path: "./out/fanout/13_onerror_recover_null.json"
-        content: ${{ tasks.partition.output }}
+        content: ${{ with.partition }}
         create_dirs: true

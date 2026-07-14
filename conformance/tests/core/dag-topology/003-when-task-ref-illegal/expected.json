@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-VAR-021",
+      "category": "validation_error"
+    }
+  ],
+  "note": "04 §the reference boundary · when: reads LOCAL namespaces only · hoist the observation into with: and read ${{ with.took_ms }}."
+}

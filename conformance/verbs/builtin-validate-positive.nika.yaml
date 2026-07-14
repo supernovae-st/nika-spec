@@ -27,18 +27,20 @@ tasks:
               minimum: 0
 
   assert_valid:
-    depends_on: [validate_doc]
+    with:
+      is_valid: ${{ tasks.validate_doc.output.valid }}
     invoke:
       tool: "nika:assert"
       args:
-        condition: "${{ tasks.validate_doc.output.valid == true }}"
+        condition: "${{ with.is_valid == true }}"
         message: "Expected valid:true but got false"
 
   write_result:
-    depends_on: [validate_doc]
+    with:
+      report: ${{ tasks.validate_doc.output }}
     invoke:
       tool: "nika:write"
       args:
         path: "./out/data-validation/w01-validate-valid-object.json"
-        content: ${{ tasks.validate_doc.output }}
+        content: ${{ with.report }}
         create_dirs: true

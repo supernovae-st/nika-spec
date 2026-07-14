@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: f002ok
+tasks:
+  a:
+    exec: { command: ["./a.sh"] }
+    on_error: { skip: true }
+  b:
+    with:
+      data: "${{ tasks.a.output }}"
+    after: { a: succeeded }
+    exec: { command: ["./b.sh", "${{ with.data }}"] }

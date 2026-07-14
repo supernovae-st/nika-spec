@@ -114,7 +114,7 @@ field's shape ·
 |---|---|---|
 | `.output` · `.<named binding>` | **value** | `success` **or** `skipped` (the value of a skipped task is defined-`null` · [04](./04-variables.md#defined-null-reads-normative--the-branch-join-unlock)) |
 | `.status` · `.duration_ms` · `.started_at` · `.ended_at` | **terminal-observation** | **any** terminal state (`success` · `failure` · `skipped` · `cancelled`) — you asked to OBSERVE the outcome, so every outcome admits |
-| `.error` | **failure-observation** | `failure` only — a task that did not fail has no error to read (a recovered task settles `success` · the edge does not admit) |
+| `.error` | **failure-observation** | `failure` **or** `skipped` — a skip may carry a PRESERVED error (`on_error: skip` · [05 §Fields](./05-errors.md)); a decision-skip's error reads defined-`null`. A recovered task settles `success` · the edge does not admit |
 
 An expression with N references creates **N edges** (the graph is what CAN
 be required · the trace records what actually was). Two edges from the same
@@ -692,12 +692,17 @@ that admit the consumer ·
 ```
 value edge                {success, skipped}
 terminal-observation      {success, failure, skipped, cancelled}
-failure-observation       {failure}
+failure-observation       {failure, skipped}
 control · succeeded       {success}
 control · failed          {failure}
 control · skipped         {skipped}
 control · terminal        {success, failure, skipped, cancelled}
 ```
+
+(Pass-sets are **context-free**: an edge's role and predicate alone
+determine admission, never the rest of the program. `failure-observation`
+includes `skipped` because a skip may carry a preserved error — and when it
+does not, the read is defined-`null`, total either way.)
 
 **GATE-v2** · a task is admitted iff **EVERY** incoming edge's producer
 settled **inside that edge's pass-set**. Any settled producer outside a
@@ -1029,16 +1034,20 @@ These rules are informative for authors and **normative for linters**: a
 conformant linter (the reference `one-obvious-way` rule set) warns on the
 discouraged form ·
 
-| Intent | ✅ The one way | ❌ Discouraged · why |
-|---|---|---|
-| « B consumes A's output » | a `with:` binding — the data IS the edge | adding `after: {a: terminal}` next to it · a non-tightening restatement (`one-obvious-way/008`) |
-| « run B only if A succeeded, no data » | `after: { a: succeeded }` | an unused `with:` binding just for the edge · dead data |
-| « run B even if A failed » | `after: { a: terminal }` (+ a `.status` observation to branch) | `when: true` · it no longer replaces the gate — it restates the default |
-| « retry on transient failure » | `retry:` · the ONE retry shape (`max_attempts` · `backoff_*` · `on_codes`) | a `when:`-guarded duplicate task · a self-referencing recovery chain |
-| « provide a fallback value » | `on_error: { recover: … }` · the route stays *in the failing task* | a second task `after: {a: failed}` for a mere value · use a task only when real *work* runs on failure |
-| « cleanup that always runs » | `on_finally:` | a terminal task depending on everything with a permissive gate |
-| « time-bound an iteration » | `timeout:` on the `for_each` task · it applies **per iteration** (§for_each semantics) | per-element timing tricks inside the body · a whole-fan-out timer (none exists in v0.1) |
-| « cap fan-out concurrency » | `max_parallel:` | manual sharding into N sequential tasks |
+| Rule | Intent | ✅ The one way | ❌ Discouraged · why |
+|---|---|---|---|
+| `/008` | « B consumes A's output » | a `with:` binding — the data IS the edge | adding a non-tightening `after:` entry next to it (`after: {a: terminal}` beside a value edge changes nothing) |
+| `/002` | « depend on a skippable producer » | decide the skip path: `after: {a: succeeded}` (skip cancels me) or read the value (`with:` · skip passes as `null`) | an `on_error: { skip: true }` producer whose dependents never acknowledge the skip either way |
+| `/003` | « retry on transient failure » | `retry:` · the ONE retry shape (`max_attempts` · `backoff_*` · `on_codes`) | an `after: {a: failed}` duplicate of the failing task · a self-referencing recovery chain |
+| `/004` | « provide a fallback value » | `on_error: { recover: … }` · the route stays *in the failing task* | a second task `after: {a: failed}` for a mere value · use a task only when real *work* runs on failure |
+| `/005` | « cleanup that always runs » | `on_finally:` (per task) · or ONE terminal report task | a task with `after: {…: terminal}` on everything — a cleanup smuggled into the graph |
+| `/006` | « time-bound an iteration » | `timeout:` on the `for_each` task · it applies **per iteration** (§for_each semantics) | per-element timing tricks inside the body · a whole-fan-out timer (none exists in v0.1) |
+| `/007` | « cap fan-out concurrency » | `max_parallel:` | manual sharding into N sequential tasks |
+
+(`one-obvious-way/001` — the pre-W2 « redundant success `when:` » class —
+is **retired**: its discouraged form, a `tasks.*` status test inside
+`when:`, is no longer merely discouraged but ILLEGAL (`NIKA-VAR-021`).
+Rule ids are stable identifiers: retired ids are never reused.)
 
 The dividing line, stated once · **`with:` imports data (and IS the data
 edge) · `after:` orders on state (and IS the control edge) · `when:` reads
@@ -1046,8 +1055,8 @@ LOCAL values to decide *whether* an admitted task runs · `on_error:`/`retry:`
 decide *what happens inside* a task's own failure.** A construct that
 restates another construct's default is noise; a construct that smuggles
 another's job is a trap. The reference validator ships these as warnings
-(`one-obvious-way/001`…`/008` · table order), never hard errors (the
-discouraged forms are legal · just not canonical).
+(the `Rule` column above · stable ids), never hard errors (the discouraged
+forms are legal · just not canonical).
 
 ## Native-first · preference rules (normative for lints)
 

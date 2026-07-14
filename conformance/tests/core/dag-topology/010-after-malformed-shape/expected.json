@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "validation_error"
+    }
+  ],
+  "note": "03-dag.md §after · after: is a map {producer: predicate}, never a list · the schema layer flags the shape and the oracle survives it (collected verdict · no crash)."
+}

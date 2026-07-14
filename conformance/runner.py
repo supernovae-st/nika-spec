@@ -6,10 +6,11 @@
 # Implements the STATIC layer that needs no LLM engine ·
 #   (1) JSON Schema structural validation (schemas/workflow.schema.json)
 #   (2) the engine-parse cross-reference rules the schema cannot express ·
-#         NIKA-DAG-001  cycle in depends_on (including self-dependency)
-#         NIKA-DAG-002  depends_on references an undeclared task
-#         NIKA-DAG-003  a `${{ tasks.X }}` reference from when:/with:/for_each:/
-#                       any verb body without depends_on:[X] (03-dag.md ·
+#         NIKA-DAG-001  cycle in G_p = E_d ∪ E_c (including self-dependency)
+#         NIKA-DAG-002  with:/after: references an undeclared task
+#         NIKA-DAG-005  after: predicate outside the closed set
+#         NIKA-PARSE-024  depends_on is dead (data → with: · control → after:)
+#         NIKA-VAR-021  a tasks.* reference outside the boundary (03-dag.md ·
 #                       « anywhere — in when: · with: · any verb field … »)
 #         NIKA-VAR-003  a `tasks.X.output.<path>` reference the producing
 #                       task's declared schema: PROVABLY forbids (04 §Static
@@ -72,10 +73,12 @@ STR_LIT = re.compile(r"'[^']*'|\"[^\"]*\"")
 ROOT_ID = re.compile(r"(?<![.\w])([A-Za-z_][A-Za-z0-9_]*)(?:\.([A-Za-z_][A-Za-z0-9_]*))?")
 CEL_BUILTINS = {"true", "false", "null", "in", "size"}  # v0.1 CEL subset · 03-dag.md
 LOOP_LOCALS = {"item", "index"}  # for_each-scoped locals · 04-variables.md §5 namespaces
-# Fields whose `tasks.X` refs REQUIRE depends_on:[X] (03-dag.md §Referencing a task) ·
-# on_error/on_finally deliberately excluded (recover refs a fallback source ·
-# on_finally refs the parent task itself · neither is an execution-order edge).
-DAG_EDGE_FIELDS = ("when", "with", "for_each", "infer", "exec", "invoke", "agent")
+# Body fields where a `tasks.X` ref is OUTSIDE the boundary (NIKA-VAR-021 ·
+# 04 §the reference boundary) · with:/after: are the edge doors · on_error.
+# recover reads a fallback source · on_finally reads its PARENT only ·
+# workflow outputs: read the settled world.
+BODY_FIELDS = ("when", "for_each", "infer", "exec", "invoke", "agent")
+AFTER_PREDICATES = {"succeeded", "failed", "skipped", "terminal"}
 
 
 
@@ -406,6 +409,8 @@ def _resolution_errors(value, scopes: dict, where: str) -> list[dict]:
                 if seg and seg not in scopes[root]:
                     var_err(f"{root}.{seg} is not declared")
             elif root == "tasks":
+                if scopes.get("tasks_mode") == "skip":
+                    continue  # boundary surfaces report DAG-002/VAR-021 instead
                 if seg and seg not in scopes["tasks"]:
                     var_err(f"tasks.{seg} references a non-existent task")
             elif seg:  # dotted unknown root · not one of the 5 namespaces
@@ -503,21 +508,48 @@ def cross_ref_errors(doc: dict) -> list[dict]:
     # duplicate task identity is now a duplicate MAP KEY — the YAML loader
     # itself rejects it before this layer (PARSE-007 mechanics · W1).
 
-    # Non-string depends_on entries (a mapping · a number) are schema-layer
-    # violations · this layer must SURVIVE them (collected verdict · no crash).
-    def _deps(t: dict) -> list[str]:
-        raw = t.get("depends_on") or []
-        return [d for d in raw if isinstance(d, str)] if isinstance(raw, list) else []
-
-    # NIKA-DAG-002 · depends_on references an undeclared task
+    # NIKA-PARSE-024 · depends_on is dead (W2 · data → with: · control → after:)
     for tid, t in tasks:
-        for dep in _deps(t):
-            if dep not in idset:
-                errs.append({"code": "NIKA-DAG-002", "category": "validation_error",
-                             "detail": f"task '{tid}' depends_on undeclared '{dep}'"})
+        if "depends_on" in t:
+            errs.append({"code": "NIKA-PARSE-024", "category": "validation_error",
+                         "detail": f"task '{tid}' carries depends_on: — dead since W2 · "
+                                   "data → with: bindings · control → after: predicates "
+                                   "(check --fix migrates the provable cases)"})
 
-    # NIKA-DAG-001 · cycle in depends_on (DFS)
-    graph = {tid: _deps(t) for tid, t in tasks}
+    # Malformed after: shapes are schema-layer violations · this layer must
+    # SURVIVE them (collected verdict · no crash).
+    def _after(t: dict) -> dict:
+        raw = t.get("after")
+        return raw if isinstance(raw, dict) else {}
+
+    # NIKA-DAG-005 · after: predicate outside the closed set
+    # NIKA-DAG-002 · after: references an undeclared task
+    for tid, t in tasks:
+        for target, pred in _after(t).items():
+            if not isinstance(target, str):
+                continue  # schema-layer shape violation · survived
+            if target not in idset:
+                errs.append({"code": "NIKA-DAG-002", "category": "validation_error",
+                             "detail": f"task '{tid}' after: references undeclared '{target}'"})
+            if not (isinstance(pred, str) and pred in AFTER_PREDICATES):
+                errs.append({"code": "NIKA-DAG-005", "category": "validation_error",
+                             "detail": f"task '{tid}' after.{target}: {pred!r} ∉ "
+                                       "{succeeded · failed · skipped · terminal}"})
+
+    # NIKA-DAG-002 · a with: binding references an undeclared task (the
+    # binding IS an edge · an edge to nowhere is a DAG error, not a VAR one)
+    for tid, t in tasks:
+        for r in sorted(_expr_task_refs(t.get("with"))):
+            if r not in idset:
+                errs.append({"code": "NIKA-DAG-002", "category": "validation_error",
+                             "detail": f"task '{tid}' with: references undeclared '{r}'"})
+
+    # NIKA-DAG-001 · cycle in G_p = E_d(with) ∪ E_c(after) (DFS)
+    graph = {
+        tid: sorted((_expr_task_refs(t.get("with")) & idset)
+                    | {k for k in _after(t) if isinstance(k, str) and k in idset})
+        for tid, t in tasks
+    }
     WHITE, GREY, BLACK = 0, 1, 2
     color = {n: WHITE for n in graph}
 
@@ -533,27 +565,54 @@ def cross_ref_errors(doc: dict) -> list[dict]:
         color[n] = BLACK
         return False
 
+    # a self-edge is a 1-cycle (a after a · a with-ref to itself)
+    for tid in graph:
+        if tid in graph[tid]:
+            errs.append({"code": "NIKA-DAG-001", "category": "validation_error",
+                         "detail": f"task '{tid}' edges to itself (1-cycle)"})
     if any(color[n] == WHITE and dfs(n) for n in graph):
         errs.append({"code": "NIKA-DAG-001", "category": "validation_error",
-                     "detail": "cycle detected in depends_on"})
+                     "detail": "cycle detected in G_p = E_d ∪ E_c"})
 
-    # NIKA-DAG-003 · a `${{ tasks.X }}` reference from when:/with:/for_each:/any
-    # verb body without depends_on:[X] (03-dag.md · the edge is never inferred)
+    # NIKA-VAR-021 · a tasks.* reference outside the boundary (04 §the
+    # reference boundary) · body fields read LOCAL names only — hoist into
+    # with: (the machine-applicable fix) · on_finally reads its PARENT only
     for tid, t in tasks:
-        declared = set(_deps(t))
-        refs: set[str] = set()
-        for field in DAG_EDGE_FIELDS:
-            refs |= _expr_task_refs(t.get(field))
-        missing = {r for r in refs if r in idset and r not in declared}
-        for r in sorted(missing):
-            errs.append({"code": "NIKA-DAG-003", "category": "validation_error",
-                         "detail": f"task '{t.get('id')}' references tasks.{r} "
-                                   f"without depends_on:[{r}]"})
+        for field in BODY_FIELDS:
+            for r in sorted(_expr_task_refs(t.get(field))):
+                errs.append({"code": "NIKA-VAR-021", "category": "validation_error",
+                             "detail": f"task '{tid}' {field}: references tasks.{r} — "
+                                       "outside the boundary · hoist it into with: "
+                                       "and read ${{ with.<name> }}"})
+        for r in sorted(_expr_task_refs(t.get("on_finally")) - {tid}):
+            errs.append({"code": "NIKA-VAR-021", "category": "validation_error",
+                         "detail": f"task '{tid}' on_finally references tasks.{r} — "
+                                   "the parent is the only readable task inside a "
+                                   "cleanup (a sibling read would race)"})
+
+    # NIKA-VAR-005 · for_each is a PRE-fan-out surface: a with-binding it
+    # reads must not itself reference item/index (circular · 03 §for_each)
+    for tid, t in tasks:
+        fe = t.get("for_each")
+        if not isinstance(fe, str):
+            continue
+        with_block = t.get("with") if isinstance(t.get("with"), dict) else {}
+        for body in _expr_bodies(fe):
+            for root, seg in ROOT_ID.findall(body):
+                if root == "with" and seg in with_block:
+                    binding_roots = {rt for b in _expr_bodies(with_block[seg])
+                                     for rt, _ in ROOT_ID.findall(b)}
+                    if binding_roots & LOOP_LOCALS:
+                        errs.append({
+                            "code": "NIKA-VAR-005", "category": "validation_error",
+                            "detail": f"task '{tid}' for_each reads with.{seg} whose "
+                                      "binding references item/index — the collection "
+                                      "is evaluated BEFORE iterations exist (circular)"})
 
     # NIKA-DAG-004 · on_error.recover references a task DOWNSTREAM of the
     # declaring task — the recovery-time await would deadlock (05 §recover
-    # resolution · the 03 carve-out exempts recover from EDGES, not from
-    # acyclicity). Transitive walk over depends_on.
+    # resolution · the recovery surface is exempt from EDGES, not from
+    # acyclicity). Transitive walk over G_p.
     def _transitive_deps(start: str) -> set[str]:
         seen: set[str] = set()
         stack = [start]
@@ -586,13 +645,23 @@ def cross_ref_errors(doc: dict) -> list[dict]:
     env_keys = _keys(doc.get("env"))
     secrets_keys = _keys(doc.get("secrets"))
     for tid, t in tasks:
+        # tasks-root existence inside a task body is judged by the boundary
+        # rules (with:/after: ghosts → DAG-002 · body refs → VAR-021 · the
+        # recover ghost check below) — never double-reported as VAR-001.
         scopes = {"vars": vars_keys, "env": env_keys, "secrets": secrets_keys,
                   "tasks": idset, "with": _keys(t.get("with")),
-                  "in_for_each": "for_each" in t}
+                  "in_for_each": "for_each" in t, "tasks_mode": "skip"}
         where = f"task '{tid}'"
         errs.extend(_resolution_errors(t, scopes, where))
         errs.extend(_unclosed_expr_errors(t, where))
         errs.extend(_bare_envelope_errors(t, where))
+        on_error = t.get("on_error")
+        recover = on_error.get("recover") if isinstance(on_error, dict) else None
+        for r in sorted(_expr_task_refs(recover)):
+            if r not in idset:
+                errs.append({"code": "NIKA-VAR-001", "category": "variable_error",
+                             "detail": f"task '{tid}' on_error.recover reads "
+                                       f"tasks.{r} — a non-existent task"})
     out_scopes = {"vars": vars_keys, "env": env_keys, "secrets": secrets_keys,
                   "tasks": idset, "with": set(), "in_for_each": False}
     errs.extend(_resolution_errors(doc.get("outputs"), out_scopes, "outputs:"))

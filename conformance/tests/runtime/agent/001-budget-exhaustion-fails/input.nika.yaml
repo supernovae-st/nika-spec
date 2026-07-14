@@ -11,6 +11,7 @@ tasks:
       tools: ["nika:wait"]
       max_turns: 2
   reader:
-    depends_on: [loop]
-    when: ${{ tasks.loop.error != null }}
-    infer: { prompt: "${{ tasks.loop.error.code }}" }
+    with:
+      err: ${{ tasks.loop.error }}
+    when: ${{ with.err != null }}
+    infer: { prompt: "${{ with.err.code }}" }

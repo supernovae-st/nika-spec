@@ -1,11 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
 # Expected: exit 0 — when:false skips the task; workflow completes clean.
 nika: v1
 workflow:
   id: when-false-skip
-# SPEC 03 §when: runtime-false → task SKIPPED (not failed); downstream sees it completed.
-# A downstream with plain depends_on a skipped task → default gate (success|skipped) satisfied → RUNS.
+# SPEC 03 §when: runtime-false → task SKIPPED (not failed); downstream sees it settled.
+# A downstream observing the skipped task through with: (terminal-observation
+# edge — every settled state admits) → RUNS and reads status "skipped".
 # Markers: 13_gated.json ABSENT (when false → skipped);
-#          13_down.json present (depends_on a skipped task still runs).
+#          13_down.json present (the observation edge passes on skipped).
 vars:
   flag: { type: boolean, default: false }
 tasks:
@@ -15,7 +17,8 @@ tasks:
       tool: nika:write
       args: { path: "./out/ctrlflow/13_gated.json", content: "gated-ran" }
   down:
-    depends_on: [gated]
+    with:
+      gated_status: ${{ tasks.gated.status }}
     invoke:
       tool: nika:write
-      args: { path: "./out/ctrlflow/13_down.json", content: "down-ran:${{ tasks.gated.status }}" }
+      args: { path: "./out/ctrlflow/13_down.json", content: "down-ran:${{ with.gated_status }}" }

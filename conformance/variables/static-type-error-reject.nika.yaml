@@ -11,7 +11,8 @@ tasks:
     exec:
       command: ["echo", "hello"]
   conditional:
-    depends_on: [step]
+    after:
+      step: succeeded
     when: ${{ vars.count }}
     exec:
       command: ["echo", "should", "not", "reach"]

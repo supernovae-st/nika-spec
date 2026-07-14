@@ -20,10 +20,11 @@ tasks:
         expression: ".nonexistent_key | .nested_path"
 
   write_result:
-    depends_on: [bad_jq]
+    with:
+      bad_jq: ${{ tasks.bad_jq.output }}
     invoke:
       tool: "nika:write"
       args:
         path: "./out/data-validation/w24-check-vs-runtime-gap.json"
-        content: ${{ tasks.bad_jq.output }}
+        content: ${{ with.bad_jq }}
         create_dirs: true

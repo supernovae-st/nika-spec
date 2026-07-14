@@ -12,9 +12,10 @@ tasks:
     infer:
       prompt: "Research ${{ vars.topic }}"
   summarize:
-    depends_on: [research]
+    with:
+      research: ${{ tasks.research.output }}
     infer:
-      prompt: "Summarize ${{ tasks.research.output }}"
+      prompt: "Summarize ${{ with.research }}"
 outputs:
   brief:
     value: ${{ tasks.summarize.output }}

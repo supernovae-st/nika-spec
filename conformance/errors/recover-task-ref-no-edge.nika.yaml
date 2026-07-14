@@ -1,6 +1,6 @@
 # Expected: NIKA-VAR-001 at RUN — BUT this encodes an ENGINE-vs-SPEC DIVERGENCE.
 # Spec 05 recover resolution (NORMATIVE): a recover ref is NOT an edge ("the
-# canonical example references a fallback source with no depends_on"); a
+# canonical example references a fallback source with no scheduling edge"); a
 # pending/running referent must be AWAITED to terminal state. Per spec, this
 # workflow SHOULD recover with 99 (source succeeds trivially). The engine
 # renders immediately against the records snapshot -> VAR-001, always.
@@ -22,9 +22,10 @@ tasks:
     on_error:
       recover: ${{ tasks.source.output }}
   sink:
-    depends_on: [risky]
+    with:
+      risky: ${{ tasks.risky.output }}
     invoke:
       tool: nika:write
       args:
         path: ./out/errors/recover-a.json
-        content: ${{ tasks.risky.output }}
+        content: ${{ with.risky }}

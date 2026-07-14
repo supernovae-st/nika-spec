@@ -16,8 +16,9 @@ tasks:
         expression: "{content: .}"
 
   analyze:
-    depends_on: [fetch_untrusted]
+    with:
+      fetch_untrusted: ${{ tasks.fetch_untrusted.output }}
     agent:
       model: mock/echo
-      prompt: "Analyze this document: ${{ tasks.fetch_untrusted.output }}"
+      prompt: "Analyze this document: ${{ with.fetch_untrusted }}"
       tools: ["nika:jq"]

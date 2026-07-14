@@ -10,6 +10,7 @@ tasks:
     for_each: ${{ vars.items }}
     infer: { prompt: "never runs" }
   reader:
-    depends_on: [work]
-    when: ${{ tasks.work.output == null }}
+    with:
+      result: ${{ tasks.work.output }}
+    when: ${{ with.result == null }}
     infer: { prompt: "the empty branch" }

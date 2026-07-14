@@ -1,9 +1,9 @@
-# Expected: NIKA-VAR-001 at CHECK.
-# C10 · referencing tasks.X where X does not EXIST → NIKA-VAR-001 at CHECK.
-# Spec: 04-variables "an unresolvable root is NIKA-VAR-001". The missing-TASK case
-# is VAR-001 (unresolvable root); the missing-EDGE case (task exists · no
-# depends_on) is NIKA-DAG-003 — that split is covered by c27. Empirically
-# confirmed 2026-07-02 (engine emits VAR-001 here · DAG-003 in c27).
+# SPDX-License-Identifier: Apache-2.0
+# Expected: NIKA-DAG-002 at CHECK.
+# C10 · a with: binding referencing tasks.X where X does not EXIST → the
+# binding IS an edge, and an edge to nowhere is NIKA-DAG-002 at CHECK
+# (pre-W2 this surfaced as VAR-001 through when:; the boundary makes the
+# missing task an EDGE error — same refusal, sharper name).
 # We assert it is REJECTED, not silently null.
 nika: v1
 workflow:
@@ -11,7 +11,9 @@ workflow:
 
 tasks:
   gate:
-    when: "${{ tasks.nonexistent.status == 'success' }}"   # no depends_on, task absent
+    with:
+      st: ${{ tasks.nonexistent.status }}
+    when: "${{ with.st == 'success' }}"
     invoke:
       tool: "nika:write"
       args: { path: "./out/cel/c10-ran.json", content: { ran: true }, create_dirs: true }

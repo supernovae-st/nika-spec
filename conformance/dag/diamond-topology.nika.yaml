@@ -12,7 +12,6 @@ tasks:
       args: { input: { seed: 10 }, expression: ".seed" }
 
   b:
-    depends_on: [a]
     with:
       s: ${{ tasks.a.output }}
     invoke:
@@ -20,7 +19,6 @@ tasks:
       args: { input: { s: "${{ with.s }}" }, expression: "(.s * 2)" }   # 20
 
   c:
-    depends_on: [a]
     with:
       s: ${{ tasks.a.output }}
     invoke:
@@ -28,7 +26,6 @@ tasks:
       args: { input: { s: "${{ with.s }}" }, expression: "(.s + 5)" }   # 15
 
   d:
-    depends_on: [b, c]
     with:
       bv: ${{ tasks.b.output }}
       cv: ${{ tasks.c.output }}
@@ -39,10 +36,11 @@ tasks:
         expression: "{ b: .b, c: .c, joined: (.b + .c) }"   # {20,15,35}
 
   persist:
-    depends_on: [d]
+    with:
+      d: ${{ tasks.d.output }}
     invoke:
       tool: nika:write
       args:
         path: "./out/fanout/26_diamond_dag.json"
-        content: ${{ tasks.d.output }}
+        content: ${{ with.d }}
         create_dirs: true

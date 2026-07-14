@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-DAG-001",
+      "category": "validation_error"
+    }
+  ],
+  "note": "03-dag.md §four graphs · G_p = E_d ∪ E_c is ONE precedence graph · a value edge b→a plus a control edge a→b is a mixed cycle · rejected."
+}

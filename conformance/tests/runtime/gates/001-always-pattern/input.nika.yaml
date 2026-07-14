@@ -9,9 +9,8 @@ tasks:
       tool: "nika:assert"
       args: { condition: "${{ 1 > 2 }}", message: "designed failure" }
   dependent:
-    depends_on: [work]
+    after: { work: succeeded }
     infer: { prompt: "never runs" }
   record:
-    depends_on: [work]
-    when: true
+    after: { work: terminal }
     infer: { prompt: "the record lands" }

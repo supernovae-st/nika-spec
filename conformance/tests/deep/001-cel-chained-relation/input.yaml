@@ -1,10 +1,12 @@
 nika: v1
 workflow:
   id: deep-001
+vars:
+  mode: "fast"
 tasks:
   a:
     infer: { prompt: "x" }
   b:
-    depends_on: [a]
-    when: ${{ tasks.a.status == 'success' == true }}
+    after: { a: succeeded }
+    when: ${{ vars.mode == 'fast' == true }}
     infer: { prompt: "y" }

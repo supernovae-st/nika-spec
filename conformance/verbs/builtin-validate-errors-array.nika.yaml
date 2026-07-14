@@ -24,17 +24,19 @@ tasks:
             severity: { type: string, enum: [low, medium, high, critical] }
 
   report:
-    depends_on: [validate]
+    with:
+      validate: ${{ tasks.validate.output }}
     invoke:
       tool: "nika:jq"
       args:
-        input: "${{ tasks.validate.output }}"
+        input: "${{ with.validate }}"
         expression: '{ valid: .valid, has_errors: ((.errors | length) > 0) } | tojson'
 
   write_out:
-    depends_on: [report]
+    with:
+      report: ${{ tasks.report.output }}
     invoke:
       tool: "nika:write"
       args:
         path: "./out/support/21-validate-invalid-report.json"
-        content: "${{ tasks.report.output }}"
+        content: "${{ with.report }}"

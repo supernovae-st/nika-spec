@@ -140,10 +140,13 @@ authors and tooling ·
 - **engine-parse** — *cross-reference* rules the schema structurally cannot
   express, requiring the engine's DAG/variable resolver ·
   - cycle detection, including self-dependency (`NIKA-DAG-001`)
-  - unresolved `depends_on` (`NIKA-DAG-002`)
-  - a `${{ tasks.X }}` reference from `when:` · `with:` · `for_each:` · or any
-    verb body without `depends_on:[X]` (`NIKA-DAG-003` · per
-    [03-dag.md](../spec/03-dag.md) the edge is never inferred)
+  - an unresolved `with:`/`after:` edge target (`NIKA-DAG-002`)
+  - a `tasks.*` reference outside the boundary — `when:` · `for_each:` · any
+    verb body · a non-parent `on_finally` read (`NIKA-VAR-021` · per
+    [04-variables.md](../spec/04-variables.md) §the reference boundary ·
+    the fix is machine-applicable: hoist into `with:`)
+  - a dead `depends_on:` (`NIKA-PARSE-024`) · an unknown `after:` predicate
+    (`NIKA-DAG-005`)
   - an unresolved `${{ }}` reference (`NIKA-VAR-001` · per
     [04-variables.md](../spec/04-variables.md) §Resolution order) · a
     non-existent task · an undeclared `vars.` / `with.` / `env.` / `secrets.`

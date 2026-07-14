@@ -19,9 +19,10 @@ tasks:
       recover: "stale_fallback_data"
 
   write_result:
-    depends_on: [slow_fetch]
+    with:
+      slow_fetch: ${{ tasks.slow_fetch.output }}
     invoke:
       tool: "nika:write"
       args:
         path: "./out/errors/e28-result.txt"
-        content: "${{ tasks.slow_fetch.output }}"
+        content: "${{ with.slow_fetch }}"

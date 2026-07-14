@@ -3,7 +3,7 @@ nika: v1
 workflow:
   id: onerror-recover-downstream
 # SPEC 05 §on_error: recover → status success, downstream runs normally.
-# KNOWN-NUANCED: recover WITH depends_on. failing task recovers; a task that depends_on it
+# KNOWN-NUANCED: recover WITH a value edge. failing task recovers; a task bound to it
 # should run (recovered = success → default gate satisfied).
 # Markers: 05_down.json present (downstream ran after recovery).
 tasks:
@@ -13,7 +13,8 @@ tasks:
     on_error:
       recover: "fallback"
   down:
-    depends_on: [fails]
+    with:
+      fails: ${{ tasks.fails.output }}
     invoke:
       tool: nika:write
-      args: { path: "./out/ctrlflow/05_down.json", content: "down-ran:${{ tasks.fails.output }}" }
+      args: { path: "./out/ctrlflow/05_down.json", content: "down-ran:${{ with.fails }}" }

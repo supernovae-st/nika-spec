@@ -10,7 +10,8 @@ tasks:
     exec:
       command: ["git", "log", "--oneline", "-1"]
   snapshot:
-    depends_on: [log_head]
+    with:
+      log_head: ${{ tasks.log_head.output }}
     invoke:
       tool: "nika:write"
-      args: { path: "./out/head.txt", content: "${{ tasks.log_head.output }}" }
+      args: { path: "./out/head.txt", content: "${{ with.log_head }}" }

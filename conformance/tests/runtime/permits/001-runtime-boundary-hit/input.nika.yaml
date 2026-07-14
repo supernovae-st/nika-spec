@@ -14,9 +14,10 @@ tasks:
       tool: "nika:jq"
       args: { input: "${{ vars.hosts }}", expression: ".[0]" }
   fetcher:
-    depends_on: [pick]
+    with:
+      pick: ${{ tasks.pick.output }}
     invoke:
       tool: "nika:fetch"
       args:
-        url: "${{ tasks.pick.output }}"
+        url: "${{ with.pick }}"
         mode: text

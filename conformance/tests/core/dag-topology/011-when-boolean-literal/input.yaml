@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 nika: v1
 workflow:
   id: core-when-true
@@ -5,6 +6,6 @@ tasks:
   build:
     exec: { command: ["./build.sh"] }
   notify:
-    depends_on: [build]
+    after: { build: terminal }
     when: true
     invoke: { tool: "nika:notify", args: { message: "done either way" } }
