@@ -45,6 +45,14 @@ jobs:
           python conformance/runner.py all
           python conformance/type_core_selftest.py
 
+      # The committed corpus must be BYTE-exact against type_core.py (a
+      # drifted corpus makes the Rust differential judge stale verdicts)
+      # and every broken-judge mutation must be killed by it.
+      - name: Type corpus · drift + mutation adequacy
+        run: |
+          python scripts/gen-type-corpus.py --check
+          python scripts/gen-type-corpus.py --mutate
+
       - name: Projection gates · in-repo canon markers + pack manifest + llms files
         run: |
           python scripts/canon-projectors.py --check

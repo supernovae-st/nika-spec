@@ -216,6 +216,38 @@ law("fit · array judged per element", fits(["a"], t({"array": "string"}), N)
 law("fit · Never admits nothing", not fits("x", NEVER, N) and not fits(None, NEVER, N))
 law("fit · Unknown admits all", fits({"any": 1}, UNKNOWN, N))
 
+# ── canonical forms (the PL-059 cohort — same values, same form) ────────
+from type_core import norm_union  # noqa: E402
+
+law("canon · union absorbs Unknown", norm_union([t("string"), UNKNOWN]) == UNKNOWN)
+law("canon · union collapses subsumed members",
+    t({"union": ["integer", "number"]}) == t("number"))
+law("canon · enum member collapses into string",
+    t({"union": [{"enum": ["a"]}, "string"]}) == t("string"))
+law("canon · non-subsumed union keeps both members",
+    "union" in t({"union": ["integer", {"number": {"min": 0}}]}))
+law("canon · unbounded numeric refinement IS its primitive",
+    t({"integer": {}}) == t("integer") and t({"number": {}}) == t("number"))
+law("canon · unbounded string refinement IS string", t({"string": {}}) == t("string"))
+law("canon · non-numeric bound refused", refuses({"integer": {"min": "x"}}, "NIKA-TYPE-001"))
+law("canon · empty numeric range refused",
+    refuses({"integer": {"min": 5, "max": 3}}, "NIKA-TYPE-001"))
+law("canon · empty length range refused",
+    refuses({"string": {"min_len": 9, "max_len": 2}}, "NIKA-TYPE-001"))
+law("canon · negative length refused", refuses({"string": {"min_len": -1}}, "NIKA-TYPE-001"))
+
+# ── the openness law (an open a leaves undeclared keys FREE) ────────────
+OPEN0 = t({"object": {}, "additional": True})
+CLOSED_AOPT = t({"object": {"a": {"optional": None}}})
+law("order · open{} not below a closed object", not subtype(OPEN0, CLOSED_AOPT, N))
+law("order · closed object below open{}", subtype(CLOSED_AOPT, OPEN0, N))
+law("order · open{} not below an open object that constrains a key",
+    not subtype(OPEN0, t({"object": {"a": {"optional": "string"}}, "additional": True}), N))
+law("order · open widens into a freer open (F_b ⊆ F_a)",
+    subtype(t({"object": {"a": "string"}, "additional": True}), OPEN0, N))
+law("order · open ⋢ closed rides assignable too",
+    not assignable(OPEN0, CLOSED_AOPT, N))
+
 bad = [n for n, ok in CHECKS if not ok]
 print(f"type-core selftest · {len(CHECKS) - len(bad)}/{len(CHECKS)} laws hold")
 for n in bad:

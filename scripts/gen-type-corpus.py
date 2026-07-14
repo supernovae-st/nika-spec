@@ -99,7 +99,7 @@ def gen_type(rng: random.Random, depth: int = 0):
 
 
 def canonical(v) -> str:
-    return json.dumps(v, sort_keys=True, separators=(",", ":"))
+    return json.dumps(v, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
 
 
 # The sentinel exprs guarantee the DIRECTED pairs a random draw can miss —
@@ -117,6 +117,16 @@ SENTINELS = [
     {"object": {"a": {"optional": "string"}}},
     {"union": ["string", "null"]},
     {"array": "integer"}, {"array": "number"},
+    # canonical-forms cohort (the antisymmetry witnesses) — the OPEN
+    # empty object vs a closed optional-field object · a collapsing
+    # union · a NON-collapsing union · unbounded refinements parsing
+    # straight to their prims
+    {"object": {}, "additional": True},
+    {"object": {"a": {"optional": None}}},
+    {"union": ["integer", "number"]},
+    {"union": ["integer", {"number": {"min": 0}}]},
+    {"integer": {}}, {"number": {}}, {"string": {}},
+    {"object": {"a": {"optional": "string"}}, "additional": True},
 ]
 
 
@@ -225,6 +235,25 @@ def mutations():
         # consistency judged as assignability (subsumption leaks into ~)
         return {"consistent": assignable(a, b, {})}
 
+    def m_open_source_ignored(a, b, true):
+        # an OPEN a judged as if it were closed (the openness law
+        # dropped — the PL-059 antisymmetry hole)
+        if "object" in a and a.get("additional"):
+            return {"subtype": subtype({"object": a["object"]}, b, {})}
+        return None
+
+    def m_open_target_unconstrained(a, b, true):
+        # open ⊑ open judged without the F_b ⊆ F_a containment (b's
+        # optional fields silently constrain keys a leaves free)
+        if "object" in a and a.get("additional") \
+                and "object" in b and b.get("additional") \
+                and any(k not in a["object"] for k in b["object"]):
+            fa = dict(a["object"])
+            for k, bf in b["object"].items():
+                fa.setdefault(k, dict(bf))
+            return {"subtype": subtype({"object": fa, "additional": True}, b, {})}
+        return None
+
     return [
         ("widening_reversed", m_widening_reversed),
         ("unknown_universal_subtype", m_unknown_universal),
@@ -235,6 +264,8 @@ def mutations():
         ("union_any_member", m_union_any_member),
         ("newtype_bidirectional", m_newtype_bidirectional),
         ("consistency_gains_subsumption", m_consistency_transitive),
+        ("open_source_ignored", m_open_source_ignored),
+        ("open_target_unconstrained", m_open_target_unconstrained),
     ]
 
 
