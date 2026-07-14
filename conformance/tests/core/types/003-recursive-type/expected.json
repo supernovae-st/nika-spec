@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-TYPE-002",
+      "category": "validation_error"
+    }
+  ],
+  "note": "09-types.md \u00b7 the types: graph must be acyclic (decidability)."
+}

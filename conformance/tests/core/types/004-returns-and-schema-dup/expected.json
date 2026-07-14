@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-TYPE-003",
+      "category": "validation_error"
+    }
+  ],
+  "note": "09-types.md \u00b7 one contract, one spelling \u2014 returns: OR the schema: hatch."
+}

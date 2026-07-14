@@ -11,6 +11,7 @@
 #         NIKA-DAG-005  after: predicate outside the closed set
 #         NIKA-DAG-006  statically dead task (03 §static liveness · conservative fold)
 #         NIKA-DAG-007  status literal outside the vocabulary
+#         NIKA-TYPE-001..005 + NIKA-PARSE-025  the type core (09-types.md · type_core.py)
 #         NIKA-PARSE-024  depends_on is dead (data → with: · control → after:)
 #         NIKA-VAR-021  a tasks.* reference outside the boundary (03-dag.md ·
 #                       « anywhere — in when: · with: · any verb field … »)
@@ -57,6 +58,7 @@ import yaml
 from jsonschema import Draft202012Validator
 
 from deep_static import deep_static_errors
+from type_core import type_core_errors
 
 HERE = pathlib.Path(__file__).resolve().parent
 SPEC_ROOT = HERE.parent
@@ -921,6 +923,7 @@ def validate_workflow(doc: dict, validator: Draft202012Validator,
                      "detail": detail})
     errs.extend(cross_ref_errors(doc))
     errs.extend(deep_static_errors(doc))
+    errs.extend(type_core_errors(doc))
     if canon is not None:
         errs.extend(stdlib_surface_errors(doc, canon))
     return {"valid": not errs, "errors": errs}

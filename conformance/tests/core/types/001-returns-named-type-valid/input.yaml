@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: t
+types:
+  Summary:
+    object:
+      title: string
+      bullets: { array: string }
+      score: { integer: { min: 0, max: 100 } }
+tasks:
+  fetch:
+    exec: { command: ["cat", "article.txt"] }
+  summarize:
+    with: { article: "${{ tasks.fetch.output }}" }
+    infer:
+      prompt: "Summarize · ${{ with.article }}"
+    returns: Summary
