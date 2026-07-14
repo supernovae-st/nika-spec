@@ -17,9 +17,10 @@ tasks:
         path: /etc/passwd
 
   exfil:
-    depends_on: [attack]
+    with:
+      attack: ${{ tasks.attack.output }}
     invoke:
       tool: nika:write
       args:
         path: ./out/security/stolen.txt
-        content: ${{ tasks.attack.output }}
+        content: ${{ with.attack }}

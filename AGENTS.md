@@ -45,8 +45,8 @@ INTENT ──route──▶ TEMPLATE ──fill──▶ DRAFT ──check──
    and what the schema allows there (exactly-one-verb · snake_case id ·
    quoted duration · unknown field) ·
    `NIKA-DAG-001` = break the dependency cycle ·
-   `NIKA-DAG-002` = the `depends_on` names a task that doesn't exist ·
-   `NIKA-DAG-003` = add the missing `depends_on` edge ·
+   `NIKA-DAG-002` = a `with:`/`after:` entry names a task that doesn't exist ·
+   `NIKA-VAR-021` = a `tasks.*` reference outside the boundary — hoist it into `with:` ·
    `NIKA-DAG-004` = your `recover:` points DOWNSTREAM of the failing
    task (deadlock) — recover from an upstream or independent source ·
    `NIKA-VAR-001` = declare the name or fix the typo ·
@@ -70,7 +70,9 @@ errors): one verb per task — the verb IS the task key (`infer:` /
 `exec:` / `invoke:` / `agent:` · NEVER a `verb:` field with flattened
 args) · snake_case task ids · kebab-case `workflow:` · every
 `${{ tasks.X }}` reference in `when:`/`with:`/`for_each:`/verb fields
-REQUIRES `depends_on: [X]` (the ONLY exemptions · `output:` is pure jq
+lives at the BOUNDARY: `with:` values (the binding IS the edge) · `after:`
+keys · `on_error.recover` · `on_finally` (parent only) · workflow `outputs:`
+(the ONLY other exemptions · `output:` is pure jq
 — `${{ }}` never appears there at all — and `on_error.recover:` /
 `on_finally:` read recovery/parent state · 03 §carve-out) · `invoke`
 arguments live under `args:` (not `input:` / `params:`) · quote any

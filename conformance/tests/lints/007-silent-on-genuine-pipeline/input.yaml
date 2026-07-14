@@ -6,8 +6,10 @@ tasks:
   fetch:
     exec: { command: ["./fetch.sh"] }
   parse:
-    depends_on: [fetch]
+    after:
+      fetch: succeeded
     exec: { command: ["./parse.sh", "--strict", "input.json"] }
   report:
-    depends_on: [parse]
+    after:
+      parse: succeeded
     exec: { command: ["./report.sh"] }

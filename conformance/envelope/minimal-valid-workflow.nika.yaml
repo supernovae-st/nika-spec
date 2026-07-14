@@ -14,9 +14,10 @@ tasks:
         expression: "{ total: (.items | add), count: (.items | length), label: .label }"
 
   sink:
-    depends_on: [compute]
+    with:
+      compute: ${{ tasks.compute.output }}
     invoke:
       tool: nika:write
       args:
         path: ./out/f01.json
-        content: ${{ tasks.compute.output }}
+        content: ${{ with.compute }}

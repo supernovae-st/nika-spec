@@ -6,5 +6,5 @@
       "category": "validation_error"
     }
   ],
-  "note": "03-dag.md \u00b7 cycle detection \u00b7 a 1-cycle (a depends_on [a]) is a cycle \u00b7 the engine MUST reject cyclic dependencies at parse time."
+  "note": "03-dag.md · cycle detection · a 1-cycle (a after a) is a cycle · the engine rejects self-edges in G_p."
 }

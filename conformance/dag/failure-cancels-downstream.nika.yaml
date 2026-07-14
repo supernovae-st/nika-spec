@@ -11,11 +11,13 @@ tasks:
       command: ["false"]
 
   step_b:
-    depends_on: [step_a]
+    after:
+      step_a: succeeded
     exec:
       command: ["echo", "this", "should", "not", "run"]
 
   step_c:
-    depends_on: [step_b]
+    after:
+      step_b: succeeded
     exec:
       command: ["echo", "this", "should", "not", "run", "either"]

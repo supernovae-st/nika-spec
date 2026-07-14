@@ -39,7 +39,7 @@ from day 1 so anyone can reproduce or extend it.
 | `difficulty` | t1-t4 | mirrors the showcase tiers |
 | `expect.verbs` | string[] | verbs the solution must use |
 | `expect.min_tasks` / `max_tasks` | int | DAG size bounds |
-| `expect.constructs` | string[] | required constructs (schema · for_each · depends_on · retry · permits …) |
+| `expect.constructs` | string[] | required constructs (schema · for_each · with · after · retry · permits …) |
 | `reference` | string | path to one valid reference solution (not the only one) |
 
 ## Grounding note (2026-07-05 fresh-sweep)

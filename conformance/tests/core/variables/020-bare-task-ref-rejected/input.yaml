@@ -10,6 +10,7 @@ tasks:
       tool: "nika:read"
       args: { path: "./README.md" }
   think:
-    depends_on: [gather]
+    with:
+      gather: ${{ tasks.gather }}
     infer:
-      prompt: "Summarize ${{ tasks.gather }}"
+      prompt: "Summarize ${{ with.gather }}"

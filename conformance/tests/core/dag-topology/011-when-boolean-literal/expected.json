@@ -1,1 +1,4 @@
-{"valid": true, "errors": []}
+{
+  "valid": true,
+  "note": "03-dag.md §when · the YAML literal true is legal (POST-gate · a no-op the linter may flag) · the always-pattern itself lives in after: {build: terminal}."
+}

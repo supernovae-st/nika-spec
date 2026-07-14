@@ -22,10 +22,11 @@ tasks:
           type: not_a_real_json_schema_type
 
   write_result:
-    depends_on: [validate_bad_schema]
+    with:
+      validate_bad_schema: ${{ tasks.validate_bad_schema.output }}
     invoke:
       tool: "nika:write"
       args:
         path: "./out/data-validation/w37-validate-bad-schema.json"
-        content: ${{ tasks.validate_bad_schema.output }}
+        content: ${{ with.validate_bad_schema }}
         create_dirs: true

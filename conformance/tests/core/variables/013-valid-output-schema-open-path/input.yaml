@@ -22,6 +22,10 @@ tasks:
   fetch_raw:
     exec: { command: ["./dump.sh"] }
   report:
-    depends_on: [extract, fetch_raw]
+    with:
+      extract_entities: ${{ tasks.extract.output.entities }}
+      extract_meta_anything: ${{ tasks.extract.output.meta.anything }}
+      extract_maybe_extra: ${{ tasks.extract.output.maybe_extra }}
+      fetch_raw_whatever: ${{ tasks.fetch_raw.output.whatever }}
     exec:
-      command: ["report", "${{ tasks.extract.output.entities }}", "${{ tasks.extract.output.meta.anything }}", "${{ tasks.extract.output.maybe_extra }}", "${{ tasks.fetch_raw.output.whatever }}"]
+      command: ["report", "${{ with.extract_entities }}", "${{ with.extract_meta_anything }}", "${{ with.extract_maybe_extra }}", "${{ with.fetch_raw_whatever }}"]

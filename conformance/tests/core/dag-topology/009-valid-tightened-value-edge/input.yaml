@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: chain
+tasks:
+  fetch:
+    invoke:
+      tool: nika:fetch
+      args: { url: "https://example.com", mode: article }
+  summarize:
+    after: { fetch: succeeded }
+    with:
+      content: ${{ tasks.fetch.output }}
+    infer:
+      prompt: "Summarize · ${{ with.content }}"

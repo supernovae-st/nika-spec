@@ -13,7 +13,7 @@
 ```
 examples/
 ├── 01-hello.nika.yaml             envelope · 1 infer task · local model (mock twin)
-├── 02-parallel-fanout.nika.yaml   DAG fan-out + merge · depends_on · with
+├── 02-parallel-fanout.nika.yaml   DAG fan-out + merge · with value edges
 ├── 03-exec-pipeline.nika.yaml     exec · capture:structured · timeout · when · on_finally
 ├── 04-schema-retry.nika.yaml      infer schema (JSON Schema) · retry · typed vars
 ├── 05-fetch-chain.nika.yaml       invoke nika:fetch · output: jq · on_error recover
@@ -21,7 +21,7 @@ examples/
 └── 07-for-each-locales.nika.yaml  for_each · max_parallel · fail_fast · item/index
 ```
 
-Together: all 4 verbs · `depends_on` · `when` · `for_each` (+
+Together: all 4 verbs · `with:`/`after:` edges · `when` · `for_each` (+
 `max_parallel` + `fail_fast`) · `retry` · `on_error` · `on_finally` ·
 `with` · `output:` jq bindings · `schema:` structured output · the 5
 namespaces · `${{ item }}`/`${{ index }}` loop locals · tool refs.

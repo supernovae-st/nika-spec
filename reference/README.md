@@ -4,12 +4,15 @@ The readable semantics of the scheduling core, verified against the real
 engine by differential testing (the Cedar method: model → proofs on the
 model → production implementation → differential random testing).
 
-- **`semantics.py`** — the model. Each law is a normative sentence
-  (GATE · RETRY · RECOVER · SKIP · HALT · DEFAULT); evaluation is a pure
-  function of the parsed workflow.
-- **`generate.py`** — seeded generator of small valid workflows built from
-  deterministic blocks only (`exec` argv `true`/`false`, `depends_on`,
-  retry/on_error armor). Same seed → same bytes.
+- **`semantics.py`** — the model (W2 « the flow »). Each law is a normative
+  sentence (GATE-v2 per-edge pass-sets · WHEN post-gate · RETRY · RECOVER ·
+  SKIP · HALT · DEFAULT); evaluation is a pure function of the parsed
+  workflow. Edge roles: value · terminal-observation · failure-observation ·
+  control (after predicates · terminal includes cancelled).
+- **`generate.py`** — seeded generator of small valid W2 workflows built
+  from deterministic blocks only (`exec` argv `true`/`false`, `with:`
+  bindings, `after:` predicates, retry/on_error armor). Same seed → same
+  bytes.
 - **`differential.py`** — runs every seed through the model AND the real
   binary (offline, zero providers) and compares per-task terminal statuses
   plus the recovered flag. A divergence means either the model's sentence

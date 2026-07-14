@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: Apache-2.0
+# Adversarial shape · an after: that is not a map (a sequence). The schema
+# layer flags it · every later layer must SURVIVE it and still produce a
+# collected verdict (oracle crash = conformance bug).
+nika: v1
+workflow:
+  id: malformed-after
+  description: "a sequence-shaped after: must not crash the oracle"
+
+tasks:
+  gather:
+    invoke:
+      tool: "nika:read"
+      args: { path: "./input.txt" }
+
+  think:
+    after:
+      - gather
+    with:
+      notes: ${{ tasks.gather.output }}
+    infer:
+      prompt: "Summarize · ${{ with.notes }}"

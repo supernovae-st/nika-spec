@@ -204,6 +204,47 @@ def _node_label(task: dict, tid: str) -> str:
     return " · ".join(parts)
 
 
+TASK_REF_RE = re.compile(r"tasks\.([a-z][a-z0-9_]*)")
+
+
+def _with_producers(task: dict) -> list[str]:
+    """Producer ids referenced by the with: bindings (E_d · the binding IS
+    the edge) · source order · deduped."""
+    blk = task.get("with")
+    out: list[str] = []
+
+    def walk(v):
+        if isinstance(v, str):
+            for m in TASK_REF_RE.findall(v):
+                if m not in out:
+                    out.append(m)
+        elif isinstance(v, dict):
+            for x in v.values():
+                walk(x)
+        elif isinstance(v, list):
+            for x in v:
+                walk(x)
+
+    walk(blk)
+    return out
+
+
+def _after_entries(task: dict) -> list[tuple[str, str]]:
+    raw = task.get("after")
+    if not isinstance(raw, dict):
+        return []
+    return [(k, v) for k, v in raw.items() if isinstance(k, str)]
+
+
+def _producers(task: dict) -> list[str]:
+    """All scheduling producers (G_p = E_d ∪ E_c) · with-refs then after keys."""
+    out = _with_producers(task)
+    for k, _pred in _after_entries(task):
+        if k not in out:
+            out.append(k)
+    return out
+
+
 def render_mermaid(lean_text: str) -> str:
     """The docs DAG diagram · GENERATED from the same yaml (drift-proof) ·
     canonical verb palette · conditional edges dashed with the when label."""
@@ -220,9 +261,10 @@ def render_mermaid(lean_text: str) -> str:
         label = _node_label(t, tid).replace('"', "'")
         lines.append(f'  {tid}["{label}"]:::{verb}')
     for tid, t in tasks:
-        arrow = "-.->" if "when" in t else "-->"
-        for d in (t.get("depends_on") or []):
-            lines.append(f"  {d} {arrow} {tid}")
+        for d in _with_producers(t):
+            lines.append(f"  {d} --> {tid}")
+        for d, pred in _after_entries(t):
+            lines.append(f"  {d} -.->|{pred}| {tid}")
     used = sorted(set(verbs.values()))
     cls = [c for c in MERMAID_CLASSES.split("\n")
            if any(f"classDef {v} " in c for v in used)]
@@ -239,7 +281,8 @@ CONSTRUCTS = [
     ("timeout",       "task time-bound",                   "/concepts/workflows"),
     ("on_finally",    "cleanup that always runs",          "/concepts/workflows"),
     ("on_error",      "fallback recovery",                 "/reference/error-codes"),
-    ("with",          "scoped aliasing",                   "/concepts/bindings"),
+    ("with",          "the data boundary · bindings ARE edges", "/concepts/bindings"),
+    ("after",         "state-predicate control edges",     "/concepts/workflows"),
     ("output",        "jq output bindings",                "/concepts/bindings"),
     ("schema",        "typed (structured) output",         "/concepts/verbs"),
     ("thinking",      "extended thinking budget",          "/concepts/verbs"),
@@ -338,7 +381,7 @@ def build_dag(lean_text: str) -> dict:
         if tid in waves:
             return waves[tid]
         task = next((body for key, body in tasks if key == tid), None)
-        deps = [d for d in (task.get("depends_on") or []) if d not in seen] if task else []
+        deps = [d for d in _producers(task) if d not in seen] if task else []
         w = 0 if not deps else 1 + max(wave_of(d, (*seen, tid)) for d in deps)
         waves[tid] = w
         return w
@@ -347,13 +390,11 @@ def build_dag(lean_text: str) -> dict:
         verb = next((v for v in ("infer", "exec", "invoke", "agent") if v in t), "invoke")
         line0, line1 = ranges.get(tid, (0, 0))
         when = t.get("when")
-        gate = ("always" if when is True
-                else "when" if when is not None
-                else "default")
+        gate = "when" if when is not None else "default"
         tasks_out.append({
             "id": tid,
             "verb": verb,
-            "deps": list(t.get("depends_on") or []),
+            "deps": _producers(t),
             "wave": wave_of(tid),
             "gate": gate,
             "gloss": _gloss(t),
@@ -773,10 +814,13 @@ def main() -> int:
         cat_tbl = "| Category | Meaning |\n|---|---|\n" + "\n".join(
             f"| `{c}` | {cat_meanings.get(c, '')} |" for c in cats)
         def mdx_cell(text: str) -> str:
-            # MDX parses bare { } in table cells as JSX expressions — escape
-            # them as HTML entities (backtick spans would also work but the
-            # registry text mixes prose + glyphs · entities are uniform).
-            return text.replace("{", "&#123;").replace("}", "&#125;")
+            # MDX parses bare { } in table cells as JSX expressions and bare
+            # < > as JSX tags (`<value>` reads as an unclosed element — the
+            # broken-links class) — escape all four as HTML entities
+            # (backtick spans would also work but the registry text mixes
+            # prose + glyphs · entities are uniform).
+            return (text.replace("{", "&#123;").replace("}", "&#125;")
+                        .replace("<", "&lt;").replace(">", "&gt;"))
         code_tbl = "| Code | Failure | Category | `transient` |\n|---|---|---|---|\n" + "\n".join(
             f"| `{e['code']}` | {mdx_cell(e['failure'])} | `{e['category']}` | {e['transient']} |"
             for e in canon["error_codes"]["items"])

@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-PARSE-024",
+      "category": "validation_error"
+    }
+  ],
+  "note": "03-dag.md §depends_on · the field died in W2 · data → with: bindings · control → after: predicates · check --fix migrates the provable cases."
+}

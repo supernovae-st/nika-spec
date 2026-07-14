@@ -1,0 +1,15 @@
+{
+  "workflow_state": "success",
+  "tasks": {
+    "c": {
+      "status": "success"
+    },
+    "p": {
+      "status": "skipped"
+    },
+    "seed": {
+      "status": "success"
+    }
+  },
+  "note": "gate-v2 matrix \u00b7 skipped \u00d7 when-true \u00b7 statuses authored by reference/semantics.py (the model defines \u00b7 the engine follows)"
+}

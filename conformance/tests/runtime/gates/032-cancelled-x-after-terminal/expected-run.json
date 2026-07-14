@@ -1,0 +1,15 @@
+{
+  "workflow_state": "failure",
+  "tasks": {
+    "c": {
+      "status": "success"
+    },
+    "p": {
+      "status": "cancelled"
+    },
+    "seed": {
+      "status": "failure"
+    }
+  },
+  "note": "gate-v2 matrix \u00b7 cancelled \u00d7 after-terminal \u00b7 statuses authored by reference/semantics.py (the model defines \u00b7 the engine follows)"
+}

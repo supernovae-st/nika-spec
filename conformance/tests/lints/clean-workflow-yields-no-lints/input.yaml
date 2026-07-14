@@ -11,8 +11,9 @@ tasks:
     on_error:
       recover: { items: [] }
   process:
-    depends_on: [fetch]
-    for_each: "${{ tasks.fetch.output.items }}"
+    with:
+      fetch_items: ${{ tasks.fetch.output.items }}
+    for_each: "${{ with.fetch_items }}"
     max_parallel: 4
     timeout: 60s
     exec: { command: ["./process.sh"] }

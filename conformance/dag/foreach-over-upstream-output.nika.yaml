@@ -15,10 +15,10 @@ tasks:
         expression: "(.raw | split(\",\"))"
 
   process:
-    depends_on: [discover]
-    for_each: ${{ tasks.discover.output }}
+    for_each: ${{ with.discover }}
     max_parallel: 2
     with:
+      discover: ${{ tasks.discover.output }}
       tok: ${{ item }}
       i: ${{ index }}
     invoke:
@@ -28,10 +28,11 @@ tasks:
         expression: "{ i: .i, upper: (.tok | ascii_upcase) }"
 
   persist:
-    depends_on: [process]
+    with:
+      process: ${{ tasks.process.output }}
     invoke:
       tool: nika:write
       args:
         path: "./out/fanout/32_foreach_over_upstream_output.json"
-        content: ${{ tasks.process.output }}
+        content: ${{ with.process }}
         create_dirs: true

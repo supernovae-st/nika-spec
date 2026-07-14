@@ -19,10 +19,11 @@ tasks:
         expression: "{ i: .i, name: .name }"
 
   persist:
-    depends_on: [loop]
+    with:
+      loop: ${{ tasks.loop.output }}
     invoke:
       tool: nika:write
       args:
         path: "./out/fanout/04_foreach_index_binding.json"
-        content: ${{ tasks.loop.output }}
+        content: ${{ with.loop }}
         create_dirs: true

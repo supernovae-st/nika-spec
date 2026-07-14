@@ -1,4 +1,4 @@
 {
   "valid": true,
-  "note": "03-dag.md \u00b7 a diamond (a\u2192b,c\u2192d) is acyclic \u00b7 b and c MAY run in parallel \u00b7 valid."
+  "note": "03-dag.md · a diamond (a→b,c via control · b,c→d via value bindings) is acyclic · b and c MAY run in parallel · valid."
 }

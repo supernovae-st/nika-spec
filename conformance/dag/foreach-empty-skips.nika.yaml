@@ -1,10 +1,12 @@
-# Expected: exit 0 — empty collection skips the for_each task; downstream default gate satisfied.
+# SPDX-License-Identifier: Apache-2.0
+# Expected: exit 0 — empty collection skips the for_each task; the value edge passes on skipped.
 nika: v1
 workflow:
   id: foreach-empty
 # SPEC 03 §for_each semantics: "If the collection is empty · the task is skipped".
-# A skipped for_each → downstream default gate satisfied → downstream RUNS.
-# Markers: 08_iter_*.json ABSENT (no iterations ran); 08_after.json present.
+# A skipped for_each → a downstream VALUE edge admits (pass-set {success,skipped})
+# and its binding reads defined-null. Markers: 08_iter_*.json ABSENT (no
+# iterations ran); 08_after.json present with the null payload visible.
 vars:
   empty_list: { type: array, default: [] }
 tasks:
@@ -14,7 +16,8 @@ tasks:
       tool: nika:write
       args: { path: "./out/ctrlflow/08_iter_${{ index }}.json", content: "${{ item }}" }
   after:
-    depends_on: [mapped]
+    with:
+      result: ${{ tasks.mapped.output }}
     invoke:
       tool: nika:write
-      args: { path: "./out/ctrlflow/08_after.json", content: "after-empty-ran" }
+      args: { path: "./out/ctrlflow/08_after.json", content: "after-empty-ran:${{ with.result }}" }

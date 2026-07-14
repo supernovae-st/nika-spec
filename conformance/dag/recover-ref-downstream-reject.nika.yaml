@@ -13,6 +13,7 @@ tasks:
       recover: ${{ tasks.step_b.output }}
 
   step_b:
-    depends_on: [step_a]
+    after:
+      step_a: succeeded
     exec:
       command: ["echo", "downstream"]

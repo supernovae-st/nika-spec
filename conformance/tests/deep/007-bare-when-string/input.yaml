@@ -5,6 +5,7 @@ tasks:
   check:
     exec: { command: ["./check.sh"] }
   deploy:
-    depends_on: [check]
+    after:
+      check: succeeded
     when: "tasks.check.status == 'success'"
     exec: { command: ["./deploy.sh"] }

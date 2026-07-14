@@ -8,5 +8,7 @@ tasks:
   b:
     exec: { command: ["./b.sh"] }
   summarize:
-    depends_on: [a, b]
-    exec: { command: ["./summarize.sh"] }
+    with:
+      left: "${{ tasks.a.output }}"
+      right: "${{ tasks.b.output }}"
+    exec: { command: ["./summarize.sh", "${{ with.left }}", "${{ with.right }}"] }

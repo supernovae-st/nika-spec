@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-VAR-021",
+      "category": "validation_error"
+    }
+  ],
+  "note": "03-dag.md §on_finally · the parent is the only readable task inside a cleanup (a sibling may still be RUNNING — the read would race, unchecked pre-W2)."
+}

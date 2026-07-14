@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-VAR-021",
+      "category": "validation_error"
+    }
+  ],
+  "note": "04 §the reference boundary · a verb body reads local names only · hoist into with: (the machine-applicable fix)."
+}

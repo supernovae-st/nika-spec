@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-DAG-002",
+      "category": "validation_error"
+    }
+  ],
+  "note": "03-dag.md · an after: target must be a declared task · 'ghost' is not."
+}

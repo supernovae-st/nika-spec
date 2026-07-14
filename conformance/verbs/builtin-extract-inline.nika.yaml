@@ -25,13 +25,15 @@ tasks:
       body: ".body"
 
   build_prompt_data:
-    depends_on: [echo_content]
+    with:
+      echo_content_title: ${{ tasks.echo_content.title }}
+      echo_content_body: ${{ tasks.echo_content.body }}
     invoke:
       tool: nika:jq
       args:
         input:
-          title: ${{ tasks.echo_content.title }}
-          body: ${{ tasks.echo_content.body }}
+          title: ${{ with.echo_content_title }}
+          body: ${{ with.echo_content_body }}
           word_count: 20
         expression: |
           {
@@ -43,10 +45,11 @@ tasks:
           }
 
   save:
-    depends_on: [build_prompt_data]
+    with:
+      build_prompt_data: ${{ tasks.build_prompt_data.output }}
     invoke:
       tool: nika:write
       args:
         path: "./out/research/r12-mock-chain.json"
-        content: "${{ tasks.build_prompt_data.output }}"
+        content: "${{ with.build_prompt_data }}"
         create_dirs: true

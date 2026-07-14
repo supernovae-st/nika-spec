@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-DAG-005",
+      "category": "validation_error"
+    }
+  ],
+  "note": "03-dag.md §after · the predicate set is CLOSED (succeeded · failed · skipped · terminal) · 'passed' is not in it."
+}

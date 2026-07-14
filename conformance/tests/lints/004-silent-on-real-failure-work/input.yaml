@@ -8,8 +8,7 @@ tasks:
       tool: "nika:fetch"
       args: { url: "https://primary.example.com" }
   mirror:
-    depends_on: [a]
-    when: "${{ tasks.a.status == 'failure' }}"
+    after: { a: failed }
     invoke:
       tool: "nika:fetch"
       args: { url: "https://mirror.example.com" }

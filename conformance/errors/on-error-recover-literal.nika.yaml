@@ -17,9 +17,10 @@ tasks:
       recover: "default_value"
 
   write_result:
-    depends_on: [fail_step]
+    with:
+      fail_step: ${{ tasks.fail_step.output }}
     invoke:
       tool: "nika:write"
       args:
         path: "./out/errors/e14-result.txt"
-        content: "${{ tasks.fail_step.output }}"
+        content: "${{ with.fail_step }}"

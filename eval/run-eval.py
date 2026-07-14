@@ -62,7 +62,9 @@ instantiated, never invented.
    Creativity belongs ONLY in prompts, jq expressions and paths.
 3. Hard rules the validator enforces: one verb per task · snake_case
    task ids · kebab-case workflow: · every ${{ tasks.X }} reference
-   REQUIRES depends_on: [X] · when: is a ${{ }} CEL boolean or the
+   crosses ONLY through with: (the binding IS the edge — bodies read
+   ${{ with.name }}) · pure control = after: {task: succeeded|failed|
+   skipped|terminal} · when: is a ${{ }} CEL boolean over LOCAL names or the
    literal true/false (a bare string is rejected) · size() is the only
    CEL function · nika:jq's arg is `expression:` (never query/expr) ·
    nika:wait takes duration: XOR until: · nika:write needs content: ·

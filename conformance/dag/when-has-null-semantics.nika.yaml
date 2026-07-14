@@ -1,11 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
 # Expected: exit 0 — has() is false on defined-but-null; present-consumer skips, absent-consumer runs.
 nika: v1
 workflow:
   id: when-null-upstream
-# COVERS: a defined-but-NULL upstream value read in when: via has() (spec 03 L165-171,L209).
-# producer emits {maybe: null}; consumer_present runs when has(...) is true (it is defined but null
-# -> has() returns false per spec: "true iff resolves to a defined, NON-null value").
-# So has(maybe) == false -> consumer_present SKIPS, consumer_absent RUNS.
+# COVERS: a defined-but-NULL upstream value imported through with: and read
+# in when: via has() (spec 03 §when · §side constraint 1). producer emits
+# {maybe: null}; the binding is a value edge (producer succeeds → admits);
+# has(with.maybe) is false per spec ("true iff resolves to a defined,
+# NON-null value") -> consumer_present SKIPS, consumer_absent RUNS.
 tasks:
   producer:
     invoke:
@@ -15,15 +17,17 @@ tasks:
       maybe: ".maybe"
 
   consumer_present:
-    depends_on: [producer]
-    when: ${{ has(tasks.producer.maybe) }}
+    with:
+      maybe: ${{ tasks.producer.maybe }}
+    when: ${{ has(with.maybe) }}
     invoke:
       tool: nika:write
       args: { path: "./out/fanout/27_present.json", content: { branch: "present" }, create_dirs: true }
 
   consumer_absent:
-    depends_on: [producer]
-    when: ${{ !has(tasks.producer.maybe) }}
+    with:
+      maybe: ${{ tasks.producer.maybe }}
+    when: ${{ !has(with.maybe) }}
     invoke:
       tool: nika:write
       args: { path: "./out/fanout/27_absent.json", content: { branch: "absent" }, create_dirs: true }

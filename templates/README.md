@@ -41,7 +41,7 @@ template matching the OUTER shape.
 5. **Repair** · every error names its rule — fix exactly that, nothing
    else. The recurring ones:
    - `NIKA-DAG-003` → you referenced `${{ tasks.X }}` without
-     `depends_on: [X]`. Add the edge.
+     the boundary. Hoist the reference into `with:` — the binding IS the edge.
    - `NIKA-VAR-001` → undeclared `vars./with./secrets.` name. Declare
      it in the envelope or fix the typo. A declared `required: true` var
      is supplied at launch · `nika run <file> --var name=value`

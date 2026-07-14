@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-DAG-006",
+      "category": "validation_error"
+    }
+  ],
+  "note": "03-dag.md \u00a7static liveness \u00b7 gate-v2 matrix cell skipped \u00d7 after-failed: the edge's pass-set can never admit \u2014 the producer's reachable states exclude it \u00b7 statically dead, refused before any run."
+}

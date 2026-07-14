@@ -8,5 +8,5 @@ tasks:
     on_error:
       recover: ${{ tasks.fallback.output }}
   fallback:
-    depends_on: [fetch]
+    after: { fetch: succeeded }
     infer: { prompt: "depends on the task it would rescue" }

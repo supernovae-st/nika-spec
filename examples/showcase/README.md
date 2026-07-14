@@ -74,7 +74,7 @@ T4 EPIC        multi-stage pipelines · agents under budget · self-reporting ru
   (the pinned local `qwen3.5` qualifies)
 - every file is a conformance input · `python conformance/runner.py all`
   MUST stay green · one verb per task · snake_case ids · every
-  `${{ tasks.X }}` reference backed by `depends_on`
+  `${{ tasks.X }}` reference at the `with:` boundary (the binding IS the edge)
 - these files are the **single source** for the YAML shown in the
   public docs (`nika-docs` examples pages) and the website use-cases
   explorer — projected, never hand-copied

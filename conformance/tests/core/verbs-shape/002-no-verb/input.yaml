@@ -4,4 +4,3 @@ workflow:
   id: hello
 tasks:
   greet:
-    depends_on: []

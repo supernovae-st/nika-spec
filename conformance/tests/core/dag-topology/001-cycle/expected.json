@@ -5,5 +5,6 @@
       "code": "NIKA-DAG-001",
       "category": "validation_error"
     }
-  ]
+  ],
+  "note": "03-dag.md · a control cycle (a after b · b after a) makes G_p = E_d ∪ E_c cyclic · rejected at parse."
 }

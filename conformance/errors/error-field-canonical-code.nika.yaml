@@ -1,12 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0
 # Expected: exit 0 — NIKA-VAR-006 fires internally at args-stage, recovered via on_error (skip); tasks.fail_var.error carries the canonical wire code (spec 05 §errors).
 # C26 · does tasks.X.error (the SPEC-named surface) carry the canonical code or
-# the leaked internal NIKA-1702/1703? Spec 05-errors lines 142-144 name tasks.X.error
+# the leaked internal NIKA-1702/1703? Spec 05-errors names tasks.X.error
 # explicitly as a surface that MUST carry the canonical form, not an internal code.
 # `fail_var` triggers a cross-type compare (VAR-006) IN ITS ARGS (task-stage) and
-# recovers via on_error.skip so its .error stays readable; downstream serializes it.
-# NOTE (2026-07-02 empirical): a `when:` GATE eval error does NOT route through
-# on_error (task → failure · workflow fails) — the gate is outside the task's work.
-# Spec gap: 03-dag §gate doesn't state this. Trigger must therefore be args-stage.
+# recovers via on_error.skip so its .error stays readable; downstream imports the
+# record through with: (.status = terminal-observation edge · .error =
+# failure-observation edge, whose pass-set includes skipped BECAUSE a skip may
+# carry a preserved error) and serializes it.
+# NOTE (W2): a boundary eval error (with:/when:) does NOT route through
+# on_error (task → failure) — 03-dag §task states now states this law.
+# The trigger must therefore stay args-stage.
 nika: v1
 workflow:
   id: c26-error-field-surface
@@ -23,12 +27,14 @@ tasks:
     on_error:
       skip: true
   capture:
-    depends_on: [fail_var]
+    with:
+      fv_status: ${{ tasks.fail_var.status }}
+      fv_error: ${{ tasks.fail_var.error }}
     invoke:
       tool: "nika:write"
       args:
         path: "./out/cel/c26-error.json"
         content:
-          status: "${{ tasks.fail_var.status }}"
-          error_code: "${{ tasks.fail_var.error.code }}"
+          status: "${{ with.fv_status }}"
+          error_code: "${{ with.fv_error.code }}"
         create_dirs: true

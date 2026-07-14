@@ -6,11 +6,13 @@ tasks:
   a:
     exec: { command: ["./prepare.sh"] }
   b:
-    depends_on: [a]
+    after: { a: succeeded }
     infer: { prompt: "Analyze branch B" }
   c:
-    depends_on: [a]
+    after: { a: succeeded }
     infer: { prompt: "Analyze branch C" }
   d:
-    depends_on: [b, c]
-    infer: { prompt: "Merge" }
+    with:
+      b: ${{ tasks.b.output }}
+      c: ${{ tasks.c.output }}
+    infer: { prompt: "Merge · ${{ with.b }} · ${{ with.c }}" }

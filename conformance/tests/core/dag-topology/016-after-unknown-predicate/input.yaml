@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: hello
+tasks:
+  tests:
+    exec: { command: ["cargo", "test"] }
+  deploy:
+    after: { tests: passed }
+    exec: { command: ["./deploy.sh"] }

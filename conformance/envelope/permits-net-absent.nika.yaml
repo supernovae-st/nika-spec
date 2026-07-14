@@ -17,9 +17,10 @@ tasks:
         url: "https://api.example.com/data"
 
   sink:
-    depends_on: [attack]
+    with:
+      attack: ${{ tasks.attack.output }}
     invoke:
       tool: nika:write
       args:
         path: ./out/security/data.json
-        content: ${{ tasks.attack.output }}
+        content: ${{ with.attack }}
