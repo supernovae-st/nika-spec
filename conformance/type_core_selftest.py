@@ -52,6 +52,11 @@ law("union ⊑ only if every member fits",
 law("union with escapee ⋢",
     not subtype(t({"union": ["integer", "bytes"]}), t("number"), N))
 
+# gradual consistency is NOT transitive — Unknown never launders
+# (null ~ Unknown ~ bool · yet null ⋢ bool · spec 09 §lattice)
+law("unknown never launders (null ⋢ bool despite ~Unknown~)",
+    not subtype(t("null"), t("bool"), N))
+
 # objects · width + depth + closedness
 A = t({"object": {"a": "string", "b": "integer"}})
 B = t({"object": {"a": "string"}})

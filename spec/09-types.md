@@ -133,7 +133,11 @@ Two type expressions are compared **after normalization** ·
 - `Unknown` (the type of any undeclared producer · §gradual) satisfies
   `Unknown ⊑ T` and `T ⊑ Unknown` for every T — gradual, permissive,
   and *named*: the check never invents a rejection where it has no
-  knowledge.
+  knowledge. **This makes the Unknown arm a *consistency* relation, not
+  an order**: reflexivity and transitivity are laws of the Unknown-free
+  fragment only, and an `Unknown` in the middle never launders an
+  unrelated pair (`null ~ Unknown ~ bool`, yet `null ⋢ bool` — the
+  classic gradual-typing law, property-pinned in both evaluators).
 
 Join (`⊔`) and meet (`⊓`) exist for every pair (union-of / structural
 intersection, collapsing to `Unknown` where no informative bound
