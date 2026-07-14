@@ -1,0 +1,47 @@
+{
+  "t": "2026-07-14T20:00:00Z",
+  "evidence": [
+    {
+      "key": "failed_required_checks",
+      "value": 8,
+      "source": "ci",
+      "observed_at": "2026-07-14T20:00:00Z",
+      "digest": "d1",
+      "confidentiality": "internal",
+      "integrity": "verified",
+      "quality": {
+        "freshness": "fresh",
+        "completeness": "complete",
+        "independence_group": "ci"
+      }
+    },
+    {
+      "key": "touches_release_workflow",
+      "value": true,
+      "source": "ci",
+      "observed_at": "2026-07-14T20:00:00Z",
+      "digest": "d2",
+      "confidentiality": "internal",
+      "integrity": "verified",
+      "quality": {
+        "freshness": "fresh",
+        "completeness": "complete",
+        "independence_group": "ci"
+      }
+    },
+    {
+      "key": "relevant_coverage_bp",
+      "value": 2000,
+      "source": "coverage-bot",
+      "observed_at": "2026-07-14T20:00:00Z",
+      "digest": "d3",
+      "confidentiality": "internal",
+      "integrity": "observed",
+      "quality": {
+        "freshness": "fresh",
+        "completeness": "complete",
+        "independence_group": "coverage-bot"
+      }
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "t": "2026-07-14T20:00:00Z",
+  "evidence": [
+    {
+      "key": "failed_required_checks",
+      "value": 2,
+      "source": "ci",
+      "observed_at": "2026-07-14T20:00:00Z",
+      "digest": "d1",
+      "confidentiality": "internal",
+      "integrity": "authoritative",
+      "quality": {
+        "freshness": "fresh",
+        "completeness": "complete",
+        "independence_group": "ci"
+      }
+    },
+    {
+      "key": "failed_required_checks",
+      "value": 7,
+      "source": "audit-bot",
+      "observed_at": "2026-07-14T20:00:00Z",
+      "digest": "d9",
+      "confidentiality": "internal",
+      "integrity": "authoritative",
+      "quality": {
+        "freshness": "fresh",
+        "completeness": "complete",
+        "independence_group": "audit-bot"
+      }
+    },
+    {
+      "key": "touches_release_workflow",
+      "value": false,
+      "source": "ci",
+      "observed_at": "2026-07-14T20:00:00Z",
+      "digest": "d2",
+      "confidentiality": "internal",
+      "integrity": "verified",
+      "quality": {
+        "freshness": "fresh",
+        "completeness": "complete",
+        "independence_group": "ci"
+      }
+    }
+  ]
+}
