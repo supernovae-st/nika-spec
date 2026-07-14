@@ -57,7 +57,7 @@ import sys, json, re, pathlib
 import yaml
 from jsonschema import Draft202012Validator
 
-from deep_static import deep_static_errors
+from deep_static import deep_static_errors, policy_errors
 from type_core import type_core_errors
 
 HERE = pathlib.Path(__file__).resolve().parent
@@ -924,6 +924,7 @@ def validate_workflow(doc: dict, validator: Draft202012Validator,
     errs.extend(cross_ref_errors(doc))
     errs.extend(deep_static_errors(doc))
     errs.extend(type_core_errors(doc))
+    errs.extend(policy_errors(doc))
     if canon is not None:
         errs.extend(stdlib_surface_errors(doc, canon))
     return {"valid": not errs, "errors": errs}

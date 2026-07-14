@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: t
+policy:
+  require:
+    human_gate_before: [exec]
+permits:
+  exec: ["echo"]
+tasks:
+  act:
+    exec: { command: ["echo", "unattended"] }

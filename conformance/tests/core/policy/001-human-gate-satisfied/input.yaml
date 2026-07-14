@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: t
+policy:
+  require:
+    human_gate_before: [exec]
+permits:
+  exec: ["echo"]
+  tools: ["nika:prompt"]
+tasks:
+  human:
+    invoke:
+      tool: "nika:prompt"
+      args: { message: "Proceed?", default: false }
+  act:
+    with: { go: "${{ tasks.human.output }}" }
+    when: ${{ with.go == true }}
+    exec: { command: ["echo", "shipped"] }

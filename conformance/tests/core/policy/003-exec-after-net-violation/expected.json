@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-POLICY-001", "category": "security_error" }
+  ],
+  "note": "10-authority.md · forbid.exec_after: [net] — act is a descendant of fetch_page (the path is the witness)."
+}
