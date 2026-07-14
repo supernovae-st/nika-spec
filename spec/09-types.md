@@ -54,14 +54,13 @@ A **type expression** is one of ·
 
 | Form | Meaning |
 |---|---|
-| `null` · `bool` · `integer` · `number` · `string` · `bytes` · `uri` · `path` · `duration` · `timestamp` | the primitives |
-| `money` | a decimal amount + ISO-4217 currency (reserved refinements land with the decision core — see §reserved) |
+| `null` · `bool` · `integer` · `number` · `string` · `bytes` · `uri` · `path` · `duration` · `timestamp` | the **10** primitives (`null` may be written as the bare YAML null scalar or the string) |
 | `PascalName` | a reference to a declared named type |
 | `{ array: T }` | homogeneous list |
 | `{ map: T }` | string-keyed map with homogeneous values |
 | `{ object: { field: T, … } }` | **closed** record — see §closed objects |
-| `{ union: [T, …] }` | untagged union (≥ 2 members) |
-| `{ optional: T }` | exactly `union: [T, null]` (sugar · normalized away) |
+| `{ union: [T, …] }` | untagged union (≥ 2 members) — **nullability is spelled here**: `{ union: [T, null] }` |
+| `{ optional: T }` | **field-presence modifier — legal ONLY at a field position** inside `{ object: … }` (§optional is presence, not null) |
 | `{ enum: ["a", "b", …] }` | closed string enumeration (≥ 1 member · unique) |
 | `{ integer: { min?, max? } }` · `{ number: { min?, max? } }` | bounded numerics (inclusive bounds) |
 | `{ string: { pattern?, min_len?, max_len? } }` | refined string (`pattern` is a regular expression **without backreferences or lookaround** — linear-time matchable) |
@@ -74,6 +73,7 @@ v1 and their semantics land with their owning wave ·
 | `result<T>` | Outcome IR (W5) | a task outcome is a *contract*, not a convention — the slot is reserved so no user type squats the name |
 | `artifact<mime>` | artifact lanes (W5) | `outputs:` already speak it informally; the typed form needs runtime identity first |
 | `secret<T>` | authority wave (W4) | a secret is a *confidentiality*, not a shape — see §secrets never lower |
+| `money` | decision core (W-DEC) | an amount is **fixed-point + ISO-4217 currency, never a binary float** — a `money` that is semantically an empty string would be a lie; the name is reserved until the decision core brings the real representation |
 
 ### Closed objects (normative)
 
@@ -89,26 +89,62 @@ types:
   Loose: { object: { id: string }, additional: true }
 ```
 
-An **optional field** is declared with `optional:` on the field type ·
+### Optional is presence, not null (normative)
+
+**Absence and null are different facts**, and the grammar keeps them
+apart ·
 
 ```yaml
 types:
   Story:
     object:
-      headline: string                 # required
-      byline: { optional: string }     # may be absent or null
+      headline: string                     # required · present · non-null
+      byline: { optional: string }         # MAY BE ABSENT · when present: a string (null refused)
+      score: { union: [integer, null] }    # required · present · may be NULL
+      note: { optional: { union: [string, null] } }   # may be absent · may be null
 ```
+
+- `{ optional: T }` is a **field-presence modifier**: the field may be
+  omitted; when present, its value must inhabit `T` — a present `null`
+  is a violation unless `T` itself admits null.
+- **Nullability is a union**: `{ union: [T, null] }` — one spelling,
+  no `nullable<>` alias.
+- `optional:` anywhere OUTSIDE a field position (a `returns:`, an array
+  element, a union member, a `types:` root) is refused —
+  `NIKA-TYPE-001`-class, with the teaching « optional is a
+  field-presence modifier — for a nullable value write
+  `union: [T, null]` ».
+- Lowering: an optional field leaves `required` and lowers as
+  `lower(T)` — **never** an implicit `anyOf` with null (JSON Schema's
+  `required` carries presence · `type: null` carries nullability · the
+  two never blur).
 
 ### Normalization (normative)
 
 Two type expressions are compared **after normalization** ·
 
-1. `optional: T` rewrites to `union: [T, null]`.
-2. Unions flatten (`union` inside `union`), deduplicate structurally,
+1. Unions flatten (`union` inside `union`), deduplicate structurally,
    and order canonically (member order never carries meaning).
-3. A one-member union collapses to its member.
+2. A one-member union collapses to its member.
+3. Field optionality is **not** a type — it lives on the field slot and
+   never rewrites into the value type (§optional is presence, not null).
 
-## The lattice · `⊑` (normative)
+## The relations · `⊑` (subtyping) · `~` (consistency) · `⊑~` (assignability) (normative)
+
+Three relations, never conflated — the soundness core of this chapter ·
+
+| Relation | Nature | Laws |
+|---|---|---|
+| `A ⊑ B` | **static subtyping** over KNOWN types | reflexive · transitive · **antisymmetric** (a partial order — `Unknown` is comparable only to itself) |
+| `A ~ B` | **gradual consistency** | reflexive · **symmetric** · NOT transitive · `Unknown ~ T` for every T · structural elsewhere |
+| `A ⊑~ B` | **assignability** (consistent subtyping — what every static judge consumes: the walk · `TYPE-004` · the static fit) | `⊑` with `Unknown` accepting at the leaves — exactly Siek-Taha consistent subtyping |
+
+Internal forms (an engine's IR MAY carry them · **never authorable
+surface**): `Never` (bottom — no value inhabits it · the honest result
+of a disjoint meet) and `Unknown` (absence of static information — the
+gradual type). There is no authorable `Any`: the permissive role is
+`Unknown`'s, and a lattice top has no v1 use case. Contradictions are
+DIAGNOSTICS (refusals), never a type.
 
 `A ⊑ B` (« every A value is a B value ») is decidable and total ·
 
@@ -130,19 +166,23 @@ Two type expressions are compared **after normalization** ·
   restriction ·
 - unions: `A ⊑ union U` iff `A ⊑` some member; `union U ⊑ B` iff
   **every** member `⊑ B` ·
-- `Unknown` (the type of any undeclared producer · §gradual) satisfies
-  `Unknown ⊑ T` and `T ⊑ Unknown` for every T — gradual, permissive,
-  and *named*: the check never invents a rejection where it has no
-  knowledge. **This makes the Unknown arm a *consistency* relation, not
-  an order**: reflexivity and transitivity are laws of the Unknown-free
-  fragment only, and an `Unknown` in the middle never launders an
-  unrelated pair (`null ~ Unknown ~ bool`, yet `null ⋢ bool` — the
-  classic gradual-typing law, property-pinned in both evaluators).
+- `Unknown ⊑ Unknown` only — in the ORDER, `Unknown` is comparable to
+  nothing else (antisymmetry survives). The permissive behavior lives
+  in `~` and `⊑~`: `Unknown ~ T` always, and `A ⊑~ B` accepts wherever
+  an `Unknown` leaf stands in for missing knowledge. Consistency is
+  deliberately NOT transitive — an `Unknown` in the middle never
+  launders an unrelated pair (`null ~ Unknown ~ bool`, yet `null ⋢ bool`
+  and `null ⋢~ bool` — property-pinned in both evaluators).
 
-Join (`⊔`) and meet (`⊓`) exist for every pair (union-of / structural
-intersection, collapsing to `Unknown` where no informative bound
-exists) — engines use them internally (edge typing · inference); they
-are not authorable surface.
+**Join** (`⊔`) is `union_of` — the language HAS unions, so the join is
+always expressible. **Meet** (`⊓`) is honest three-way: **exact** when
+computable (structural intersection · nested bounds · enum
+intersection), **`Never`** when the pair is provably disjoint
+(`string ⊓ integer = Never` — impossibility, NOT `Unknown`:
+insufficient information and impossibility are different facts and are
+never interchanged), and **not-computed** (reported as such) where an
+exact meet is not implemented — never guessed. Engines use both
+internally (edge typing · inference); neither is authorable surface.
 
 ## Lowering · Nika type → JSON Schema 2020-12 (normative · one direction)
 
@@ -183,6 +223,33 @@ Two laws ride the table ·
   when it lands in W4 — a type that would ship a secret's *shape* to a
   provider is refused statically (`NIKA-TYPE-005`). Reserved now so the
   hole never opens.
+
+### The regex dialect (normative · locked)
+
+« No backreferences or lookaround » alone does not make two engines
+agree — the dialect is a **closed whitelist**, validated identically by
+both evaluators at declaration time ·
+
+- **Accepted constructs** · literals · `.` · character classes
+  `[…]`/`[^…]` (ranges · the classes below) · the perl classes `\d \D
+  \w \W \s \S` · escaped metacharacters (`\.` `\+` …) · quantifiers
+  `* + ?` and `{m}` `{m,}` `{m,n}` (greedy only) · alternation `|` ·
+  groups `(…)` and `(?:…)` · anchors `^` `$`.
+- **Refused at declaration** (out of dialect · `NIKA-TYPE-006`) ·
+  backreferences (`\1`…) · lookaround (`(?=` `(?!` `(?<=` `(?<!`) ·
+  named groups (`(?P<`/`(?<name>`) · inline flags (`(?i)` …) · lazy or
+  possessive quantifiers (`*?` `++` …) · `\b`/`\B` word boundaries ·
+  unicode property classes (`\p{…}`) · octal/hex classes beyond `\xHH`.
+- **Semantics** · matching is **unanchored search** (the JSON Schema
+  `pattern` convention — anchor explicitly with `^…$`) · `.` does not
+  match newline · the perl classes are **Unicode-aware** in the engine
+  and the reference evaluator (a provider judging the lowered schema
+  may be more or less generous — the ENGINE is the judge, the lowered
+  pattern is advisory transport).
+- **Limits** · a pattern is ≤ 512 characters · engines MUST match in
+  linear time (the dialect is regular — RE2-class).
+- **Invalid or out-of-dialect pattern** = `NIKA-TYPE-006` at
+  declaration, in BOTH evaluators, with the offending construct named.
 
 ## `returns:` · the task's output contract (normative)
 
@@ -225,11 +292,15 @@ tasks:
     returns: { object: { count: integer, mean: number } }
 ```
 
-- `decode:` applies to the captured **string** stream (`capture:
-  stdout` · `stderr` · `combined`) · `text` (default — the value is the
-  string, trailing newline trimmed as today) · `json` (parse one JSON
-  document) · `jsonl` (parse newline-delimited JSON into an array) ·
-  `bytes` (no decoding · the value is opaque bytes).
+- `decode:` applies to the captured **raw byte stream** (`capture:
+  stdout` · `stderr` · `combined`) — the pipeline is
+  `raw bytes → decode → value`, never `bytes → lossy string → decode` ·
+  `text` (default — strict UTF-8; invalid UTF-8 settles the task
+  `failure`, honestly: an author who wants octets says `bytes`;
+  trailing newline trimmed as today) · `json` (parse one JSON document
+  from the bytes) · `jsonl` (newline-delimited JSON into an array) ·
+  `bytes` (no decoding · the value is the opaque octets, base64 at any
+  JSON boundary).
 - `decode:` with `capture: structured` is rejected (`NIKA-PARSE-025`) —
   the structured capture *is* already an object
   (`{ stdout, stderr, exit_code }`); a `returns:` on such a task types
@@ -247,14 +318,22 @@ tasks:
 
 A `with:` binding's type is **derived, never declared** ·
 
-- `with.x` bound to `${{ tasks.P.output }}` has type
-  `optional<returns(P)>` — optional because a **skipped** producer
-  passes a value edge and reads defined-`null`
-  ([03 §gate algebra](./03-dag.md#the-gate-algebra-v2-normative) ·
-  [04 §value rendering](./04-variables.md)). A consumer that runs only
-  on `after: { P: succeeded }` + reads the same binding still types it
-  `optional` — the type follows the edge, not the gate (simple, uniform,
-  and safe: `null`-handling is never a surprise).
+- `with.x` bound to `${{ tasks.P.output }}` has the producer's
+  **business type — `returns(P)`, unpolluted**. That a task may settle
+  `skipped` is an OUTCOME fact (`Outcome(P) = Success(T) · Skipped ·
+  Failure · Cancelled` — the Outcome IR of W5), never a silent rewrite
+  of its contract into `union[T, null]`.
+  **Explicit W2-compatibility decision (debt · witness W2-Q3, owed
+  W5)** · under W2's gate algebra a skipped producer passes a value
+  edge and the binding reads defined-`null`
+  ([03 §gate algebra](./03-dag.md#the-gate-algebra-v2-normative)) —
+  a run-time state the static type deliberately does NOT fold into
+  `returns(P)`. A consumer that must branch on availability reads the
+  `.status` observation (the closed enum) — availability is observed,
+  never typed. The Outcome IR resolves the debt properly; until then
+  the gap is NAMED here, pinned by a runtime witness fixture and a
+  property in both evaluators, and is a decision — not a consequence
+  of the type core.
 - A deep read (`tasks.P.output.count`) types as the walked field type.
 - `.status` observations type `{ enum: ["success","failure","skipped","cancelled"] }`
   (the closed vocabulary of [03](./03-dag.md) — `NIKA-DAG-007` guards the

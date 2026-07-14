@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-TYPE-001",
+      "category": "validation_error"
+    }
+  ],
+  "note": "09-types.md \u00a7optional is presence \u00b7 optional is a field-presence modifier \u2014 a nullable value is union: [T, null]."
+}

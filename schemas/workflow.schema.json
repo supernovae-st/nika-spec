@@ -844,12 +844,16 @@
       ]
     },
     "typeExpr": {
-      "description": "A Nika type expression (spec 09-types.md · closed v1 grammar)",
+      "description": "A Nika type expression (spec 09-types.md · closed v1 grammar · optional is FIELD-ONLY, see fieldTypeExpr)",
       "oneOf": [
         {
+          "type": "null",
+          "description": "the bare YAML null scalar spells the null type"
+        },
+        {
           "type": "string",
-          "pattern": "^(null|bool|integer|number|string|bytes|uri|path|duration|money|timestamp|[A-Z][A-Za-z0-9]*)$",
-          "description": "a primitive name or a declared PascalCase type reference"
+          "pattern": "^(null|bool|integer|number|string|bytes|uri|path|duration|timestamp|[A-Z][A-Za-z0-9]*)$",
+          "description": "a primitive name or a declared PascalCase type reference (money/result/artifact/secret are reserved — the checker refuses them with their wave)"
         },
         {
           "type": "object",
@@ -865,7 +869,7 @@
             "object": {
               "type": "object",
               "additionalProperties": {
-                "$ref": "#/$defs/typeExpr"
+                "$ref": "#/$defs/fieldTypeExpr"
               }
             },
             "additional": {
@@ -877,9 +881,6 @@
               "items": {
                 "$ref": "#/$defs/typeExpr"
               }
-            },
-            "optional": {
-              "$ref": "#/$defs/typeExpr"
             },
             "enum": {
               "type": "array",
@@ -918,7 +919,8 @@
               "additionalProperties": false,
               "properties": {
                 "pattern": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 512
                 },
                 "min_len": {
                   "type": "integer",
@@ -932,6 +934,26 @@
             }
           },
           "additionalProperties": false
+        }
+      ]
+    },
+    "fieldTypeExpr": {
+      "description": "A field slot (spec 09 §optional is presence): a type expression, or { optional: T } — the presence modifier is legal ONLY here",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/typeExpr"
+        },
+        {
+          "type": "object",
+          "required": [
+            "optional"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "optional": {
+              "$ref": "#/$defs/typeExpr"
+            }
+          }
         }
       ]
     }

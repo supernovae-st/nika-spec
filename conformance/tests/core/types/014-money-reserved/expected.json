@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-TYPE-001",
+      "category": "validation_error"
+    }
+  ],
+  "note": "09-types.md \u00a7reserved \u00b7 money lands with the decision core (fixed-point + ISO-4217 \u00b7 never binary floats)."
+}
