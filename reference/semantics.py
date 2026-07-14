@@ -77,7 +77,7 @@ AFTER_PREDICATES = {
     "terminal": set(TERMINAL),
 }
 
-REF = re.compile(r"\$\{\{\s*tasks\.([A-Za-z0-9_-]+)\.(output|status|error|duration_ms)[^}]*\}\}")
+REF = re.compile(r"\$\{\{\s*tasks\.([A-Za-z0-9_-]+)\.(output|status|cause|error|duration_ms)[^}]*\}\}")
 
 
 class ModelError(Exception):
