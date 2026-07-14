@@ -40,6 +40,7 @@ FULL_ORDER = [
     "spec/06-stdlib-contract.md",
     "spec/07-conformance.md",
     "spec/08-out-of-scope.md",
+    "spec/09-types.md",
     "stdlib/builtins-v0.1.md",
     "stdlib/providers-v0.1.md",
     "stdlib/extract-modes-v0.1.md",
@@ -78,12 +79,13 @@ autocomplete + validation via a `yaml-language-server` modeline:
 - [Overview]({RAW}/spec/00-overview.md): what Nika is · the five design pillars
 - [Envelope]({RAW}/spec/01-envelope.md): the `nika: v1` marker · top-level shape
 - [Verbs]({RAW}/spec/02-verbs.md): the four closed verbs · infer · exec · invoke · agent
-- [DAG]({RAW}/spec/03-dag.md): task ordering · needs · fan-out · when-gates
+- [DAG]({RAW}/spec/03-dag.md): the two doors — with: data edges · after: control · gate v2 · fan-out
 - [Variables]({RAW}/spec/04-variables.md): the five namespaces · CEL + jq expressions
 - [Errors]({RAW}/spec/05-errors.md): the NIKA-XXX code contract · {c["error_namespaces"]} namespaces
 - [Stdlib contract]({RAW}/spec/06-stdlib-contract.md): {c["builtins"]} builtins · {c["providers"]} providers · {c["extract_modes"]} extract modes
 - [Conformance]({RAW}/spec/07-conformance.md): three levels · the fixture suite · editor tooling
 - [Out of scope]({RAW}/spec/08-out-of-scope.md): what Nika deliberately does not do
+- [Types]({RAW}/spec/09-types.md): the decidable type core · types: · returns: · decode:
 
 ## Reference
 
@@ -95,7 +97,7 @@ autocomplete + validation via a `yaml-language-server` modeline:
 
 ## Optional
 
-- [Extract modes]({RAW}/stdlib/extract-modes-v0.1.md): the {c["extract_modes"]} `nika:extract` modes
+- [Extract modes]({RAW}/stdlib/extract-modes-v0.1.md): the {c["extract_modes"]} `nika:fetch` extract modes
 - [Registry contract]({RAW}/registry/registry-v0.1.md): how artifacts are shared — entries, trust model, advisories
 - [Changelog]({RAW}/CHANGELOG.md): spec evolution log
 - [Reference engine](https://github.com/supernovae-st/nika): Rust · AGPL-3.0 · `brew install supernovae-st/tap/nika`
