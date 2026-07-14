@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from type_core import lower, parse_type, subtype  # noqa: E402
+from type_core import fits, lower, parse_type, subtype  # noqa: E402
 
 CHECKS: list[tuple[str, bool]] = []
 
@@ -106,6 +106,24 @@ for expr in ("null", "bool", "integer", "number", "string", "bytes", "uri",
         law(f"lowering total on {expr!r}"[:60], True)
     except Exception:  # noqa: BLE001 — the law IS "never raises"
         law(f"lowering total on {expr!r}"[:60], False)
+
+# ── runtime fit laws (spec 09 · the TYPE-101 judgment) ──────────────────
+law("fit · value inhabits its object", fits({"count": 3}, t({"object": {"count": "integer"}}), N))
+law("fit · wrong member type refuses", not fits({"count": "three"}, t({"object": {"count": "integer"}}), N))
+law("fit · closed object refuses extras",
+    not fits({"count": 3, "x": 1}, t({"object": {"count": "integer"}}), N))
+law("fit · additional admits extras",
+    fits({"count": 3, "x": 1}, t({"object": {"count": "integer"}, "additional": True}), N))
+law("fit · optional absent ok", fits({}, t({"object": {"b": {"optional": "string"}}}), N))
+law("fit · 3.0 is an integer · 3.5 is not",
+    fits(3.0, t("integer"), N) and not fits(3.5, t("integer"), N))
+law("fit · bool is NOT an integer", not fits(True, t("integer"), N))
+law("fit · enum membership", fits("high", t({"enum": ["low", "high"]}), N)
+    and not fits("mid", t({"enum": ["low", "high"]}), N))
+law("fit · null needs an optional", fits(None, t({"optional": "string"}), N)
+    and not fits(None, t("string"), N))
+law("fit · array elements judged", fits(["a"], t({"array": "string"}), N)
+    and not fits(["a", 1], t({"array": "string"}), N))
 
 bad = [n for n, ok in CHECKS if not ok]
 print(f"type-core selftest · {len(CHECKS) - len(bad)}/{len(CHECKS)} laws hold")

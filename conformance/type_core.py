@@ -379,3 +379,63 @@ def subtype(a: dict, b: dict, named: dict[str, dict]) -> bool:
                 return False
         return True
     return False
+
+# ── runtime fit · does a decoded VALUE inhabit a type? (spec 09) ─────────
+
+def fits(value, t: dict, named: dict[str, dict]) -> bool:
+    """value ∈ T — the run-time half of the contract (`NIKA-TYPE-101`
+    when an exec/invoke decoded value escapes its returns:). String
+    newtypes check the FAMILY only (the format is the static contract);
+    refined-string patterns are static-only here (no regex engine
+    dependency — documented honest gap, both evaluators agree)."""
+    if "ref" in t:
+        rt = named.get(t["ref"])
+        return rt is not None and fits(value, rt, named)
+    if t == {"prim": "null"}:
+        return value is None
+    if "union" in t:
+        return any(fits(value, m, named) for m in t["union"])
+    if t.get("prim") == "bool":
+        return isinstance(value, bool)
+    if t.get("prim") == "integer":
+        return isinstance(value, int) and not isinstance(value, bool) or (
+            isinstance(value, float) and value.is_integer())
+    if t.get("prim") == "number":
+        return isinstance(value, (int, float)) and not isinstance(value, bool)
+    if t.get("prim") in ("string", "uri", "path", "duration", "money",
+                         "timestamp", "bytes"):
+        return isinstance(value, str)
+    if "enum" in t:
+        return isinstance(value, str) and value in t["enum"]
+    if t.get("refined") in ("integer", "number"):
+        if not isinstance(value, (int, float)) or isinstance(value, bool):
+            return False
+        if t["refined"] == "integer" and not (
+                isinstance(value, int) or float(value).is_integer()):
+            return False
+        b = t["bounds"]
+        return ("min" not in b or value >= b["min"]) and                ("max" not in b or value <= b["max"])
+    if t.get("refined") == "string":
+        if not isinstance(value, str):
+            return False
+        b = t["bounds"]
+        return ("min_len" not in b or len(value) >= b["min_len"]) and                ("max_len" not in b or len(value) <= b["max_len"])
+    if "array" in t:
+        return isinstance(value, list) and all(fits(v, t["array"], named) for v in value)
+    if "map" in t:
+        return isinstance(value, dict) and all(
+            isinstance(k, str) and fits(v, t["map"], named) for k, v in value.items())
+    if "object" in t:
+        if not isinstance(value, dict):
+            return False
+        fields = t["object"]
+        for k, ft in fields.items():
+            if k in value:
+                if not fits(value[k], ft, named):
+                    return False
+            elif not _is_optional(ft):
+                return False
+        if not t.get("additional") and any(k not in fields for k in value):
+            return False
+        return True
+    return True  # Unknown-class · gradual
