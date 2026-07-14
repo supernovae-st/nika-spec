@@ -740,6 +740,29 @@ read `null` · the diamond-join unlock) · `succeeded` is the strict gate ·
 `terminal` is the always-pattern (the report / cleanup / notify class —
 pair it with a `.status` observation to branch on what happened).
 
+### Static liveness (check-time · normative)
+
+The gate algebra is decidable **before any run**. `check` computes each
+task's statically-reachable settled-state set (a task with no `when:` and no
+skip route can never settle `skipped` · a literal `when: false` can never
+settle `success`/`failure` · `cancelled` is always reachable) and folds it
+along G_p ·
+
+- an incoming edge whose pass-set excludes **every** reachable producer
+  state makes the consumer **provably dead** — cancelled on every possible
+  run. That program is refused · **`NIKA-DAG-006`**. The same code covers a
+  `when:` gate that is false under every reachable combination of upstream
+  status observations. (This is why `after: {x: skipped}` on a producer
+  that cannot skip is a check error, not a silent never-fires edge.)
+- a status observation compared against a literal outside the vocabulary
+  (`success` · `failure` · `skipped` · `cancelled`) can never match — `==`
+  is always false, `!=` always true. Refused · **`NIKA-DAG-007`**, with a
+  did-you-mean fix (`'failed'` → `failure`).
+
+A literal `when: false` alone is **not** a finding — it is the documented
+never-pattern (feature-flag). The task settles `skipped` by explicit
+intent, and downstream edges judge that state like any other.
+
 ---
 
 ## DAG execution model
@@ -752,7 +775,9 @@ A conformant engine MUST ·
    `depends_on` refused (`NIKA-PARSE-024`)
 2. **Derive** · E_d from `with:` bindings (role per field shape) · E_c from
    `after:` (predicate per entry) · G_p = E_d ∪ E_c · detect cycles
-   (`NIKA-DAG-001`) · record E_r/E_f for projection + recovery/cleanup
+   (`NIKA-DAG-001`) · refuse statically dead tasks + out-of-vocabulary
+   status literals (`NIKA-DAG-006` · `NIKA-DAG-007` · §static liveness) ·
+   record E_r/E_f for projection + recovery/cleanup
 3. **Schedule** · Kahn waves over G_p · execute each wave in parallel
    (engine MAY use a thread/task pool · configurable concurrency)
 4. **Admit** · per task, once all edge-producers settled · apply GATE-v2

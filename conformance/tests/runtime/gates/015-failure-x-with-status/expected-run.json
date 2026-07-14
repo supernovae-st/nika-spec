@@ -1,0 +1,16 @@
+{
+  "workflow_state": "failure",
+  "tasks": {
+    "c": {
+      "status": "success",
+      "output_contains": "p was failure"
+    },
+    "p": {
+      "status": "failure"
+    },
+    "seed": {
+      "status": "success"
+    }
+  },
+  "note": "gate-v2 matrix \u00b7 failure \u00d7 with-status \u00b7 statuses authored by reference/semantics.py (the model defines \u00b7 the engine follows)"
+}

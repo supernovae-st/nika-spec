@@ -9,6 +9,8 @@
 #         NIKA-DAG-001  cycle in G_p = E_d ∪ E_c (including self-dependency)
 #         NIKA-DAG-002  with:/after: references an undeclared task
 #         NIKA-DAG-005  after: predicate outside the closed set
+#         NIKA-DAG-006  statically dead task (03 §static liveness · conservative fold)
+#         NIKA-DAG-007  status literal outside the vocabulary
 #         NIKA-PARSE-024  depends_on is dead (data → with: · control → after:)
 #         NIKA-VAR-021  a tasks.* reference outside the boundary (03-dag.md ·
 #                       « anywhere — in when: · with: · any verb field … »)
@@ -498,6 +500,132 @@ def _schema_path_errors(doc: dict) -> list[dict]:
     return errs
 
 
+# Field → edge role → pass-set (03 §gate algebra v2 · mirrors the engine's
+# analyzer::edges::role_of_field). A named output is a value read.
+_PASS_ALL = frozenset({"success", "failure", "skipped", "cancelled"})
+_PASS_VALUE = frozenset({"success", "skipped"})
+_PASS_FAILURE_OBS = frozenset({"failure", "skipped"})
+_AFTER_PASS = {
+    "succeeded": frozenset({"success"}),
+    "failed": frozenset({"failure"}),
+    "skipped": frozenset({"skipped"}),
+    "terminal": _PASS_ALL,
+}
+TASK_FIELD_REF = re.compile(r"\btasks\.([a-z][a-z0-9_]*)\.([a-z][a-z0-9_]*)\b")
+
+
+def _binding_pass(field: str) -> frozenset:
+    if field in {"status", "duration_ms", "started_at", "ended_at"}:
+        return _PASS_ALL          # terminal-observation
+    if field == "error":
+        return _PASS_FAILURE_OBS  # failure-observation
+    return _PASS_VALUE            # value (output · named output)
+
+
+def _static_liveness_errors(tasks, idset) -> list[dict]:
+    """NIKA-DAG-006 · fold reachable settled-state sets over G_p (acyclic
+    by the time this runs). `when:` literal false → {skipped}; literal
+    true/absent → {success·failure}; a string expression widens to all
+    three; for_each / on_error.skip add skipped; cancelled always reachable."""
+    errs: list[dict] = []
+    by_id = dict(tasks)
+    possible: dict[str, frozenset] = {}
+
+    def incoming(t: dict) -> list[tuple[str, frozenset, str]]:
+        edges = []
+        for body in _expr_bodies_raw(t.get("with")):
+            for producer, field in TASK_FIELD_REF.findall(body):
+                if producer in idset:
+                    edges.append((producer, _binding_pass(field), "with"))
+        raw_after = t.get("after")
+        for target, pred in (raw_after if isinstance(raw_after, dict) else {}).items():
+            if isinstance(target, str) and target in idset \
+                    and isinstance(pred, str) and pred in _AFTER_PASS:
+                edges.append((target, _AFTER_PASS[pred], f"after: {pred}"))
+        return edges
+
+    def fold(tid: str) -> frozenset:
+        if tid in possible:
+            return possible[tid]
+        t = by_id[tid]
+        alive = True
+        for producer, mask, door in incoming(t):
+            if not (fold(producer) & mask):
+                alive = False
+                errs.append({
+                    "code": "NIKA-DAG-006", "category": "validation_error",
+                    "detail": f"task '{tid}' is statically dead — the {door} "
+                              f"edge from '{producer}' can never admit "
+                              f"(producer settles only "
+                              f"{{{' · '.join(sorted(fold(producer)))}}})"})
+        states = {"cancelled"}
+        if alive:
+            when = t.get("when", True)
+            if when is False:
+                states.add("skipped")   # the documented never-pattern
+            elif when is True:
+                states.update({"success", "failure"})
+            else:
+                states.update({"success", "failure", "skipped"})
+            if "for_each" in t:
+                states.add("skipped")
+        on_error = t.get("on_error")
+        if isinstance(on_error, dict) and on_error.get("skip") is True:
+            states.add("skipped")
+        possible[tid] = frozenset(states)
+        return possible[tid]
+
+    for tid, _ in tasks:
+        fold(tid)
+    return errs
+
+
+_STATUS_CMP = re.compile(
+    r"(?:with\.([a-z][a-z0-9_]*)\s*(?:==|!=)\s*'([^']*)'"
+    r"|'([^']*)'\s*(?:==|!=)\s*with\.([a-z][a-z0-9_]*))")
+
+
+def _status_vocabulary_errors(tasks) -> list[dict]:
+    """NIKA-DAG-007 · a status observation compared against a literal
+    outside {success·failure·skipped·cancelled} never matches. Conservative:
+    ==/!= against a single-quoted literal on a direct `.status` binding."""
+    errs: list[dict] = []
+    vocab = {"success", "failure", "skipped", "cancelled"}
+    for tid, t in tasks:
+        status_bindings = set()
+        with_block = t.get("with")
+        if isinstance(with_block, dict):
+            for name, expr in with_block.items():
+                if isinstance(expr, str):
+                    islands = EXPR_BODY.findall(expr)
+                    if len(islands) == 1 and re.fullmatch(
+                            r"\s*tasks\.[a-z][a-z0-9_]*\.status\s*", islands[0]):
+                        status_bindings.add(name)
+        when = t.get("when")
+        if not (status_bindings and isinstance(when, str)):
+            continue
+        for body in EXPR_BODY.findall(when):
+            for m in _STATUS_CMP.finditer(body):
+                name = m.group(1) or m.group(4)
+                lit = m.group(2) if m.group(1) else m.group(3)
+                if name in status_bindings and lit not in vocab:
+                    errs.append({
+                        "code": "NIKA-DAG-007", "category": "validation_error",
+                        "detail": f"task '{tid}' when: compares a status "
+                                  f"observation against '{lit}' — not in the "
+                                  "vocabulary {success · failure · skipped · "
+                                  "cancelled}"})
+    return errs
+
+
+def _expr_bodies_raw(value):
+    """Every `${{ ... }}` body WITH string literals intact (the liveness
+    fold reads task-field refs; the vocabulary scan reads the literals)."""
+    for s in _strings(value):
+        for m in EXPR_BODY.finditer(s):
+            yield m.group(1)
+
+
 def cross_ref_errors(doc: dict) -> list[dict]:
     """The engine-parse cross-reference rules (beyond JSON Schema)."""
     errs: list[dict] = []
@@ -566,13 +694,26 @@ def cross_ref_errors(doc: dict) -> list[dict]:
         return False
 
     # a self-edge is a 1-cycle (a after a · a with-ref to itself)
+    self_cycle = False
     for tid in graph:
         if tid in graph[tid]:
+            self_cycle = True
             errs.append({"code": "NIKA-DAG-001", "category": "validation_error",
                          "detail": f"task '{tid}' edges to itself (1-cycle)"})
-    if any(color[n] == WHITE and dfs(n) for n in graph):
+    has_cycle = any(color[n] == WHITE and dfs(n) for n in graph)
+    if has_cycle:
         errs.append({"code": "NIKA-DAG-001", "category": "validation_error",
                      "detail": "cycle detected in G_p = E_d ∪ E_c"})
+
+    # NIKA-DAG-006 / NIKA-DAG-007 · static liveness (03 §static liveness).
+    # The CONSERVATIVE mirror of the engine's gate-v2 abstract evaluator:
+    # fold each task's reachable settled-state set over G_p edge pass-sets.
+    # A string `when:` widens to {success·failure·skipped} (the engine's
+    # status-observation judge can refuse MORE — this oracle only refuses
+    # what is provably dead from structure alone, never a valid program).
+    if not (has_cycle or self_cycle):
+        errs.extend(_static_liveness_errors(tasks, idset))
+    errs.extend(_status_vocabulary_errors(tasks))
 
     # NIKA-VAR-021 · a tasks.* reference outside the boundary (04 §the
     # reference boundary) · body fields read LOCAL names only — hoist into

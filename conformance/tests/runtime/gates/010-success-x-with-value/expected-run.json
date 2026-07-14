@@ -1,0 +1,16 @@
+{
+  "workflow_state": "success",
+  "tasks": {
+    "c": {
+      "status": "success",
+      "output_contains": "got the producer speaks"
+    },
+    "p": {
+      "status": "success"
+    },
+    "seed": {
+      "status": "success"
+    }
+  },
+  "note": "gate-v2 matrix \u00b7 success \u00d7 with-value \u00b7 statuses authored by reference/semantics.py (the model defines \u00b7 the engine follows)"
+}
