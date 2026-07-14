@@ -295,7 +295,7 @@ error_codes:
     - { code: NIKA-TYPE-003, category: validation_error, transient: "false", failure: "returns: and schema: on the same task — one contract, one spelling" }
     - { code: NIKA-TYPE-004, category: validation_error, transient: "false", failure: "returns: type unreachable from the declared decode: (an object contract over decode: text · …)" }
     - { code: NIKA-TYPE-005, category: security_error, transient: "false", failure: "a secret-carrying type in a lowered position (reserved with secret<T> · W4)" }
-    - { code: NIKA-TYPE-006, category: validation_error, transient: "false", failure: "regex pattern outside the locked dialect (backreference · lookaround · named group · inline flags · lazy/possessive · \\b · \\p — spec 09 §the regex dialect)" }
+    - { code: NIKA-TYPE-006, category: validation_error, transient: "false", failure: "regex pattern outside the locked dialect (backreference · lookaround · named group · inline flags · lazy/possessive · word-boundary · unicode-class — spec 09 §the regex dialect)" }
     - { code: NIKA-TYPE-101, category: validation_error, transient: "false", failure: "run-time contract violation — the decoded value does not fit returns: (exec:/invoke: lane)" }
     - { code: NIKA-VAR-001, category: variable_error, transient: "false", failure: "unresolved reference (unknown namespace entry · undeclared env/vars key)" }
     - { code: NIKA-VAR-002, category: variable_error, transient: "false", failure: "binding cardinality — a jq binding emitted zero or multiple values" }
