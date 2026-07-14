@@ -66,6 +66,24 @@ counts:
   mcp_tools: 9
   mcp_protocol_versions: 5
 
+# ------------------------------------------- outcome transitions (spec 13 · W5)
+# THE normative (class × cause) table — machine-readable so the reference
+# evaluator (outcome_core.py) and the engine (vendored pack) consume ONE
+# source. Any pair outside this table is an engine bug, never a state.
+outcome_transitions:
+  trace_format: 2
+  classes: [success, failure, skipped, cancelled]
+  legal:
+    success: [normal, recovered]
+    failure: [verb_error, timeout, retry_exhausted]
+    skipped: [gate, error_skip]
+    cancelled: [upstream, operator, budget]
+  payload:
+    success: [value, attempts, "recovered_from?"]
+    failure: [error, attempts]
+    skipped: ["error?"]
+    cancelled: [reason]
+
 # ---------------------------------------------------------------- verbs
 # D-2026-05-22-N18 · "the count is 4, absolute · immutable forever".
 # A verb = a distinct native execution model · fetch is NOT a verb (it is the
