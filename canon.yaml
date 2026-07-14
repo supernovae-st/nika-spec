@@ -328,7 +328,7 @@ error_codes:
     - { code: NIKA-SEC-004, category: security_error, transient: "false", failure: "effect outside the declared permits: capability boundary (fs/net/exec/tool)" }
     - { code: NIKA-SEC-005, category: security_error, transient: "false", failure: "SSRF block — a nika:fetch/nika:notify URL resolves to a loopback/private/link-local/metadata target (always-on engine floor · independent of permits:)" }
     - { code: NIKA-SEC-006, category: security_error, transient: "false", failure: "secret flow — a secrets.<name> value reaches an unsanctioned sink (exec argument · invoke payload · infer/agent prompt) · the diagnostic carries the taint path + the egress clause that would sanction it (spec 10 · flow rules in 01 §egress)" }
-    - { code: NIKA-SEC-007, category: security_error, transient: "false", failure: "secret egress — a tainted value reaches the workflow boundary (outputs:) · the diagnostic carries the taint path (spec 10 · to: \"outputs\" sanction in 01 §egress)" }
+    - { code: NIKA-SEC-007, category: security_error, transient: "false", failure: "secret egress — a tainted value reaches the workflow boundary (outputs:) · the diagnostic carries the taint path (spec 10 · the to: outputs sanction in 01 §egress)" }
     - { code: NIKA-TIMEOUT-001, category: timeout_error, transient: "false", failure: "task (or for_each iteration) exceeded timeout:" }
     - { code: NIKA-CANCEL-001, category: cancelled, transient: "false", failure: "task cancelled (workflow failure gate · user cancellation)" }
     - { code: NIKA-BUILTIN-001, category: validation_error, transient: "false", failure: "builtin invoke violates its statically-checkable arg contract (e.g. nika:fetch without url: · nika:jq arg shape)" }
