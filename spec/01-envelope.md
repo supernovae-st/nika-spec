@@ -586,7 +586,6 @@ tasks:
       prompt: "Research the topic · ${{ vars.topic }} · in 5 paragraphs"
 
   write:
-    depends_on: [research]
     with:
       content: ${{ tasks.research.output }}
     invoke:
