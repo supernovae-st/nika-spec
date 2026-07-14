@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-TYPE-004",
+      "category": "validation_error"
+    }
+  ],
+  "note": "09-types.md \u00a7decode \u00b7 an object contract needs decode: json/jsonl (default decode is text)."
+}

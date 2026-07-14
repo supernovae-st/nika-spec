@@ -39,6 +39,14 @@ no clocks, no randomness, no I/O.
 
 from __future__ import annotations
 
+import json
+import sys as _sys
+from pathlib import Path as _Path
+
+_sys.path.insert(0, str(_Path(__file__).resolve().parent.parent / "conformance"))
+from type_core import parse_type as tc_parse  # noqa: E402
+from type_core import fits as tc_fits  # noqa: E402
+
 import re
 
 import yaml
@@ -109,6 +117,24 @@ def parse(text: str) -> dict:
         cmd = exec_block.get("command")
         if not isinstance(cmd, list) or not cmd:
             raise ModelError(f"{tid}: this model covers exec argv tasks only")
+        # W3 · decode + returns over `echo <payload>` (the differential's
+        # typed slice): decode json parses argv[1] · a returns contract is
+        # judged by the reference type core (fit ⊑ · NIKA-TYPE-101 class).
+        decode_fails = False
+        fit_fails = False
+        if exec_block.get("decode") == "json" and cmd[0] == "echo":
+            payload = cmd[1] if len(cmd) > 1 else ""
+            try:
+                decoded = json.loads(payload)
+            except (ValueError, TypeError):
+                decode_fails = True
+                decoded = None
+            ret = t.get("returns")
+            if not decode_fails and ret is not None:
+                names = set(doc.get("types") or {})
+                rt = tc_parse(ret, names, f"{tid}.returns")
+                if not tc_fits(decoded, rt, {}):
+                    fit_fails = True
         # E_d — with bindings, one edge per ref, role per field (G11)
         for _name, expr in (t.get("with") or {}).items():
             edges.extend(_edges_of_binding(tid, expr))
@@ -131,7 +157,7 @@ def parse(text: str) -> dict:
         elif on_error.get("fail_workflow") is True:
             armor = ("fail_workflow", None)
         tasks[tid] = {
-            "fails": cmd[0] == "false",
+            "fails": cmd[0] == "false" or decode_fails or fit_fails,
             "when": bool(when),
             "attempts": 1 + int((t.get("retry") or {}).get("max_attempts") or 0),
             "armor": armor,

@@ -671,6 +671,7 @@ outputs:                              # what the workflow returns · symmetric t
 | [06 stdlib contract](./06-stdlib-contract.md) | How the stdlib versions independently |
 | [07 conformance](./07-conformance.md) | What « v0.1-compliant » means |
 | [08 out of scope](./08-out-of-scope.md) | Explicit defer list (memory · macros · etc.) |
+| [09 types](./09-types.md) | The decidable type core · `types:` · `returns:` · `decode:` · the lattice · JSON-Schema lowering |
 
 **Stdlib** (versioned independently · not a spec section) · [stdlib/](../stdlib/): **<!-- canon:providers -->16<!-- /canon --> providers · <!-- canon:extract_modes -->9<!-- /canon --> extract modes · <!-- canon:builtins -->27<!-- /canon --> builtins** (6 core · 5 file · 8 data · 2 network · 2 introspection · 4 media).
 
@@ -739,6 +740,10 @@ workflow:                               # required · the workflow object (W1: t
 
 # Workflow-level default model · any task may override · <provider>/<name>
 model: ollama/qwen3.5:4b         # optional · anthropic/claude-sonnet-4-6 for cloud
+
+# Named types · referenced by returns:/outputs: (09-types.md)
+types:
+  Summary: { object: { title: string, bullets: { array: string } } }
 
 # Inputs · available as ${{ vars.<name> }} · untyped OR typed
 vars:
@@ -871,6 +876,22 @@ backend and decides local-vs-cloud (`ollama/` · `lmstudio/` = local · the rest
 
 A task may override this. If absent · each `infer:`/`agent:` task must specify
 its own `model:`.
+
+### `types` · *optional · named type declarations*
+
+```yaml
+types:
+  Summary:
+    object:
+      title: string
+      bullets: { array: string }
+```
+
+Named, PascalCase, acyclic type declarations — referenced by task
+`returns:` and typed `outputs:`. The grammar, the subtyping lattice and
+the JSON-Schema lowering are the whole of [09-types.md](./09-types.md);
+the envelope only owns the block's position. Unknown names are
+`NIKA-TYPE-001` · recursion is `NIKA-TYPE-002`.
 
 ### `vars` · *optional · workflow inputs · untyped OR typed*
 
@@ -1159,7 +1180,7 @@ outputs:
   # Typed form — declares the return shape · powers the callable-workflow output schema
   report:
     value: ${{ tasks.write_report.output }}
-    type: string
+    type: string                # flat enum today — widens to 09-types.md with typed vars: (G9 · one break)
     description: "The final markdown brief"
 ```
 
@@ -1463,7 +1484,7 @@ research:
 | `model` | no | string | Override workflow default · `<provider>/<name>` · see stdlib/providers-v0.1.md |
 | `temperature` | no | number 0-2 | Sampling temperature |
 | `max_tokens` | no | integer | Max output tokens · provider-dependent default |
-| `schema` | no | object | JSON Schema · structured output validation |
+| `schema` | no | object | raw JSON Schema · structured output validation — the **out-of-core hatch**; the typed door is task-level `returns:` ([09](./09-types.md) · both on one task = `NIKA-TYPE-003`) |
 | `thinking` | no | object | Extended thinking · `{ enabled, budget_tokens }` |
 | `vision` | no | array | Image inputs · each `{ source: file|url, path|url, … }` |
 
@@ -1513,7 +1534,8 @@ test:
 | `cwd` | no | string | Working directory · default = engine's cwd |
 | `env` | no | object | OS environment variables for **this subprocess** · key→value map |
 | `stdin` | no | string | Stdin data · may use `${{ ... }}` |
-| `capture` | no | enum | `stdout` (default) · `stderr` · `combined` · `structured` (= `{ stdout, stderr, exit_code }`) |
+| `capture` | no | enum | `stdout` (default) · `stderr` · `combined` · `structured` (= `{ stdout, stderr, exit_code }`) — the **source** |
+| `decode` | no | enum | `text` (default) · `json` · `jsonl` · `bytes` — how the captured **string** becomes a value ([09 §decode](./09-types.md#decode--how-exec-bytes-become-a-value-normative)) · illegal with `capture: structured` (`NIKA-PARSE-025` — that capture already IS an object) · a non-parsing stream settles the task `failure` inside `on_error:` scope |
 
 > **`exec.env` ≠ the envelope `env:`**: different scopes, same word (the one
 > overlap to know). The envelope `env:` is *workflow config* read via
@@ -1693,7 +1715,7 @@ research:
 | `max_turns` | no | integer | Loop limit · default 10 |
 | `max_tokens_total` | no | integer | Cumulative token budget · default engine-configurable |
 | `temperature` | no | number 0-2 | Sampling temperature |
-| `schema` | no | object | JSON Schema · validates the agent's **final message** as structured output (same contract as `infer.schema:`) · `.output` becomes the matching object |
+| `schema` | no | object | raw JSON Schema · validates the agent's **final message** as structured output (same contract as `infer.schema:` · the out-of-core hatch — the typed door is `returns:` · [09](./09-types.md)) · `.output` becomes the matching object |
 
 ### Loop semantics
 
@@ -1950,6 +1972,7 @@ my_task:                        # the map KEY is the identity · snake_case · u
   timeout: "60s"                # optional · task-level timeout (Go duration string)
   infer:                        # required · one of the 4 verbs
     prompt: "... ${{ with.data }} ..."
+  returns: Summary              # optional · the OUTPUT CONTRACT (a named type or inline · 09-types.md)
   output:                       # optional · named jq bindings
     result: ".choices[0].message.content"
     tokens: ".usage.total_tokens"
@@ -2531,6 +2554,33 @@ surface**: it may read `tasks.*` (a fallback source is a settled record) —
 the reference is a *recovery edge* in the graph projection, and the
 anti-deadlock law (`NIKA-DAG-004` · the source must not be downstream of
 the declaring task) is unchanged.
+
+### `returns` · *optional · the output contract*
+
+```yaml
+summarize:
+  with: { article: "${{ tasks.fetch.output }}" }
+  infer:
+    prompt: "Summarize · ${{ with.article }}"
+  returns: Summary              # a name declared in types: — or an inline type expression
+```
+
+Declares **what `tasks.X.output` is** — the typed door. Per-verb
+mechanics (structured-output compilation for `infer:`/`agent:` ·
+`decode:` + run-time fit for `exec:` · refinement for `invoke:`), the
+type grammar, the lattice and the JSON-Schema lowering all live in
+[09-types.md](./09-types.md). Two laws to know from here ·
+
+- `returns:` and a verb-level `schema:` on one task = `NIKA-TYPE-003`
+  (one contract, one spelling — `schema:` stays the out-of-core hatch).
+- No `returns:` = the output is `Unknown` — gradual and honest: the
+  static walk stops, nothing is invented ([04](./04-variables.md)).
+
+Downstream, the contract types every value edge: a consumer binding
+`${{ tasks.X.output }}` imports `optional<returns(X)>` (a skipped
+producer reads defined-`null` · [09 §typed value edges](./09-types.md#typed-value-edges-normative)).
+
+---
 
 ### `output` · *optional · output binding*
 
@@ -3366,6 +3416,14 @@ is never refused) while making the declared-schema path the
 better-tooling path (one more reason structured output is the default
 authoring style).
 
+**`returns:` sharpens the walk (normative · [09-types.md](./09-types.md)).**
+When the producer declares a `returns:` type instead of a raw `schema:`,
+the walk runs on the type with **full precision**: the v1 type grammar
+has no open construct, so every level is walkable — a member outside a
+closed object is `NIKA-VAR-003` (the same code · one voice), and only
+`additional: true` or an `Unknown` producer opens a level. The raw
+`schema:` hatch keeps the weaker subset walk above.
+
 ### `${{ env.X }}` · environment variable
 
 ```yaml
@@ -3699,6 +3757,7 @@ Error codes follow the format `NIKA-<NAMESPACE>-<NNN>` where namespace is 2-9 up
 | `NIKA-MCP` | MCP client errors | 001-099 |
 | `NIKA-SEC` | Security policy violations (SSRF · blocklist) | 001-099 |
 | `NIKA-TIMEOUT` | Task or step timeouts | 001-099 |
+| `NIKA-TYPE` | Type core · contracts · lowering ([09-types.md](./09-types.md)) | 001-199 (001-099 static · 101+ runtime) |
 | `NIKA-CANCEL` | Task or workflow cancellation | 001-099 |
 | `NIKA-IMPL` | Engine internal errors | 001-099 |
 
@@ -3736,12 +3795,19 @@ these from this file alone.
 | `NIKA-PARSE-022` | `tasks:` is a sequence — it became a map keyed by task id | `validation_error` | false |
 | `NIKA-PARSE-023` | a task carries an `id:` field — the map key IS the identity | `validation_error` | false |
 | `NIKA-PARSE-024` | a task carries `depends_on:` — dead since W2 (data → `with:` bindings · control → `after:` predicates · `check --fix` migrates) | `validation_error` | false |
+| `NIKA-PARSE-025` | `decode:` with `capture: structured` — that capture already IS an object (`{stdout, stderr, exit_code}`) · type the object with `returns:` instead | `validation_error` | false |
 | `NIKA-DAG-001` | cycle in the precedence graph G_p = E_d ∪ E_c (incl. self-dependency · via `with:`/`after:`) | `validation_error` | false |
 | `NIKA-DAG-002` | `with:`/`after:` references an undeclared task | `validation_error` | false |
 | `NIKA-DAG-004` | `on_error.recover` references a task downstream of the declaring task (await would deadlock) | `validation_error` | false |
 | `NIKA-DAG-005` | `after:` predicate outside the closed set (`succeeded` · `failed` · `skipped` · `terminal`) | `validation_error` | false |
 | `NIKA-DAG-006` | statically dead task — an incoming edge’s pass-set excludes every reachable producer state, or the `when:` gate is false under every reachable upstream combination ([03 §gate algebra](./03-dag.md#the-gate-algebra-v2-normative)) | `validation_error` | false |
 | `NIKA-DAG-007` | status compared against a literal outside the vocabulary (`success` · `failure` · `skipped` · `cancelled`) — `==` never matches, `!=` always holds | `validation_error` | false |
+| `NIKA-TYPE-001` | unknown type name (in `types:` · `returns:` · an `outputs:` type) — did-you-mean when close | `validation_error` | false |
+| `NIKA-TYPE-002` | recursive type reference — the `types:` graph must be acyclic | `validation_error` | false |
+| `NIKA-TYPE-003` | `returns:` and `schema:` on the same task — one contract, one spelling | `validation_error` | false |
+| `NIKA-TYPE-004` | `returns:` type unreachable from the declared `decode:` (an object contract over `decode: text` · …) | `validation_error` | false |
+| `NIKA-TYPE-005` | a secret-carrying type in a lowered position (reserved with `secret<T>` · W4) | `security_error` | false |
+| `NIKA-TYPE-101` | run-time contract violation — the decoded value does not fit `returns:` (`exec:`/`invoke:` lane · `infer:`/`agent:` stay `NIKA-INFER-002`-class) | `validation_error` | false |
 | `NIKA-VAR-001` | unresolved reference (unknown namespace entry · undeclared `env`/`vars` key) | `variable_error` | false |
 | `NIKA-VAR-002` | binding cardinality — a jq binding emitted zero or multiple values (evaluation-time · data-dependent) | `variable_error` | false |
 | `NIKA-VAR-003` | provably-invalid path into a declared `schema:` (static walk · [04](./04-variables.md)) | `validation_error` | false |

@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: t
+tasks:
+  probe:
+    exec:
+      command: ["./run.sh"]
+      capture: structured
+      decode: json

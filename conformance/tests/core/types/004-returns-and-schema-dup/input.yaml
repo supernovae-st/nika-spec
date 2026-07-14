@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: t
+tasks:
+  s:
+    infer:
+      prompt: "x"
+      schema: { type: object, properties: { a: { type: string } } }
+    returns: { object: { a: string } }

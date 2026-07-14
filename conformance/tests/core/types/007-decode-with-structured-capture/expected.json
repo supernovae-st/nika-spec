@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-PARSE-025",
+      "category": "validation_error"
+    }
+  ],
+  "note": "02-verbs \u00a7decode \u00b7 structured capture already IS an object \u2014 type it with returns:."
+}

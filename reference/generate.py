@@ -5,6 +5,7 @@ engine exists — until then it feeds the model's own property tests).
 Emits small valid workflows in the W2 grammar: task map · with bindings
 (.output / .status / .error refs → value / terminal-observation /
 failure-observation edges) · after predicates · when literals · exec argv
+· W3: decode+returns slices (json decode failure · TYPE-101 fit failure)
 [true]/[false] · retry and on_error armor. No depends_on — W2 kills it.
 Determinism: same seed → same bytes.
 """
@@ -60,8 +61,26 @@ def generate(seed: int) -> str:
             skippable = True
             wf_never_runs = True
         fails = rng.random() < 0.35
-        lines.append("    exec:")
-        lines.append(f"      command: [\"{'false' if fails else 'true'}\"]")
+        # W3 · a slice of tasks carries decode+returns: echo emits either
+        # valid JSON (decode+fit succeed) or junk (decode fails → failure)
+        # or a shape that misses the contract (fit fails → NIKA-TYPE-101).
+        typed = not fails and rng.random() < 0.30
+        if typed:
+            shape = rng.random()
+            if shape < 0.45:
+                payload, ok = '{\\"count\\": 3}', True          # decodes + fits
+            elif shape < 0.70:
+                payload, ok = 'not-json', False                 # decode failure
+            else:
+                payload, ok = '{\\"count\\": \\"three\\"}', False  # fit failure (TYPE-101)
+            lines.append("    exec:")
+            lines.append(f'      command: ["echo", "{payload}"]')
+            lines.append("      decode: json")
+            lines.append("    returns: { object: { count: integer }, additional: true }")
+            fails = not ok
+        else:
+            lines.append("    exec:")
+            lines.append(f"      command: [\"{'false' if fails else 'true'}\"]")
         if fails:
             if rng.random() < 0.20:
                 lines.append("    retry:")

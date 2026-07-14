@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-TYPE-001",
+      "category": "validation_error"
+    }
+  ],
+  "note": "09-types.md \u00b7 unknown type name \u2014 did-you-mean `Summary`."
+}
