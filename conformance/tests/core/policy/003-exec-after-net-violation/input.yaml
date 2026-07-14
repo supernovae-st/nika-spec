@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: t
+policy:
+  forbid:
+    exec_after: [net]
+permits:
+  exec: ["echo"]
+  net: { http: ["example.com"] }
+  tools: ["nika:fetch"]
+tasks:
+  fetch_page:
+    invoke:
+      tool: "nika:fetch"
+      args: { url: "https://example.com/data" }
+  act:
+    with: { body: "${{ tasks.fetch_page.output }}" }
+    exec: { command: ["echo", "${{ with.body }}"] }

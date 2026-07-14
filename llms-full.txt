@@ -672,6 +672,7 @@ outputs:                              # what the workflow returns · symmetric t
 | [07 conformance](./07-conformance.md) | What « v0.1-compliant » means |
 | [08 out of scope](./08-out-of-scope.md) | Explicit defer list (memory · macros · etc.) |
 | [09 types](./09-types.md) | The decidable type core · `types:` · `returns:` · `decode:` · the lattice · JSON-Schema lowering |
+| [10 authority](./10-authority.md) | The authority system · the effect vocabulary · `policy:` (named workflow law) · secret-flow codes · `certificate.effects` |
 
 **Stdlib** (versioned independently · not a spec section) · [stdlib/](../stdlib/): **<!-- canon:providers -->16<!-- /canon --> providers · <!-- canon:extract_modes -->9<!-- /canon --> extract modes · <!-- canon:builtins -->27<!-- /canon --> builtins** (6 core · 5 file · 8 data · 2 network · 2 introspection · 4 media).
 
@@ -996,7 +997,9 @@ By default, a `secrets.<name>` value reaching ANY effect, an `exec:` or
 `invoke:` sink, OR an `infer:`/`agent:` **prompt** (`prompt:` + `system:`),
 is a **blocking leak**: the engine masks its own output but cannot follow a
 secret a subprocess, a tool, or a third-party provider re-emits (`nika check`
-reports it · the workflow is refused). An `infer:`/`agent:` prompt is a
+refuses the workflow — `NIKA-SEC-006`, the taint path in the diagnostic;
+a tainted value reaching `outputs:` is `NIKA-SEC-007` ·
+[10 §secret flow](./10-authority.md#secret-flow-refusals-carry-their-codes-normative)). An `infer:`/`agent:` prompt is a
 provider-egress sink like any other: a secret in it LEAVES the run to the
 provider, so it needs an explicit sanction (`egress: [{ to: "infer" }]` /
 `{ to: "agent" }`) exactly as a tool sink does.
@@ -3837,6 +3840,9 @@ these from this file alone.
 | `NIKA-SEC-003` | run-recursion bound — nested-run depth exceeded OR self-launching workflow | `security_error` | false |
 | `NIKA-SEC-004` | effect outside the declared `permits:` capability boundary (fs/net/exec/tool · [01 §permits](./01-envelope.md#permits--optional--the-declared-capability-boundary)) | `security_error` | false |
 | `NIKA-SEC-005` | SSRF block — a `nika:fetch`/`nika:notify` URL resolves to a loopback/private/link-local/metadata target (the always-on engine floor · independent of `permits:`, with ONE carve-out: an exact loopback literal in `permits.net.http` declassifies the floor for that host only · [01 §permits](./01-envelope.md#permits--optional--the-declared-capability-boundary)) | `security_error` | false |
+| `NIKA-SEC-006` | secret flow — a `secrets.<name>` value reaches an unsanctioned sink (an `exec:` argument · an `invoke:` payload · an `infer:`/`agent:` prompt) · the diagnostic carries the **taint path** + the exact `egress:` clause that would sanction it ([10 §secret flow](./10-authority.md#secret-flow-refusals-carry-their-codes-normative) · rules in [01 §egress](./01-envelope.md#egress--optional--sanctioned-destinations-declassification)) | `security_error` | false |
+| `NIKA-SEC-007` | secret egress — a tainted value reaches the workflow boundary (`outputs:` · where a result leaves the run) · the diagnostic carries the taint path ([10 §secret flow](./10-authority.md#secret-flow-refusals-carry-their-codes-normative)) | `security_error` | false |
+| `NIKA-POLICY-001` | a hard `policy:` rule is violated (`require.human_gate_before` · `forbid.exec_after` · `allow.providers` · `limits.max_tasks`) — the diagnostic names rule + task + witness · check-time, before any token ([10 §policy](./10-authority.md#the-policy-block--optional--named-workflow-law)) | `security_error` | false |
 | `NIKA-TIMEOUT-001` | task (or for_each iteration) exceeded `timeout:` | `timeout_error` | false |
 | `NIKA-CANCEL-001` | task cancelled (workflow failure gate · user cancellation) | `cancelled` | false |
 | `NIKA-BUILTIN-001` | builtin `invoke:` violates its statically-checkable arg contract (e.g. `nika:fetch` without `url:` · `nika:jq` arg shape) | `validation_error` | false |

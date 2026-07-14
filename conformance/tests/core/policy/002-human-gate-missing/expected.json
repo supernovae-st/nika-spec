@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-POLICY-001", "category": "security_error" }
+  ],
+  "note": "10-authority.md · require.human_gate_before: [exec] with no nika:prompt ancestor — the witness names the ungated task."
+}

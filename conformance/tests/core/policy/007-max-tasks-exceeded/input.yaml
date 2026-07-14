@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: t
+policy:
+  limits:
+    max_tasks: 2
+tasks:
+  a:
+    infer: { prompt: "one" }
+  b:
+    infer: { prompt: "two" }
+  c:
+    infer: { prompt: "three" }

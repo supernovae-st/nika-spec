@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-POLICY-001", "category": "security_error" }
+  ],
+  "note": "10-authority.md · a templated model: cannot be judged statically under a declared allowlist — fail-closed, pin the literal."
+}

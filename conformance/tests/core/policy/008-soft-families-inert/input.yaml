@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: t
+policy:
+  prefer:
+    providers: [ollama]
+  optimize: cost
+tasks:
+  s:
+    infer: { prompt: "summarize", model: "openai/gpt-4o" }

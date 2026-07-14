@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-POLICY-001", "category": "security_error" }
+  ],
+  "note": "10-authority.md · allow.providers — openai is not in the allowlist (the offending literal is the witness)."
+}

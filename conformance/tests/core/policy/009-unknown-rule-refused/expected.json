@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "namespace": "NIKA-PARSE", "category": "validation_error" }
+  ],
+  "note": "10-authority.md · the rule set is CLOSED — write_after is not a v1 rule (strict parse refusal, never a silent no-op)."
+}

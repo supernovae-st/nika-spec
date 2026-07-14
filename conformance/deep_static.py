@@ -559,3 +559,136 @@ def deep_static_errors(doc: dict) -> list[dict]:
                                                "permits.tools (the agent cannot exceed the file)"})
 
     return errs
+
+# ── POLICY · the hard families judged on the graph (spec 10-authority) ──
+
+# The effect-class table for policy rules — the COARSE projection of the
+# builtin classification (10 §the effect vocabulary · one voice with the
+# engine's builtin_effect table · fs split at its grain of harm: write).
+_POLICY_NET_TOOLS = {"nika:fetch", "nika:notify"}
+_POLICY_WRITE_TOOLS = {"nika:write", "nika:edit"}
+_HUMAN_GATE_TOOL = "nika:prompt"
+
+
+def _task_tool(t: dict) -> str | None:
+    inv = t.get("invoke")
+    if isinstance(inv, dict) and isinstance(inv.get("tool"), str):
+        return inv["tool"]
+    return None
+
+
+def _task_effect_classes(t: dict) -> set[str]:
+    """The policy effect classes a task carries (exec · write · net · tools)."""
+    out: set[str] = set()
+    if "exec" in t:
+        out.add("exec")
+    tool = _task_tool(t)
+    if tool is not None:
+        out.add("tools")
+        if tool in _POLICY_NET_TOOLS:
+            out.add("net")
+        if tool in _POLICY_WRITE_TOOLS:
+            out.add("write")
+    return out
+
+
+def _policy_graph(tasks: list) -> dict[str, set[str]]:
+    """tid → direct ancestor tids (E_d via with: refs ∪ E_c via after: keys) —
+    the same derived graph every judge reads (03 · with/after are the two
+    doors · a boundary-crossing ref outside them is NIKA-VAR-021 upstream)."""
+    import json as _json
+    ids = {tid for tid, _ in tasks}
+    up: dict[str, set[str]] = {tid: set() for tid, _ in tasks}
+    for tid, t in tasks:
+        refs: set[str] = set()
+        w = t.get("with")
+        if w is not None:
+            for body in EXPR_BODY.findall(_json.dumps(w)):
+                for m in re.finditer(r"tasks\.([a-z][a-z0-9_]*)", body):
+                    refs.add(m.group(1))
+        after = t.get("after")
+        if isinstance(after, dict):
+            refs.update(k for k in after if isinstance(k, str))
+        up[tid] = refs & ids
+    return up
+
+
+def _ancestors(up: dict[str, set[str]], tid: str) -> set[str]:
+    seen: set[str] = set()
+    stack = list(up.get(tid, ()))
+    while stack:
+        a = stack.pop()
+        if a in seen:
+            continue
+        seen.add(a)
+        stack.extend(up.get(a, ()))
+    return seen
+
+
+def policy_errors(doc: dict) -> list[dict]:
+    """The hard policy: families (spec 10) · require.human_gate_before ·
+    forbid.exec_after · allow.providers · limits.max_tasks. Soft families
+    (prefer/optimize) are recorded, never judged — no rule here reads them."""
+    pol = doc.get("policy")
+    if not isinstance(pol, dict):
+        return []
+    errs: list[dict] = []
+    tasks = iter_tasks(doc)
+    up = _policy_graph(tasks)
+    classes = {tid: _task_effect_classes(t) for tid, t in tasks}
+
+    def violation(detail: str) -> None:
+        errs.append({"code": "NIKA-POLICY-001", "namespace": "NIKA-POLICY",
+                     "category": "security_error", "detail": detail})
+
+    require = pol.get("require") if isinstance(pol.get("require"), dict) else {}
+    gated = require.get("human_gate_before")
+    if isinstance(gated, list):
+        gate_ids = {tid for tid, t in tasks if _task_tool(t) == _HUMAN_GATE_TOOL}
+        for tid, _t in tasks:
+            hit = classes[tid] & set(gated)
+            if hit and not (_ancestors(up, tid) & gate_ids):
+                violation(f"task '{tid}' · require.human_gate_before: "
+                          f"{sorted(hit)} — no {_HUMAN_GATE_TOOL} ancestor "
+                          "(the pause IS the consent · 10 §policy)")
+
+    forbid = pol.get("forbid") if isinstance(pol.get("forbid"), dict) else {}
+    upstream_classes = forbid.get("exec_after")
+    if isinstance(upstream_classes, list):
+        wanted = set(upstream_classes)
+        for tid, _t in tasks:
+            if "exec" not in classes[tid]:
+                continue
+            tainted = [a for a in _ancestors(up, tid) if classes[a] & wanted]
+            if tainted:
+                path = " → ".join(sorted(tainted)) + f" → {tid}"
+                violation(f"task '{tid}' · forbid.exec_after: "
+                          f"{sorted(wanted)} — the path is the witness: {path} "
+                          "(order law · 10 §policy)")
+
+    allow = pol.get("allow") if isinstance(pol.get("allow"), dict) else {}
+    providers = allow.get("providers")
+    if isinstance(providers, list):
+        root_model = doc.get("model") if isinstance(doc.get("model"), str) else None
+        for tid, t in tasks:
+            body = t.get("infer") if isinstance(t.get("infer"), dict) else                 t.get("agent") if isinstance(t.get("agent"), dict) else None
+            if body is None:
+                continue
+            model = body.get("model") if isinstance(body.get("model"), str)                 else root_model
+            if model is None or EXPR_BODY.search(model):
+                violation(f"task '{tid}' · allow.providers — the provider is "
+                          "not statically determinable (templated or absent "
+                          "model:) · fail-closed: pin the literal (10 §policy)")
+                continue
+            provider = model.split("/", 1)[0]
+            if provider not in providers:
+                violation(f"task '{tid}' · allow.providers — '{provider}' is "
+                          f"not in {providers} (10 §policy)")
+
+    limits = pol.get("limits") if isinstance(pol.get("limits"), dict) else {}
+    max_tasks = limits.get("max_tasks")
+    if isinstance(max_tasks, int) and not isinstance(max_tasks, bool)             and len(tasks) > max_tasks:
+        violation(f"limits.max_tasks: {max_tasks} — the workflow declares "
+                  f"{len(tasks)} tasks (10 §policy)")
+
+    return errs

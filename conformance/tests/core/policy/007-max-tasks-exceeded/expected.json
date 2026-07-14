@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-POLICY-001", "category": "security_error" }
+  ],
+  "note": "10-authority.md · limits.max_tasks: 2 — the workflow declares 3."
+}
