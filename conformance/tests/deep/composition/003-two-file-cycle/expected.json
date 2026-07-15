@@ -1,0 +1,1 @@
+{"valid": false, "errors": [{"code": "NIKA-COMP-003", "category": "validation_error"}], "note": "spec 14 law 7 - A -> B -> A; the harness resolves siblings of input.yaml"}

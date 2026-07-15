@@ -1,0 +1,1 @@
+{"valid": false, "errors": [{"code": "NIKA-COMP-004", "category": "validation_error"}], "note": "spec 14 law 2 - the child's outputs (report: string) do not fit the parent's returns (report: integer)"}

@@ -1,0 +1,8 @@
+nika: v1
+workflow:
+  id: comp-001-templated
+vars:
+  which: "a"
+tasks:
+  call:
+    invoke: { workflow: "./sub-${{ vars.which }}.nika.yaml" }
