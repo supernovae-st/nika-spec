@@ -15,11 +15,20 @@
 
 ## The one projection (normative)
 
-A **semantic document** is the machine-readable view of a source file: the
-canonical graph, the source spans, and — when the graph cannot be built —
-the one-word reason why. It is what `nika inspect --format json` prints,
-what the language server answers to `nika/semanticDocument`, and what the
-`nika_inspect` MCP tool returns — **the same bytes on all three**.
+There is **one canonical projection** of a workflow — the graph of
+[03](./03-dag.md) (`graph_format: 2`) — and every surface serves *that same
+projection*. `nika inspect --format json` (CLI), `nika/semanticDocument`
+(LSP), and the `nika_inspect` MCP tool all carry the **byte-identical**
+canonical projection; the surfaces differ only in what presentation they
+wrap around it.
+
+A **semantic document** is the LSP-side surface: the canonical projection
+*verbatim*, plus the source spans a client needs to link graph nodes back
+to text, plus — when the graph cannot be built — the one-word reason why.
+It is a **superset** of the bare projection (the CLI and MCP serve the
+projection without editor spans), and it is the **growth point** of the
+oracle: holes, actions, and capabilities land here (§the additive arc),
+which is why it carries its own version.
 
 ```
 semantic_document = (
@@ -61,19 +70,23 @@ signal, not a sentinel value.
 
 ## The triangle law (normative)
 
-The projection has **exactly one producer** and three surfaces:
+The **canonical projection** has **exactly one producer** and is served,
+byte-identical, by three surfaces:
 
 ```
-nika inspect --format json     ┐
+nika inspect --format json     ┐  the canonical projection (graph_format: 2)
 nika/semanticDocument (LSP)     ├─ byte-identical · one projection, three lenses
-nika_inspect (MCP)              ┘
+nika_inspect (MCP)              ┘  (the LSP additionally wraps editor spans)
 ```
 
-- The three MUST serve the **same bytes** for the same input — a lens
-  that drifts is a bug, tested by parity, not by convention.
-- The projection is a **typed contract**, not a JSON bag: renaming a
-  field breaks the producer's compilation (and the law tests) before it
-  can break a consumer silently.
+- The three MUST serve the **same canonical-projection bytes** for the
+  same input — a lens that drifts is a bug, tested by parity, not by
+  convention. The LSP's semantic document carries that same projection
+  *verbatim* and adds spans (a presentation superset, not a re-derivation);
+  the CLI and MCP serve the projection without editor spans.
+- Each surface is a **typed contract**, not a JSON bag: renaming a field
+  breaks the producer's compilation (and the law tests) before it can
+  break a consumer silently.
 
 ## Read discipline (normative)
 
