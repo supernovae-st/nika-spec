@@ -1,0 +1,6 @@
+nika: v1
+workflow:
+  id: comp-004-self
+tasks:
+  again:
+    invoke: { workflow: "./input.yaml" }

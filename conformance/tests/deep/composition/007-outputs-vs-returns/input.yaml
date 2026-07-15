@@ -1,0 +1,9 @@
+nika: v1
+workflow:
+  id: comp-007-returns
+tasks:
+  call:
+    invoke:
+      workflow: "./child.nika.yaml"
+      args: { url: "https://example.com" }
+    returns: { object: { report: integer } }

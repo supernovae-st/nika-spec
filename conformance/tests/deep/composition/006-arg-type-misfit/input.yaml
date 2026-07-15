@@ -1,0 +1,8 @@
+nika: v1
+workflow:
+  id: comp-006-misfit
+tasks:
+  call:
+    invoke:
+      workflow: "./child.nika.yaml"
+      args: { url: 42 }

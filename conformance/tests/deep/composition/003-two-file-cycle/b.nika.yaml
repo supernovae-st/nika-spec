@@ -1,0 +1,6 @@
+nika: v1
+workflow:
+  id: comp-003-cycle-b
+tasks:
+  back:
+    invoke: { workflow: "./input.yaml" }

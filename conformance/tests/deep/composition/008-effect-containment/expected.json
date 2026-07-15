@@ -1,0 +1,1 @@
+{"valid": false, "errors": [{"code": "NIKA-COMP-002", "category": "security_error"}], "note": "spec 14 laws 3/4 - the child's inferred exec effect is outside the parent's declared boundary"}

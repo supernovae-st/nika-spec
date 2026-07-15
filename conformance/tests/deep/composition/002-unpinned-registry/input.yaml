@@ -1,0 +1,6 @@
+nika: v1
+workflow:
+  id: comp-002-unpinned
+tasks:
+  call:
+    invoke: { workflow: "registry:acme/audit" }

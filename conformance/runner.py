@@ -58,6 +58,7 @@ import yaml
 from jsonschema import Draft202012Validator
 
 from deep_static import deep_static_errors, policy_errors
+from composition_core import composition_errors
 from type_core import type_core_errors
 
 HERE = pathlib.Path(__file__).resolve().parent
@@ -850,7 +851,8 @@ _UniqueKeyLoader.add_constructor(
 
 
 def validate_text(text: str, validator: Draft202012Validator,
-                  canon: dict | None = None) -> dict:
+                  canon: dict | None = None,
+                  base_dir: 'pathlib.Path | None' = None) -> dict:
     """Parse a workflow under test — rejecting duplicate mapping keys per
     NIKA-PARSE-017 — then validate. The only entry point the runner uses for
     documents under test; canon.yaml (trusted) still loads via safe_load."""
@@ -878,11 +880,12 @@ def validate_text(text: str, validator: Draft202012Validator,
         return {"valid": False, "errors": [{
             "code": "NIKA-PARSE-001", "namespace": "NIKA-PARSE",
             "category": "parse_error", "detail": detail}]}
-    return validate_workflow(doc, validator, canon)
+    return validate_workflow(doc, validator, canon, base_dir=base_dir)
 
 
 def validate_workflow(doc: dict, validator: Draft202012Validator,
-                      canon: dict | None = None) -> dict:
+                      canon: dict | None = None,
+                      base_dir: 'pathlib.Path | None' = None) -> dict:
     """Combined verdict · {valid, errors:[{code|namespace, category, detail}]}.
 
     `canon` enables the Stdlib v0.1 static-surface layer (always on for this
@@ -925,6 +928,7 @@ def validate_workflow(doc: dict, validator: Draft202012Validator,
     errs.extend(deep_static_errors(doc))
     errs.extend(type_core_errors(doc))
     errs.extend(policy_errors(doc))
+    errs.extend(composition_errors(doc, base_dir))
     if canon is not None:
         errs.extend(stdlib_surface_errors(doc, canon))
     return {"valid": not errs, "errors": errs}
@@ -959,7 +963,7 @@ def run_fixtures(fixtures_dir: pathlib.Path, validator: Draft202012Validator,
     for inp in inputs:
         rel = inp.parent.relative_to(fixtures_dir.parent)
         exp = json.loads((inp.parent / "expected.json").read_text())
-        verdict = validate_text(inp.read_text(), validator, canon)
+        verdict = validate_text(inp.read_text(), validator, canon, base_dir=inp.parent)
         ok = verdict["valid"] == exp["valid"]
         if ok and not exp["valid"]:
             # at least one expected error must match an emitted one

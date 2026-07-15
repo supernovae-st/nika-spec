@@ -1,0 +1,11 @@
+nika: v1
+workflow:
+  id: comp-008-contain
+permits:
+  net:
+    http: ["api.example.com"]
+tasks:
+  call:
+    invoke:
+      workflow: "./child.nika.yaml"
+      args: { url: "https://api.example.com/x" }
