@@ -52,3 +52,60 @@ tombstones:
       date: "2026-07-17"
       count: 0
     notes: "R5 verbatim : « la classe did-you-mean 'failed'->failure (DAG-007) meurt ». Le CODE NIKA-DAG-007 survit (il garde le vocabulaire des comparaisons de status · success · failure · skipped · cancelled · per canon/laws/gates.yaml header) ; ce qui meurt = la CLASSE de correction did-you-mean : post-codemod l'auteur n'apprend plus jamais une orthographe participiale, la classe n'a plus d'objet (proof obligation LAW-GRAMMAR-0231). Kill exécuté au leg pc-light (2026-07-17) : spec/03-dag.md:788 (la phrase « with a did-you-mean fix ('failed' -> failure) ») + gen-gate-matrix VOCAB fixture (le literal hors-vocabulaire passe de 'failed' à 'done' · le guard DAG-007 reste exercé · la note expected perd le did-you-mean) + deep/028 régénéré. Un code retiré n'est jamais réutilisé (SSOT-2 B.22) — s'applique ici à la CLASSE : toute future correction didactique sur ce champ est une classe NEUVE. Le did-you-mean TYPE-001 (« did-you-mean when close » · unknown type name) est une autre classe · il survit · hors census (pattern scoped au literal participial quoté)."
+  - id: result-constructor-public-reservation
+    status: retired
+    owner: spec
+    law_ids: ["LAW-SURFACE-0520"]
+    introduced_in: P-C
+    kind: constructor
+    retired_in: P-C
+    census_pattern:
+      tool: grep
+      pattern: "result<"
+      scope: spec
+    final_census:
+      date: "2026-07-17"
+      count: 0
+    notes: "R6 point 1 verbatim : « result<T> -> retirer de la grammaire publique et de la liste des constructeurs réservés. » Kill exécuté au leg pc-light (MIG-constructors · 2026-07-17) : la row de la table réservée 09-types.md:73 + la mention no-generics 09-types.md:393 meurent · en position de type, result refuse désormais comme nom inconnu (NIKA-TYPE-001 · fixture 009-reserved-constructor garde sa polarité négative · sa note wave-claim est morte). « le nom pourra être réévalué uniquement avec un besoin distinct d'Outcome » — jamais réutilisé sans ce besoin démontré (B.22)."
+  - id: secret-constructor-public-reservation
+    status: retired
+    owner: spec
+    law_ids: ["LAW-SURFACE-0521"]
+    introduced_in: P-C
+    kind: constructor
+    retired_in: P-C
+    census_pattern:
+      tool: grep
+      pattern: "secret<"
+      scope: spec
+    notes: "R6 point 2 verbatim : « secret<T> -> retirer de la grammaire publique réservée. La sensibilité reste représentée dans l'IR interne … Un secret reste une store-reference gouvernée, pas une valeur ordinaire enveloppée par l'auteur. » Kill pc-light (2026-07-17) : la row de la table réservée 09-types.md:75 + la mention no-generics 09-types.md:394 meurent · type_core.py ne réserve plus secret (refus nom-inconnu). PAS de final_census : 3 sites secret< SURVIVENT en spec (09-types.md §secrets-never-lower + les deux rows NIKA-TYPE-005 09:380/05:116) — FINDING-E (canon/laws/constructors.yaml header verbatim) : « Le sort de NIKA-TYPE-005 … n'est PAS tranché par R6 : arbitrage owed à la cascade, enregistré ici, jamais décidé silencieusement. » Le census atteint 0 quand cet arbitrage tombe · jamais avant."
+  - id: money-bare-constructor-reservation
+    status: retired
+    owner: spec
+    law_ids: ["LAW-SURFACE-0522"]
+    introduced_in: P-C
+    kind: constructor
+    retired_in: P-C
+    census_pattern:
+      tool: grep
+      pattern: "(returns|type): money"
+      scope: spec
+    final_census:
+      date: "2026-07-17"
+      count: 0
+    notes: "R6 point 4 verbatim : « money -> retirer sous la forme nue money. Conserver uniquement un research candidate pour une future forme exacte … » Kill pc-light (2026-07-17) : la row de la table réservée 09-types.md:76 + la lowering row 09-types.md:226 (« decimal + currency refinements land with the decision core ») meurent avec la forme (LAW-SURFACE-0522 proof obligation). En position de type, money refuse comme nom inconnu · fixture 014-money-reserved garde sa polarité négative (son input conformance/…/014-money-reserved/input.yaml exerce légitimement la forme morte en NEGATIVE · hors scope census spec). Les neuf exigences d'introduction future gardent le research candidate hors surface publique."
+  - id: constructor-wave-landing-mentions
+    status: retired
+    owner: spec
+    law_ids: ["LAW-MIGR-0520"]
+    introduced_in: P-C
+    kind: phrase
+    retired_in: P-C
+    census_pattern:
+      tool: grep
+      pattern: "land with their owning wave|land with their waves|lands? with the decision core"
+      scope: spec
+    final_census:
+      date: "2026-07-17"
+      count: 0
+    notes: "R6 point 5 verbatim : « Supprimer toutes les anciennes mentions : \"lands with W5\" ; \"lands with W-DEC\" ; propriétaires ou vagues closes erronées. » + note de cascade verbatim : « (Cascade : inclut les strings de diagnostic ENGINE — TESTED P7 : result<string> dit encore « lands with outcomes (W5) ».) » Kill pc-light (2026-07-17) sur les surfaces SPEC-repo : table 09-types (Outcome IR (W5) · artifact lanes (W5) · authority wave (W4) · decision core (W-DEC) · l'intro « land with their owning wave ») + lowering row 09:226 + notes fixtures 009/014 + type_core.py RESERVED dict (les quatre wave-strings) + type_core_selftest labels. Portée du pattern per LAW-MIGR-0520 proof obligation 2 : mentions CONSTRUCTEURS seulement · 07-conformance.md:178 (« lands with the reference engine ») + 12-gateway (« land with workflow composition ») ne sont PAS des mentions de constructeur · hors census. RESTES documentés : les « · W4 » des deux rows NIKA-TYPE-005 (FINDING-E · owed) · les strings ENGINE (le leg engine de la cascade · hors spec-repo)."

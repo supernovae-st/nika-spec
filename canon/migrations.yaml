@@ -153,3 +153,30 @@ migrations:
     receipt_slot: research/pre1-gate/mini-gates/ANNEX_2026-07-17_minigates-winners.md
     state: ratified
     notes: "N2-b VERBATIM (ANNEX D-2026-07-17-N2) : N2-b · F5-H1 · nouvelle ROW table 13 : `Outcome.class = failure · cause = budget_exhausted`. L'épuisement d'un budget agent (`max_turns` / `max_tokens_total`) est une transition sémantique DISTINCTE (R8 loi 13 : un mot par transition) · symétrie avec la row `deadline_exceeded` née de B-17 (« jamais un boolean ») · law-link AGENT-001/002 · fixtures des deux côtés (épuisé vs done-avant-budget). Jamais un mapping code-only. [codemod none-additive : addition d'une row à la table 13, aucune réécriture de source · equivalence_or_stop const true du schema scellé.]"
+  - id: mig-r6-constructor-withdrawals
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0520
+      - LAW-SURFACE-0521
+      - LAW-SURFACE-0522
+      - LAW-SURFACE-0523
+      - LAW-SURFACE-0524
+      - LAW-GRAMMAR-0520
+      - LAW-GRAMMAR-0521
+      - LAW-MIGR-0520
+      - LAW-CONF-0520
+    introduced_in: P-C
+    ruling: R6
+    wave: "C1→C2"
+    codemod:
+      id: r6-constructor-withdrawals-v1
+      equivalence_or_stop: true
+    old_form: reserved-constructors-four-with-wave-claims
+    new_form: artifact-sole-reserved-no-delivery-claim
+    blast_radius:
+      authored_files: 5
+      spec_fences: 4
+    receipt_slot: proofs/pc-light/census-constructors-after.txt
+    state: executed
+    notes: "MIG-constructors (pc-light leg · executed 2026-07-17 at the C1→C2 seam · the decision-free mechanical MIG extracted by the orchestrator per R8 law 14). R6 points 1/2/4: result<T> + secret<T> + bare money WITHDRAWN from the public grammar and the reserved list (refuse as unknown type names · NIKA-TYPE-001 · fixtures 009/014 keep their negative polarity · their wave-claim notes died per LAW-SURFACE-0520/0522 proof obligations). R6 point 3: artifact<mime> sole reserved · owner spec · reserved-not-implemented · honest diagnostic (type_core.py teaching carries NO wave and NO date) · the nine activation prerequisites named in the 09-types table. R6 point 5: constructor wave/lands-with mentions census -> tombstone constructor-wave-landing-mentions (the LAW-MIGR-0520 'migration-row-minted' closure gate advances with THIS row · FINDING-A resolved: the orchestrator mints it, the law import never did). STOP (FINDING-E · constructors.yaml header verbatim): the NIKA-TYPE-005 row sites (09-types.md:380 + 05-errors.md:116 + the secrets-never-lower bullet 09-types.md:243) are NOT touched — « Le sort de NIKA-TYPE-005 (réécrit sur la représentation IR interne de la sensibilité, ou retiré) n'est PAS tranché par R6 : arbitrage owed à la cascade, enregistré ici, jamais décidé silencieusement » — 3 secret< sites + their W4 mentions survive until that arbitrage. ENGINE strings (TESTED P7 · result<string> says « lands with outcomes (W5) ») = the engine leg of the cascade, outside this spec-repo MIG."

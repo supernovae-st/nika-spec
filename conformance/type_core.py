@@ -28,12 +28,11 @@ PRIMITIVES = {
     "uri", "path", "duration", "timestamp",
 }
 STRING_NEWTYPES = {"uri", "path", "duration", "timestamp"}
-# named now · landing with their waves (spec 09 §reserved)
+# the sole public reserved constructor of the group (spec 09 §reserved · R6)
+# result/secret/money are WITHDRAWN (R6 points 1/2/4): not reserved, not
+# known — they refuse as unknown type names, never with a wave claim.
 RESERVED = {
-    "result": "outcomes (W5)",
-    "artifact": "artifact lanes (W5)",
-    "secret": "the authority wave (W4)",
-    "money": "the decision core (W-DEC) — fixed-point + ISO-4217, never binary floats",
+    "artifact": "reserved-not-implemented",
 }
 TYPE_NAME = re.compile(r"^[A-Z][A-Za-z0-9]*$")
 COMPOSITE_KEYS = {
@@ -173,7 +172,7 @@ def parse_type(expr, names: set[str], where: str) -> dict:
         base = expr.split("<")[0]
         if base in RESERVED:
             raise TypeError_("NIKA-TYPE-001",
-                             f"{where} · {expr!r} is reserved — lands with {RESERVED[base]}")
+                             f"{where} · {expr!r} is {RESERVED[base]} — not authorable")
         raise TypeError_("NIKA-TYPE-001", f"{where} · not a type: {expr!r}")
     if isinstance(expr, dict):
         keys = set(expr) - {"additional"}
