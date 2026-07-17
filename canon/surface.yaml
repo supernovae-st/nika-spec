@@ -1,22 +1,212 @@
-# canon/surface.yaml · C0 SANDBOX SKELETON · Language Surface Registry (SSOT-1 §3A)
-# Schema: schemas/registries.schema.json#/$defs/surfaceRow (SCELLÉ · consommé as-is).
-# Ce que C0 importe ici : mots-clés · orthographes · namespaces · formes mortes ·
-# version du langage · statuts authorable/reserved/internal (SSOT-1 §3A verbatim :
-# « Language Surface Registry — mots-clés ; orthographes ; namespaces ; formes
-# mortes ; version du langage ; statuts authorable/reserved/internal »).
-# Le schema scellé impose minItems 1 : la row seed réelle ci-dessous porte le
-# marqueur de langage (R11 point 16 · LAW-SURFACE-0101). Le reste = import C0
-# depuis canon.yaml (MIG-canon-yaml) + census SSOT-1 §30.
 registry_document_format: 1
-"$comment": "C0 sandbox skeleton · seed row = nika version marker (R11 point 16) · full import owed at C0 from canon.yaml + census"
+$comment: C0 sandbox skeleton · seed row = nika version marker (R11 point 16) · full import owed at C0
+  from canon.yaml + census
 surface:
-  - id: nika_version_marker
-    status: reserved
-    owner: spec
-    law_ids: ["LAW-SURFACE-0101"]
-    introduced_in: C0
-    spelling: "nika"
-    kind: envelope-key
-    family: envelope
-    exposure: authorable
-    notes: "R11 point 16 verbatim : « Le langage reste nika: v1. » La clé d'enveloppe nika porte le seul marqueur public de version ; la valeur exigée est jugée par la row grammar envelope_nika_field."
+- id: nika_version_marker
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-SURFACE-0101
+  introduced_in: C0
+  spelling: nika
+  kind: envelope-key
+  family: envelope
+  exposure: authorable
+  notes: 'R11 point 16 verbatim : « Le langage reste nika: v1. » La clé d''enveloppe nika porte le seul
+    marqueur public de version ; la valeur exigée est jugée par la row grammar envelope_nika_field.'
+- id: bool_primitive_spelling
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-SURFACE-0211
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  spelling: bool-primitive-spelling
+  kind: record-field
+  family: bool
+  exposure: internal
+- id: boolean_spelling_variant
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-SURFACE-0211
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  spelling: boolean-spelling-variant
+  kind: record-field
+  family: boolean
+  exposure: internal
+- id: callable_contract_type_shapes
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-SURFACE-0212
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  spelling: callable-contract-type-shapes
+  kind: record-field
+  family: callable
+  exposure: internal
+- id: delta_formal_notation
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-GUAR-0401
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  spelling: delta-formal-notation
+  kind: record-field
+  family: delta
+  exposure: internal
+- id: guarantee_spelling_on_projections
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-GUAR-0412
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  spelling: guarantee-spelling-on-projections
+  kind: record-field
+  family: guarantee
+  exposure: internal
+- id: outcome_class_spellings
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-SURFACE-0231
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  spelling: outcome-class-spellings
+  kind: predicate
+  family: outcome
+  exposure: internal
+- id: six_enum_type_sublanguage
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-SURFACE-0211
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  spelling: six-enum-type-sublanguage
+  kind: record-field
+  family: six
+  exposure: internal
+- id: task_out_binding_names
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-SURFACE-0221
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  spelling: task-out-binding-names
+  kind: record-field
+  family: task
+  exposure: internal
+- id: task_out_namespace
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-SURFACE-0221
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  spelling: task-out-namespace
+  kind: record-field
+  family: task
+  exposure: internal
+- id: task_record_engine_field_names
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-SURFACE-0221
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  spelling: task-record-engine-field-names
+  kind: record-field
+  family: task
+  exposure: internal
+- id: task_record_fields_current
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-SURFACE-0222
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  spelling: task-record-fields-current
+  kind: record-field
+  family: task
+  exposure: internal
+- id: task_record_fields_released
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-SURFACE-0222
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  spelling: task-record-fields-released
+  kind: record-field
+  family: task
+  exposure: internal
+- id: task_record_namespace
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-SURFACE-0222
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  spelling: task-record-namespace
+  kind: record-field
+  family: task
+  exposure: internal
+- id: value_authority_aliases
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-SURFACE-0202
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  spelling: value-authority-aliases
+  kind: record-field
+  family: value
+  exposure: internal
+- id: value_authority_family
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-SURFACE-0201
+  - LAW-SURFACE-0202
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  spelling: value-authority-family
+  kind: record-field
+  family: value
+  exposure: internal

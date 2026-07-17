@@ -1,0 +1,279 @@
+# canon/laws/types.yaml · C0 import · R3b typed inputs/outputs × Type Core (widen + valider
+# les defaults). SSOT: RULINGS_2026-07-15.md §R3b (standard pick · le texte du choix EST le
+# record normatif · cite verbatim, jamais paraphrase). Schema: schemas/law.schema.json (SCELLE).
+# Bloc d'ids assigne: TYPE-02xx + SURFACE-02xx + GRAMMAR-02xx (sous-plage x211-x219 ici).
+#
+# Codes: NIKA-TYPE-001 est REUTILISE (existant · spec/05-errors.md:112 « unknown type name
+# (in `types:` · `returns:` · an `outputs:` type) » couvre deja la position io) · le check des
+# defaults est NEUF (le trou P0): NIKA-DEFAULT-001 c0-proposed, namespace neuf zero-collision
+# (grep = 0), renumerotable avant C1 per pattern pilote FINDING-05.
+#
+# Empirie au pin (ancres reelles, jamais des nombres inventes): le sous-langage 6-enum vit en
+# 01-envelope:219 « one of the closed enum (`string` · `number` · `integer` · `boolean` ·
+# `array` · `object`) » · PARSE-015 = spec/05-errors.md:92 « typed `vars:` declaration
+# malformed (type in string/number/integer/boolean/array/object) » · le Type Core orthographie
+# `bool` parmi les 10 primitives (09-types:57) et projette `{ "type": "boolean" }` en JSON
+# Schema (09-types:217 · une PROJECTION machine, jamais une orthographe de surface).
+
+laws_document_format: 1
+
+pilot: c0-types
+
+laws:
+
+  # ───────────────── R3b · le champ type parle le TypeExpr complet ───────────
+
+  - id: LAW-GRAMMAR-0211
+    slug: types/io-type-field-speaks-full-typeexpr
+    status: reserved
+    owner: spec
+    domain: GRAMMAR
+    title: "Le champ type des declarations inputs et outputs parle le TypeExpr complet de 09-types"
+    prose_projection:
+      chapters: ["09-types", "01-envelope"]
+      text: "R3b verbatim : « **Choix : OUI — widen + valider les defaults.** » · R3b verbatim : « `type:` des inputs/outputs parle le **TypeExpr complet** de 09-types (named types · unions · shapes · refinements) — le sous-langage 6-enum meurt (PARSE-015 class retirée), `boolean`↔`bool` meurt avec lui. » La value_shape du champ type aux positions de declaration io est le TypeExpr entier; ce que PARSE-015 refusait (les formes riches) est admis, ce qui reste hors TypeExpr refuse via le code existant NIKA-TYPE-001."
+    inputs:
+      - registry: ir
+        id: io_declared_type_expressions
+        role: required
+      - registry: types
+        id: type_expr
+        role: ceiling
+    premises:
+      - operator: conforms_to
+        operands:
+          - registry: ir
+            id: io_declared_type_expressions
+          - registry: types
+            id: type_expr
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-TYPE-001"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: types
+          id: type_expr
+      independent_judgment: true
+    domain_payload:
+      kind: grammar
+      position: io_declaration
+      field_rules:
+        - field: type
+          cardinality: optional
+          value_shape:
+            registry: types
+            id: type_expr
+    diagnostics: ["NIKA-TYPE-001"]
+    fixtures:
+      - conformance/tests/core/types/008-composed-types-valid
+      - to-mint-c1/conformance/types/valid/input-typeexpr-union
+    negative_fixtures:
+      - conformance/tests/core/types/002-unknown-type-name
+      - to-mint-c1/conformance/types/invalid/io-type-outside-typeexpr
+    projections: ["prose:09-types", "prose:01-envelope", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:type_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:types-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R3b verbatim : « le sous-langage 6-enum meurt (PARSE-015 class retirée) ». PARSE-015 (spec/05-errors.md:92) devient tombstone au registre diagnostics; le 6-enum de 01-envelope:219 n'existe plus dans aucune surface d'enseignement."
+      - "Le code NIKA-TYPE-001 existant (spec/05-errors.md:112) couvre deja « an `outputs:` type » : la loi reutilise le code vivant, aucun second systeme d'erreur n'est mint pour la meme classe."
+    closure_gates:
+      - parse-015-tombstoned
+      - six-enum-census-zero
+
+  # ───────────────── R3b · le 6-enum et la dualité boolean/bool meurent ──────
+
+  - id: LAW-SURFACE-0211
+    slug: types/six-enum-dead-bool-single-spelling
+    status: reserved
+    owner: spec
+    domain: SURFACE
+    title: "Le sous-langage 6-enum est mort et le type booleen garde une seule orthographe, celle du Type Core"
+    prose_projection:
+      chapters: ["09-types", "01-envelope"]
+      text: "R3b verbatim : « le sous-langage 6-enum meurt (PARSE-015 class retirée), `boolean`↔`bool` meurt avec lui. » La dualite d'orthographes meurt AVEC le sous-langage : `boolean` n'existait que dans le 6-enum (01-envelope:219); le Type Core orthographie `bool` (09-types:57, les 10 primitives). Une orthographe par type; la projection JSON Schema `{ \"type\": \"boolean\" }` (09-types:217) est une projection machine, jamais une orthographe de surface authorable."
+    inputs:
+      - registry: surface
+        id: six_enum_type_sublanguage
+        role: required
+      - registry: surface
+        id: boolean_spelling_variant
+        role: required
+    premises:
+      - operator: absent
+        operands:
+          - registry: surface
+            id: six_enum_type_sublanguage
+        quantifier: forall
+      - operator: absent
+        operands:
+          - registry: surface
+            id: boolean_spelling_variant
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: surface
+          id: bool_primitive_spelling
+      independent_judgment: true
+    domain_payload:
+      kind: surface
+      constraint: spelling_unique
+      subject:
+        registry: surface
+        id: bool_primitive_spelling
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/types/valid/bool-spelling
+    negative_fixtures:
+      - to-mint-c1/conformance/types/invalid/boolean-spelling-dead
+    projections: ["prose:09-types", "prose:01-envelope", "schema", "cli:check", "docs"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:type_core.py
+      - cli:nika-check
+      - conformance:types-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R8 point 18 verbatim : « Toutes les anciennes formes décidées mortes doivent atteindre un census de zéro. » Census `boolean` (surface authorable) = 0 et census 6-enum (positions io) = 0 avant fermeture."
+      - "L'orthographe survivante n'est pas inventee ici : elle est celle du Type Core au pin (09-types:57 `bool`); toute divergence decouverte a l'import est un finding, jamais un ajustement silencieux (SSOT-1 §29)."
+    closure_gates:
+      - six-enum-census-zero
+      - boolean-spelling-census-zero
+
+  # ───────────────── R3b · la validation des defaults est obligatoire ────────
+
+  - id: LAW-TYPE-0211
+    slug: types/defaults-validate-against-declared-type
+    status: reserved
+    owner: spec
+    domain: TYPE
+    title: "La validation des defaults contre leur type declare est obligatoire au check"
+    prose_projection:
+      chapters: ["09-types", "01-envelope"]
+      text: "R3b verbatim : « **La validation des defaults contre leur type déclaré devient obligatoire au check** (le trou de soundness P0 — `{type: integer, default: \"abc\"}` passait check ET run — se ferme). » Chaque default declare doit conformer au type declare de sa declaration io; la non-conformite refuse au check, jamais un passage silencieux."
+    inputs:
+      - registry: ir
+        id: io_default_values
+        role: required
+      - registry: ir
+        id: io_declared_types
+        role: ceiling
+    premises:
+      - operator: conforms_to
+        operands:
+          - registry: ir
+            id: io_default_values
+          - registry: ir
+            id: io_declared_types
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-DEFAULT-001"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: types
+          id: type_expr
+      independent_judgment: true
+    domain_payload:
+      kind: type
+      relation: validates_default
+      operands:
+        - registry: ir
+          id: io_default_values
+        - registry: ir
+          id: io_declared_types
+    diagnostics: ["NIKA-DEFAULT-001"]
+    fixtures:
+      - to-mint-c1/conformance/types/valid/default-conforms-to-type
+    negative_fixtures:
+      - to-mint-c1/conformance/types/invalid/default-type-mismatch
+    projections: ["prose:09-types", "prose:01-envelope", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:type_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:types-suite
+    introduced_in: C0
+    proof_obligations:
+      - "La fixture negative default-type-mismatch reproduit le P0 exact du ruling (`{type: integer, default: \"abc\"}`) et refuse au check sur toutes les surfaces : le trou qui « passait check ET run » est structurellement ferme."
+      - "R3b verbatim : « widen + valider les defaults » — la validation est OBLIGATOIRE, jamais un mode permissif ni un warning-only."
+    closure_gates:
+      - p0-default-soundness-hole-closed
+      - fixture-parity
+
+  # ───────────────── R3b · le contrat callable/MCP expose les vraies formes ──
+
+  - id: LAW-SURFACE-0212
+    slug: types/callable-mcp-contract-exposes-true-shapes
+    status: reserved
+    owner: spec
+    domain: SURFACE
+    title: "Le contrat callable et la surface MCP exposent les vraies formes de types"
+    prose_projection:
+      chapters: ["09-types", "14-composition"]
+      text: "R3b verbatim : « Le contrat callable/MCP expose les vraies formes. » Les formes exposees par le contrat callable (la moitie I/O du CallableContract) et par la surface MCP sont les TypeExpr declares/derives reels, jamais une degradation 6-enum ni une approximation."
+    inputs:
+      - registry: ir
+        id: callable_contract_exposed_shapes
+        role: required
+      - registry: ir
+        id: io_declared_type_expressions
+        role: required
+    premises:
+      - operator: equals
+        operands:
+          - registry: ir
+            id: callable_contract_exposed_shapes
+          - registry: ir
+            id: io_declared_type_expressions
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: surface
+          id: callable_contract_type_shapes
+      independent_judgment: true
+    domain_payload:
+      kind: surface
+      constraint: exposure_rule
+      subject:
+        registry: surface
+        id: callable_contract_type_shapes
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/types/contract/mcp-exposes-typeexpr
+    projections: ["prose:09-types", "prose:14-composition", "schema", "cli:inspect", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:type_core.py
+      - mcp:nika-mcp
+      - lsp:nika-lsp
+      - conformance:types-suite
+    introduced_in: C0
+    proof_obligations:
+      - "La parite est jugee sur les trois surfaces d'exposition (contrat callable · MCP · SDK) contre les memes declarations io : une degradation d'une seule surface est un echec, jamais une tolerance."
+    closure_gates:
+      - callable-contract-true-shapes

@@ -1,0 +1,440 @@
+# canon/laws/assertions.yaml · C0 IMPORT · R13 assert normatif + jugé au check
+# SSOT: RULINGS_2026-07-15.md §R13 (verbatim · JAMAIS paraphrasé). Les citations
+# reproduisent les bytes du ruling (dé-wrap markdown uniquement, précédent pilote R11);
+# les ancres sont "R13 tête" et "R13 bullet N" (le ruling R13 est une tête de choix +
+# 3 bullets, pas une liste numérotée).
+# Schema: schemas/law.schema.json (SCELLÉ). Bloc d'ids réservé au groupe: LAW-ASSERT-03xx.
+#
+# FINDING-ASSERT-01 (SSOT-1 §29) : R13 nomme « existence des tâches » comme obligation
+# statiquement décidable; l'enum obligation_property du schema scellé (before | bounded
+# | eventually | no_secret_egress) n'a pas de membre existence, et la référence
+# proof_core.py ne la liste pas dans STATIC_PROPERTIES. L'existence est portée ici
+# comme premise (present des refs) de LAW-ASSERT-0302, jamais résolue en douce; un
+# membre d'enum dédié serait un amendement du pack (geste GATED).
+#
+# FINDING-ASSERT-02 (SSOT-1 §29 · tension R13 vs référence) : R13 liste trois
+# obligations statiquement décidables (existence · before · bounded) et dit « le reste
+# = Unknown, jamais optimiste ». La référence proof_core.py déclare STATIC_PROPERTIES
+# = {before, bounded, no_secret_egress} : no_secret_egress y est jugé statiquement
+# (taint) alors que la lecture stricte de R13 le range dans « le reste ». Aucune
+# correction silencieuse : LAW-ASSERT-0305 porte no_secret_egress sous claim ≤ evidence
+# (un StaticProof n'y est légal que si le juge le décide réellement), l'arbitrage
+# statique-par-taint vs Unknown-par-défaut est TO-RULE à C0.
+#
+# FINDING-ASSERT-03 (exemplaires épinglés) : l'assertionPayload exige exactement une
+# obligation_property par loi; les lois de portée bloc-entier (0301 admission schema ·
+# 0306 claim ≤ evidence · 0307 receipt) épinglent un exemplaire (pattern FINDING-11 du
+# pilote : la loi gouverne la famille, le payload épingle l'exemplaire).
+#
+# Codes : NIKA-ASSERT-001 est LIVE au registre (« an assert: claims a level the
+# evidence does not support (a StaticProof the IR cannot decide · a mis-leveled
+# obligation · spec 15) ») et porte exactement la classe claim ≤ evidence.
+#
+# Em dash : ma prose = zéro em dash; la citation R13 en porte un (« claim ≤ evidence —
+# le reste = Unknown ») et le garde (bytes du ruling · précédent pilote).
+
+laws_document_format: 1
+
+group: c0-assertions
+
+laws:
+
+  # ── R13 tête + bullet 3 · le bloc est normatif, le milieu interdit meurt ──────
+
+  - id: LAW-ASSERT-0301
+    slug: assert/normative-block-judged-at-check
+    status: reserved
+    owner: spec
+    domain: ASSERT
+    title: "Le bloc assert est normatif au schema et juge au check; le milieu interdit meurt"
+    prose_projection:
+      chapters: ["15-proof"]
+      text: "R13 tête verbatim : « **Choix : (A) normatif + jugé au check.** » · R13 bullet 1 verbatim (segment d'admission) : « `assert` entre au `workflow.schema.json` ; le checker juge les obligations statiquement décidables (existence des tâches · `before` via reachability · `bounded` via fan-out littéral) avec **claim ≤ evidence** — le reste = Unknown, jamais optimiste. » · R13 bullet 3 verbatim (segment) : « Le milieu interdit (schema-refuse / parser-accepte / checker-ignore, épinglé P3) meurt. » Le payload épingle before comme exemplaire; la loi gouverne le bloc entier (FINDING-ASSERT-03)."
+    inputs:
+      - registry: ir
+        id: assert_block
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: assert_block_schema_admission
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: assert_obligations
+      independent_judgment: true
+    domain_payload:
+      kind: assertion
+      obligation_property: before
+      judgment_time: check
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/assert/valid/schema-admits-assert
+    negative_fixtures:
+      - to-mint-c1/conformance/assert/invalid/forbidden-middle-dead
+    projections: ["prose:15-proof", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:proof_core.py
+      - cli:nika-check
+      - conformance:assert-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Le milieu interdit est mécaniquement mort : le schema admet assert, le parser le construit, le checker le juge; la fixture forbidden-middle-dead prouve qu'aucune surface ne reste dans l'état schema-refuse / parser-accepte / checker-ignore épinglé P3."
+      - "L'admission au workflow.schema.json est la première marche : au pin sandbox actuel le schema ne porte pas encore de bloc assert workflow-level (seul le builtin nika:assert y vit), la cascade P-C ferme."
+    closure_gates:
+      - forbidden-middle-dead
+      - schema-admits-assert
+
+  # ── R13 bullet 1 · before via reachability, existence en premise ──────────────
+
+  - id: LAW-ASSERT-0302
+    slug: assert/before-via-reachability
+    status: reserved
+    owner: spec
+    domain: ASSERT
+    title: "L'obligation before se juge statiquement par reachability; les refs doivent exister"
+    prose_projection:
+      chapters: ["15-proof", "03-dag"]
+      text: "R13 bullet 1 verbatim (segment) : « le checker juge les obligations statiquement décidables (existence des tâches · `before` via reachability · `bounded` via fan-out littéral) » Cette loi porte la branche before : l'obligation est un jugement de reachability sur le graphe statique; l'existence des tâches référencées est la premise (FINDING-ASSERT-01 : existence n'est pas un membre de l'enum obligation_property, elle vit en premise present)."
+    inputs:
+      - registry: ir
+        id: assert_before_obligations
+        role: required
+      - registry: ir
+        id: precedence_graph
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: assert_obligation_task_refs
+        quantifier: forall
+      - operator: reachable
+        operands:
+          - registry: ir
+            id: assert_before_subject
+          - registry: ir
+            id: assert_before_target
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-ASSERT-001"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: assert_evidence_levels
+      independent_judgment: true
+    domain_payload:
+      kind: assertion
+      obligation_property: before
+      judgment_time: check
+    diagnostics: ["NIKA-ASSERT-001"]
+    fixtures:
+      - to-mint-c1/conformance/assert/valid/before-reachability-staticproof
+    negative_fixtures:
+      - to-mint-c1/conformance/assert/invalid/before-unreachable-claimed-static
+      - to-mint-c1/conformance/assert/invalid/before-ref-missing-task
+    projections: ["prose:15-proof", "cli:check", "lsp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:proof_core.py
+      - cli:nika-check
+      - conformance:assert-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Un before dont la reachability est établie sur le graphe statique atteint StaticProof; un before non établi ne monte jamais au-dessus du niveau que le juge peut réellement décider (claim ≤ evidence, loi 0306)."
+      - "La fixture before-ref-missing-task refuse : une obligation qui référence une tâche inexistante n'est jamais jugée Unknown-et-admise, l'existence est une premise dure."
+    closure_gates:
+      - before-judged-by-reachability
+
+  # ── R13 bullets 1 + 2 · bounded via fan-out littéral, fix B-13 ────────────────
+
+  - id: LAW-ASSERT-0303
+    slug: assert/bounded-via-literal-fanout
+    status: reserved
+    owner: spec
+    domain: ASSERT
+    title: "L'obligation bounded se juge par fan-out litteral; le StaticProof inconditionnel B-13 meurt"
+    prose_projection:
+      chapters: ["15-proof"]
+      text: "R13 bullet 1 verbatim (segment) : « `bounded` via fan-out littéral » · R13 bullet 2 verbatim : « Fix B-13 : `proof_core.py` cesse de lever `bounded` en StaticProof inconditionnel. » Un bounded n'atteint StaticProof que si chaque fan-out du périmètre est un littéral statique; tout fan-out non littéral rétrograde le niveau, jamais l'inverse."
+    inputs:
+      - registry: ir
+        id: assert_bounded_obligations
+        role: required
+      - registry: ir
+        id: literal_fanout_witnesses
+        role: required
+    premises:
+      - operator: conforms_to
+        operands:
+          - registry: ir
+            id: assert_bounded_evidence
+          - registry: ir
+            id: literal_fanout_witnesses
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-ASSERT-001"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: assert_evidence_levels
+      independent_judgment: true
+    domain_payload:
+      kind: assertion
+      obligation_property: bounded
+      judgment_time: check
+    diagnostics: ["NIKA-ASSERT-001"]
+    fixtures:
+      - to-mint-c1/conformance/assert/valid/bounded-literal-fanout-staticproof
+    negative_fixtures:
+      - to-mint-c1/conformance/assert/invalid/bounded-dynamic-fanout-claimed-static
+    projections: ["prose:15-proof", "cli:check", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:proof_core.py
+      - cli:nika-check
+      - conformance:assert-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R13 bullet 2 verbatim : « Fix B-13 : `proof_core.py` cesse de lever `bounded` en StaticProof inconditionnel. » La fixture bounded-dynamic-fanout-claimed-static est la non-régression : un fan-out non littéral avec claim StaticProof refuse (NIKA-ASSERT-001), il ne passe plus jamais inconditionnellement."
+    closure_gates:
+      - b13-unconditional-staticproof-dead
+      - bounded-judged-by-literal-fanout
+
+  # ── R13 bullet 1 · le reste = Unknown · branche eventually ────────────────────
+
+  - id: LAW-ASSERT-0304
+    slug: assert/eventually-unknown-never-optimistic
+    status: reserved
+    owner: spec
+    domain: ASSERT
+    title: "Une obligation eventually non decidable statiquement recoit Unknown, jamais un niveau optimiste"
+    prose_projection:
+      chapters: ["15-proof"]
+      text: "R13 bullet 1 verbatim (segment) : « — le reste = Unknown, jamais optimiste. » Cette loi porte la branche eventually du reste : le checker n'invente aucun niveau; une obligation qu'il ne peut pas décider est enregistrée Unknown au check, et seul un TraceVerified gagné au run peut la relever (loi 0307 pour le receipt)."
+    inputs:
+      - registry: ir
+        id: assert_eventually_obligations
+        role: required
+    premises:
+      - operator: equals
+        operands:
+          - registry: ir
+            id: statically_undecidable_obligation_level
+          - registry: ir
+            id: unknown_level
+        quantifier: forall
+    conclusion:
+      verdict: record
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: assert_evidence_levels
+      independent_judgment: true
+    domain_payload:
+      kind: assertion
+      obligation_property: eventually
+      judgment_time: check
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/assert/valid/eventually-unknown-at-check
+    projections: ["prose:15-proof", "cli:check", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:proof_core.py
+      - conformance:assert-suite
+    introduced_in: C0
+    proof_obligations:
+      - "eventually n'appartient pas à STATIC_PROPERTIES de la référence proof_core.py : c'est le représentant exact du « reste » de R13, et son niveau au check est Unknown par construction, jamais un défaut optimiste."
+    closure_gates:
+      - rest-defaults-to-unknown
+
+  # ── R13 bullet 1 · le reste, branche no_secret_egress (tension référence) ─────
+
+  - id: LAW-ASSERT-0305
+    slug: assert/no-secret-egress-claim-bounded-by-judge
+    status: reserved
+    owner: spec
+    domain: ASSERT
+    title: "no_secret_egress ne porte jamais un niveau que le juge n'a pas reellement decide"
+    prose_projection:
+      chapters: ["15-proof", "10-authority"]
+      text: "R13 bullet 1 verbatim (segment) : « le checker juge les obligations statiquement décidables (existence des tâches · `before` via reachability · `bounded` via fan-out littéral) avec **claim ≤ evidence** — le reste = Unknown, jamais optimiste. » Cette loi porte la branche no_secret_egress. FINDING-ASSERT-02 : R13 ne la nomme pas parmi les statiquement décidables, la référence proof_core.py la déclare STATIC (jugée par taint); l'arbitrage est TO-RULE, la loi garantit dans les deux lectures qu'aucun niveau n'excède ce que le juge décide réellement."
+    inputs:
+      - registry: ir
+        id: assert_no_secret_egress_obligations
+        role: required
+      - registry: ir
+        id: secret_taint_analysis
+        role: required
+    premises:
+      - operator: conforms_to
+        operands:
+          - registry: ir
+            id: assert_no_secret_egress_level
+          - registry: ir
+            id: judge_decided_levels
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-ASSERT-001"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: assert_evidence_levels
+      independent_judgment: true
+    domain_payload:
+      kind: assertion
+      obligation_property: no_secret_egress
+      judgment_time: check
+    diagnostics: ["NIKA-ASSERT-001"]
+    fixtures:
+      - to-mint-c1/conformance/assert/valid/no-secret-egress-judged
+    negative_fixtures:
+      - to-mint-c1/conformance/assert/invalid/no-secret-egress-claim-over-judge
+    projections: ["prose:15-proof", "cli:check", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:proof_core.py
+      - conformance:assert-suite
+    introduced_in: C0
+    proof_obligations:
+      - "FINDING-ASSERT-02 tracé, jamais résolu en douce : si le TO-RULE retient la lecture stricte de R13, le niveau au check est Unknown; s'il retient la référence (statique par taint), le niveau est StaticProof quand le taint le décide. Dans les deux cas la fixture claim-over-judge refuse."
+    closure_gates:
+      - no-secret-egress-arbitrated-c0
+
+  # ── R13 bullet 1 · claim ≤ evidence ───────────────────────────────────────────
+
+  - id: LAW-ASSERT-0306
+    slug: assert/claim-not-above-evidence
+    status: reserved
+    owner: spec
+    domain: ASSERT
+    title: "Aucun claim d'assertion ne depasse le niveau d'evidence etabli"
+    prose_projection:
+      chapters: ["15-proof"]
+      text: "R13 bullet 1 verbatim (segment) : « avec **claim ≤ evidence** — le reste = Unknown, jamais optimiste. » La hiérarchie des niveaux est celle du juge (Unknown < TraceVerified < StaticProof); un claim au-dessus de l'evidence refuse avec NIKA-ASSERT-001 (le code LIVE porte exactement cette classe). Le payload épingle bounded comme exemplaire : c'est la branche B-13 qui violait historiquement cette loi (FINDING-ASSERT-03)."
+    inputs:
+      - registry: ir
+        id: assert_claim_levels
+        role: required
+      - registry: ir
+        id: assert_evidence_levels
+        role: required
+    premises:
+      - operator: meet
+        operands:
+          - registry: ir
+            id: assert_claim_level
+          - registry: ir
+            id: assert_claim_level
+          - registry: ir
+            id: assert_evidence_level
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-ASSERT-001"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: assert_evidence_levels
+      independent_judgment: true
+    domain_payload:
+      kind: assertion
+      obligation_property: bounded
+      judgment_time: check
+    diagnostics: ["NIKA-ASSERT-001"]
+    fixtures:
+      - to-mint-c1/conformance/assert/valid/claim-at-evidence
+    negative_fixtures:
+      - to-mint-c1/conformance/assert/invalid/claim-over-evidence
+    projections: ["prose:15-proof", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:proof_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - conformance:assert-suite
+    introduced_in: C0
+    proof_obligations:
+      - "La premise meet épèle l'ordre sans string libre : claim = meet(claim, evidence) équivaut exactement à claim ≤ evidence dans le treillis des niveaux (la forme target-first à trois opérandes du schema scellé)."
+      - "NIKA-ASSERT-001 LIVE verbatim registre : « an assert: claims a level the evidence does not support (a StaticProof the IR cannot decide · a mis-leveled obligation · spec 15) » : le code et la loi désignent la même classe."
+    closure_gates:
+      - claim-bounded-by-evidence
+
+  # ── R13 bullet 3 · le receipt porte les niveaux atteints ──────────────────────
+
+  - id: LAW-ASSERT-0307
+    slug: assert/receipt-carries-achieved-levels
+    status: reserved
+    owner: spec
+    domain: ASSERT
+    title: "Le receipt porte le niveau atteint par chaque assertion"
+    prose_projection:
+      chapters: ["15-proof"]
+      text: "R13 bullet 3 verbatim (segment) : « Le receipt porte les niveaux atteints. » Chaque assertion du bloc apparait dans le receipt avec son niveau réellement atteint (StaticProof gagné au check, TraceVerified gagné au run, Unknown sinon); le payload épingle before comme exemplaire (FINDING-ASSERT-03), la loi gouverne toutes les obligations."
+    inputs:
+      - registry: ir
+        id: assert_obligations
+        role: required
+      - registry: ir
+        id: assert_evidence_levels
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: assert_levels_in_receipt
+        quantifier: forall
+    conclusion:
+      verdict: record
+    canonicalization:
+      order_sensitive: false
+      normalization: ["jcs"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: assert_levels_in_receipt
+      independent_judgment: true
+    domain_payload:
+      kind: assertion
+      obligation_property: before
+      judgment_time: both
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/assert/receipt/levels-recorded
+    projections: ["prose:15-proof", "cli:run", "sdk", "docs"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:proof_core.py
+      - conformance:assert-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Le receipt d'un run dont une assertion n'a atteint que Unknown porte Unknown en clair : l'absence d'un niveau n'est jamais projetée comme succès (cohérent « jamais optimiste »)."
+    closure_gates:
+      - receipt-carries-assert-levels

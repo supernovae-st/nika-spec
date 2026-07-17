@@ -1,0 +1,552 @@
+# canon/laws/constructors.yaml · C0 IMPORT · R6 constructeurs réservés
+# SSOT: RULINGS_2026-07-15.md §R6 (10 points + la note de cascade · verbatim · JAMAIS
+# paraphrasé, les citations reproduisent les bytes du ruling, ancres "R6 point N").
+# Schema: schemas/law.schema.json (SCELLÉ · consommé as-is). Bloc d'ids du groupe :
+# SURFACE 05xx · GRAMMAR 05xx · CONF 05xx · MIGR 05xx (0520-0529 réservés à constructors).
+# Couverture : p1 → SURFACE-0520 · p2 → SURFACE-0521 · p3 → SURFACE-0523 + GRAMMAR-0520
+# + GRAMMAR-0521 · p4 → SURFACE-0522 · p5 + note cascade → MIGR-0520 · p6+p7+p8+p10 →
+# SURFACE-0524 · p9 → CONF-0520.
+#
+# FINDING-A (part constructors · SSOT-1 §29) : R6 point 5 est une migration doc-kill
+# (mentions "lands with" + strings de diagnostic ENGINE) SANS row dans canon/migrations.yaml
+# (rows existantes : mig-f1..f5 + mig-n2a + mig-n2b) · et canon/types.yaml notes cite un
+# "migration-plan MIG-constructors" qui n'a pas non plus de row. Row à minter par
+# l'orchestrateur, jamais ici (mission : jamais l'ajouter).
+#
+# FINDING-E (SSOT-1 §29) : la row normative NIKA-TYPE-005 (09-types.md:380 + 05-errors.md:116)
+# dit "a secret-carrying type in a lowered position (reserved with secret<T> · W4)" : elle
+# porte À LA FOIS une réservation secret<T> que R6 point 2 retire ET une attribution de
+# vague (W4) que R6 point 5 tue. Le sort de NIKA-TYPE-005 (réécrit sur la représentation
+# IR interne de la sensibilité, ou retiré) n'est PAS tranché par R6 : arbitrage owed à la
+# cascade, enregistré ici, jamais décidé silencieusement.
+#
+# Refs : les symboles constructeurs vivent en registry ir (convention sandbox), SAUF la
+# row seedée types/artifact_constructor_reserved (le sujet réel de SURFACE-0523).
+
+laws_document_format: 1
+
+group: r6-reserved-constructors
+
+laws:
+
+  # ─────────────────── R6 point 1 · result<T> retiré ────────────────────────────
+
+  - id: LAW-SURFACE-0520
+    slug: constructors/result-withdrawn
+    status: reserved
+    owner: spec
+    domain: SURFACE
+    title: "result<T> est retiré de la grammaire publique et de la liste des constructeurs réservés"
+    prose_projection:
+      chapters: ["09-types"]
+      text: "R6 point 1 verbatim : « **result<T>** → retirer de la grammaire publique et de la liste des constructeurs réservés. Motivation : risque de duplication avec Outcome.class/cause/payload ; sémantique succès/erreur non définie ; aucun consommateur démontré ; le nom pourra être réévalué uniquement avec un besoin distinct d'Outcome. » Post-retrait, result<...> en position de type n'est ni réservé ni connu : il refuse comme nom de type inconnu."
+    inputs:
+      - registry: ir
+        id: result_constructor_type_position_event
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: result_constructor_type_position_event
+        quantifier: exists
+    conclusion:
+      verdict: refuse
+      diagnostics_on_refuse: ["NIKA-TYPE-001"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: public_reserved_constructors
+      independent_judgment: true
+    domain_payload:
+      kind: surface
+      constraint: reservation
+      subject:
+        registry: ir
+        id: result_constructor_spelling
+    diagnostics: ["NIKA-TYPE-001"]
+    fixtures:
+      - to-mint-c1/conformance/constructors/valid/no-result-type
+    negative_fixtures:
+      - conformance/tests/core/types/009-reserved-constructor
+    projections: ["prose:09-types", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:type_core.py
+      - cli:nika-check
+      - conformance:constructors-suite
+    introduced_in: C0
+    proof_obligations:
+      - "La fixture réelle 009-reserved-constructor (returns: result → valid:false · NIKA-TYPE-001) garde sa polarité négative post-retrait ; son expected note « result/artifact/secret are named but land with their waves » meurt avec le census R6 point 5 (LAW-MIGR-0520)."
+      - "R6 point 1 verbatim : « le nom pourra être réévalué uniquement avec un besoin distinct d'Outcome. » Aucune réintroduction sans ce besoin démontré."
+    closure_gates:
+      - fixture-parity
+      - reserved-list-excludes-result
+
+  # ─────────────────── R6 point 2 · secret<T> retiré ────────────────────────────
+
+  - id: LAW-SURFACE-0521
+    slug: constructors/secret-withdrawn
+    status: reserved
+    owner: spec
+    domain: SURFACE
+    title: "secret<T> est retiré de la grammaire publique réservée, la sensibilité vit dans l'IR interne"
+    prose_projection:
+      chapters: ["09-types"]
+      text: "R6 point 2 verbatim : « **secret<T>** → retirer de la grammaire publique réservée. La sensibilité reste représentée dans l'IR interne par : provenance ; confidentialité ; taint ; autorité de résolution ; egress/declassification. Un secret reste une store-reference gouvernée, pas une valeur ordinaire enveloppée par l'auteur. » Post-retrait, secret<...> en position de type refuse comme nom inconnu ; aucune surface publique n'enveloppe un secret dans un constructeur de type."
+    inputs:
+      - registry: ir
+        id: secret_constructor_type_position_event
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: secret_constructor_type_position_event
+        quantifier: exists
+    conclusion:
+      verdict: refuse
+      diagnostics_on_refuse: ["NIKA-TYPE-001"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: public_reserved_constructors
+      independent_judgment: true
+    domain_payload:
+      kind: surface
+      constraint: reservation
+      subject:
+        registry: ir
+        id: secret_constructor_spelling
+    diagnostics: ["NIKA-TYPE-001"]
+    fixtures:
+      - to-mint-c1/conformance/constructors/valid/no-secret-type
+    negative_fixtures:
+      - to-mint-c1/conformance/constructors/invalid/secret-type-position
+    projections: ["prose:09-types", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:type_core.py
+      - cli:nika-check
+      - conformance:constructors-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Les cinq dimensions IR internes citées (provenance ; confidentialité ; taint ; autorité de résolution ; egress/declassification) ne sont PAS des surfaces publiques : aucune n'apparaît dans la grammaire."
+      - "FINDING-E : la row NIKA-TYPE-005 dit encore « reserved with `secret<T>` · W4 » (09-types.md:380 + 05-errors.md:116) ; son sort (réécriture sur l'IR interne ou retrait) est un arbitrage owed à la cascade, jamais décidé ici."
+    closure_gates:
+      - fixture-parity
+      - reserved-list-excludes-secret
+
+  # ─────────────────── R6 point 4 · money forme nue retirée ─────────────────────
+
+  - id: LAW-SURFACE-0522
+    slug: constructors/money-bare-withdrawn
+    status: reserved
+    owner: spec
+    domain: SURFACE
+    title: "money est retiré sous sa forme nue, seul un research candidate survit hors surface publique"
+    prose_projection:
+      chapters: ["09-types"]
+      text: "R6 point 4 verbatim : « **money** → retirer sous la forme nue `money`. Conserver uniquement un research candidate pour une future forme exacte : decimal ; money<CURRENCY> ; ou Money{amount: Decimal, currency: ISO4217}. Toute future introduction exige : zéro float binaire ; règle d'arrondi ; précision ; devise ; canonicalization ; JSON/JCS ; hash ; comparaisons ; conversions explicites. » Post-retrait, money en position de type refuse comme nom inconnu ; la lowering row string de 09-types.md:226 meurt avec la forme."
+    inputs:
+      - registry: ir
+        id: money_bare_type_position_event
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: money_bare_type_position_event
+        quantifier: exists
+    conclusion:
+      verdict: refuse
+      diagnostics_on_refuse: ["NIKA-TYPE-001"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: public_reserved_constructors
+      independent_judgment: true
+    domain_payload:
+      kind: surface
+      constraint: reservation
+      subject:
+        registry: ir
+        id: money_bare_spelling
+    diagnostics: ["NIKA-TYPE-001"]
+    fixtures:
+      - to-mint-c1/conformance/constructors/valid/no-money-type
+    negative_fixtures:
+      - conformance/tests/core/types/014-money-reserved
+    projections: ["prose:09-types", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:type_core.py
+      - cli:nika-check
+      - conformance:constructors-suite
+    introduced_in: C0
+    proof_obligations:
+      - "La fixture réelle 014-money-reserved (returns: money → valid:false · NIKA-TYPE-001) garde sa polarité négative post-retrait ; son expected note « money lands with the decision core » meurt avec le census R6 point 5 (LAW-MIGR-0520)."
+      - "Les neuf exigences d'introduction future (zéro float binaire ; règle d'arrondi ; précision ; devise ; canonicalization ; JSON/JCS ; hash ; comparaisons ; conversions explicites) gardent le research candidate hors de la surface publique tant qu'elles ne sont pas toutes définies."
+    closure_gates:
+      - fixture-parity
+      - reserved-list-excludes-money
+
+  # ─────────────── R6 point 3 · artifact<mime> seul réservé ─────────────────────
+
+  - id: LAW-SURFACE-0523
+    slug: constructors/artifact-sole-reserved
+    status: reserved
+    owner: spec
+    domain: SURFACE
+    title: "artifact<mime> est l'unique constructeur public réservé du groupe, non authorable"
+    prose_projection:
+      chapters: ["09-types"]
+      text: "R6 point 3 verbatim (première partie) : « **artifact<mime>** → conserver comme unique constructeur public réservé de ce groupe, non authorable. Ajouter : owner explicite ; future gate ; définition minimale attendue ; statut reserved-not-implemented ; diagnostic honnête ; aucun claim de livraison. » La row seedée types/artifact_constructor_reserved porte owner: spec + reservation.future_gate: constructor-activation-gate + status: reserved ; le spelling « statut reserved-not-implemented » se mappe sur le lifecycle scellé reserved (documenté, jamais silencieux) ; définition minimale attendue et diagnostic honnête sont jugés par LAW-GRAMMAR-0520/0521."
+    inputs:
+      - registry: types
+        id: artifact_constructor_reserved
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: types
+            id: artifact_constructor_reserved
+        quantifier: exactly_one
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: types
+          id: artifact_constructor_reserved
+      independent_judgment: true
+    domain_payload:
+      kind: surface
+      constraint: reservation
+      subject:
+        registry: types
+        id: artifact_constructor_reserved
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/constructors/registry/artifact-sole-reserved-row
+    projections: ["prose:09-types", "schema", "cli:check", "docs"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:type_core.py
+      - conformance:constructors-suite
+    introduced_in: C0
+    proof_obligations:
+      - "exactly_one : le registre types porte exactement une row de constructeur réservé de ce groupe, et c'est artifact<mime>."
+      - "R6 point 3 verbatim : « aucun claim de livraison. » Aucune surface (diagnostic, doc, teaching) n'annonce une vague ou une date pour artifact<mime>."
+    closure_gates:
+      - sole-reserved-constructor-row
+      - no-delivery-claim
+
+  - id: LAW-GRAMMAR-0520
+    slug: constructors/artifact-not-authorable
+    status: reserved
+    owner: spec
+    domain: GRAMMAR
+    title: "artifact<mime> refuse en position de type authorable avec un diagnostic honnête"
+    prose_projection:
+      chapters: ["09-types"]
+      text: "R6 point 3 verbatim : « **artifact<mime>** → conserver comme unique constructeur public réservé de ce groupe, non authorable. » La branche grammaire : artifact<...> écrit par un auteur en position de type refuse ; le diagnostic dit reserved-not-implemented, sans claim de livraison (« diagnostic honnête ; aucun claim de livraison. »)."
+    inputs:
+      - registry: ir
+        id: artifact_constructor_type_position_event
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: artifact_constructor_type_position_event
+        quantifier: exists
+    conclusion:
+      verdict: refuse
+      diagnostics_on_refuse: ["NIKA-TYPE-001"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: public_reserved_constructors
+      independent_judgment: true
+    domain_payload:
+      kind: grammar
+      position: type_expression
+      field_rules:
+        - field: artifact_constructor
+          cardinality: forbidden
+    diagnostics: ["NIKA-TYPE-001"]
+    fixtures:
+      - to-mint-c1/conformance/constructors/valid/no-artifact-type
+    negative_fixtures:
+      - to-mint-c1/conformance/constructors/invalid/artifact-type-position
+    projections: ["prose:09-types", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:type_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:constructors-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Le teaching du refus nomme le statut reserved-not-implemented et ne cite AUCUNE vague ni date (la classe « lands with » est morte par LAW-MIGR-0520) ; NIKA-TYPE-001 est la classe opérante aujourd'hui (fixture 009 du même groupe), un code dédié reserved-use est un arbitrage owed à l'import diagnostics, jamais inventé ici."
+    closure_gates:
+      - fixture-parity
+      - honest-diagnostic-no-wave-claim
+
+  - id: LAW-GRAMMAR-0521
+    slug: constructors/artifact-authorable-prerequisites
+    status: reserved
+    owner: spec
+    domain: GRAMMAR
+    title: "artifact<mime> ne devient authorable qu'avec ses neuf définitions préalables"
+    prose_projection:
+      chapters: ["09-types"]
+      text: "R6 point 3 verbatim (seconde partie) : « Avant de devenir authorable, il devra définir : content digest ; media type canonique ; size ; provenance ; storage reference ; integrity ; lifecycle ; composition ; receipt projection. » La définition du constructeur porte les neuf champs, tous requis ; tant qu'un manque, le statut reste reserved-not-implemented et LAW-GRAMMAR-0520 refuse l'authoring."
+    inputs:
+      - registry: ir
+        id: artifact_constructor_definition
+        role: required
+    premises:
+      - operator: conforms_to
+        operands:
+          - registry: ir
+            id: artifact_constructor_definition
+          - registry: ir
+            id: artifact_definition_minimum
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: artifact_definition_minimum
+      independent_judgment: true
+    domain_payload:
+      kind: grammar
+      position: artifact_constructor_definition
+      field_rules:
+        - field: content_digest
+          cardinality: required
+        - field: media_type
+          cardinality: required
+        - field: size
+          cardinality: required
+        - field: provenance
+          cardinality: required
+        - field: storage_reference
+          cardinality: required
+        - field: integrity
+          cardinality: required
+        - field: lifecycle
+          cardinality: required
+        - field: composition
+          cardinality: required
+        - field: receipt_projection
+          cardinality: required
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/constructors/gate/artifact-definition-complete
+    negative_fixtures:
+      - to-mint-c1/conformance/constructors/gate/artifact-definition-incomplete
+    projections: ["prose:09-types", "schema", "docs"]
+    implementation_surfaces:
+      - reference:type_core.py
+      - conformance:constructors-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Les noms machine des neuf champs (content_digest · media_type · size · provenance · storage_reference · integrity · lifecycle · composition · receipt_projection) sont la forme canonique lowercase des neuf items du ruling (« media type canonique » → media_type) ; mapping un pour un, aucun omis, aucun ajouté."
+      - "Cette loi juge le passage FUTUR au statut authorable (la future gate constructor-activation-gate de la row seedée) ; elle n'implémente rien maintenant (R6 point 7)."
+    closure_gates:
+      - nine-prerequisites-enforced
+      - activation-gate-declared
+
+  # ─────────────── R6 points 6 + 7 + 8 + 10 · la clôture du groupe ──────────────
+
+  - id: LAW-SURFACE-0524
+    slug: constructors/research-registry-group-closure
+    status: reserved
+    owner: spec
+    domain: SURFACE
+    title: "Le registre de recherche garde les quatre idées, la surface publique ne réserve qu'artifact<mime>"
+    prose_projection:
+      chapters: ["09-types"]
+      text: "R6 point 6 verbatim : « Le registre de recherche peut conserver les quatre idées, mais seule `artifact<mime>` reste réservée dans la surface publique. » · R6 point 7 verbatim : « Aucun constructeur n'est implémenté maintenant. » · R6 point 8 verbatim : « Aucun alias, aucun placeholder runtime et aucun type factice. » · R6 point 10 verbatim : « Le langage reste nika: v1. » L'ensemble des constructeurs publics réservés du groupe est exactement le singleton artifact<mime>."
+    inputs:
+      - registry: ir
+        id: public_reserved_constructors
+        role: required
+      - registry: ir
+        id: research_registry_constructor_candidates
+        role: required
+    premises:
+      - operator: equals
+        operands:
+          - registry: ir
+            id: public_reserved_constructors
+          - registry: ir
+            id: artifact_constructor_singleton
+        quantifier: forall
+      - operator: present
+        operands:
+          - registry: ir
+            id: research_registry_constructor_candidates
+        quantifier: exists
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: public_reserved_constructors
+      independent_judgment: true
+    domain_payload:
+      kind: surface
+      constraint: family_membership
+      subject:
+        registry: ir
+        id: public_reserved_constructors
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/constructors/registry/group-closure-singleton
+    projections: ["prose:09-types", "schema", "cli:check", "docs"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:type_core.py
+      - conformance:constructors-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R6 point 8 verbatim : « Aucun alias, aucun placeholder runtime et aucun type factice. » Aucune surface n'expose un type stub ou un alias de compatibilité pour result/secret/money."
+      - "Le registre de recherche (hors surface publique) conserve les quatre idées : sa présence est jugée exists, son contenu n'entre jamais dans la grammaire."
+    closure_gates:
+      - reserved-group-is-singleton
+      - no-runtime-placeholder
+
+  # ─────────────── R6 point 5 + note de cascade · le census ─────────────────────
+
+  - id: LAW-MIGR-0520
+    slug: constructors/stale-mentions-census-zero
+    status: reserved
+    owner: spec
+    domain: MIGR
+    title: "Les anciennes mentions lands-with et attributions de vagues atteignent un census de zéro"
+    prose_projection:
+      chapters: ["09-types", "05-errors"]
+      text: "R6 point 5 verbatim : « Supprimer toutes les anciennes mentions : \"lands with W5\" ; \"lands with W-DEC\" ; propriétaires ou vagues closes erronées. » Note de cascade du ruling, verbatim : « (Cascade : inclut les strings de diagnostic ENGINE — TESTED P7 : `result<string>` dit encore « lands with outcomes (W5) ».) » Le census couvre spec, canon, schema, docs, fixtures ET les strings de diagnostic engine. FINDING-A : cette migration doc-kill n'a AUCUNE row dans canon/migrations.yaml · row à minter par l'orchestrateur."
+    inputs:
+      - registry: ir
+        id: constructor_stale_wave_mentions
+        role: required
+    premises:
+      - operator: absent
+        operands:
+          - registry: ir
+            id: constructor_stale_wave_mentions
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: constructor_stale_wave_mentions
+      independent_judgment: true
+    domain_payload:
+      kind: migration
+      constraint: old_form_census_zero
+      subject:
+        registry: ir
+        id: constructor_stale_wave_mentions
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/constructors/census/stale-mentions-zero
+    projections: ["prose:09-types", "prose:05-errors", "cli:check", "docs"]
+    implementation_surfaces:
+      - conformance:constructors-suite
+      - reference:census_gate.py
+    introduced_in: C0
+    proof_obligations:
+      - "Census empirique au pin (hits vivants) : 09-types.md:71-76 (la table réservée avec Outcome IR (W5) · artifact lanes (W5) · authority wave (W4) · decision core (W-DEC)) · 09-types.md:226 (« land with the decision core ») · 09-types.md:380 + 05-errors.md:116 (« reserved with `secret<T>` · W4 ») · les notes expected.json des fixtures 009 (« land with their waves ») et 014 (« money lands with the decision core ») · les strings de diagnostic ENGINE (TESTED P7). Le census post-cascade rend 0."
+      - "Portée du pattern : 07-conformance.md:178 (« lands with the reference engine ») n'est PAS une mention de constructeur ; le census se scope aux mentions constructeurs, jamais un grep naïf du mot lands."
+    closure_gates:
+      - stale-mentions-census-zero
+      - migration-row-minted
+
+  # ─────────────────── R6 point 9 · le reflet exact ─────────────────────────────
+
+  - id: LAW-CONF-0520
+    slug: constructors/surfaces-reflect-exactly
+    status: reserved
+    owner: spec
+    domain: CONF
+    title: "Diagnostics, canon, schema, docs et projections reflètent exactement le ruling constructeurs"
+    prose_projection:
+      chapters: ["09-types"]
+      text: "R6 point 9 verbatim : « Les diagnostics, canon, schema, docs et projections doivent refléter exactement ce ruling. » Chaque surface rend le même état : result/secret/money retirés, artifact<mime> seul réservé non-authorable, aucune mention de vague ; une surface divergente est un échec de build."
+    inputs:
+      - registry: ir
+        id: constructor_surfaces_state
+        role: required
+    premises:
+      - operator: equals
+        operands:
+          - registry: ir
+            id: constructor_surfaces_state
+          - registry: ir
+            id: constructor_ruling_state
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: constructor_ruling_state
+      independent_judgment: true
+    domain_payload:
+      kind: conformance
+      constraint: engine_reference_parity
+      subject:
+        registry: ir
+        id: constructors_ruling_parity
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/constructors/parity/all-surfaces-reflect-ruling
+    projections: ["prose:09-types", "schema", "cli:check", "lsp", "mcp", "sdk", "docs"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:type_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:constructors-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Le harnais différentiel vérifie sur chaque surface (diagnostics, canon, schema, docs, projections) l'état exact du ruling : les quatre verdicts par constructeur et zéro claim de livraison."
+    closure_gates:
+      - fixture-parity
+      - surfaces-reflect-ruling-exactly

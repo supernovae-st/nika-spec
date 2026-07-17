@@ -1,0 +1,210 @@
+# canon/laws/gates.yaml · C0 import · R5 predicats de gate (les orthographes des classes
+# Outcome). SSOT: RULINGS_2026-07-15.md §R5 (standard pick · le texte du choix EST le record
+# normatif · cite verbatim, jamais paraphrase). Schema: schemas/law.schema.json (SCELLE).
+# Bloc d'ids assigne: GRAMMAR-02xx + SURFACE-02xx + OUTCOME-02xx (sous-plage x231-x239 ici).
+#
+# Code NIKA-GATE-001: c0-proposed · namespace NEUF (grep spec/+canon/ = 0 occurrence) ·
+# renumerotable avant C1 per pattern pilote FINDING-05.
+#
+# Empirie au pin: le vocabulaire ACTUEL des predicats after est participial · 03-dag:55
+# « predicate ∈ succeeded | failed | skipped | terminal » · le codemod 1:1 du ruling mappe
+# donc mecaniquement chaque participe vers sa classe (succeeded->success · failed->failure ·
+# skipped et terminal inchanges) : lecture mecanique du vocabulaire source vers les classes,
+# aucun choix semantique. DAG-007 (spec/05-errors.md:111) garde le vocabulaire des
+# comparaisons de status (« success · failure · skipped · cancelled ») avec le did-you-mean
+# 'failed'->failure (03-dag:788) : cette classe did-you-mean meurt avec R5.
+#
+# FINDING (SSOT-1 §29, remonte au retour structure): R5 ne grave PAS l'extension du predicat
+# terminal (quelles classes le satisfont) ni un chemin de gate direct pour la classe
+# cancelled (presente dans le vocabulaire de comparaison DAG-007 05:111 et dans R2/B-17,
+# absente du vocabulaire after choisi). LAW-OUTCOME-0231 fixe le STATUT de terminal
+# (predicat, pas une classe); son extension se declare a la table 13-outcomes, jamais ici.
+
+laws_document_format: 1
+
+pilot: c0-gates
+
+laws:
+
+  # ───────────────── R5 · le vocabulaire du champ after ──────────────────────
+
+  - id: LAW-GRAMMAR-0231
+    slug: gates/after-predicate-vocabulary
+    status: reserved
+    owner: spec
+    domain: GRAMMAR
+    title: "Le vocabulaire des predicats after est exactement success, failure, skipped, terminal"
+    prose_projection:
+      chapters: ["03-dag"]
+      text: "R5 verbatim : « **Choix : (a) `after: success | failure | skipped | terminal`.** » · R5 verbatim : « Codemod 1:1 mécanique · la classe did-you-mean `'failed'→failure` (DAG-007) meurt · le flip interne 15:93 vs const:193 devient impossible. » Empirie au pin : le vocabulaire actuel est participial (03-dag:55 « predicate ∈ succeeded | failed | skipped | terminal »); le 1:1 mecanique mappe chaque participe vers sa classe (succeeded->success · failed->failure · skipped et terminal inchanges). Tout predicat hors des quatre orthographes refuse."
+    inputs:
+      - registry: ir
+        id: after_gate_predicates
+        role: required
+      - registry: grammar
+        id: gate_predicate_vocabulary
+        role: ceiling
+    premises:
+      - operator: member_of
+        operands:
+          - registry: ir
+            id: after_gate_predicates
+          - registry: grammar
+            id: gate_predicate_vocabulary
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-GATE-001"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: gate_predicate_vocabulary
+      independent_judgment: true
+    domain_payload:
+      kind: grammar
+      position: task_after_entry
+      field_rules:
+        - field: predicate
+          cardinality: required
+          value_shape:
+            registry: grammar
+            id: gate_predicate_vocabulary
+    diagnostics: ["NIKA-GATE-001"]
+    fixtures:
+      - to-mint-c1/conformance/gates/valid/after-class-spellings
+    negative_fixtures:
+      - to-mint-c1/conformance/gates/invalid/after-participial-spelling-dead
+      - to-mint-c1/conformance/gates/invalid/after-unknown-predicate
+    projections: ["prose:03-dag", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:outcome_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:dag-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R5 verbatim : « la classe did-you-mean `'failed'→failure` (DAG-007) meurt ». Apres le codemod, l'auteur n'apprend plus jamais une orthographe participiale : la classe de correction n'a plus d'objet et devient tombstone au registre diagnostics."
+      - "R5 verbatim : « Codemod 1:1 mécanique ». Chaque site after migre cle-a-cle sans arbitrage semantique; census des orthographes participiales = 0 avant fermeture (R8 point 18). Les fixtures dag actuelles au monde participial (failure-cancels-downstream · foreach-empty-skips · cycle-reject et soeurs, toutes en `succeeded` au pin) migrent dans la MEME cascade."
+    closure_gates:
+      - dag-007-did-you-mean-tombstoned
+      - codemod-one-to-one
+      - participial-spellings-census-zero
+
+  # ───────────────── R5 · les prédicats parlent les orthographes des classes ─
+
+  - id: LAW-SURFACE-0231
+    slug: gates/predicates-speak-outcome-class-spellings
+    status: reserved
+    owner: spec
+    domain: SURFACE
+    title: "Les predicats de gate adoptent les orthographes des classes Outcome, une orthographe par signification"
+    prose_projection:
+      chapters: ["03-dag", "13-outcomes"]
+      text: "R5 verbatim : « Les prédicats adoptent les orthographes des classes Outcome ; `terminal` reste (prédicat honnête sur les classes, pas une classe). » · R5 verbatim : « le flip interne 15:93 vs const:193 devient impossible. » Une classe Outcome possede UNE orthographe, la meme partout : predicat after, comparaison de status, table des outcomes; deux surfaces internes ne peuvent plus orthographier differemment la meme classe."
+    inputs:
+      - registry: grammar
+        id: gate_class_predicates
+        role: required
+      - registry: ir
+        id: outcome_class_spellings
+        role: ceiling
+    premises:
+      - operator: subset_of
+        operands:
+          - registry: grammar
+            id: gate_class_predicates
+          - registry: ir
+            id: outcome_class_spellings
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: surface
+          id: outcome_class_spellings
+      independent_judgment: true
+    domain_payload:
+      kind: surface
+      constraint: one_spelling_per_meaning
+      subject:
+        registry: surface
+        id: outcome_class_spellings
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/gates/registry/predicate-spellings-equal-class-spellings
+    projections: ["prose:03-dag", "prose:13-outcomes", "schema", "cli:check", "docs"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:outcome_core.py
+      - conformance:dag-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R5 verbatim : « le flip interne 15:93 vs const:193 devient impossible. » La preuve est structurelle : les predicats-classes sont un sous-ensemble des orthographes de la table Outcome (une seule source), un flip exigerait deux tables et il n'en existe qu'une."
+      - "Le predicat terminal est HORS de ce sous-ensemble par construction (il n'est pas une classe, LAW-OUTCOME-0231); la loi ne compare que les predicats-classes."
+    closure_gates:
+      - internal-spelling-flip-impossible
+      - one-spelling-per-class
+
+  # ───────────────── R5 · terminal est un prédicat, jamais une classe ────────
+
+  - id: LAW-OUTCOME-0231
+    slug: gates/terminal-honest-predicate-not-a-class
+    status: reserved
+    owner: spec
+    domain: OUTCOME
+    title: "terminal reste un predicat honnete sur les classes Outcome, jamais une classe"
+    prose_projection:
+      chapters: ["13-outcomes", "03-dag"]
+      text: "R5 verbatim : « `terminal` reste (prédicat honnête sur les classes, pas une classe). » La table des classes Outcome reste fermee SANS terminal : terminal est un predicat derive qui juge les classes, il n'entre jamais dans la table comme row. Son extension exacte (quelles classes le satisfont) se declare a la table 13-outcomes, jamais dans le code moteur; R5 ne grave pas cette extension (finding remonte : le vocabulaire de comparaison DAG-007 05:111 contient la classe cancelled, absente du vocabulaire after choisi · la declaration d'extension a la table est le seul chemin, jamais une invention ici)."
+    inputs:
+      - registry: ir
+        id: outcome_class_table
+        role: required
+      - registry: ir
+        id: terminal_as_outcome_class
+        role: probe
+    premises:
+      - operator: absent
+        operands:
+          - registry: ir
+            id: terminal_as_outcome_class
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: outcome_class_table
+      independent_judgment: true
+    domain_payload:
+      kind: outcome
+      transition_table:
+        registry: ir
+        id: outcome_class_table
+      constraint: legal_pairs_closed
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/gates/registry/terminal-not-in-class-table
+    projections: ["prose:13-outcomes", "prose:03-dag", "schema", "cli:check", "docs"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:outcome_core.py
+      - conformance:dag-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R5 verbatim : « prédicat honnête sur les classes, pas une classe ». L'honnetete est structurelle : terminal se DERIVE de la table (une disjonction declaree de classes), il ne peut ni gagner une cause, ni porter une row, ni etre retourne comme Outcome.class."
+      - "L'extension de terminal est declaree au registre de la table 13-outcomes avant C1; toute divergence entre cette declaration et le comportement engine est un finding, jamais un ajustement silencieux (SSOT-1 §29)."
+    closure_gates:
+      - terminal-extension-declared-at-table
+      - outcome-class-table-closed

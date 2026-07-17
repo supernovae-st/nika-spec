@@ -1,0 +1,418 @@
+# canon/laws/outputs.yaml · C0 import · R4 bindings et extraction + F3 outputs-form
+# KEEP-HARDENED. SSOT primaire: RULINGS_2026-07-15.md §R4 (standard pick · le texte du choix
+# EST le record normatif) + §R8 point 11 (RULING CUSTOM verbatim · le quartet outputs).
+# SSOT du verdict F3 (DUAL-SOURCE DECLARE · finding remonte au retour structure) :
+# RULINGS §MINI-GATES donne Winner = « PENDING mini-gate » pour outputs-declaration-form ·
+# le verdict est ratifie PAR ANNEXE (le texte locke n'est jamais edite, mecanisme prevu) :
+# ANNEX_2026-07-17_minigates-winners.md §Les winners row F3 (D-2026-07-17-N2) +
+# mini-gates/f3-outputs-form-receipt.md (§DECISION · §Migration row) +
+# mini-gates/f3-outputs-form-receipt.json (notes ligne 49 · la ou vit le WARN redundant).
+# Les lois F3 ci-dessous citent CES fichiers avec leurs ancres propres.
+# Schema: schemas/law.schema.json (SCELLE). Bloc d'ids: SURFACE/GRAMMAR/TYPE-02xx
+# (sous-plage x221-x229 ici).
+#
+# Codes NIKA-OUT-001..005: c0-proposed · namespace NEUF (grep spec/+canon/ = 0 occurrence) ·
+# renumerotables avant C1 per pattern pilote FINDING-05.
+#
+# Empirie au pin: PARSE-013 = spec/05-errors.md:90 « `with:`/`output:` binding uses a
+# reserved name (`output` · `status` · `error` · `started_at` · `ended_at` · `duration_ms`) »
+# (la liste spec = 6 noms · l'engine en reservait 7 · la divergence .cause du ruling) ·
+# le champ task output: vit en 03-dag:67 · la paire enseignee vit en 01-envelope:501
+# « **`outputs:` (envelope · plural) ≠ `output:` (task · singular).** » · la fixture negative
+# conformance/variables/typed-outputs-mismatch.nika.yaml EXISTE (577 bytes · le negative
+# witness cite par le receipt F3).
+
+laws_document_format: 1
+
+pilot: c0-outputs
+
+laws:
+
+  # ───────────────── R4 · les arbres disjoints (out.<n> hors record) ─────────
+
+  - id: LAW-SURFACE-0221
+    slug: outputs/bindings-out-tree-disjoint-from-record
+    status: reserved
+    owner: spec
+    domain: SURFACE
+    title: "Les bindings extraits vivent sous tasks.X.out.<name>, un arbre disjoint du record moteur"
+    prose_projection:
+      chapters: ["04-variables", "03-dag"]
+      text: "R4 verbatim : « **Choix : (b) `tasks.X.out.<n>` + `extract:`.** » · R4 verbatim : « Les bindings jq sortent du namespace record → `tasks.X.out.<name>` (arbres disjoints · le record grandit additivement à jamais · la liste réservée PARSE-013 et son treadmill meurent). » · R4 verbatim : « Ferme le hard-reject vivant (engine 7 noms vs spec 6 · `.cause` divergence). » Les noms de champs moteur du record et les noms de bindings d'auteur vivent dans deux arbres disjoints; l'espace out.<name> appartient entierement a l'auteur, aucune liste reservee ne le contraint plus."
+    inputs:
+      - registry: surface
+        id: task_record_engine_field_names
+        role: required
+      - registry: surface
+        id: task_out_binding_names
+        role: required
+    premises:
+      - operator: intersect_empty
+        operands:
+          - registry: surface
+            id: task_record_engine_field_names
+          - registry: surface
+            id: task_out_binding_names
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-OUT-001"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: surface
+          id: task_out_namespace
+      independent_judgment: true
+    domain_payload:
+      kind: surface
+      constraint: family_membership
+      subject:
+        registry: surface
+        id: task_out_namespace
+    diagnostics: ["NIKA-OUT-001"]
+    fixtures:
+      - to-mint-c1/conformance/outputs/valid/out-names-free-of-reserved-list
+    negative_fixtures:
+      - to-mint-c1/conformance/outputs/invalid/record-tree-collision
+    projections: ["prose:04-variables", "prose:03-dag", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:values_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:variables-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R4 verbatim : « la liste réservée PARSE-013 et son treadmill meurent ». PARSE-013 (spec/05-errors.md:90 · la liste des 6 noms reserves) devient tombstone; un nom de binding jadis reserve (output · status · error · started_at · ended_at · duration_ms) est legal sous out.<name>."
+      - "R4 verbatim : « Ferme le hard-reject vivant (engine 7 noms vs spec 6 · `.cause` divergence). » La divergence engine-vs-spec sur .cause devient sans objet : les noms record ne contraignent plus jamais les bindings d'auteur, aucune des deux listes ne survit."
+      - "R8 point 11 verbatim : « Concernant outputs : distinguer strictement tasks.X.output, tasks.X.out.<name>, extract:, outputs: du workflow ». Quatre objets, quatre arbres/roles distincts, zero collision structurelle."
+    closure_gates:
+      - parse-013-tombstoned
+      - reserved-name-treadmill-dead
+      - seven-vs-six-hard-reject-closed
+
+  - id: LAW-SURFACE-0222
+    slug: outputs/record-grows-additively-forever
+    status: reserved
+    owner: spec
+    domain: SURFACE
+    title: "Le record moteur grandit additivement a jamais"
+    prose_projection:
+      chapters: ["04-variables", "03-dag"]
+      text: "R4 verbatim : « Les bindings jq sortent du namespace record → `tasks.X.out.<name>` (arbres disjoints · le record grandit additivement à jamais · la liste réservée PARSE-013 et son treadmill meurent). » Branche additivite : le record (les champs moteur sous tasks.X) est reserve au moteur et n'evolue que par ajout; un champ record publie ne disparait jamais et n'est jamais renomme, et un ajout ne peut plus jamais casser un binding d'auteur (les arbres sont disjoints)."
+    inputs:
+      - registry: surface
+        id: task_record_fields_released
+        role: required
+      - registry: surface
+        id: task_record_fields_current
+        role: required
+    premises:
+      - operator: subset_of
+        operands:
+          - registry: surface
+            id: task_record_fields_released
+          - registry: surface
+            id: task_record_fields_current
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: surface
+          id: task_record_namespace
+      independent_judgment: true
+    domain_payload:
+      kind: surface
+      constraint: reservation
+      subject:
+        registry: surface
+        id: task_record_namespace
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/outputs/registry/record-additive-evolution
+    projections: ["prose:04-variables", "schema", "cli:check", "docs"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:values_core.py
+      - conformance:variables-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Le treadmill mort est la preuve structurelle : avant R4, chaque nouveau champ record ajoutait un nom reserve qui cassait des workflows existants (le treadmill PARSE-013); avec les arbres disjoints, l'ajout d'un champ record est invisible pour l'auteur, a jamais."
+    closure_gates:
+      - record-additive-forever
+
+  # ───────────────── R4 · extract: remplace le misnomer output: ──────────────
+
+  - id: LAW-GRAMMAR-0221
+    slug: outputs/task-extract-replaces-output
+    status: reserved
+    owner: spec
+    domain: GRAMMAR
+    title: "Le champ task extract porte les bindings d'extraction, le misnomer output est une forme morte"
+    prose_projection:
+      chapters: ["03-dag", "01-envelope"]
+      text: "R4 verbatim : « Task `output:` → **`extract:`** (le misnomer meurt · la paire singulier/pluriel meurt · le champ graph-node se renomme dans le même format bump). » Empirie au pin : le champ vit en 03-dag:67 (« output: # optional · named jq bindings ») et la paire s'enseigne en 01-envelope:501 « **`outputs:` (envelope · plural) ≠ `output:` (task · singular).** » : cette paire pedagogique meurt avec le rename. Receipt F3 §Migration row verbatim : « R4 quartet (`tasks.X.output` · `tasks.X.out.<n>` · `extract:` · `outputs:`) intact. » L'EXPRESSION tasks.X.output (l'acces record) survit; seul le CHAMP de declaration se renomme."
+    inputs:
+      - registry: ir
+        id: task_output_field
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: task_output_field
+        quantifier: exists
+    conclusion:
+      verdict: refuse
+      diagnostics_on_refuse: ["NIKA-OUT-002"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: task_extract_field
+      independent_judgment: true
+    domain_payload:
+      kind: grammar
+      position: task
+      field_rules:
+        - field: extract
+          cardinality: optional
+          value_shape:
+            registry: grammar
+            id: jq_binding_map
+        - field: output
+          cardinality: forbidden
+    diagnostics: ["NIKA-OUT-002"]
+    fixtures:
+      - to-mint-c1/conformance/outputs/valid/extract-bindings
+    negative_fixtures:
+      - to-mint-c1/conformance/outputs/invalid/task-output-field-dead
+    projections: ["prose:03-dag", "prose:01-envelope", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:values_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:dag-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R4 verbatim : « le champ graph-node se renomme dans le même format bump ». Le format machine graph porte le rename dans le MEME bump de version de format, jamais deux formats vivants pour le meme champ."
+      - "R8 point 15 verbatim : « Codemod equivalence-or-stop. » Le rename output:->extract: est cle-a-cle mecanique; census old-form = 0 avant fermeture (R8 point 18)."
+    closure_gates:
+      - old-form-output-census-zero
+      - graph-node-field-renamed-same-bump
+      - codemod-equivalence-or-stop
+
+  # ───────────────── F3 · la forme de déclaration garde value: ───────────────
+
+  - id: LAW-GRAMMAR-0222
+    slug: outputs/declaration-keeps-value-keyword
+    status: reserved
+    owner: spec
+    domain: GRAMMAR
+    title: "La declaration outputs garde value comme mot de la reference-expression, from reste tool-args only"
+    prose_projection:
+      chapters: ["01-envelope"]
+      text: "ANNEX_2026-07-17_minigates-winners.md §Les winners row F3 verbatim (D-2026-07-17-N2) : Winner = « **KEEP-HARDENED · `value:` + type dérivé-par-défaut** ». Receipt f3-outputs-form-receipt.md §DECISION verbatim : « **`keep-hardened` · winner `statu-quo-value`** · linter-re-derived (the reinforced form's single weight-5 win does not clear the ≥2 bar; the constitution candidate is hard-rejected). » ANNEX §Réservations négatives verbatim : « from: → tool-args ONLY (l'arg REQUIRED de nika:convert · JAMAIS un keyword envelope) ». Receipt §Migration row verbatim : « Equivalence law: `name: ${{ref}}` ≡ `{value: ${{ref}}}` at identical derived type. » La forme longue {value, type, description} et la bare-ref courte sont une seule semantique, deux ergonomies, zero deuxieme verite; `description:` never touched (receipt verbatim)."
+    inputs:
+      - registry: ir
+        id: outputs_declaration_from_field
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: outputs_declaration_from_field
+        quantifier: exists
+    conclusion:
+      verdict: refuse
+      diagnostics_on_refuse: ["NIKA-OUT-003"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: outputs_declaration_form
+      independent_judgment: true
+    domain_payload:
+      kind: grammar
+      position: workflow_outputs_declaration
+      field_rules:
+        - field: value
+          cardinality: optional
+          value_shape:
+            registry: grammar
+            id: reference_expression
+        - field: type
+          cardinality: optional
+          value_shape:
+            registry: types
+            id: type_expr
+        - field: description
+          cardinality: optional
+        - field: from
+          cardinality: forbidden
+    diagnostics: ["NIKA-OUT-003"]
+    fixtures:
+      - to-mint-c1/conformance/outputs/valid/outputs-value-long-form
+      - to-mint-c1/conformance/outputs/valid/outputs-bare-ref-short-form
+    negative_fixtures:
+      - to-mint-c1/conformance/outputs/invalid/outputs-from-keyword-refused
+    projections: ["prose:01-envelope", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:values_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:variables-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Receipt §Hard-reject verbatim : « `from:` = live REQUIRED `nika:convert` arg (stdlib/builtins-v0.1.md:232 · website corpus `convert.nika.yaml:12`) + claimed by the F1 candidate (const:148) · one word, three senses in one authoring surface (R8 law 10). » Le refus de from: a la declaration outputs est evidence, jamais esthetique."
+      - "Receipt §DECISION verbatim : « `from:` reservation: **attributed to NOBODY** (couple F1+F3) · tool-args-only forever. » La reservation negative est gravee au registre anti-collision."
+      - "R8 point 6 verbatim : « Une famille qui ne gagne pas son tournament garde sa forme actuelle, mais sa sémantique et ses tests sont durcis dans cette même fenêtre. » Le durcissement = la loi de derivation de type (LAW-TYPE-0221/0222), shippe dans la MEME fenetre."
+    closure_gates:
+      - from-reservation-tool-args-only
+      - outputs-form-keep-hardened
+
+  # ───────────────── F3 · le type du contrat se dérive par défaut ────────────
+
+  - id: LAW-TYPE-0221
+    slug: outputs/contract-type-derived-by-default
+    status: reserved
+    owner: spec
+    domain: TYPE
+    title: "Le type du contrat output se derive de l'expression value via le Type Core par defaut"
+    prose_projection:
+      chapters: ["01-envelope", "09-types"]
+      text: "ANNEX row F3 verbatim : « **KEEP-HARDENED · `value:` + type dérivé-par-défaut** » avec Migration = « `outputs-type-derive-v1` (equivalence-or-stop · dépend R3b) ». Receipt json (candidates reinforced-value-derived · notes, ligne 49) verbatim : « value: kept · type: DERIVED-BY-DEFAULT from the Type Core (composes the R3b TypeExpr leg) » et « non-derivable -> type: REQUIRED (the sole truth, e.g. the callable/MCP O-half at an untyped frontier). » R8 point 11 verbatim : « éviter toute redéclaration manuelle de type lorsqu'il peut être dérivé du Type Core ; aucune deuxième vérité entre expression source et contrat exporté. » Le contrat exporte porte le type derive de l'expression value; a une frontiere non derivable, le type ecrit est REQUIRED et devient la seule verite."
+    inputs:
+      - registry: ir
+        id: output_value_expression
+        role: required
+      - registry: ir
+        id: output_contract_type
+        role: derived
+    premises:
+      - operator: derived_from
+        operands:
+          - registry: ir
+            id: output_contract_type
+          - registry: ir
+            id: output_value_expression
+        quantifier: forall
+    conclusion:
+      verdict: derive
+      derives:
+        registry: ir
+        id: output_contract_type
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: output_contract_type
+      independent_judgment: true
+    domain_payload:
+      kind: type
+      relation: normalizes_to
+      operands:
+        - registry: ir
+          id: output_value_expression
+        - registry: ir
+          id: output_contract_type
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/outputs/valid/contract-type-derived
+      - to-mint-c1/conformance/outputs/valid/non-derivable-written-type-required
+    projections: ["prose:01-envelope", "prose:09-types", "schema", "cli:check", "cli:inspect", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:type_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:variables-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Receipt §Migration row verbatim : « derive D from the `value:` expression via the Type Core; `type:` ≡ D → DROP (equivalence proven, receipt records derived=declared); `type:` ≠ D → STOP dual-truth finding (negative witness `conformance/variables/typed-outputs-mismatch.nika.yaml`); non-derivable → `type:` stays REQUIRED. » Le codemod outputs-type-derive-v1 est equivalence-or-stop et depend du leg R3b (sequence apres lui dans LA cascade atomique unique, R8 point 14)."
+      - "La derivation est deterministe : meme expression value + meme Type Core = meme type de contrat, sur toutes les surfaces (checker · reference · MCP)."
+    closure_gates:
+      - non-derivable-requires-written-type
+      - no-second-truth-source-vs-contract
+
+  - id: LAW-TYPE-0222
+    slug: outputs/written-type-equal-derived-warns-diverge-errors
+    status: reserved
+    owner: spec
+    domain: TYPE
+    title: "Un type ecrit egal au derive est un WARN de redondance, un type ecrit divergent est une ERROR"
+    prose_projection:
+      chapters: ["01-envelope", "09-types"]
+      text: "Receipt f3-outputs-form-receipt.json (candidates reinforced-value-derived · notes, ligne 49) verbatim : « written type == derived -> WARN redundant; written type != derived -> ERROR (existing negative witness conformance/variables/typed-outputs-mismatch.nika.yaml) ». Receipt md §Migration row verbatim : « `type:` ≠ D → STOP dual-truth finding ». R8 point 11 verbatim : « aucune deuxième vérité entre expression source et contrat exporté. » Quand un type est ecrit ET derivable : l'egalite au derive vaut WARN (redeclaration a eviter, R8 point 11 « éviter »), la divergence vaut ERROR (une deuxieme verite, refusee au check)."
+    inputs:
+      - registry: ir
+        id: output_written_type
+        role: required
+      - registry: ir
+        id: output_derived_type
+        role: required
+    premises:
+      - operator: equals
+        operands:
+          - registry: ir
+            id: output_written_type
+          - registry: ir
+            id: output_derived_type
+        quantifier: forall
+    conclusion:
+      verdict: warn
+      diagnostics_on_refuse: ["NIKA-OUT-004"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: output_contract_type
+      independent_judgment: true
+    domain_payload:
+      kind: type
+      relation: normalizes_to
+      operands:
+        - registry: ir
+          id: output_written_type
+        - registry: ir
+          id: output_derived_type
+    diagnostics: ["NIKA-OUT-005", "NIKA-OUT-004"]
+    fixtures:
+      - to-mint-c1/conformance/outputs/warn/written-type-equals-derived
+    negative_fixtures:
+      - conformance/variables/typed-outputs-mismatch.nika.yaml
+    projections: ["prose:01-envelope", "prose:09-types", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:type_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:variables-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Le negative witness EXISTE deja au pin : conformance/variables/typed-outputs-mismatch.nika.yaml (cite verbatim par le receipt F3) refuse sur la divergence ecrit/derive; la branche WARN recoit sa fixture a C1."
+      - "NIKA-OUT-005 (WARN redondance) et NIKA-OUT-004 (ERROR dual-truth) sont deux codes distincts : jamais un meme code pour deux severites (SSOT-2 B.16 un code = une condition normative exacte)."
+    closure_gates:
+      - dual-truth-zero
+      - redundant-written-type-warns

@@ -1,0 +1,841 @@
+# canon/laws/features.yaml · C0 IMPORT · R7 feature detection
+# SSOT: RULINGS_2026-07-15.md §R7 (18 points numérotés + le paragraphe final · verbatim ·
+# JAMAIS paraphrasé, les citations reproduisent les bytes du ruling, ancres "R7 point N").
+# Schema: schemas/law.schema.json (SCELLÉ · consommé as-is). Bloc d'ids du groupe :
+# SURFACE 05xx · GRAMMAR 05xx · CONF 05xx · MIGR 05xx (0510-0519 réservés à features).
+# Couverture : 18/18 points portés (p1+p15 → SURFACE-0510 · p2+p16 → GRAMMAR-0510 ·
+# p3+paragraphe final → SURFACE-0511 · p4+p5 → CONF-0510 · p6 → CONF-0511 · p7 →
+# CONF-0512 · p8 → SURFACE-0512 · p9 → GRAMMAR-0511 · p10+p17 → CONF-0513 · p11+p12 →
+# CONF-0514 · p13 → GRAMMAR-0512 · p14 → SURFACE-0513 · p18 → CONF-0515).
+#
+# FINDING-C (SSOT-1 §29 · mapping documenté, jamais silencieux) : R7 point 9 nomme les
+# champs "id namespacé ; kind ; status ; owner ; introduced_in ; détection ; conformance ;
+# replacement éventuel". Le schema SCELLÉ registries.schema.json#featureRow épelle :
+# detection_law (détection) · conformance_profile (conformance) · replaced_by (replacement
+# éventuel) · et exige EN PLUS law_ids (absent du ruling · l'ajout implémente SSOT-1 §10).
+# La row seed yaml_profile_strict n'a pas de séparateur de namespace dans son id alors que
+# le ruling demande "id namespacé" (machineId admet le point : namespacing possible).
+# À arbitrer à l'import registre réel, jamais tranché ici.
+#
+# Refs : les symboles feature (required_language_features · ...) n'ont AUCUNE row seedée
+# hors la row exemplaire features/yaml_profile_strict : ils vivent en registry ir
+# (convention sandbox du compiler) · l'inventaire réel des rows features est owed (le
+# header du registre le dit : "l'import R7 réel remplace à C0").
+
+laws_document_format: 1
+
+group: r7-feature-detection
+
+laws:
+
+  # ─────────────────── R7 points 1 + 15 · le marqueur unique ────────────────────
+
+  - id: LAW-SURFACE-0510
+    slug: features/source-marker-only-v1
+    status: reserved
+    owner: spec
+    domain: SURFACE
+    title: "La source Nika conserve uniquement le marqueur nika v1, aucun nika v2"
+    prose_projection:
+      chapters: ["01-envelope"]
+      text: "R7 point 1 verbatim : « La source Nika conserve uniquement : `nika: v1` » · R7 point 15 verbatim : « Aucun `nika: v2`. » La détection de features ne passe JAMAIS par un bump du marqueur de langage : la source ne porte aucun autre marqueur de version, et aucun second marqueur n'existera."
+    inputs:
+      - registry: surface
+        id: nika_version_marker
+        role: required
+      - registry: grammar
+        id: envelope_nika_field
+        role: ceiling
+    premises:
+      - operator: matches
+        operands:
+          - registry: surface
+            id: nika_version_marker
+          - registry: grammar
+            id: envelope_nika_field
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: surface
+          id: nika_version_marker
+      independent_judgment: true
+    domain_payload:
+      kind: surface
+      constraint: one_spelling_per_meaning
+      subject:
+        registry: surface
+        id: nika_version_marker
+    diagnostics: []
+    fixtures:
+      - conformance/envelope/minimal-valid-workflow.nika.yaml
+    negative_fixtures:
+      - conformance/envelope/parse-bad-version.nika.yaml
+    projections: ["prose:01-envelope", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:envelope_core.py
+      - cli:nika-check
+      - conformance:features-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R7 point 15 verbatim : « Aucun `nika: v2`. » Tout marqueur autre que v1 refuse à l'enveloppe (fixture réelle parse-bad-version)."
+      - "Sœur de LAW-SURFACE-0101 (R11 point 16) : même marqueur, ruling distinct, chaque loi cite SON ancre."
+    closure_gates:
+      - single-language-marker
+
+  # ─────────────────── R7 points 2 + 16 · aucun champ manuel ────────────────────
+
+  - id: LAW-GRAMMAR-0510
+    slug: features/requires-features-field-forbidden
+    status: reserved
+    owner: spec
+    domain: GRAMMAR
+    title: "Aucun champ manuel requires_features n'existe dans la grammaire du workflow"
+    prose_projection:
+      chapters: ["01-envelope"]
+      text: "R7 point 2 verbatim : « Aucun champ manuel `requires_features:` n'est ajouté au workflow. » · R7 point 16 verbatim : « Aucun `requires_features:` manuel. » La clé n'entre jamais dans la grammaire publique : un auteur qui l'écrit tombe sur le refus unknown-field du mode strict."
+    inputs:
+      - registry: ir
+        id: requires_features_key_event
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: requires_features_key_event
+        quantifier: exists
+    conclusion:
+      verdict: refuse
+      diagnostics_on_refuse: ["NIKA-PARSE-005"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: feature_requirement_sets
+      independent_judgment: true
+    domain_payload:
+      kind: grammar
+      position: workflow_envelope
+      field_rules:
+        - field: requires_features
+          cardinality: forbidden
+    diagnostics: ["NIKA-PARSE-005"]
+    fixtures:
+      - conformance/envelope/minimal-valid-workflow.nika.yaml
+    negative_fixtures:
+      - conformance/envelope/parse-unknown-field.nika.yaml
+      - to-mint-c1/conformance/features/invalid/requires-features-key
+    projections: ["prose:01-envelope", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:envelope_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:features-suite
+    introduced_in: C0
+    proof_obligations:
+      - "NIKA-PARSE-005 est le code réel du refus unknown-field en mode strict (fixture réelle conformance/envelope/parse-unknown-field.nika.yaml : « INTENT: NIKA-PARSE-005 (unknown field in strict mode) ») : requires_features en est une instance, jamais une clé connue."
+      - "R7 point 17 verbatim : « Aucun second système de vérité. » Un champ manuel serait une seconde vérité contre l'inférence IR de LAW-SURFACE-0511."
+    closure_gates:
+      - fixture-parity
+      - requires-features-census-zero
+
+  # ─────────────── R7 point 3 + paragraphe final · l'inférence IR ───────────────
+
+  - id: LAW-SURFACE-0511
+    slug: features/requirements-derived-from-semantic-ir
+    status: reserved
+    owner: spec
+    domain: SURFACE
+    title: "Les exigences de features sont dérivées du Semantic IR, jamais déclarées"
+    prose_projection:
+      chapters: ["07-conformance"]
+      text: "R7 point 3 verbatim : « Le compilateur déduit automatiquement depuis le Semantic IR : required_language_features ; required_runtime_capabilities ; required_backend_capabilities. » Paragraphe final verbatim : « Si une exigence future n'est réellement pas inférable depuis le Semantic IR, elle devra d'abord être modélisée dans le deployment/control plane, pas automatiquement ajoutée à la grammaire Nika. » Les trois ensembles requis sont une surface dérivée : leur seule voie d'existence est l'inférence."
+    inputs:
+      - registry: ir
+        id: semantic_ir
+        role: required
+    premises:
+      - operator: derived_from
+        operands:
+          - registry: ir
+            id: required_feature_sets
+          - registry: ir
+            id: semantic_ir
+        quantifier: forall
+    conclusion:
+      verdict: derive
+      derives:
+        registry: ir
+        id: required_feature_sets
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: required_feature_sets
+      independent_judgment: true
+    domain_payload:
+      kind: surface
+      constraint: exposure_rule
+      subject:
+        registry: ir
+        id: required_feature_sets
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/features/derive/requirements-from-ir
+    projections: ["prose:07-conformance", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:features_core.py
+      - cli:nika-check
+      - conformance:features-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Même fichier, même Semantic IR : mêmes ensembles requis, octet pour octet (la dérivation est déterministe)."
+      - "Paragraphe final verbatim : « Grave cette architecture dans le ruling, le canon, le manifest schema, la conformance et le plan de migration avant implémentation. » Ce fichier est la gravure canon ; manifest schema et plan de migration sont P-A owed."
+    closure_gates:
+      - derivation-deterministic
+      - no-authored-requirement-set
+
+  # ─────────────────── R7 points 4 + 5 · les deux commandes ─────────────────────
+
+  - id: LAW-CONF-0510
+    slug: features/manifest-and-inspect-official
+    status: reserved
+    owner: spec
+    domain: CONF
+    title: "Le manifest engine et l'inspection workflow sont des surfaces machine officielles vérifiées"
+    prose_projection:
+      chapters: ["07-conformance"]
+      text: "R7 point 4 verbatim : « L'engine expose un manifest machine-readable officiel : `nika features --format json` » · R7 point 5 verbatim : « Le workflow peut être inspecté par : `nika inspect <file> --requirements --format json` » Les deux sorties sont jugées contre la même SSOT : le manifest reflète les features supportées déclarées au registre, l'inspection reflète les ensembles dérivés du Semantic IR."
+    inputs:
+      - registry: ir
+        id: engine_feature_manifest
+        role: required
+      - registry: ir
+        id: inspect_requirements_output
+        role: required
+    premises:
+      - operator: derived_from
+        operands:
+          - registry: ir
+            id: engine_feature_manifest
+          - registry: ir
+            id: features_registry_projection
+        quantifier: forall
+      - operator: equals
+        operands:
+          - registry: ir
+            id: inspect_requirements_output
+          - registry: ir
+            id: required_feature_sets
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["jcs"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: engine_feature_manifest
+      independent_judgment: true
+    domain_payload:
+      kind: conformance
+      constraint: engine_reference_parity
+      subject:
+        registry: ir
+        id: feature_manifest_parity
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/features/cli/features-manifest-json
+      - to-mint-c1/conformance/features/cli/inspect-requirements-json
+    projections: ["prose:07-conformance", "cli:features", "cli:inspect", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-cli
+      - reference:features_core.py
+      - cli:nika-features
+      - cli:nika-inspect
+      - conformance:features-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Le manifest et l'inspection rendent du JSON stable (format machine versionné par LAW-SURFACE-0513), comparé byte à byte par la suite différentielle."
+    closure_gates:
+      - fixture-parity
+      - manifest-format-versioned
+
+  # ─────────────────── R7 point 6 · la loi de compatibilité ─────────────────────
+
+  - id: LAW-CONF-0511
+    slug: features/language-compatibility-law
+    status: reserved
+    owner: spec
+    domain: CONF
+    title: "Un programme n'est compatible que si ses features de langage requises sont supportées par l'engine"
+    prose_projection:
+      chapters: ["07-conformance"]
+      text: "R7 point 6 verbatim : « La loi de compatibilité est : RequiredLanguageFeatures(program) ⊆ SupportedLanguageFeatures(engine) » L'inclusion est jugée avant exécution ; un ensemble requis non inclus refuse."
+    inputs:
+      - registry: ir
+        id: required_language_features
+        role: required
+      - registry: ir
+        id: supported_language_features
+        role: ceiling
+    premises:
+      - operator: subset_of
+        operands:
+          - registry: ir
+            id: required_language_features
+          - registry: ir
+            id: supported_language_features
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: required_language_features
+      independent_judgment: true
+    domain_payload:
+      kind: conformance
+      constraint: profile_membership
+      subject:
+        registry: ir
+        id: language_feature_compatibility
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/features/compat/required-subset-supported
+    negative_fixtures:
+      - to-mint-c1/conformance/features/compat/required-exceeds-supported
+    projections: ["prose:07-conformance", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:features_core.py
+      - cli:nika-check
+      - conformance:features-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R7 point 12 verbatim : « Aucun warning permissif, aucune approximation et aucune détection fondée uniquement sur semver. » L'inclusion se juge sur les ensembles inférés, jamais sur une comparaison de versions."
+    closure_gates:
+      - fixture-parity
+      - fail-before-execution
+
+  # ─────────────────── R7 point 7 · la loi de déploiement ───────────────────────
+
+  - id: LAW-CONF-0512
+    slug: features/deployment-compatibility-law-distinct
+    status: reserved
+    owner: spec
+    domain: CONF
+    title: "La loi de déploiement est distincte et porte sur les capabilities backend effectives"
+    prose_projection:
+      chapters: ["07-conformance"]
+      text: "R7 point 7 verbatim : « La loi de déploiement est distincte : RequiredBackendCapabilities(program) ⊆ EffectiveBackendCapabilities(deployment) » Deux lois, deux ensembles de droite : la compatibilité engine (LAW-CONF-0511) ne dit rien du deployment, et réciproquement."
+    inputs:
+      - registry: ir
+        id: required_backend_capabilities
+        role: required
+      - registry: ir
+        id: effective_backend_capabilities
+        role: ceiling
+    premises:
+      - operator: subset_of
+        operands:
+          - registry: ir
+            id: required_backend_capabilities
+          - registry: ir
+            id: effective_backend_capabilities
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: required_backend_capabilities
+      independent_judgment: true
+    domain_payload:
+      kind: conformance
+      constraint: profile_membership
+      subject:
+        registry: ir
+        id: backend_capability_compatibility
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/features/deploy/required-subset-effective
+    negative_fixtures:
+      - to-mint-c1/conformance/features/deploy/required-exceeds-effective
+    projections: ["prose:07-conformance", "cli:check", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:features_core.py
+      - cli:nika-check
+      - conformance:features-suite
+    introduced_in: C0
+    proof_obligations:
+      - "La loi se juge avant le run contre le capability manifest du deployment ; une incompatibilité refuse avant exécution (R7 point 11)."
+    closure_gates:
+      - fixture-parity
+      - fail-before-execution
+
+  # ─────────────────── R7 point 8 · trois catégories séparées ───────────────────
+
+  - id: LAW-SURFACE-0512
+    slug: features/three-categories-separated
+    status: reserved
+    owner: spec
+    domain: SURFACE
+    title: "Features de langage, runtime capabilities et backend capabilities sont trois familles disjointes"
+    prose_projection:
+      chapters: ["07-conformance"]
+      text: "R7 point 8 verbatim : « Features de langage, runtime capabilities et backend capabilities sont trois catégories séparées. » Chaque entrée du registre appartient à exactement une famille ; aucune entrée ne vit dans deux catégories."
+    inputs:
+      - registry: ir
+        id: language_feature_family
+        role: required
+      - registry: ir
+        id: runtime_capability_family
+        role: required
+      - registry: ir
+        id: backend_capability_family
+        role: required
+    premises:
+      - operator: intersect_empty
+        operands:
+          - registry: ir
+            id: language_feature_family
+          - registry: ir
+            id: runtime_capability_family
+          - registry: ir
+            id: backend_capability_family
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: feature_category_taxonomy
+      independent_judgment: true
+    domain_payload:
+      kind: surface
+      constraint: family_membership
+      subject:
+        registry: ir
+        id: feature_category_taxonomy
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/features/registry/categories-disjoint
+    projections: ["prose:07-conformance", "schema", "cli:check", "docs"]
+    implementation_surfaces:
+      - reference:features_core.py
+      - conformance:features-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Le champ kind du registre (featureRow scellé) porte la famille ; le gate refuse toute row dont le kind n'appartient pas à exactement une des trois catégories."
+    closure_gates:
+      - categories-disjoint
+
+  # ─────────────────── R7 point 9 · le registre canonique ───────────────────────
+
+  - id: LAW-GRAMMAR-0511
+    slug: features/registry-row-shape
+    status: reserved
+    owner: spec
+    domain: GRAMMAR
+    title: "Le registre canonique unique des features impose la forme de row du ruling"
+    prose_projection:
+      chapters: ["07-conformance"]
+      text: "R7 point 9 verbatim : « La spec possède un registre canonique unique, par exemple : `canon/features.yaml` Chaque entrée possède : id namespacé ; kind ; status ; owner ; introduced_in ; détection ; conformance ; replacement éventuel. » FINDING-C enregistré : le schema scellé featureRow épelle detection_law (détection) · conformance_profile (conformance) · replaced_by (replacement éventuel) et exige en plus law_ids ; la row seed yaml_profile_strict n'a pas d'id namespacé. Mapping documenté, arbitrage owed à l'import registre."
+    inputs:
+      - registry: features
+        id: yaml_profile_strict
+        role: exemplar
+      - registry: ir
+        id: features_registry_rows
+        role: required
+    premises:
+      - operator: conforms_to
+        operands:
+          - registry: ir
+            id: features_registry_rows
+          - registry: ir
+            id: feature_row_shape
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: feature_row_shape
+      independent_judgment: true
+    domain_payload:
+      kind: grammar
+      position: features_registry_row
+      field_rules:
+        - field: id
+          cardinality: required
+        - field: kind
+          cardinality: required
+        - field: status
+          cardinality: required
+        - field: owner
+          cardinality: required
+        - field: introduced_in
+          cardinality: required
+        - field: detection_law
+          cardinality: required
+        - field: conformance_profile
+          cardinality: required
+        - field: replaced_by
+          cardinality: optional
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/features/registry/row-shape-complete
+    projections: ["prose:07-conformance", "schema", "cli:check", "docs"]
+    implementation_surfaces:
+      - reference:features_registry_gate.py
+      - conformance:features-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Le registre est UNIQUE : canon/features.yaml est l'owner canonique, aucun second inventaire de features n'existe sur aucune surface."
+      - "La row exemplaire seedée yaml_profile_strict satisfait la forme (detection_law: LAW-GRAMMAR-0101 · conformance_profile: core) ; l'import réel R7 remplace son wiring placeholder."
+    closure_gates:
+      - registry-unique-owner
+      - row-shape-enforced
+
+  # ─────────────────── R7 points 10 + 17 · une seule vérité ─────────────────────
+
+  - id: LAW-CONF-0513
+    slug: features/all-surfaces-derive-from-ssot
+    status: reserved
+    owner: spec
+    domain: CONF
+    title: "CLI, LSP, MCP, SDK, docs et manifests dérivent tous du registre features, aucun second système"
+    prose_projection:
+      chapters: ["07-conformance", "16-projections"]
+      text: "R7 point 10 verbatim : « CLI, LSP, MCP, SDK, docs et manifests dérivent tous de cette SSOT. » · R7 point 17 verbatim : « Aucun second système de vérité. » Toute surface qui parle de features projette le registre ; une surface qui en divergerait est un échec de build, jamais une tolérance."
+    inputs:
+      - registry: ir
+        id: feature_surfaces_content
+        role: required
+    premises:
+      - operator: derived_from
+        operands:
+          - registry: ir
+            id: feature_surfaces_content
+          - registry: ir
+            id: features_registry_projection
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: features_registry_projection
+      independent_judgment: true
+    domain_payload:
+      kind: conformance
+      constraint: engine_reference_parity
+      subject:
+        registry: ir
+        id: features_ssot_parity
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/features/parity/all-surfaces-same-inventory
+    projections: ["prose:07-conformance", "cli:check", "lsp", "mcp", "sdk", "docs"]
+    implementation_surfaces:
+      - engine:nika-cli
+      - reference:features_core.py
+      - cli:nika-features
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:features-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Le harnais différentiel compare l'inventaire de features rendu par chaque surface (CLI, LSP, MCP, SDK, docs, manifests) au registre : divergence = rouge."
+    closure_gates:
+      - fixture-parity
+      - no-second-truth-system
+
+  # ─────────────── R7 points 11 + 12 · échec avant exécution ────────────────────
+
+  - id: LAW-CONF-0514
+    slug: features/unknown-feature-fails-before-execution
+    status: reserved
+    owner: spec
+    domain: CONF
+    title: "Une feature inconnue ou non supportée échoue avant exécution, sans mode permissif"
+    prose_projection:
+      chapters: ["07-conformance"]
+      text: "R7 point 11 verbatim : « Une feature inconnue ou non supportée échoue avant exécution. » · R7 point 12 verbatim : « Aucun warning permissif, aucune approximation et aucune détection fondée uniquement sur semver. » Le verdict est refuse, jamais warn : la classe est un échec de pré-exécution typé."
+    inputs:
+      - registry: ir
+        id: unknown_or_unsupported_feature
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: unknown_or_unsupported_feature
+        quantifier: exists
+    conclusion:
+      verdict: refuse
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: feature_support_gate
+      independent_judgment: true
+    domain_payload:
+      kind: conformance
+      constraint: profile_membership
+      subject:
+        registry: ir
+        id: feature_support_gate
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/features/gate/known-supported-admits
+    negative_fixtures:
+      - to-mint-c1/conformance/features/gate/unknown-feature-refuses
+      - to-mint-c1/conformance/features/gate/unsupported-feature-refuses
+    projections: ["prose:07-conformance", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:features_core.py
+      - cli:nika-check
+      - conformance:features-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Aucun code diagnostic n'est gravé par R7 pour ce refus : le code canonique est owed à l'import du registre diagnostics (SSOT-2 B.21 : aucun rejet normatif sans diagnostic canonique), jamais inventé ici."
+      - "R7 point 12 verbatim : « Aucun warning permissif, aucune approximation et aucune détection fondée uniquement sur semver. » Aucune surface ne rend warn sur cette classe."
+    closure_gates:
+      - fail-before-execution
+      - feature-gate-diagnostic-ruled
+
+  # ─────────────────── R7 point 13 · l'enregistrement ───────────────────────────
+
+  - id: LAW-GRAMMAR-0512
+    slug: features/lockfile-artifact-receipt-record
+    status: reserved
+    owner: spec
+    domain: GRAMMAR
+    title: "Lockfile, artefact compilé et receipt portent le bloc d'enregistrement des features"
+    prose_projection:
+      chapters: ["15-proof"]
+      text: "R7 point 13 verbatim : « Le lockfile, l'artefact compilé et le receipt enregistrent : required features ; supported features ; negotiated features ; conformance profile ; spec identity ; engine identity ; backend capabilities effectives. » Les trois porteurs partagent la même forme de bloc, aux champs tous requis."
+    inputs:
+      - registry: ir
+        id: lockfile_feature_record
+        role: required
+      - registry: ir
+        id: compiled_artifact_feature_record
+        role: required
+      - registry: ir
+        id: receipt_feature_record
+        role: required
+    premises:
+      - operator: conforms_to
+        operands:
+          - registry: ir
+            id: lockfile_feature_record
+          - registry: ir
+            id: feature_negotiation_record_shape
+        quantifier: forall
+      - operator: conforms_to
+        operands:
+          - registry: ir
+            id: compiled_artifact_feature_record
+          - registry: ir
+            id: feature_negotiation_record_shape
+        quantifier: forall
+      - operator: conforms_to
+        operands:
+          - registry: ir
+            id: receipt_feature_record
+          - registry: ir
+            id: feature_negotiation_record_shape
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["jcs"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: feature_negotiation_record_shape
+      independent_judgment: true
+    domain_payload:
+      kind: grammar
+      position: feature_negotiation_record
+      field_rules:
+        - field: required_features
+          cardinality: required
+        - field: supported_features
+          cardinality: required
+        - field: negotiated_features
+          cardinality: required
+        - field: conformance_profile
+          cardinality: required
+        - field: spec_identity
+          cardinality: required
+        - field: engine_identity
+          cardinality: required
+        - field: effective_backend_capabilities
+          cardinality: required
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/features/record/lockfile-block
+      - to-mint-c1/conformance/features/record/receipt-block
+    projections: ["prose:15-proof", "schema", "cli:check", "sdk"]
+    implementation_surfaces:
+      - engine:nika-lock
+      - reference:features_core.py
+      - conformance:features-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Les noms machine des champs (required_features · supported_features · negotiated_features · conformance_profile · spec_identity · engine_identity · effective_backend_capabilities) sont la forme canonique lowercase des sept items du point 13 ; mapping un pour un, aucun item omis, aucun ajouté."
+    closure_gates:
+      - record-shape-on-three-carriers
+
+  # ─────────────────── R7 point 14 · formats versionnés à part ──────────────────
+
+  - id: LAW-SURFACE-0513
+    slug: features/machine-formats-independently-versioned
+    status: reserved
+    owner: spec
+    domain: SURFACE
+    title: "Les formats machine sont versionnés indépendamment du marqueur de langage"
+    prose_projection:
+      chapters: ["07-conformance", "16-projections"]
+      text: "R7 point 14 verbatim : « Les formats machine restent versionnés indépendamment du langage : feature_manifest_format · graph_format · semantic_document_format · receipt_format » Les marqueurs de version des formats machine forment une famille disjointe du marqueur de langage : un bump de format ne touche jamais nika: v1, et réciproquement."
+    inputs:
+      - registry: ir
+        id: machine_format_version_markers
+        role: required
+      - registry: surface
+        id: nika_version_marker
+        role: ceiling
+    premises:
+      - operator: intersect_empty
+        operands:
+          - registry: ir
+            id: machine_format_version_markers
+          - registry: ir
+            id: language_version_marker_family
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: machine_format_version_markers
+      independent_judgment: true
+    domain_payload:
+      kind: surface
+      constraint: family_membership
+      subject:
+        registry: ir
+        id: machine_format_version_markers
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/features/formats/independent-versions
+    projections: ["prose:07-conformance", "prose:16-projections", "schema", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:features_core.py
+      - conformance:features-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Les quatre marqueurs nommés par le ruling (feature_manifest_format · graph_format · semantic_document_format · receipt_format) sont chacun un entier de format indépendant ; aucun ne dérive de la version du langage."
+    closure_gates:
+      - formats-versioned-independently
+
+  # ─────────────────── R7 point 18 · les tests obligatoires ─────────────────────
+
+  - id: LAW-CONF-0515
+    slug: features/differential-metamorphic-tests-mandatory
+    status: reserved
+    owner: spec
+    domain: CONF
+    title: "Tests différentiels et métamorphiques obligatoires sur la détection de features"
+    prose_projection:
+      chapters: ["07-conformance"]
+      text: "R7 point 18 verbatim : « Tests différentiels et métamorphiques obligatoires. » La suite features porte les deux classes : différentielle (engine contre modèle de référence sur les mêmes sources) et métamorphique (transformations préservant le Semantic IR qui doivent préserver les ensembles dérivés)."
+    inputs:
+      - registry: ir
+        id: features_differential_tests
+        role: required
+      - registry: ir
+        id: features_metamorphic_tests
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: features_differential_tests
+        quantifier: exists
+      - operator: present
+        operands:
+          - registry: ir
+            id: features_metamorphic_tests
+        quantifier: exists
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: features_suite_adequacy
+      independent_judgment: true
+    domain_payload:
+      kind: conformance
+      constraint: mutation_adequacy
+      subject:
+        registry: ir
+        id: features_suite_adequacy
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/features/suite/differential-present
+      - to-mint-c1/conformance/features/suite/metamorphic-present
+    projections: ["prose:07-conformance", "cli:check", "docs"]
+    implementation_surfaces:
+      - reference:features_core.py
+      - conformance:features-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Une mutation de la dérivation (un ensemble requis faussement vide, une catégorie confondue) doit être tuée par au moins un test de la suite : l'adéquation se prouve en rouge d'abord."
+    closure_gates:
+      - mutation-adequacy-proven

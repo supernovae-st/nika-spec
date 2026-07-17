@@ -1,0 +1,260 @@
+# canon/laws/values.yaml · C0 import · R3a la famille des valeurs (E-split) + les lois de
+# fenetre R8 qui la scellent (la famille est fermee · elle ne repasse PAS de mini-gate).
+# SSOT: RULINGS_2026-07-15.md §R3a (standard pick · le texte du choix EST le record normatif ·
+# cite verbatim, jamais paraphrase) + §R8 points 11/15/16/17/18/19 (RULING CUSTOM verbatim)
+# + §MINI-GATES bloc « Deja rulees ». Schema: schemas/law.schema.json (SCELLE · as-is).
+# Bloc d'ids assigne a ce groupe: SURFACE-02xx + GRAMMAR-02xx (sous-plage x201-x209 ici).
+#
+# Codes diagnostics NIKA-VALUES-001..003: c0-proposed · namespace NEUF (grep spec/+canon/ = 0
+# occurrence, zero collision par construction, pattern pilote FINDING-05) · renumerotables
+# avant C1 · SSOT-2 B.21 exige un diagnostic canonique par rejet normatif expose.
+#
+# Fixtures: la famille 4-autorites est NEUVE, aucune fixture E-split n'existe (mesure) ·
+# to-mint-c1. La fixture actuelle conformance/variables/typed-vars-declarations.nika.yaml
+# vit au monde `vars:` d'avant-cascade: elle MIGRE a P-C, elle n'est pas reclassee ici.
+#
+# FINDING (SSOT-1 §29, remonte au retour structure): R3a clot par « B-9 se résout dans le
+# même sens. » · B-9 n'est defini NULLE PART dans RULINGS_2026-07-15.md (B-13 et B-17 y sont,
+# B-9 non · reference externe probable: la queue session B du VERDICT_operator-report.md).
+# Le sens rule (= le meme sens que R3a) est porte par LAW-SURFACE-0201; aucune loi separee
+# B-9 n'est mintable sans texte source · jamais de paraphrase.
+
+laws_document_format: 1
+
+pilot: c0-values
+
+laws:
+
+  # ───────────────── R3a · la famille 4-autorités est la loi ─────────────────
+
+  - id: LAW-SURFACE-0201
+    slug: values/four-authority-family
+    status: reserved
+    owner: spec
+    domain: SURFACE
+    title: "La famille des autorites de valeur est exactement inputs, config, const, secrets"
+    prose_projection:
+      chapters: ["04-variables", "01-envelope"]
+      text: "R3a verbatim : « **Choix : (E) `inputs / config / const / secrets`** — le modèle 4-autorités ratifié (constitution §2.8) ship dans la fenêtre de cassure. » · RULINGS §MINI-GATES verbatim : « **Déjà rulées (ne repassent PAS de mini-gate — elles migrent dans la cascade) :** values E-split (R3a) » · R3a verbatim : « B-9 se résout dans le même sens. » La famille des autorites de valeur est fermee a quatre; toute reference de namespace de valeur hors famille refuse."
+    inputs:
+      - registry: ir
+        id: value_namespace_references
+        role: required
+      - registry: grammar
+        id: value_authority_family
+        role: ceiling
+    premises:
+      - operator: member_of
+        operands:
+          - registry: ir
+            id: value_namespace_references
+          - registry: grammar
+            id: value_authority_family
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-VALUES-003"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: value_authority_family
+      independent_judgment: true
+    domain_payload:
+      kind: surface
+      constraint: family_membership
+      subject:
+        registry: surface
+        id: value_authority_family
+    diagnostics: ["NIKA-VALUES-003"]
+    fixtures:
+      - to-mint-c1/conformance/values/valid/four-authority-namespaces
+    negative_fixtures:
+      - to-mint-c1/conformance/values/invalid/foreign-value-namespace
+    projections: ["prose:04-variables", "prose:01-envelope", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:values_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:values-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R3a verbatim : « le modèle 4-autorités ratifié (constitution §2.8) ship dans la fenêtre de cassure. » La famille ship dans CETTE fenetre, la derniere cassure publique pre-1.0 (R8 point 1)."
+      - "R8 point 19 verbatim : « Toutes les formes conservées doivent avoir une loi normative, des fixtures et une SSOT claire. » Cette entree EST la loi normative de la famille conservee; les fixtures sont mintees a C1."
+      - "R3a verbatim : « B-9 se résout dans le même sens. » B-9 n'a pas de texte propre dans RULINGS_2026-07-15.md : son sens rule est CE sens (finding remonte, jamais une loi separee sans source)."
+    closure_gates:
+      - four-authority-family-shipped
+      - old-form-census-zero
+
+  # ───────────────── R3a · vars/env meurent (les deux formes mortes) ─────────
+
+  - id: LAW-GRAMMAR-0201
+    slug: values/vars-envelope-field-dead
+    status: reserved
+    owner: spec
+    domain: GRAMMAR
+    title: "Le champ d'enveloppe vars est une forme morte, refuse avec teaching de classification"
+    prose_projection:
+      chapters: ["01-envelope", "04-variables"]
+      text: "R3a verbatim : « `vars`/`env` meurent. » Branche vars. Empirie au pin : 04-variables:43 enseigne aujourd'hui « ${{ vars.X }} workflow inputs (declared in envelope `vars:` · untyped or typed) ». R3a verbatim : « Codemod classify-not-rename (equivalence-or-stop). » Chaque usage vars est CLASSE vers l'autorite que son role reel commande (E-split), jamais renomme en bloc; indecidable = STOP, jamais un guess."
+    inputs:
+      - registry: ir
+        id: envelope_vars_field
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: envelope_vars_field
+        quantifier: exists
+    conclusion:
+      verdict: refuse
+      diagnostics_on_refuse: ["NIKA-VALUES-001"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: dead_value_forms
+      independent_judgment: true
+    domain_payload:
+      kind: grammar
+      position: workflow_envelope
+      field_rules:
+        - field: vars
+          cardinality: forbidden
+    diagnostics: ["NIKA-VALUES-001"]
+    fixtures:
+      - to-mint-c1/conformance/values/valid/inputs-block-replaces-vars
+    negative_fixtures:
+      - to-mint-c1/conformance/values/invalid/vars-block-dead
+    projections: ["prose:01-envelope", "prose:04-variables", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:values_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:values-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R8 point 18 verbatim : « Toutes les anciennes formes décidées mortes doivent atteindre un census de zéro. » Le census vars (bloc envelope + namespace d'expression) atteint zero avant la fermeture de fenetre."
+      - "R3a verbatim : « Codemod classify-not-rename (equivalence-or-stop). » Le codemod prouve l'equivalence de chaque classification ou s'arrete; le diagnostic NIKA-VALUES-001 enseigne la famille, jamais un parse error generique."
+    closure_gates:
+      - old-form-vars-census-zero
+      - codemod-classify-not-rename-equivalence-or-stop
+
+  - id: LAW-GRAMMAR-0202
+    slug: values/env-envelope-field-dead
+    status: reserved
+    owner: spec
+    domain: GRAMMAR
+    title: "Le champ d'enveloppe env est une forme morte, refuse avec teaching de classification"
+    prose_projection:
+      chapters: ["01-envelope", "04-variables"]
+      text: "R3a verbatim : « `vars`/`env` meurent. » Branche env. Empirie au pin : le bloc `env:` vit dans 01-envelope (01:50 · 01:242) et 01:281 le decrit « non-sensitive config in `env:` (appears in logs), masked references in `secrets:` (never logged) »; le namespace d'expression ${{ env.X }} vit en 04-variables:46. Chaque usage env est CLASSE (E-split : config non sensible ou secrets gouvernes, selon le role reel), per R3a « Codemod classify-not-rename (equivalence-or-stop). »"
+    inputs:
+      - registry: ir
+        id: envelope_env_field
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: envelope_env_field
+        quantifier: exists
+    conclusion:
+      verdict: refuse
+      diagnostics_on_refuse: ["NIKA-VALUES-002"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: dead_value_forms
+      independent_judgment: true
+    domain_payload:
+      kind: grammar
+      position: workflow_envelope
+      field_rules:
+        - field: env
+          cardinality: forbidden
+    diagnostics: ["NIKA-VALUES-002"]
+    fixtures:
+      - to-mint-c1/conformance/values/valid/config-block-replaces-env
+    negative_fixtures:
+      - to-mint-c1/conformance/values/invalid/env-block-dead
+    projections: ["prose:01-envelope", "prose:04-variables", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:values_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:values-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R8 point 18 verbatim : « Toutes les anciennes formes décidées mortes doivent atteindre un census de zéro. » Le census env (bloc envelope + namespace d'expression) atteint zero avant la fermeture de fenetre."
+      - "La classification env est celle du role reel de chaque usage; la loi ne grave AUCUNE table de mapping globale (classify-not-rename : l'equivalence se prouve par site ou la migration s'arrete)."
+    closure_gates:
+      - old-form-env-census-zero
+      - codemod-classify-not-rename-equivalence-or-stop
+
+  # ───────────────── R3a + R8 points 15-17 · une autorité, une orthographe ───
+
+  - id: LAW-SURFACE-0202
+    slug: values/one-authority-one-spelling-no-alias
+    status: reserved
+    owner: spec
+    domain: SURFACE
+    title: "Une valeur a exactement une autorite et une orthographe, aucun alias, aucune deuxieme syntaxe"
+    prose_projection:
+      chapters: ["04-variables", "01-envelope"]
+      text: "R8 points 15-17 verbatim : « 15. Codemod equivalence-or-stop. 16. Aucun alias. 17. Aucune deuxième syntaxe. » · R3a verbatim : « Codemod classify-not-rename (equivalence-or-stop). » La classification est le SEUL pont entre les formes mortes (vars/env) et la famille 4-autorites; aucun alias de compatibilite ne survit a la cascade, aucune deuxieme orthographe d'autorite n'existe."
+    inputs:
+      - registry: surface
+        id: value_authority_aliases
+        role: required
+    premises:
+      - operator: absent
+        operands:
+          - registry: surface
+            id: value_authority_aliases
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: value_authority_family
+      independent_judgment: true
+    domain_payload:
+      kind: surface
+      constraint: one_spelling_per_meaning
+      subject:
+        registry: surface
+        id: value_authority_family
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/values/registry/no-authority-aliases
+    projections: ["prose:04-variables", "schema", "cli:check", "docs"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:values_core.py
+      - conformance:values-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R8 point 16 verbatim : « Aucun alias. » Le registre surface ne contient aucune row alias pour les quatre autorites, ni pour les formes mortes vars/env."
+      - "R8 point 17 verbatim : « Aucune deuxième syntaxe. » Le global invariant du gate le reaffirme : « no alias · no second syntax · no second truth »."
+    closure_gates:
+      - no-alias-zero
+      - no-second-syntax
