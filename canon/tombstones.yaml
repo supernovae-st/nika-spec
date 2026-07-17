@@ -109,3 +109,19 @@ tombstones:
       date: "2026-07-17"
       count: 0
     notes: "R6 point 5 verbatim : « Supprimer toutes les anciennes mentions : \"lands with W5\" ; \"lands with W-DEC\" ; propriétaires ou vagues closes erronées. » + note de cascade verbatim : « (Cascade : inclut les strings de diagnostic ENGINE — TESTED P7 : result<string> dit encore « lands with outcomes (W5) ».) » Kill pc-light (2026-07-17) sur les surfaces SPEC-repo : table 09-types (Outcome IR (W5) · artifact lanes (W5) · authority wave (W4) · decision core (W-DEC) · l'intro « land with their owning wave ») + lowering row 09:226 + notes fixtures 009/014 + type_core.py RESERVED dict (les quatre wave-strings) + type_core_selftest labels. Portée du pattern per LAW-MIGR-0520 proof obligation 2 : mentions CONSTRUCTEURS seulement · 07-conformance.md:178 (« lands with the reference engine ») + 12-gateway (« land with workflow composition ») ne sont PAS des mentions de constructeur · hors census. RESTES documentés : les « · W4 » des deux rows NIKA-TYPE-005 (FINDING-E · owed) · les strings ENGINE (le leg engine de la cascade · hors spec-repo)."
+  - id: model-select-ghost-form
+    status: retired
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0501", "LAW-MIGR-0501"]
+    introduced_in: P-C
+    kind: field
+    retired_in: P-C
+    replaced_by: "ir:model_string_form"
+    census_pattern:
+      tool: grep
+      pattern: "model_select|model: . select:"
+      scope: spec
+    final_census:
+      date: "2026-07-17"
+      count: 0
+    notes: "Annexe A-16 phrase 2 verbatim : « La ligne ghost `model: { select: {require, prefer} }` (15:72) est supprimée. » Kill exécuté au leg pc-light (MIG-modelref · 2026-07-17) : l'unique hit vivant (LAW-MIGR-0501 proof obligation verbatim : « l'unique hit vivant est spec/15-proof.md:72 ») meurt — le champ lock model_select: ET son commentaire dans le bloc nika.lock (« la surface auteur et sa matérialisation lock meurent ensemble » · LAW-GRAMMAR-0501 · « Le lock format perd le champ model_select: dans le même geste » · LAW-MIGR-0501). La string <provider>/<name> = SEULE surface v1 (LAW-SURFACE-0501) · la var EST l'alias logique (LAW-SURFACE-0502). Le pattern census couvre les deux orthographes (champ lock · forme inline) · le '.' du pattern = la brace (grep -E metachar-safe). Les records verbatim (canon/laws/model.yaml ×3 + laws-index généré) citent la forme morte à jamais — le record du ruling EST la loi (le receipt pc-census-baseline comptait 3 sites : 1 vivant + les citations du record · re-mesure pc-light empirique)."

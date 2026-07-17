@@ -180,3 +180,26 @@ migrations:
     receipt_slot: proofs/pc-light/census-constructors-after.txt
     state: executed
     notes: "MIG-constructors (pc-light leg · executed 2026-07-17 at the C1→C2 seam · the decision-free mechanical MIG extracted by the orchestrator per R8 law 14). R6 points 1/2/4: result<T> + secret<T> + bare money WITHDRAWN from the public grammar and the reserved list (refuse as unknown type names · NIKA-TYPE-001 · fixtures 009/014 keep their negative polarity · their wave-claim notes died per LAW-SURFACE-0520/0522 proof obligations). R6 point 3: artifact<mime> sole reserved · owner spec · reserved-not-implemented · honest diagnostic (type_core.py teaching carries NO wave and NO date) · the nine activation prerequisites named in the 09-types table. R6 point 5: constructor wave/lands-with mentions census -> tombstone constructor-wave-landing-mentions (the LAW-MIGR-0520 'migration-row-minted' closure gate advances with THIS row · FINDING-A resolved: the orchestrator mints it, the law import never did). STOP (FINDING-E · constructors.yaml header verbatim): the NIKA-TYPE-005 row sites (09-types.md:380 + 05-errors.md:116 + the secrets-never-lower bullet 09-types.md:243) are NOT touched — « Le sort de NIKA-TYPE-005 (réécrit sur la représentation IR interne de la sensibilité, ou retiré) n'est PAS tranché par R6 : arbitrage owed à la cascade, enregistré ici, jamais décidé silencieusement » — 3 secret< sites + their W4 mentions survive until that arbitrage. ENGINE strings (TESTED P7 · result<string> says « lands with outcomes (W5) ») = the engine leg of the cascade, outside this spec-repo MIG."
+  - id: mig-a16-model-select-ghost
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0501
+      - LAW-SURFACE-0502
+      - LAW-GRAMMAR-0501
+      - LAW-MIGR-0501
+      - LAW-MIGR-0502
+    introduced_in: P-C
+    ruling: A-16
+    wave: "C1→C2"
+    codemod:
+      id: a16-model-select-ghost-kill-v1
+      equivalence_or_stop: true
+    old_form: model-select-object-form-ghost
+    new_form: model-string-provider-name-sole-surface
+    blast_radius:
+      authored_files: 1
+      spec_fences: 1
+    receipt_slot: proofs/pc-light/census-modelref-after.txt
+    state: executed
+    notes: "MIG-modelref (pc-light leg · executed 2026-07-17 at the C1→C2 seam · decision-free mechanical MIG per R8 law 14 · the WAVE_MAP staging slotted A-16 ghost deletion at C6 — the orchestrator extracted it into the light leg because it is fully ruled and 1:1). A-16 phrase 2 verbatim : « La ligne ghost `model: { select: {require, prefer} }` (15:72) est supprimée. » The single living hit (LAW-MIGR-0501 proof obligation: « l'unique hit vivant est spec/15-proof.md:72 ») dies: the nika.lock block loses the model_select: field AND its ghost comment in one gesture (the materialization of a deleted surface does not outlive the surface). The string <provider>/<name> stays the SOLE v1 surface (LAW-SURFACE-0501) · the var IS the logical alias (LAW-SURFACE-0502 · FINDING-B reading recorded there). The LAW-MIGR-0501 'migration-row-minted' closure gate advances with THIS row (FINDING-A part model resolved by the orchestrator as ruled). Tombstone: model-select-ghost-form (field · census pattern model_select + inline form · final 0). The pc-census-baseline receipt counted 3 sites: the pc-light re-measure found 1 LIVING (15:72) + the canon/laws/model.yaml verbatim ruling-record quotes (x3 · the law that orders the kill · kept forever · never a codemod target)."

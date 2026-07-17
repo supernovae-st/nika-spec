@@ -1,0 +1,24 @@
+# pc-light census AFTER · MIG-modelref (A-16) · 2026-07-17
+
+## grep -rn 'model_select|model: { select' — WIDEST living scope (spec stdlib examples templates conformance design schemas reference scripts canon.yaml registry eval adr QUICKSTART README llms*)
+(zero on all living surfaces)
+BEFORE: 1 living (spec/15-proof.md:72 · per LAW-MIGR-0501 proof obligation « l'unique hit vivant ») · AFTER: 0 · UNACCOUNTED: 0
+
+## receipt-3 reconciliation (honest delta)
+the pc-census-baseline receipt counted 3 sites · pc-light re-measure: 1 LIVING + 3 verbatim ruling-record quotes in canon/laws/model.yaml (LAW-SURFACE-0501/LAW-GRAMMAR-0501/LAW-MIGR-0501 texts · the law that ORDERS the kill · never a codemod target · PATH-LAW spirit) + laws-index.json (generated from those laws) · the 3 records are the STOP-list of this MIG
+
+## STOP-list
+1-3. canon/laws/model.yaml (3 quotes of « model: { select: {require, prefer} } » inside A-16 verbatim law texts) · normative ruling records · kept forever.
+4. projections/laws-index.json (generated projection of those laws) · follows the laws · never edited by hand.
+
+## The kill
+spec/15-proof.md nika.lock block: the model_select: field AND its ghost comment died in one gesture (LAW-GRAMMAR-0501 « la surface auteur et sa matérialisation lock meurent ensemble » · LAW-MIGR-0501 « Le lock format perd le champ model_select: dans le même geste »).
+
+## MUTATION PROOF
+mutant: model_select: line reintroduced into the lock block -> grep census = 1 (SEEN) · reverted -> 0.
+
+## Battery AFTER
+runner.py all rc=0 · 8 selftests OK · ssot-compiler --check rc=0 · --check-canon rc=0 · 6 projectors green (llms re-emitted · canon.yaml untouched: no gated surface moved)
+
+## Registries
+migration row minted: mig-a16-model-select-ghost (state: executed · LAW-MIGR-0501 'migration-row-minted' closure gate advances) · tombstone: model-select-ghost-form (kind: field · final_census 0)
