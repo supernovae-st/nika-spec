@@ -1,0 +1,189 @@
+# canon/diagnostics/registry.yaml · C0 SANDBOX SEED · Diagnostic Registry (SSOT-2 §B)
+# Schema: schemas/registries.schema.json#/$defs/diagnosticRow (SCELLÉ · consommé as-is).
+# R11 point 5 verbatim : « Ajouter des codes machine namespacés et stables pour :
+# anchor interdit ; alias interdit ; merge key interdite ; duplicate key. »
+# Les 4 codes MANDATÉS = NIKA-YAML-001..004. NIKA-YAML-005 (scalar cap · gap P5) est
+# hérité du draft. FINDING-05 : NIKA-YAML-006..011 sont C0-PROPOSED (branches R11
+# point 13 · SSOT-2 B.21 : « Aucun rejet normatif sans diagnostic canonique lorsqu'il
+# est exposé à l'utilisateur ») · renumérotables avant C1, jamais après mint.
+# Choix de champs (documenté · pas silencieux) : plane=check (ces codes vivent au
+# check du profil) · outcome_class=failure + cause=profile_violation (le schema exige
+# les 2 champs SSOT-2 B.16 même pour la plane check ; la cause n'est PAS une row de
+# la table 13 runtime, voir $comment) · retryable=false · terminal=true ·
+# span_required=true (R11 point 4 : diagnostic pédagogique pointé source).
+# Teachings 001..005 : repris du draft consommé (contenu préservé · séparateur
+# normalisé au style maison « · » · le draft est une proposition, pas un ruling).
+registry_document_format: 1
+"$comment": "C0 sandbox seed · 4 mandated codes (R11 point 5) + scalar-cap code (P5 gap) + 6 c0-proposed codes (R11 point 13 branches · FINDING-05) · cause=profile_violation is a check-plane cause, never a table-13 runtime row"
+diagnostics:
+  - id: NIKA-YAML-001
+    status: reserved
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0101"]
+    introduced_in: C0
+    namespace: YAML
+    plane: check
+    condition: "anchor node present"
+    outcome_class: failure
+    cause: profile_violation
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
+    span_required: true
+    teaching: "YAML valide mais le profil Nika interdit les anchors · inline la valeur."
+  - id: NIKA-YAML-002
+    status: reserved
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0102"]
+    introduced_in: C0
+    namespace: YAML
+    plane: check
+    condition: "alias node present"
+    outcome_class: failure
+    cause: profile_violation
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
+    span_required: true
+    teaching: "Les aliases (*ref) sont interdits · répète la valeur explicitement."
+  - id: NIKA-YAML-003
+    status: reserved
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0103"]
+    introduced_in: C0
+    namespace: YAML
+    plane: check
+    condition: "merge key << present"
+    outcome_class: failure
+    cause: profile_violation
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
+    span_required: true
+    teaching: "Les merge keys (<<) sont interdites · compose les mappings à la main."
+  - id: NIKA-YAML-004
+    status: reserved
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0104"]
+    introduced_in: C0
+    namespace: YAML
+    plane: check
+    condition: "duplicate mapping key"
+    outcome_class: failure
+    cause: profile_violation
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
+    span_required: true
+    teaching: "Clé dupliquée · chaque clé de mapping est unique."
+  - id: NIKA-YAML-005
+    status: reserved
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0110"]
+    introduced_in: C0
+    namespace: YAML
+    plane: check
+    condition: "scalar length > cap"
+    outcome_class: failure
+    cause: profile_violation
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
+    span_required: true
+    teaching: "Scalar trop long · le profil borne la taille (voir le cap déclaré)."
+  - id: NIKA-YAML-006
+    status: reserved
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0105"]
+    introduced_in: C0
+    namespace: YAML
+    plane: check
+    condition: "custom tag present (outside YAML core schema)"
+    outcome_class: failure
+    cause: profile_violation
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
+    span_required: true
+    teaching: "Tag custom interdit · le profil Nika n'admet que le schema core YAML (str, int, float, bool, null, map, seq)."
+    notes: "c0-proposed (FINDING-05) · renumérotable avant C1."
+  - id: NIKA-YAML-007
+    status: reserved
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0106"]
+    introduced_in: C0
+    namespace: YAML
+    plane: check
+    condition: "non-string mapping key"
+    outcome_class: failure
+    cause: profile_violation
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
+    span_required: true
+    teaching: "Clé non-string interdite · chaque clé de mapping du profil Nika est une string."
+    notes: "c0-proposed (FINDING-05) · renumérotable avant C1."
+  - id: NIKA-YAML-008
+    status: reserved
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0107"]
+    introduced_in: C0
+    namespace: YAML
+    plane: check
+    condition: "non-finite float scalar (.nan/.inf)"
+    outcome_class: failure
+    cause: profile_violation
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
+    span_required: true
+    teaching: "NaN et Infinity sont interdits · le JSON canonique du Semantic IR n'admet que des nombres finis."
+    notes: "c0-proposed (FINDING-05) · renumérotable avant C1."
+  - id: NIKA-YAML-009
+    status: reserved
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0108"]
+    introduced_in: C0
+    namespace: YAML
+    plane: check
+    condition: "document depth > cap"
+    outcome_class: failure
+    cause: profile_violation
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
+    span_required: true
+    teaching: "Document trop profond · le profil borne la profondeur d'imbrication (voir le cap déclaré)."
+    notes: "c0-proposed (FINDING-05) · cap TO-RULE (FINDING-04)."
+  - id: NIKA-YAML-010
+    status: reserved
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0109"]
+    introduced_in: C0
+    namespace: YAML
+    plane: check
+    condition: "document size > cap"
+    outcome_class: failure
+    cause: profile_violation
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
+    span_required: true
+    teaching: "Document trop grand · le profil borne la taille de document (voir le cap déclaré)."
+    notes: "c0-proposed (FINDING-05) · cap TO-RULE (FINDING-04)."
+  - id: NIKA-YAML-011
+    status: reserved
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0111"]
+    introduced_in: C0
+    namespace: YAML
+    plane: check
+    condition: "source bytes violate the declared unicode NFC/BOM contract"
+    outcome_class: failure
+    cause: profile_violation
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
+    span_required: true
+    teaching: "La source viole le contrat Unicode du profil (NFC/BOM) · voir la disposition déclarée au registre grammar."
+    notes: "c0-proposed (FINDING-05) · disposition TO-RULE (FINDING-04)."

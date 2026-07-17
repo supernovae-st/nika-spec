@@ -1,0 +1,79 @@
+# canon/grammar.yaml · C0 SANDBOX SKELETON · Grammar Registry (SSOT-1 §3B)
+# Schema: schemas/registries.schema.json#/$defs/grammarRow (SCELLÉ · consommé as-is).
+# Ce que C0 importe ici : formes syntaxiques · cardinalités · discriminants · champs
+# requis · champs interdits · unknown-field policy (SSOT-1 §3B verbatim : « Grammar —
+# formes syntaxiques ; cardinalités ; discriminants ; champs requis ; champs
+# interdits ; unknown-field policy »).
+# Rows seed réelles : les tables consommées par le pilote R11 (generated_facts des
+# lois LAW-GRAMMAR-0101..0111 + LAW-SURFACE-0101). FINDING-04 : R11 point 13 mandate
+# les caps (profondeur · taille document · taille scalar) et l'aspect NFC/BOM mais ne
+# fixe NI valeur numérique NI disposition ; rien n'est inventé, les rows portent le
+# TO-RULE explicitement.
+registry_document_format: 1
+"$comment": "C0 sandbox skeleton · seed rows = the R11 pilot generated_facts tables · cap VALUES and unicode disposition are TO-RULE at C0 (FINDING-04) · full grammar import owed at C0"
+grammar:
+  - id: yaml_forbidden_event_classes
+    status: reserved
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0101", "LAW-GRAMMAR-0102", "LAW-GRAMMAR-0103", "LAW-GRAMMAR-0104", "LAW-GRAMMAR-0105", "LAW-GRAMMAR-0106", "LAW-GRAMMAR-0107"]
+    introduced_in: C0
+    position: yaml_source_document
+    fields:
+      - name: anchor
+        cardinality: forbidden
+      - name: alias
+        cardinality: forbidden
+      - name: merge_key
+        cardinality: forbidden
+      - name: duplicate_key
+        cardinality: forbidden
+      - name: custom_tag
+        cardinality: forbidden
+      - name: non_string_key
+        cardinality: forbidden
+      - name: non_finite_float
+        cardinality: forbidden
+    notes: "La table des classes d'events interdites par le profil YAML Nika (R11 points 1 + 13). C'est la table que les évaluateurs CONSOMMENT (judgment.generated_facts) ; chaque évaluateur implémente le jugement lui-même (independent_judgment)."
+  - id: yaml_scalar_cap
+    status: reserved
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0110"]
+    introduced_in: C0
+    position: yaml_scalar
+    fields:
+      - name: size_over_cap
+        cardinality: forbidden
+    notes: "FINDING-04 · la VALEUR du cap scalar est TO-RULE à C0. Note de clôture R11 verbatim : « (Ferme le gap P5 : le cap de taille scalaire — 200k chars passait — entre au profil normatif.) » L'empirie third-pass (200k passait) borne le débat, le ruling ne grave pas le nombre."
+  - id: yaml_document_caps
+    status: reserved
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0108", "LAW-GRAMMAR-0109"]
+    introduced_in: C0
+    position: yaml_document
+    fields:
+      - name: depth_over_cap
+        cardinality: forbidden
+      - name: size_over_cap
+        cardinality: forbidden
+    notes: "FINDING-04 · les VALEURS des caps profondeur + taille de document sont TO-RULE à C0 (R11 point 13 mandate l'aspect, pas le nombre)."
+  - id: yaml_unicode_contract
+    status: reserved
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0111"]
+    introduced_in: C0
+    position: yaml_source_bytes
+    fields:
+      - name: non_nfc_or_bom_disposition
+        cardinality: required
+    notes: "FINDING-04 · R11 point 13 mandate la couverture Unicode NFC/BOM sans fixer la disposition (refuser un BOM ou le strip · exiger NFC ou normaliser). La row exige qu'une disposition soit déclarée avant C1 ; elle n'en choisit aucune."
+  - id: envelope_nika_field
+    status: reserved
+    owner: spec
+    law_ids: ["LAW-SURFACE-0101"]
+    introduced_in: C0
+    position: envelope
+    fields:
+      - name: nika
+        cardinality: required
+        value_shape: nika_v1_literal
+    notes: "R11 point 16 verbatim : « Le langage reste nika: v1. » Le champ d'enveloppe nika est requis et sa valeur est le littéral v1."

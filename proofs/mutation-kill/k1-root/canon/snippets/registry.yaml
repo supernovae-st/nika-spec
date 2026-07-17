@@ -1,0 +1,19 @@
+# canon/snippets/registry.yaml · C0 SANDBOX SKELETON · Snippet Registry
+# Schema: schemas/registries.schema.json#/$defs/snippetRow (SCELLÉ · consommé as-is).
+# Ce que C0 importe ici : le census des ≈210 fences current-facing (SSOT-1 §30 ·
+# baseline third-pass P9) classés par selector + class. Row seed réelle : la probe
+# anchors du pre1-gate, classée negative_fixture (R11 point 11 : « Les fixtures
+# négatives contenant des anchors sont explicitement classées invalides. »).
+registry_document_format: 1
+"$comment": "C0 sandbox skeleton · seed row = the real anchors probe classified negative_fixture (R11 point 11) · the ~210-fence census import owed at C0 (SSOT-1 §30)"
+snippets:
+  - id: anchors-probe-negative
+    status: reserved
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0101", "LAW-GRAMMAR-0102"]
+    introduced_in: C0
+    selector:
+      kind: whole_file
+      source: research/pre1-gate/probes/anchors.nika.yaml
+    class: negative_fixture
+    notes: "Fixture RÉELLE (monorepo pre1-gate) : contient un anchor &shared (jamais un simple exemple mort) + un alias *shared. Couvre les négatifs des lois anchor + alias du pilote R11."

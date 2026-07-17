@@ -1,0 +1,3 @@
+REFUSED (profile · R11 gate · exit 3):
+canon/types.yaml: YAML anchor (&own) at line 20, column 15 · R11 points 1+3: forbidden even when never referenced
+rc=3

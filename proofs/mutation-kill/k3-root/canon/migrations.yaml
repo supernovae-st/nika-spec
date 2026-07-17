@@ -1,0 +1,155 @@
+# canon/migrations.yaml · C0 SANDBOX SEED RÉEL · Migration Registry
+# Schema: schemas/registries.schema.json#/$defs/migrationRow (SCELLÉ · consommé as-is).
+# Sources (verbatim · jamais paraphrasé) :
+#   · les 5 receipts P-B scellés (mini-gates/f1..f5-*-receipt.json · champ
+#     migration_row recopié BYTE-À-BYTE dans notes)
+#   · les 2 rulings binaires N2-a + N2-b (ANNEX_2026-07-17_minigates-winners.md ·
+#     D-2026-07-17-N2 · paragraphes recopiés verbatim dans notes)
+# Mapping schema (FINDING-07 · documenté, jamais silencieux) :
+#   · migrationRow exige des machineIds lowercase : les ids/codemods des receipts
+#     gardent leur orthographe verbatim dans notes ; la forme machine est normalisée
+#     (F4-b17-temporal → f4-b17-temporal).
+#   · ruling : familles mini-gates F1/F2/F3/F5 + N2-a/N2-b → R8 (le protocole
+#     mini-gates est la loi R8 · l'ANNEX remplit la table §MINI-GATES exigée par R8) ·
+#     F4 → B-17 (le seul shift de sens vivant · remodel-per-B17).
+#   · state : ratified partout (D-2026-07-17-N2 · opérateur session 2026-07-17) ·
+#     l'exécution appartient à P-C/C-waves, jamais à C0.
+#   · blast_radius : les nombres MESURÉS des receipts (authored_files/spec_fences).
+#   · status : reserved (les law_ids arrivent avec l'import des lois à C0 ·
+#     activeNeedsLaw ne contraint que le statut active).
+registry_document_format: 1
+"$comment": "REAL SEED · 5 sealed P-B receipt migration_rows + N2-a + N2-b (verbatim in notes · D-2026-07-17-N2) · machine fields normalized per sealed migrationRow schema (FINDING-07) · states ratified, execution owed to P-C"
+migrations:
+  - id: mig-f1-secrets-provenance
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: P-B
+    ruling: R8
+    wave: "P-B→C2/C3"
+    codemod:
+      id: f1-keep-identity-or-secrets-source-explicit-v1
+      equivalence_or_stop: true
+    old_form: secrets-source-envelope
+    new_form: secrets-source-envelope
+    blast_radius:
+      authored_files: 28
+      spec_fences: 8
+      consumers: [engine, schema, website, cli, lsp]
+    receipt_slot: research/pre1-gate/mini-gates/f1-secrets-provenance-receipt.json
+    state: ratified
+    notes: "migration_row VERBATIM (receipt scellé F1) : F1 · NONE (keep) · no rename row. H1 operator binary (D-pending, never silent per SSOT-1 §29): if 'source: required' wins -> codemod secrets-source-explicit-v1 (insert `source: vault` where omitted, exact equivalence to engine envelope.rs:172-174 None=>Vault; authored census without source: = 0 at pin) and the engine default dies; if 'default vault normative' wins -> prose-fix (the word '(required)' at spec/01-envelope.md:265 dies) + positive fixture {key: k}. H2 wrong-locator fixtures + H3 shared-grammar doc ship additively in the ONE atomic cascade (R8 law 14). NEGATIVE RESERVATION MINTED: `from:` = tool-args-only (nika:convert) · never an envelope keyword (couple F1+F3 ruling: the word is attributed to NOBODY). [Le H1 operator binary est TRANCHÉ depuis : N2-a, row mig-n2a ci-dessous.]"
+  - id: mig-f2-secrets-declassification
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: P-B
+    ruling: R8
+    wave: "P-B→C2/C3"
+    codemod:
+      id: f2-identity-hardening-h1-h4
+      equivalence_or_stop: true
+    old_form: secrets-egress-declassification
+    new_form: secrets-egress-declassification
+    blast_radius:
+      authored_files: 23
+      spec_fences: 5
+      consumers: [engine, schema, docs]
+    receipt_slot: research/pre1-gate/mini-gates/f2-secrets-declassification-receipt.json
+    state: ratified
+    notes: "migration_row VERBATIM (receipt scellé F2) : F2 · NONE (keep) · no MIGRATION_REGISTRY rename row is minted; hardening H1-H4 enters the ONE atomic cascade (R8 law 14) as additive artifacts: H1 host:-literal + permits.net.http composition fixtures (incl. negatives SEC-006 / refusal), H2 >=1 public corpus workflow exercising secrets+egress (0/27 at pin), H3 structured law-ids for the 3-layer egress law + to:-required + host XOR host_from_self (SSOT-1 law 27; SEC-006/007 registry-linked per SSOT-2), H4 anchor + spelling FROZEN. NEGATIVE RESERVATIONS MINTED: allow: = policy providers-only forever (R9 laws 13-14); the F2 family is decoupled from the F1/F3 from: knot and can cascade first."
+  - id: mig-f3-outputs-type-derive
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: P-B
+    ruling: R8
+    wave: "P-B→C2/C3"
+    codemod:
+      id: outputs-type-derive-v1
+      equivalence_or_stop: true
+    old_form: outputs-type-declared
+    new_form: outputs-type-derived-by-default
+    blast_radius:
+      authored_files: 27
+      spec_fences: 7
+      consumers: [engine, schema, reference, vscode]
+    receipt_slot: research/pre1-gate/mini-gates/f3-outputs-form-receipt.json
+    state: ratified
+    notes: "migration_row VERBATIM (receipt scellé F3) : F3 · outputs-type-derive-v1 (29 typed in-block sites on 27 spec files at pin, structural re-measure; sequenced AFTER the R3b Type Core leg inside the ONE atomic cascade, R8 law 14): derive D from the value: expression via the Type Core; type: == D -> DROP the line (equivalence PROVEN, receipt records derived=declared); type: != D -> STOP with a dual-truth finding (negative witness conformance/variables/typed-outputs-mismatch.nika.yaml; never silent per SSOT-1 §29); non-derivable -> type: stays REQUIRED (sole truth). description: never touched; untyped entries never touched; R4 quartet (tasks.X.output · tasks.X.out.<n> · extract: · outputs:) intact. NEGATIVE RESERVATION MINTED: from: = tool-args-only · never an outputs keyword (couple F1+F3 ruling: the word is attributed to NOBODY)."
+  - id: mig-f4-b17-temporal
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: P-B
+    ruling: B-17
+    wave: "P-B→C6"
+    codemod:
+      id: f4-b17-temporal
+      equivalence_or_stop: true
+    old_form: timeout-total-including-retries
+    new_form: timeout-attempt-scope-deadline-grace
+    blast_radius:
+      authored_files: 36
+      spec_fences: 16
+      consumers: [engine, schema, reference, docs, backend-manifest]
+    receipt_slot: research/pre1-gate/mini-gates/f4-limits-temporal-receipt.json
+    state: ratified
+    notes: "migration_row VERBATIM (receipt scellé F4 · le codemod y est épelé F4-b17-temporal, normalisé lowercase ici) : F4-b17-temporal · additive-grammar + semantic-shift-flag + doc-kill. The relational linter maps winner != statu-quo to verdict 'rename'; MATERIALLY NO EXISTING KEY IS RENAMED (operator ruling D-2026-07-17-N2 'remodel-per-B17' · the linter's mechanical label is accepted, the substance is additive): R1 IDENTITY · every task timeout: stays byte-identical (the spelling is kept; only the normative text moves to attempt-scope per B-17 law 5, ALREADY LAW). R2 STOP · every task carrying BOTH timeout: AND retry: is flagged for author arbitration (old law 03-dag.md:601-603 total-incl-retries vs B-17 laws 5-7 per-attempt + min-composition; equivalence mechanically undecidable · keep timeout: as the attempt bound OR move the envelope to deadline:). R3 DOC-KILL · every normative 24h-cap mention dies in the cascade (census 'Maximum · 24h' -> 0, B-17 law 37). R4 REFUSE · task-level limits: = NIKA-PARSE-class refusal forever (policy.limits untouched: another family; constitution witnesses regenerate post-window per R9 laws 3-4). R5 IDENTITY · --max-cost-usd CLI and flat max_turns/max_tokens_total unchanged (F5 seam: turns/completion belong to F5; rho-cost here). NEW KEYS MINTED: deadline: (workflow) + grace: (finally), census-0 verified at pin. STOP-conditions: unparsable duration · timeout: under for_each (verify zero envelope reliance) · any pre-existing deadline:/grace: key discovered (census expected 0 · else stop)."
+  - id: mig-f5-stop-completion
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: P-B
+    ruling: R8
+    wave: "P-B→C2/C3"
+    codemod:
+      id: f5-identity-plus-stop-guards-s1-s3
+      equivalence_or_stop: true
+    old_form: agent-flat-budgets
+    new_form: agent-flat-budgets
+    blast_radius:
+      authored_files: 23
+      spec_fences: 5
+      consumers: [engine, schema, docs]
+    receipt_slot: research/pre1-gate/mini-gates/f5-stop-completion-receipt.json
+    state: ratified
+    notes: "migration_row VERBATIM (receipt scellé F5) : F5 · NONE (keep) · no rename row. Codemod = identity + STOP guards: S1 any stop: key under agent params in an authored file -> STOP + pedagogic diagnostic pointing the flat fields (NEVER a silent unbag: stop.max_cost_usd has NO task-level equivalent · the cost cap is run-scope, cancelled(budget) 13-outcomes.md:46; stop.timeout is ambiguous against the task timeout:); S2 user-defined stop: keys outside agent-params position untouched (the guard is path-contextual, never word-grep); S3 design/v1-constitution.md is a frozen draft · regenerated post-window per R9 laws 3-4, never edited by this codemod. Hardening H1-H5 additive in the ONE atomic cascade (R8 law 14): H1 budget-exhaustion cause · OPERATOR BINARY: a failure(budget) row in table 13 OR an explicit law-link AGENT-001/002 -> failure budget_error (fixtures both sides; today the mapping exists via code only); H2 max_tokens_total default engine-configurable -> capability-manifest-declared + receipt-recorded (R12 law 26 spirit); H3 NEGATIVE decision graved: workflow-halt = B-17 vocabulary · F5 never mints a halt/stop word (deadline -> cancelled(deadline_exceeded) and timeout -> failure(timeout) arrive via the B-17 cascade); H4 negative fixtures: AGENT-001 with partial_output present · AGENT-002 · on_error recover of the partial · boundary nika:done-at-last-permitted-turn = success never failure; H5 NEGATIVE RESERVATION: `stop` stays reserved to the sampling domain (stop-sequences on infer, a future additive surface). Census agent.stop: authored = 0 at all pins (born green · a ratchet fixture + grep probe keep it 0 forever). [Le H1 operator binary est TRANCHÉ depuis : N2-b, row mig-n2b ci-dessous.]"
+  - id: mig-n2a-secrets-source-required
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: P-B
+    ruling: R8
+    wave: "P-B→C8"
+    codemod:
+      id: secrets-source-explicit-v1
+      equivalence_or_stop: true
+    old_form: secrets-source-optional-engine-default
+    new_form: secrets-source-required
+    blast_radius:
+      authored_files: 0
+      spec_fences: 2
+      consumers: [engine, schema, reference]
+    receipt_slot: research/pre1-gate/mini-gates/ANNEX_2026-07-17_minigates-winners.md
+    state: ratified
+    notes: "N2-a VERBATIM (ANNEX D-2026-07-17-N2) : N2-a · F1-H1 · `secrets.<n>.source:` devient REQUIRED. La dual-truth (spec/01:265 « required » vs spec/01:275 + engine `envelope.rs:174 None=>Vault` défaut silencieux) se résout côté EXPLICITE : un défaut de provenance silencieux est exactement la classe que R12 tue partout (« Aucun fallback permissif » · « Aucun mode silencieux dépendant de la machine ») · R8 loi 9 (précision > brièveté). Conséquences : codemod `secrets-source-explicit-v1` · le défaut engine meurt (fenêtre C8) · fixture négative `missing-source` mintée · le moment est le moins cher de l'histoire du langage (corpus public : 0/27 blocs secrets authored). [blast_radius : authored 0 (census 0/27) · spec_fences 2 = les deux sites de la dual-truth spec/01:265 + spec/01:275.]"
+  - id: mig-n2b-budget-exhausted-row
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: P-B
+    ruling: R8
+    wave: "P-B→C2/C3"
+    codemod:
+      id: none-additive-outcome-row
+      equivalence_or_stop: true
+    old_form: budget-exhaustion-code-only-mapping
+    new_form: failure-budget-exhausted-row
+    blast_radius:
+      authored_files: 0
+      spec_fences: 1
+      consumers: [engine, reference, docs]
+    receipt_slot: research/pre1-gate/mini-gates/ANNEX_2026-07-17_minigates-winners.md
+    state: ratified
+    notes: "N2-b VERBATIM (ANNEX D-2026-07-17-N2) : N2-b · F5-H1 · nouvelle ROW table 13 : `Outcome.class = failure · cause = budget_exhausted`. L'épuisement d'un budget agent (`max_turns` / `max_tokens_total`) est une transition sémantique DISTINCTE (R8 loi 13 : un mot par transition) · symétrie avec la row `deadline_exceeded` née de B-17 (« jamais un boolean ») · law-link AGENT-001/002 · fixtures des deux côtés (épuisé vs done-avant-budget). Jamais un mapping code-only. [codemod none-additive : addition d'une row à la table 13, aucune réécriture de source · equivalence_or_stop const true du schema scellé.]"
