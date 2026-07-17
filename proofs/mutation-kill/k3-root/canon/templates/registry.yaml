@@ -1,0 +1,22 @@
+# canon/templates/registry.yaml · C0 SANDBOX SKELETON · Template Registry (SSOT-2 §A)
+# Schema: schemas/registries.schema.json#/$defs/templateRow (SCELLÉ · consommé as-is).
+# SSOT-2 §A verbatim (extraits) : « 2. Le registre est l'unique inventaire officiel
+# des templates. » · « 6. Chaque entrée référence une source `.nika.yaml` canonique
+# vérifiée. » · « 4. Aucun regex parsing du README ou d'une page Markdown pour
+# reconstruire le catalogue. »
+# Le schema impose minItems 1 + source_digest sha256 : la row placeholder porte un
+# digest ZÉRO explicitement marqué (jamais un digest revendiqué) ; l'import C0 la
+# remplace par le catalogue réel (chaque source passe parser + checker + conformance
+# + profil published per SSOT-2 A.8).
+registry_document_format: 1
+"$comment": "C0 sandbox skeleton · placeholder row with an ALL-ZERO digest explicitly marked (never a claimed digest) · real template catalog import owed at C0 (SSOT-2 A.1-12)"
+templates:
+  - id: template-catalog-import-pending
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    source_path: to-mint-c1/templates/catalog-import
+    source_digest: "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    category: placeholder
+    notes: "Digest tout-zéro = marqueur de placeholder, jamais un digest revendiqué. L'import C0 remplace cette row par le catalogue réel (SSOT-2 A.6-8 : source canonique vérifiée + digest réel + published profile)."

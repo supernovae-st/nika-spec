@@ -1,0 +1,1112 @@
+# canon/laws/guarantees.yaml · C0 import · R10 delta = GuaranteeProfile
+# SSOT: RULINGS_2026-07-15.md §R10 (preambule + 27 points · verbatim · JAMAIS paraphrase,
+# les citations reproduisent les bytes du ruling, ancres "R10 preambule" / "R10 point N").
+# Schema: schemas/law.schema.json (SCELLE · consomme as-is). Bloc d'ids de ce groupe:
+# GUAR 04xx.
+#
+# FINDING-G1 (forme du schema vs lois non-compositionnelles · precedent FINDING-11 du
+# pilote) : guaranteePayload exige operator_rules (minItems 1) sur CHAQUE loi GUAR, meme
+# non compositionnelle (ex. l'interdiction de cle delta:). Convention de ce fichier :
+# les lois non compositionnelles portent la regle conservatrice par defaut
+# [{operator: sequential, combine: meet}], fondee verbatim sur R10 point 10 (composition
+# conservative meet). De meme, guaranteePayload.dimension pinne UN exemplaire ; la
+# famille complete des dimensions vit en inputs (grammar/guarantee_dimensions).
+#
+# FINDING-G2 (codes c0-proposed · precedent FINDING-05 du pilote) : R10 ne mandate aucun
+# code machine. NIKA-GUAR-001 (garantie auto-attribuee sans evidence verifiable · point
+# 9), NIKA-GUAR-002 (claim depassant l'evidence / le demontrable · points 7 + 26) et
+# NIKA-GUAR-003 (cle YAML publique delta: refusee · point 22) sont mintes c0-proposed
+# (SSOT-2 B.21 : un diagnostic canonique par rejet normatif expose), renumerotables
+# avant C1.
+#
+# FINDING-G3 (frontiere de l'enum dimension · interpretation enregistree, pas une
+# contradiction) : R10 point 3 garde « completion/boundedness si cette propriété est
+# conservée » conditionnel et n'admet une autre dimension que « seulement après
+# définition formelle ». L'enum scelle du guaranteePayload FERME les dimensions a
+# exactement {determinism, idempotence, replayability, boundedness} : il RESOUT le
+# conditionnel (boundedness conservee · cohérent R13 qui corrige proof_core.py sur
+# bounded) et toute dimension future exige un amendement de schema (loi MIGR). R10
+# point 11 nomme aussi « purity » comme PROPRIETE distincte : purity n'est PAS une
+# dimension du profil (absente du minimum du point 3 et de l'enum scelle), c'est
+# coherent, enregistre ici pour que personne ne l'ajoute en silence.
+#
+# Fixtures : aucune fixture guarantees n'existe au pin (mesure) ; R10 point 25 nomme
+# les 10 classes a minter, chemins to-mint-c1/conformance/guarantees/<classe>.
+# Surface reference REELLE : conformance/proof_core.py (la hierarchie d'evidence
+# StaticProof/TraceVerified vit dans spec/15-proof.md + R13).
+
+laws_document_format: 1
+
+pilot: r10-guarantee-profile
+
+laws:
+
+  # ─────────────── R10 preambule + points 1 + 2 · delta EST le profil ──────────
+
+  - id: LAW-GUAR-0401
+    slug: r10/delta-is-guarantee-profile
+    status: reserved
+    owner: spec
+    domain: GUAR
+    title: "delta designe le GuaranteeProfile du CallableContract, la forme nommee est canonique"
+    prose_projection:
+      chapters: ["15-proof", "14-composition"]
+      text: "R10 preambule verbatim : « δ désigne le GuaranteeProfile du CallableContract. La forme canonique principale devient nommée : CallableContract { inputs, outputs, errors, effects, resources, guarantees }. La forme Callable<I, O, E, ε, ρ, δ> reste uniquement une notation formelle compacte et dérivée. » · R10 point 1 verbatim : « δ = GuaranteeProfile. » · R10 point 2 verbatim : « δ ne signifie pas uniquement determinism ou idempotence. »"
+    inputs:
+      - registry: surface
+        id: delta_formal_notation
+        role: required
+      - registry: grammar
+        id: guarantee_profile_named_form
+        role: required
+      - registry: ir
+        id: callable_contract
+        role: required
+    premises:
+      - operator: derived_from
+        operands:
+          - registry: surface
+            id: delta_formal_notation
+          - registry: grammar
+            id: guarantee_profile_named_form
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: guarantee_profile_named_form
+      independent_judgment: true
+    domain_payload:
+      kind: guarantee
+      dimension: determinism
+      operator_rules:
+        - operator: sequential
+          combine: meet
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/guarantees/named-form-canonical
+    projections: ["prose:15-proof", "prose:14-composition", "schema", "docs", "sdk"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:proof_core.py
+      - conformance:guarantee-suite
+    introduced_in: C0
+    proof_obligations:
+      - "La notation grecque est DERIVEE de la forme nommee, jamais l'inverse : le sens de la premisse derived_from est directionnel (le compact se derive du canonique)."
+      - "FINDING-G1 : dimension exemplaire determinism ; la famille des dimensions vit au registre grammar/guarantee_dimensions (loi LAW-GUAR-0402)."
+    closure_gates:
+      - named-form-canonical-everywhere
+
+  # ─────────────── R10 point 3 · produit structure de dimensions ───────────────
+
+  - id: LAW-GUAR-0402
+    slug: r10/structured-product-of-dimensions
+    status: reserved
+    owner: spec
+    domain: GUAR
+    title: "GuaranteeProfile est un produit structure de dimensions independantes, minimum ferme"
+    prose_projection:
+      chapters: ["15-proof"]
+      text: "R10 point 3 verbatim : « GuaranteeProfile est un produit structuré de dimensions indépendantes, au minimum : determinism ; idempotence ; replayability ; completion/boundedness si cette propriété est conservée ; toute autre dimension seulement après définition formelle. » FINDING-G3 : l'enum scelle du schema resout le conditionnel (boundedness conservee) et ferme la porte aux dimensions non definies formellement."
+    inputs:
+      - registry: grammar
+        id: guarantee_minimum_dimensions
+        role: required
+      - registry: ir
+        id: guarantee_profile_dimensions
+        role: required
+    premises:
+      - operator: subset_of
+        operands:
+          - registry: grammar
+            id: guarantee_minimum_dimensions
+          - registry: ir
+            id: guarantee_profile_dimensions
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["sorted-keys"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: guarantee_dimensions
+      independent_judgment: true
+    domain_payload:
+      kind: guarantee
+      dimension: determinism
+      operator_rules:
+        - operator: sequential
+          combine: meet
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/guarantees/product-dimensions-present
+    projections: ["prose:15-proof", "schema", "sdk", "docs"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:proof_core.py
+      - conformance:guarantee-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Une dimension hors enum est refusee par le schema (produit FERME cote machine) ; l'ajout d'une dimension = definition formelle + amendement (loi MIGR), jamais une extension silencieuse."
+    closure_gates:
+      - dimensions-enum-closed
+
+  # ─────────────── R10 points 4 + 5 · claim, scope, assumptions, evidence ──────
+
+  - id: LAW-GUAR-0403
+    slug: r10/claim-scope-assumptions-evidence
+    status: reserved
+    owner: spec
+    domain: GUAR
+    title: "Une garantie porte separement claim, scope, assumptions et evidence level"
+    prose_projection:
+      chapters: ["15-proof"]
+      text: "R10 point 4 verbatim : « Une garantie possède séparément : claim ; scope ; assumptions ; evidence level. » · R10 point 5 verbatim : « Ne jamais confondre la propriété affirmée et la force de sa preuve. » Les quatre champs sont des axes distincts de la declaration ; aucun n'infere un autre."
+    inputs:
+      - registry: ir
+        id: guarantee_declaration
+        role: required
+      - registry: grammar
+        id: guarantee_declaration_shape
+        role: ceiling
+    premises:
+      - operator: conforms_to
+        operands:
+          - registry: ir
+            id: guarantee_declaration
+          - registry: grammar
+            id: guarantee_declaration_shape
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["sorted-keys"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: guarantee_declaration_shape
+      independent_judgment: true
+    domain_payload:
+      kind: guarantee
+      dimension: determinism
+      operator_rules:
+        - operator: sequential
+          combine: meet
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/guarantees/declaration-four-fields
+    projections: ["prose:15-proof", "schema", "cli:check", "sdk"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:proof_core.py
+      - cli:nika-check
+      - conformance:guarantee-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R10 point 5 verbatim : « Ne jamais confondre la propriété affirmée et la force de sa preuve. » La fixture refuse une declaration qui fusionne claim et evidence en un seul champ."
+    closure_gates:
+      - four-fields-separate
+
+  # ─────────────── R10 point 6 · la hierarchie d'evidence reutilisee ───────────
+
+  - id: LAW-GUAR-0404
+    slug: r10/evidence-hierarchy-reuse
+    status: reserved
+    owner: spec
+    domain: GUAR
+    title: "Les niveaux d'evidence sont StaticProof, TraceVerified, Unknown, aucun second systeme"
+    prose_projection:
+      chapters: ["15-proof"]
+      text: "R10 point 6 verbatim : « Les niveaux d'évidence réutilisent la hiérarchie existante : StaticProof · TraceVerified · Unknown. Aucun second système de preuve concurrent. » La hierarchie existante est celle de spec/15-proof.md ; le profil la consomme, il n'en cree pas une autre."
+    inputs:
+      - registry: ir
+        id: guarantee_evidence_level
+        role: required
+      - registry: grammar
+        id: evidence_levels
+        role: ceiling
+    premises:
+      - operator: member_of
+        operands:
+          - registry: ir
+            id: guarantee_evidence_level
+          - registry: grammar
+            id: evidence_levels
+        quantifier: forall
+      - operator: absent
+        operands:
+          - registry: grammar
+            id: second_evidence_system
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: evidence_levels
+      independent_judgment: true
+    domain_payload:
+      kind: guarantee
+      dimension: determinism
+      operator_rules:
+        - operator: sequential
+          combine: meet
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/guarantees/evidence-levels-closed
+    projections: ["prose:15-proof", "schema", "cli:check", "sdk"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:proof_core.py
+      - conformance:guarantee-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R13 corrige deja proof_core.py (bounded ne se leve plus en StaticProof inconditionnel) : la meme hierarchie sert assert et guarantees, un seul systeme de preuve."
+    closure_gates:
+      - single-evidence-system
+
+  # ─────────────── R10 point 7 · Strength(claim) <= Strength(evidence) ─────────
+
+  - id: LAW-GUAR-0405
+    slug: r10/strength-claim-le-evidence
+    status: reserved
+    owner: spec
+    domain: GUAR
+    title: "Loi absolue, la force du claim ne depasse jamais la force de l'evidence"
+    prose_projection:
+      chapters: ["15-proof"]
+      text: "R10 point 7 verbatim : « Loi absolue : Strength(claim) ≤ Strength(evidence) » Aucune surface ne peut admettre une declaration dont le claim est plus fort que sa preuve."
+    inputs:
+      - registry: ir
+        id: claim_strength
+        role: required
+      - registry: ir
+        id: evidence_strength
+        role: required
+    premises:
+      - operator: min_of
+        operands:
+          - registry: ir
+            id: claim_strength
+          - registry: ir
+            id: claim_strength
+          - registry: ir
+            id: evidence_strength
+        quantifier: forall
+        $comment: "Encodage exact du <= dans l'algebre scellee : min_of(x,a,b) dit x = min(a,b) ; avec x = a = claim_strength, claim = min(claim, evidence) equivaut a claim <= evidence."
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-GUAR-002"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: evidence_levels
+      independent_judgment: true
+    domain_payload:
+      kind: guarantee
+      dimension: determinism
+      operator_rules:
+        - operator: sequential
+          combine: meet
+    diagnostics: ["NIKA-GUAR-002"]
+    fixtures:
+      - to-mint-c1/conformance/guarantees/claim-at-evidence
+    negative_fixtures:
+      - to-mint-c1/conformance/guarantees/claim-above-evidence-refused
+    projections: ["prose:15-proof", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:proof_core.py
+      - cli:nika-check
+      - conformance:guarantee-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R13 applique la meme loi a assert (fragment verbatim : « avec **claim ≤ evidence** — le reste = Unknown, jamais optimiste. ») : les deux surfaces jugent avec la meme inegalite, un seul sens."
+      - "FINDING-G2 : NIKA-GUAR-002 est c0-proposed, renumerotable avant C1."
+    closure_gates:
+      - strength-inequality-enforced
+      - fixture-parity
+
+  # ─────────────── R10 point 8 · l'absence signifie Unknown ────────────────────
+
+  - id: LAW-GUAR-0406
+    slug: r10/absence-means-unknown
+    status: reserved
+    owner: spec
+    domain: GUAR
+    title: "L'absence d'une garantie signifie Unknown, jamais true par defaut"
+    prose_projection:
+      chapters: ["15-proof"]
+      text: "R10 point 8 verbatim : « L'absence d'une garantie signifie Unknown, jamais true par défaut. » Le defaut du produit est Unknown sur chaque dimension non declaree ; aucun optimisme implicite."
+    inputs:
+      - registry: ir
+        id: guarantee_claim_for_dimension
+        role: required
+    premises:
+      - operator: absent
+        operands:
+          - registry: ir
+            id: guarantee_claim_for_dimension
+        quantifier: forall
+    conclusion:
+      verdict: derive
+      derives:
+        registry: ir
+        id: guarantee_unknown_default
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: guarantee_unknown_default
+      independent_judgment: true
+    domain_payload:
+      kind: guarantee
+      dimension: determinism
+      operator_rules:
+        - operator: sequential
+          combine: meet
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/guarantees/unknown-propagation
+    projections: ["prose:15-proof", "schema", "cli:check", "sdk"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:proof_core.py
+      - conformance:guarantee-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R10 point 25 nomme la classe « Unknown propagation » ; la fixture prouve qu'une dimension absente lit Unknown sur toutes les surfaces, jamais true."
+    closure_gates:
+      - unknown-default-proven
+
+  # ─────────────── R10 point 9 · aucune auto-attribution ───────────────────────
+
+  - id: LAW-GUAR-0407
+    slug: r10/no-self-attributed-guarantee
+    status: reserved
+    owner: spec
+    domain: GUAR
+    title: "Aucun modele, provider, tool ou backend ne s'auto-attribue une garantie sans evidence"
+    prose_projection:
+      chapters: ["15-proof"]
+      text: "R10 point 9 verbatim : « Un modèle, provider, tool ou backend ne peut pas s'auto-attribuer une garantie sans evidence vérifiable. » Une declaration tierce sans evidence verifiable refuse ; elle ne retombe meme pas a Unknown en silence, elle est refusee comme claim illegal."
+    inputs:
+      - registry: ir
+        id: third_party_guarantee_claims
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: self_attributed_guarantee_without_evidence
+        quantifier: exists
+    conclusion:
+      verdict: refuse
+      diagnostics_on_refuse: ["NIKA-GUAR-001"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: evidence_levels
+      independent_judgment: true
+    domain_payload:
+      kind: guarantee
+      dimension: determinism
+      operator_rules:
+        - operator: sequential
+          combine: meet
+    diagnostics: ["NIKA-GUAR-001"]
+    fixtures:
+      - to-mint-c1/conformance/guarantees/evidence-backed-claim
+    negative_fixtures:
+      - to-mint-c1/conformance/guarantees/self-attribution-refused
+    projections: ["prose:15-proof", "cli:check", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:proof_core.py
+      - cli:nika-check
+      - conformance:guarantee-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Les manifests de tools/providers participent a l'inference (R12 point 17) mais leurs claims de garantie sans evidence sont refuses : participer n'est pas s'auto-certifier."
+      - "FINDING-G2 : NIKA-GUAR-001 est c0-proposed, renumerotable avant C1."
+    closure_gates:
+      - no-self-certification
+      - fixture-parity
+
+  # ─────────────── R10 point 10 · composition conservative meet ────────────────
+
+  - id: LAW-GUAR-0408
+    slug: r10/conservative-meet-composition
+    status: reserved
+    owner: spec
+    domain: GUAR
+    title: "Les garanties se composent conservativement, la composition ne depasse pas le meet des enfants"
+    prose_projection:
+      chapters: ["14-composition", "15-proof"]
+      text: "R10 point 10 verbatim : « Les garanties se composent conservativement. En général : Guarantees(composition) ≤ meet(Guarantees(children)) avec des lois propres à chaque dimension. » Le meet est la borne superieure de ce que la composition peut affirmer ; les lois propres par dimension (point 25) ne peuvent que rester en dessous."
+    inputs:
+      - registry: ir
+        id: composed_guarantee_profile
+        role: required
+      - registry: ir
+        id: child_guarantee_profile_left
+        role: required
+      - registry: ir
+        id: child_guarantee_profile_right
+        role: required
+    premises:
+      - operator: meet
+        operands:
+          - registry: ir
+            id: composed_guarantee_profile
+          - registry: ir
+            id: child_guarantee_profile_left
+          - registry: ir
+            id: child_guarantee_profile_right
+        quantifier: forall
+        $comment: "Forme target-first du schema scelle : meet(x,a,b) dit x est le meet du treillis de a,b ; le ruling dit <= en general, les lois propres par dimension ne peuvent que descendre sous le meet, jamais monter."
+    conclusion:
+      verdict: derive
+      derives:
+        registry: ir
+        id: composed_guarantee_profile
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: composed_guarantee_profile
+      independent_judgment: true
+    domain_payload:
+      kind: guarantee
+      dimension: determinism
+      operator_rules:
+        - operator: sequential
+          combine: meet
+        - operator: concurrent
+          combine: meet
+        - operator: retry
+          combine: meet
+        - operator: recovery
+          combine: meet
+        - operator: nesting
+          combine: meet
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/guarantees/deterministic-children
+    negative_fixtures:
+      - to-mint-c1/conformance/guarantees/nondeterministic-child
+    projections: ["prose:14-composition", "prose:15-proof", "schema", "cli:check", "sdk"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:proof_core.py
+      - reference:composition_core.py
+      - conformance:guarantee-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Deux enfants deterministes composent au plus deterministe (fixture deterministic-children) ; un enfant non deterministe rabat la composition (fixture nondeterministic-child) : le meet est prouve dans les deux sens."
+      - "Les cinq operateurs du payload portent tous combine meet : la regle generale du point 10 ; toute regle meet_then_cap par dimension arrive avec les lois propres du point 25 (LAW-GUAR-0416), jamais inventee ici."
+    closure_gates:
+      - conservative-meet-proven
+      - fixture-parity
+
+  # ─────────────── R10 points 11 + 15 + 16 + 17 · proprietes distinctes ────────
+
+  - id: LAW-GUAR-0409
+    slug: r10/properties-distinct-no-implication
+    status: reserved
+    owner: spec
+    domain: GUAR
+    title: "Determinism, idempotence, purity, replayability, boundedness restent distincts, aucune implication gratuite"
+    prose_projection:
+      chapters: ["15-proof"]
+      text: "R10 point 11 verbatim : « Determinism, idempotence, purity, replayability et boundedness restent des propriétés distinctes. » · R10 point 15 verbatim : « Un callable sans effet n'est pas automatiquement déterministe. » · R10 point 16 verbatim : « Un callable déterministe n'est pas automatiquement idempotent. » · R10 point 17 verbatim : « Un callable idempotent n'est pas automatiquement pur. »"
+    inputs:
+      - registry: grammar
+        id: guarantee_dimensions
+        role: required
+      - registry: grammar
+        id: purity_property
+        role: required
+    premises:
+      - operator: not_equals
+        operands:
+          - registry: grammar
+            id: determinism_dimension
+          - registry: grammar
+            id: idempotence_dimension
+        quantifier: forall
+      - operator: not_equals
+        operands:
+          - registry: grammar
+            id: idempotence_dimension
+          - registry: grammar
+            id: purity_property
+        quantifier: forall
+      - operator: not_equals
+        operands:
+          - registry: grammar
+            id: replayability_dimension
+          - registry: grammar
+            id: boundedness_dimension
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: guarantee_dimensions
+      independent_judgment: true
+    domain_payload:
+      kind: guarantee
+      dimension: idempotence
+      operator_rules:
+        - operator: sequential
+          combine: meet
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/guarantees/no-implication-chain
+    projections: ["prose:15-proof", "cli:check", "docs"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:proof_core.py
+      - conformance:guarantee-suite
+    introduced_in: C0
+    proof_obligations:
+      - "La fixture presente un callable sans effet non deterministe, un deterministe non idempotent et un idempotent non pur : les trois non-implications des points 15-17 sont chacune realisees par un contre-exemple."
+      - "FINDING-G3 : purity est une PROPRIETE distincte nommee par le point 11, pas une dimension du profil (absente du minimum du point 3 et de l'enum scelle)."
+    closure_gates:
+      - no-implication-counterexamples
+
+  # ─────────────── R10 points 12 + 13 + 14 · les plans epsilon, rho, delta ─────
+
+  - id: LAW-GUAR-0410
+    slug: r10/epsilon-rho-delta-separation
+    status: reserved
+    owner: spec
+    domain: GUAR
+    title: "Les effets restent dans epsilon, les ressources dans rho, les garanties comportementales dans delta"
+    prose_projection:
+      chapters: ["15-proof", "14-composition"]
+      text: "R10 point 12 verbatim : « Les effets restent dans ε. » · R10 point 13 verbatim : « Les ressources et budgets restent dans ρ. » · R10 point 14 verbatim : « Les garanties comportementales restent dans δ. » Trois plans du CallableContract, aucun ne fuit dans un autre."
+    inputs:
+      - registry: ir
+        id: effects_declaration
+        role: required
+      - registry: ir
+        id: resource_budgets
+        role: required
+      - registry: ir
+        id: behavioral_guarantees
+        role: required
+    premises:
+      - operator: member_of
+        operands:
+          - registry: ir
+            id: effects_declaration
+          - registry: ir
+            id: epsilon_plane
+        quantifier: forall
+      - operator: member_of
+        operands:
+          - registry: ir
+            id: resource_budgets
+          - registry: ir
+            id: rho_plane
+        quantifier: forall
+      - operator: member_of
+        operands:
+          - registry: ir
+            id: behavioral_guarantees
+          - registry: ir
+            id: delta_plane
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: delta_plane
+      independent_judgment: true
+    domain_payload:
+      kind: guarantee
+      dimension: determinism
+      operator_rules:
+        - operator: sequential
+          combine: meet
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/guarantees/planes-separation
+    projections: ["prose:15-proof", "schema", "sdk", "docs"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:proof_core.py
+      - conformance:guarantee-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Cohere avec B-17 point 12 (les budgets de compute appartiennent a rho, LAW-TEMPORAL-0409) : la meme frontiere rho vue des deux rulings, une seule loi de placement par plan."
+    closure_gates:
+      - planes-no-leak
+
+  # ─────────────── R10 points 18 + 19 · declaration au hash, preuves au receipt ─
+
+  - id: LAW-GUAR-0411
+    slug: r10/declaration-in-ir-proofs-in-receipt
+    status: reserved
+    owner: spec
+    domain: GUAR
+    title: "La declaration du profil appartient a l'IR et au hash, les preuves observees au receipt"
+    prose_projection:
+      chapters: ["15-proof", "16-projections"]
+      text: "R10 point 18 verbatim : « La déclaration du GuaranteeProfile appartient au Semantic IR et au semantic hash. » · R10 point 19 verbatim : « Les preuves observées pendant l'exécution appartiennent au receipt, aux attestations et aux traces, pas au hash du programme. » FINDING-G1 note de mapping : loi de classe HASH ancree dans le bloc GUAR du grant de ce groupe (meme mouvement que LAW-TEMPORAL-0421)."
+    inputs:
+      - registry: ir
+        id: guarantee_profile_declaration
+        role: required
+      - registry: ir
+        id: semantic_ir
+        role: required
+      - registry: ir
+        id: observed_guarantee_evidence
+        role: required
+    premises:
+      - operator: member_of
+        operands:
+          - registry: ir
+            id: guarantee_profile_declaration
+          - registry: ir
+            id: semantic_ir
+        quantifier: forall
+      - operator: intersect_empty
+        operands:
+          - registry: ir
+            id: observed_guarantee_evidence
+          - registry: ir
+            id: semantic_hash_preimage
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["jcs"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: semantic_hash_preimage
+      independent_judgment: true
+    domain_payload:
+      kind: guarantee
+      dimension: replayability
+      operator_rules:
+        - operator: sequential
+          combine: meet
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/guarantees/partial-evidence
+    projections: ["prose:15-proof", "schema", "receipt", "sdk"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:proof_core.py
+      - conformance:guarantee-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Deux runs du meme programme avec des preuves observees differentes produisent le MEME semantic hash ; changer la declaration du profil change le hash. La fixture partial-evidence (classe du point 25) prouve les deux directions."
+    closure_gates:
+      - hash-placement-proven
+      - receipt-parity
+
+  # ─────────────── R10 points 20 + 21 · forme nommee partout, grecque aux maths ─
+
+  - id: LAW-GUAR-0412
+    slug: r10/named-form-projected-greek-math-only
+    status: reserved
+    owner: spec
+    domain: GUAR
+    title: "La forme nommee est utilisee sur toutes les surfaces, la forme grecque reste aux maths"
+    prose_projection:
+      chapters: ["15-proof"]
+      text: "R10 point 20 verbatim : « La forme nommée est utilisée dans : spec narrative ; canon ; schemas machine ; diagnostics ; LSP/MCP ; SDK ; documentation. » · R10 point 21 verbatim : « La forme grecque est réservée aux définitions mathématiques et preuves. »"
+    inputs:
+      - registry: surface
+        id: guarantee_spelling_on_projections
+        role: required
+      - registry: grammar
+        id: guarantee_profile_named_form
+        role: ceiling
+    premises:
+      - operator: matches
+        operands:
+          - registry: surface
+            id: guarantee_spelling_on_projections
+          - registry: grammar
+            id: guarantee_profile_named_form
+        quantifier: forall
+      - operator: absent
+        operands:
+          - registry: surface
+            id: greek_spelling_on_projections
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: guarantee_profile_named_form
+      independent_judgment: true
+    domain_payload:
+      kind: guarantee
+      dimension: determinism
+      operator_rules:
+        - operator: sequential
+          combine: meet
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/guarantees/named-form-on-surfaces
+    projections: ["prose:15-proof", "schema", "cli:check", "lsp", "mcp", "sdk", "docs"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:proof_core.py
+      - conformance:guarantee-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Les sept surfaces du point 20 sont enumerees dans projections ; le census de LAW-GUAR-0414 verifie qu'aucune n'epelle delta a la place de guarantees hors definitions mathematiques."
+    closure_gates:
+      - named-form-census
+
+  # ─────────────── R10 point 22 · aucune cle YAML delta ────────────────────────
+
+  - id: LAW-GUAR-0413
+    slug: r10/no-public-delta-yaml-key
+    status: reserved
+    owner: spec
+    domain: GUAR
+    title: "Aucune cle YAML publique delta, ni en lettre latine ni en lettre grecque"
+    prose_projection:
+      chapters: ["15-proof", "01-envelope"]
+      text: "R10 point 22 verbatim : « Aucune clé YAML publique `delta:` ou `δ:`. » Une source qui authore l'une des deux formes refuse ; le mot public du plan est guarantees, jamais la notation."
+    inputs:
+      - registry: ir
+        id: authored_envelope_keys
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: authored_delta_key
+        quantifier: exists
+    conclusion:
+      verdict: refuse
+      diagnostics_on_refuse: ["NIKA-GUAR-003"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["nfc"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: guarantee_profile_named_form
+      independent_judgment: true
+    domain_payload:
+      kind: guarantee
+      dimension: determinism
+      operator_rules:
+        - operator: sequential
+          combine: meet
+    diagnostics: ["NIKA-GUAR-003"]
+    fixtures:
+      - to-mint-c1/conformance/guarantees/guarantees-key-legal
+    negative_fixtures:
+      - to-mint-c1/conformance/guarantees/delta-key-refused
+      - to-mint-c1/conformance/guarantees/greek-delta-key-refused
+    projections: ["prose:15-proof", "prose:01-envelope", "schema", "cli:check", "lsp"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:proof_core.py
+      - cli:nika-check
+      - conformance:guarantee-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Les deux orthographes interdites (latine delta: et grecque) portent chacune leur fixture negative ; la normalisation nfc garantit qu'aucune variante Unicode de la lettre grecque ne passe."
+      - "FINDING-G2 : NIKA-GUAR-003 est c0-proposed, renumerotable avant C1."
+    closure_gates:
+      - no-delta-key-census-zero
+      - fixture-parity
+
+  # ─────────────── R10 point 23 · les anciennes formulations meurent ───────────
+
+  - id: LAW-GUAR-0414
+    slug: r10/old-delta-formulations-removed
+    status: reserved
+    owner: spec
+    domain: GUAR
+    title: "Les anciennes formulations ou delta signifiait seulement determinism/idempotence sont supprimees"
+    prose_projection:
+      chapters: ["15-proof"]
+      text: "R10 point 23 verbatim : « Les anciennes formulations où δ signifiait seulement determinism/idempotence sont supprimées. » Census mecanique : aucune surface current-facing ne porte l'ancienne definition reduite."
+    inputs:
+      - registry: ir
+        id: current_facing_surfaces
+        role: required
+      - registry: grammar
+        id: old_delta_formulations
+        role: ceiling
+    premises:
+      - operator: intersect_empty
+        operands:
+          - registry: ir
+            id: current_facing_surfaces
+          - registry: grammar
+            id: old_delta_formulations
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: old_delta_formulations
+      independent_judgment: true
+    domain_payload:
+      kind: guarantee
+      dimension: determinism
+      operator_rules:
+        - operator: sequential
+          combine: meet
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/guarantees/old-formulations-census-zero
+    projections: ["prose:15-proof", "docs", "cli:check"]
+    implementation_surfaces:
+      - conformance:guarantee-suite
+      - reference:proof_core.py
+    introduced_in: C0
+    proof_obligations:
+      - "R10 point 27 verbatim : « Le langage reste nika: v1. » La suppression des anciennes formulations n'ouvre aucun second marqueur de langage (FINDING-T4 du fichier temporal : meme convention d'ancrage du point invariant)."
+    closure_gates:
+      - old-delta-formulations-census-zero
+
+  # ─────────────── R10 point 24 · une seule definition, toutes les projections ─
+
+  - id: LAW-GUAR-0415
+    slug: r10/single-definition-all-projections
+    status: reserved
+    owner: spec
+    domain: GUAR
+    title: "canonical_phrasing et toutes les projections derivent d'une seule definition"
+    prose_projection:
+      chapters: ["15-proof", "16-projections"]
+      text: "R10 point 24 verbatim : « canonical_phrasing et toutes les projections dérivent d'une seule définition. » La definition unique vit dans cette loi structuree ; le canonical_phrasing du canon et chaque projection en derivent, aucune ne re-definit."
+    inputs:
+      - registry: ir
+        id: canonical_phrasing
+        role: required
+      - registry: laws
+        id: LAW-GUAR-0401
+        role: required
+    premises:
+      - operator: derived_from
+        operands:
+          - registry: ir
+            id: canonical_phrasing
+          - registry: laws
+            id: LAW-GUAR-0401
+        quantifier: forall
+      - operator: derived_from
+        operands:
+          - registry: projections
+            id: guarantee_projections
+          - registry: laws
+            id: LAW-GUAR-0401
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: projections
+          id: guarantee_projections
+      independent_judgment: true
+    domain_payload:
+      kind: guarantee
+      dimension: determinism
+      operator_rules:
+        - operator: sequential
+          combine: meet
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/guarantees/projection-drift-zero
+    projections: ["prose:15-proof", "schema", "cli:check", "docs"]
+    implementation_surfaces:
+      - conformance:guarantee-suite
+      - reference:proof_core.py
+    introduced_in: C0
+    proof_obligations:
+      - "Regle SSOT-1 point 15 (structured law vs projection divergente = build failure) appliquee a ce domaine : un canonical_phrasing qui contredit LAW-GUAR-0401 rend la CI rouge, jamais une re-definition parallele."
+    closure_gates:
+      - projection-drift-zero
+
+  # ─────────────── R10 point 25 · lois de composition et fixtures ──────────────
+
+  - id: LAW-GUAR-0416
+    slug: r10/composition-laws-and-fixtures-suite
+    status: reserved
+    owner: spec
+    domain: GUAR
+    title: "Les lois de composition par dimension et les dix classes de fixtures sont ajoutees"
+    prose_projection:
+      chapters: ["14-composition", "07-conformance"]
+      text: "R10 point 25 verbatim : « Ajouter des lois de composition et des fixtures pour : deterministic children ; nondeterministic child ; external snapshots ; retries ; recovery ; concurrent scheduling ; idempotency keys ; nested workflows ; partial evidence ; Unknown propagation. » Dix classes, dix fixtures, mapping un-pour-un."
+    inputs:
+      - registry: conformance
+        id: guarantee-composition-suite
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: conformance
+            id: guarantee-composition-suite
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: conformance
+          id: guarantee-composition-suite
+      independent_judgment: true
+    domain_payload:
+      kind: guarantee
+      dimension: determinism
+      operator_rules:
+        - operator: sequential
+          combine: meet
+        - operator: concurrent
+          combine: meet
+        - operator: retry
+          combine: meet
+        - operator: recovery
+          combine: meet
+        - operator: nesting
+          combine: meet
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/guarantees/deterministic-children
+      - to-mint-c1/conformance/guarantees/nondeterministic-child
+      - to-mint-c1/conformance/guarantees/external-snapshots
+      - to-mint-c1/conformance/guarantees/retries
+      - to-mint-c1/conformance/guarantees/recovery
+      - to-mint-c1/conformance/guarantees/concurrent-scheduling
+      - to-mint-c1/conformance/guarantees/idempotency-keys
+      - to-mint-c1/conformance/guarantees/nested-workflows
+      - to-mint-c1/conformance/guarantees/partial-evidence
+      - to-mint-c1/conformance/guarantees/unknown-propagation
+    projections: ["prose:14-composition", "cli:check", "docs"]
+    implementation_surfaces:
+      - conformance:guarantee-suite
+      - reference:proof_core.py
+      - reference:composition_core.py
+    introduced_in: C0
+    proof_obligations:
+      - "Les lois propres par dimension (le « avec des lois propres à chaque dimension » du point 10) arrivent AVEC ces fixtures : chaque regle meet_then_cap ou unless_assumption future se prouve contre sa classe, le vocabulaire d'assumptions est celui de l'algebre scellee, jamais un second vocabulaire."
+      - "Les cinq operateurs du payload (sequential, concurrent, retry, recovery, nesting) couvrent les classes retries, recovery, concurrent scheduling et nested workflows du point 25 ; les classes restantes vivent sur les dimensions (snapshots sur replayability, Unknown sur toutes)."
+    closure_gates:
+      - ten-classes-covered
+      - fixture-parity
+
+  # ─────────────── R10 point 26 (+27) · le claim borne par le demontrable ──────
+
+  - id: LAW-GUAR-0417
+    slug: r10/claim-capped-by-demonstrable
+    status: reserved
+    owner: spec
+    domain: GUAR
+    title: "Aucun claim de garantie ne depasse ce que checker, runtime ou attestation demontrent"
+    prose_projection:
+      chapters: ["15-proof"]
+      text: "R10 point 26 verbatim : « Aucun claim de garantie ne peut dépasser ce que le checker, le runtime ou une attestation peuvent effectivement démontrer. » L'operationnalisation du point 7 : la force demontrable est le plafond effectif du claim sur chaque surface de jugement."
+    inputs:
+      - registry: ir
+        id: claim_strength
+        role: required
+      - registry: ir
+        id: demonstrable_strength
+        role: ceiling
+    premises:
+      - operator: min_of
+        operands:
+          - registry: ir
+            id: claim_strength
+          - registry: ir
+            id: claim_strength
+          - registry: ir
+            id: demonstrable_strength
+        quantifier: forall
+        $comment: "Meme encodage du <= que LAW-GUAR-0405 : claim = min(claim, demonstrable) equivaut a claim <= demonstrable."
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-GUAR-002"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: evidence_levels
+      independent_judgment: true
+    domain_payload:
+      kind: guarantee
+      dimension: determinism
+      operator_rules:
+        - operator: sequential
+          combine: meet
+    diagnostics: ["NIKA-GUAR-002"]
+    fixtures:
+      - to-mint-c1/conformance/guarantees/claim-at-evidence
+    negative_fixtures:
+      - to-mint-c1/conformance/guarantees/claim-above-evidence-refused
+    projections: ["prose:15-proof", "cli:check", "receipt", "sdk"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:proof_core.py
+      - cli:nika-check
+      - conformance:guarantee-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R10 point 27 verbatim : « Le langage reste nika: v1. » Le profil de garanties n'introduit aucun marqueur de version nouveau (convention d'ancrage FINDING-T4, invariant deja porte par LAW-SURFACE-0101 pour R11)."
+      - "Les trois demonstrateurs du point 26 (checker, runtime, attestation) correspondent aux niveaux de LAW-GUAR-0404 : StaticProof au checker, TraceVerified au runtime et aux attestations, Unknown quand aucun ne demontre."
+    closure_gates:
+      - strength-inequality-enforced
+      - fixture-parity

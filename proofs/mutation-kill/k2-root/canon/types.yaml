@@ -1,0 +1,21 @@
+# canon/types.yaml · C0 SANDBOX SKELETON · Type Core Registry
+# Schema: schemas/registries.schema.json#/$defs/typeRow (SCELLÉ · consommé as-is).
+# Ce que C0 importe ici : le TypeExpr unique (SSOT-1 §27 : « TypeExpr unique ») +
+# productions du Type Core + le constructeur réservé. La row seed réelle vient de R6
+# (constructeurs · migration-plan MIG-constructors : « artifact<mime> sole reserved »).
+registry_document_format: 1
+"$comment": "C0 sandbox skeleton · seed row = the sole reserved constructor per R6 · full TypeExpr import owed at C0 (SSOT-1 §27)"
+types:
+  - id: artifact_constructor_reserved
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    production: reserved_constructor
+    spelling: "artifact<mime>"
+    reservation:
+      future_gate: constructor-activation-gate
+    notes: "Seed R6 (migration-plan MIG-constructors new_form : « artifact<mime> sole reserved »). Les lois TYPE arrivent à l'import TypeExpr C0 ; law_ids vide tant que la row reste reserved (activeNeedsLaw ne contraint que le statut active)."
+# mutated: R11 violation injected
+shared_owner: &own spec
+echo_owner: *own

@@ -1,0 +1,1420 @@
+# canon/laws/authority.yaml · C0 IMPORT · R12 capability model + R9 points 10-20 +
+# N2-a + F1/F2 keep-hardened
+# SSOT: RULINGS_2026-07-15.md §R12 (30 points · verbatim · JAMAIS paraphrasé) + §R9
+# points 10-20 + mini-gates/ANNEX_2026-07-17_minigates-winners.md (D-2026-07-17-N2 ·
+# N2-a + table F1/F2 + §Réservations négatives). Les citations reproduisent les bytes
+# des rulings (trois normalisations de FORME markdown seulement, sens intact : dé-wrap
+# des retours de ligne · dé-échappement des pipes de cellules de table « \| » → « | » ·
+# espaces d'alignement de bloc code réduits à un espace); les ancres sont "R12 point N",
+# "R9 point N", "ANNEX §N2-a", "ANNEX table F1/F2", "ANNEX §Réservations négatives".
+# Schema: schemas/law.schema.json (SCELLÉ · consommé as-is). Bloc d'ids réservé au
+# groupe: LAW-AUTH-03xx.
+#
+# FINDING-AUTH-01 (SSOT-1 §29 · mapping de domaine, jamais silencieux) : les lois
+# N2-a/F1/F2 (famille secrets : provenance · déclassification) sont mappées sur le
+# domaine AUTH (le bloc du groupe). Le DOMAIN enum scellé n'a pas de domaine SECRETS
+# et l'authorityPayload (sets/relation/pipeline_stage) n'a pas de variante provenance.
+# Justification : R6 point 2 (un secret = "une store-reference gouvernée" portant
+# "provenance ; confidentialité ; taint ; autorité de résolution ; egress/
+# declassification") + R8 loi 10 ("ne jamais confondre provenance, autorité et
+# destination de déclassification") placent la famille dans le plan autorité. Le
+# squelette payload des lois 0321-0323 est donc approximatif; le verbatim porte la loi.
+#
+# FINDING-AUTH-02 (codes) : NIKA-AUTH-001..005, NIKA-SEC-008 sont c0-proposed
+# (SSOT-2 B.21 : tout rejet normatif exposé exige un diagnostic canonique) et
+# renumérotables avant C1. Codes LIVE réutilisés tels quels : NIKA-SEC-004 (boundary
+# permits au check, fixture envelope/permits-net-absent l'atteste), NIKA-POLICY-001
+# (hard policy rule · allow.providers), NIKA-PARSE-005 (unknown field · closed set ·
+# fixture policy/009), NIKA-SEC-006/NIKA-SEC-007 (secret flow/egress).
+#
+# FINDING-AUTH-03 (generated_facts en registry ir) : les registres capacitaires
+# (required_capabilities, effective_authority, ...) ne sont pas seedés au canon
+# sandbox et ce fichier n'a pas le droit d'écrire hors canon/laws/. Les refs utilisent
+# registry: ir, exempt par design du compiler ("ir refs are runtime/IR symbols
+# (unresolvable in canon by design, like the sealed examples' required_capabilities)").
+# Migration vers des rows seedées à C1.
+#
+# FINDING-AUTH-04 (informatif · surface LIVE vs R12) : la surface actuelle (spec/01
+# §permits + NIKA-SEC-004 "effect outside the declared permits: capability boundary" +
+# les fixtures envelope/permits-*) traite permits: comme LA boundary d'enforcement.
+# R12 la requalifie enveloppe déclarative qui n'est "jamais la source réelle du grant
+# runtime" (le grant réel = EffectiveAuthority = RequiredCapabilities ∩
+# AvailableAuthority). La note SUPERSEDE du ruling n'abolit explicitement que le
+# two-mode de 01:382-384; la requalification touche toute la surface 01 §permits.
+# Cascade P-C owed; aucune réécriture ici.
+#
+# FINDING-AUTH-05 (em dash · citations) : ma prose = zéro em dash; les citations
+# verbatim reproduisent les bytes des rulings, em dashes inclus quand la source en
+# porte (précédent : le pilote R11 cite la note P5 avec ses em dashes).
+#
+# Directive de clôture R12, verbatim : « Grave cette loi dans le ruling, le canon, la
+# conformance, le manifest de capabilities, le modèle de référence, le runtime et les
+# receipts avant implémentation. » Ce fichier est l'étape canon de cette gravure.
+
+laws_document_format: 1
+
+group: c0-authority
+
+laws:
+
+  # ── R12 points 1 + 17 · l'inférence est la seule source de Required ──────────
+
+  - id: LAW-AUTH-0301
+    slug: authority/required-capabilities-inferred
+    status: reserved
+    owner: spec
+    domain: AUTH
+    title: "RequiredCapabilities est toujours inféré depuis le Semantic IR, manifests inclus"
+    prose_projection:
+      chapters: ["10-authority"]
+      text: "R12 point 1 verbatim : « Le compilateur infère toujours RequiredCapabilities depuis le Semantic IR. » · R12 point 17 verbatim : « Les callable/tool manifests participent à l'inférence des capacités. » Cette loi fait de l'inférence l'unique origine de l'ensemble Required; aucun champ manuel ne le remplace."
+    inputs:
+      - registry: ir
+        id: semantic_ir
+        role: required
+      - registry: ir
+        id: callable_tool_manifests
+        role: required
+    premises:
+      - operator: derived_from
+        operands:
+          - registry: ir
+            id: required_capabilities
+          - registry: ir
+            id: semantic_ir
+        quantifier: forall
+      - operator: derived_from
+        operands:
+          - registry: ir
+            id: required_capabilities
+          - registry: ir
+            id: callable_tool_manifests
+        quantifier: forall
+    conclusion:
+      verdict: derive
+      derives:
+        registry: ir
+        id: required_capabilities
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: required_capabilities
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["RequiredCapabilities"]
+      relation: equality
+      pipeline_stage: infer
+    diagnostics: []
+    fixtures:
+      - conformance/tests/runtime/permits/002-empty-permits-pure-compute
+      - to-mint-c1/conformance/authority/inference/tool-manifest-participates
+    projections: ["prose:10-authority", "schema", "cli:check", "cli:inspect", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:authority_core.py
+      - cli:nika-check
+      - conformance:authority-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R12 point 1 verbatim : « Le compilateur infère toujours RequiredCapabilities depuis le Semantic IR. » La fixture pure-compute dérive Required vide sans aucune déclaration."
+      - "R12 point 17 verbatim : « Les callable/tool manifests participent à l'inférence des capacités. » La fixture tool-manifest-participates prouve qu'un manifest externe injecte sa capability dans Required."
+    closure_gates:
+      - inference-sole-origin-of-required
+
+  # ── R12 points 2 + 7 · permits est une enveloppe, jamais le grant ─────────────
+
+  - id: LAW-AUTH-0302
+    slug: authority/declared-permits-envelope-never-grant
+    status: reserved
+    owner: spec
+    domain: AUTH
+    title: "permits est une enveloppe declarative certifiable, jamais la source du grant runtime"
+    prose_projection:
+      chapters: ["10-authority", "01-envelope"]
+      text: "R12 point 2 verbatim : « `permits:` est une enveloppe déclarative et certifiable de l'auteur. Ce n'est jamais la source réelle du grant runtime. » · R12 point 7 verbatim : « DeclaredPermits ne peut jamais augmenter EffectiveAuthority. » EffectiveAuthority ne dérive que de Required et Available (loi 0305); Declared gate sans jamais accorder."
+    inputs:
+      - registry: ir
+        id: declared_permits
+        role: required
+    premises:
+      - operator: derived_from
+        operands:
+          - registry: ir
+            id: effective_authority
+          - registry: ir
+            id: required_capabilities
+        quantifier: forall
+      - operator: derived_from
+        operands:
+          - registry: ir
+            id: effective_authority
+          - registry: ir
+            id: available_authority
+        quantifier: forall
+    conclusion:
+      verdict: record
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: declared_permits
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["DeclaredPermits", "EffectiveAuthority"]
+      relation: subset
+      pipeline_stage: permits_check
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/authority/envelope/declared-superset-never-granted
+    projections: ["prose:10-authority", "schema", "cli:check", "cli:inspect", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:authority_core.py
+      - conformance:authority-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R12 point 7 verbatim : « DeclaredPermits ne peut jamais augmenter EffectiveAuthority. » La fixture declared-superset-never-granted déclare plus que requis et observe que l'excédent n'est jamais accordé au run."
+      - "FINDING-AUTH-04 : la surface LIVE spec/01 §permits traite permits: comme la boundary d'enforcement; R12 point 2 la requalifie enveloppe. La cascade P-C réécrit 01 §permits; cette loi est la cible."
+    closure_gates:
+      - declared-never-grants
+
+  # ── R12 points 3 + 14 · Required ⊆ Declared quand permits est présent ─────────
+
+  - id: LAW-AUTH-0303
+    slug: authority/required-subset-declared
+    status: reserved
+    owner: spec
+    domain: AUTH
+    title: "Quand permits est present, toute capacite requise doit etre declaree"
+    prose_projection:
+      chapters: ["10-authority", "01-envelope"]
+      text: "R12 point 3 verbatim : « Lorsqu'il est présent : RequiredCapabilities ⊆ DeclaredPermits » · R12 point 14 verbatim : « Une capacité requise mais non déclarée est une erreur. » Le code vivant de cette classe au check est NIKA-SEC-004 (la fixture permits-net-absent l'atteste : bloc présent, net requis non déclaré, refus au check)."
+    inputs:
+      - registry: ir
+        id: required_capabilities
+        role: required
+      - registry: ir
+        id: declared_permits
+        role: required
+    premises:
+      - operator: subset_of
+        operands:
+          - registry: ir
+            id: required_capabilities
+          - registry: ir
+            id: declared_permits
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-SEC-004"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: required_capabilities
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["RequiredCapabilities", "DeclaredPermits"]
+      relation: subset
+      pipeline_stage: permits_check
+    diagnostics: ["NIKA-SEC-004"]
+    fixtures:
+      - conformance/tests/runtime/permits/002-empty-permits-pure-compute
+    negative_fixtures:
+      - conformance/envelope/permits-net-absent.nika.yaml
+      - conformance/envelope/permits-exec-absent.nika.yaml
+      - conformance/envelope/permits-tool-not-listed.nika.yaml
+      - conformance/envelope/permits-fs-read-escape.nika.yaml
+      - conformance/envelope/permits-fs-write-escape-absolute.nika.yaml
+    projections: ["prose:10-authority", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:authority_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:authority-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R12 point 14 verbatim : « Une capacité requise mais non déclarée est une erreur. » Chaque fixture négative porte exactement une capacité requise hors de DeclaredPermits et refuse au check."
+    closure_gates:
+      - required-subset-declared-enforced
+
+  # ── R12 points 4 + 5 + 15 · le deployment fournit Available, vérifié avant run ─
+
+  - id: LAW-AUTH-0304
+    slug: authority/required-subset-available-before-run
+    status: reserved
+    owner: spec
+    domain: AUTH
+    title: "Le deployment fournit AvailableAuthority; requis et declare doivent y tenir avant execution"
+    prose_projection:
+      chapters: ["10-authority"]
+      text: "R12 point 4 verbatim : « Le deployment/backend fournit AvailableAuthority. » · R12 point 5 verbatim : « Avant exécution : RequiredCapabilities ⊆ AvailableAuthority » · R12 point 15 verbatim : « Une capacité déclarée mais indisponible dans le deployment est une erreur avant exécution. » Le deployment-check est un gate pré-run, jamais un échec tardif."
+    inputs:
+      - registry: ir
+        id: required_capabilities
+        role: required
+      - registry: ir
+        id: declared_permits
+        role: required
+      - registry: ir
+        id: available_authority
+        role: required
+    premises:
+      - operator: subset_of
+        operands:
+          - registry: ir
+            id: required_capabilities
+          - registry: ir
+            id: available_authority
+        quantifier: forall
+      - operator: subset_of
+        operands:
+          - registry: ir
+            id: declared_permits
+          - registry: ir
+            id: available_authority
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-AUTH-001"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: available_authority
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["RequiredCapabilities", "DeclaredPermits", "AvailableAuthority"]
+      relation: subset
+      pipeline_stage: deployment_check
+    diagnostics: ["NIKA-AUTH-001"]
+    fixtures:
+      - to-mint-c1/conformance/authority/deployment/available-covers-required
+    negative_fixtures:
+      - to-mint-c1/conformance/authority/deployment/insufficient-deployment
+    projections: ["prose:10-authority", "cli:check", "cli:inspect", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:authority_core.py
+      - conformance:authority-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R12 point 15 verbatim : « Une capacité déclarée mais indisponible dans le deployment est une erreur avant exécution. » La fixture insufficient-deployment refuse avant tout effet observable (test R12 point 29 : deployment insuffisant)."
+      - "NIKA-AUTH-001 est c0-proposed (FINDING-AUTH-02) : aucun code deployment n'existe au registre LIVE, SSOT-2 B.21 exige un diagnostic canonique."
+    closure_gates:
+      - deployment-check-before-run
+
+  # ── R12 chapeau + point 6 · EffectiveAuthority = Required ∩ Available ─────────
+
+  - id: LAW-AUTH-0305
+    slug: authority/effective-authority-minimal-intersection
+    status: reserved
+    owner: spec
+    domain: AUTH
+    title: "L'autorite accordee est minimale : l'intersection du requis et du disponible"
+    prose_projection:
+      chapters: ["10-authority"]
+      text: "R12 chapeau verbatim : « Je refuse à la fois le \"floor ambiant\" silencieux et le global default-deny qui rendrait chaque hello-world inutilement verbeux. La loi unique est fondée sur quatre ensembles : RequiredCapabilities(program) · DeclaredPermits(program) · AvailableAuthority(deployment) · EffectiveAuthority(run). » · R12 point 6 verbatim : « L'autorité réellement accordée est minimale : EffectiveAuthority = RequiredCapabilities ∩ AvailableAuthority »"
+    inputs:
+      - registry: ir
+        id: required_capabilities
+        role: required
+      - registry: ir
+        id: available_authority
+        role: required
+    premises:
+      - operator: equals
+        operands:
+          - registry: ir
+            id: effective_authority
+          - registry: ir
+            id: granted_minimum
+            derivation:
+              function: intersection
+              args:
+                - registry: ir
+                  id: required_capabilities
+                - registry: ir
+                  id: available_authority
+        quantifier: forall
+    conclusion:
+      verdict: derive
+      derives:
+        registry: ir
+        id: effective_authority
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: effective_authority
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["RequiredCapabilities", "AvailableAuthority", "EffectiveAuthority"]
+      relation: intersection
+      pipeline_stage: effective
+    diagnostics: []
+    fixtures:
+      - conformance/tests/runtime/permits/001-runtime-boundary-hit
+      - to-mint-c1/conformance/authority/effective/minimal-intersection
+    projections: ["prose:10-authority", "cli:check", "cli:inspect", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:authority_core.py
+      - conformance:authority-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R12 point 6 verbatim : « L'autorité réellement accordée est minimale : EffectiveAuthority = RequiredCapabilities ∩ AvailableAuthority » La premise equals épèle la formule via la derivation intersection, jamais une string libre."
+      - "La fixture 001-runtime-boundary-hit prouve que la borne effective tient aussi au run (defense-in-depth de la borne minimale)."
+    closure_gates:
+      - effective-equals-intersection
+
+  # ── R12 points 8 + 9 · draft sans permits : inferred, jamais un floor ─────────
+
+  - id: LAW-AUTH-0306
+    slug: authority/draft-absent-permits-inferred
+    status: reserved
+    owner: spec
+    domain: AUTH
+    title: "En draft sans bloc permits, la declaration est l'inference elle-meme, jamais un floor ambiant"
+    prose_projection:
+      chapters: ["10-authority", "01-envelope"]
+      text: "R12 point 8 verbatim : « En mode local/draft, si `permits:` est absent : DeclaredPermits := RequiredCapabilities · declaration_provenance := inferred. L'autorité reste exactement bornée aux capacités inférées. » · R12 point 9 verbatim : « L'absence de `permits:` ne signifie jamais \"ambient floor\" ni accès général aux capacités du runner. » Note de clôture du ruling, verbatim : « (SUPERSEDE : le two-mode « permits absent = engine floor ambiant » de 01:382-384 est ABOLI.) »"
+    inputs:
+      - registry: ir
+        id: required_capabilities
+        role: required
+    premises:
+      - operator: equals
+        operands:
+          - registry: ir
+            id: declared_permits
+          - registry: ir
+            id: required_capabilities
+        quantifier: forall
+      - operator: present
+        operands:
+          - registry: ir
+            id: declaration_provenance_inferred
+        quantifier: forall
+    conclusion:
+      verdict: derive
+      derives:
+        registry: ir
+        id: declared_permits
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: declared_permits
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["DeclaredPermits", "RequiredCapabilities"]
+      relation: equality
+      pipeline_stage: permits_check
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/authority/draft/absent-permits-inferred
+      - to-mint-c1/conformance/authority/draft/external-workflow-no-permits
+    projections: ["prose:10-authority", "prose:01-envelope", "cli:check", "cli:inspect", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:authority_core.py
+      - conformance:authority-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R12 point 9 verbatim : « L'absence de `permits:` ne signifie jamais \"ambient floor\" ni accès général aux capacités du runner. » La fixture external-workflow-no-permits (test R12 point 29 : workflow externe sans permits en draft) observe une autorité exactement bornée à l'inféré, zéro capacité du runner héritée."
+      - "Le two-mode aboli de 01:382-384 ne survit dans aucune projection : le census de la cascade P-C le prouve (closure gate)."
+    closure_gates:
+      - ambient-floor-dead
+      - two-mode-01-382-census-zero
+
+  # ── R12 points 10 + 11 · published : permits explicite obligatoire, meme vide ─
+
+  - id: LAW-AUTH-0307
+    slug: authority/published-explicit-permits-required
+    status: reserved
+    owner: spec
+    domain: AUTH
+    title: "En mode published, un bloc permits explicite est obligatoire, meme vide"
+    prose_projection:
+      chapters: ["10-authority", "01-envelope"]
+      text: "R12 point 10 verbatim : « En mode published/certified, un bloc `permits:` explicite est obligatoire, même vide : permits: {} » · R12 point 11 verbatim : « Le mode published appartient au lifecycle/conformance plane, pas au YAML : nika check --profile published · nika publish » Le profil published est un contexte de jugement, jamais un champ de la source."
+    inputs:
+      - registry: ir
+        id: published_profile_context
+        role: required
+      - registry: ir
+        id: declared_permits_block
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: declared_permits_block
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-AUTH-002"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: declared_permits_block
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["DeclaredPermits"]
+      relation: equality
+      pipeline_stage: permits_check
+    diagnostics: ["NIKA-AUTH-002"]
+    fixtures:
+      - conformance/tests/runtime/permits/002-empty-permits-pure-compute
+    negative_fixtures:
+      - to-mint-c1/conformance/authority/published/missing-permits-block
+    projections: ["prose:10-authority", "cli:check", "cli:publish", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:authority_core.py
+      - cli:nika-check
+      - conformance:authority-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R12 point 10 verbatim : « En mode published/certified, un bloc `permits:` explicite est obligatoire, même vide : permits: {} » La fixture 002-empty-permits-pure-compute porte permits: {} et passe : la forme vide est légale et suffisante pour un pur."
+      - "R12 point 11 verbatim : « Le mode published appartient au lifecycle/conformance plane, pas au YAML : nika check --profile published · nika publish » Aucun champ YAML nouveau ne porte le mode (loi 0320)."
+    closure_gates:
+      - published-requires-explicit-permits
+
+  # ── R12 point 12 · moindre privilège en published ─────────────────────────────
+
+  - id: LAW-AUTH-0308
+    slug: authority/published-least-privilege
+    status: reserved
+    owner: spec
+    domain: AUTH
+    title: "En published, toute permission declaree non requise est une erreur de moindre privilege"
+    prose_projection:
+      chapters: ["10-authority"]
+      text: "R12 point 12 verbatim : « Pour le profil published : DeclaredPermits − RequiredCapabilities doit être vide. Toute permission inutilisée est une erreur de moindre privilège. » La premise subset épèle la même loi : DeclaredPermits ⊆ RequiredCapabilities équivaut à DeclaredPermits − RequiredCapabilities = ∅."
+    inputs:
+      - registry: ir
+        id: published_profile_context
+        role: required
+      - registry: ir
+        id: declared_permits
+        role: required
+      - registry: ir
+        id: required_capabilities
+        role: required
+    premises:
+      - operator: subset_of
+        operands:
+          - registry: ir
+            id: declared_permits
+          - registry: ir
+            id: required_capabilities
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-AUTH-003"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: declared_permits
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["DeclaredPermits", "RequiredCapabilities"]
+      relation: subset
+      pipeline_stage: permits_check
+    diagnostics: ["NIKA-AUTH-003"]
+    fixtures:
+      - to-mint-c1/conformance/authority/published/exact-permits
+    negative_fixtures:
+      - to-mint-c1/conformance/authority/published/unused-permit-refused
+    projections: ["prose:10-authority", "cli:check", "cli:publish", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:authority_core.py
+      - conformance:authority-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Tests R12 point 29 couverts ici : « permits explicites exacts » (fixture exact-permits admet) et « permit excédentaire » (fixture unused-permit-refused refuse en published)."
+    closure_gates:
+      - published-least-privilege-enforced
+
+  # ── R12 point 13 · draft : permit inutilisé = diagnostic pédagogique ──────────
+
+  - id: LAW-AUTH-0309
+    slug: authority/draft-unused-permit-pedagogical
+    status: reserved
+    owner: spec
+    domain: AUTH
+    title: "En draft, une permission declaree inutilisee produit au minimum un diagnostic pedagogique"
+    prose_projection:
+      chapters: ["10-authority"]
+      text: "R12 point 13 verbatim : « En mode draft/local, une permission déclarée mais inutilisée produit au minimum un diagnostic pédagogique. » Le verdict draft est warn, jamais silencieux; la même condition devient une erreur au profil published (loi 0308)."
+    inputs:
+      - registry: ir
+        id: declared_permits
+        role: required
+      - registry: ir
+        id: required_capabilities
+        role: required
+    premises:
+      - operator: subset_of
+        operands:
+          - registry: ir
+            id: declared_permits
+          - registry: ir
+            id: required_capabilities
+        quantifier: forall
+    conclusion:
+      verdict: warn
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: declared_permits
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["DeclaredPermits", "RequiredCapabilities"]
+      relation: subset
+      pipeline_stage: permits_check
+    diagnostics: ["NIKA-AUTH-004"]
+    fixtures:
+      - to-mint-c1/conformance/authority/draft/unused-permit-warns
+    projections: ["prose:10-authority", "cli:check", "lsp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:authority_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - conformance:authority-suite
+    introduced_in: C0
+    proof_obligations:
+      - "La fixture unused-permit-warns observe le code NIKA-AUTH-004 en classe warn : le diagnostic est pédagogique (il nomme le permit inutilisé), jamais un refus draft et jamais un silence."
+    closure_gates:
+      - draft-unused-permit-warns
+
+  # ── R12 points 16 + 18 · non-inférable = erreur, jamais d'approximation ───────
+
+  - id: LAW-AUTH-0310
+    slug: authority/non-inferable-refused
+    status: reserved
+    owner: spec
+    domain: AUTH
+    title: "Une capacite non inferable statiquement ou un target dynamique non borne refuse"
+    prose_projection:
+      chapters: ["10-authority"]
+      text: "R12 point 16 verbatim : « Une capacité impossible à inférer statiquement est une erreur. Aucun fallback permissif et aucune approximation. » · R12 point 18 verbatim : « Un target dynamique non borné est refusé ou doit être remplacé par une enveloppe statique vérifiable. » La présence d'un site non inférable refuse; l'enveloppe statique vérifiable est la seule sortie légale."
+    inputs:
+      - registry: ir
+        id: semantic_ir
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: statically_uninferable_capability_site
+        quantifier: exists
+    conclusion:
+      verdict: refuse
+      diagnostics_on_refuse: ["NIKA-AUTH-005"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: required_capabilities
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["RequiredCapabilities"]
+      relation: equality
+      pipeline_stage: infer
+    diagnostics: ["NIKA-AUTH-005"]
+    fixtures:
+      - to-mint-c1/conformance/authority/inference/static-envelope-accepted
+    negative_fixtures:
+      - to-mint-c1/conformance/authority/inference/dynamic-unbounded-target
+    projections: ["prose:10-authority", "cli:check", "lsp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:authority_core.py
+      - cli:nika-check
+      - conformance:authority-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R12 point 16 verbatim : « Une capacité impossible à inférer statiquement est une erreur. Aucun fallback permissif et aucune approximation. » Aucune surface ne produit un Required approximé : le verdict est refuse, dans tous les modes."
+    closure_gates:
+      - no-permissive-fallback
+
+  # ── R12 points 19 + 20 + R9 point 16 · builtins classés, zéro bypass ──────────
+
+  - id: LAW-AUTH-0311
+    slug: authority/builtin-classification-no-bypass
+    status: reserved
+    owner: spec
+    domain: AUTH
+    title: "Chaque builtin est classe explicitement dans la SSOT; nika:jq n'a aucun bypass magique"
+    prose_projection:
+      chapters: ["10-authority", "06-stdlib-contract"]
+      text: "R12 point 19 verbatim : « Chaque builtin possède une classification explicite dans la SSOT : pure/internal ou external capability requirements. » · R12 point 20 verbatim : « `nika:jq` ne bénéficie d'aucun bypass magique. Il exige zéro permit uniquement parce qu'il est officiellement classé pure/internal. » · R9 point 16 verbatim : « Aucun builtin, y compris nika:jq, ne bénéficie d'une exception implicite : soit il est explicitement classé comme pure/internal ; soit sa capability est déclarée ; jamais de bypass magique. »"
+    inputs:
+      - registry: builtins
+        id: nika:jq
+        role: required
+      - registry: ir
+        id: builtin_capability_classifications
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: builtin_capability_classification
+        quantifier: forall
+      - operator: member_of
+        operands:
+          - registry: builtins
+            id: nika:jq
+          - registry: ir
+            id: pure_internal_builtins
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-AUTH-005"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: builtins
+          id: nika:jq
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["RequiredCapabilities"]
+      relation: subset
+      pipeline_stage: infer
+    diagnostics: ["NIKA-AUTH-005"]
+    fixtures:
+      - conformance/tests/runtime/permits/002-empty-permits-pure-compute
+    negative_fixtures:
+      - to-mint-c1/conformance/authority/builtins/unclassified-builtin-refused
+    projections: ["prose:10-authority", "prose:06-stdlib-contract", "cli:check", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:authority_core.py
+      - conformance:authority-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R12 point 20 verbatim : « `nika:jq` ne bénéficie d'aucun bypass magique. Il exige zéro permit uniquement parce qu'il est officiellement classé pure/internal. » La row builtins:nika:jq du canon porte la classification; la fixture pure-compute (test R12 point 29 : builtin pure) tourne avec permits: {}."
+      - "Un builtin sans classification rend sa capacité non inférable : même classe de refus que la loi 0310, même code NIKA-AUTH-005 (FINDING-AUTH-02)."
+    closure_gates:
+      - builtins-classified-in-ssot
+      - no-magic-bypass
+
+  # ── R12 point 21 + R9 point 12 · policy ne peut que réduire ───────────────────
+
+  - id: LAW-AUTH-0312
+    slug: authority/policy-never-enlarges
+    status: reserved
+    owner: spec
+    domain: AUTH
+    title: "policy ne peut jamais agrandir l'autorite, seulement la reduire ou la contraindre"
+    prose_projection:
+      chapters: ["10-authority"]
+      text: "R12 point 21 verbatim : « `policy:` ne peut jamais agrandir l'autorité. Elle peut uniquement réduire ou contraindre EffectiveAuthority. » · R9 point 12 verbatim : « `policy:` ne peut jamais agrandir l'autorité ; elle peut seulement imposer des restrictions ou contraintes. » Le policy-check est monotone décroissant sur l'autorité."
+    inputs:
+      - registry: ir
+        id: effective_authority
+        role: required
+      - registry: ir
+        id: policy_rules
+        role: required
+    premises:
+      - operator: subset_of
+        operands:
+          - registry: ir
+            id: policy_constrained_effective_authority
+          - registry: ir
+            id: effective_authority
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: policy_constrained_effective_authority
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["PolicyCeiling", "EffectiveAuthority"]
+      relation: subset
+      pipeline_stage: policy_check
+    diagnostics: []
+    fixtures:
+      - conformance/tests/core/policy/007-max-tasks-exceeded
+      - conformance/tests/core/policy/008-soft-families-inert
+    projections: ["prose:10-authority", "cli:check", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:authority_core.py
+      - conformance:authority-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Aucune règle policy légale n'existe qui ajoute une capacité : le vocabulaire policy est CLOSED (fixture 009-unknown-rule-refused de la loi 0313) et chaque règle vivante restreint (007-max-tasks-exceeded) ou reste inerte (008-soft-families-inert)."
+    closure_gates:
+      - policy-monotone-decreasing
+
+  # ── R12 point 22 + R9 points 13 + 14 + 15 + ANNEX · policy.allow providers-only
+
+  - id: LAW-AUTH-0313
+    slug: authority/policy-allow-providers-only
+    status: reserved
+    owner: spec
+    domain: AUTH
+    title: "policy.allow reste providers-only; toute capability sous policy.allow refuse"
+    prose_projection:
+      chapters: ["10-authority"]
+      text: "R12 point 22 verbatim : « `policy.allow` reste providers-only comme décidé précédemment. » · R9 point 13 verbatim : « `policy.allow` reste providers-only. » · R9 point 14 verbatim : « Ces formes doivent être refusées : policy.allow.tools · policy.allow.fs · policy.allow.net · policy.allow.exec · toute autre capability placée sous policy.allow. » · R9 point 15 verbatim : « `policy.allow.providers` ne donne aucune permission réseau par lui-même. » · ANNEX 2026-07-17 §Réservations négatives verbatim : « allow: → policy.allow providers-only FOREVER (R9 loi 13-14) »"
+    inputs:
+      - registry: ir
+        id: policy_allow_block
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: policy_allow_non_provider_capability_key
+        quantifier: exists
+    conclusion:
+      verdict: refuse
+      diagnostics_on_refuse: ["NIKA-PARSE-005"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: policy_allow_block
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["PolicyCeiling"]
+      relation: subset
+      pipeline_stage: policy_check
+    diagnostics: ["NIKA-PARSE-005", "NIKA-POLICY-001"]
+    fixtures:
+      - conformance/tests/core/policy/006-providers-allowlist-clean
+    negative_fixtures:
+      - conformance/tests/core/policy/005-providers-allowlist-violation
+      - conformance/tests/core/policy/009-unknown-rule-refused
+      - conformance/tests/core/policy/010-provider-templated-fail-closed
+      - to-mint-c1/conformance/authority/policy/allow-tools-refused
+    projections: ["prose:10-authority", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:authority_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:authority-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R9 point 14 verbatim : « Ces formes doivent être refusées : policy.allow.tools · policy.allow.fs · policy.allow.net · policy.allow.exec · toute autre capability placée sous policy.allow. » Le ruleset policy est CLOSED au parse strict : la fixture 009-unknown-rule-refused atteste la classe NIKA-PARSE (le code vivant est NIKA-PARSE-005, unknown field hors du set fermé)."
+      - "R9 point 15 verbatim : « `policy.allow.providers` ne donne aucune permission réseau par lui-même. » La règle allow.providers restreint le choix de provider (NIKA-POLICY-001 sur violation, fixture 005); le réseau reste accordé par le plan permits seul (loi 0314)."
+      - "ANNEX §Réservations négatives : le mot allow: est réservé policy.allow providers-only FOREVER; la candidate F2 allow: est morte sur cette collision (table F2, loi 0323)."
+    closure_gates:
+      - policy-allow-providers-only
+      - allow-reservation-graved
+
+  # ── R9 points 10 + 11 · permits est l'unique bloc capacitaire ─────────────────
+
+  - id: LAW-AUTH-0314
+    slug: authority/permits-sole-capability-block
+    status: reserved
+    owner: spec
+    domain: AUTH
+    title: "permits est l'unique bloc public d'autorite capacitaire"
+    prose_projection:
+      chapters: ["10-authority", "01-envelope"]
+      text: "R9 point 10 verbatim : « `permits:` est l'unique bloc public d'autorité capacitaire. » · R9 point 11 verbatim : « Les capacités filesystem, network, exec et tools ne peuvent être accordées que par `permits:` et les couches de déploiement/enforcement correspondantes. » Tout site d'octroi de capacité appartient au canal permits + deployment; aucun autre bloc YAML n'accorde."
+    inputs:
+      - registry: ir
+        id: capability_grant_sites
+        role: required
+    premises:
+      - operator: member_of
+        operands:
+          - registry: ir
+            id: capability_grant_site
+          - registry: ir
+            id: permits_and_deployment_channels
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: capability_grant_sites
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["DeclaredPermits", "AvailableAuthority"]
+      relation: subset
+      pipeline_stage: permits_check
+    diagnostics: []
+    fixtures:
+      - conformance/envelope/permits-empty-default-deny.nika.yaml
+    projections: ["prose:10-authority", "prose:01-envelope", "schema", "cli:check", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:authority_core.py
+      - conformance:authority-suite
+    introduced_in: C0
+    proof_obligations:
+      - "La fixture permits-empty-default-deny (check-reject : bloc permits vide + effets requis) prouve par le refus qu'aucun canal parallèle n'accorde fs/net/exec/tools quand permits ne les porte pas."
+    closure_gates:
+      - single-capability-grant-channel
+
+  # ── R12 point 28 + R9 point 19 · aucune seconde autorité, aucun alias ─────────
+
+  - id: LAW-AUTH-0315
+    slug: authority/no-alias-no-second-authority
+    status: reserved
+    owner: spec
+    domain: AUTH
+    title: "Aucun alias, aucune seconde autorite, aucun comportement backend-specific non declare"
+    prose_projection:
+      chapters: ["10-authority"]
+      text: "R12 point 28 verbatim : « Aucun alias, aucune seconde autorité et aucun comportement backend-specific non déclaré. » · R9 point 19 verbatim : « Aucun alias, aucune deuxième autorité et aucune ancienne projection conservée. » Le modèle 4-ensembles est l'unique plan d'autorité; les anciennes projections meurent au census."
+    inputs:
+      - registry: ir
+        id: authority_surfaces
+        role: required
+    premises:
+      - operator: absent
+        operands:
+          - registry: ir
+            id: second_capability_authority_surface
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: authority_surfaces
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["EffectiveAuthority"]
+      relation: equality
+      pipeline_stage: effective
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/authority/census/no-second-authority
+    projections: ["prose:10-authority", "cli:check", "docs"]
+    implementation_surfaces:
+      - conformance:authority-suite
+      - reference:authority_core.py
+    introduced_in: C0
+    proof_obligations:
+      - "R9 point 19 verbatim : « Aucun alias, aucune deuxième autorité et aucune ancienne projection conservée. » Le census des projections d'autorité anciennes atteint zéro dans la cascade P-C."
+    closure_gates:
+      - old-authority-projections-census-zero
+
+  # ── R12 point 23 · la surface CLI d'inspection des 4 ensembles ────────────────
+
+  - id: LAW-AUTH-0316
+    slug: authority/cli-inspect-authority-surface
+    status: reserved
+    owner: spec
+    domain: AUTH
+    title: "Le CLI expose l'inspection machine des quatre ensembles et de leur provenance"
+    prose_projection:
+      chapters: ["10-authority"]
+      text: "R12 point 23 verbatim : « Le CLI expose : nika inspect <file> --authority --format json avec : required_capabilities ; declared_permits ; available_authority ; effective_authority ; provenance inferred/declared ; missing capabilities ; unused permits ; enforcement level. » Le rapport est une projection des mêmes ensembles jugés, jamais un recalcul parallèle."
+    inputs:
+      - registry: ir
+        id: authority_inspection_report
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: authority_inspection_report
+        quantifier: forall
+    conclusion:
+      verdict: record
+    canonicalization:
+      order_sensitive: false
+      normalization: ["jcs"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: authority_inspection_report
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["RequiredCapabilities", "DeclaredPermits", "AvailableAuthority", "EffectiveAuthority"]
+      relation: equality
+      pipeline_stage: effective
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/authority/cli/inspect-authority-golden
+    projections: ["cli:inspect", "lsp", "mcp", "sdk", "docs"]
+    implementation_surfaces:
+      - cli:nika-inspect
+      - engine:nika-engine
+      - conformance:authority-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Le golden inspect-authority contient les huit champs nommés par R12 point 23, byte-stables sous JCS; un champ manquant est un échec de conformance."
+    closure_gates:
+      - inspect-authority-eight-fields
+
+  # ── R12 point 24 · lockfile, bundle et receipt scellent les digests ───────────
+
+  - id: LAW-AUTH-0317
+    slug: authority/receipts-record-set-digests
+    status: reserved
+    owner: spec
+    domain: AUTH
+    title: "Lockfile, deployment bundle et receipt enregistrent les digests des quatre ensembles"
+    prose_projection:
+      chapters: ["10-authority"]
+      text: "R12 point 24 verbatim : « Le lockfile, deployment bundle et receipt enregistrent les digests de ces ensembles. » Les ensembles jugés au check et au run sont scellés par digest; le receipt d'un run porte la preuve de l'autorité réellement en vigueur."
+    inputs:
+      - registry: ir
+        id: authority_set_digests
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: authority_set_digests_in_receipt
+        quantifier: forall
+    conclusion:
+      verdict: record
+    canonicalization:
+      order_sensitive: false
+      normalization: ["jcs"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: authority_set_digests
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["RequiredCapabilities", "DeclaredPermits", "AvailableAuthority", "EffectiveAuthority"]
+      relation: equality
+      pipeline_stage: runtime_revalidation
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/authority/receipts/set-digests-recorded
+    projections: ["cli:run", "sdk", "docs"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:authority_core.py
+      - conformance:authority-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Test R12 point 29 : « receipt parity » : le digest de chaque ensemble dans le receipt égale le digest du même ensemble recalculé par le modèle de référence sur la même source et le même deployment."
+    closure_gates:
+      - receipt-carries-authority-digests
+
+  # ── R12 points 25 + 26 · déterminisme, zéro mode machine-dépendant ────────────
+
+  - id: LAW-AUTH-0318
+    slug: authority/deterministic-effective-authority
+    status: reserved
+    owner: spec
+    domain: AUTH
+    title: "Meme fichier, meme Semantic IR, meme deployment : meme EffectiveAuthority"
+    prose_projection:
+      chapters: ["10-authority"]
+      text: "R12 point 25 verbatim : « Même fichier + même Semantic IR + même deployment → même EffectiveAuthority. » · R12 point 26 verbatim : « Aucun mode silencieux dépendant de la machine. » L'autorité effective est une fonction pure de la source et du deployment; la machine hôte n'entre jamais dans le calcul."
+    inputs:
+      - registry: ir
+        id: effective_authority
+        role: required
+    premises:
+      - operator: equals
+        operands:
+          - registry: ir
+            id: effective_authority
+          - registry: ir
+            id: effective_authority_recomputed
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["jcs"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: effective_authority
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["EffectiveAuthority"]
+      relation: equality
+      pipeline_stage: effective
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/authority/determinism/same-inputs-same-authority
+    projections: ["prose:10-authority", "cli:check", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:authority_core.py
+      - conformance:authority-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R12 point 26 verbatim : « Aucun mode silencieux dépendant de la machine. » Deux évaluations du même triplet (fichier, IR, deployment) sur deux machines rendent des ensembles byte-identiques sous JCS; N2-a tue le dernier défaut machine-dépendant connu (le vault par défaut, loi 0321)."
+    closure_gates:
+      - effective-authority-deterministic
+
+  # ── R9 points 17 + 18 + R12 point 29 · une loi, toutes surfaces, tests ────────
+
+  - id: LAW-AUTH-0319
+    slug: authority/one-law-all-surfaces-differential
+    status: reserved
+    owner: spec
+    domain: AUTH
+    title: "Toutes les surfaces derivent de la meme loi d'autorite; tests negatifs et differentiels obligatoires"
+    prose_projection:
+      chapters: ["10-authority", "07-conformance"]
+      text: "R9 point 17 verbatim : « Schema, parser, checker, canon, référence Python, engine, CLI, LSP, MCP et docs dérivent tous de la même loi. » · R9 point 18 verbatim : « Tests négatifs et différentiels obligatoires. » · R12 point 29 verbatim : « Tests obligatoires : pure workflow sans permits ; workflow externe sans permits en draft ; même workflow en published ; permits explicites exacts ; permit manquant ; permit excédentaire ; deployment insuffisant ; builtin pure ; tool externe ; workflow enfant ; authority containment ; CLI/LSP/MCP parity ; receipt parity. »"
+    inputs:
+      - registry: ir
+        id: engine_authority_verdict
+        role: required
+      - registry: ir
+        id: reference_authority_verdict
+        role: required
+    premises:
+      - operator: equals
+        operands:
+          - registry: ir
+            id: engine_authority_verdict
+          - registry: ir
+            id: reference_authority_verdict
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: engine_authority_verdict
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["EffectiveAuthority"]
+      relation: equality
+      pipeline_stage: effective
+    diagnostics: []
+    fixtures:
+      - conformance/tests/runtime/permits/001-runtime-boundary-hit
+      - conformance/tests/runtime/permits/002-empty-permits-pure-compute
+      - to-mint-c1/conformance/authority/parity/thirteen-mandatory-tests
+    projections: ["prose:10-authority", "cli:check", "lsp", "mcp", "sdk", "docs"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:authority_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:authority-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R12 point 29 nomme treize tests; la suite parity/thirteen-mandatory-tests les mappe un à un (chaque test cite sa clause) et le harnais différentiel compare engine et référence sur chacun."
+      - "R9 point 18 verbatim : « Tests négatifs et différentiels obligatoires. » Une divergence engine/référence est un échec de build, jamais une tolérance."
+      - "Directive de clôture R12 verbatim : « Grave cette loi dans le ruling, le canon, la conformance, le manifest de capabilities, le modèle de référence, le runtime et les receipts avant implémentation. » Ce fichier est l'étape canon; les six autres surfaces de gravure sont les implementation_surfaces et projections déclarées par les 23 lois."
+    closure_gates:
+      - thirteen-mandatory-tests-present
+      - authority-differential-parity
+
+  # ── R12 points 27 + 30 + R9 point 20 · aucune surface nouvelle, nika v1 ───────
+
+  - id: LAW-AUTH-0320
+    slug: authority/no-new-surface-language-stays-v1
+    status: reserved
+    owner: spec
+    domain: AUTH
+    title: "Le modele capacitaire n'ajoute aucun champ YAML de publication; le langage reste nika v1"
+    prose_projection:
+      chapters: ["10-authority", "01-envelope"]
+      text: "R12 point 27 verbatim : « Aucun nouveau champ YAML de publication. » · R12 point 30 verbatim : « Le langage reste nika: v1. » · R9 point 20 verbatim : « Le langage reste nika: v1. » Le modèle 4-ensembles vit dans le lifecycle plane et les manifests; la grammaire publique ne gagne ni champ de publication ni marqueur de version."
+    inputs:
+      - registry: surface
+        id: nika_version_marker
+        role: required
+      - registry: grammar
+        id: envelope_nika_field
+        role: ceiling
+    premises:
+      - operator: matches
+        operands:
+          - registry: surface
+            id: nika_version_marker
+          - registry: grammar
+            id: envelope_nika_field
+        quantifier: forall
+      - operator: absent
+        operands:
+          - registry: ir
+            id: publication_yaml_field
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: surface
+          id: nika_version_marker
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["DeclaredPermits"]
+      relation: equality
+      pipeline_stage: permits_check
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/yaml-profile/envelope/nika-v1-marker
+    projections: ["prose:10-authority", "schema", "cli:check", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:authority_core.py
+      - conformance:authority-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R12 point 27 verbatim : « Aucun nouveau champ YAML de publication. » Le profil published s'invoque par nika check --profile published et nika publish (loi 0307), jamais par un champ de la source."
+      - "Le squelette payload est approximatif pour cette loi de surface (FINDING-AUTH-01 pattern) : le marqueur de langage est la loi; LAW-SURFACE-0101 du pilote porte la même phrase pour R11 point 16, celle-ci ancre R12 point 30 et R9 point 20."
+    closure_gates:
+      - single-language-marker
+      - no-publication-yaml-field
+
+  # ── ANNEX N2-a (D-2026-07-17-N2) · secrets.<n>.source devient REQUIRED ────────
+
+  - id: LAW-AUTH-0321
+    slug: authority/secrets-source-required
+    status: reserved
+    owner: spec
+    domain: AUTH
+    title: "La provenance d'un secret est declaree explicitement : source est REQUIRED, le defaut vault meurt"
+    prose_projection:
+      chapters: ["01-envelope", "10-authority"]
+      text: "ANNEX 2026-07-17 §N2-a (D-2026-07-17-N2) verbatim : « **N2-a · F1-H1 · `secrets.<n>.source:` devient REQUIRED.** La dual-truth (spec/01:265 « required » vs spec/01:275 + engine `envelope.rs:174 None=>Vault` défaut silencieux) se résout côté EXPLICITE : un défaut de provenance silencieux est exactement la classe que R12 tue partout (« Aucun fallback permissif » · « Aucun mode silencieux dépendant de la machine ») · R8 loi 9 (précision > brièveté). Conséquences : codemod `secrets-source-explicit-v1` · le défaut engine meurt (fenêtre C8) · fixture négative `missing-source` mintée · le moment est le moins cher de l'histoire du langage (corpus public : 0/27 blocs secrets authored). »"
+    inputs:
+      - registry: ir
+        id: secrets_declarations
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: secret_source_field
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-SEC-008"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: secret_resolution_authorities
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["DeclaredPermits"]
+      relation: equality
+      pipeline_stage: infer
+    diagnostics: ["NIKA-SEC-008"]
+    fixtures:
+      - conformance/envelope/secrets-infer-egress-sanctioned.nika.yaml
+    negative_fixtures:
+      - to-mint-c1/conformance/secrets/invalid/missing-source
+    projections: ["prose:01-envelope", "schema", "cli:check", "lsp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:authority_core.py
+      - cli:nika-check
+      - conformance:authority-suite
+    introduced_in: C0
+    proof_obligations:
+      - "La fixture négative missing-source (nommée par le ruling) refuse un bloc secrets sans source:; la positive réelle secrets-infer-egress-sanctioned porte source: env et passe."
+      - "Le défaut engine envelope.rs:174 None=>Vault meurt dans la fenêtre C8 : le codemod secrets-source-explicit-v1 (equivalence-or-stop) insère source: vault là où il était omis, puis le chemin défaut est supprimé (closure gate)."
+      - "FINDING-AUTH-01 : loi de la famille secrets mappée sur AUTH; la provenance est l'autorité de résolution du secret (R6 point 2), le squelette payload est approximatif."
+    closure_gates:
+      - codemod-secrets-source-explicit-v1-applied
+      - engine-default-vault-dead-c8
+      - missing-source-fixture-minted
+
+  # ── ANNEX table F1 · secrets-provenance KEEP-HARDENED source ──────────────────
+
+  - id: LAW-AUTH-0322
+    slug: authority/secrets-provenance-keeps-source
+    status: reserved
+    owner: spec
+    domain: AUTH
+    title: "La famille secrets-provenance garde source; from n'est jamais un keyword envelope"
+    prose_projection:
+      chapters: ["01-envelope"]
+      text: "ANNEX 2026-07-17 table F1, cellules verbatim (colonnes Family · Current · Candidate · Winner · Migration) : « secrets-provenance (F1) » · « `source: vault|env|file` + `key:`/`path:` » · « `from:` » · « **KEEP-HARDENED · `source:`** » · « identity + durcissements F1-H ». ANNEX §Réservations négatives verbatim : « from: → tool-args ONLY (l'arg REQUIRED de nika:convert · JAMAIS un keyword envelope) » et « source: · egress: · value: · timeout: → gardés par leurs familles »."
+    inputs:
+      - registry: ir
+        id: envelope_keywords
+        role: required
+    premises:
+      - operator: absent
+        operands:
+          - registry: ir
+            id: envelope_from_keyword
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-PARSE-005"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: secret_resolution_authorities
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["DeclaredPermits"]
+      relation: equality
+      pipeline_stage: infer
+    diagnostics: ["NIKA-PARSE-005"]
+    fixtures:
+      - conformance/envelope/secrets-infer-egress-sanctioned.nika.yaml
+    negative_fixtures:
+      - to-mint-c1/conformance/secrets/invalid/from-as-envelope-keyword
+    projections: ["prose:01-envelope", "schema", "cli:check", "docs"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:authority_core.py
+      - conformance:authority-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Le spelling source: est KEEP-HARDENED : la forme actuelle survit avec sa loi normative, ses fixtures et sa SSOT (R8 loi 19 esprit), et le mot from: reste attribué aux tool-args de nika:convert seulement."
+      - "La réservation négative est structurelle : from: comme clé envelope tombe dans le set fermé du parse strict (NIKA-PARSE-005), jamais un alias toléré."
+    closure_gates:
+      - from-envelope-keyword-census-zero
+      - f1-hardenings-shipped
+
+  # ── ANNEX table F2 · secrets-declassification KEEP-HARDENED egress ────────────
+
+  - id: LAW-AUTH-0323
+    slug: authority/secrets-declassification-keeps-egress
+    status: reserved
+    owner: spec
+    domain: AUTH
+    title: "La declassification garde egress comme unique destination sanctionnee; allow reste au plan policy"
+    prose_projection:
+      chapters: ["01-envelope", "10-authority"]
+      text: "ANNEX 2026-07-17 table F2, cellules verbatim (colonnes Family · Current · Candidate · Winner · Migration) : « secrets-declassification (F2) » · « `egress: [{to, host|host_from_self}]` » · « `allow:` » · « **KEEP-HARDENED · `egress:`** » · « identity + H1-H4 additifs ». ANNEX §Réservations négatives verbatim : « allow: → policy.allow providers-only FOREVER (R9 loi 13-14) ». La destination de déclassification d'un secret se déclare par egress:; le mot allow: appartient au plan policy et ne sanctionne jamais un flux de secret."
+    inputs:
+      - registry: ir
+        id: secret_declassification_sites
+        role: required
+    premises:
+      - operator: member_of
+        operands:
+          - registry: ir
+            id: secret_declassification_site
+          - registry: ir
+            id: egress_clauses
+        quantifier: forall
+      - operator: absent
+        operands:
+          - registry: ir
+            id: envelope_allow_keyword
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-SEC-006", "NIKA-SEC-007"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: secret_declassification_sites
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["DeclaredPermits", "EffectiveAuthority"]
+      relation: subset
+      pipeline_stage: effective
+    diagnostics: ["NIKA-SEC-006", "NIKA-SEC-007"]
+    fixtures:
+      - conformance/envelope/secrets-infer-egress-sanctioned.nika.yaml
+    negative_fixtures:
+      - conformance/envelope/secrets-leak-infer-prompt.nika.yaml
+      - conformance/envelope/secrets-leak-exec-sink.nika.yaml
+      - conformance/envelope/secrets-launder-concat.nika.yaml
+      - conformance/envelope/secrets-two-sinks-one-sanctioned.nika.yaml
+    projections: ["prose:01-envelope", "prose:10-authority", "schema", "cli:check", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:authority_core.py
+      - cli:nika-check
+      - conformance:authority-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Les fixtures vivantes portent déjà la loi : un sink sanctionné par egress passe (secrets-infer-egress-sanctioned), tout sink non sanctionné refuse avec son taint path (les quatre négatives, codes NIKA-SEC-006/NIKA-SEC-007)."
+      - "R8 loi 10 contexte du mini-gate : provenance (source:, loi 0322), autorité (permits/policy, lois 0313-0314) et destination de déclassification (egress:, cette loi) ne sont jamais confondues; la candidate allow: est morte sur la collision avec policy.allow (loi 0313)."
+    closure_gates:
+      - egress-sole-declassification-form
+      - f2-hardenings-shipped

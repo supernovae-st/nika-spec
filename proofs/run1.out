@@ -1,0 +1,4 @@
+write OK · 3 outputs
+projection projections/laws-index.json sha256:ea382f4b2b5201bf7c9f56c20e2a0b506bc6de10313bb1625762d00b09d07419
+lock canon/ssot.lock sha256:3fa1639ce7dafa9f20ee07ee0b974d099609dc91624994b2e21077b229573f6d (detached in canon/ssot.lock.sha256)
+rc=0

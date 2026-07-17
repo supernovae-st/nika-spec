@@ -1,0 +1,1946 @@
+# canon/laws/temporal.yaml · C0 import · B-17 modele temporel + F4 + N2-b + F5
+# SSOT: RULINGS_2026-07-15.md §Annexe B-17 (39 points · verbatim · JAMAIS paraphrase,
+# les citations reproduisent les bytes du ruling, ancres "B-17 point N") + l'annexe datee
+# mini-gates ANNEX_2026-07-17_minigates-winners.md (D-2026-07-17-N2 · F4 remodel-per-B17 ·
+# N2-b nouvelle row table 13 · F5 keep-hardened) + les receipts
+# mini-gates/f4-limits-temporal-receipt.md et mini-gates/f5-stop-completion-receipt.md +
+# le census mini-gates/F4_TIMEOUT_RETRY_CENSUS.md (les 2 proses a tuer).
+# Schema: schemas/law.schema.json (SCELLE · consomme as-is). Blocs d'ids de ce groupe:
+# TEMPORAL 04xx + OUTCOME 04xx (les lois outcome de B-17/N2-b vivent ICI, le fichier
+# suit le GROUPE de rulings, le domaine suit le schema).
+#
+# FINDING-T1 (SSOT-1 §29 · divergence live-spec vs loi rulee · kill PLANIFIE, jamais
+# silencieux) : spec/03-dag.md §timeout enseigne AUJOURD'HUI « Hard timeout for the
+# entire task (including any retries and their backoff sleeps · wall-clock) » (:601-602)
+# et « Maximum · 24h » (:625), en contradiction avec B-17 points 5 + 2/37 et le re-loi F4.
+# Le census F4 nomme les 2 proses a tuer (spec/spec/03-dag.md:592-606 +
+# docs/reference/yaml-syntax.mdx:72), reecrites dans le MEME commit cascade P-C.
+# Ce fichier importe la loi rulee + les closure gates, il ne reecrit RIEN du spec.
+#
+# FINDING-T2 (vocabulaire fixture pre-cascade) : la fixture REELLE
+# conformance/tests/runtime/agent/001-budget-exhaustion-fails prouve le cote "epuise"
+# de N2-b mais sa note expected-run epelle "budget_error" (la CATEGORY des codes
+# NIKA-AGENT-001/002 dans canon.yaml + spec/05-errors.md), tandis que N2-b mint la row
+# Outcome cause `budget_exhausted`. La fixture se re-keye a la cascade P-C, referencee
+# telle quelle ici, jamais editee en silence.
+#
+# FINDING-T3 (grammaire diagCode scellee vs code live) : la row cancelled/budget de la
+# table 13 cite NIKA-RUN-1704 (spec/13-outcomes.md · serial 4 chiffres) ; le pattern
+# diagCode du schema scelle admet exactement 3 chiffres. Toute loi future citant
+# NIKA-RUN-1704 dans diagnostics[] echouerait la validation : ruling C1 requis
+# (renumerotation ou amendement de grammaire). Aucune loi de ce fichier ne le cite.
+#
+# FINDING-T4 (mapping de domaine per grant · precedent FINDING-01 du pilote) :
+# B-17 point 39 (« Le langage reste nika: v1. » · classe SURFACE), points 33-34
+# (placement classe HASH), point 36 (suite classe CONF) et la mecanique codemod F4
+# (classe MIGR · equivalence-or-stop) s'ancrent DANS les lois TEMPORAL/OUTCOME de ce
+# groupe : les blocs accordes sont TEMPORAL/OUTCOME/GUAR 04xx uniquement. Couverture
+# preservee par citation verbatim ; re-domiciliation cross-domain = geste C1 opere.
+#
+# FINDING-T5 (codes c0-proposed · precedent FINDING-05 du pilote) : NIKA-TEMPORAL-001
+# (incompatibilite de capacites temporelles refusee avant run · B-17 points 16-17) et
+# NIKA-TEMPORAL-002 (duree non entiere-exacte / overflow refuse · point 31) sont mintes
+# c0-proposed (SSOT-2 B.21 : un diagnostic canonique par rejet normatif expose),
+# renumerotables avant C1. B-17 lui-meme ne mandate aucun code.
+#
+# Fixtures : les REELLES du repo spec sont referencees quand elles existent
+# (conformance/verbs/* · conformance/errors/* · conformance/tests/core/errors/* ·
+# conformance/tests/runtime/agent/*) ; le reste = to-mint-c1/<slug> (convention pilote),
+# noms des classes de test tires de B-17 point 36 et de la paire du census F4.
+
+laws_document_format: 1
+
+pilot: b17-f4-n2b-f5-temporal
+
+laws:
+
+  # ─────────────────── B-17 points 1 + 2 + 3 · aucun cap universel ─────────────
+
+  - id: LAW-TEMPORAL-0401
+    slug: b17/no-universal-cap
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "Aucune duree maximale universelle codee dans le langage, le cap 24 h est supprime"
+    prose_projection:
+      chapters: ["03-dag"]
+      text: "B-17 point 1 verbatim : « Nika ne possède aucune durée maximale universelle codée dans le langage. » · B-17 point 2 verbatim : « Supprimer toute mention normative d'un cap fixe de 24 h. » · B-17 point 3 verbatim : « L'exemple de 48 h devient légal si les capacités du deployment permettent son exécution. » La borne vient du programme ou du deployment (points 15-16, loi LAW-TEMPORAL-0413), jamais d'un cap du langage."
+    inputs:
+      - registry: grammar
+        id: temporal_duration_grammar
+        role: required
+      - registry: ir
+        id: deployment_capabilities
+        role: ceiling
+    premises:
+      - operator: absent
+        operands:
+          - registry: grammar
+            id: universal_duration_cap
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: temporal_duration_grammar
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: attempt_timeout
+      composition: independent
+    diagnostics: []
+    fixtures:
+      - conformance/tests/core/errors/006-valid-timeout-compound
+      - to-mint-c1/conformance/temporal/timeout-48h-legal
+      - to-mint-c1/conformance/temporal/multi-day-duration-legal
+    projections: ["prose:03-dag", "schema", "cli:check", "docs"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:temporal_core.py
+      - cli:nika-check
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "B-17 point 37 verbatim : « Aucun cap 24 h résiduel dans : spec ; canon ; schema ; engine ; Oracle ; docs ; fixtures ; diagnostics ; SDK ; LSP/MCP. » Le census de LAW-TEMPORAL-0424 rend le compte exact."
+      - "FINDING-T1 : la prose actuelle spec/03-dag.md porte le cap (:625, verbatim spec : « Maximum · `24h`. »), kill-target du census F4, reecrite dans le meme commit cascade que le re-loi (jamais de fenetre ou la doc enseigne l'ancien cap)."
+      - "B-17 point 3 verbatim : « L'exemple de 48 h devient légal si les capacités du deployment permettent son exécution. » La fixture timeout-48h-legal admet des que le deployment le supporte."
+    closure_gates:
+      - cap-24h-census-zero
+      - fixture-parity
+
+  # ─────────────────── B-17 point 4 · les 5 genres de borne distincts ──────────
+
+  - id: LAW-TEMPORAL-0402
+    slug: b17/five-bound-kinds-distinct
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "Cinq genres de borne temporelle strictement distincts, chaque borne declaree se classe"
+    prose_projection:
+      chapters: ["03-dag"]
+      text: "B-17 point 4 verbatim : « Distinguer strictement : task attempt timeout ; workflow deadline ; active resource budget ; deployment lease/cap ; durable suspension. » Chaque borne declaree appartient a exactement un de ces genres du registre grammar ; aucun mot-valise ne les conflue (le bag `limits:` est mort par F4, loi LAW-TEMPORAL-0430)."
+    inputs:
+      - registry: ir
+        id: declared_temporal_bound
+        role: required
+      - registry: grammar
+        id: temporal_measures
+        role: ceiling
+    premises:
+      - operator: member_of
+        operands:
+          - registry: ir
+            id: declared_temporal_bound
+          - registry: grammar
+            id: temporal_measures
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: temporal_measures
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: attempt_timeout
+      composition: independent
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/temporal/five-measures-classified
+    projections: ["prose:03-dag", "schema", "cli:check", "docs"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:temporal_core.py
+      - cli:nika-check
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Le payload temporel du schema scelle pinne un exemplaire (attempt_timeout) ; la famille des 5 genres vit au registre grammar/temporal_measures cite en inputs (convention exemplaire du pilote, FINDING-11)."
+    closure_gates:
+      - five-measures-declared-in-grammar-registry
+
+  # ─────────────────── B-17 point 5 · le timeout borne UNE tentative ───────────
+
+  - id: LAW-TEMPORAL-0403
+    slug: b17/attempt-timeout-bounds-one-attempt
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "Le timeout d'une task borne une tentative individuelle, jamais l'enveloppe des retries"
+    prose_projection:
+      chapters: ["03-dag"]
+      text: "B-17 point 5 verbatim : « Le timeout d'une task borne une tentative individuelle. » Ancre F4 (ANNEX_2026-07-17_minigates-winners.md §La politique d'arbitrage F4, intro verbatim) : « `timeout:` passe de « entire task including retries » (spec/03:601-603) à **attempt-scope** (B-17 loi 5 verbatim : le timeout borne une tentative individuelle). Politique ratifiée : »"
+    inputs:
+      - registry: ir
+        id: task_timeout_declaration
+        role: required
+      - registry: grammar
+        id: attempt_scope_contract
+        role: ceiling
+    premises:
+      - operator: conforms_to
+        operands:
+          - registry: ir
+            id: task_timeout_declaration
+          - registry: grammar
+            id: attempt_scope_contract
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: attempt_scope_contract
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: attempt_timeout
+      composition: min
+    diagnostics: []
+    fixtures:
+      - conformance/verbs/timeout-basic.nika.yaml
+      - to-mint-c1/conformance/temporal/timeout-attempt-scope
+    projections: ["prose:03-dag", "schema", "cli:check", "lsp", "docs"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:temporal_core.py
+      - cli:nika-check
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "FINDING-T1 : la definition normative actuelle contredit cette loi (census F4 verbatim : « Hard timeout for the **entire task (including any retries** and their backoff sleeps · wall-clock) » a spec/03-dag.md:601-602) ; kill-target reecrite dans le commit du re-loi (LAW-TEMPORAL-0432)."
+      - "La paire de fixtures du census F4 (timeout-attempt-scope vs deadline-envelope) est mintee avant la cascade (politique F4 point 4)."
+    closure_gates:
+      - attempt-scope-relaw-shipped
+      - fixture-parity
+
+  # ─────────────────── B-17 point 6 · retry ne reset jamais la deadline ────────
+
+  - id: LAW-TEMPORAL-0404
+    slug: b17/retry-never-resets-deadline
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "Un retry ne remet jamais a zero la deadline globale"
+    prose_projection:
+      chapters: ["03-dag"]
+      text: "B-17 point 6 verbatim : « Un retry ne remet jamais à zéro la deadline globale. » La deadline du workflow decroit de facon monotone ; chaque tentative consomme le budget restant, aucune ne le regenere."
+    inputs:
+      - registry: ir
+        id: workflow_deadline_after_retry
+        role: required
+      - registry: ir
+        id: workflow_deadline_before_retry
+        role: required
+    premises:
+      - operator: equals
+        operands:
+          - registry: ir
+            id: workflow_deadline_after_retry
+          - registry: ir
+            id: workflow_deadline_before_retry
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: workflow_deadline_before_retry
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: workflow_deadline
+      composition: min
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/temporal/retry-remaining-budget
+    projections: ["prose:03-dag", "cli:check", "docs"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:temporal_core.py
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "B-17 point 36 nomme la classe de test « retry et budget restant » ; la fixture retry-remaining-budget prouve que la deadline absolue reste identique avant et apres chaque retry."
+    closure_gates:
+      - fixture-parity
+
+  # ─────────────────── B-17 point 7 · EffectiveAttemptTimeout = min(...) ───────
+
+  - id: LAW-TEMPORAL-0405
+    slug: b17/effective-attempt-timeout-min
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "Avant chaque tentative le timeout effectif est le min des trois bornes restantes"
+    prose_projection:
+      chapters: ["03-dag"]
+      text: "B-17 point 7 verbatim : « Avant chaque tentative : EffectiveAttemptTimeout = min(LocalAttemptTimeout, RemainingWorkflowDeadline, RemainingDeploymentDeadline) » La derivation est deterministe et re-derivable a chaque tentative."
+    inputs:
+      - registry: ir
+        id: local_attempt_timeout
+        role: required
+      - registry: ir
+        id: remaining_workflow_deadline
+        role: required
+      - registry: ir
+        id: remaining_deployment_deadline
+        role: required
+    premises:
+      - operator: min_of
+        operands:
+          - registry: ir
+            id: effective_attempt_timeout
+          - registry: ir
+            id: local_attempt_timeout
+          - registry: ir
+            id: remaining_workflow_deadline
+          - registry: ir
+            id: remaining_deployment_deadline
+        quantifier: forall
+    conclusion:
+      verdict: derive
+      derives:
+        registry: ir
+        id: effective_attempt_timeout
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: effective_attempt_timeout
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: attempt_timeout
+      composition: min
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/temporal/attempt-timeout-clamped-by-deadline
+    projections: ["prose:03-dag", "cli:check", "receipt"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:temporal_core.py
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "L'operande cible du min_of est effective_attempt_timeout (forme target-first du schema scelle) ; les trois sources sont exactement celles du point 7, dans l'ordre du ruling."
+    closure_gates:
+      - fixture-parity
+      - receipt-parity
+
+  # ─────────────────── B-17 point 8 · la deadline borne end-to-end ─────────────
+
+  - id: LAW-TEMPORAL-0406
+    slug: b17/workflow-deadline-end-to-end
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "La deadline d'un workflow borne l'execution end-to-end, toutes phases comprises"
+    prose_projection:
+      chapters: ["03-dag"]
+      text: "B-17 point 8 verbatim : « La deadline d'un workflow borne l'exécution end-to-end : tasks ; retries ; recovery ; finally ; child workflows ; waits et suspensions. » Aucune phase n'echappe a l'enveloppe."
+    inputs:
+      - registry: ir
+        id: end_to_end_execution_span
+        role: required
+      - registry: ir
+        id: effective_workflow_deadline
+        role: ceiling
+    premises:
+      - operator: conforms_to
+        operands:
+          - registry: ir
+            id: end_to_end_execution_span
+          - registry: ir
+            id: effective_workflow_deadline
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: effective_workflow_deadline
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: workflow_deadline
+      composition: min
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/temporal/deadline-envelope
+    projections: ["prose:03-dag", "schema", "cli:check", "docs"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:temporal_core.py
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Les six phases nommees par le point 8 (tasks, retries, recovery, finally, child workflows, waits et suspensions) sont chacune couvertes par une fixture de la suite LAW-TEMPORAL-0423."
+      - "La spelling de l'enveloppe est `deadline:`, mintee census-0 par F4 (LAW-TEMPORAL-0431)."
+    closure_gates:
+      - fixture-parity
+
+  # ─────────────────── B-17 points 9 + 10 · composition parent/enfant ──────────
+
+  - id: LAW-TEMPORAL-0407
+    slug: b17/child-deadline-min-composition
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "Un enfant n'etend jamais la deadline du parent, sa deadline effective est le min des trois"
+    prose_projection:
+      chapters: ["03-dag", "14-composition"]
+      text: "B-17 point 9 verbatim : « Un workflow enfant ne peut jamais étendre la deadline du parent. » · B-17 point 10 verbatim : « Loi de composition : EffectiveDeadline(child) = min(parent remaining deadline, child declared deadline, deployment deadline) »"
+    inputs:
+      - registry: ir
+        id: parent_remaining_deadline
+        role: required
+      - registry: ir
+        id: child_declared_deadline
+        role: required
+      - registry: ir
+        id: deployment_deadline
+        role: required
+    premises:
+      - operator: min_of
+        operands:
+          - registry: ir
+            id: effective_child_deadline
+          - registry: ir
+            id: parent_remaining_deadline
+          - registry: ir
+            id: child_declared_deadline
+          - registry: ir
+            id: deployment_deadline
+        quantifier: forall
+    conclusion:
+      verdict: derive
+      derives:
+        registry: ir
+        id: effective_child_deadline
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: effective_child_deadline
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: workflow_deadline
+      composition: min
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/temporal/child-workflow
+      - to-mint-c1/conformance/temporal/parent-stricter
+      - to-mint-c1/conformance/temporal/child-stricter
+      - to-mint-c1/conformance/temporal/deployment-stricter
+    projections: ["prose:03-dag", "prose:14-composition", "cli:check", "receipt"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:temporal_core.py
+      - reference:composition_core.py
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "B-17 point 36 nomme les classes « workflow enfant ; parent plus strict ; child plus strict ; deployment plus strict » ; les quatre fixtures les realisent une a une."
+      - "Le min a trois sources rend le point 9 mecanique : aucun terme enfant ne peut depasser parent remaining deadline puisque le min le borne."
+    closure_gates:
+      - fixture-parity
+      - receipt-parity
+
+  # ─────────────────── B-17 point 11 · les mesures de temps distinctes ─────────
+
+  - id: LAW-TEMPORAL-0408
+    slug: b17/time-measures-distinct
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "Temps mural, actif, provider, tool, attente externe et suspension sont des mesures distinctes"
+    prose_projection:
+      chapters: ["03-dag"]
+      text: "B-17 point 11 verbatim : « Temps mural, temps actif, temps provider, temps tool, attente externe et suspension sont des mesures distinctes. » Chaque enregistrement de duree se classe dans exactement une mesure du registre grammar ; aucune mesure n'absorbe une autre."
+    inputs:
+      - registry: ir
+        id: observed_duration_record
+        role: required
+      - registry: grammar
+        id: distinct_time_measures
+        role: ceiling
+    premises:
+      - operator: member_of
+        operands:
+          - registry: ir
+            id: observed_duration_record
+          - registry: grammar
+            id: distinct_time_measures
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: distinct_time_measures
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: external_wait
+      composition: independent
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/temporal/distinct-measures-receipt
+    projections: ["prose:03-dag", "receipt", "docs"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:temporal_core.py
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Le receipt de LAW-TEMPORAL-0422 enregistre wall duration, active duration et suspended duration separement ; la fixture distinct-measures-receipt verifie qu'aucune ne se confond."
+    closure_gates:
+      - fixture-parity
+      - receipt-parity
+
+  # ─────────────────── B-17 point 12 · les budgets compute vivent dans ρ ───────
+
+  - id: LAW-TEMPORAL-0409
+    slug: b17/compute-budgets-in-rho
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "Les budgets de compute appartiennent a rho/resources, jamais a la deadline murale"
+    prose_projection:
+      chapters: ["03-dag"]
+      text: "B-17 point 12 verbatim : « Les budgets de compute appartiennent à ρ/resources, pas à la deadline murale. » Ancre F4 (ANNEX §Les winners, row F4, fragment verbatim) : « ρ nommés-avec-unité · JAMAIS de bag »."
+    inputs:
+      - registry: ir
+        id: compute_budget_declaration
+        role: required
+      - registry: ir
+        id: rho_resources
+        role: required
+    premises:
+      - operator: member_of
+        operands:
+          - registry: ir
+            id: compute_budget_declaration
+          - registry: ir
+            id: rho_resources
+        quantifier: forall
+      - operator: intersect_empty
+        operands:
+          - registry: ir
+            id: rho_resources
+          - registry: ir
+            id: wall_deadline_axis
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: rho_resources
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: resource_budget
+      composition: independent
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/temporal/rho-budget-independent
+    projections: ["prose:03-dag", "schema", "cli:check", "docs"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:temporal_core.py
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Receipt F4 §DECISION verbatim (fragment) : « ρ budgets stay flat named-with-unit, `--max-cost-usd` stays run-scope CLI (B-17 law 32) ». Le budget de cout ne se re-scope jamais silencieusement dans l'axe deadline."
+    closure_gates:
+      - fixture-parity
+
+  # ─────────────────── B-17 point 13 · le contrat de suspension durable ────────
+
+  - id: LAW-TEMPORAL-0410
+    slug: b17/durable-suspension-contract
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "Une suspension durable checkpoint, libere, attend, reprend avec le meme run identity, sous la deadline"
+    prose_projection:
+      chapters: ["03-dag"]
+      text: "B-17 point 13 verbatim : « Une suspension durable : checkpoint l'état ; libère les ressources actives ; attend un timer ou événement durable ; reprend avec le même run identity ; reste soumise à la deadline murale. »"
+    inputs:
+      - registry: ir
+        id: durable_suspension_event
+        role: required
+      - registry: grammar
+        id: durable_suspension_contract
+        role: ceiling
+    premises:
+      - operator: conforms_to
+        operands:
+          - registry: ir
+            id: durable_suspension_event
+          - registry: grammar
+            id: durable_suspension_contract
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: durable_suspension_contract
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: durable_suspension
+      composition: min
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/temporal/durable-wait
+      - to-mint-c1/conformance/temporal/checkpoint-resume
+    projections: ["prose:03-dag", "receipt", "docs"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:temporal_core.py
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "B-17 point 36 nomme les classes « durable wait ; checkpoint/resume » ; les deux fixtures verifient les cinq clauses du contrat, dont l'identite du run preservee a la reprise."
+    closure_gates:
+      - fixture-parity
+      - receipt-parity
+
+  # ─────────────────── B-17 points 14 + 38 · nika:wait sans exception ──────────
+
+  - id: LAW-TEMPORAL-0411
+    slug: b17/nika-wait-no-active-hold
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "nika:wait ne garde pas un processus actif des heures, et ne beneficie d'aucune exception"
+    prose_projection:
+      chapters: ["03-dag", "06-stdlib-contract"]
+      text: "B-17 point 14 verbatim : « `nika:wait` ne doit pas garder un processus actif pendant plusieurs heures ou jours. » · B-17 point 38 verbatim : « Aucun alias et aucune exception spécifique à nika:wait. » Le builtin passe par le contrat de suspension durable (LAW-TEMPORAL-0410) comme tout le monde."
+    inputs:
+      - registry: builtins
+        id: nika:wait
+        role: required
+      - registry: grammar
+        id: durable_wait_contract
+        role: ceiling
+    premises:
+      - operator: conforms_to
+        operands:
+          - registry: builtins
+            id: nika:wait
+          - registry: grammar
+            id: durable_wait_contract
+        quantifier: forall
+      - operator: absent
+        operands:
+          - registry: grammar
+            id: nika_wait_temporal_exception
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: durable_wait_contract
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: external_wait
+      composition: min
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/temporal/durable-wait
+    projections: ["prose:03-dag", "prose:06-stdlib-contract", "cli:check", "docs"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:temporal_core.py
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Receipt F4 §Blast radius (fragment verbatim) : « `nika:wait` timeout ARG seam (core_tools.rs:242,268 · defs.rs:145 · B-17 law 38 no exception) ». La couture d'argument existante migre sans exception ni alias."
+    closure_gates:
+      - fixture-parity
+
+  # ─────────────────── B-17 point 15 · le capability manifest du backend ───────
+
+  - id: LAW-TEMPORAL-0412
+    slug: b17/backend-temporal-capability-manifest
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "Le backend expose ses six capacites temporelles dans son capability manifest"
+    prose_projection:
+      chapters: ["12-gateway"]
+      text: "B-17 point 15 verbatim : « Le backend expose dans son capability manifest : max_task_duration ; max_workflow_duration ; max_lease_duration ; max_suspended_duration ; supports_durable_suspend ; supports_checkpoint_resume. »"
+    inputs:
+      - registry: ir
+        id: backend_temporal_capability_manifest
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: backend_temporal_capability_manifest
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: backend_temporal_capability_manifest
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: deployment_lease
+      composition: min
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/temporal/backend-temporal-manifest
+    projections: ["prose:12-gateway", "schema", "cli:check", "sdk"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:gateway_core.py
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Les six champs du point 15 sont chacun presents et types dans le manifest ; l'absence d'un champ est un manifest invalide, jamais un defaut silencieux (point 18)."
+    closure_gates:
+      - fixture-parity
+      - manifest-fields-complete
+
+  # ─────────────────── B-17 points 16 + 17 + 18 · compatibilite avant run ──────
+
+  - id: LAW-TEMPORAL-0413
+    slug: b17/temporal-capabilities-subset-pre-run
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "Les capacites temporelles requises sont incluses dans celles du deployment, sinon refus avant run"
+    prose_projection:
+      chapters: ["12-gateway"]
+      text: "B-17 point 16 verbatim : « Avant exécution : RequiredTemporalCapabilities(program) ⊆ SupportedTemporalCapabilities(deployment) » · B-17 point 17 verbatim : « Une incompatibilité est refusée avant le run. » · B-17 point 18 verbatim : « Aucun fallback permissif et aucune troncature silencieuse d'une durée. »"
+    inputs:
+      - registry: ir
+        id: required_temporal_capabilities
+        role: required
+      - registry: ir
+        id: supported_temporal_capabilities
+        role: ceiling
+    premises:
+      - operator: subset_of
+        operands:
+          - registry: ir
+            id: required_temporal_capabilities
+          - registry: ir
+            id: supported_temporal_capabilities
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-TEMPORAL-001"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: required_temporal_capabilities
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: deployment_lease
+      composition: min
+    diagnostics: ["NIKA-TEMPORAL-001"]
+    fixtures:
+      - to-mint-c1/conformance/temporal/deployment-stricter
+    negative_fixtures:
+      - to-mint-c1/conformance/temporal/deployment-insufficient-refused
+    projections: ["prose:12-gateway", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:temporal_core.py
+      - cli:nika-check
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "B-17 point 18 verbatim : « Aucun fallback permissif et aucune troncature silencieuse d'une durée. » Le refus est la seule sortie d'une incompatibilite ; aucune surface ne tronque pour faire passer."
+      - "FINDING-T5 : NIKA-TEMPORAL-001 est c0-proposed (aucun code mandate par B-17) ; renumerotable avant C1 ; SSOT-2 B.21 exige un diagnostic canonique par rejet normatif expose."
+    closure_gates:
+      - fixture-parity
+      - no-permissive-fallback
+
+  # ─────────────────── B-17 points 19 + 20 + 21 · les horloges ─────────────────
+
+  - id: LAW-TEMPORAL-0414
+    slug: b17/monotonic-elapsed-utc-absolute
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "Durees ecoulees sur horloge monotone, deadlines absolues sur instant UTC normalise"
+    prose_projection:
+      chapters: ["03-dag"]
+      text: "B-17 point 19 verbatim : « Pour les durées écoulées, utiliser une horloge monotone. » · B-17 point 20 verbatim : « Pour les deadlines absolues, utiliser un instant UTC normalisé. » · B-17 point 21 verbatim : « Aucun calcul de durée écoulée basé sur une horloge murale ajustable. »"
+    inputs:
+      - registry: ir
+        id: elapsed_duration
+        role: required
+      - registry: ir
+        id: monotonic_clock
+        role: required
+      - registry: ir
+        id: absolute_deadline_instant
+        role: required
+      - registry: ir
+        id: utc_normalized_instant
+        role: required
+    premises:
+      - operator: derived_from
+        operands:
+          - registry: ir
+            id: elapsed_duration
+          - registry: ir
+            id: monotonic_clock
+        quantifier: forall
+      - operator: derived_from
+        operands:
+          - registry: ir
+            id: absolute_deadline_instant
+          - registry: ir
+            id: utc_normalized_instant
+        quantifier: forall
+      - operator: intersect_empty
+        operands:
+          - registry: ir
+            id: elapsed_duration_sources
+          - registry: ir
+            id: adjustable_wall_clock
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: monotonic_clock
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: attempt_timeout
+      composition: independent
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/temporal/monotonic-clock
+    projections: ["prose:03-dag", "receipt", "docs"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:temporal_core.py
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "B-17 point 36 nomme la classe « horloge monotone » ; la fixture prouve qu'un saut d'horloge murale ne change ni une duree ecoulee ni un verdict de timeout."
+    closure_gates:
+      - fixture-parity
+
+  # ─────────────────── B-17 point 24 · propagation causale des annulations ─────
+
+  - id: LAW-TEMPORAL-0415
+    slug: b17/cancellation-causal-propagation
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "Les annulations sont propagees causalement aux descendants actifs"
+    prose_projection:
+      chapters: ["03-dag", "13-outcomes"]
+      text: "B-17 point 24 verbatim : « Les annulations sont propagées causalement aux descendants actifs. » L'evenement d'annulation atteint chaque descendant actif ; la propagation est enregistree au receipt (LAW-TEMPORAL-0422, cancellation propagation)."
+    inputs:
+      - registry: ir
+        id: cancellation_event
+        role: required
+      - registry: ir
+        id: active_descendants
+        role: required
+    premises:
+      - operator: reachable
+        operands:
+          - registry: ir
+            id: cancellation_event
+          - registry: ir
+            id: active_descendants
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: true
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: cancellation_event
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: workflow_deadline
+      composition: min
+    diagnostics: ["NIKA-CANCEL-001"]
+    fixtures:
+      - to-mint-c1/conformance/temporal/cancellation
+    projections: ["prose:03-dag", "prose:13-outcomes", "receipt"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:outcome_core.py
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "B-17 point 36 nomme la classe « cancellation » ; la fixture verifie que chaque descendant actif recoit l'annulation et qu'aucun orphelin ne continue apres l'expiration parent."
+    closure_gates:
+      - fixture-parity
+      - receipt-parity
+
+  # ─────────────────── B-17 point 25 · le grace budget de finally ──────────────
+
+  - id: LAW-TEMPORAL-0416
+    slug: b17/finally-grace-budget
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "finally ne dispose que d'un grace budget explicitement reserve, jamais illimite"
+    prose_projection:
+      chapters: ["03-dag"]
+      text: "B-17 point 25 verbatim : « `finally` ne dispose que d'un grace budget explicitement réservé. Il ne reçoit jamais une durée illimitée après expiration. » La spelling du budget est `grace:`, mintee census-0 par F4 (LAW-TEMPORAL-0431)."
+    inputs:
+      - registry: ir
+        id: finally_grace_budget
+        role: required
+      - registry: ir
+        id: finally_execution_span
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: finally_grace_budget
+        quantifier: exactly_one
+      - operator: conforms_to
+        operands:
+          - registry: ir
+            id: finally_execution_span
+          - registry: ir
+            id: finally_grace_budget
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: finally_grace_budget
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: workflow_deadline
+      composition: sum
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/temporal/finally-grace-budget
+    projections: ["prose:03-dag", "schema", "cli:check", "docs"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:temporal_core.py
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "B-17 point 36 nomme la classe « finally grace budget » ; la fixture prouve que finally s'arrete a l'epuisement du grace, jamais au-dela."
+    closure_gates:
+      - fixture-parity
+
+  # ─────────────────── B-17 points 26 + 27 · recovery sous budget global ───────
+
+  - id: LAW-TEMPORAL-0417
+    slug: b17/recovery-retry-within-remaining-budget
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "Recovery et retry restent sous le budget global, jamais de succes silencieux apres expiration"
+    prose_projection:
+      chapters: ["03-dag", "05-errors"]
+      text: "B-17 point 26 verbatim : « Recovery et retry restent soumis au budget global restant. » · B-17 point 27 verbatim : « Une expiration globale ne peut jamais être transformée en succès silencieux par recovery. »"
+    inputs:
+      - registry: ir
+        id: recovery_execution_span
+        role: required
+      - registry: ir
+        id: remaining_global_budget
+        role: ceiling
+    premises:
+      - operator: conforms_to
+        operands:
+          - registry: ir
+            id: recovery_execution_span
+          - registry: ir
+            id: remaining_global_budget
+        quantifier: forall
+      - operator: absent
+        operands:
+          - registry: ir
+            id: silent_success_after_global_expiry
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: remaining_global_budget
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: workflow_deadline
+      composition: min
+    diagnostics: []
+    fixtures:
+      - conformance/errors/timeout-recovered.nika.yaml
+      - to-mint-c1/conformance/temporal/recovery
+    projections: ["prose:03-dag", "prose:05-errors", "cli:check", "receipt"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:temporal_core.py
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "B-17 point 36 nomme la classe « recovery » ; la fixture reelle timeout-recovered couvre la recovery d'un timeout local, la fixture to-mint couvre l'expiration globale non transformable en succes."
+    closure_gates:
+      - fixture-parity
+      - receipt-parity
+
+  # ─────────────────── B-17 points 28 + 29 · borne finie en published ──────────
+
+  - id: LAW-TEMPORAL-0418
+    slug: b17/published-finite-bound
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "Un artefact published garantit une borne temporelle finie, sans deadline obligatoire par source"
+    prose_projection:
+      chapters: ["03-dag", "12-gateway"]
+      text: "B-17 point 28 verbatim : « Pour un artefact published/certified, une borne temporelle finie doit être garantie par : le programme ; ou le deployment profile. » · B-17 point 29 verbatim : « Il n'est pas obligatoire d'ajouter une deadline dans chaque source Nika. »"
+    inputs:
+      - registry: ir
+        id: finite_bound_witness
+        role: required
+      - registry: grammar
+        id: published_profile_requirements
+        role: ceiling
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: finite_bound_witness
+        quantifier: forall
+      - operator: absent
+        operands:
+          - registry: grammar
+            id: mandatory_deadline_field
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: finite_bound_witness
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: workflow_deadline
+      composition: min
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/temporal/published-finite-bound
+    projections: ["prose:03-dag", "prose:12-gateway", "cli:check", "docs"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:temporal_core.py
+      - cli:nika-check
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Le witness de borne finie vient du programme OU du deployment profile (les deux sources du point 28) ; la fixture couvre les deux chemins et le refus quand aucun des deux ne borne."
+    closure_gates:
+      - fixture-parity
+
+  # ─────────────────── B-17 point 30 · la provenance de la borne ───────────────
+
+  - id: LAW-TEMPORAL-0419
+    slug: b17/receipt-bound-provenance
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "Le receipt indique la provenance de la borne, declared ou inherited ou deployment"
+    prose_projection:
+      chapters: ["13-outcomes"]
+      text: "B-17 point 30 verbatim : « Le receipt indique la provenance de la borne : declared ; inherited ; deployment. » La valeur de provenance appartient a l'enum ferme du registre grammar ; aucune quatrieme valeur sans amendement."
+    inputs:
+      - registry: ir
+        id: receipt_bound_provenance
+        role: required
+      - registry: grammar
+        id: bound_provenance_values
+        role: ceiling
+    premises:
+      - operator: member_of
+        operands:
+          - registry: ir
+            id: receipt_bound_provenance
+          - registry: grammar
+            id: bound_provenance_values
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: bound_provenance_values
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: workflow_deadline
+      composition: independent
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/temporal/receipt-provenance
+    projections: ["receipt", "schema", "sdk"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:temporal_core.py
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Trois fixtures de provenance (declared, inherited, deployment) rendent chacune la valeur exacte au receipt ; receipt parity de LAW-TEMPORAL-0422 verifie le champ."
+    closure_gates:
+      - fixture-parity
+      - receipt-parity
+
+  # ─────────────────── B-17 points 31 + 32 · representation exacte ─────────────
+
+  - id: LAW-TEMPORAL-0420
+    slug: b17/duration-exact-representation
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "Les durees sont des entiers exacts, overflow refuse, normalisation canonique"
+    prose_projection:
+      chapters: ["03-dag", "09-types"]
+      text: "B-17 point 31 verbatim : « La représentation des durées est exacte : entier ; pas de float ; overflow refusé ; normalisation canonique. » · B-17 point 32 verbatim : « Les limites techniques du format machine sont distinctes des politiques opérationnelles des engines. »"
+    inputs:
+      - registry: ir
+        id: duration_scalar
+        role: required
+      - registry: grammar
+        id: duration_exact_integer_shape
+        role: ceiling
+    premises:
+      - operator: conforms_to
+        operands:
+          - registry: ir
+            id: duration_scalar
+          - registry: grammar
+            id: duration_exact_integer_shape
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-TEMPORAL-002"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: duration_exact_integer_shape
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: attempt_timeout
+      composition: independent
+    diagnostics: ["NIKA-TEMPORAL-002"]
+    fixtures:
+      - conformance/tests/core/errors/006-valid-timeout-compound
+    negative_fixtures:
+      - conformance/tests/core/errors/001-timeout-bad-format
+      - conformance/tests/core/errors/005-timeout-day-unit
+      - to-mint-c1/conformance/temporal/duration-overflow-refused
+    projections: ["prose:03-dag", "prose:09-types", "schema", "cli:check", "sdk"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:type_core.py
+      - cli:nika-check
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "B-17 point 36 nomme la classe « overflow » ; la fixture duration-overflow-refused refuse sans troncature (point 18)."
+      - "Les fixtures reelles 001-timeout-bad-format (unite w) et 005-timeout-day-unit (unite d) restent valides sous B-17 : elles pinnnent la grammaire d'unites (48h est la forme composee legale de 2 jours), elles ne portent PAS un cap de duree."
+      - "FINDING-T5 : NIKA-TEMPORAL-002 est c0-proposed, renumerotable avant C1."
+    closure_gates:
+      - fixture-parity
+      - no-engine-choice-residual
+
+  # ─────────────────── B-17 points 33 + 34 · placement IR/hash vs receipt ──────
+
+  - id: LAW-TEMPORAL-0421
+    slug: b17/declared-in-ir-observed-in-receipt
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "Le declare appartient au Semantic IR et au hash, l'observe au snapshot et au receipt"
+    prose_projection:
+      chapters: ["03-dag", "16-projections"]
+      text: "B-17 point 33 verbatim : « Les timeouts/deadlines déclarés appartiennent au Semantic IR et au semantic hash. » · B-17 point 34 verbatim : « Les deadlines effectives, limites deployment, durées observées et événements de suspension appartiennent au lock/deployment snapshot et au receipt. » FINDING-T4 : loi de classe HASH ancree dans le bloc TEMPORAL du grant de ce groupe."
+    inputs:
+      - registry: ir
+        id: declared_temporal_bounds
+        role: required
+      - registry: ir
+        id: semantic_ir
+        role: required
+      - registry: ir
+        id: observed_temporal_facts
+        role: required
+    premises:
+      - operator: member_of
+        operands:
+          - registry: ir
+            id: declared_temporal_bounds
+          - registry: ir
+            id: semantic_ir
+        quantifier: forall
+      - operator: intersect_empty
+        operands:
+          - registry: ir
+            id: observed_temporal_facts
+          - registry: ir
+            id: semantic_hash_preimage
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["jcs"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: semantic_hash_preimage
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: workflow_deadline
+      composition: independent
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/temporal/hash-placement
+    projections: ["prose:03-dag", "schema", "receipt", "sdk"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:temporal_core.py
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Deux runs du meme programme avec des durees observees differentes produisent le MEME semantic hash ; changer un timeout declare change le hash. La fixture hash-placement prouve les deux directions."
+    closure_gates:
+      - fixture-parity
+      - hash-placement-proven
+
+  # ─────────────────── B-17 point 35 · le minimum du receipt ───────────────────
+
+  - id: LAW-TEMPORAL-0422
+    slug: b17/receipt-temporal-minimum-record
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "Le receipt enregistre au minimum les dix familles temporelles du point 35"
+    prose_projection:
+      chapters: ["13-outcomes", "16-projections"]
+      text: "B-17 point 35 verbatim : « Le receipt enregistre au minimum : declared deadline ; effective deadline ; provenance ; attempt timeouts ; wall duration ; active duration ; suspended duration ; deadline violations ; cancellation propagation ; checkpoint/resume events. »"
+    inputs:
+      - registry: grammar
+        id: receipt_temporal_minimum_fields
+        role: required
+      - registry: ir
+        id: run_receipt_fields
+        role: required
+    premises:
+      - operator: subset_of
+        operands:
+          - registry: grammar
+            id: receipt_temporal_minimum_fields
+          - registry: ir
+            id: run_receipt_fields
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: receipt_temporal_minimum_fields
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: workflow_deadline
+      composition: independent
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/temporal/receipt-parity
+    projections: ["receipt", "schema", "sdk"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:temporal_core.py
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "B-17 point 36 nomme la classe « receipt parity » ; la fixture verifie la presence des dix familles minimum, champ par champ."
+    closure_gates:
+      - receipt-parity
+
+  # ─────────────────── B-17 point 36 · la suite de conformance ─────────────────
+
+  - id: LAW-TEMPORAL-0423
+    slug: b17/temporal-conformance-suite
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "La suite de tests temporelle couvre les seize classes du point 36"
+    prose_projection:
+      chapters: ["07-conformance"]
+      text: "B-17 point 36 verbatim : « Ajouter des tests pour : timeout inférieur à 24 h ; timeout de 48 h ; plusieurs jours ; overflow ; retry et budget restant ; recovery ; workflow enfant ; parent plus strict ; child plus strict ; deployment plus strict ; durable wait ; checkpoint/resume ; cancellation ; finally grace budget ; horloge monotone ; receipt parity. » FINDING-T4 : loi de classe CONF ancree dans le bloc TEMPORAL du grant de ce groupe."
+    inputs:
+      - registry: conformance
+        id: temporal-suite
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: conformance
+            id: temporal-suite
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: conformance
+          id: temporal-suite
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: attempt_timeout
+      composition: independent
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/temporal/timeout-under-24h
+      - to-mint-c1/conformance/temporal/timeout-48h-legal
+      - to-mint-c1/conformance/temporal/multi-day-duration-legal
+      - to-mint-c1/conformance/temporal/duration-overflow-refused
+      - to-mint-c1/conformance/temporal/retry-remaining-budget
+      - to-mint-c1/conformance/temporal/recovery
+      - to-mint-c1/conformance/temporal/child-workflow
+      - to-mint-c1/conformance/temporal/parent-stricter
+      - to-mint-c1/conformance/temporal/child-stricter
+      - to-mint-c1/conformance/temporal/deployment-stricter
+      - to-mint-c1/conformance/temporal/durable-wait
+      - to-mint-c1/conformance/temporal/checkpoint-resume
+      - to-mint-c1/conformance/temporal/cancellation
+      - to-mint-c1/conformance/temporal/finally-grace-budget
+      - to-mint-c1/conformance/temporal/monotonic-clock
+      - to-mint-c1/conformance/temporal/receipt-parity
+    projections: ["cli:check", "docs"]
+    implementation_surfaces:
+      - conformance:temporal-suite
+      - reference:temporal_core.py
+    introduced_in: C0
+    proof_obligations:
+      - "Seize classes, seize fixtures : le mapping est un-pour-un avec l'enumeration du point 36, aucune classe fusionnee, aucune omise. Les fixtures reelles timeout-basic et timeout-recovered ancrent deja les classes timeout et recovery cote engine."
+    closure_gates:
+      - sixteen-classes-covered
+      - fixture-parity
+
+  # ─────────────────── B-17 points 37 + 2 (+39) · census cap 24 h = 0 ──────────
+
+  - id: LAW-TEMPORAL-0424
+    slug: b17/cap-24h-census-zero
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "Aucun cap 24 h residuel sur les dix surfaces, census mecanique a zero"
+    prose_projection:
+      chapters: ["03-dag"]
+      text: "B-17 point 37 verbatim : « Aucun cap 24 h résiduel dans : spec ; canon ; schema ; engine ; Oracle ; docs ; fixtures ; diagnostics ; SDK ; LSP/MCP. » · B-17 point 2 verbatim : « Supprimer toute mention normative d'un cap fixe de 24 h. » Le census est un gate de fermeture mecanique, pas une discipline."
+    inputs:
+      - registry: ir
+        id: current_facing_surfaces
+        role: required
+      - registry: grammar
+        id: cap_24h_mentions
+        role: ceiling
+    premises:
+      - operator: intersect_empty
+        operands:
+          - registry: ir
+            id: current_facing_surfaces
+          - registry: grammar
+            id: cap_24h_mentions
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: cap_24h_mentions
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: attempt_timeout
+      composition: independent
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/temporal/cap-24h-census-zero
+    projections: ["prose:03-dag", "cli:check", "docs"]
+    implementation_surfaces:
+      - conformance:temporal-suite
+      - reference:temporal_core.py
+    introduced_in: C0
+    proof_obligations:
+      - "B-17 point 39 verbatim : « Le langage reste nika: v1. » Le modele temporel n'introduit aucun marqueur de version nouveau (FINDING-T4 : invariant de classe SURFACE ancre ici, deja porte par LAW-SURFACE-0101 pour R11 point 16)."
+      - "Census F4 (F4_TIMEOUT_RETRY_CENSUS.md) fragment verbatim : « Le résidu cap-24h vit dans le même fichier » (spec/03-dag.md, sweep positif) ; le doc-kill part dans le meme commit cascade que le re-loi."
+    closure_gates:
+      - cap-24h-census-zero
+
+  # ═══════════════ B-17 points 22 + 23 + note · les rows Outcome ═══════════════
+
+  - id: LAW-OUTCOME-0401
+    slug: b17/timeout-outcome-failure-timeout
+    status: reserved
+    owner: spec
+    domain: OUTCOME
+    title: "Un timeout local produit Outcome.class failure et Outcome.cause timeout"
+    prose_projection:
+      chapters: ["13-outcomes"]
+      text: "B-17 point 22 verbatim : « Un timeout local produit : Outcome.class = failure · Outcome.cause = timeout » La row failure/timeout existe DEJA dans la table 13 (spec/13-outcomes.md, code NIKA-TIMEOUT-001) : cette loi la CONFIRME sous le modele B-17, elle ne mint rien."
+    inputs:
+      - registry: ir
+        id: attempt_timeout_expiry
+        role: required
+      - registry: ir
+        id: outcome_transition_table
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: attempt_timeout_expiry
+        quantifier: exists
+    conclusion:
+      verdict: derive
+      derives:
+        registry: ir
+        id: outcome_failure_timeout
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: outcome_transition_table
+      independent_judgment: true
+    domain_payload:
+      kind: outcome
+      transition_table:
+        registry: ir
+        id: outcome_transition_table
+      constraint: legal_pairs_closed
+    diagnostics: ["NIKA-TIMEOUT-001"]
+    fixtures:
+      - conformance/verbs/timeout-basic.nika.yaml
+      - conformance/errors/timeout-never-retryable.nika.yaml
+    projections: ["prose:13-outcomes", "cli:run", "receipt", "sdk"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:outcome_core.py
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "La fixture reelle timeout-never-retryable pinne la non-retryabilite du timeout (transient false) ; le census F4 note que son libelle cite l'ancienne definition d'enveloppe et se re-keye a la cascade, sa semantique visee survit."
+    closure_gates:
+      - fixture-parity
+      - legal-pairs-closed
+
+  - id: LAW-OUTCOME-0402
+    slug: b17/deadline-outcome-cancelled-deadline-exceeded
+    status: reserved
+    owner: spec
+    domain: OUTCOME
+    title: "Une deadline parent ou deployment expiree produit cancelled avec cause deadline_exceeded"
+    prose_projection:
+      chapters: ["13-outcomes"]
+      text: "B-17 point 23 verbatim : « Une deadline parent/deployment expirée produit : Outcome.class = cancelled · Outcome.cause = deadline_exceeded » Note de cloture du ruling, verbatim : « (Nouvelle cause Outcome : `deadline_exceeded` — nouvelle ROW du tableau 13, jamais un boolean.) » Verifie au pin : la table 13 actuelle ne porte PAS cette row, elle est neuve."
+    inputs:
+      - registry: ir
+        id: deadline_expiry_event
+        role: required
+      - registry: ir
+        id: outcome_transition_table
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: deadline_expiry_event
+        quantifier: exists
+    conclusion:
+      verdict: derive
+      derives:
+        registry: ir
+        id: outcome_cancelled_deadline_exceeded
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: outcome_transition_table
+      independent_judgment: true
+    domain_payload:
+      kind: outcome
+      transition_table:
+        registry: ir
+        id: outcome_transition_table
+      constraint: new_fact_new_cause
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/temporal/deadline-envelope
+      - to-mint-c1/conformance/outcome/deadline-exceeded-row
+    projections: ["prose:13-outcomes", "cli:run", "receipt", "sdk"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:outcome_core.py
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "La note de cloture interdit le boolean : la nouvelle transition est une ROW (class + cause) de la table fermee, jamais un flag. Le fait nouveau porte sa cause nouvelle (constraint new_fact_new_cause)."
+      - "L'annulation se propage causalement aux descendants actifs (B-17 point 24, LAW-TEMPORAL-0415) et s'enregistre au receipt (point 35)."
+    closure_gates:
+      - fixture-parity
+      - new-row-minted-in-table-13
+
+  - id: LAW-OUTCOME-0403
+    slug: n2b/agent-budget-exhausted-row
+    status: reserved
+    owner: spec
+    domain: OUTCOME
+    title: "L'epuisement d'un budget agent produit failure avec cause budget_exhausted, nouvelle row table 13"
+    prose_projection:
+      chapters: ["13-outcomes", "02-verbs"]
+      text: "ANNEX_2026-07-17_minigates-winners.md §Les 2 dual-truths TRANCHEES, N2-b verbatim : « **N2-b · F5-H1 · nouvelle ROW table 13 : `Outcome.class = failure · cause = budget_exhausted`.** L'épuisement d'un budget agent (`max_turns` / `max_tokens_total`) est une transition sémantique DISTINCTE (R8 loi 13 : un mot par transition) · symétrie avec la row `deadline_exceeded` née de B-17 (« jamais un boolean ») · law-link AGENT-001/002 · fixtures des deux côtés (épuisé vs done-avant-budget). Jamais un mapping code-only. »"
+    inputs:
+      - registry: ir
+        id: agent_budget_exhaustion_event
+        role: required
+      - registry: ir
+        id: outcome_transition_table
+        role: required
+      - registry: diagnostics
+        id: NIKA-AGENT-001
+        role: required
+      - registry: diagnostics
+        id: NIKA-AGENT-002
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: agent_budget_exhaustion_event
+        quantifier: exists
+    conclusion:
+      verdict: derive
+      derives:
+        registry: ir
+        id: outcome_failure_budget_exhausted
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: outcome_transition_table
+      independent_judgment: true
+    domain_payload:
+      kind: outcome
+      transition_table:
+        registry: ir
+        id: outcome_transition_table
+      constraint: new_fact_new_cause
+    diagnostics: ["NIKA-AGENT-001", "NIKA-AGENT-002"]
+    fixtures:
+      - conformance/tests/runtime/agent/001-budget-exhaustion-fails
+      - conformance/tests/runtime/agent/002-done-result-becomes-output
+    projections: ["prose:13-outcomes", "prose:02-verbs", "cli:run", "receipt", "sdk"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:outcome_core.py
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Les fixtures des deux cotes sont REELLES au pin : 001-budget-exhaustion-fails (epuise, NIKA-AGENT-001) et 002-done-result-becomes-output (done-avant-budget, succes). La row se prouve des sa naissance."
+      - "FINDING-T2 : la note expected-run de 001-budget-exhaustion-fails epelle le vocabulaire pre-cascade budget_error (la category des codes AGENT) ; la cause Outcome rulee est budget_exhausted ; la fixture se re-keye a la cascade P-C, jamais editee en silence ici."
+      - "Le law-link AGENT-001/002 est verifie au pin : NIKA-AGENT-001 (max_turns exhausted before completion) et NIKA-AGENT-002 (max_tokens_total exhausted before completion), category budget_error, spec/05-errors.md + canon.yaml."
+      - "Verifie au pin : la table 13 actuelle ne porte aucune row failure/budget_exhausted, la row est neuve (jamais un boolean, jamais un mapping code-only)."
+    closure_gates:
+      - fixture-parity
+      - new-row-minted-in-table-13
+
+  # ═══════════════ F4 · limits-temporal · winner REMODEL-per-B17 ═══════════════
+
+  - id: LAW-TEMPORAL-0430
+    slug: f4/winner-remodel-per-b17
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "F4 ratifie remodel-per-B17, timeout garde sa spelling re-loi attempt-scope, jamais de bag"
+    prose_projection:
+      chapters: ["03-dag"]
+      text: "ANNEX_2026-07-17_minigates-winners.md §Les winners, row F4 (Winner RATIFIE) verbatim : « **REMODEL-per-B17** : `timeout:` re-loi attempt-scope · `deadline:` (workflow) + `grace:` (finally) NEUFS (census-0) · ρ nommés-avec-unité · JAMAIS de bag » · Migration verbatim : « `F4-b17-temporal` (additif + STOP arbitrage) » (D-2026-07-17-N2)."
+    inputs:
+      - registry: ir
+        id: task_timeout_declaration
+        role: required
+      - registry: grammar
+        id: attempt_scope_contract
+        role: ceiling
+    premises:
+      - operator: conforms_to
+        operands:
+          - registry: ir
+            id: task_timeout_declaration
+          - registry: grammar
+            id: attempt_scope_contract
+        quantifier: forall
+      - operator: absent
+        operands:
+          - registry: grammar
+            id: task_level_limits_bag
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: attempt_scope_contract
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: attempt_timeout
+      composition: min
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/temporal/timeout-attempt-scope
+    negative_fixtures:
+      - to-mint-c1/conformance/temporal/task-level-limits-refused
+    projections: ["prose:03-dag", "schema", "cli:check", "lsp", "docs"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:temporal_core.py
+      - cli:nika-check
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Receipt F4 §DECISION verbatim : « **Linter verdict `rename` · winner `b17-temporal`** · mechanically re-derived and accepted per the operator's instruction; the operator's material framing is **remodel-per-B17**: keep the `timeout:` spelling re-lawed attempt-scope, MINT `deadline:` + `grace:` (census-0 free words at pin), ρ budgets stay flat named-with-unit, `--max-cost-usd` stays run-scope CLI (B-17 law 32). »"
+      - "RULINGS §MINI-GATES row limits, objet semantique verbatim : « B-17 le décompose : attempt-timeout ≠ workflow deadline ≠ ρ budget ≠ lease — « limits » sac-générique est INTERDIT par R8 loi 12 » Le bag est mort par hard-reject (collisions policy.limits + dual-behavior, receipt F4)."
+      - "Reservation gravee (ANNEX §Reservations negatives) verbatim : « limits:  → policy.limits ONLY (jamais task-level · R8 loi 12 bag interdit) » Le refus task-level part en classe NIKA-PARSE (receipt F4 codemod R4), code concret minte par l'owner du bloc PARSE."
+    closure_gates:
+      - no-limits-bag-forever
+      - fixture-parity
+
+  - id: LAW-TEMPORAL-0431
+    slug: f4/deadline-grace-minted-census-zero
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "deadline: et grace: sont mintes par F4 a census zero verifie"
+    prose_projection:
+      chapters: ["03-dag"]
+      text: "ANNEX §Reservations negatives GRAVEES, ligne verbatim : « deadline: · grace: → mintés par F4 (census-0 vérifié) » Receipt F4 §Corpus (fragment verbatim) : « authorable `^\\s*deadline:` keys **0** · `grace` ci **5** (all \"gracefully\") · `^\\s*grace:` keys **0** » Les deux mots naissent libres au pin, aucune collision."
+    inputs:
+      - registry: ir
+        id: authored_deadline_keys_at_pin
+        role: required
+      - registry: ir
+        id: authored_grace_keys_at_pin
+        role: required
+    premises:
+      - operator: absent
+        operands:
+          - registry: ir
+            id: authored_deadline_keys_at_pin
+        quantifier: forall
+      - operator: absent
+        operands:
+          - registry: ir
+            id: authored_grace_keys_at_pin
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: deadline_field
+        - registry: grammar
+          id: grace_field
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: workflow_deadline
+      composition: min
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/temporal/deadline-envelope
+      - to-mint-c1/conformance/temporal/finally-grace-budget
+    projections: ["prose:03-dag", "schema", "cli:check", "lsp", "docs"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:temporal_core.py
+      - cli:nika-check
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Census-0 verifie au pin spec 24c3dfdeee7de5181107c02bdda7bc211d167bb8 (receipt F4 §Corpus, comptes re-derives au mint) ; la migration est additive-grammar, aucune cle existante renommee (receipt F4 §Migration row)."
+    closure_gates:
+      - deadline-grace-census-zero-at-mint
+      - fixture-parity
+
+  - id: LAW-TEMPORAL-0432
+    slug: f4/arbitration-default-attempt-stop-per-site
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "Arbitrage F4, defaut attempt-scope, STOP par site co-occurrent, les deux proses tuees meme commit"
+    prose_projection:
+      chapters: ["03-dag"]
+      text: "ANNEX §La politique d'arbitrage F4, points ratifies verbatim : 1. « Census EXHAUSTIF des sites `timeout:` + `retry:` co-occurrents AVANT la cascade P-C. » 2. « Codemod `F4-b17-temporal` = STOP sur chaque co-occurrence (l'équivalence attempt-vs-enveloppe est indécidable mécaniquement) · défaut = attempt-scope · un site qui voulait l'enveloppe migre vers `deadline:` dans le MÊME commit cascade. » 3. « Les surfaces d'enseignement qui disent « entire task including retries » se réécrivent dans le même commit (doc-kill du cap 24h inclus · B-17 §37). » 4. « Paire de fixtures mintée (attempt-scope vs enveloppe) avant la cascade. » FINDING-T4 : mecanique de classe MIGR (equivalence-or-stop) ancree dans le bloc TEMPORAL du grant."
+    inputs:
+      - registry: ir
+        id: timeout_retry_cooccurrence_sites
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: timeout_retry_cooccurrence_sites
+        quantifier: exists
+    conclusion:
+      verdict: record
+    canonicalization:
+      order_sensitive: true
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: f4_arbitration_census
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: attempt_timeout
+      composition: min
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/temporal/timeout-attempt-scope
+      - to-mint-c1/conformance/temporal/deadline-envelope
+    projections: ["prose:03-dag", "cli:check", "docs"]
+    implementation_surfaces:
+      - cli:nika-check
+      - reference:temporal_core.py
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Census execute (F4_TIMEOUT_RETRY_CENSUS.md, D-2026-07-17-N2) verbatim : « **15 co-occurrences · 15/15 classées `default-attempt` · 0 intention-enveloppe détectée** dans les workflows authored. » Le STOP du codemod confirme site-par-site a P-C."
+      - "Prose a tuer 1 (census verbatim, fragment) : « **`spec/spec/03-dag.md:592-606`** · LA définition normative actuelle : « Hard timeout for the **entire task (including any retries** and their backoff sleeps · wall-clock) » (:601-602) + « timeout already covered the retries by definition » (:606) »"
+      - "Prose a tuer 2 (census verbatim, fragment) : « **`docs/reference/yaml-syntax.mdx:72`** · « bounds the **entire task**, wall-clock: retries and their backoff sleeps » · même réécriture, surface Mintlify »"
+      - "Les 2 proses se reecrivent DANS le commit du re-loi : jamais de fenetre ou la doc enseigne l'ancienne semantique sur la nouvelle grammaire (census §Ce que la cascade P-C fait)."
+    closure_gates:
+      - timeout-retry-sites-arbitrated
+      - two-prose-kill-rewritten-same-commit
+      - cap-24h-census-zero
+
+  # ═══════════════ F5 · stop-completion · KEEP-HARDENED ════════════════════════
+
+  - id: LAW-TEMPORAL-0433
+    slug: f5/keep-hardened-flat-agent-budgets
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "F5 ratifie keep-hardened, les budgets agent plats gardent leur forme, halt est vocabulaire B-17"
+    prose_projection:
+      chapters: ["02-verbs"]
+      text: "ANNEX §Les winners, row F5 (Winner RATIFIE) verbatim : « **KEEP-HARDENED** (halt = vocabulaire B-17 · un mot par transition) » · Migration verbatim : « identity + H1-H5 additifs » (D-2026-07-17-N2). Les formes plates `max_turns` / `max_tokens_total` restent la spelling ; le bag `stop:` est mort par hard-reject (4 ecrans, receipt F5)."
+    inputs:
+      - registry: ir
+        id: agent_budget_declarations
+        role: required
+      - registry: grammar
+        id: flat_agent_budget_fields
+        role: ceiling
+    premises:
+      - operator: conforms_to
+        operands:
+          - registry: ir
+            id: agent_budget_declarations
+          - registry: grammar
+            id: flat_agent_budget_fields
+        quantifier: forall
+      - operator: absent
+        operands:
+          - registry: grammar
+            id: agent_stop_bag
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: flat_agent_budget_fields
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: resource_budget
+      composition: independent
+    diagnostics: ["NIKA-AGENT-001", "NIKA-AGENT-002"]
+    fixtures:
+      - conformance/tests/runtime/agent/001-budget-exhaustion-fails
+      - conformance/tests/runtime/agent/002-done-result-becomes-output
+    projections: ["prose:02-verbs", "schema", "cli:check", "lsp", "docs"]
+    implementation_surfaces:
+      - engine:nika
+      - reference:temporal_core.py
+      - cli:nika-check
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "RULINGS §MINI-GATES row stop / completion, objet semantique verbatim : « R8 loi 13 : completion ≠ failure ≠ cancellation ≠ workflow-halt ≠ agent-done — un mot par transition » Le workflow-halt parle le vocabulaire B-17 (deadline, cancellation), F5 ne mint JAMAIS un mot halt/stop (receipt F5 H3)."
+      - "Le durcissement H1 est tranche par N2-b (LAW-OUTCOME-0403, row failure/budget_exhausted) ; H2 rend le defaut engine de max_tokens_total capability-manifest-declared + receipt-recorded (receipt F5 §Migration row)."
+    closure_gates:
+      - flat-budgets-kept
+      - fixture-parity
+
+  - id: LAW-TEMPORAL-0434
+    slug: f5/stop-reserved-sampling
+    status: reserved
+    owner: spec
+    domain: TEMPORAL
+    title: "stop reste reserve au domaine sampling, jamais un bag envelope"
+    prose_projection:
+      chapters: ["02-verbs"]
+      text: "ANNEX §Reservations negatives GRAVEES, ligne verbatim : « stop     → réservé sampling (stop-sequences engine) · jamais un bag envelope » Receipt F5 §Migration row H5 verbatim : « H5 NEGATIVE RESERVATION: `stop` stays reserved to the sampling domain (stop-sequences on `infer`). » FINDING-T4 : reservation de classe SURFACE ancree dans le bloc TEMPORAL du grant (famille F5)."
+    inputs:
+      - registry: grammar
+        id: stop_word_reservation
+        role: required
+    premises:
+      - operator: absent
+        operands:
+          - registry: grammar
+            id: stop_envelope_keyword
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: stop_word_reservation
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: resource_budget
+      composition: independent
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/temporal/stop-under-agent-refused
+    projections: ["prose:02-verbs", "schema", "cli:check", "docs"]
+    implementation_surfaces:
+      - engine:nika
+      - cli:nika-check
+      - conformance:temporal-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Receipt F5 §Codemod (fragment verbatim) : « S1 any `stop:` under agent params → STOP + pedagogic diagnostic (never a silent unbag); S2 user-defined `stop:` keys elsewhere untouched (path-contextual) » La reservation ne confisque pas les cles utilisateur hors position agent."
+      - "Receipt F5 §Migration row (fragment verbatim) : « Census `agent.stop:` authored = 0 at all pins · born green, kept green by a ratchet fixture + grep probe. »"
+    closure_gates:
+      - stop-sampling-reservation-held
+      - fixture-parity

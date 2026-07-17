@@ -1,0 +1,474 @@
+registry_document_format: 1
+$comment: C0 sandbox skeleton · seed rows = the R11 pilot generated_facts tables · cap VALUES and unicode
+  disposition are TO-RULE at C0 (FINDING-04) · full grammar import owed at C0
+grammar:
+- id: yaml_forbidden_event_classes
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-GRAMMAR-0101
+  - LAW-GRAMMAR-0102
+  - LAW-GRAMMAR-0103
+  - LAW-GRAMMAR-0104
+  - LAW-GRAMMAR-0105
+  - LAW-GRAMMAR-0106
+  - LAW-GRAMMAR-0107
+  introduced_in: C0
+  position: yaml_source_document
+  fields:
+  - name: anchor
+    cardinality: forbidden
+  - name: alias
+    cardinality: forbidden
+  - name: merge_key
+    cardinality: forbidden
+  - name: duplicate_key
+    cardinality: forbidden
+  - name: custom_tag
+    cardinality: forbidden
+  - name: non_string_key
+    cardinality: forbidden
+  - name: non_finite_float
+    cardinality: forbidden
+  notes: La table des classes d'events interdites par le profil YAML Nika (R11 points 1 + 13). C'est la
+    table que les évaluateurs CONSOMMENT (judgment.generated_facts) ; chaque évaluateur implémente le
+    jugement lui-même (independent_judgment).
+- id: yaml_scalar_cap
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-GRAMMAR-0110
+  introduced_in: C0
+  position: yaml_scalar
+  fields:
+  - name: size_over_cap
+    cardinality: forbidden
+  notes: 'FINDING-04 · la VALEUR du cap scalar est TO-RULE à C0. Note de clôture R11 verbatim : « (Ferme
+    le gap P5 : le cap de taille scalaire — 200k chars passait — entre au profil normatif.) » L''empirie
+    third-pass (200k passait) borne le débat, le ruling ne grave pas le nombre.'
+- id: yaml_document_caps
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-GRAMMAR-0108
+  - LAW-GRAMMAR-0109
+  introduced_in: C0
+  position: yaml_document
+  fields:
+  - name: depth_over_cap
+    cardinality: forbidden
+  - name: size_over_cap
+    cardinality: forbidden
+  notes: FINDING-04 · les VALEURS des caps profondeur + taille de document sont TO-RULE à C0 (R11 point
+    13 mandate l'aspect, pas le nombre).
+- id: yaml_unicode_contract
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-GRAMMAR-0111
+  introduced_in: C0
+  position: yaml_source_bytes
+  fields:
+  - name: non_nfc_or_bom_disposition
+    cardinality: required
+  notes: FINDING-04 · R11 point 13 mandate la couverture Unicode NFC/BOM sans fixer la disposition (refuser
+    un BOM ou le strip · exiger NFC ou normaliser). La row exige qu'une disposition soit déclarée avant
+    C1 ; elle n'en choisit aucune.
+- id: envelope_nika_field
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-SURFACE-0101
+  introduced_in: C0
+  position: envelope
+  fields:
+  - name: nika
+    cardinality: required
+    value_shape: nika_v1_literal
+  notes: 'R11 point 16 verbatim : « Le langage reste nika: v1. » Le champ d''enveloppe nika est requis
+    et sa valeur est le littéral v1.'
+- id: attempt_scope_contract
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-TEMPORAL-0403
+  - LAW-TEMPORAL-0430
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: attempt_scope_contract
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: bound_provenance_values
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-TEMPORAL-0419
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: bound_provenance_values
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: cap_
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-TEMPORAL-0424
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: cap_
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: dead_value_forms
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-GRAMMAR-0201
+  - LAW-GRAMMAR-0202
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: dead_value_forms
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: deadline_field
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-TEMPORAL-0431
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: deadline_field
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: distinct_time_measures
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-TEMPORAL-0408
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: distinct_time_measures
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: durable_suspension_contract
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-TEMPORAL-0410
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: durable_suspension_contract
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: durable_wait_contract
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-TEMPORAL-0411
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: durable_wait_contract
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: duration_exact_integer_shape
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-TEMPORAL-0420
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: duration_exact_integer_shape
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: evidence_levels
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-GUAR-0404
+  - LAW-GUAR-0405
+  - LAW-GUAR-0407
+  - LAW-GUAR-0417
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: evidence_levels
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: flat_agent_budget_fields
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-TEMPORAL-0433
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: flat_agent_budget_fields
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: gate_class_predicates
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-SURFACE-0231
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: gate_class_predicates
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: gate_predicate_vocabulary
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-GRAMMAR-0231
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: gate_predicate_vocabulary
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: grace_field
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-TEMPORAL-0431
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: grace_field
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: guarantee_declaration_shape
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-GUAR-0403
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: guarantee_declaration_shape
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: guarantee_dimensions
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-GUAR-0402
+  - LAW-GUAR-0409
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: guarantee_dimensions
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: guarantee_minimum_dimensions
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-GUAR-0402
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: guarantee_minimum_dimensions
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: guarantee_profile_named_form
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-GUAR-0401
+  - LAW-GUAR-0412
+  - LAW-GUAR-0413
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: guarantee_profile_named_form
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: old_delta_formulations
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-GUAR-0414
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: old_delta_formulations
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: outputs_declaration_form
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-GRAMMAR-0222
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: outputs_declaration_form
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: published_profile_requirements
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-TEMPORAL-0418
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: published_profile_requirements
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: purity_property
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-GUAR-0409
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: purity_property
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: receipt_temporal_minimum_fields
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-TEMPORAL-0422
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: receipt_temporal_minimum_fields
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: stop_word_reservation
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-TEMPORAL-0434
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: stop_word_reservation
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: task_extract_field
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-GRAMMAR-0221
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: task_extract_field
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: temporal_duration_grammar
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-TEMPORAL-0401
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: temporal_duration_grammar
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: temporal_measures
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-TEMPORAL-0402
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: temporal_measures
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: value_authority_family
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-SURFACE-0201
+  - LAW-SURFACE-0202
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  position: value_authority_family
+  fields:
+  - name: reserved-shape
+    cardinality: optional
+- id: cap_24h_mentions
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-TEMPORAL-0424
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · minted by its citing laws (§12 no-orphan)
+    · shape fills at C1.
+  position: cap_24h_mentions
+  fields:
+  - name: reserved-shape
+    cardinality: optional

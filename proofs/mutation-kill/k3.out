@@ -1,0 +1,4 @@
+REFUSED (schema/reference · exit 2):
+canon/laws/yaml-profile.yaml · entry[0] (LAW-YAML-0001) · at /domain · 'YAML' is not one of ['SURFACE', 'GRAMMAR', 'TYPE', 'GRAPH', 'OUTCOME', 'AUTH', 'COMPOSE', 'TEMPORAL', 'ASSERT', 'GUAR', 'HASH', 'DIAG', 'CONF', 'PROJ', 'MIGR']
+canon/laws/yaml-profile.yaml · entry[0] (LAW-YAML-0001) · at /id · 'LAW-YAML-0001' does not match '^LAW-(SURFACE|GRAMMAR|TYPE|GRAPH|OUTCOME|AUTH|COMPOSE|TEMPORAL|ASSERT|GUAR|HASH|DIAG|CONF|PROJ|MIGR)-[0-9]{4}$'
+rc=2

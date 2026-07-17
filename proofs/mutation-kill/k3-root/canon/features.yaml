@@ -1,0 +1,19 @@
+# canon/features.yaml · C0 SANDBOX SKELETON · Feature/Capability Registry (R7)
+# Schema: schemas/registries.schema.json#/$defs/featureRow (SCELLÉ · consommé as-is).
+# Ce que C0 importe ici : les features détectables et leur loi de dérivation IR (R7 ·
+# SSOT-1 §27 : « feature/capability detection »). Le schema exige detection_law (un
+# law id, jamais de la prose) : la row seed câble la strictesse du profil YAML sur la
+# loi pilote anchor (exemplaire de la famille) · placeholder wiring documenté, l'import
+# R7 réel remplace à C0.
+registry_document_format: 1
+"$comment": "C0 sandbox skeleton · seed row = yaml_profile_strict wired on the pilot anchor law as family exemplar · real R7 feature import owed at C0"
+features:
+  - id: yaml_profile_strict
+    status: reserved
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0101"]
+    introduced_in: C0
+    kind: language_feature
+    detection_law: LAW-GRAMMAR-0101
+    conformance_profile: core
+    notes: "Placeholder wiring explicite : la détection réelle R7 (dérivée du Semantic IR) remplace cette row à l'import C0. detection_law cite la loi anchor comme exemplaire de la famille yaml-profile."

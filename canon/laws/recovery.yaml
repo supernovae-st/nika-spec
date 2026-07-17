@@ -1,0 +1,410 @@
+# canon/laws/recovery.yaml · C0 IMPORT · R2 recovery-resolution law
+# SSOT: RULINGS_2026-07-15.md §R2 (verbatim · JAMAIS paraphrasé) + Annexe B-17 points
+# 26-27 (l'interaction citée par R2). Les citations reproduisent les bytes du ruling
+# (dé-wrap markdown uniquement, précédent pilote R11); les ancres sont "R2 tête",
+# "R2 bullet N" (tête de choix + 5 bullets) et "B-17 point N".
+# Schema: schemas/law.schema.json (SCELLÉ). Blocs d'ids réservés au groupe:
+# LAW-GRAPH-03xx + LAW-OUTCOME-03xx.
+#
+# FINDING-REC-01 (SSOT-1 §29 · dual-truth spec vs engine, empirique au pin) : la
+# fixture LIVE conformance/errors/recover-task-ref-no-edge.nika.yaml se déclare
+# elle-même « ENGINE-vs-SPEC DIVERGENCE » (header verbatim : « Expected: NIKA-VAR-001
+# at RUN — BUT this encodes an ENGINE-vs-SPEC DIVERGENCE. ... Per spec, this workflow
+# SHOULD recover with 99 ... The engine renders immediately against the records
+# snapshot -> VAR-001, always. ») : l'engine ne fait pas l'await de 05-errors.md
+# steps 1-4. La REVIEW second-pass a établi l'autre branche (settle success(recovered)
+# value-null sur source skipped/failed, la preuve motivante P2 de R2). Les lois
+# ci-dessous structurent R2 (la CIBLE ratifiée); la fixture divergente n'est classée
+# ni positive ni négative ici (sa classification actuelle encode le comportement
+# engine, pas la loi), elle est citée en proof_obligation; la cascade P-C ferme la
+# dual-truth. Aucune correction silencieuse.
+#
+# FINDING-REC-02 (codes) : NIKA-VAR-001 et NIKA-DAG-004 sont LIVE au registre et
+# cités par R2 lui-même. NIKA-DAG-005 (détecteur runtime d'await-cycle · échec typé)
+# est c0-proposed (SSOT-2 B.21 : tout rejet exposé exige un code canonique),
+# renumérotable avant C1.
+#
+# FINDING-REC-03 (generated_facts en registry ir) : même disposition que
+# FINDING-AUTH-03 (registres recovery non seedés au sandbox · refs ir exemptes par
+# design du compiler · migration vers rows seedées à C1).
+#
+# Em dash : ma prose = zéro em dash; les citations R2/fixture en portent (bytes des
+# sources · précédent pilote).
+
+laws_document_format: 1
+
+group: c0-recovery
+
+laws:
+
+  # ── R2 tête + bullet 2 · G_p ∪ E_r acyclique (NIKA-DAG-004 généralisé) ────────
+
+  - id: LAW-GRAPH-0301
+    slug: recovery/union-precedence-recovery-acyclic
+    status: reserved
+    owner: spec
+    domain: GRAPH
+    title: "Le graphe de resolution G_p union E_r est acyclique au check"
+    prose_projection:
+      chapters: ["03-dag", "05-errors"]
+      text: "R2 tête verbatim : « **Choix : (A) await + VAR-001 + cycles refusés statiquement.** » · R2 bullet 2 verbatim (segment) : « `NIKA-DAG-004` généralisé : **G_p ∪ E_r acyclique** » Le graphe jugé est l'union des arêtes de précédence (G_p = E_d ∪ E_c) et des arêtes de recovery (E_r, qui ne schedulent jamais); tout cycle de l'union refuse au check avec NIKA-DAG-004."
+    inputs:
+      - registry: ir
+        id: precedence_graph
+        role: required
+      - registry: ir
+        id: recovery_edges
+        role: required
+    premises:
+      - operator: acyclic
+        operands:
+          - registry: ir
+            id: recovery_resolution_graph
+            derivation:
+              function: union
+              args:
+                - registry: ir
+                  id: precedence_graph
+                - registry: ir
+                  id: recovery_edges
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-DAG-004"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: recovery_resolution_graph
+      independent_judgment: true
+    domain_payload:
+      kind: graph
+      graph: recovery_resolution_graph
+      edge_sets: [precedence_edges, recovery_edges]
+      property: acyclic
+    diagnostics: ["NIKA-DAG-004"]
+    fixtures:
+      - conformance/errors/recover-task-ref-with-edge.nika.yaml
+      - conformance/errors/on-error-recover-literal.nika.yaml
+    negative_fixtures:
+      - to-mint-c1/conformance/recovery/invalid/union-cycle-reject
+    projections: ["prose:03-dag", "prose:05-errors", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:recovery_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - conformance:recovery-suite
+    introduced_in: C0
+    proof_obligations:
+      - "La premise acyclic porte la derivation union(G_p, E_r) en structure, jamais une string : le graphe jugé est exactement celui du ruling."
+      - "La fixture union-cycle-reject ferme un cycle UNIQUEMENT via une arête E_r (aucun cycle dans G_p seul) et refuse : la généralisation dépasse le NIKA-DAG-004 downstream-only d'aujourd'hui."
+    closure_gates:
+      - union-graph-acyclic-at-check
+
+  # ── R2 bullet 2 · downstream réflexif-transitif (self/mutual-recover morts) ───
+
+  - id: LAW-GRAPH-0302
+    slug: recovery/downstream-reflexive-transitive
+    status: reserved
+    owner: spec
+    domain: GRAPH
+    title: "Le downstream de la clause recovery est reflexif-transitif : self-recover et mutual-recover refusent"
+    prose_projection:
+      chapters: ["03-dag", "05-errors"]
+      text: "R2 bullet 2 verbatim (segment) : « + « downstream » **réflexif-transitif** (self-recover et mutual-recover morts au check). » Une référence recover: vers toute tâche du downstream réflexif-transitif de la tâche déclarante refuse au check : la clôture inclut la tâche elle-même (self-recover mort) et la transitivité tue le mutual-recover via la loi 0301 (le cycle de l'union)."
+    inputs:
+      - registry: ir
+        id: recovery_reference_targets
+        role: required
+      - registry: ir
+        id: precedence_graph
+        role: required
+    premises:
+      - operator: intersect_empty
+        operands:
+          - registry: ir
+            id: recovery_reference_targets
+          - registry: ir
+            id: declaring_task_downstream_closure
+            derivation:
+              function: reflexive_transitive_downstream
+              args:
+                - registry: ir
+                  id: precedence_graph
+                - registry: ir
+                  id: declaring_task
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-DAG-004"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: recovery_reference_targets
+      independent_judgment: true
+    domain_payload:
+      kind: graph
+      graph: precedence_graph
+      edge_sets: [dependency_edges, condition_edges]
+      property: reflexive_transitive_downstream
+    diagnostics: ["NIKA-DAG-004"]
+    fixtures:
+      - conformance/errors/on-error-recover-downstream.nika.yaml
+      - conformance/errors/recover-task-ref-with-edge.nika.yaml
+    negative_fixtures:
+      - conformance/dag/recover-ref-downstream-reject.nika.yaml
+      - to-mint-c1/conformance/recovery/invalid/self-recover-reject
+      - to-mint-c1/conformance/recovery/invalid/mutual-recover-reject
+    projections: ["prose:03-dag", "prose:05-errors", "cli:check", "lsp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:recovery_core.py
+      - cli:nika-check
+      - conformance:recovery-suite
+    introduced_in: C0
+    proof_obligations:
+      - "La derivation reflexive_transitive_downstream(G_p, declaring_task) du schema scellé épèle la clôture exacte : le seed appartient à sa propre clôture, donc recover: ${{ tasks.self }} refuse (fixture self-recover-reject)."
+      - "La fixture LIVE recover-ref-downstream-reject atteste le noyau transitif déjà enforced (NIKA-DAG-004 at CHECK); les fixtures self/mutual sont le delta réflexif-transitif de la généralisation R2."
+      - "La positive on-error-recover-downstream (un consommateur AVAL de la tâche récupérée tourne après recovery) reste légale : la clôture interdit de référencer l'aval, jamais d'être consommé par lui."
+    closure_gates:
+      - self-recover-dead-at-check
+      - mutual-recover-dead-at-check
+
+  # ── R2 bullet 1 · source pending/running : await terminal ─────────────────────
+
+  - id: LAW-GRAPH-0303
+    slug: recovery/await-terminal-resolution
+    status: reserved
+    owner: spec
+    domain: GRAPH
+    title: "Une source de recovery pending ou running est attendue jusqu'a son etat terminal"
+    prose_projection:
+      chapters: ["05-errors"]
+      text: "R2 bullet 1 verbatim (segment) : « L'engine se conforme à `05-errors.md:315-347` : source pending/running → **await terminal** ; » La résolution d'une référence recover: attend l'état terminal de la source, de façon déterministe (le DAG est fini, l'await termine toujours sous la loi 0301); la valeur ne se rend jamais contre un snapshot intermédiaire."
+    inputs:
+      - registry: ir
+        id: recovery_source_state
+        role: required
+      - registry: ir
+        id: await_graph
+        role: required
+    premises:
+      - operator: reachable
+        operands:
+          - registry: ir
+            id: recovery_source_state
+          - registry: ir
+            id: terminal_outcome_state
+        quantifier: forall
+    conclusion:
+      verdict: derive
+      derives:
+        registry: ir
+        id: recovery_source_terminal_outcome
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: recovery_source_terminal_outcome
+      independent_judgment: true
+    domain_payload:
+      kind: graph
+      graph: await_graph
+      edge_sets: [await_edges]
+      property: reachability
+    diagnostics: []
+    fixtures:
+      - conformance/errors/retry-exhausted-then-recover.nika.yaml
+      - conformance/errors/timeout-recovered.nika.yaml
+      - conformance/tests/core/errors/008-on-error-on-codes-recover
+      - to-mint-c1/conformance/recovery/valid/await-pending-source-resolves
+    projections: ["prose:05-errors", "cli:run", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:recovery_core.py
+      - conformance:recovery-suite
+    introduced_in: C0
+    proof_obligations:
+      - "FINDING-REC-01, évidence header verbatim de conformance/errors/recover-task-ref-no-edge.nika.yaml : « Expected: NIKA-VAR-001 at RUN — BUT this encodes an ENGINE-vs-SPEC DIVERGENCE. » (l'engine rend VAR-001 immédiatement contre le snapshot au lieu d'attendre; per spec le workflow SHOULD recover with 99). Sous cette loi, ce workflow récupère : la fixture to-mint await-pending-source-resolves en est la forme conforme, la fixture divergente est requalifiée dans la cascade P-C, jamais silencieusement ici."
+      - "L'await est borné par le budget global restant (LAW-OUTCOME-0302 · B-17 points 26-27) : attendre n'est jamais un droit d'excéder la deadline."
+    closure_gates:
+      - await-terminal-implemented
+      - no-edge-divergence-closed
+
+  # ── R2 bullet 3 · détecteur runtime d'await-cycle (defense-in-depth) ──────────
+
+  - id: LAW-GRAPH-0304
+    slug: recovery/runtime-await-cycle-detector
+    status: reserved
+    owner: spec
+    domain: GRAPH
+    title: "Un await-cycle detecte au runtime produit un echec type, jamais un hang"
+    prose_projection:
+      chapters: ["05-errors"]
+      text: "R2 bullet 3 verbatim : « Détecteur runtime d'await-cycle en defense-in-depth (hang → échec typé). » Le check statique (lois 0301 et 0302) rend le cycle impossible; le runtime garde néanmoins son détecteur : si un cycle d'attente apparaissait (bug, état importé), la résolution échoue avec un diagnostic typé au lieu de pendre."
+    inputs:
+      - registry: ir
+        id: runtime_await_graph
+        role: required
+    premises:
+      - operator: acyclic
+        operands:
+          - registry: ir
+            id: runtime_await_graph
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-DAG-005"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: runtime_await_graph
+      independent_judgment: true
+    domain_payload:
+      kind: graph
+      graph: runtime_await_graph
+      edge_sets: [await_edges]
+      property: acyclic
+    diagnostics: ["NIKA-DAG-005"]
+    fixtures:
+      - to-mint-c1/conformance/recovery/runtime/await-cycle-typed-failure
+    projections: ["prose:05-errors", "cli:run", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - conformance:recovery-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Le détecteur est defense-in-depth : la fixture injecte l'état impossible (le check l'interdit) et observe un échec typé borné dans le temps, jamais un hang (NIKA-DAG-005 c0-proposed, FINDING-REC-02)."
+    closure_gates:
+      - await-cycle-detector-typed
+
+  # ── R2 bullet 1 + bullet 5 · source sans valeur : VAR-001, jamais success-null ─
+
+  - id: LAW-OUTCOME-0301
+    slug: recovery/no-value-source-fails-var-001
+    status: reserved
+    owner: spec
+    domain: OUTCOME
+    title: "Une source terminee sans valeur utilisable fait echouer la recovery en NIKA-VAR-001, jamais success-null"
+    prose_projection:
+      chapters: ["05-errors", "13-outcomes"]
+      text: "R2 bullet 1 verbatim (segment) : « source terminée sans valeur utilisable (`failure`/`cancelled`/`skipped`) → **NIKA-VAR-001**, la recovery échoue (échec diagnostiqué, jamais success-null). » · R2 bullet 5 verbatim : « Preuve motivante (P2 trace-level) : le shipped Option B settle `success(recovered)` value-null sur source skipped/failed — violait le critère « aucune recovery silencieusement success-null ». » La table des transitions légales est fermée : la pair (source sans valeur → success(recovered) value-null) n'existe pas."
+    inputs:
+      - registry: ir
+        id: recovery_source_terminal_outcome
+        role: required
+      - registry: ir
+        id: outcome_transition_table
+        role: required
+    premises:
+      - operator: member_of
+        operands:
+          - registry: ir
+            id: recovery_source_terminal_outcome
+          - registry: ir
+            id: value_bearing_outcome_classes
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-VAR-001"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: outcome_transition_table
+      independent_judgment: true
+    domain_payload:
+      kind: outcome
+      transition_table:
+        registry: ir
+        id: outcome_transition_table
+      constraint: legal_pairs_closed
+    diagnostics: ["NIKA-VAR-001"]
+    fixtures:
+      - to-mint-c1/conformance/recovery/valid/source-success-resolves
+    negative_fixtures:
+      - to-mint-c1/conformance/recovery/invalid/source-failure-var-001
+      - to-mint-c1/conformance/recovery/invalid/source-cancelled-var-001
+      - to-mint-c1/conformance/recovery/invalid/source-skipped-var-001
+    projections: ["prose:05-errors", "cli:run", "sdk", "docs"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:recovery_core.py
+      - reference:outcome_core.py
+      - conformance:recovery-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Les trois négatives couvrent exactement les trois classes sans valeur nommées par le ruling (failure · cancelled · skipped) : chacune échoue diagnostiquée NIKA-VAR-001, la tâche échoue comme si on_error: était absent (05-errors step 4)."
+      - "FINDING-REC-01 (branche P2) : le comportement shipped settle success(recovered) value-null viole cette loi au pin; la non-régression est la paire trace-level (success-null observé = rouge) dans la cascade P-C."
+    closure_gates:
+      - no-silent-success-null-recovery
+      - three-no-value-classes-covered
+
+  # ── R2 bullet 4 + B-17 points 26-27 · l'expiration globale ne devient jamais un succès
+
+  - id: LAW-OUTCOME-0302
+    slug: recovery/global-expiry-never-silent-success
+    status: reserved
+    owner: spec
+    domain: OUTCOME
+    title: "L'await de recovery reste sous le budget global; une expiration globale n'est jamais un succes silencieux"
+    prose_projection:
+      chapters: ["05-errors", "13-outcomes"]
+      text: "R2 bullet 4 verbatim : « Interaction B-17 : l'await de recovery reste soumis au budget/deadline global restant ; une expiration globale ne devient jamais un succès silencieux via recovery (B-17 lois 26-27). » · B-17 point 26 verbatim : « Recovery et retry restent soumis au budget global restant. » · B-17 point 27 verbatim : « Une expiration globale ne peut jamais être transformée en succès silencieux par recovery. » La pair (expiration globale pendant l'await → success via recovery) est absente de la table des transitions légales."
+    inputs:
+      - registry: ir
+        id: recovery_await_budget
+        role: required
+      - registry: ir
+        id: outcome_transition_table
+        role: required
+    premises:
+      - operator: absent
+        operands:
+          - registry: ir
+            id: recovery_success_after_global_expiry
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: outcome_transition_table
+      independent_judgment: true
+    domain_payload:
+      kind: outcome
+      transition_table:
+        registry: ir
+        id: outcome_transition_table
+      constraint: legal_pairs_closed
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/recovery/temporal/deadline-expiry-during-await
+    projections: ["prose:05-errors", "cli:run", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:recovery_core.py
+      - reference:outcome_core.py
+      - conformance:recovery-suite
+    introduced_in: C0
+    proof_obligations:
+      - "La fixture deadline-expiry-during-await expire la deadline globale pendant l'await de recovery et observe la transition d'annulation de B-17 (jamais une classe success) : l'await n'est pas un abri contre l'expiration."
+      - "La composition temporelle exacte (min des budgets, causes cancelled/deadline_exceeded) appartient aux lois TEMPORAL du pack B-17; cette loi OUTCOME ferme la seule pair concernée par R2 : expiration globale puis succès via recovery."
+    closure_gates:
+      - global-expiry-never-success-via-recovery

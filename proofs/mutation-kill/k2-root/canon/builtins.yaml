@@ -1,0 +1,21 @@
+# canon/builtins.yaml · C0 SANDBOX SKELETON · Builtins Registry
+# Schema: schemas/registries.schema.json#/$defs/builtinRow (SCELLÉ · consommé as-is).
+# Ce que C0 importe ici : la classification capacitaire de CHAQUE builtin (R12 point
+# 19 verbatim : « Chaque builtin possède une classification explicite dans la SSOT :
+# pure/internal ou external capability requirements. »). Row seed réelle : nika:jq
+# (R12 point 20 verbatim : « nika:jq ne bénéficie d'aucun bypass magique. Il exige
+# zéro permit uniquement parce qu'il est officiellement classé pure/internal. »).
+registry_document_format: 1
+"$comment": "C0 sandbox skeleton · seed row = nika:jq pure_internal per R12 point 20 · full builtin classification import owed at C0"
+builtins:
+  - id: nika:jq
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    category: data
+    capability_classification:
+      class: pure_internal
+    args_schema: to-mint-c1/builtins/jq-args.schema.json
+    error_plane: to-mint-c1/builtins/jq-error-plane.yaml
+    notes: "R12 point 20 verbatim : « nika:jq ne bénéficie d'aucun bypass magique. Il exige zéro permit uniquement parce qu'il est officiellement classé pure/internal. » Les lois AUTH du modèle 4-ensembles arrivent à l'import R12 (C0) ; law_ids vide tant que reserved."

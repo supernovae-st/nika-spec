@@ -1,0 +1,29 @@
+registry_document_format: 1
+$comment: C0 sandbox skeleton · seed row = the sole reserved constructor per R6 · full TypeExpr import
+  owed at C0 (SSOT-1 §27)
+types:
+- id: artifact_constructor_reserved
+  status: reserved
+  owner: spec
+  law_ids: []
+  introduced_in: C0
+  production: reserved_constructor
+  spelling: artifact<mime>
+  reservation:
+    future_gate: constructor-activation-gate
+  notes: 'Seed R6 (migration-plan MIG-constructors new_form : « artifact<mime> sole reserved »). Les lois
+    TYPE arrivent à l''import TypeExpr C0 ; law_ids vide tant que la row reste reserved (activeNeedsLaw
+    ne contraint que le statut active).'
+- id: type_expr
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-GRAMMAR-0211
+  - LAW-TYPE-0211
+  introduced_in: C0
+  notes: 'Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law''s implementation window (C1+) · reserved,
+    never silently widened. · production=union: TypeExpr est l union des productions du Type Core (R3b)
+    · la décomposition per-production arrive C1.'
+  production: union
+  spelling: type-expr

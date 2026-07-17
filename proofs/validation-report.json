@@ -1,0 +1,73 @@
+{
+  "$comment": "C0 sandbox machine summary · generated from the proof runs recorded in proofs/ · digests are the FINAL sealed state",
+  "sandbox_root": "~/.pre1-autonomous/pre1-pa/post-lot10-preparation/c0-sandbox",
+  "sealed_inputs_consumed_as_is": {
+    "schemas/law.schema.json": "sha256:f2e69a48da63999135a491725b459c8fb63a4c70703dd09eb29346a73cefbd66",
+    "schemas/registries.schema.json": "sha256:27fdfec1dc4fc3e543098c7b7a68d62b85e9bb046ddd87326166b6c4848d763f",
+    "copy_proof": "byte-identical to design-pack-pre1/schemas/* (shasum pair recorded in session log)"
+  },
+  "pilot": {
+    "file": "canon/laws/yaml-profile.yaml",
+    "law_entries": 18,
+    "entries_valid_against_sealed_schema": 18,
+    "r11_points_covered": 16,
+    "r11_points_total": 16,
+    "id_blocks": {
+      "LAW-GRAMMAR-0101..0111": "the 11 source-form laws (points 1, 3, 5, 13)",
+      "LAW-DIAG-0101..0102": "dedicated pedagogical + namespaced stable codes (points 4, 5)",
+      "LAW-HASH-0101": "canonicalization/hash on conformant sources only (points 8, 9)",
+      "LAW-CONF-0101..0103": "cross-surface parity, fixture polarity, current-facing census (points 10, 11, 12)",
+      "LAW-SURFACE-0101": "language marker stays nika v1 (point 16)"
+    },
+    "folded_points": {
+      "2": "implementation_surfaces engine+reference on every law + proof_obligations verbatim",
+      "6": "proof_obligations of LAW-GRAMMAR-0101/0102 (verbatim)",
+      "7": "refuse verdict class + proof_obligations (verbatim) + LAW-CONF-0101",
+      "14": "closure_gates no-engine-choice-residual + caps-declared-in-grammar-registry",
+      "15": "proof_obligations of LAW-GRAMMAR-0102/0103 (verbatim)"
+    }
+  },
+  "registries": {
+    "skeletons": 12,
+    "row_counts": {"builtins": 1, "conformance": 4, "diagnostics": 11, "features": 1, "grammar": 5, "migrations": 7, "projections": 1, "snippets": 1, "surface": 1, "templates": 1, "tombstones": 1, "types": 1},
+    "all_valid_against_sealed_registries_schema": true
+  },
+  "migrations_seed": {
+    "rows": 7,
+    "sources": [
+      "f1-secrets-provenance-receipt.json migration_row (verbatim in notes)",
+      "f2-secrets-declassification-receipt.json migration_row (verbatim in notes)",
+      "f3-outputs-form-receipt.json migration_row (verbatim in notes)",
+      "f4-limits-temporal-receipt.json migration_row (verbatim in notes)",
+      "f5-stop-completion-receipt.json migration_row (verbatim in notes)",
+      "ANNEX_2026-07-17_minigates-winners.md N2-a (verbatim in notes)",
+      "ANNEX_2026-07-17_minigates-winners.md N2-b (verbatim in notes)"
+    ],
+    "states": "ratified x7 (D-2026-07-17-N2) · status reserved (law_ids owed at C0 import)"
+  },
+  "compiler": {
+    "script": "scripts/ssot-compiler.py",
+    "version": "0.1.0-sandbox",
+    "modes": ["write", "--check", "--root <dir>"],
+    "exit_codes": {"0": "ok", "1": "check drift", "2": "schema/reference refusal", "3": "R11 profile violation in canon inputs", "4": "usage/env"},
+    "zero_network": true,
+    "check_x2_byte_identical": true,
+    "projection_digest": "sha256:ea382f4b2b5201bf7c9f56c20e2a0b506bc6de10313bb1625762d00b09d07419",
+    "lock_digest": "sha256:3fa1639ce7dafa9f20ee07ee0b974d099609dc91624994b2e21077b229573f6d",
+    "lock_own_digest_detached": "canon/ssot.lock.sha256 (PAA-006)"
+  },
+  "mutation_kills": {
+    "k1_required_field_removed": {"mutation": "judgment deleted from LAW-GRAMMAR-0103 (copy)", "rc": 2, "diagnostic": "entry[2] (LAW-GRAMMAR-0103) · at / · 'judgment' is a required property"},
+    "k2_r11_gate_anchor": {"mutation": "&own + *own appended to canon/types.yaml (copy)", "rc": 3, "diagnostic": "YAML anchor (&own) at line 20, column 15 · R11 points 1+3"},
+    "k3_draft_shape": {"mutation": "LAW-GRAMMAR-0101 flipped to LAW-YAML-0001 + domain YAML (copy)", "rc": 2, "diagnostic": "domain 'YAML' not in the 15-domain enum + id pattern refusal"},
+    "k4_manual_projection_edit": {"mutation": "one byte class edited inside emitted projections/laws-index.json", "rc": 1, "diagnostic": "DRIFT · bytes differ from regeneration · restore then rc=0"}
+  },
+  "draft_measurement": {
+    "file": "quickwins/proposed/C0_PILOT_R11_yaml-profile-laws.PROPOSED.json",
+    "claim": "Conforme au schema SCELLÉ schemas/law.schema.json @ a075125bd",
+    "measured_valid_entries": 0,
+    "measured_total_entries": 5,
+    "verdict": "claim FALSE · every entry refused on 6+ axes (proofs/draft-measurement.out)"
+  },
+  "findings_count": 11
+}

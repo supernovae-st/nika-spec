@@ -1,0 +1,126 @@
+registry_document_format: 1
+$comment: 'C0 sandbox skeleton · row 1 = real anchors probe (negative · refuse NIKA-YAML-001/002) · rows
+  2-3 = pilot CONF law subjects with to-mint paths (FINDING-06: zero yaml-profile fixtures exist in spec
+  conformance today)'
+conformance:
+- id: yaml-profile-anchors-probe
+  status: reserved
+  owner: conformance
+  law_ids:
+  - LAW-GRAMMAR-0101
+  - LAW-GRAMMAR-0102
+  - LAW-CONF-0102
+  introduced_in: C0
+  path: research/pre1-gate/probes/anchors.nika.yaml
+  polarity: negative
+  expected:
+    surface: check
+    verdict: refuse
+    diagnostics:
+    - NIKA-YAML-001
+    - NIKA-YAML-002
+  profile: core
+  notes: 'R11 point 11 verbatim : « Les fixtures négatives contenant des anchors sont explicitement classées
+    invalides. » Cette row EST la classification explicite de la probe réelle (anchor &shared + alias
+    *shared).'
+- id: yaml-profile-parity
+  status: reserved
+  owner: conformance
+  law_ids:
+  - LAW-CONF-0101
+  introduced_in: C0
+  path: to-mint-c1/conformance/yaml-profile/parity
+  polarity: positive
+  expected:
+    surface: check
+    verdict: pass
+  profile: core
+  notes: 'Sujet de LAW-CONF-0101 (R11 point 10 : même verdict sur CLI, checker, modèle de référence, schema,
+    LSP, MCP et SDK). La suite différentielle se mint à C1.'
+- id: yaml-profile-negatives
+  status: reserved
+  owner: conformance
+  law_ids:
+  - LAW-CONF-0102
+  introduced_in: C0
+  path: to-mint-c1/conformance/yaml-profile/negatives
+  polarity: negative
+  expected:
+    surface: check
+    verdict: refuse
+  profile: core
+  notes: 'Sujet de LAW-CONF-0102 : le lot des fixtures négatives yaml-profile (chacune polarity: negative
+    déclarée · jamais une fixture orpheline).'
+- id: yaml-profile-current-facing-census
+  status: reserved
+  owner: conformance
+  law_ids:
+  - LAW-CONF-0103
+  introduced_in: C0
+  path: to-mint-c1/conformance/yaml-profile/census
+  polarity: positive
+  expected:
+    surface: check
+    verdict: pass
+  profile: core
+  notes: 'Sujet de LAW-CONF-0103 (R11 point 12 : anchors = 0 · aliases = 0 · merge keys = 0 sur les six
+    classes de surfaces current-facing). Le census mécanique se mint à C1.'
+- id: guarantee
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-GUAR-0416
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  path: to-mint-c1/guarantee.nika.yaml
+  polarity: negative
+  expected:
+    surface: check
+    verdict: refuse
+  profile: core
+- id: temporal
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-TEMPORAL-0423
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  path: to-mint-c1/temporal.nika.yaml
+  polarity: negative
+  expected:
+    surface: check
+    verdict: refuse
+  profile: core
+- id: guarantee-composition-suite
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-GUAR-0416
+  introduced_in: C0
+  path: to-mint-c1/guarantee-composition-suite.nika.yaml
+  polarity: positive
+  expected:
+    surface: check
+    verdict: pass
+  profile: deep
+  notes: 'Seeded at the SSOT-1 §27 import wave (2026-07-17) · R10 point 25 (lois de composition + fixtures:
+    deterministic children · nondeterministic child · retries · recovery · nested · partial evidence ·
+    Unknown propagation) · la suite se mint à C1.'
+- id: temporal-suite
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-TEMPORAL-0423
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · minted by its citing laws (§12 no-orphan)
+    · shape fills at C1.
+  path: to-mint-c1/temporal-suite.nika.yaml
+  polarity: positive
+  expected:
+    surface: check
+    verdict: pass
+  profile: deep

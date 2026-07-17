@@ -1,0 +1,1106 @@
+# canon/laws/yaml-profile.yaml · C0 SANDBOX PILOT · R11 yaml-profile import
+# SSOT: RULINGS_2026-07-15.md §R11 (16 points · verbatim · JAMAIS paraphrasé — les
+# citations ci-dessous reproduisent les bytes du ruling; les ancres sont "R11 point N").
+# Schema: schemas/law.schema.json (SCELLÉ · copié byte-identical du design pack ·
+# sha256 f2e69a48da63999135a491725b459c8fb63a4c70703dd09eb29346a73cefbd66 · consommé
+# as-is, jamais ré-inventé). Chaque entrée du tableau `laws` valide contre ce schema.
+#
+# FINDING-01 (SSOT-1 §29 · jamais de correction silencieuse) : le draft
+# C0_PILOT_R11_yaml-profile-laws.PROPOSED.json demandait `domain: YAML` + ids
+# LAW-YAML-NNNN. Le schema scellé ferme le DOMAIN enum à 15 (pas de YAML) et
+# 01_STRUCTURED_LAW_SCHEMA.md §1 dit : « The DOMAIN enum is CLOSED (15). Adding a
+# domain = a MIGR law + registry amendment. » Le pilote mappe donc les lois R11 sur
+# les domaines existants (bloc numérique 01xx réservé au yaml-profile) :
+#   LAW-YAML-0001 → LAW-GRAMMAR-0101 (anchor)      LAW-YAML-0002 → LAW-GRAMMAR-0102 (alias)
+#   LAW-YAML-0003 → LAW-GRAMMAR-0103 (merge key)   LAW-YAML-0004 → LAW-GRAMMAR-0104 (dup key)
+#   LAW-YAML-0005 → LAW-GRAMMAR-0110 (scalar cap)  + 12 lois neuves (couverture 16/16 points)
+# Les slugs yaml/* gardent l'identité yaml-profile. Si l'opérateur veut un domaine
+# YAML dédié : amendement du pack (loi MIGR + schema), geste GATED, jamais ici.
+#
+# Fixtures : le repo spec n'a AUCUNE fixture conformance yaml-profile aujourd'hui
+# (mesuré · find = 0). Convention sandbox : les chemins `to-mint-c1/...` = fixtures à
+# minter à C1 (la forme `TO-MINT-C1` majuscule violerait le pattern fixturePath du
+# schema scellé). Seule fixture RÉELLE existante :
+# research/pre1-gate/probes/anchors.nika.yaml (monorepo · contient &shared + *shared).
+
+laws_document_format: 1
+
+pilot: r11-yaml-profile
+
+laws:
+
+  # ───────────────────────────────── R11 point 1 · les 3 interdictions ─────────
+
+  - id: LAW-GRAMMAR-0101
+    slug: yaml/anchor-forbidden
+    status: reserved
+    owner: spec
+    domain: GRAMMAR
+    title: "Un anchor YAML est refusé par le profil Nika, même s'il n'est jamais référencé"
+    prose_projection:
+      chapters: ["11-yaml-profile"]
+      text: "R11 point 1 verbatim : « Le profil YAML Nika interdit : anchors ; aliases ; merge keys `<<`. » · R11 point 3 verbatim : « Un anchor est refusé même s'il n'est jamais référencé. » Cette loi porte la branche anchor. La présence seule de l'event anchor refuse la source, avec le diagnostic dédié NIKA-YAML-001."
+    inputs:
+      - registry: ir
+        id: yaml_source_events
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: yaml_anchor_event
+        quantifier: exists
+    conclusion:
+      verdict: refuse
+      diagnostics_on_refuse: ["NIKA-YAML-001"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: yaml_forbidden_event_classes
+      independent_judgment: true
+    domain_payload:
+      kind: grammar
+      position: yaml_source_document
+      field_rules:
+        - field: anchor
+          cardinality: forbidden
+    diagnostics: ["NIKA-YAML-001"]
+    fixtures:
+      - to-mint-c1/conformance/yaml-profile/valid/no-anchors
+    negative_fixtures:
+      - research/pre1-gate/probes/anchors.nika.yaml
+      - to-mint-c1/conformance/yaml-profile/invalid/anchor-unused
+    projections: ["prose:11-yaml-profile", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:yaml_profile_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:yaml-profile-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R11 point 3 verbatim : « Un anchor est refusé même s'il n'est jamais référencé. » La fixture anchor-unused refuse sans aucune référence alias."
+      - "R11 point 6 verbatim : « Aucun moteur ne peut choisir de développer les anchors silencieusement. » Aucun chemin d'expansion n'existe, le verdict est refuse."
+      - "R11 point 7 verbatim : « Aucun mode permissif, aucun warning-only et aucun backend-specific behavior. » La classe de verdict est refuse dans tous les modes."
+      - "R11 point 2 verbatim : « Cette interdiction est normative dans la spec et appliquée par l'engine. » Surfaces engine + reference déclarées ci-dessus."
+    closure_gates:
+      - fixture-parity
+      - current-facing-anchor-census-zero
+
+  - id: LAW-GRAMMAR-0102
+    slug: yaml/alias-forbidden
+    status: reserved
+    owner: spec
+    domain: GRAMMAR
+    title: "Un alias YAML (*ref) est refusé par le profil Nika, sans expansion silencieuse"
+    prose_projection:
+      chapters: ["11-yaml-profile"]
+      text: "R11 point 1 verbatim : « Le profil YAML Nika interdit : anchors ; aliases ; merge keys `<<`. » Cette loi porte la branche alias. R11 point 15 verbatim : « Pas d'alias de compatibilité, pas de mécanisme d'expansion avec budget. »"
+    inputs:
+      - registry: ir
+        id: yaml_source_events
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: yaml_alias_event
+        quantifier: exists
+    conclusion:
+      verdict: refuse
+      diagnostics_on_refuse: ["NIKA-YAML-002"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: yaml_forbidden_event_classes
+      independent_judgment: true
+    domain_payload:
+      kind: grammar
+      position: yaml_source_document
+      field_rules:
+        - field: alias
+          cardinality: forbidden
+    diagnostics: ["NIKA-YAML-002"]
+    fixtures:
+      - to-mint-c1/conformance/yaml-profile/valid/no-aliases
+    negative_fixtures:
+      - research/pre1-gate/probes/anchors.nika.yaml
+      - to-mint-c1/conformance/yaml-profile/invalid/alias-ref
+    projections: ["prose:11-yaml-profile", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:yaml_profile_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:yaml-profile-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R11 point 6 verbatim : « Aucun moteur ne peut choisir de développer les anchors silencieusement. » Le couple anchor+alias ne se résout jamais, il refuse."
+      - "R11 point 15 verbatim : « Pas d'alias de compatibilité, pas de mécanisme d'expansion avec budget. » Aucun budget d'expansion n'existe dans aucune surface."
+    closure_gates:
+      - fixture-parity
+      - current-facing-alias-census-zero
+
+  - id: LAW-GRAMMAR-0103
+    slug: yaml/merge-key-forbidden
+    status: reserved
+    owner: spec
+    domain: GRAMMAR
+    title: "Une merge key YAML (<<) est refusée par le profil Nika"
+    prose_projection:
+      chapters: ["11-yaml-profile"]
+      text: "R11 point 1 verbatim : « Le profil YAML Nika interdit : anchors ; aliases ; merge keys `<<`. » Cette loi porte la branche merge key. Composition de mappings explicite uniquement."
+    inputs:
+      - registry: ir
+        id: yaml_source_events
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: yaml_merge_key_event
+        quantifier: exists
+    conclusion:
+      verdict: refuse
+      diagnostics_on_refuse: ["NIKA-YAML-003"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    domain_payload:
+      kind: grammar
+      position: yaml_source_document
+      field_rules:
+        - field: merge_key
+          cardinality: forbidden
+    diagnostics: ["NIKA-YAML-003"]
+    fixtures:
+      - to-mint-c1/conformance/yaml-profile/valid/no-merge-keys
+    negative_fixtures:
+      - to-mint-c1/conformance/yaml-profile/invalid/merge-key
+    projections: ["prose:11-yaml-profile", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:yaml_profile_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:yaml-profile-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R11 point 15 verbatim : « Pas d'alias de compatibilité, pas de mécanisme d'expansion avec budget. » La merge key ne bénéficie d'aucune expansion de compatibilité."
+    closure_gates:
+      - fixture-parity
+      - current-facing-merge-key-census-zero
+
+  # ───────────────────────── R11 points 5 + 13 · duplicate keys ────────────────
+
+  - id: LAW-GRAMMAR-0104
+    slug: yaml/duplicate-key-forbidden
+    status: reserved
+    owner: spec
+    domain: GRAMMAR
+    title: "Une clé dupliquée dans un mapping est refusée avec un code stable dédié"
+    prose_projection:
+      chapters: ["11-yaml-profile"]
+      text: "R11 point 5 verbatim : « Ajouter des codes machine namespacés et stables pour : anchor interdit ; alias interdit ; merge key interdite ; duplicate key. » · R11 point 13 verbatim : « Compléter dans la même source normative le profil YAML concernant : duplicate keys ; custom tags ; non-string keys ; NaN/Infinity ; profondeur ; taille de document et de scalar ; Unicode NFC/BOM. » Cette loi porte la branche duplicate keys, code dédié NIKA-YAML-004."
+    inputs:
+      - registry: ir
+        id: yaml_source_events
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: yaml_duplicate_key_event
+        quantifier: exists
+    conclusion:
+      verdict: refuse
+      diagnostics_on_refuse: ["NIKA-YAML-004"]
+    canonicalization:
+      order_sensitive: true
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: yaml_forbidden_event_classes
+      independent_judgment: true
+    domain_payload:
+      kind: grammar
+      position: yaml_source_document
+      field_rules:
+        - field: duplicate_key
+          cardinality: forbidden
+    diagnostics: ["NIKA-YAML-004"]
+    fixtures:
+      - to-mint-c1/conformance/yaml-profile/valid/distinct-keys
+    negative_fixtures:
+      - to-mint-c1/conformance/yaml-profile/invalid/dup-key
+    projections: ["prose:11-yaml-profile", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:yaml_profile_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:yaml-profile-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R11 point 14 verbatim : « Les règles déjà cohérentes peuvent être conservées, mais aucune ne reste \"engine choice\". » Le traitement duplicate-key est loi normative, plus jamais un choix moteur."
+    closure_gates:
+      - fixture-parity
+      - no-engine-choice-residual
+
+  # ───────────────────────── R11 point 13 · complétion du profil ───────────────
+
+  - id: LAW-GRAMMAR-0105
+    slug: yaml/custom-tag-forbidden
+    status: reserved
+    owner: spec
+    domain: GRAMMAR
+    title: "Un tag YAML custom est refusé par le profil Nika"
+    prose_projection:
+      chapters: ["11-yaml-profile"]
+      text: "R11 point 13 verbatim : « Compléter dans la même source normative le profil YAML concernant : duplicate keys ; custom tags ; non-string keys ; NaN/Infinity ; profondeur ; taille de document et de scalar ; Unicode NFC/BOM. » Branche custom tags : tout tag hors schema core YAML (str, int, float, bool, null, map, seq) refuse."
+    inputs:
+      - registry: ir
+        id: yaml_source_events
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: yaml_custom_tag_event
+        quantifier: exists
+    conclusion:
+      verdict: refuse
+      diagnostics_on_refuse: ["NIKA-YAML-006"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: yaml_forbidden_event_classes
+      independent_judgment: true
+    domain_payload:
+      kind: grammar
+      position: yaml_source_document
+      field_rules:
+        - field: custom_tag
+          cardinality: forbidden
+    diagnostics: ["NIKA-YAML-006"]
+    fixtures:
+      - to-mint-c1/conformance/yaml-profile/valid/core-tags-only
+    negative_fixtures:
+      - to-mint-c1/conformance/yaml-profile/invalid/custom-tag
+    projections: ["prose:11-yaml-profile", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:yaml_profile_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:yaml-profile-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R11 point 14 verbatim : « Les règles déjà cohérentes peuvent être conservées, mais aucune ne reste \"engine choice\". » La frontière core-schema est déclarée au registre grammar, jamais un choix moteur."
+    closure_gates:
+      - fixture-parity
+      - no-engine-choice-residual
+
+  - id: LAW-GRAMMAR-0106
+    slug: yaml/non-string-key-forbidden
+    status: reserved
+    owner: spec
+    domain: GRAMMAR
+    title: "Une clé de mapping non-string est refusée par le profil Nika"
+    prose_projection:
+      chapters: ["11-yaml-profile"]
+      text: "R11 point 13 verbatim : « Compléter dans la même source normative le profil YAML concernant : duplicate keys ; custom tags ; non-string keys ; NaN/Infinity ; profondeur ; taille de document et de scalar ; Unicode NFC/BOM. » Branche non-string keys : toute clé de mapping non scalaire-string refuse."
+    inputs:
+      - registry: ir
+        id: yaml_source_events
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: yaml_non_string_key_event
+        quantifier: exists
+    conclusion:
+      verdict: refuse
+      diagnostics_on_refuse: ["NIKA-YAML-007"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: yaml_forbidden_event_classes
+      independent_judgment: true
+    domain_payload:
+      kind: grammar
+      position: yaml_source_document
+      field_rules:
+        - field: non_string_key
+          cardinality: forbidden
+    diagnostics: ["NIKA-YAML-007"]
+    fixtures:
+      - to-mint-c1/conformance/yaml-profile/valid/string-keys-only
+    negative_fixtures:
+      - to-mint-c1/conformance/yaml-profile/invalid/non-string-key
+    projections: ["prose:11-yaml-profile", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:yaml_profile_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:yaml-profile-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R11 point 14 verbatim : « Les règles déjà cohérentes peuvent être conservées, mais aucune ne reste \"engine choice\". »"
+    closure_gates:
+      - fixture-parity
+      - no-engine-choice-residual
+
+  - id: LAW-GRAMMAR-0107
+    slug: yaml/nan-infinity-forbidden
+    status: reserved
+    owner: spec
+    domain: GRAMMAR
+    title: "Les scalaires float NaN et Infinity sont refusés par le profil Nika"
+    prose_projection:
+      chapters: ["11-yaml-profile"]
+      text: "R11 point 13 verbatim : « Compléter dans la même source normative le profil YAML concernant : duplicate keys ; custom tags ; non-string keys ; NaN/Infinity ; profondeur ; taille de document et de scalar ; Unicode NFC/BOM. » Branche NaN/Infinity : les floats non finis (.nan, .inf, -.inf et variantes) refusent."
+    inputs:
+      - registry: ir
+        id: yaml_source_events
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: yaml_non_finite_float_event
+        quantifier: exists
+    conclusion:
+      verdict: refuse
+      diagnostics_on_refuse: ["NIKA-YAML-008"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: yaml_forbidden_event_classes
+      independent_judgment: true
+    domain_payload:
+      kind: grammar
+      position: yaml_source_document
+      field_rules:
+        - field: non_finite_float
+          cardinality: forbidden
+    diagnostics: ["NIKA-YAML-008"]
+    fixtures:
+      - to-mint-c1/conformance/yaml-profile/valid/finite-floats
+    negative_fixtures:
+      - to-mint-c1/conformance/yaml-profile/invalid/nan-scalar
+      - to-mint-c1/conformance/yaml-profile/invalid/infinity-scalar
+    projections: ["prose:11-yaml-profile", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:yaml_profile_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:yaml-profile-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Le JSON canonique du Semantic IR n'admet aucun float non fini, la loi ferme la porte à la source."
+    closure_gates:
+      - fixture-parity
+      - no-engine-choice-residual
+
+  - id: LAW-GRAMMAR-0108
+    slug: yaml/document-depth-cap
+    status: reserved
+    owner: spec
+    domain: GRAMMAR
+    title: "La profondeur de document dépassant le cap normatif est refusée"
+    prose_projection:
+      chapters: ["11-yaml-profile"]
+      text: "R11 point 13 verbatim : « Compléter dans la même source normative le profil YAML concernant : duplicate keys ; custom tags ; non-string keys ; NaN/Infinity ; profondeur ; taille de document et de scalar ; Unicode NFC/BOM. » Branche profondeur. La VALEUR du cap n'est pas fixée par R11 : TO-RULE à C0 (FINDING-04), la loi fixe l'existence normative du cap, jamais un nombre inventé."
+    inputs:
+      - registry: ir
+        id: yaml_document_depth
+        role: required
+      - registry: grammar
+        id: yaml_document_caps
+        role: ceiling
+    premises:
+      - operator: conforms_to
+        operands:
+          - registry: ir
+            id: yaml_document_depth
+          - registry: grammar
+            id: yaml_document_caps
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-YAML-009"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: yaml_document_caps
+      independent_judgment: true
+    domain_payload:
+      kind: grammar
+      position: yaml_document
+      field_rules:
+        - field: depth_over_cap
+          cardinality: forbidden
+          value_shape:
+            registry: grammar
+            id: yaml_document_caps
+    diagnostics: ["NIKA-YAML-009"]
+    fixtures:
+      - to-mint-c1/conformance/yaml-profile/valid/depth-at-cap
+    negative_fixtures:
+      - to-mint-c1/conformance/yaml-profile/invalid/depth-over-cap
+    projections: ["prose:11-yaml-profile", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:yaml_profile_core.py
+      - cli:nika-check
+      - conformance:yaml-profile-suite
+    introduced_in: C0
+    proof_obligations:
+      - "La fixture depth-at-cap admet, la fixture depth-over-cap refuse : le cap est une frontière exacte."
+      - "R11 point 14 verbatim : « Les règles déjà cohérentes peuvent être conservées, mais aucune ne reste \"engine choice\". » Le cap vit au registre grammar, jamais dans le code moteur."
+    closure_gates:
+      - fixture-parity
+      - caps-declared-in-grammar-registry
+
+  - id: LAW-GRAMMAR-0109
+    slug: yaml/document-size-cap
+    status: reserved
+    owner: spec
+    domain: GRAMMAR
+    title: "La taille de document dépassant le cap normatif est refusée"
+    prose_projection:
+      chapters: ["11-yaml-profile"]
+      text: "R11 point 13 verbatim : « Compléter dans la même source normative le profil YAML concernant : duplicate keys ; custom tags ; non-string keys ; NaN/Infinity ; profondeur ; taille de document et de scalar ; Unicode NFC/BOM. » Branche taille de document. Valeur du cap TO-RULE à C0 (FINDING-04)."
+    inputs:
+      - registry: ir
+        id: yaml_document_size
+        role: required
+      - registry: grammar
+        id: yaml_document_caps
+        role: ceiling
+    premises:
+      - operator: conforms_to
+        operands:
+          - registry: ir
+            id: yaml_document_size
+          - registry: grammar
+            id: yaml_document_caps
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-YAML-010"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: yaml_document_caps
+      independent_judgment: true
+    domain_payload:
+      kind: grammar
+      position: yaml_document
+      field_rules:
+        - field: size_over_cap
+          cardinality: forbidden
+          value_shape:
+            registry: grammar
+            id: yaml_document_caps
+    diagnostics: ["NIKA-YAML-010"]
+    fixtures:
+      - to-mint-c1/conformance/yaml-profile/valid/document-at-cap
+    negative_fixtures:
+      - to-mint-c1/conformance/yaml-profile/invalid/document-over-cap
+    projections: ["prose:11-yaml-profile", "schema", "cli:check", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:yaml_profile_core.py
+      - cli:nika-check
+      - conformance:yaml-profile-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R11 point 32 du modèle B-17 ne s'applique pas ici ; la distinction pertinente est celle du point 14 : le cap est normatif au registre, aucun résidu engine-choice."
+    closure_gates:
+      - fixture-parity
+      - caps-declared-in-grammar-registry
+
+  - id: LAW-GRAMMAR-0110
+    slug: yaml/scalar-size-cap
+    status: reserved
+    owner: spec
+    domain: GRAMMAR
+    title: "Un scalar dépassant le cap normatif est refusé (ferme le gap P5)"
+    prose_projection:
+      chapters: ["11-yaml-profile"]
+      text: "R11 point 13 verbatim : « Compléter dans la même source normative le profil YAML concernant : duplicate keys ; custom tags ; non-string keys ; NaN/Infinity ; profondeur ; taille de document et de scalar ; Unicode NFC/BOM. » Note de clôture du ruling, verbatim : « (Ferme le gap P5 : le cap de taille scalaire — 200k chars passait — entre au profil normatif.) » La VALEUR du cap reste TO-RULE à C0 (FINDING-04) : l'empirie third-pass dit que 200k passait, le ruling ne grave pas le nombre."
+    inputs:
+      - registry: ir
+        id: yaml_scalar_size
+        role: required
+      - registry: grammar
+        id: yaml_scalar_cap
+        role: ceiling
+    premises:
+      - operator: conforms_to
+        operands:
+          - registry: ir
+            id: yaml_scalar_size
+          - registry: grammar
+            id: yaml_scalar_cap
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-YAML-005"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: yaml_scalar_cap
+      independent_judgment: true
+    domain_payload:
+      kind: grammar
+      position: yaml_scalar
+      field_rules:
+        - field: size_over_cap
+          cardinality: forbidden
+          value_shape:
+            registry: grammar
+            id: yaml_scalar_cap
+    diagnostics: ["NIKA-YAML-005"]
+    fixtures:
+      - to-mint-c1/conformance/yaml-profile/valid/scalar-at-cap
+    negative_fixtures:
+      - to-mint-c1/conformance/yaml-profile/invalid/scalar-over-cap
+    projections: ["prose:11-yaml-profile", "schema", "cli:check", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:yaml_profile_core.py
+      - cli:nika-check
+      - conformance:yaml-profile-suite
+    introduced_in: C0
+    proof_obligations:
+      - "La fixture scalar-over-cap refuse, la fixture scalar-at-cap admet : le gap P5 (un scalar de 200k chars passait) est structurellement fermé."
+    closure_gates:
+      - fixture-parity
+      - caps-declared-in-grammar-registry
+
+  - id: LAW-GRAMMAR-0111
+    slug: yaml/unicode-nfc-bom
+    status: reserved
+    owner: spec
+    domain: GRAMMAR
+    title: "La source doit satisfaire le contrat Unicode NFC/BOM déclaré au profil"
+    prose_projection:
+      chapters: ["11-yaml-profile"]
+      text: "R11 point 13 verbatim : « Compléter dans la même source normative le profil YAML concernant : duplicate keys ; custom tags ; non-string keys ; NaN/Infinity ; profondeur ; taille de document et de scalar ; Unicode NFC/BOM. » Branche Unicode NFC/BOM. R11 exige que le profil COUVRE l'aspect, il ne fixe pas la disposition (refuser un BOM ou le strip, exiger NFC ou normaliser) : disposition TO-RULE à C0 (FINDING-04), rien n'est inventé ici."
+    inputs:
+      - registry: ir
+        id: yaml_source_bytes
+        role: required
+      - registry: grammar
+        id: yaml_unicode_contract
+        role: ceiling
+    premises:
+      - operator: conforms_to
+        operands:
+          - registry: ir
+            id: yaml_source_bytes
+          - registry: grammar
+            id: yaml_unicode_contract
+        quantifier: forall
+    conclusion:
+      verdict: admit
+      diagnostics_on_refuse: ["NIKA-YAML-011"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["nfc"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: yaml_unicode_contract
+      independent_judgment: true
+    domain_payload:
+      kind: grammar
+      position: yaml_source_bytes
+      field_rules:
+        - field: non_nfc_or_bom_disposition
+          cardinality: required
+          value_shape:
+            registry: grammar
+            id: yaml_unicode_contract
+    diagnostics: ["NIKA-YAML-011"]
+    fixtures:
+      - to-mint-c1/conformance/yaml-profile/valid/nfc-clean
+    negative_fixtures:
+      - to-mint-c1/conformance/yaml-profile/invalid/bom-or-non-nfc
+    projections: ["prose:11-yaml-profile", "schema", "cli:check", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:yaml_profile_core.py
+      - cli:nika-check
+      - conformance:yaml-profile-suite
+    introduced_in: C0
+    proof_obligations:
+      - "La disposition (refuse ou normalise) est déclarée au registre grammar avant C1, la loi refuse tout résidu engine-choice sur cet aspect."
+    closure_gates:
+      - fixture-parity
+      - unicode-disposition-ruled
+
+  # ───────────────────────── R11 points 4 + 5 · lois diagnostics ───────────────
+
+  - id: LAW-DIAG-0101
+    slug: yaml/dedicated-pedagogical-diagnostics
+    status: reserved
+    owner: spec
+    domain: DIAG
+    title: "Les diagnostics du profil YAML sont dédiés et pédagogiques, jamais un parse error générique"
+    prose_projection:
+      chapters: ["11-yaml-profile"]
+      text: "R11 point 4 verbatim : « Le diagnostic doit être dédié et pédagogique : YAML valide mais non admis par le profil Nika, et non un simple parse error générique. » Chaque code NIKA-YAML porte un teaching orienté profil ; le blanket parse générique meurt pour ces classes (MIG-yaml-profile)."
+    inputs:
+      - registry: diagnostics
+        id: NIKA-YAML-001
+      - registry: diagnostics
+        id: NIKA-YAML-002
+      - registry: diagnostics
+        id: NIKA-YAML-003
+      - registry: diagnostics
+        id: NIKA-YAML-004
+    premises:
+      - operator: present
+        operands:
+          - registry: diagnostics
+            id: NIKA-YAML-001
+        quantifier: exactly_one
+      - operator: present
+        operands:
+          - registry: diagnostics
+            id: NIKA-YAML-002
+        quantifier: exactly_one
+      - operator: present
+        operands:
+          - registry: diagnostics
+            id: NIKA-YAML-003
+        quantifier: exactly_one
+      - operator: present
+        operands:
+          - registry: diagnostics
+            id: NIKA-YAML-004
+        quantifier: exactly_one
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: diagnostics
+          id: NIKA-YAML-001
+      independent_judgment: true
+    domain_payload:
+      kind: diagnostic
+      constraint: teaching_required
+      subject:
+        registry: diagnostics
+        id: NIKA-YAML-001
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/yaml-profile/registry/teaching-present
+    projections: ["prose:11-yaml-profile", "cli:check", "lsp", "docs"]
+    implementation_surfaces:
+      - conformance:yaml-profile-suite
+      - reference:diagnostics_registry_gate.py
+    introduced_in: C0
+    proof_obligations:
+      - "Chaque row NIKA-YAML-001..004 du registre diagnostics porte un champ teaching non vide qui nomme le profil Nika, jamais le mot parse-error seul."
+      - "FINDING-11 : diagnosticPayload.subject est un typedRef UNIQUE ; la loi gouverne la famille des 4 codes, le subject épingle l'exemplaire NIKA-YAML-001 et inputs porte la famille complète."
+    closure_gates:
+      - teaching-required-on-yaml-codes
+
+  - id: LAW-DIAG-0102
+    slug: yaml/namespaced-stable-codes
+    status: reserved
+    owner: spec
+    domain: DIAG
+    title: "Les classes de refus du profil YAML possèdent des codes machine namespacés et stables"
+    prose_projection:
+      chapters: ["11-yaml-profile"]
+      text: "R11 point 5 verbatim : « Ajouter des codes machine namespacés et stables pour : anchor interdit ; alias interdit ; merge key interdite ; duplicate key. » Les 4 codes mandatés vivent au namespace YAML ; un code retiré devient tombstone et n'est jamais réutilisé."
+    inputs:
+      - registry: diagnostics
+        id: NIKA-YAML-001
+      - registry: diagnostics
+        id: NIKA-YAML-002
+      - registry: diagnostics
+        id: NIKA-YAML-003
+      - registry: diagnostics
+        id: NIKA-YAML-004
+    premises:
+      - operator: present
+        operands:
+          - registry: diagnostics
+            id: NIKA-YAML-001
+        quantifier: exactly_one
+      - operator: present
+        operands:
+          - registry: diagnostics
+            id: NIKA-YAML-002
+        quantifier: exactly_one
+      - operator: present
+        operands:
+          - registry: diagnostics
+            id: NIKA-YAML-003
+        quantifier: exactly_one
+      - operator: present
+        operands:
+          - registry: diagnostics
+            id: NIKA-YAML-004
+        quantifier: exactly_one
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: diagnostics
+          id: NIKA-YAML-001
+      independent_judgment: true
+    domain_payload:
+      kind: diagnostic
+      constraint: namespace_scope
+      subject:
+        registry: diagnostics
+        id: NIKA-YAML-001
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/yaml-profile/registry/codes-namespaced
+    projections: ["prose:11-yaml-profile", "cli:check", "docs"]
+    implementation_surfaces:
+      - conformance:yaml-profile-suite
+      - reference:diagnostics_registry_gate.py
+    introduced_in: C0
+    proof_obligations:
+      - "Les 4 codes sont globalement uniques au registre (SSOT-2 B.17) et leur namespace YAML est réservé aux classes du profil."
+      - "FINDING-05 : R11 point 5 mandate exactement 4 codes ; les codes NIKA-YAML-005..011 des branches point 13 sont c0-proposed (SSOT-2 B.21 exige un diagnostic canonique par rejet normatif), renumérotables avant C1."
+    closure_gates:
+      - yaml-codes-namespaced-stable
+      - tombstone-no-reuse
+
+  # ───────────────────────── R11 points 8 + 9 · canonicalisation / hash ────────
+
+  - id: LAW-HASH-0101
+    slug: yaml/canonicalization-conformant-sources-only
+    status: reserved
+    owner: spec
+    domain: HASH
+    title: "Canonicalisation et semantic hash n'opèrent que sur des sources conformes au profil"
+    prose_projection:
+      chapters: ["11-yaml-profile"]
+      text: "R11 point 8 verbatim : « La canonicalisation et le semantic hash opèrent uniquement sur des sources conformes au profil Nika. » · R11 point 9 verbatim : « Aucun anchor expansion n'entre dans le Semantic IR. » Le hash se dérive après admission profil ; aucun node issu d'une expansion d'anchor n'existe dans l'IR, donc aucun ne peut entrer dans le préimage."
+    inputs:
+      - registry: ir
+        id: yaml_source
+        role: required
+      - registry: grammar
+        id: yaml_forbidden_event_classes
+        role: ceiling
+    premises:
+      - operator: conforms_to
+        operands:
+          - registry: ir
+            id: yaml_source
+          - registry: grammar
+            id: yaml_forbidden_event_classes
+        quantifier: forall
+      - operator: absent
+        operands:
+          - registry: ir
+            id: anchor_expansion_ir_nodes
+        quantifier: forall
+    conclusion:
+      verdict: derive
+      derives:
+        registry: ir
+        id: semantic_hash
+    canonicalization:
+      order_sensitive: false
+      normalization: ["nfc", "lf", "jcs"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: yaml_forbidden_event_classes
+      independent_judgment: true
+    domain_payload:
+      kind: hash
+      hash_domain: semantic_hash
+      preimage: ["domain_tag", "format_version", "jcs_semantic_ir"]
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/yaml-profile/hash/conformant-source-hashes
+    negative_fixtures:
+      - to-mint-c1/conformance/yaml-profile/hash/non-conformant-never-hashes
+    projections: ["prose:11-yaml-profile", "schema", "cli:check", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:semantic_hash_core.py
+      - conformance:yaml-profile-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Une source refusée par le profil ne produit JAMAIS de semantic hash, sur aucune surface."
+      - "Le préimage du hash (domain_tag, format_version, jcs_semantic_ir) est à recouper avec le chapitre hash scellé du pack à C0 ; toute divergence = finding, jamais un ajustement silencieux."
+    closure_gates:
+      - hash-only-after-profile-admission
+
+  # ───────────────────────── R11 points 10 + 11 + 12 · conformance ─────────────
+
+  - id: LAW-CONF-0101
+    slug: yaml/verdict-parity-all-surfaces
+    status: reserved
+    owner: spec
+    domain: CONF
+    title: "Toutes les surfaces rendent le même verdict sur le profil YAML"
+    prose_projection:
+      chapters: ["11-yaml-profile"]
+      text: "R11 point 10 verbatim : « CLI, checker, modèle de référence, schema, LSP, MCP et SDK rendent le même verdict. » La parité engine/reference est jugée par la suite conformance ; les surfaces CLI, LSP, MCP consomment le même noyau de jugement. FINDING-03 : le pattern implementation_surfaces du schema scellé n'a pas de préfixe sdk:, la parité SDK est portée par la projection sdk et par cette obligation de preuve."
+    inputs:
+      - registry: ir
+        id: engine_verdict
+        role: required
+      - registry: ir
+        id: reference_verdict
+        role: required
+    premises:
+      - operator: equals
+        operands:
+          - registry: ir
+            id: engine_verdict
+          - registry: ir
+            id: reference_verdict
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: conformance
+          id: yaml-profile-parity
+      independent_judgment: true
+    domain_payload:
+      kind: conformance
+      constraint: engine_reference_parity
+      subject:
+        registry: conformance
+        id: yaml-profile-parity
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/yaml-profile/parity/all-surfaces-same-verdict
+    projections: ["prose:11-yaml-profile", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:yaml_profile_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:yaml-profile-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R11 point 10 verbatim : « CLI, checker, modèle de référence, schema, LSP, MCP et SDK rendent le même verdict. » Le harnais différentiel compare les 7 surfaces sur chaque fixture du profil."
+      - "R11 point 7 verbatim : « Aucun mode permissif, aucun warning-only et aucun backend-specific behavior. » Une surface divergente est un échec de build, jamais une tolérance."
+    closure_gates:
+      - fixture-parity
+      - cross-surface-verdict-parity
+
+  - id: LAW-CONF-0102
+    slug: yaml/negative-fixtures-classified-invalid
+    status: reserved
+    owner: spec
+    domain: CONF
+    title: "Les fixtures négatives contenant des anchors sont explicitement classées invalides"
+    prose_projection:
+      chapters: ["11-yaml-profile"]
+      text: "R11 point 11 verbatim : « Les fixtures négatives contenant des anchors sont explicitement classées invalides. » Chaque fixture du profil porte une polarité déclarée au registre conformance ; aucune fixture à anchors ne vit sans classification négative explicite."
+    inputs:
+      - registry: conformance
+        id: yaml-profile-negatives
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: conformance
+            id: yaml-profile-negatives
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: conformance
+          id: yaml-profile-negatives
+      independent_judgment: true
+    domain_payload:
+      kind: conformance
+      constraint: polarity_declared
+      subject:
+        registry: conformance
+        id: yaml-profile-negatives
+    diagnostics: []
+    fixtures:
+      - research/pre1-gate/probes/anchors.nika.yaml
+    projections: ["prose:11-yaml-profile", "cli:check", "docs"]
+    implementation_surfaces:
+      - conformance:yaml-profile-suite
+      - reference:fixtures_registry_gate.py
+    introduced_in: C0
+    proof_obligations:
+      - "La probe réelle research/pre1-gate/probes/anchors.nika.yaml (anchor &shared + alias *shared) est enregistrée polarity: negative au registre conformance du sandbox : la loi est déjà satisfaite par une row réelle."
+    closure_gates:
+      - orphan-fixtures-zero
+      - polarity-declared-on-yaml-fixtures
+
+  - id: LAW-CONF-0103
+    slug: yaml/current-facing-census-zero
+    status: reserved
+    owner: spec
+    domain: CONF
+    title: "Les surfaces current-facing portent zéro anchor, zéro alias, zéro merge key"
+    prose_projection:
+      chapters: ["11-yaml-profile"]
+      text: "R11 point 12 verbatim : « Les exemples, templates, starters, docs, registry et snippets current-facing doivent avoir : anchors = 0 · aliases = 0 · merge keys = 0 » Le census est un gate de fermeture mécanique, pas une discipline."
+    inputs:
+      - registry: ir
+        id: current_facing_source_events
+        role: required
+      - registry: grammar
+        id: yaml_forbidden_event_classes
+        role: ceiling
+    premises:
+      - operator: intersect_empty
+        operands:
+          - registry: ir
+            id: current_facing_source_events
+          - registry: grammar
+            id: yaml_forbidden_event_classes
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: grammar
+          id: yaml_forbidden_event_classes
+      independent_judgment: true
+    domain_payload:
+      kind: conformance
+      constraint: profile_membership
+      subject:
+        registry: conformance
+        id: yaml-profile-current-facing-census
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/yaml-profile/census/current-facing-zero
+    projections: ["prose:11-yaml-profile", "cli:check", "docs"]
+    implementation_surfaces:
+      - conformance:yaml-profile-suite
+      - reference:census_gate.py
+    introduced_in: C0
+    proof_obligations:
+      - "R11 point 12 verbatim : « Les exemples, templates, starters, docs, registry et snippets current-facing doivent avoir : anchors = 0 · aliases = 0 · merge keys = 0 » Le census tourne sur les six classes de surfaces nommées et rend un compte exact."
+    closure_gates:
+      - current-facing-anchor-census-zero
+      - current-facing-alias-census-zero
+      - current-facing-merge-key-census-zero
+
+  # ───────────────────────── R11 point 16 · le marqueur de langage ─────────────
+
+  - id: LAW-SURFACE-0101
+    slug: yaml/language-marker-stays-v1
+    status: reserved
+    owner: spec
+    domain: SURFACE
+    title: "Le langage reste nika v1, une seule orthographe du marqueur"
+    prose_projection:
+      chapters: ["11-yaml-profile"]
+      text: "R11 point 16 verbatim : « Le langage reste nika: v1. » Le marqueur d'enveloppe garde son unique orthographe ; aucune variante, aucun second marqueur de version public."
+    inputs:
+      - registry: surface
+        id: nika_version_marker
+        role: required
+      - registry: grammar
+        id: envelope_nika_field
+        role: ceiling
+    premises:
+      - operator: matches
+        operands:
+          - registry: surface
+            id: nika_version_marker
+          - registry: grammar
+            id: envelope_nika_field
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: surface
+          id: nika_version_marker
+      independent_judgment: true
+    domain_payload:
+      kind: surface
+      constraint: one_spelling_per_meaning
+      subject:
+        registry: surface
+        id: nika_version_marker
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/yaml-profile/envelope/nika-v1-marker
+    projections: ["prose:11-yaml-profile", "schema", "cli:check", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:envelope_core.py
+      - conformance:yaml-profile-suite
+    introduced_in: C0
+    proof_obligations:
+      - "R11 point 16 verbatim : « Le langage reste nika: v1. » Tout autre marqueur de version refuse à l'enveloppe."
+    closure_gates:
+      - single-language-marker

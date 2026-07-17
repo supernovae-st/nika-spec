@@ -1,0 +1,42 @@
+registry_document_format: 1
+$comment: C0 sandbox skeleton · seed row = the laws-index projection THIS sandbox compiler emits (self-describing
+  · the check_command is the proof command) · full projector inventory import owed at C0
+projections:
+- id: laws-index
+  status: reserved
+  owner: tooling
+  law_ids: []
+  introduced_in: C0
+  sources:
+  - laws
+  generator:
+    identity: ssot-compiler
+    version: 0.1.0-sandbox
+  outputs:
+  - projections/laws-index.json
+  check_command: python3 scripts/ssot-compiler.py --check
+  digest_home: canon/ssot.lock
+  channel_sensitivity: stable-only
+  notes: 'SSOT-1 §21 verbatim : « Le générateur possède : une identité/version ; une commande unique ;
+    un mode write ; un mode --check ; une sortie déterministe ; un digest ; aucune dépendance réseau.
+    » La row décrit le compiler v0 du sandbox ; l''inventaire complet des projectors (machine/projector-inventory.json)
+    s''importe à C0.'
+- id: guarantee_projections
+  status: reserved
+  owner: spec
+  law_ids:
+  - LAW-GUAR-0415
+  introduced_in: C0
+  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
+    no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
+    silently widened.
+  sources:
+  - laws
+  generator:
+    identity: ssot-compiler
+    version: 0.1.0
+  outputs:
+  - projections/laws-index.json
+  check_command: python3 scripts/ssot-compiler.py --check
+  digest_home: canon/ssot.lock
+  channel_sensitivity: nightly-ok

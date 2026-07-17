@@ -1,0 +1,308 @@
+# canon/laws/model.yaml · C0 IMPORT · Annexe A-16 model string-only
+# SSOT: RULINGS_2026-07-15.md §Annexe A-16 (3 phrases · verbatim · JAMAIS paraphrasé,
+# les citations reproduisent les bytes du ruling, ancres "Annexe A-16 phrase N") +
+# SSOT-1 point 27 (ModelRef dans la liste d'import).
+# Schema: schemas/law.schema.json (SCELLÉ · consommé as-is). Bloc d'ids du groupe :
+# SURFACE 05xx · GRAMMAR 05xx · CONF 05xx · MIGR 05xx (0501-0509 réservés à model).
+#
+# Refs: resolve_refs (ssot-compiler) exige des rows seedées hors ir/laws. Les symboles
+# model (model_string_form · model_logical_alias · ...) n'ont AUCUNE row surface/grammar
+# seedée : ils vivent en registry ir (convention sandbox documentée par le compiler,
+# "unresolvable in canon by design") · la row surface model est owed à l'import registre.
+#
+# FINDING-B (SSOT-1 §29 · jamais silencieux) : A-16 dit "la var EST l'alias logique"
+# alors que R3a tue les spellings vars:/env: (E-split inputs/config/const/secrets).
+# Lecture retenue : "var" = liaison de valeur generique du modele 4-autorites, jamais
+# le keyword vars:. La fixture reelle 005-valid-parameterized-model epelle encore
+# "${{ vars.model }}" (pre-R3a) : elle migre avec le codemod R3a, referencee telle quelle.
+#
+# FINDING-A (part model) : la suppression de la ligne ghost (15:72) est une migration
+# doc-kill SANS row dans canon/migrations.yaml (rows existantes : mig-f1..f5 + mig-n2a
+# + mig-n2b). Row à minter par l'orchestrateur, jamais ici (mission : jamais l'ajouter).
+
+laws_document_format: 1
+
+group: a16-model-string-only
+
+laws:
+
+  # ─────────────────── Annexe A-16 phrase 1 · la seule surface v1 ───────────────
+
+  - id: LAW-SURFACE-0501
+    slug: model/string-provider-name-sole-surface
+    status: reserved
+    owner: spec
+    domain: SURFACE
+    title: "La string <provider>/<name> est la seule surface publique v1 du champ model"
+    prose_projection:
+      chapters: ["01-envelope", "02-verbs"]
+      text: "Annexe A-16 phrase 1 verbatim : « **Choix : (a).** La string `<provider>/<name>` = SEULE surface v1 (la var EST l'alias logique). » Cette loi porte la branche surface-unique : toute valeur du champ model (default d'enveloppe 01-envelope.md:156 et override de task infer/agent 02-verbs.md:91,319) est la string <provider>/<name>. Aucune forme objet, aucun champ provider: séparé, aucun nom nu sans préfixe."
+    inputs:
+      - registry: ir
+        id: model_value_surface
+        role: required
+      - registry: ir
+        id: model_string_form
+        role: ceiling
+    premises:
+      - operator: matches
+        operands:
+          - registry: ir
+            id: model_value_surface
+          - registry: ir
+            id: model_string_form
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: model_string_form
+      independent_judgment: true
+    domain_payload:
+      kind: surface
+      constraint: one_spelling_per_meaning
+      subject:
+        registry: ir
+        id: model_string_form
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/model/valid/provider-name-string
+    negative_fixtures:
+      - conformance/tests/stdlib/providers/002-model-missing-provider-prefix
+    projections: ["prose:01-envelope", "prose:02-verbs", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:envelope_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:model-suite
+    introduced_in: C0
+    proof_obligations:
+      - "La fixture réelle 002-model-missing-provider-prefix refuse un nom nu (model: claude-sonnet-4-6) avec la note : « ONE field · `model: <provider>/<name>` · there is no separate provider: field and no bare model name · the prefix IS the provider selection. » La loi est déjà exercée par une fixture négative réelle."
+      - "Aucune forme objet du champ model n'existe en v1 : la branche select est refusée par LAW-GRAMMAR-0501."
+    closure_gates:
+      - fixture-parity
+      - model-surface-registry-row-seeded
+
+  # ─────────────────── Annexe A-16 phrase 1 · la var est l'alias ────────────────
+
+  - id: LAW-SURFACE-0502
+    slug: model/var-is-the-logical-alias
+    status: reserved
+    owner: spec
+    domain: SURFACE
+    title: "L'alias logique de modèle est une liaison de valeur du workflow, jamais une surface dédiée"
+    prose_projection:
+      chapters: ["01-envelope", "02-verbs"]
+      text: "Annexe A-16 phrase 1 verbatim : « **Choix : (a).** La string `<provider>/<name>` = SEULE surface v1 (la var EST l'alias logique). » Cette loi porte la parenthèse : le besoin d'alias/sélection logique se sert par une liaison de valeur du workflow interpolée dans la string model, jamais par une surface d'alias dédiée. FINDING-B enregistré : R3a tue les spellings vars:/env: · « var » se lit liaison de valeur générique du modèle 4-autorités (inputs/config/const/secrets), jamais le keyword vars:."
+    inputs:
+      - registry: ir
+        id: model_parameter_binding
+        role: required
+    premises:
+      - operator: derived_from
+        operands:
+          - registry: ir
+            id: model_logical_alias
+          - registry: ir
+            id: model_parameter_binding
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: model_logical_alias
+      independent_judgment: true
+    domain_payload:
+      kind: surface
+      constraint: exposure_rule
+      subject:
+        registry: ir
+        id: model_logical_alias
+    diagnostics: []
+    fixtures:
+      - conformance/tests/stdlib/providers/005-valid-parameterized-model
+    projections: ["prose:01-envelope", "prose:02-verbs", "cli:check", "docs"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:envelope_core.py
+      - conformance:model-suite
+    introduced_in: C0
+    proof_obligations:
+      - "La fixture réelle 005-valid-parameterized-model prouve le pattern : un input typé string avec default anthropic/claude-sonnet-4-6 interpolé dans model. Sa note : « a dynamic `${{ }}` model is resolved at runtime · the static surface layer skips it (the canonical parameterize-the-backend pattern · providers-v0.1.md). »"
+      - "La fixture épelle encore vars.model (pre-R3a) : elle migre avec le codemod R3a classify-not-rename, la loi reste inchangée (la liaison porte l'alias, quel que soit son nom de famille post-E-split)."
+    closure_gates:
+      - fixture-parity
+      - no-dedicated-alias-surface
+
+  # ─────────────── Annexe A-16 phrase 2 · la ligne ghost select ─────────────────
+
+  - id: LAW-GRAMMAR-0501
+    slug: model/select-form-forbidden
+    status: reserved
+    owner: spec
+    domain: GRAMMAR
+    title: "La forme objet model select est interdite dans la grammaire publique v1"
+    prose_projection:
+      chapters: ["01-envelope", "15-proof"]
+      text: "Annexe A-16 phrase 2 verbatim : « La ligne ghost `model: { select: {require, prefer} }` (15:72) est **supprimée**. » Cette loi porte la branche grammaire : le champ model ne parle que la string <provider>/<name> (LAW-SURFACE-0501) · une clé select (et toute forme mapping du champ model) refuse. La ligne 15:72 vivait dans le bloc nika.lock (le champ lock model_select: qui matérialisait la forme ghost) : la surface auteur et sa matérialisation lock meurent ensemble."
+    inputs:
+      - registry: ir
+        id: model_select_key_event
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: model_select_key_event
+        quantifier: exists
+    conclusion:
+      verdict: refuse
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: model_string_form
+      independent_judgment: true
+    domain_payload:
+      kind: grammar
+      position: model_field
+      field_rules:
+        - field: select
+          cardinality: forbidden
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/model/valid/string-only
+    negative_fixtures:
+      - to-mint-c1/conformance/model/invalid/model-select-mapping
+    projections: ["prose:01-envelope", "prose:15-proof", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - reference:envelope_core.py
+      - cli:nika-check
+      - lsp:nika-lsp
+      - mcp:nika-mcp
+      - conformance:model-suite
+    introduced_in: C0
+    proof_obligations:
+      - "Un model: porteur d'un mapping refuse au check : la classe opérante aujourd'hui est le NIKA-PARSE générique (01-envelope.md:220 · validation_error · model non-string). Aucun code numéroté dédié n'est gravé par A-16 : le code canonique est owed à l'import du registre diagnostics (SSOT-2 B.21), jamais inventé ici."
+      - "Le schema JSON du workflow ne publie aucune forme objet du champ model : string uniquement."
+    closure_gates:
+      - fixture-parity
+      - model-select-diagnostic-ruled
+
+  - id: LAW-MIGR-0501
+    slug: model/select-ghost-census-zero
+    status: reserved
+    owner: spec
+    domain: MIGR
+    title: "La forme ghost model select atteint un census de zéro sur les surfaces current-facing"
+    prose_projection:
+      chapters: ["15-proof"]
+      text: "Annexe A-16 phrase 2 verbatim : « La ligne ghost `model: { select: {require, prefer} }` (15:72) est **supprimée**. » Cette loi porte la branche migration : la mention 15:72 (le champ model_select: du bloc nika.lock et son commentaire) meurt dans la cascade, et aucune surface current-facing (spec · canon · schema · docs · exemples · lock format) ne mentionne plus la forme select. FINDING-A : cette migration doc-kill n'a AUCUNE row dans canon/migrations.yaml · row à minter par l'orchestrateur."
+    inputs:
+      - registry: ir
+        id: model_select_ghost_mentions
+        role: required
+    premises:
+      - operator: absent
+        operands:
+          - registry: ir
+            id: model_select_ghost_mentions
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: model_select_ghost_mentions
+      independent_judgment: true
+    domain_payload:
+      kind: migration
+      constraint: old_form_census_zero
+      subject:
+        registry: ir
+        id: model_select_ghost_form
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/model/census/select-ghost-zero
+    projections: ["prose:15-proof", "cli:check", "docs"]
+    implementation_surfaces:
+      - conformance:model-suite
+      - reference:census_gate.py
+    introduced_in: C0
+    proof_obligations:
+      - "Census empirique au pin : l'unique hit vivant est spec/15-proof.md:72 (model_select: · commentaire « `model: { select: {require, prefer} }` materialized » dans le bloc nika.lock). Le census post-cascade rend 0."
+      - "Le lock format perd le champ model_select: dans le même geste (la matérialisation d'une surface supprimée ne survit pas à sa surface)."
+    closure_gates:
+      - model-select-census-zero
+      - migration-row-minted
+
+  # ─────────────── Annexe A-16 phrase 3 · ModelRef entre à l'import ─────────────
+
+  - id: LAW-MIGR-0502
+    slug: model/modelref-enters-ssot1-import
+    status: reserved
+    owner: spec
+    domain: MIGR
+    title: "ModelRef entre dans l'import SSOT-1 des décisions PRE1, dans la fenêtre dédiée"
+    prose_projection:
+      chapters: ["01-envelope"]
+      text: "Annexe A-16 phrase 3 verbatim : « **ModelRef** entre dans l'import SSOT-1 (loi 27). » SSOT-1 point 27 verbatim : « Les nouvelles décisions PRE1 doivent être importées en premier dans cette source : inputs/config/const/secrets ; TypeExpr unique ; extract et tasks.X.out ; classes Outcome dans after ; recovery law ; YAML profile ; permits ; assertions ; guarantees ; modèle temporel ; ModelRef ; feature/capability detection. » Ce fichier EST cet import pour ModelRef : les lois LAW-SURFACE-0501/0502 + LAW-GRAMMAR-0501 + LAW-MIGR-0501 structurent la décision A-16 dans la source normative, dans la fenêtre pré-1.0 dédiée (SSOT-1 points 30-31)."
+    inputs:
+      - registry: ir
+        id: model_ref
+        role: required
+      - registry: ir
+        id: ssot1_first_import_set
+        role: ceiling
+    premises:
+      - operator: member_of
+        operands:
+          - registry: ir
+            id: model_ref
+          - registry: ir
+            id: ssot1_first_import_set
+        quantifier: forall
+    conclusion:
+      verdict: record
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: ssot1_first_import_set
+      independent_judgment: true
+    domain_payload:
+      kind: migration
+      constraint: single_window
+      subject:
+        registry: ir
+        id: model_ref
+    diagnostics: []
+    fixtures:
+      - to-mint-c1/conformance/model/import/modelref-laws-present
+    projections: ["cli:check", "docs"]
+    implementation_surfaces:
+      - conformance:model-suite
+    introduced_in: C0
+    proof_obligations:
+      - "SSOT-1 point 28 verbatim : « Ne pas modifier leur sens pendant la structuration. » Les 4 lois de ce fichier citent A-16 aux bytes près, aucun sens ajouté."
+      - "SSOT-1 point 31 verbatim : « Cette fenêtre peut être découpée en commits et PRs, mais elle doit être fermée avant le freeze 1.0. » L'import ModelRef appartient à cette unique fenêtre."
+    closure_gates:
+      - modelref-import-complete

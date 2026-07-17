@@ -1,0 +1,23 @@
+# canon/tombstones.yaml · C0 SANDBOX SKELETON · Tombstone Registry
+# Schema: schemas/registries.schema.json#/$defs/tombstoneRow (SCELLÉ · consommé as-is).
+# Ce que C0 importe ici : les formes mortes (codes retirés · mots retirés · formes de
+# fichier retirées) avec census pattern (SSOT-2 B.22-23 : « Les codes retirés
+# deviennent des tombstones. Un code retiré n'est jamais réutilisé avec une nouvelle
+# signification. »). Row seed : la réservation du kill MIG-yaml-profile (l'usage
+# blanket du parse générique pour les classes anchor/alias/merge/dup meurt à C1 ·
+# le code générique lui-même survit pour les vrais parse errors).
+registry_document_format: 1
+"$comment": "C0 sandbox skeleton · seed row = reserved tombstone for the blanket-parse USE on yaml-profile classes (MIG-yaml-profile kills it at C1 · the generic code itself survives for real parse errors)"
+tombstones:
+  - id: yaml-profile-blanket-parse-use
+    status: retired
+    owner: spec
+    law_ids: ["LAW-DIAG-0101"]
+    introduced_in: C0
+    kind: phrase
+    retired_in: C1
+    census_pattern:
+      tool: grep
+      pattern: "NIKA-PARSE-001"
+      scope: to-mint-c1/conformance/yaml-profile
+    notes: "Le schema scellé force status: retired sur toute row tombstone (un tombstone EST une retraite) ; retired_in: C1 porte la fenêtre où le kill s'exécute. Réservation du kill : après MIG-yaml-profile, plus aucune fixture yaml-profile ne s'attend au code parse générique pour les classes anchor/alias/merge-key/duplicate-key (R11 point 4 : diagnostic dédié, pas un parse error générique). Le census vise le périmètre yaml-profile, jamais le code générique global."
