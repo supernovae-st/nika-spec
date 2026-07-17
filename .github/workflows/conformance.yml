@@ -59,6 +59,17 @@ jobs:
           python scripts/gen-type-corpus.py --check
           python scripts/gen-type-corpus.py --mutate
 
+      # SSOT gate (SSOT-1 §21-23) · the laws-index/lock projections must equal
+      # their regeneration byte-for-byte, and canon.yaml — a GENERATED projection
+      # since the C0 flip — must carry its header and equal its own --emit-canon
+      # regeneration. A manual edit of a generated surface makes THIS step red
+      # (rc=1 lock drift · rc=5 canon divergence). Fixed commands · repo files
+      # only · no user-controlled strings reach the shell.
+      - name: SSOT gate · lock + laws-index + canon.yaml generated projection
+        run: |
+          python scripts/ssot-compiler.py --check
+          python scripts/ssot-compiler.py --check-canon
+
       - name: Projection gates · in-repo canon markers + pack manifest + llms files
         run: |
           python scripts/canon-projectors.py --check

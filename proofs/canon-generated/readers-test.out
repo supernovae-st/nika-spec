@@ -1,0 +1,30 @@
+# readers test · the canon.yaml readers run UNCHANGED on the regenerated canon (the flip is invisible to every reader)
+
+== in-repo battery (the CI suite · run in the flipped worktree) ==
+type_core_selftest rc=0
+decision_core_selftest rc=0
+gateway_core_selftest rc=0
+outcome_core_selftest rc=0
+composition_core_selftest rc=0
+proof_core_selftest rc=0
+projection_core_selftest rc=0
+gen-type-corpus--check rc=0
+canon-projectors--check rc=0
+showcase-projector--check rc=0
+llms-projector--check rc=0
+starters-projector--check rc=0
+authoring-projector--check rc=0
+design-projector--check rc=0
+runner-all rc=0 (conformance/runner.py all · stdlib surface lists derive from canon.yaml)
+
+== monorepo readers (REPO_ROOT shadow-root: spec/repo -> the flipped worktree · everything else -> the real monorepo) ==
+-- baseline (real checkout · authored canon.yaml) --
+canon-spec-counts-derive.sh --check rc=0 · [GREEN] canon-spec-counts coherent · no drift in current-canon prose
+canon-fix.sh --check rc=0 · [GREEN] canon-fix · 24 target(s) · all markers match canon.yaml
+-- shadow (flipped canon.yaml · GENERATED header) --
+canon-spec-counts-derive.sh --check rc=0 · [GREEN] canon-spec-counts coherent · no drift in current-canon prose
+canon-fix.sh --check rc=0 · [GREEN] canon-fix · 24 target(s) · all markers match canon.yaml
+
+note · the real checkout sits at #111 (24c3dfd) while the shadow spec = origin/main + the flip:
+2 extra GREEN markers (spec/06-stdlib-contract.md:92 · spec/07-conformance.md:167 · canon:builtins=28)
+come from main being ahead of the local checkout, not from the flip. canon-fix target count identical (24).

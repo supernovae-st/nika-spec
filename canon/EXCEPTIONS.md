@@ -33,7 +33,7 @@
 | `severity` (4) | C0 | C1 | studio vocabulary · stays authored per operator reco |
 | `mcp.tools` (9) | C0 | C1 | engine-verified projection (`crates/nika-mcp/src/tools.rs` registry) · features-registry home ruling owed (runtime_capability candidates · sister of the imported `mcp.protocol_versions`) |
 | `canonical_phrasing` (10) | C0 | C1 | the F2 one-voice phrasing registry · `canon/snippets/` home ruling owed (phrase-level rows · sweep tooling reads `match:` fragments) |
-| `schema_version` | C0 | C1 | canon.yaml's own projection marker (v1) · dies at the flip when canon.yaml gains the GENERATED header (SSOT-1 §23) |
+| `schema_version` | C0 | C1 | canon.yaml's own projection marker (v1) · **flip disposition (CF-13)**: SURVIVES the flip verbatim — the reader contract depends on it (`scripts/canon-projectors.py` exits 2 on an unknown version · monorepo derive gates read it) · the original « dies at the flip » intent rides the C1 projector cascade, never a silent removal |
 
 ## Findings register (canon-flip import · SSOT-1 §29)
 
@@ -78,3 +78,38 @@
   LOCK · DECIDE · POLICY · PORT` have codes but no namespace-table row ·
   prose-internal lag, import untouched (canon.yaml is the import source) ·
   prose fix owed at the flip cascade.
+- **CF-12** (the flip · `--emit-canon`) · the 2 SSOT-1 §27 seed rows
+  `NIKA-AGENT-001` + `NIKA-AGENT-002` (byte-untouched at the import wave per
+  the diagnostics `$comment`) are law-minted (LAW-OUTCOME-0403/0402 · causes
+  `budget_exhausted`/`deadline_exceeded`) and do NOT carry the canon.yaml
+  v0.1 projection fields (their `condition` is the law-anchored reservation,
+  not the canon failure text · no `category:`/`transient:` note greppables).
+  Their 2 canon.yaml item lines stay AUTHORED (template-carried by the
+  emitter · `SEED_CARRIED_CODES`) until the C1 diagnostics minting unifies
+  them · id membership stays gated (subset check) · never silent.
+- **CF-13** (the flip) · `schema_version` SURVIVES the flip verbatim (see
+  ledger row) — the « dies at the flip » wording predates the reader census:
+  `canon-projectors.py` refuses unknown versions (exit 2) and the monorepo
+  derive/fix gates read the marker · retirement rides the C1 projector
+  cascade with its own consumer sweep.
+
+## The flip (C0 · `--emit-canon` · SSOT-1 §21-23)
+
+canon.yaml is a **generated projection** since the flip: `--emit-canon`
+re-derives the gated surfaces from the registries (counts by `len(items)` ·
+verbs/namespaces from the surface spellings + the notes-carried « … »
+verbatim semantics · builtins/templates from row ids · error_codes fields
+from the import-c0 rows: `condition` == failure text · category/transient
+note greppables · mcp.protocol_versions via the bijective id transform,
+`latest` = max · outcome classes from the sealed enum) and carries the 16
+ledger sections above + every prose comment + the authored item SEQUENCE
+verbatim from the current file. A GENERATED header tops the file (body
+sha256 · own digest detached per PAA-006). `--check-canon` verifies header
+presence + file == regeneration byte-for-byte (rc 5 · CI red on any manual
+edit of a generated surface — editing an authored ledger section stays
+legal). Scope notes, never silent: (a) item ORDER inside gated sections is
+authored presentation (the registry seeds lead with the §27/YAML rows · the
+SET + field content are the generated truth); (b) a top-level section
+outside the 21 known keys makes emission REFUSE (SSOT-1 §29 · closes the
+doc-vs-code gap where an unlisted uncounted section could pass silently);
+(c) CF-12 above carries the 2 seed-presented codes.

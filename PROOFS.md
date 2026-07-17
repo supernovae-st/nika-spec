@@ -178,6 +178,9 @@ kills rc 2/3/2/1 · les digests changent (chemins/pins C0) et se re-scellent au 
 > documenté · read-only · zéro réseau · déterministe). Le flip réel (canon.yaml
 > GÉNÉRÉ + `--emit-canon` + test des 70+ lecteurs monorepo) reste l'étape
 > suivante du plan — HORS de cette vague.
+>
+> → **FAIT** · la vague suivante a exécuté le flip · voir `§canon-generated`
+> ci-dessous (`--emit-canon` · header GENERATED · byte-gate rc=5 · lecteurs verts).
 
 ### CF-P1 · L'import (9 surfaces gatées · sources verbatim)
 
@@ -244,3 +247,78 @@ deadline_exceeded · lois OUTCOME-0403/0402 vs table legal canon) · CF-09
 IMPL/PROVIDER zéro code (underivable) · CF-10 error_categories sans foyer scellé
 (carried en notes greppables `category: <c>`) · CF-11 la table §namespaces de
 spec/05 liste 15 alors que sa propre table de codes en use 21 (prose lag).
+
+## §canon-generated · 2026-07-17 · LE FLIP · canon.yaml devient une projection générée (SSOT-1 §21-23)
+
+> DoD C0 · la dernière vague MIG-canon-yaml. Le compiler gagne `--emit-canon`
+> (mode write du flip) · canon.yaml gagne son header GENERATED · `--check-canon`
+> gagne le byte-gate (header présent + fichier == sa propre régénération ·
+> **rc=5** sur toute édition manuelle d'une surface générée) · le gate SSOT
+> entre en CI (conformance.yml · « toute édition manuelle d'une projection
+> générée rend la CI rouge » · §23 devient effectif, pas déclaratif).
+
+### CG-P0 · Le dry-run du flip · diff NUL au premier emit
+
+```
+sha256(canon.yaml authored · pré-flip)   a566985e828a0ae531533fc6aed168f19ff3f1f09b891ecc63e848efd1d5d0a1
+sha256(body émis depuis les registres)   a566985e828a0ae531533fc6aed168f19ff3f1f09b891ecc63e848efd1d5d0a1
+```
+
+Le body régénéré == le canon.yaml authored **byte-à-byte** (diff vide · zéro
+finding de contenu). La preuve vit dans le header lui-même : la ligne
+`# body-sha256:` du canon.yaml flippé porte exactement le sha du fichier
+authored pré-flip. Ce que `--emit-canon` dérive des registres · counts par
+`len(items)` · verbs/namespaces (spellings surface + sémantiques « … » verbatim
+des notes) · builtins/templates (row ids) · error_codes (condition == failure ·
+greppables `category:`/`transient:` des notes import-c0) · mcp.protocol_versions
+(transform bijectif · latest = max) · outcome classes (enum scellé). Ce qu'il
+porte verbatim · les 16 sections ledger + chaque commentaire prose + la SÉQUENCE
+des items (présentation authored · les 2 codes seed-carried per CF-12).
+
+### CG-P1 · Déterminisme ×2 + idempotence (emit-run1.out / emit-run2.out)
+
+```
+python3 scripts/ssot-compiler.py --emit-canon   ×2 (le 2e SUR le fichier flippé)
+→ sha256:2f804d154b7c773a8390ff708724cd4eb60129b8a126090cc49d62590d12b3e8 les deux fois
+→ cmp = byte-identique (même commit ⇒ mêmes bytes · §22) · emit(emit(F)) == emit(F)
+```
+
+### CG-P2 · La batterie de mutations (mutation-battery.out · rc capturés SANS pipe)
+
+```
+M1  item généré édité   (builtins assert→asserts)      → rc=5 (+ le gate de parité nomme nika:asserts)
+M2  count généré édité  (counts.builtins 28→29)         → rc=5 (+ « 29 != len 28 » intra-canon)
+M3  failure généré édité (NIKA-SEC-001 hit→HIT)         → rc=5 (byte-gate seul · le champ vient de la row)
+M4  header GENERATED retiré (lignes 1-12)               → rc=5 (« header missing » + bytes differ)
+M5  CONTRE-PREUVE · section AUTHORED éditée (pillars)
+    + ré-émission                                       → rc=0 (les 16 sections ledger restent libres · §18)
+restore byte-exact après chaque mutation                → rc=0
+```
+
+### CG-P3 · Le test des lecteurs (readers-test.out · INCHANGÉS · verts sur le canon régénéré)
+
+```
+IN-REPO (la suite CI complète · jouée dans l'arbre flippé) · 15/15 rc=0
+  conformance/runner.py all (les listes stdlib dérivent de canon.yaml) · 7 selftests
+  (type/decision/gateway/outcome/composition/proof/projection) · gen-type-corpus --check ·
+  6 projectors --check (canon/showcase/llms/starters/authoring/design)
+MONOREPO (REPO_ROOT=shadow-root · spec/repo → l'arbre flippé · le reste → le monorepo réel)
+  canon-spec-counts-derive.sh --check → rc=0 (baseline réel rc=0 · sortie byte-identique)
+  canon-fix.sh --check               → rc=0 · 24 target(s) all markers match (== baseline 24)
+Census · 47 fichiers sous plumbing/scripts + dx référencent le canon spec · les 2
+exécuteurs nommés du DoD tournent verts · le header (commentaires YAML + parse yaml/grep
+counts) est invisible pour chaque classe de lecteur.
+```
+
+### CG-P4 · FINDINGS de la vague (registre complet dans canon/EXCEPTIONS.md)
+
+CF-12 · les 2 seeds §27 (NIKA-AGENT-001/002 · byte-intouchées à l'import) ne
+portent pas les champs projection v0.1 → leurs 2 lignes canon restent authored
+(template-carried · `SEED_CARRIED_CODES`) · l'appartenance reste gatée (subset).
+CF-13 · `schema_version` SURVIT au flip (le « meurt au flip » pré-datait le
+census lecteurs · canon-projectors.py exit 2 + gates monorepo le lisent) · la
+retraite ride la cascade projector C1. Scope déclaré (jamais silencieux) ·
+l'ORDRE des items d'une surface gatée = présentation authored (le SET + le
+contenu des champs = la vérité générée) · une section top-level hors des 21
+clés connues fait REFUSER l'émission (§29 · ferme le trou doc-vs-code du
+--check-canon v0.2 sur les sections non comptées).

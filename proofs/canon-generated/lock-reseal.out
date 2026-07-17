@@ -1,0 +1,7 @@
+# lock re-seal · the compiler source changed (emit-canon + flip gate) -> generator.source_sha256 moved -> write + check
+write OK · 3 outputs
+projection projections/laws-index.json sha256:e61e0731ea31925c59ae5430fe21f9d7ca36d1fb5bc72161d059951ffbabcc97
+lock canon/ssot.lock sha256:dfc099667d696f1e6b21b84e42e688f4aebf784224c007a128349a071a6cccec (detached in canon/ssot.lock.sha256)
+check OK · byte-identical ×3 outputs
+projection projections/laws-index.json sha256:e61e0731ea31925c59ae5430fe21f9d7ca36d1fb5bc72161d059951ffbabcc97
+lock canon/ssot.lock sha256:dfc099667d696f1e6b21b84e42e688f4aebf784224c007a128349a071a6cccec (detached in canon/ssot.lock.sha256)

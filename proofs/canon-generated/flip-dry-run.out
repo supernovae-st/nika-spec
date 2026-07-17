@@ -1,0 +1,7 @@
+# flip dry-run · the emitted body vs the authored canon.yaml (pre-flip) · SSOT-1 « canon.yaml régénéré == authored (diff nul au flip) »
+
+sha256(authored canon.yaml · pre-flip)                 a566985e828a0ae531533fc6aed168f19ff3f1f09b891ecc63e848efd1d5d0a1
+sha256(emit_canon_body · derived from the registries)  a566985e828a0ae531533fc6aed168f19ff3f1f09b891ecc63e848efd1d5d0a1
+
+diff = EMPTY (byte-identical) · zero content findings · the two seed-carried lines (CF-12) are
+template-carried by construction · the header's body-sha256 line in the flipped file IS this digest.
