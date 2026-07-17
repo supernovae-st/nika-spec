@@ -19,7 +19,7 @@
 | Section (canon.yaml) | Owner | Deadline | Reason |
 |---|---|---|---|
 | `counts` | C0 | C1 | counts = derived by parity gate (`--check-canon` verifies `count == len(items)` for every counted section, and registry parity for the imported ones) · never copied · the block becomes a pure projection at the flip |
-| `providers` (16) | C0 | C1 | needs registry home ruling (builtins-section vs registre propre · plan row « ruler au flip ») |
+| `providers` (17) | C0 | C1 | needs registry home ruling (builtins-section vs registre propre · plan row « ruler au flip ») · moonshot (17th · 11th cloud) landed 2026-07-17 via ADR-105 as an authored item in the ledger section (a new provider still edits the authored list, not a sealed row) · the registry home stays owed |
 | `extract_modes` (9) | C0 | C1 | needs registry home ruling (surface vs types · extract = grammaire · plan row) |
 | `error_namespaces` (21 · PARTIAL) | C0 | C1 | 19/21 derived from the imported diagnostic rows and GATED (a row namespace outside the canon set = rc 5) · `NIKA-IMPL` + `NIKA-PROVIDER` carry zero v0.1 codes (canon.yaml AND spec/05-errors.md concrete table) → underivable · reserved-row ruling owed (FINDING CF-09) |
 | `error_categories` (12) | C0 | C1 | the sealed `diagnosticRow` has no category field · each imported row carries its category documentarily in `notes` (greppable `category: <c>`) · registry home ruling owed (FINDING CF-10) |
