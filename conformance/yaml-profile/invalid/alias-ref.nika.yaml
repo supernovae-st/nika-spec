@@ -1,0 +1,10 @@
+# Expected: NIKA-YAML-002 at CHECK.
+# The alias event refuses AT PARSE EVENTS, before any composition — an engine that
+# composes first (and reports an undefined-alias parse error) checks in the wrong order.
+nika: v1
+workflow:
+  id: alias-ref
+tasks:
+  t:
+    exec:
+      command: [echo, *ghost]

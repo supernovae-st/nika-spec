@@ -17,11 +17,14 @@
 # Les slugs yaml/* gardent l'identité yaml-profile. Si l'opérateur veut un domaine
 # YAML dédié : amendement du pack (loi MIGR + schema), geste GATED, jamais ici.
 #
-# Fixtures : le repo spec n'a AUCUNE fixture conformance yaml-profile aujourd'hui
-# (mesuré · find = 0). Convention sandbox : les chemins `to-mint-c1/...` = fixtures à
-# minter à C1 (la forme `TO-MINT-C1` majuscule violerait le pattern fixturePath du
-# schema scellé). Seule fixture RÉELLE existante :
-# research/pre1-gate/probes/anchors.nika.yaml (monorepo · contient &shared + *shared).
+# Fixtures : RÉELLES depuis C1 — conformance/yaml-profile/ (13 négatives sous
+# invalid/ · 4 positives sous valid/ dont la paire frontière depth-at-cap 64-pile +
+# scalar-at-cap 64-KiB-pile) · évaluateur de référence conformance/yaml_profile_core.py
+# · sweep fixture-parity dans yaml_profile_core_selftest.py. Les refs `to-mint-c1/...`
+# restantes (hash/ · parity/ · census/ · envelope/) = artefacts d'autres fenêtres
+# (semantic_hash_core · harnais différentiel 7-surfaces · census_gate · envelope_core) ·
+# jamais tuées en silence. La probe monorepo research/pre1-gate/probes/anchors.nika.yaml
+# reste où elle est (hors spec · contient &shared + *shared).
 
 laws_document_format: 1
 
@@ -69,10 +72,10 @@ laws:
           cardinality: forbidden
     diagnostics: ["NIKA-YAML-001"]
     fixtures:
-      - to-mint-c1/conformance/yaml-profile/valid/no-anchors
+      - conformance/yaml-profile/valid/clean-minimal.nika.yaml
     negative_fixtures:
       - research/pre1-gate/probes/anchors.nika.yaml
-      - to-mint-c1/conformance/yaml-profile/invalid/anchor-unused
+      - conformance/yaml-profile/invalid/anchor-unreferenced.nika.yaml
     projections: ["prose:11-yaml-profile", "schema", "cli:check", "lsp", "mcp", "sdk"]
     implementation_surfaces:
       - engine:nika-schema
@@ -129,10 +132,10 @@ laws:
           cardinality: forbidden
     diagnostics: ["NIKA-YAML-002"]
     fixtures:
-      - to-mint-c1/conformance/yaml-profile/valid/no-aliases
+      - conformance/yaml-profile/valid/clean-minimal.nika.yaml
     negative_fixtures:
       - research/pre1-gate/probes/anchors.nika.yaml
-      - to-mint-c1/conformance/yaml-profile/invalid/alias-ref
+      - conformance/yaml-profile/invalid/alias-ref.nika.yaml
     projections: ["prose:11-yaml-profile", "schema", "cli:check", "lsp", "mcp", "sdk"]
     implementation_surfaces:
       - engine:nika-schema
@@ -187,9 +190,9 @@ laws:
           cardinality: forbidden
     diagnostics: ["NIKA-YAML-003"]
     fixtures:
-      - to-mint-c1/conformance/yaml-profile/valid/no-merge-keys
+      - conformance/yaml-profile/valid/clean-minimal.nika.yaml
     negative_fixtures:
-      - to-mint-c1/conformance/yaml-profile/invalid/merge-key
+      - conformance/yaml-profile/invalid/merge-key.nika.yaml
     projections: ["prose:11-yaml-profile", "schema", "cli:check", "lsp", "mcp", "sdk"]
     implementation_surfaces:
       - engine:nika-schema
@@ -245,9 +248,9 @@ laws:
           cardinality: forbidden
     diagnostics: ["NIKA-YAML-004"]
     fixtures:
-      - to-mint-c1/conformance/yaml-profile/valid/distinct-keys
+      - conformance/yaml-profile/valid/clean-minimal.nika.yaml
     negative_fixtures:
-      - to-mint-c1/conformance/yaml-profile/invalid/dup-key
+      - conformance/yaml-profile/invalid/dup-key.nika.yaml
     projections: ["prose:11-yaml-profile", "schema", "cli:check", "lsp", "mcp", "sdk"]
     implementation_surfaces:
       - engine:nika-schema
@@ -303,9 +306,9 @@ laws:
           cardinality: forbidden
     diagnostics: ["NIKA-YAML-006"]
     fixtures:
-      - to-mint-c1/conformance/yaml-profile/valid/core-tags-only
+      - conformance/yaml-profile/valid/unicode-nfc.nika.yaml
     negative_fixtures:
-      - to-mint-c1/conformance/yaml-profile/invalid/custom-tag
+      - conformance/yaml-profile/invalid/custom-tag.nika.yaml
     projections: ["prose:11-yaml-profile", "schema", "cli:check", "lsp", "mcp", "sdk"]
     implementation_surfaces:
       - engine:nika-schema
@@ -359,9 +362,9 @@ laws:
           cardinality: forbidden
     diagnostics: ["NIKA-YAML-007"]
     fixtures:
-      - to-mint-c1/conformance/yaml-profile/valid/string-keys-only
+      - conformance/yaml-profile/valid/unicode-nfc.nika.yaml
     negative_fixtures:
-      - to-mint-c1/conformance/yaml-profile/invalid/non-string-key
+      - conformance/yaml-profile/invalid/non-string-key.nika.yaml
     projections: ["prose:11-yaml-profile", "schema", "cli:check", "lsp", "mcp", "sdk"]
     implementation_surfaces:
       - engine:nika-schema
@@ -415,10 +418,10 @@ laws:
           cardinality: forbidden
     diagnostics: ["NIKA-YAML-008"]
     fixtures:
-      - to-mint-c1/conformance/yaml-profile/valid/finite-floats
+      - conformance/yaml-profile/valid/unicode-nfc.nika.yaml
     negative_fixtures:
-      - to-mint-c1/conformance/yaml-profile/invalid/nan-scalar
-      - to-mint-c1/conformance/yaml-profile/invalid/infinity-scalar
+      - conformance/yaml-profile/invalid/nan-scalar.nika.yaml
+      - conformance/yaml-profile/invalid/infinity-scalar.nika.yaml
     projections: ["prose:11-yaml-profile", "schema", "cli:check", "lsp", "mcp", "sdk"]
     implementation_surfaces:
       - engine:nika-schema
@@ -480,9 +483,9 @@ laws:
             id: yaml_document_caps
     diagnostics: ["NIKA-YAML-009"]
     fixtures:
-      - to-mint-c1/conformance/yaml-profile/valid/depth-at-cap
+      - conformance/yaml-profile/valid/depth-at-cap.nika.yaml
     negative_fixtures:
-      - to-mint-c1/conformance/yaml-profile/invalid/depth-over-cap
+      - conformance/yaml-profile/invalid/depth-over-cap.nika.yaml
     projections: ["prose:11-yaml-profile", "schema", "cli:check", "lsp", "mcp", "sdk"]
     implementation_surfaces:
       - engine:nika-schema
@@ -543,9 +546,9 @@ laws:
             id: yaml_document_caps
     diagnostics: ["NIKA-YAML-010"]
     fixtures:
-      - to-mint-c1/conformance/yaml-profile/valid/document-at-cap
+      - conformance/yaml-profile/valid/clean-minimal.nika.yaml
     negative_fixtures:
-      - to-mint-c1/conformance/yaml-profile/invalid/document-over-cap
+      - conformance/yaml-profile/invalid/document-over-cap.nika.yaml
     projections: ["prose:11-yaml-profile", "schema", "cli:check", "sdk"]
     implementation_surfaces:
       - engine:nika-schema
@@ -605,9 +608,9 @@ laws:
             id: yaml_scalar_cap
     diagnostics: ["NIKA-YAML-005"]
     fixtures:
-      - to-mint-c1/conformance/yaml-profile/valid/scalar-at-cap
+      - conformance/yaml-profile/valid/scalar-at-cap.nika.yaml
     negative_fixtures:
-      - to-mint-c1/conformance/yaml-profile/invalid/scalar-over-cap
+      - conformance/yaml-profile/invalid/scalar-over-cap.nika.yaml
     projections: ["prose:11-yaml-profile", "schema", "cli:check", "sdk"]
     implementation_surfaces:
       - engine:nika-schema
@@ -667,9 +670,10 @@ laws:
             id: yaml_unicode_contract
     diagnostics: ["NIKA-YAML-011"]
     fixtures:
-      - to-mint-c1/conformance/yaml-profile/valid/nfc-clean
+      - conformance/yaml-profile/valid/unicode-nfc.nika.yaml
     negative_fixtures:
-      - to-mint-c1/conformance/yaml-profile/invalid/bom-or-non-nfc
+      - conformance/yaml-profile/invalid/bom.nika.yaml
+      - conformance/yaml-profile/invalid/non-nfc.nika.yaml
     projections: ["prose:11-yaml-profile", "schema", "cli:check", "sdk"]
     implementation_surfaces:
       - engine:nika-schema
@@ -742,7 +746,7 @@ laws:
         id: NIKA-YAML-001
     diagnostics: []
     fixtures:
-      - to-mint-c1/conformance/yaml-profile/registry/teaching-present
+      - conformance/yaml_profile_core_selftest.py
     projections: ["prose:11-yaml-profile", "cli:check", "lsp", "docs"]
     implementation_surfaces:
       - conformance:yaml-profile-suite
@@ -811,7 +815,7 @@ laws:
         id: NIKA-YAML-001
     diagnostics: []
     fixtures:
-      - to-mint-c1/conformance/yaml-profile/registry/codes-namespaced
+      - conformance/yaml_profile_core_selftest.py
     projections: ["prose:11-yaml-profile", "cli:check", "docs"]
     implementation_surfaces:
       - conformance:yaml-profile-suite

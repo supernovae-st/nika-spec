@@ -1,0 +1,14 @@
+# Expected: NIKA-YAML-001 at CHECK.
+# R11 point 3: an anchor is refused EVEN when never referenced — no alias below,
+# the anchor's mere presence refuses (never a silent expansion path · R11 point 6).
+nika: v1
+workflow:
+  id: anchor-unreferenced
+vars:
+  retries: &shared
+    type: number
+    default: 2
+tasks:
+  t:
+    exec:
+      command: [echo, ok]

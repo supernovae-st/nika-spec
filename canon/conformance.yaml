@@ -1,7 +1,8 @@
 registry_document_format: 1
-$comment: 'C0 sandbox skeleton · row 1 = real anchors probe (negative · refuse NIKA-YAML-001/002) · rows
-  2-3 = pilot CONF law subjects with to-mint paths (FINDING-06: zero yaml-profile fixtures exist in spec
-  conformance today)'
+$comment: 'C0 sandbox skeleton · row 1 = real anchors probe (negative · refuse NIKA-YAML-001/002) · the
+  yaml-profile suite is REAL since C1 (conformance/yaml-profile/ · 13 negatives + 4 positives incl. the
+  at-cap frontier pair · per-file classification via the # Expected header grammar · sweep enforced by
+  conformance/yaml_profile_core_selftest.py) · the census row keeps its to-mint path (census_gate.py owed)'
 conformance:
 - id: yaml-profile-anchors-probe
   status: reserved
@@ -29,28 +30,32 @@ conformance:
   law_ids:
   - LAW-CONF-0101
   introduced_in: C0
-  path: to-mint-c1/conformance/yaml-profile/parity
+  path: conformance/yaml-profile
   polarity: positive
   expected:
     surface: check
     verdict: pass
   profile: core
   notes: 'Sujet de LAW-CONF-0101 (R11 point 10 : même verdict sur CLI, checker, modèle de référence, schema,
-    LSP, MCP et SDK). La suite différentielle se mint à C1.'
+    LSP, MCP et SDK). Le terrain de parité est RÉEL depuis C1 : conformance/yaml-profile/ (17 fixtures) +
+    le modèle de référence conformance/yaml_profile_core.py. Le harnais différentiel cross-surfaces reste
+    owed (la row s''active quand il juge les 7 surfaces sur chaque fixture).'
 - id: yaml-profile-negatives
-  status: reserved
+  status: active
   owner: conformance
   law_ids:
   - LAW-CONF-0102
   introduced_in: C0
-  path: to-mint-c1/conformance/yaml-profile/negatives
+  path: conformance/yaml-profile/invalid
   polarity: negative
   expected:
     surface: check
     verdict: refuse
   profile: core
-  notes: 'Sujet de LAW-CONF-0102 : le lot des fixtures négatives yaml-profile (chacune polarity: negative
-    déclarée · jamais une fixture orpheline).'
+  notes: 'Sujet de LAW-CONF-0102 (R11 point 11 : les fixtures négatives à anchors sont explicitement classées
+    invalides). RÉEL depuis C1 : 13 négatives sous conformance/yaml-profile/invalid/ · chacune porte son
+    code exact via l''en-tête « # Expected: NIKA-YAML-NNN at CHECK. » (la grammaire d''intention du corpus)
+    · le sweep de yaml_profile_core_selftest.py refuse toute orpheline (une négative qui admet = RED).'
 - id: yaml-profile-current-facing-census
   status: reserved
   owner: conformance

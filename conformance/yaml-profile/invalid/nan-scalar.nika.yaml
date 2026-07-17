@@ -1,0 +1,14 @@
+# Expected: NIKA-YAML-008 at CHECK.
+# R11 point 13: NaN refuses — the canonical JSON of the Semantic IR admits only
+# finite numbers (a non-finite float cannot hash deterministically).
+nika: v1
+workflow:
+  id: nan-scalar
+vars:
+  ratio:
+    type: number
+    default: .nan
+tasks:
+  t:
+    exec:
+      command: [echo, ok]

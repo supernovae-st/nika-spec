@@ -1,0 +1,22 @@
+# Expected: exit 0 — the near-boundary LEGAL forms: NFC-normalized accents (café · émis),
+# a QUOTED "123" key (a string key · only PLAIN non-string keys refuse), a finite float,
+# and an explicit CORE-schema tag (!!str) — the profile admits the core seven.
+nika: v1
+workflow:
+  id: unicode-nfc
+  description: café émis en NFC
+vars:
+  ratio:
+    type: number
+    default: 3.14
+  label:
+    type: string
+    default: !!str calme
+  m:
+    type: object
+    default:
+      "123": quoted-string-key
+tasks:
+  t:
+    exec:
+      command: [echo, ok]

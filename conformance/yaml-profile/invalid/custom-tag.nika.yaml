@@ -1,0 +1,10 @@
+# Expected: NIKA-YAML-006 at CHECK.
+# R11 point 13: only the YAML core schema (str, int, float, bool, null, map, seq) is
+# admitted — a custom application tag refuses.
+nika: v1
+workflow:
+  id: custom-tag
+tasks:
+  t:
+    exec:
+      command: [echo, !secret hi]

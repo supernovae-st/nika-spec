@@ -1,0 +1,10 @@
+# Expected: NIKA-YAML-004 at CHECK.
+# R11 points 5+13: a duplicate mapping key refuses with its own stable code —
+# never a silent last-wins.
+nika: v1
+workflow:
+  id: dup-key
+tasks:
+  t:
+    exec: { command: [echo, one] }
+    exec: { command: [echo, two] }

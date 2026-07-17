@@ -1,0 +1,10 @@
+# Expected: exit 0 — profile-clean minimal workflow (R11: no anchors · no aliases ·
+# no merge keys · distinct string keys · core tags only · finite floats · NFC · no BOM ·
+# depth, document and scalar sizes all under the D-2026-07-17-N5 caps).
+nika: v1
+workflow:
+  id: clean-minimal
+tasks:
+  t:
+    exec:
+      command: [echo, ok]

@@ -1,0 +1,13 @@
+# Expected: NIKA-YAML-008 at CHECK.
+# R11 point 13: Infinity refuses (both signs · same law as NaN · LAW-GRAMMAR-0107).
+nika: v1
+workflow:
+  id: infinity-scalar
+vars:
+  bound:
+    type: number
+    default: -.inf
+tasks:
+  t:
+    exec:
+      command: [echo, ok]
