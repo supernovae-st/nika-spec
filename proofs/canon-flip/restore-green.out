@@ -1,0 +1,28 @@
+=== RESTORE · byte-exact copy-back of the pristine file ===
+COUNTS · 18 keys verified against len(items) (derived · never copied)
+PARITY verbs · canon 4 == rows 4
+PARITY namespaces · canon 5 == rows 5
+PARITY builtins · canon 28 == rows 28
+PARITY templates · canon 10 == rows 10
+PARITY error_codes · canon 82 == rows 82 · registry-ahead rows (not yet in canon.yaml · CF-05): NIKA-YAML-001 NIKA-YAML-002 NIKA-YAML-003 NIKA-YAML-004 NIKA-YAML-005 NIKA-YAML-006 NIKA-YAML-007 NIKA-YAML-008 NIKA-YAML-009 NIKA-YAML-010 NIKA-YAML-011
+PARITY error_namespaces · derived 19/21 · declared-empty (ledger CF-09): NIKA-IMPL NIKA-PROVIDER
+PARITY mcp.protocol_versions · canon 5 == rows 5
+PARITY outcome_transitions.classes · canon == sealed enum (4 classes)
+SKIP canonical_phrasing · exception ledger (canon/EXCEPTIONS.md) · one-voice phrasing registry · canon/snippets home ruling owed C1
+SKIP counts · exception ledger (canon/EXCEPTIONS.md) · derived by this gate (count == len(items) verified per section) · never copied
+SKIP diamond_layers · exception ledger (canon/EXCEPTIONS.md) · studio vocabulary · stays authored per operator reco
+SKIP error_categories · exception ledger (canon/EXCEPTIONS.md) · no category field in the sealed diagnosticRow · carried in row notes · ruling owed C1 (CF-10)
+SKIP extract_modes · exception ledger (canon/EXCEPTIONS.md) · needs registry home ruling (C1) · see canon/EXCEPTIONS.md
+SKIP lifecycle_decision · exception ledger (canon/EXCEPTIONS.md) · studio vocabulary · stays authored per operator reco
+SKIP lifecycle_product · exception ledger (canon/EXCEPTIONS.md) · studio vocabulary · stays authored per operator reco
+SKIP lifecycle_risk · exception ledger (canon/EXCEPTIONS.md) · studio vocabulary · stays authored per operator reco
+SKIP mcp.tools · exception ledger (canon/EXCEPTIONS.md) · engine-verified projection (crates/nika-mcp/src/tools.rs) · features home ruling owed C1
+SKIP outcome_transitions.legal · exception ledger (canon/EXCEPTIONS.md) · table-13 registry home owed C1 · kernel-ahead causes = FINDINGS CF-07/CF-08
+SKIP outcome_transitions.payload · exception ledger (canon/EXCEPTIONS.md) · table-13 registry home owed C1 (rides the same ruling as .legal)
+SKIP pillars · exception ledger (canon/EXCEPTIONS.md) · studio vocabulary · stays authored per operator reco
+SKIP providers · exception ledger (canon/EXCEPTIONS.md) · needs registry home ruling (C1) · see canon/EXCEPTIONS.md
+SKIP schema_version · exception ledger (canon/EXCEPTIONS.md) · canon.yaml projection marker · dies at the flip (GENERATED header · SSOT-1 §23)
+SKIP severity · exception ledger (canon/EXCEPTIONS.md) · studio vocabulary · stays authored per operator reco
+SKIP steal_pattern_tiers · exception ledger (canon/EXCEPTIONS.md) · studio vocabulary · stays authored per operator reco
+check-canon OK · one truth · 9 gated surfaces · 16 declared skips (ledger)
+restore rc=0

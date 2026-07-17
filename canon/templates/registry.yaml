@@ -1,22 +1,125 @@
-# canon/templates/registry.yaml · C0 SANDBOX SKELETON · Template Registry (SSOT-2 §A)
+# canon/templates/registry.yaml · C0 CANON-FLIP · Template Registry (SSOT-2 §A)
 # Schema: schemas/registries.schema.json#/$defs/templateRow (SCELLÉ · consommé as-is).
 # SSOT-2 §A verbatim (extraits) : « 2. Le registre est l'unique inventaire officiel
 # des templates. » · « 6. Chaque entrée référence une source `.nika.yaml` canonique
 # vérifiée. » · « 4. Aucun regex parsing du README ou d'une page Markdown pour
 # reconstruire le catalogue. »
-# Le schema impose minItems 1 + source_digest sha256 : la row placeholder porte un
-# digest ZÉRO explicitement marqué (jamais un digest revendiqué) ; l'import C0 la
-# remplace par le catalogue réel (chaque source passe parser + checker + conformance
-# + profil published per SSOT-2 A.8).
+# Import 2026-07-17 (canon-flip) : le placeholder digest-zéro du sandbox est remplacé
+# par le catalogue réel per sa propre déclaration · chaque row porte le sha256 RÉEL de
+# sa source (vérifiée sur disque) · la parité registre↔canon.yaml est gardée par
+# `ssot-compiler --check-canon` (rc=5 sur divergence).
 registry_document_format: 1
-"$comment": "C0 sandbox skeleton · placeholder row with an ALL-ZERO digest explicitly marked (never a claimed digest) · real template catalog import owed at C0 (SSOT-2 A.1-12)"
+$comment: 'canon-flip import 2026-07-17 · the 10 instantiable skeletons imported verbatim from canon.yaml (prose
+  home templates/README.md) · the C0-sandbox all-zero-digest placeholder row is REPLACED per its own declaration
+  · every source_digest is the real sha256 of templates/<id>.nika.yaml · gate: ssot-compiler --check-canon.'
 templates:
-  - id: template-catalog-import-pending
+  - id: agent-loop
     status: reserved
     owner: spec
     law_ids: []
     introduced_in: C0
-    source_path: to-mint-c1/templates/catalog-import
-    source_digest: "sha256:0000000000000000000000000000000000000000000000000000000000000000"
-    category: placeholder
-    notes: "Digest tout-zéro = marqueur de placeholder, jamais un digest revendiqué. L'import C0 remplace cette row par le catalogue réel (SSOT-2 A.6-8 : source canonique vérifiée + digest réel + published profile)."
+    source_path: templates/agent-loop.nika.yaml
+    source_digest: sha256:0f1cbbe36fe92bbfefd565944ddb1efe12ca721150d600495af531c9f080c926
+    category: skeleton
+    notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
+      inventory) · source verified on disk · digest = real sha256 of the source bytes at import · routing intent
+      per templates/README.md.'
+  - id: api-upload-and-create
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    source_path: templates/api-upload-and-create.nika.yaml
+    source_digest: sha256:ece58461cf534963cdc98e6bceff0d51fa954f076cf29beceb7beddf1765bc47
+    category: skeleton
+    notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
+      inventory) · source verified on disk · digest = real sha256 of the source bytes at import · routing intent
+      per templates/README.md.'
+  - id: chain
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    source_path: templates/chain.nika.yaml
+    source_digest: sha256:bd9197b0a806081aaad87c3467737d09abcec419ffdca6dffd32a441c7f22455
+    category: skeleton
+    notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
+      inventory) · source verified on disk · digest = real sha256 of the source bytes at import · routing intent
+      per templates/README.md.'
+  - id: docker-report
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    source_path: templates/docker-report.nika.yaml
+    source_digest: sha256:8f2281ce8c816fc508c608a8a7ef0b61645923f6d7be3d0640af68d4f5da1d44
+    category: skeleton
+    notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
+      inventory) · source verified on disk · digest = real sha256 of the source bytes at import · routing intent
+      per templates/README.md.'
+  - id: etl-state
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    source_path: templates/etl-state.nika.yaml
+    source_digest: sha256:dd894559fad69754dcf38404bbf34ac3cd9e8a51ef2246dae82423ca35445511
+    category: skeleton
+    notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
+      inventory) · source verified on disk · digest = real sha256 of the source bytes at import · routing intent
+      per templates/README.md.'
+  - id: fanout
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    source_path: templates/fanout.nika.yaml
+    source_digest: sha256:0b54e48df2fc0d53e0fe512a38c5842d1fa58b965212b1afac4ac56c1e15afc4
+    category: skeleton
+    notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
+      inventory) · source verified on disk · digest = real sha256 of the source bytes at import · routing intent
+      per templates/README.md.'
+  - id: gate-and-act
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    source_path: templates/gate-and-act.nika.yaml
+    source_digest: sha256:1301f2d6d7d3bc9930281f1e159accf0f34e08d8727e8b97c6c47fcdcc168659
+    category: skeleton
+    notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
+      inventory) · source verified on disk · digest = real sha256 of the source bytes at import · routing intent
+      per templates/README.md.'
+  - id: human-gated-ship
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    source_path: templates/human-gated-ship.nika.yaml
+    source_digest: sha256:7398940b9744413cc38367e7bf574ab8c43c4026347c3304d8abd980891012f1
+    category: skeleton
+    notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
+      inventory) · source verified on disk · digest = real sha256 of the source bytes at import · routing intent
+      per templates/README.md.'
+  - id: media-asset-pack
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    source_path: templates/media-asset-pack.nika.yaml
+    source_digest: sha256:ebf9ea261f64f5eccbb6f9fd51e8c832d437f07ee3840e2fd642876533ffb0e5
+    category: skeleton
+    notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
+      inventory) · source verified on disk · digest = real sha256 of the source bytes at import · routing intent
+      per templates/README.md.'
+  - id: website-brief
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    source_path: templates/website-brief.nika.yaml
+    source_digest: sha256:93f91f88bbd46444a3130d355621c257942bd1975b97753981f65bed0864ba9f
+    category: skeleton
+    notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
+      inventory) · source verified on disk · digest = real sha256 of the source bytes at import · routing intent
+      per templates/README.md.'

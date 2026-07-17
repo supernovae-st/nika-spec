@@ -1,45 +1,414 @@
 registry_document_format: 1
-$comment: C0 sandbox skeleton · seed row = nika:jq pure_internal per R12 point 20 · full builtin classification
-  import owed at C0
+$comment: 'canon-flip import 2026-07-17 · the 28 canonical builtins imported verbatim from canon.yaml (prose home
+  stdlib/builtins-v0.1.md) · one row per builtin, the pre-import duplicate nika:jq rows merged (FINDING CF-02 ·
+  notes carry both verbatims) · gate: ssot-compiler --check-canon.'
 builtins:
-- id: nika:jq
-  status: reserved
-  owner: spec
-  law_ids: []
-  introduced_in: C0
-  category: data
-  capability_classification:
-    class: pure_internal
-  args_schema: to-mint-c1/builtins/jq-args.schema.json
-  error_plane: to-mint-c1/builtins/jq-error-plane.yaml
-  notes: 'R12 point 20 verbatim : « nika:jq ne bénéficie d''aucun bypass magique. Il exige zéro permit
-    uniquement parce qu''il est officiellement classé pure/internal. » Les lois AUTH du modèle 4-ensembles
-    arrivent à l''import R12 (C0) ; law_ids vide tant que reserved.'
-- id: nika:jq
-  status: reserved
-  owner: spec
-  law_ids:
-  - LAW-TEMPORAL-0411
-  introduced_in: C0
-  notes: 'Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
-    no-orphan) · its full shape fills at the consuming law''s implementation window (C1+) · reserved,
-    never silently widened. · R12 point 20 verbatim: zéro permit uniquement parce que officiellement classé
-    pure/internal.'
-  category: data
-  capability_classification:
-    class: pure_internal
-  args_schema: to-mint-c1/nika-jq-args
-  error_plane: NIKA-JQ
-- id: nika:wait
-  status: reserved
-  owner: spec
-  law_ids:
-  - LAW-TEMPORAL-0411
-  introduced_in: C0
-  notes: 'Seeded at the SSOT-1 §27 import wave (2026-07-17) · minted by its citing laws (§12 no-orphan)
-    · shape fills at C1. · B-17 point 14: nika:wait ne garde pas un processus actif (durable suspension).'
-  category: core
-  capability_classification:
-    class: pure_internal
-  args_schema: to-mint-c1/nika-wait-args
-  error_plane: NIKA-NIKAWAIT
+  - id: nika:assert
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: core
+    capability_classification:
+      class: pure_internal
+    args_schema: to-mint-c1/assert-args
+    error_plane: NIKA-BUILTIN-ASSERT
+    notes: Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT).
+  - id: nika:chart
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: media
+    capability_classification:
+      class: external
+      requires:
+        - fs
+    args_schema: to-mint-c1/chart-args
+    error_plane: NIKA-BUILTIN-CHART
+    notes: Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT).
+  - id: nika:compose
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: introspection
+    capability_classification:
+      class: pure_internal
+    args_schema: to-mint-c1/compose-args
+    error_plane: NIKA-BUILTIN-COMPOSE
+    notes: Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT).
+  - id: nika:convert
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: data
+    capability_classification:
+      class: pure_internal
+    args_schema: to-mint-c1/convert-args
+    error_plane: NIKA-BUILTIN-CONVERT
+    notes: Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT).
+  - id: nika:date
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: data
+    capability_classification:
+      class: pure_internal
+    args_schema: to-mint-c1/date-args
+    error_plane: NIKA-BUILTIN-DATE
+    notes: Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT).
+  - id: nika:decide
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: decision
+    capability_classification:
+      class: pure_internal
+    args_schema: to-mint-c1/decide-args
+    error_plane: NIKA-DECIDE
+    notes: 'Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT). Doc verbatim: «
+      PURE compute — zero required effects (a bundle: path reads like any declared fs.read; an inline object needs
+      no filesystem) ». FINDING CF-04: the stdlib category table sums 27 across its rows while the total row says
+      28 · decide carries no category row in the prose table · the sealed enum has `decision` · assigned per enum,
+      divergence declared.'
+  - id: nika:done
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: core
+    capability_classification:
+      class: pure_internal
+    args_schema: to-mint-c1/done-args
+    error_plane: NIKA-BUILTIN-DONE
+    notes: Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT).
+  - id: nika:edit
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: file
+    capability_classification:
+      class: external
+      requires:
+        - fs
+    args_schema: to-mint-c1/edit-args
+    error_plane: NIKA-BUILTIN-EDIT
+    notes: Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT).
+  - id: nika:emit
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: core
+    capability_classification:
+      class: pure_internal
+    args_schema: to-mint-c1/emit-args
+    error_plane: NIKA-BUILTIN-EMIT
+    notes: Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT).
+  - id: nika:fetch
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: network
+    capability_classification:
+      class: external
+      requires:
+        - net
+    args_schema: to-mint-c1/fetch-args
+    error_plane: NIKA-BUILTIN-FETCH
+    notes: 'Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT). Doc verbatim: multipart
+      file parts « every path rides the permits.fs READ boundary (NIKA-SEC-004 on escape) » · arg-conditional fs,
+      the unconditional class is net.'
+  - id: nika:glob
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: file
+    capability_classification:
+      class: external
+      requires:
+        - fs
+    args_schema: to-mint-c1/glob-args
+    error_plane: NIKA-BUILTIN-GLOB
+    notes: Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT).
+  - id: nika:grep
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: file
+    capability_classification:
+      class: external
+      requires:
+        - fs
+    args_schema: to-mint-c1/grep-args
+    error_plane: NIKA-BUILTIN-GREP
+    notes: Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT).
+  - id: nika:hash
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: data
+    capability_classification:
+      class: pure_internal
+    args_schema: to-mint-c1/hash-args
+    error_plane: NIKA-BUILTIN-HASH
+    notes: Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT).
+  - id: nika:image_fx
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: media
+    capability_classification:
+      class: external
+      requires:
+        - fs
+    args_schema: to-mint-c1/image_fx-args
+    error_plane: NIKA-BUILTIN-IMAGE_FX
+    notes: Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT).
+  - id: nika:image_generate
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: media
+    capability_classification:
+      class: external
+      requires:
+        - fs
+        - tools
+    args_schema: to-mint-c1/image_generate-args
+    error_plane: NIKA-BUILTIN-IMAGE_GENERATE
+    notes: 'Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT). Doc verbatim: «
+      the provider egress is engine transport, exactly like infer:; permits.net.http does not govern it, permits.tools
+      + permits.fs DO ».'
+  - id: nika:inspect
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: introspection
+    capability_classification:
+      class: pure_internal
+    args_schema: to-mint-c1/inspect-args
+    error_plane: NIKA-BUILTIN-INSPECT
+    notes: Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT).
+  - id: nika:jq
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: data
+    capability_classification:
+      class: pure_internal
+    args_schema: to-mint-c1/jq-args
+    error_plane: NIKA-BUILTIN-JQ
+    notes: 'Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT). R12 point 20 verbatim
+      préservé (merge of the two pre-import rows · FINDING CF-02): « nika:jq ne bénéficie d''aucun bypass magique.
+      Il exige zéro permit uniquement parce qu''il est officiellement classé pure/internal. » Pre-import row A carried
+      args_schema to-mint-c1/builtins/jq-args.schema.json + error_plane to-mint-c1/builtins/jq-error-plane.yaml
+      · row B carried to-mint-c1/nika-jq-args + error_plane NIKA-JQ and cited LAW-TEMPORAL-0411 (a wait-scoped law
+      whose builtins ref is nika:wait · erroneous on jq · dropped, declared). Normalized to the import convention.'
+  - id: nika:json_diff
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: data
+    capability_classification:
+      class: pure_internal
+    args_schema: to-mint-c1/json_diff-args
+    error_plane: NIKA-BUILTIN-JSON_DIFF
+    notes: Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT).
+  - id: nika:json_merge_patch
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: data
+    capability_classification:
+      class: pure_internal
+    args_schema: to-mint-c1/json_merge_patch-args
+    error_plane: NIKA-BUILTIN-JSON_MERGE_PATCH
+    notes: Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT).
+  - id: nika:log
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: core
+    capability_classification:
+      class: pure_internal
+    args_schema: to-mint-c1/log-args
+    error_plane: NIKA-BUILTIN
+    notes: 'Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT). Doc: best-effort
+      · no failure codes · error_plane = the static arg-contract floor (NIKA-BUILTIN-001).'
+  - id: nika:notify
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: network
+    capability_classification:
+      class: external
+      requires:
+        - net
+    args_schema: to-mint-c1/notify-args
+    error_plane: NIKA-BUILTIN-NOTIFY
+    notes: Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT).
+  - id: nika:prompt
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: core
+    capability_classification:
+      class: pure_internal
+    args_schema: to-mint-c1/prompt-args
+    error_plane: NIKA-BUILTIN-PROMPT
+    notes: Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT).
+  - id: nika:read
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: file
+    capability_classification:
+      class: external
+      requires:
+        - fs
+    args_schema: to-mint-c1/read-args
+    error_plane: NIKA-BUILTIN-READ
+    notes: Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT).
+  - id: nika:tts_generate
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: media
+    capability_classification:
+      class: external
+      requires:
+        - fs
+        - tools
+    args_schema: to-mint-c1/tts_generate-args
+    error_plane: NIKA-BUILTIN-TTS_GENERATE
+    notes: 'Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT). Capability mirrors
+      image_generate per doc: « endpoints are engine-fixed constants … the same sanction as image_generate and infer:
+      » + output_dir rides permits.fs.'
+  - id: nika:uuid
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: data
+    capability_classification:
+      class: pure_internal
+    args_schema: to-mint-c1/uuid-args
+    error_plane: NIKA-BUILTIN
+    notes: 'Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT). Doc: « No failure
+      codes. » · error_plane = the static arg-contract floor (NIKA-BUILTIN-001).'
+  - id: nika:validate
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: data
+    capability_classification:
+      class: pure_internal
+    args_schema: to-mint-c1/validate-args
+    error_plane: NIKA-BUILTIN-VALIDATE
+    notes: Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT).
+  - id: nika:wait
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+      - LAW-TEMPORAL-0411
+    introduced_in: C0
+    category: core
+    capability_classification:
+      class: pure_internal
+    args_schema: to-mint-c1/wait-args
+    error_plane: NIKA-BUILTIN-WAIT
+    notes: 'Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT). B-17 point 14 verbatim
+      préservé: nika:wait ne garde pas un processus actif (durable suspension · LAW-TEMPORAL-0411). FINDING CF-03:
+      pre-import error_plane NIKA-NIKAWAIT contradicted stdlib/builtins-v0.1.md (NIKA-BUILTIN-WAIT-001..003) · corrected
+      to the doc value, declared.'
+  - id: nika:write
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: C0
+    category: file
+    capability_classification:
+      class: external
+      requires:
+        - fs
+    args_schema: to-mint-c1/write-args
+    error_plane: NIKA-BUILTIN-WRITE
+    notes: Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
+      · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT).

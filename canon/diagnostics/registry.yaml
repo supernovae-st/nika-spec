@@ -1,232 +1,1979 @@
 registry_document_format: 1
-$comment: C0 sandbox seed · 4 mandated codes (R11 point 5) + scalar-cap code (P5 gap) + 6 c0-proposed
-  codes (R11 point 13 branches · FINDING-05) · cause=profile_violation is a check-plane cause, never a
-  table-13 runtime row
+$comment: 'C0 sandbox seed + canon-flip import 2026-07-17 · 11 NIKA-YAML profile codes (kernel-born · R11) + 2 NIKA-AGENT
+  seeds (§27 · byte-untouched) + 80 rows imported from canon.yaml error_codes (id+namespace per spec/05-errors.md
+  table · fine fields = honest minimal floors, note import-c0, never invented) · cause=profile_violation stays a
+  check-plane cause, never a table-13 runtime row · the 3 transient=engine-assessed codes carry FINDING CF-06 in
+  notes · gate: ssot-compiler --check-canon.'
 diagnostics:
-- id: NIKA-YAML-001
-  status: reserved
-  owner: spec
-  law_ids:
-  - LAW-GRAMMAR-0101
-  introduced_in: C0
-  namespace: YAML
-  plane: check
-  condition: anchor node present
-  outcome_class: failure
-  cause: profile_violation
-  retryable: false
-  terminal: true
-  payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
-  span_required: true
-  teaching: YAML valide mais le profil Nika interdit les anchors · inline la valeur.
-- id: NIKA-YAML-002
-  status: reserved
-  owner: spec
-  law_ids:
-  - LAW-GRAMMAR-0102
-  introduced_in: C0
-  namespace: YAML
-  plane: check
-  condition: alias node present
-  outcome_class: failure
-  cause: profile_violation
-  retryable: false
-  terminal: true
-  payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
-  span_required: true
-  teaching: Les aliases (*ref) sont interdits · répète la valeur explicitement.
-- id: NIKA-YAML-003
-  status: reserved
-  owner: spec
-  law_ids:
-  - LAW-GRAMMAR-0103
-  introduced_in: C0
-  namespace: YAML
-  plane: check
-  condition: merge key << present
-  outcome_class: failure
-  cause: profile_violation
-  retryable: false
-  terminal: true
-  payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
-  span_required: true
-  teaching: Les merge keys (<<) sont interdites · compose les mappings à la main.
-- id: NIKA-YAML-004
-  status: reserved
-  owner: spec
-  law_ids:
-  - LAW-GRAMMAR-0104
-  introduced_in: C0
-  namespace: YAML
-  plane: check
-  condition: duplicate mapping key
-  outcome_class: failure
-  cause: profile_violation
-  retryable: false
-  terminal: true
-  payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
-  span_required: true
-  teaching: Clé dupliquée · chaque clé de mapping est unique.
-- id: NIKA-YAML-005
-  status: reserved
-  owner: spec
-  law_ids:
-  - LAW-GRAMMAR-0110
-  introduced_in: C0
-  namespace: YAML
-  plane: check
-  condition: scalar length > cap
-  outcome_class: failure
-  cause: profile_violation
-  retryable: false
-  terminal: true
-  payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
-  span_required: true
-  teaching: Scalar trop long · le profil borne la taille (voir le cap déclaré).
-- id: NIKA-YAML-006
-  status: reserved
-  owner: spec
-  law_ids:
-  - LAW-GRAMMAR-0105
-  introduced_in: C0
-  namespace: YAML
-  plane: check
-  condition: custom tag present (outside YAML core schema)
-  outcome_class: failure
-  cause: profile_violation
-  retryable: false
-  terminal: true
-  payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
-  span_required: true
-  teaching: Tag custom interdit · le profil Nika n'admet que le schema core YAML (str, int, float, bool,
-    null, map, seq).
-  notes: c0-proposed (FINDING-05) · renumérotable avant C1.
-- id: NIKA-YAML-007
-  status: reserved
-  owner: spec
-  law_ids:
-  - LAW-GRAMMAR-0106
-  introduced_in: C0
-  namespace: YAML
-  plane: check
-  condition: non-string mapping key
-  outcome_class: failure
-  cause: profile_violation
-  retryable: false
-  terminal: true
-  payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
-  span_required: true
-  teaching: Clé non-string interdite · chaque clé de mapping du profil Nika est une string.
-  notes: c0-proposed (FINDING-05) · renumérotable avant C1.
-- id: NIKA-YAML-008
-  status: reserved
-  owner: spec
-  law_ids:
-  - LAW-GRAMMAR-0107
-  introduced_in: C0
-  namespace: YAML
-  plane: check
-  condition: non-finite float scalar (.nan/.inf)
-  outcome_class: failure
-  cause: profile_violation
-  retryable: false
-  terminal: true
-  payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
-  span_required: true
-  teaching: NaN et Infinity sont interdits · le JSON canonique du Semantic IR n'admet que des nombres
-    finis.
-  notes: c0-proposed (FINDING-05) · renumérotable avant C1.
-- id: NIKA-YAML-009
-  status: reserved
-  owner: spec
-  law_ids:
-  - LAW-GRAMMAR-0108
-  introduced_in: C0
-  namespace: YAML
-  plane: check
-  condition: document depth > cap
-  outcome_class: failure
-  cause: profile_violation
-  retryable: false
-  terminal: true
-  payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
-  span_required: true
-  teaching: Document trop profond · le profil borne la profondeur d'imbrication (voir le cap déclaré).
-  notes: c0-proposed (FINDING-05) · cap TO-RULE (FINDING-04).
-- id: NIKA-YAML-010
-  status: reserved
-  owner: spec
-  law_ids:
-  - LAW-GRAMMAR-0109
-  introduced_in: C0
-  namespace: YAML
-  plane: check
-  condition: document size > cap
-  outcome_class: failure
-  cause: profile_violation
-  retryable: false
-  terminal: true
-  payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
-  span_required: true
-  teaching: Document trop grand · le profil borne la taille de document (voir le cap déclaré).
-  notes: c0-proposed (FINDING-05) · cap TO-RULE (FINDING-04).
-- id: NIKA-YAML-011
-  status: reserved
-  owner: spec
-  law_ids:
-  - LAW-GRAMMAR-0111
-  introduced_in: C0
-  namespace: YAML
-  plane: check
-  condition: source bytes violate the declared unicode NFC/BOM contract
-  outcome_class: failure
-  cause: profile_violation
-  retryable: false
-  terminal: true
-  payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
-  span_required: true
-  teaching: La source viole le contrat Unicode du profil (NFC/BOM) · voir la disposition déclarée au registre
-    grammar.
-  notes: c0-proposed (FINDING-05) · disposition TO-RULE (FINDING-04).
-- id: NIKA-AGENT-001
-  status: reserved
-  owner: spec
-  law_ids:
-  - LAW-OUTCOME-0403
-  introduced_in: C0
-  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · minted by its citing laws (§12 no-orphan)
-    · shape fills at C1.
-  plane: check
-  namespace: AGENT
-  condition: reserved-at-seed · agent bound reached (max_turns / max_tokens_total) without done · the
-    exact condition mints at C1 with the budget_exhausted row (N2-b)
-  outcome_class: failure
-  cause: budget_exhausted
-  retryable: false
-  terminal: true
-  payload_schema: to-mint-c1/nika-agent-payload
-  span_required: true
-  teaching: 'The agent hit its declared bound (max_turns or max_tokens_total) before done: raise the bound,
-    tighten the task, or split the loop · the run fails with cause budget_exhausted (never a silent stop)
-    · N2-b.'
-- id: NIKA-AGENT-002
-  status: reserved
-  owner: spec
-  law_ids:
-  - LAW-OUTCOME-0403
-  introduced_in: C0
-  notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · minted by its citing laws (§12 no-orphan)
-    · shape fills at C1.
-  plane: check
-  namespace: AGENT
-  condition: reserved-at-seed · agent bound reached (max_turns / max_tokens_total) without done · the
-    exact condition mints at C1 with the budget_exhausted row (N2-b)
-  outcome_class: failure
-  cause: budget_exhausted
-  retryable: false
-  terminal: true
-  payload_schema: to-mint-c1/nika-agent-payload
-  span_required: true
-  teaching: 'The agent hit its declared bound (max_turns or max_tokens_total) before done: raise the bound,
-    tighten the task, or split the loop · the run fails with cause budget_exhausted (never a silent stop)
-    · N2-b.'
+  - id: NIKA-YAML-001
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-GRAMMAR-0101
+    introduced_in: C0
+    namespace: YAML
+    plane: check
+    condition: anchor node present
+    outcome_class: failure
+    cause: profile_violation
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
+    span_required: true
+    teaching: YAML valide mais le profil Nika interdit les anchors · inline la valeur.
+  - id: NIKA-YAML-002
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-GRAMMAR-0102
+    introduced_in: C0
+    namespace: YAML
+    plane: check
+    condition: alias node present
+    outcome_class: failure
+    cause: profile_violation
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
+    span_required: true
+    teaching: Les aliases (*ref) sont interdits · répète la valeur explicitement.
+  - id: NIKA-YAML-003
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-GRAMMAR-0103
+    introduced_in: C0
+    namespace: YAML
+    plane: check
+    condition: merge key << present
+    outcome_class: failure
+    cause: profile_violation
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
+    span_required: true
+    teaching: Les merge keys (<<) sont interdites · compose les mappings à la main.
+  - id: NIKA-YAML-004
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-GRAMMAR-0104
+    introduced_in: C0
+    namespace: YAML
+    plane: check
+    condition: duplicate mapping key
+    outcome_class: failure
+    cause: profile_violation
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
+    span_required: true
+    teaching: Clé dupliquée · chaque clé de mapping est unique.
+  - id: NIKA-YAML-005
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-GRAMMAR-0110
+    introduced_in: C0
+    namespace: YAML
+    plane: check
+    condition: scalar length > cap
+    outcome_class: failure
+    cause: profile_violation
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
+    span_required: true
+    teaching: Scalar trop long · le profil borne la taille (voir le cap déclaré).
+  - id: NIKA-YAML-006
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-GRAMMAR-0105
+    introduced_in: C0
+    namespace: YAML
+    plane: check
+    condition: custom tag present (outside YAML core schema)
+    outcome_class: failure
+    cause: profile_violation
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
+    span_required: true
+    teaching: Tag custom interdit · le profil Nika n'admet que le schema core YAML (str, int, float, bool, null,
+      map, seq).
+    notes: c0-proposed (FINDING-05) · renumérotable avant C1.
+  - id: NIKA-YAML-007
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-GRAMMAR-0106
+    introduced_in: C0
+    namespace: YAML
+    plane: check
+    condition: non-string mapping key
+    outcome_class: failure
+    cause: profile_violation
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
+    span_required: true
+    teaching: Clé non-string interdite · chaque clé de mapping du profil Nika est une string.
+    notes: c0-proposed (FINDING-05) · renumérotable avant C1.
+  - id: NIKA-YAML-008
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-GRAMMAR-0107
+    introduced_in: C0
+    namespace: YAML
+    plane: check
+    condition: non-finite float scalar (.nan/.inf)
+    outcome_class: failure
+    cause: profile_violation
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
+    span_required: true
+    teaching: NaN et Infinity sont interdits · le JSON canonique du Semantic IR n'admet que des nombres finis.
+    notes: c0-proposed (FINDING-05) · renumérotable avant C1.
+  - id: NIKA-YAML-009
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-GRAMMAR-0108
+    introduced_in: C0
+    namespace: YAML
+    plane: check
+    condition: document depth > cap
+    outcome_class: failure
+    cause: profile_violation
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
+    span_required: true
+    teaching: Document trop profond · le profil borne la profondeur d'imbrication (voir le cap déclaré).
+    notes: c0-proposed (FINDING-05) · cap TO-RULE (FINDING-04).
+  - id: NIKA-YAML-010
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-GRAMMAR-0109
+    introduced_in: C0
+    namespace: YAML
+    plane: check
+    condition: document size > cap
+    outcome_class: failure
+    cause: profile_violation
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
+    span_required: true
+    teaching: Document trop grand · le profil borne la taille de document (voir le cap déclaré).
+    notes: c0-proposed (FINDING-05) · cap TO-RULE (FINDING-04).
+  - id: NIKA-YAML-011
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-GRAMMAR-0111
+    introduced_in: C0
+    namespace: YAML
+    plane: check
+    condition: source bytes violate the declared unicode NFC/BOM contract
+    outcome_class: failure
+    cause: profile_violation
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/yaml-profile.schema.json
+    span_required: true
+    teaching: La source viole le contrat Unicode du profil (NFC/BOM) · voir la disposition déclarée au registre
+      grammar.
+    notes: c0-proposed (FINDING-05) · disposition TO-RULE (FINDING-04).
+  - id: NIKA-AGENT-001
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-OUTCOME-0403
+    introduced_in: C0
+    notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · minted by its citing laws (§12 no-orphan) · shape
+      fills at C1.
+    plane: check
+    namespace: AGENT
+    condition: reserved-at-seed · agent bound reached (max_turns / max_tokens_total) without done · the exact condition
+      mints at C1 with the budget_exhausted row (N2-b)
+    outcome_class: failure
+    cause: budget_exhausted
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/nika-agent-payload
+    span_required: true
+    teaching: 'The agent hit its declared bound (max_turns or max_tokens_total) before done: raise the bound, tighten
+      the task, or split the loop · the run fails with cause budget_exhausted (never a silent stop) · N2-b.'
+  - id: NIKA-AGENT-002
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-OUTCOME-0403
+    introduced_in: C0
+    notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · minted by its citing laws (§12 no-orphan) · shape
+      fills at C1.
+    plane: check
+    namespace: AGENT
+    condition: reserved-at-seed · agent bound reached (max_turns / max_tokens_total) without done · the exact condition
+      mints at C1 with the budget_exhausted row (N2-b)
+    outcome_class: failure
+    cause: budget_exhausted
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/nika-agent-payload
+    span_required: true
+    teaching: 'The agent hit its declared bound (max_turns or max_tokens_total) before done: raise the bound, tighten
+      the task, or split the loop · the run fails with cause budget_exhausted (never a silent stop) · N2-b.'
+  - id: NIKA-PARSE-001
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: PARSE
+    plane: unclassified
+    condition: the YAML itself does not parse (syntax error)
+    outcome_class: failure
+    cause: parse_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/parse_error.schema.json
+    span_required: false
+    teaching: the YAML itself does not parse (syntax error) · spec/05-errors.md (import-c0 · the teaching string
+      mints at C1).
+    notes: 'import-c0 (canon-flip) · category: parse_error · transient: false (canon.yaml + spec/05-errors.md verbatim)
+      · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping mints at
+      C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-PARSE-002
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: PARSE
+    plane: unclassified
+    condition: 'missing envelope field (nika: / workflow: / non-empty tasks:)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'missing envelope field (nika: / workflow: / non-empty tasks:) · spec/05-errors.md (import-c0 · the
+      teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-PARSE-003
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: PARSE
+    plane: unclassified
+    condition: 'nika: version marker is not exactly v1'
+    outcome_class: failure
+    cause: parse_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/parse_error.schema.json
+    span_required: false
+    teaching: 'nika: version marker is not exactly v1 · spec/05-errors.md (import-c0 · the teaching string mints
+      at C1).'
+    notes: 'import-c0 (canon-flip) · category: parse_error · transient: false (canon.yaml + spec/05-errors.md verbatim)
+      · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping mints at
+      C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-PARSE-004
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: PARSE
+    plane: unclassified
+    condition: 'workflow: id violates ^[a-z][a-z0-9-]*$'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'workflow: id violates ^[a-z][a-z0-9-]*$ · spec/05-errors.md (import-c0 · the teaching string mints
+      at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-PARSE-005
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0313
+      - LAW-AUTH-0322
+      - LAW-GRAMMAR-0510
+    introduced_in: C0
+    namespace: PARSE
+    plane: unclassified
+    condition: unknown field — strict mode rejects anything outside the closed v1 set
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: unknown field — strict mode rejects anything outside the closed v1 set · spec/05-errors.md (import-c0
+      · the teaching string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-PARSE-006
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: PARSE
+    plane: unclassified
+    condition: task id violates ^[a-z][a-z0-9_]*$ (snake_case · CEL-safe · no hyphens)
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: task id violates ^[a-z][a-z0-9_]*$ (snake_case · CEL-safe · no hyphens) · spec/05-errors.md (import-c0
+      · the teaching string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-PARSE-007
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: PARSE
+    plane: unclassified
+    condition: duplicate task id within the workflow
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: duplicate task id within the workflow · spec/05-errors.md (import-c0 · the teaching string mints at
+      C1).
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-PARSE-008
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: PARSE
+    plane: unclassified
+    condition: task declares no verb — exactly one of infer/exec/invoke/agent required
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: task declares no verb — exactly one of infer/exec/invoke/agent required · spec/05-errors.md (import-c0
+      · the teaching string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-PARSE-009
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: PARSE
+    plane: unclassified
+    condition: task declares multiple verbs — exactly one required
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: task declares multiple verbs — exactly one required · spec/05-errors.md (import-c0 · the teaching
+      string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-PARSE-010
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: PARSE
+    plane: unclassified
+    condition: 'timeout: violates the quoted Go-duration contract (positive · max 24h · descending units)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'timeout: violates the quoted Go-duration contract (positive · max 24h · descending units) · spec/05-errors.md
+      (import-c0 · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-PARSE-011
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: PARSE
+    plane: unclassified
+    condition: 'retry: block violates the spec shape'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'retry: block violates the spec shape · spec/05-errors.md (import-c0 · the teaching string mints at
+      C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-PARSE-012
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: PARSE
+    plane: unclassified
+    condition: 'on_error: block violates the spec shape (fields mutually exclusive)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'on_error: block violates the spec shape (fields mutually exclusive) · spec/05-errors.md (import-c0
+      · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-PARSE-013
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: PARSE
+    plane: unclassified
+    condition: 'with:/output: binding uses a reserved name (output · status · error · started_at · ended_at · duration_ms)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'with:/output: binding uses a reserved name (output · status · error · started_at · ended_at · duration_ms)
+      · spec/05-errors.md (import-c0 · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-PARSE-014
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: PARSE
+    plane: unclassified
+    condition: 'secrets: entry is not a store reference — inline literals forbidden'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'secrets: entry is not a store reference — inline literals forbidden · spec/05-errors.md (import-c0
+      · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-PARSE-015
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: PARSE
+    plane: unclassified
+    condition: 'typed vars: declaration malformed (type in string/number/integer/boolean/array/object)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'typed vars: declaration malformed (type in string/number/integer/boolean/array/object) · spec/05-errors.md
+      (import-c0 · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-PARSE-017
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: PARSE
+    plane: unclassified
+    condition: duplicate mapping key — no silent last-wins
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: duplicate mapping key — no silent last-wins · spec/05-errors.md (import-c0 · the teaching string mints
+      at C1).
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-PARSE-018
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: PARSE
+    plane: unclassified
+    condition: missing required field in a verb body (infer.prompt · exec.command · invoke.tool)
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: missing required field in a verb body (infer.prompt · exec.command · invoke.tool) · spec/05-errors.md
+      (import-c0 · the teaching string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-PARSE-019
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: PARSE
+    plane: unclassified
+    condition: generic structural validation — wrong YAML shape for a field
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: generic structural validation — wrong YAML shape for a field · spec/05-errors.md (import-c0 · the
+      teaching string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-PARSE-020
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: PARSE
+    plane: unclassified
+    condition: 'workflow: is a scalar — the envelope became an object (workflow: then id: <value>)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'workflow: is a scalar — the envelope became an object (workflow: then id: <value>) · spec/05-errors.md
+      (import-c0 · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-PARSE-021
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: PARSE
+    plane: unclassified
+    condition: 'top-level description: — it moved into workflow.description'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'top-level description: — it moved into workflow.description · spec/05-errors.md (import-c0 · the
+      teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-PARSE-022
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: PARSE
+    plane: unclassified
+    condition: 'tasks: is a sequence — it became a map keyed by task id (drop `- id:`, the key IS the identity)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'tasks: is a sequence — it became a map keyed by task id (drop `- id:`, the key IS the identity) ·
+      spec/05-errors.md (import-c0 · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-PARSE-023
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: PARSE
+    plane: unclassified
+    condition: 'a task carries an id: field — the map key is the identity, the field is gone'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'a task carries an id: field — the map key is the identity, the field is gone · spec/05-errors.md
+      (import-c0 · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-PARSE-024
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: PARSE
+    plane: unclassified
+    condition: 'a task carries depends_on: — dead since W2 (data → with: bindings · control → after: predicates
+      · check --fix migrates)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'a task carries depends_on: — dead since W2 (data → with: bindings · control → after: predicates ·
+      check --fix migrates) · spec/05-errors.md (import-c0 · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-PARSE-025
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: PARSE
+    plane: unclassified
+    condition: 'decode: with capture: structured — that capture already IS an object · type it with returns:'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'decode: with capture: structured — that capture already IS an object · type it with returns: · spec/05-errors.md
+      (import-c0 · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-COMP-001
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: COMP
+    plane: unclassified
+    condition: 'invoke.workflow: target is not statically resolvable (templated · malformed · unpinned registry
+      ref) — a call graph you cannot draw before the run cannot be bounded (spec 14)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'invoke.workflow: target is not statically resolvable (templated · malformed · unpinned registry ref)
+      — a call graph you cannot draw before the run cannot be bounded (spec 14) · spec/05-errors.md (import-c0 ·
+      the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-COMP-002
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: COMP
+    plane: unclassified
+    condition: the child workflow's effect boundary exceeds the parent capped by the call-site declaration (Authority(child)
+      subset of Authority(parent) intersect declared · spec 14 laws 3/4)
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: false
+    teaching: the child workflow's effect boundary exceeds the parent capped by the call-site declaration (Authority(child)
+      subset of Authority(parent) intersect declared · spec 14 laws 3/4) · spec/05-errors.md (import-c0 · the teaching
+      string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: security_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-COMP-003
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: COMP
+    plane: unclassified
+    condition: the static call graph is not acyclic (self-launch · cycle · spec 14 law 7 · NIKA-SEC-003 is the runtime
+      depth backstop)
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: the static call graph is not acyclic (self-launch · cycle · spec 14 law 7 · NIKA-SEC-003 is the runtime
+      depth backstop) · spec/05-errors.md (import-c0 · the teaching string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-COMP-004
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: COMP
+    plane: unclassified
+    condition: the typed call does not compose — parent args do not fit child inputs, or child outputs do not fit
+      parent returns (spec 14 law 2)
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: the typed call does not compose — parent args do not fit child inputs, or child outputs do not fit
+      parent returns (spec 14 law 2) · spec/05-errors.md (import-c0 · the teaching string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-DAG-001
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: DAG
+    plane: unclassified
+    condition: cycle in the precedence graph G_p = E_d ∪ E_c (incl. self-dependency · via with:/after:)
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: cycle in the precedence graph G_p = E_d ∪ E_c (incl. self-dependency · via with:/after:) · spec/05-errors.md
+      (import-c0 · the teaching string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-DAG-002
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: DAG
+    plane: unclassified
+    condition: 'with:/after: references an undeclared task'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'with:/after: references an undeclared task · spec/05-errors.md (import-c0 · the teaching string mints
+      at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-DAG-004
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-GRAPH-0301
+      - LAW-GRAPH-0302
+    introduced_in: C0
+    namespace: DAG
+    plane: unclassified
+    condition: on_error.recover references a task downstream of the declaring task (await would deadlock)
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: on_error.recover references a task downstream of the declaring task (await would deadlock) · spec/05-errors.md
+      (import-c0 · the teaching string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-DAG-005
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-GRAPH-0304
+    introduced_in: C0
+    namespace: DAG
+    plane: unclassified
+    condition: 'after: predicate outside the closed set (succeeded · failed · skipped · terminal)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'after: predicate outside the closed set (succeeded · failed · skipped · terminal) · spec/05-errors.md
+      (import-c0 · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-DAG-006
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: DAG
+    plane: unclassified
+    condition: 'statically dead task — an incoming edge''s pass-set excludes every reachable producer state, or
+      the when: gate is false under every reachable upstream combination (gate algebra v2)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'statically dead task — an incoming edge''s pass-set excludes every reachable producer state, or the
+      when: gate is false under every reachable upstream combination (gate algebra v2) · spec/05-errors.md (import-c0
+      · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-DAG-007
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: DAG
+    plane: unclassified
+    condition: status compared against a literal outside the vocabulary (success · failure · skipped · cancelled)
+      — == never matches, != always holds
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: status compared against a literal outside the vocabulary (success · failure · skipped · cancelled)
+      — == never matches, != always holds · spec/05-errors.md (import-c0 · the teaching string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-TYPE-001
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-GRAMMAR-0211
+      - LAW-GRAMMAR-0520
+      - LAW-SURFACE-0520
+      - LAW-SURFACE-0521
+      - LAW-SURFACE-0522
+    introduced_in: C0
+    namespace: TYPE
+    plane: unclassified
+    condition: 'unknown type name (in types: · returns: · an outputs: type) — did-you-mean when close'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'unknown type name (in types: · returns: · an outputs: type) — did-you-mean when close · spec/05-errors.md
+      (import-c0 · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-TYPE-002
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: TYPE
+    plane: unclassified
+    condition: 'recursive type reference — the types: graph must be acyclic'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'recursive type reference — the types: graph must be acyclic · spec/05-errors.md (import-c0 · the
+      teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-TYPE-003
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: TYPE
+    plane: unclassified
+    condition: 'returns: and schema: on the same task — one contract, one spelling'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'returns: and schema: on the same task — one contract, one spelling · spec/05-errors.md (import-c0
+      · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-TYPE-004
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: TYPE
+    plane: unclassified
+    condition: 'returns: type unreachable from the declared decode: (an object contract over decode: text · …)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'returns: type unreachable from the declared decode: (an object contract over decode: text · …) ·
+      spec/05-errors.md (import-c0 · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-TYPE-005
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: TYPE
+    plane: unclassified
+    condition: a secret-carrying type in a lowered position (reserved with secret<T> · W4)
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: false
+    teaching: a secret-carrying type in a lowered position (reserved with secret<T> · W4) · spec/05-errors.md (import-c0
+      · the teaching string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: security_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-TYPE-006
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: TYPE
+    plane: unclassified
+    condition: regex pattern outside the locked dialect (backreference · lookaround · named group · inline flags
+      · lazy/possessive · word-boundary · unicode-class — spec 09 §the regex dialect)
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: regex pattern outside the locked dialect (backreference · lookaround · named group · inline flags
+      · lazy/possessive · word-boundary · unicode-class — spec 09 §the regex dialect) · spec/05-errors.md (import-c0
+      · the teaching string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-TYPE-101
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: TYPE
+    plane: unclassified
+    condition: 'run-time contract violation — the decoded value does not fit returns: (exec:/invoke: lane)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'run-time contract violation — the decoded value does not fit returns: (exec:/invoke: lane) · spec/05-errors.md
+      (import-c0 · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-VAR-001
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-OUTCOME-0301
+    introduced_in: C0
+    namespace: VAR
+    plane: unclassified
+    condition: unresolved reference (unknown namespace entry · undeclared env/vars key)
+    outcome_class: failure
+    cause: variable_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/variable_error.schema.json
+    span_required: false
+    teaching: unresolved reference (unknown namespace entry · undeclared env/vars key) · spec/05-errors.md (import-c0
+      · the teaching string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: variable_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-VAR-002
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: VAR
+    plane: unclassified
+    condition: binding cardinality — a jq binding emitted zero or multiple values
+    outcome_class: failure
+    cause: variable_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/variable_error.schema.json
+    span_required: false
+    teaching: binding cardinality — a jq binding emitted zero or multiple values · spec/05-errors.md (import-c0
+      · the teaching string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: variable_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-VAR-003
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: VAR
+    plane: unclassified
+    condition: provably-invalid path into a declared schema (static walk)
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: provably-invalid path into a declared schema (static walk) · spec/05-errors.md (import-c0 · the teaching
+      string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-VAR-004
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: VAR
+    plane: unclassified
+    condition: jq runtime error while evaluating a binding
+    outcome_class: failure
+    cause: variable_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/variable_error.schema.json
+    span_required: false
+    teaching: jq runtime error while evaluating a binding · spec/05-errors.md (import-c0 · the teaching string mints
+      at C1).
+    notes: 'import-c0 (canon-flip) · category: variable_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-VAR-005
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: VAR
+    plane: unclassified
+    condition: 'static expression violation — outside cel-subset/0.1 · chained relation · unknown function · non-boolean
+      when: root · jq compile error'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'static expression violation — outside cel-subset/0.1 · chained relation · unknown function · non-boolean
+      when: root · jq compile error · spec/05-errors.md (import-c0 · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-VAR-006
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: VAR
+    plane: unclassified
+    condition: 'expression type error at evaluation — cross-type compare · non-boolean when: value · for_each over
+      a non-array'
+    outcome_class: failure
+    cause: variable_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/variable_error.schema.json
+    span_required: false
+    teaching: 'expression type error at evaluation — cross-type compare · non-boolean when: value · for_each over
+      a non-array · spec/05-errors.md (import-c0 · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: variable_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-VAR-007
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: VAR
+    plane: unclassified
+    condition: bytes value substituted into a string position
+    outcome_class: failure
+    cause: variable_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/variable_error.schema.json
+    span_required: false
+    teaching: bytes value substituted into a string position · spec/05-errors.md (import-c0 · the teaching string
+      mints at C1).
+    notes: 'import-c0 (canon-flip) · category: variable_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-VAR-008
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: VAR
+    plane: unclassified
+    condition: unclosed ${{ opener
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: unclosed ${{ opener · spec/05-errors.md (import-c0 · the teaching string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-VAR-020
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: VAR
+    plane: unclassified
+    condition: 'bare tasks.X is the envelope, not a value — the projection set (.output/.status/.error/.duration_ms)
+      is closed and required (04 §namespaces · 0.103 · #75 D2)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'bare tasks.X is the envelope, not a value — the projection set (.output/.status/.error/.duration_ms)
+      is closed and required (04 §namespaces · 0.103 · #75 D2) · spec/05-errors.md (import-c0 · the teaching string
+      mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-VAR-021
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: VAR
+    plane: unclassified
+    condition: 'a tasks.* reference outside the boundary (with: · after: · on_error.recover · on_finally parent-only
+      · workflow outputs) — hoist it into with: (check --fix applies it)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'a tasks.* reference outside the boundary (with: · after: · on_error.recover · on_finally parent-only
+      · workflow outputs) — hoist it into with: (check --fix applies it) · spec/05-errors.md (import-c0 · the teaching
+      string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-VAR-009
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: VAR
+    plane: unclassified
+    condition: 'typed outputs value did not match its declared type: at run end (the output half of the callable
+      contract)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'typed outputs value did not match its declared type: at run end (the output half of the callable
+      contract) · spec/05-errors.md (import-c0 · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-INFER-001
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: INFER
+    plane: unclassified
+    condition: provider call failed (HTTP error · provider refusal)
+    outcome_class: failure
+    cause: provider_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/provider_error.schema.json
+    span_required: false
+    teaching: provider call failed (HTTP error · provider refusal) · spec/05-errors.md (import-c0 · the teaching
+      string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: provider_error · transient: engine-assessed (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false. FINDING CF-06: the source says transient:
+      engine-assessed · the sealed boolean retryable cannot carry it · false = the static floor (NOT a denial ·
+      the engine assesses the instance) · ruling owed C1.'
+  - id: NIKA-INFER-002
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: INFER
+    plane: unclassified
+    condition: structured output failed schema validation (after any engine-internal retries)
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: structured output failed schema validation (after any engine-internal retries) · spec/05-errors.md
+      (import-c0 · the teaching string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-EXEC-001
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: EXEC
+    plane: unclassified
+    condition: non-zero exit code (default capture modes)
+    outcome_class: failure
+    cause: process_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/process_error.schema.json
+    span_required: false
+    teaching: non-zero exit code (default capture modes) · spec/05-errors.md (import-c0 · the teaching string mints
+      at C1).
+    notes: 'import-c0 (canon-flip) · category: process_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-EXEC-002
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: EXEC
+    plane: unclassified
+    condition: spawn failure (command not found · permission)
+    outcome_class: failure
+    cause: process_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/process_error.schema.json
+    span_required: false
+    teaching: spawn failure (command not found · permission) · spec/05-errors.md (import-c0 · the teaching string
+      mints at C1).
+    notes: 'import-c0 (canon-flip) · category: process_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-INVOKE-001
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: INVOKE
+    plane: unclassified
+    condition: 'unknown tool (unresolvable nika:/mcp: id)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'unknown tool (unresolvable nika:/mcp: id) · spec/05-errors.md (import-c0 · the teaching string mints
+      at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-INVOKE-002
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: INVOKE
+    plane: unclassified
+    condition: tool args failed the tool's schema
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: tool args failed the tool's schema · spec/05-errors.md (import-c0 · the teaching string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-AGENT-003
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: AGENT
+    plane: unclassified
+    condition: 'a skills: path does not resolve (file missing/unreadable at compose time)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'a skills: path does not resolve (file missing/unreadable at compose time) · spec/05-errors.md (import-c0
+      · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-AGENT-004
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: AGENT
+    plane: unclassified
+    condition: 'a skills: file is not a valid Agent Skill (frontmatter shape · missing/empty name/description)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'a skills: file is not a valid Agent Skill (frontmatter shape · missing/empty name/description) ·
+      spec/05-errors.md (import-c0 · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-MCP-001
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: MCP
+    plane: unclassified
+    condition: MCP server not configured / not reachable at call time
+    outcome_class: failure
+    cause: tool_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/tool_error.schema.json
+    span_required: false
+    teaching: MCP server not configured / not reachable at call time · spec/05-errors.md (import-c0 · the teaching
+      string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: tool_error · transient: engine-assessed (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false. FINDING CF-06: the source says transient:
+      engine-assessed · the sealed boolean retryable cannot carry it · false = the static floor (NOT a denial ·
+      the engine assesses the instance) · ruling owed C1.'
+  - id: NIKA-MCP-002
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: MCP
+    plane: unclassified
+    condition: MCP tool call failed (transport · tool-side error)
+    outcome_class: failure
+    cause: tool_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/tool_error.schema.json
+    span_required: false
+    teaching: MCP tool call failed (transport · tool-side error) · spec/05-errors.md (import-c0 · the teaching string
+      mints at C1).
+    notes: 'import-c0 (canon-flip) · category: tool_error · transient: engine-assessed (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false. FINDING CF-06: the source says transient:
+      engine-assessed · the sealed boolean retryable cannot carry it · false = the static floor (NOT a denial ·
+      the engine assesses the instance) · ruling owed C1.'
+  - id: NIKA-DECIDE-001
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: DECIDE
+    plane: unclassified
+    condition: the decision bundle is malformed or violates its own laws (float weight · undeclared evidence key
+      in rules · identity key feeding a technical dimension · missing contradictory fixture · monotonicity violated
+      by the bundle's own fixtures) (spec 11)
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: the decision bundle is malformed or violates its own laws (float weight · undeclared evidence key
+      in rules · identity key feeding a technical dimension · missing contradictory fixture · monotonicity violated
+      by the bundle's own fixtures) (spec 11) · spec/05-errors.md (import-c0 · the teaching string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-DECIDE-002
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: DECIDE
+    plane: unclassified
+    condition: the evidence snapshot does not satisfy the bundle's evidence schema (type misfit · unauthorized source
+      · integrity below the declared floor · undeclared key) (spec 11)
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: the evidence snapshot does not satisfy the bundle's evidence schema (type misfit · unauthorized source
+      · integrity below the declared floor · undeclared key) (spec 11) · spec/05-errors.md (import-c0 · the teaching
+      string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-POLICY-001
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0313
+    introduced_in: C0
+    namespace: POLICY
+    plane: unclassified
+    condition: 'a hard policy: rule is violated (require.human_gate_before · forbid.exec_after · allow.providers
+      · limits.max_tasks) — the diagnostic names rule + task + witness (order rules: the path) · check-time, before
+      any token (spec 10)'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: false
+    teaching: 'a hard policy: rule is violated (require.human_gate_before · forbid.exec_after · allow.providers
+      · limits.max_tasks) — the diagnostic names rule + task + witness (order rules: the path) · check-time, before
+      any token (spec 10) · spec/05-errors.md (import-c0 · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: security_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-PORT-001
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: PORT
+    plane: unclassified
+    condition: a gateway artifact (deployment bundle · capabilities report · lowering report · fidelity report ·
+      authority delta) is malformed or violates its laws (unknown promoted · permissive_unsafe without refusal ·
+      disclosure subset-chain violated · child authority exceeding parent) (spec 12)
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: a gateway artifact (deployment bundle · capabilities report · lowering report · fidelity report ·
+      authority delta) is malformed or violates its laws (unknown promoted · permissive_unsafe without refusal ·
+      disclosure subset-chain violated · child authority exceeding parent) (spec 12) · spec/05-errors.md (import-c0
+      · the teaching string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-PORT-002
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: PORT
+    plane: unclassified
+    condition: policy lowering is permissive_unsafe — the backend would allow what the policy forbids · refused
+      with the divergence witness (spec 12)
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: false
+    teaching: policy lowering is permissive_unsafe — the backend would allow what the policy forbids · refused with
+      the divergence witness (spec 12) · spec/05-errors.md (import-c0 · the teaching string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: security_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-SEC-001
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: SEC
+    plane: unclassified
+    condition: 'exec: blocklist hit'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: false
+    teaching: 'exec: blocklist hit · spec/05-errors.md (import-c0 · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: security_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-SEC-002
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: SEC
+    plane: unclassified
+    condition: 'agent tool call outside the tools: whitelist'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: false
+    teaching: 'agent tool call outside the tools: whitelist · spec/05-errors.md (import-c0 · the teaching string
+      mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: security_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-SEC-003
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: SEC
+    plane: unclassified
+    condition: run-recursion bound — nested-run depth exceeded OR self-launching workflow
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: false
+    teaching: run-recursion bound — nested-run depth exceeded OR self-launching workflow · spec/05-errors.md (import-c0
+      · the teaching string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: security_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-SEC-004
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0303
+    introduced_in: C0
+    namespace: SEC
+    plane: unclassified
+    condition: 'effect outside the declared permits: capability boundary (fs/net/exec/tool)'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: false
+    teaching: 'effect outside the declared permits: capability boundary (fs/net/exec/tool) · spec/05-errors.md (import-c0
+      · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: security_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-SEC-005
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: SEC
+    plane: unclassified
+    condition: SSRF block — a nika:fetch/nika:notify URL resolves to a loopback/private/link-local/metadata target
+      (always-on engine floor · independent of permits:)
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: false
+    teaching: SSRF block — a nika:fetch/nika:notify URL resolves to a loopback/private/link-local/metadata target
+      (always-on engine floor · independent of permits:) · spec/05-errors.md (import-c0 · the teaching string mints
+      at C1).
+    notes: 'import-c0 (canon-flip) · category: security_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-SEC-006
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0323
+    introduced_in: C0
+    namespace: SEC
+    plane: unclassified
+    condition: secret flow — a secrets.<name> value reaches an unsanctioned sink (exec argument · invoke payload
+      · infer/agent prompt) · the diagnostic carries the taint path + the egress clause that would sanction it (spec
+      10 · flow rules in 01 §egress)
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: false
+    teaching: secret flow — a secrets.<name> value reaches an unsanctioned sink (exec argument · invoke payload
+      · infer/agent prompt) · the diagnostic carries the taint path + the egress clause that would sanction it (spec
+      10 · flow rules in 01 §egress) · spec/05-errors.md (import-c0 · the teaching string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: security_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-SEC-007
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0323
+    introduced_in: C0
+    namespace: SEC
+    plane: unclassified
+    condition: 'secret egress — a tainted value reaches the workflow boundary (outputs:) · the diagnostic carries
+      the taint path (spec 10 · the to: outputs sanction in 01 §egress)'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: false
+    teaching: 'secret egress — a tainted value reaches the workflow boundary (outputs:) · the diagnostic carries
+      the taint path (spec 10 · the to: outputs sanction in 01 §egress) · spec/05-errors.md (import-c0 · the teaching
+      string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: security_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-TIMEOUT-001
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-OUTCOME-0401
+    introduced_in: C0
+    namespace: TIMEOUT
+    plane: unclassified
+    condition: 'task (or for_each iteration) exceeded timeout:'
+    outcome_class: failure
+    cause: timeout
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/timeout_error.schema.json
+    span_required: false
+    teaching: 'task (or for_each iteration) exceeded timeout: · spec/05-errors.md (import-c0 · the teaching string
+      mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: timeout_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause = the kernel-law-declared Outcome.cause (LAW-OUTCOME-0401 verbatim) · plane (check vs runtime)
+      is not given per-code by the source → unclassified until C1 · terminal=true is the unhandled-floor (05 §workflow-level
+      semantics: an unrecovered terminal error fails the workflow) · span obligation not stated by the source →
+      span_required false.'
+  - id: NIKA-CANCEL-001
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-TEMPORAL-0415
+    introduced_in: C0
+    namespace: CANCEL
+    plane: unclassified
+    condition: task cancelled (workflow failure gate · user cancellation)
+    outcome_class: cancelled
+    cause: cancelled
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/cancelled.schema.json
+    span_required: false
+    teaching: task cancelled (workflow failure gate · user cancellation) · spec/05-errors.md (import-c0 · the teaching
+      string mints at C1).
+    notes: 'import-c0 (canon-flip) · category: cancelled · transient: false (canon.yaml + spec/05-errors.md verbatim)
+      · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping mints at
+      C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-ASSERT-001
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-ASSERT-0302
+      - LAW-ASSERT-0303
+      - LAW-ASSERT-0305
+      - LAW-ASSERT-0306
+    introduced_in: C0
+    namespace: ASSERT
+    plane: unclassified
+    condition: 'an assert: claims a level the evidence does not support (a StaticProof the IR cannot decide · a
+      mis-leveled obligation · spec 15)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'an assert: claims a level the evidence does not support (a StaticProof the IR cannot decide · a mis-leveled
+      obligation · spec 15) · spec/05-errors.md (import-c0 · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-LOCK-001
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: LOCK
+    plane: unclassified
+    condition: a dependency resolved that nika.lock does not pin, or a hand-edited lock digest does not match (pin-by-default
+      · the lock's own hash catches the edit · spec 15)
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: a dependency resolved that nika.lock does not pin, or a hand-edited lock digest does not match (pin-by-default
+      · the lock's own hash catches the edit · spec 15) · spec/05-errors.md (import-c0 · the teaching string mints
+      at C1).
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-BUILTIN-001
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: BUILTIN
+    plane: unclassified
+    condition: 'builtin invoke violates its statically-checkable arg contract (e.g. nika:fetch without url: · nika:jq
+      arg shape)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'builtin invoke violates its statically-checkable arg contract (e.g. nika:fetch without url: · nika:jq
+      arg shape) · spec/05-errors.md (import-c0 · the teaching string mints at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'
+  - id: NIKA-BUILTIN-DONE-001
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C0
+    namespace: BUILTIN
+    plane: unclassified
+    condition: 'nika:done invoked outside an agent: loop'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'nika:done invoked outside an agent: loop · spec/05-errors.md (import-c0 · the teaching string mints
+      at C1).'
+    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
+      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
+      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
+      span obligation not stated by the source → span_required false.'

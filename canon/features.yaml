@@ -1,19 +1,88 @@
-# canon/features.yaml · C0 SANDBOX SKELETON · Feature/Capability Registry (R7)
+# canon/features.yaml · C0 CANON-FLIP · Feature/Capability Registry (R7)
 # Schema: schemas/registries.schema.json#/$defs/featureRow (SCELLÉ · consommé as-is).
-# Ce que C0 importe ici : les features détectables et leur loi de dérivation IR (R7 ·
-# SSOT-1 §27 : « feature/capability detection »). Le schema exige detection_law (un
-# law id, jamais de la prose) : la row seed câble la strictesse du profil YAML sur la
-# loi pilote anchor (exemplaire de la famille) · placeholder wiring documenté, l'import
-# R7 réel remplace à C0.
+# Seed row yaml_profile_strict (family exemplar · placeholder wiring documenté · l'import
+# R7 réel des language_features reste owed à C1). Import 2026-07-17 (canon-flip) : les 5
+# révisions du protocole MCP (canon.yaml mcp.protocol_versions · engine-verified) entrent
+# en runtime_capability rows · l'id encode la révision (bijection tirets→underscores ·
+# le shape scellé n'a pas de champ valeur) · parité gardée par `ssot-compiler --check-canon`.
 registry_document_format: 1
-"$comment": "C0 sandbox skeleton · seed row = yaml_profile_strict wired on the pilot anchor law as family exemplar · real R7 feature import owed at C0"
+$comment: 'C0 sandbox skeleton + canon-flip import 2026-07-17 · seed row = yaml_profile_strict (family exemplar
+  · real R7 language-feature import owed at C1) · + 5 mcp.protocol.* runtime_capability rows imported verbatim from
+  canon.yaml mcp.protocol_versions · gate: ssot-compiler --check-canon.'
 features:
   - id: yaml_profile_strict
     status: reserved
     owner: spec
-    law_ids: ["LAW-GRAMMAR-0101"]
+    law_ids:
+      - LAW-GRAMMAR-0101
     introduced_in: C0
     kind: language_feature
     detection_law: LAW-GRAMMAR-0101
     conformance_profile: core
-    notes: "Placeholder wiring explicite : la détection réelle R7 (dérivée du Semantic IR) remplace cette row à l'import C0. detection_law cite la loi anchor comme exemplaire de la famille yaml-profile."
+    notes: 'Placeholder wiring explicite : la détection réelle R7 (dérivée du Semantic IR) remplace cette row à
+      l''import C0. detection_law cite la loi anchor comme exemplaire de la famille yaml-profile.'
+  - id: mcp.protocol.2026_07_28
+    status: reserved
+    owner: engine
+    law_ids:
+      - LAW-CONF-0510
+    introduced_in: C0
+    kind: runtime_capability
+    detection_law: LAW-CONF-0510
+    conformance_profile: runtime
+    notes: Import-c0 (canon-flip) · MCP protocol revision « 2026-07-28 » verbatim (canon.yaml mcp.protocol_versions
+      · engine-verified per crates/nika-mcp/src/protocol.rs SUPPORTED array) · the featureRow shape has no value
+      field → the id encodes the revision (dots/dashes → underscores · bijective) · detection = the engine manifest
+      surface law (LAW-CONF-0510). latest per canon.yaml.
+  - id: mcp.protocol.2025_11_25
+    status: reserved
+    owner: engine
+    law_ids:
+      - LAW-CONF-0510
+    introduced_in: C0
+    kind: runtime_capability
+    detection_law: LAW-CONF-0510
+    conformance_profile: runtime
+    notes: Import-c0 (canon-flip) · MCP protocol revision « 2025-11-25 » verbatim (canon.yaml mcp.protocol_versions
+      · engine-verified per crates/nika-mcp/src/protocol.rs SUPPORTED array) · the featureRow shape has no value
+      field → the id encodes the revision (dots/dashes → underscores · bijective) · detection = the engine manifest
+      surface law (LAW-CONF-0510).
+  - id: mcp.protocol.2025_06_18
+    status: reserved
+    owner: engine
+    law_ids:
+      - LAW-CONF-0510
+    introduced_in: C0
+    kind: runtime_capability
+    detection_law: LAW-CONF-0510
+    conformance_profile: runtime
+    notes: Import-c0 (canon-flip) · MCP protocol revision « 2025-06-18 » verbatim (canon.yaml mcp.protocol_versions
+      · engine-verified per crates/nika-mcp/src/protocol.rs SUPPORTED array) · the featureRow shape has no value
+      field → the id encodes the revision (dots/dashes → underscores · bijective) · detection = the engine manifest
+      surface law (LAW-CONF-0510).
+  - id: mcp.protocol.2025_03_26
+    status: reserved
+    owner: engine
+    law_ids:
+      - LAW-CONF-0510
+    introduced_in: C0
+    kind: runtime_capability
+    detection_law: LAW-CONF-0510
+    conformance_profile: runtime
+    notes: Import-c0 (canon-flip) · MCP protocol revision « 2025-03-26 » verbatim (canon.yaml mcp.protocol_versions
+      · engine-verified per crates/nika-mcp/src/protocol.rs SUPPORTED array) · the featureRow shape has no value
+      field → the id encodes the revision (dots/dashes → underscores · bijective) · detection = the engine manifest
+      surface law (LAW-CONF-0510).
+  - id: mcp.protocol.2024_11_05
+    status: reserved
+    owner: engine
+    law_ids:
+      - LAW-CONF-0510
+    introduced_in: C0
+    kind: runtime_capability
+    detection_law: LAW-CONF-0510
+    conformance_profile: runtime
+    notes: Import-c0 (canon-flip) · MCP protocol revision « 2024-11-05 » verbatim (canon.yaml mcp.protocol_versions
+      · engine-verified per crates/nika-mcp/src/protocol.rs SUPPORTED array) · the featureRow shape has no value
+      field → the id encodes the revision (dots/dashes → underscores · bijective) · detection = the engine manifest
+      surface law (LAW-CONF-0510).
