@@ -1,6 +1,7 @@
 registry_document_format: 1
 $comment: C0 sandbox skeleton · seed rows = the R11 pilot generated_facts tables · cap VALUES and unicode
-  disposition are TO-RULE at C0 (FINDING-04) · full grammar import owed at C0
+  disposition RULED at C1 (D-2026-07-17-N5 · value_shape ids encode the numbers · the reference evaluator
+  conformance/yaml_profile_core_selftest.py cross-checks them) · full grammar import owed at C0
 grammar:
 - id: yaml_forbidden_event_classes
   status: reserved
@@ -43,9 +44,12 @@ grammar:
   fields:
   - name: size_over_cap
     cardinality: forbidden
-  notes: 'FINDING-04 · la VALEUR du cap scalar est TO-RULE à C0. Note de clôture R11 verbatim : « (Ferme
-    le gap P5 : le cap de taille scalaire — 200k chars passait — entre au profil normatif.) » L''empirie
-    third-pass (200k passait) borne le débat, le ruling ne grave pas le nombre.'
+    value_shape: cap_65536_bytes
+  notes: 'Cap RULÉ D-2026-07-17-N5 : 65536 bytes UTF-8 par scalar (64 KiB) · refus NET jamais troncature
+    (NIKA-YAML-005). Note de clôture R11 verbatim : « (Ferme le gap P5 : le cap de taille scalaire — 200k
+    chars passait — entre au profil normatif.) » L''empirie third-pass (200k passait) bornait le débat ;
+    le ruling grave 64 KiB (tout prompt inline honnête tient · au-delà = fichier référencé). Frontière
+    exacte : conformance/yaml-profile/valid/scalar-at-cap admet · invalid/scalar-over-cap refuse.'
 - id: yaml_document_caps
   status: reserved
   owner: spec
@@ -57,10 +61,14 @@ grammar:
   fields:
   - name: depth_over_cap
     cardinality: forbidden
+    value_shape: cap_64_levels
   - name: size_over_cap
     cardinality: forbidden
-  notes: FINDING-04 · les VALEURS des caps profondeur + taille de document sont TO-RULE à C0 (R11 point
-    13 mandate l'aspect, pas le nombre).
+    value_shape: cap_1048576_bytes
+  notes: 'Caps RULÉS D-2026-07-17-N5 : profondeur 64 niveaux (la collection racine = niveau 1 · NIKA-YAML-009)
+    · document 1048576 bytes (1 MiB · NIKA-YAML-010) · refus NET jamais troncature. Frontières exactes :
+    conformance/yaml-profile/valid/depth-at-cap (64 pile) admet · invalid/depth-over-cap (65) refuse ·
+    invalid/document-over-cap (cap+1 bytes) refuse.'
 - id: yaml_unicode_contract
   status: reserved
   owner: spec
@@ -71,9 +79,11 @@ grammar:
   fields:
   - name: non_nfc_or_bom_disposition
     cardinality: required
-  notes: FINDING-04 · R11 point 13 mandate la couverture Unicode NFC/BOM sans fixer la disposition (refuser
-    un BOM ou le strip · exiger NFC ou normaliser). La row exige qu'une disposition soit déclarée avant
-    C1 ; elle n'en choisit aucune.
+    value_shape: refuse_bom_require_nfc
+  notes: 'Disposition RULÉE D-2026-07-17-N5 : BOM REFUS (jamais un strip silencieux) · NFC obligatoire
+    (jamais une normalisation silencieuse) · refus NET (NIKA-YAML-011 · une seule row, deux branches).
+    Déterminisme du hash sémantique : deux encodages du même texte ne hashent jamais différemment. Fixtures
+    : conformance/yaml-profile/invalid/bom + invalid/non-nfc refusent · valid/unicode-nfc admet.'
 - id: envelope_nika_field
   status: reserved
   owner: spec

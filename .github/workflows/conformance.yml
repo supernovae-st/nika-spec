@@ -48,6 +48,7 @@ jobs:
           python conformance/gateway_core_selftest.py
           python conformance/outcome_core_selftest.py
           python conformance/composition_core_selftest.py
+          python conformance/yaml_profile_core_selftest.py
           python conformance/proof_core_selftest.py
           python conformance/projection_core_selftest.py
 

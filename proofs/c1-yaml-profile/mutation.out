@@ -1,0 +1,8 @@
+== mutation: invalid/anchor-unreferenced.nika.yaml stripped of its anchor (&shared) ==
+-- the evaluator now ADMITS the mutated file:
+ADMIT  /var/folders/6t/h5rjb2gd54scnh70shc6nkq80000gn/T/tmp.o1L8f81L6t/conformance/yaml-profile/invalid/anchor-unreferenced.nika.yaml
+evaluator rc=0 (0 = admits · the fixture is now an ORPHAN)
+-- the fixture-parity sweep flags it RED (never a silent green):
+yaml-profile-core selftest · 53/54 laws hold
+  ✗ invalid/anchor-unreferenced.nika.yaml refuses with exactly [NIKA-YAML-001]
+selftest rc=1 (1 expected · the orphaned negative turns the harness red)

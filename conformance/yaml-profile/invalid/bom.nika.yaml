@@ -1,0 +1,10 @@
+﻿# Expected: NIKA-YAML-011 at CHECK.
+# D-2026-07-17-N5: a byte order mark refuses NET (never a silent strip) — two
+# encodings of the same text must never hash apart.
+nika: v1
+workflow:
+  id: bom
+tasks:
+  t:
+    exec:
+      command: [echo, ok]

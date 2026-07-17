@@ -1,0 +1,11 @@
+# Expected: NIKA-YAML-011 at CHECK.
+# D-2026-07-17-N5: the source must be NFC-normalized — this file carries an
+# NFD-decomposed accent (e + U+0301), the SAME text in different bytes refuses.
+nika: v1
+workflow:
+  id: non-nfc
+  description: café
+tasks:
+  t:
+    exec:
+      command: [echo, ok]

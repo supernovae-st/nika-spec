@@ -1,0 +1,15 @@
+# Expected: NIKA-YAML-007 at CHECK.
+# R11 point 13: mapping keys are strings — a PLAIN 123 resolves int and refuses
+# (the QUOTED form "123" is a string and stays legal · see valid/unicode-nfc).
+nika: v1
+workflow:
+  id: non-string-key
+vars:
+  m:
+    type: object
+    default:
+      123: not-a-string-key
+tasks:
+  t:
+    exec:
+      command: [echo, ok]
