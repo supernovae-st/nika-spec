@@ -1,0 +1,37 @@
+# mutation battery · manual edit of the GENERATED projection makes the gate red (rc=5) · authored edits stay legal
+
+== M1 · GENERATED item edit (builtins: assert -> asserts) · rc=5 ==
+CANON DIVERGENCE (exit 5):
+builtins: canon items with NO registry row: nika:asserts
+builtins: registry rows with NO canon item: nika:assert
+canon.yaml: bytes differ from the --emit-canon regeneration — manual edit of a generated surface, or the registries moved without re-emission · edit the registries, then run --emit-canon
+COUNTS · 18 keys verified against len(items) (derived · never copied)
+restore -> rc=0
+
+== M2 · GENERATED count edit (counts.builtins: 28 -> 29) · rc=5 ==
+CANON DIVERGENCE (exit 5):
+counts.builtins: 29 != len(builtins.items) 28
+canon.yaml: bytes differ from the --emit-canon regeneration — manual edit of a generated surface, or the registries moved without re-emission · edit the registries, then run --emit-canon
+COUNTS · 18 keys verified against len(items) (derived · never copied)
+PARITY verbs · canon 4 == rows 4
+restore -> rc=0
+
+== M3 · GENERATED failure-text edit (NIKA-SEC-001 hit -> HIT) · rc=5 ==
+CANON DIVERGENCE (exit 5):
+canon.yaml: bytes differ from the --emit-canon regeneration — manual edit of a generated surface, or the registries moved without re-emission · edit the registries, then run --emit-canon
+COUNTS · 18 keys verified against len(items) (derived · never copied)
+PARITY verbs · canon 4 == rows 4
+restore -> rc=0
+
+== M4 · GENERATED header stripped (lines 1-12 deleted) · rc=5 ==
+CANON DIVERGENCE (exit 5):
+canon.yaml: GENERATED header missing — canon.yaml is a generated projection since the flip (SSOT-1 §23) · run --emit-canon
+canon.yaml: bytes differ from the --emit-canon regeneration — manual edit of a generated surface, or the registries moved without re-emission · edit the registries, then run --emit-canon
+COUNTS · 18 keys verified against len(items) (derived · never copied)
+PARITY verbs · canon 4 == rows 4
+restore -> rc=0
+
+== M5 · counter-proof · AUTHORED ledger section edit (pillars semantic) + --emit-canon re-emission · rc=0 ==
+the 16 canon/EXCEPTIONS.md sections stay authored: the emitter carries them verbatim · editing them is legal (SSOT-1 §18)
+
+raw rc sequence: M1=5 restore=0 M2=5 M3=5 M4=5 M5=0 final-restore=0
