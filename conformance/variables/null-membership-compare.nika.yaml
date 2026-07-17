@@ -17,15 +17,15 @@ tasks:
     invoke: { tool: "nika:assert", args: { condition: "${{ null == null }}", message: "null == null is true" } }
   present_ne_null:
     after:
-      null_eq_null: succeeded
+      null_eq_null: success
     invoke: { tool: "nika:assert", args: { condition: "${{ vars.present != null }}", message: "7 != null is true" } }
   null_not_in_int_list:
     after:
-      present_ne_null: succeeded
+      present_ne_null: success
     invoke: { tool: "nika:assert", args: { condition: "${{ !(null in [1, 2, 3]) }}", message: "null not in [1,2,3]" } }
   sink:
     after:
-      null_not_in_int_list: succeeded
+      null_not_in_int_list: success
     invoke:
       tool: "nika:write"
       args: { path: "./out/cel/c18.json", content: { null_ok: true }, create_dirs: true }

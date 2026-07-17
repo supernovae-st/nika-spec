@@ -83,7 +83,7 @@ LOOP_LOCALS = {"item", "index"}  # for_each-scoped locals · 04-variables.md §5
 # recover reads a fallback source · on_finally reads its PARENT only ·
 # workflow outputs: read the settled world.
 BODY_FIELDS = ("when", "for_each", "infer", "exec", "invoke", "agent")
-AFTER_PREDICATES = {"succeeded", "failed", "skipped", "terminal"}
+AFTER_PREDICATES = {"success", "failure", "skipped", "terminal"}
 
 
 
@@ -509,8 +509,8 @@ _PASS_ALL = frozenset({"success", "failure", "skipped", "cancelled"})
 _PASS_VALUE = frozenset({"success", "skipped"})
 _PASS_FAILURE_OBS = frozenset({"failure", "skipped"})
 _AFTER_PASS = {
-    "succeeded": frozenset({"success"}),
-    "failed": frozenset({"failure"}),
+    "success": frozenset({"success"}),
+    "failure": frozenset({"failure"}),
     "skipped": frozenset({"skipped"}),
     "terminal": _PASS_ALL,
 }
@@ -665,7 +665,7 @@ def cross_ref_errors(doc: dict) -> list[dict]:
             if not (isinstance(pred, str) and pred in AFTER_PREDICATES):
                 errs.append({"code": "NIKA-DAG-005", "category": "validation_error",
                              "detail": f"task '{tid}' after.{target}: {pred!r} ∉ "
-                                       "{succeeded · failed · skipped · terminal}"})
+                                       "{success · failure · skipped · terminal}"})
 
     # NIKA-DAG-002 · a with: binding references an undeclared task (the
     # binding IS an edge · an edge to nowhere is a DAG error, not a VAR one)

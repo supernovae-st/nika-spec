@@ -12,7 +12,7 @@ tasks:
       command: ["echo", "hello"]
   conditional:
     after:
-      step: succeeded
+      step: success
     when: ${{ vars.count }}
     exec:
       command: ["echo", "should", "not", "reach"]

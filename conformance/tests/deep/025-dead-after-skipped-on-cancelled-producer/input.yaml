@@ -8,7 +8,7 @@ tasks:
   seed:
     exec: { command: ["false"] }
   p:
-    after: { seed: succeeded }
+    after: { seed: success }
     exec: { command: ["echo", "the producer speaks"] }
   c:
     after: { p: skipped }

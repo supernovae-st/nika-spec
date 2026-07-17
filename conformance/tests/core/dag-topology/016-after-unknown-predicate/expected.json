@@ -6,5 +6,5 @@
       "category": "validation_error"
     }
   ],
-  "note": "03-dag.md §after · the predicate set is CLOSED (succeeded · failed · skipped · terminal) · 'passed' is not in it."
+  "note": "03-dag.md §after · the predicate set is CLOSED (success · failure · skipped · terminal) · 'passed' is not in it."
 }

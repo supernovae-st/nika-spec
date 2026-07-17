@@ -106,7 +106,7 @@ these from this file alone.
 | `NIKA-DAG-001` | cycle in the precedence graph G_p = E_d ∪ E_c (incl. self-dependency · via `with:`/`after:`) | `validation_error` | false |
 | `NIKA-DAG-002` | `with:`/`after:` references an undeclared task | `validation_error` | false |
 | `NIKA-DAG-004` | `on_error.recover` references a task downstream of the declaring task (await would deadlock) | `validation_error` | false |
-| `NIKA-DAG-005` | `after:` predicate outside the closed set (`succeeded` · `failed` · `skipped` · `terminal`) | `validation_error` | false |
+| `NIKA-DAG-005` | `after:` predicate outside the closed set (`success` · `failure` · `skipped` · `terminal`) | `validation_error` | false |
 | `NIKA-DAG-006` | statically dead task — an incoming edge’s pass-set excludes every reachable producer state, or the `when:` gate is false under every reachable upstream combination ([03 §gate algebra](./03-dag.md#the-gate-algebra-v2-normative)) | `validation_error` | false |
 | `NIKA-DAG-007` | status compared against a literal outside the vocabulary (`success` · `failure` · `skipped` · `cancelled`) — `==` never matches, `!=` always holds | `validation_error` | false |
 | `NIKA-TYPE-001` | unknown type name (in `types:` · `returns:` · an `outputs:` type) — did-you-mean when close | `validation_error` | false |
@@ -372,7 +372,7 @@ optional_step:
       skip: true
 
 next:
-    after: { optional_step: succeeded }     # strict gate · a skipped producer cancels this path
+    after: { optional_step: success }       # strict gate · a skipped producer cancels this path
     exec: { command: ["..."] }
 ```
 
@@ -423,7 +423,7 @@ blanket kill** ·
   its edges checks the producer's settled state against that edge's
   pass-set. A value edge from the failed task does not admit → the consumer
   is `cancelled`, and the dead path propagates transitively.
-- A task whose edges DO admit on failure still runs · `after: {x: failed}`
+- A task whose edges DO admit on failure still runs · `after: {x: failure}`
   (the failure path) · `after: {x: terminal}` (the **always-pattern**: a
   final notify/report task runs even in a failing workflow) · a
   `.status`/`.error` observation binding.

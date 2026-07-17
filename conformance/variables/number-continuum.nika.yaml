@@ -18,27 +18,27 @@ tasks:
     invoke: { tool: "nika:assert", args: { condition: "${{ vars.one_int == 1.0 }}", message: "1 == 1.0" } }
   float_eq_int:
     after:
-      int_eq_float: succeeded
+      int_eq_float: success
     invoke: { tool: "nika:assert", args: { condition: "${{ vars.nine_float == 9 }}", message: "9.0 == 9" } }
   int_lt_float:
     after:
-      float_eq_int: succeeded
+      float_eq_int: success
     invoke: { tool: "nika:assert", args: { condition: "${{ vars.two_int < 2.5 }}", message: "2 < 2.5" } }
   int_in_float_list:
     after:
-      int_lt_float: succeeded
+      int_lt_float: success
     invoke: { tool: "nika:assert", args: { condition: "${{ vars.one_int in [1.0, 2.0, 3.0] }}", message: "1 in [1.0,2.0,3.0]" } }
   float_in_int_list:
     after:
-      int_in_float_list: succeeded
+      int_in_float_list: success
     invoke: { tool: "nika:assert", args: { condition: "${{ 1.0 in [1, 2, 3] }}", message: "1.0 in [1,2,3]" } }
   float_neq_other:
     after:
-      float_in_int_list: succeeded
+      float_in_int_list: success
     invoke: { tool: "nika:assert", args: { condition: "${{ vars.nine_float != 9.5 }}", message: "9.0 != 9.5" } }
   sink:
     after:
-      float_neq_other: succeeded
+      float_neq_other: success
     invoke:
       tool: "nika:write"
       args: { path: "./out/cel/c01.json", content: { all_number_continuum: true }, create_dirs: true }

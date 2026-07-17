@@ -1,0 +1,31 @@
+# pc-light census BEFORE · constructors · pin 8e21866
+
+## result< (scope: spec/ stdlib/ examples/ templates/ conformance/ design/)
+spec/09-types.md:73:| `result<T>` | Outcome IR (W5) | a task outcome is a *contract*, not a convention — the slot is reserved so no user type squats the name |
+spec/09-types.md:393:- **No generics / type parameters** (the reserved `result<T>` ·
+TOTAL result<: 2
+
+## secret<
+spec/09-types.md:75:| `secret<T>` | authority wave (W4) | a secret is a *confidentiality*, not a shape — see §secrets never lower |
+spec/09-types.md:243:  `outputs:` type, a callable-workflow input) may contain `secret<…>`
+spec/09-types.md:380:| `NIKA-TYPE-005` | a secret-carrying type in a lowered position (reserved with `secret<T>` · W4) | `security_error` | false |
+spec/09-types.md:394:  `artifact<mime>` · `secret<T>` are engine-owned constructors, not a
+spec/05-errors.md:116:| `NIKA-TYPE-005` | a secret-carrying type in a lowered position (reserved with `secret<T>` · W4) | `security_error` | false |
+TOTAL secret<: 5
+
+## money< (bare-form generic probe)
+TOTAL money<: 0
+
+## constructor wave/lands mentions (LAW-MIGR-0520 scope: constructor mentions only)
+conformance/type_core.py:34:    "artifact": "artifact lanes (W5)",
+conformance/type_core.py:35:    "secret": "the authority wave (W4)",
+conformance/type_core.py:36:    "money": "the decision core (W-DEC) — fixed-point + ISO-4217, never binary floats",
+conformance/type_core.py:176:                             f"{where} · {expr!r} is reserved — lands with {RESERVED[base]}")
+spec/09-types.md:69:v1 and their semantics land with their owning wave ·
+spec/09-types.md:73:| `result<T>` | Outcome IR (W5) | a task outcome is a *contract*, not a convention — the slot is reserved so no user type squats the name |
+spec/09-types.md:74:| `artifact<mime>` | artifact lanes (W5) | `outputs:` already speak it informally; the typed form needs runtime identity first |
+spec/09-types.md:75:| `secret<T>` | authority wave (W4) | a secret is a *confidentiality*, not a shape — see §secrets never lower |
+spec/09-types.md:76:| `money` | decision core (W-DEC) | an amount is **fixed-point + ISO-4217 currency, never a binary float** — a `money` that is semantically an empty string would be a lie; the name is reserved until the decision core brings the real representation |
+spec/09-types.md:226:| `money` | `{ "type": "string" }` (decimal + currency refinements land with the decision core) |
+conformance/tests/core/types/009-reserved-constructor/expected.json:9:  "note": "09-types.md \u00a7reserved \u00b7 result/artifact/secret are named but land with their waves."
+conformance/tests/core/types/014-money-reserved/expected.json:9:  "note": "09-types.md \u00a7reserved \u00b7 money lands with the decision core (fixed-point + ISO-4217 \u00b7 never binary floats)."

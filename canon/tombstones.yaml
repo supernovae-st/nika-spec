@@ -21,3 +21,34 @@ tombstones:
       pattern: "NIKA-PARSE-001"
       scope: to-mint-c1/conformance/yaml-profile
     notes: "Le schema scellé force status: retired sur toute row tombstone (un tombstone EST une retraite) ; retired_in: C1 porte la fenêtre où le kill s'exécute. Réservation du kill : après MIG-yaml-profile, plus aucune fixture yaml-profile ne s'attend au code parse générique pour les classes anchor/alias/merge-key/duplicate-key (R11 point 4 : diagnostic dédié, pas un parse error générique). Le census vise le périmètre yaml-profile, jamais le code générique global."
+  - id: after-participial-predicate-spellings
+    status: retired
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0231"]
+    introduced_in: P-C
+    kind: surface-word
+    retired_in: P-C
+    replaced_by: "grammar:gate_predicate_vocabulary"
+    census_pattern:
+      tool: grep
+      pattern: "(after|when):.*(succeeded|failed)"
+      scope: spec
+    final_census:
+      date: "2026-07-17"
+      count: 0
+    notes: "R5 verbatim : « Choix : (a) after: success | failure | skipped | terminal. » · « Codemod 1:1 mécanique » (succeeded->success · failed->failure · skipped/terminal inchangés · LAW-GRAMMAR-0231). Kill exécuté au leg pc-light (MIG-predicates · 2026-07-17) : spec (17 sites anchored + 4 multi-ligne) · examples · templates · conformance (fixtures + runner + reference + generator gen-gate-matrix + schema JSON + migrate-w2 émetteur) = census 0. Le pattern ancré du receipt pc-census-baseline couvre 6 dirs ; la scope pathLike unique vise spec (surface normative) · les carve-outs documentés : design/v1-constitution.md = frozen draft (S3 · row mig-f5 verbatim · « never edited by this codemod » · régénéré post-window per R9 lois 3-4 · 6 sites y survivent jusqu'à la régénération) · spec/03-dag.md:238 « a failed upstream » = adjectif anglais hors position grammaticale (false-positive du pattern · jamais un prédicat) · les records verbatim canon/laws/* citent les formes mortes à jamais (le record du ruling EST la loi · jamais réécrit)."
+  - id: dag-007-did-you-mean-failed-to-failure
+    status: retired
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0231"]
+    introduced_in: P-C
+    kind: phrase
+    retired_in: P-C
+    census_pattern:
+      tool: grep
+      pattern: "'failed'"
+      scope: spec
+    final_census:
+      date: "2026-07-17"
+      count: 0
+    notes: "R5 verbatim : « la classe did-you-mean 'failed'->failure (DAG-007) meurt ». Le CODE NIKA-DAG-007 survit (il garde le vocabulaire des comparaisons de status · success · failure · skipped · cancelled · per canon/laws/gates.yaml header) ; ce qui meurt = la CLASSE de correction did-you-mean : post-codemod l'auteur n'apprend plus jamais une orthographe participiale, la classe n'a plus d'objet (proof obligation LAW-GRAMMAR-0231). Kill exécuté au leg pc-light (2026-07-17) : spec/03-dag.md:788 (la phrase « with a did-you-mean fix ('failed' -> failure) ») + gen-gate-matrix VOCAB fixture (le literal hors-vocabulaire passe de 'failed' à 'done' · le guard DAG-007 reste exercé · la note expected perd le did-you-mean) + deep/028 régénéré. Un code retiré n'est jamais réutilisé (SSOT-2 B.22) — s'applique ici à la CLASSE : toute future correction didactique sur ce champ est une classe NEUVE. Le did-you-mean TYPE-001 (« did-you-mean when close » · unknown type name) est une autre classe · il survit · hors census (pattern scoped au literal participial quoté)."

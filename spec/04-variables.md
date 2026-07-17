@@ -172,7 +172,7 @@ at the boundary ·
 
 ```yaml
 deploy:
-    after: { test: succeeded }                            # strict gate · no data from test
+    after: { test: success }                              # strict gate · no data from test
     with:
       coverage: ${{ tasks.test.output.coverage }}         # value edge · read the number
       artifact: ${{ tasks.build.output.artifact_path }}   # value edge · build → deploy

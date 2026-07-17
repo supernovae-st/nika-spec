@@ -37,7 +37,7 @@ nothing), use `after:` ·
 ```yaml
   deploy:
     after:
-      tests: succeeded      # ← control edge · state, never data
+      tests: success        # ← control edge · state, never data
     exec:
       command: ["./deploy.sh"]
 ```
@@ -52,7 +52,7 @@ my_task:                        # the map KEY is the identity · snake_case · u
     data: ${{ tasks.task_a.output }}
     config: { foo: "bar" }      # literals are fine — only tasks.* refs create edges
   after:                        # optional · the CONTROL boundary · {producer: predicate}
-    task_b: succeeded           # predicate ∈ succeeded | failed | skipped | terminal
+    task_b: success             # predicate ∈ success | failure | skipped | terminal
   when: ${{ vars.enabled }}     # optional · LOCAL business condition · evaluated POST-gate
   for_each: ${{ with.pages }}   # optional · map this task over a collection (local namespaces)
   retry:                        # optional · retry policy (see 05-errors.md)
@@ -138,8 +138,8 @@ boundary. (Same law as a `when:` evaluation error · §Task states.)
 ```yaml
 deploy:
     after:
-      tests: succeeded        # run only if tests settled success
-      scan: succeeded
+      tests: success          # run only if tests settled success
+      scan: success
     exec:
       command: ["./deploy.sh"]
 ```
@@ -150,8 +150,8 @@ task ·
 
 | predicate | admits when the producer settles… |
 |---|---|
-| `succeeded` | `success` |
-| `failed` | `failure` |
+| `success` | `success` |
+| `failure` | `failure` |
 | `skipped` | `skipped` |
 | `terminal` | any terminal state — `success` · `failure` · `skipped` · **`cancelled`** (the always-pattern: « run once X is settled, whatever happened » · cancelled IS terminal) |
 
@@ -178,7 +178,7 @@ composition law precise.)
 
 **Do not restate a `with:` edge.** An `after:` entry on a producer you
 already bind through `with:` is meaningful ONLY if it *tightens* the gate
-(`after: {x: succeeded}` + a value edge = run on `success` only, excluding
+(`after: {x: success}` + a value edge = run on `success` only, excluding
 the skipped-`null` case). A non-tightening restatement (`after: {x: terminal}`
 next to a value edge) changes nothing and the reference linter warns
 (`one-obvious-way/010`).
@@ -191,7 +191,7 @@ language now spells ·
 | the old spelling meant… | the W2 spelling |
 |---|---|
 | « B consumes A's output » | a `with:` binding — the data IS the edge |
-| « B runs only after A worked » (no data) | `after: { a: succeeded }` |
+| « B runs only after A worked » (no data) | `after: { a: success }` |
 | « B runs once A is settled, whatever happened » (the `when: true` pattern) | `after: { a: terminal }` |
 
 A task carrying `depends_on:` is refused at parse time (`NIKA-PARSE-024` ·
@@ -207,7 +207,7 @@ codemod is *equivalence-or-stop*, it never guesses.
 `depends_on: [a]` on a producer that may settle `skipped` admitted on
 `{success, skipped}` with no data read. W2 makes you choose: consume the
 value (`with:` · keeps `{success, skipped}` · the skipped value is `null`) ·
-require success (`after: {a: succeeded}` · a skipped producer now cancels
+require success (`after: {a: success}` · a skipped producer now cancels
 you) · or accept every outcome (`after: {a: terminal}`). Choosing is the
 point — the old spelling hid the choice.
 
@@ -571,7 +571,7 @@ fail_fast: false                # default true · false = process all even if so
   `variable_error`). **The skipped-upstream corollary** · a value edge
   passes on a skipped producer and its binding reads `null`, so a
   fan-out over that binding fails with `NIKA-VAR-006` unless the author
-  gates it (`after: {producer: succeeded}` or a `when:` size check).
+  gates it (`after: {producer: success}` or a `when:` size check).
 - `for_each` is **bounded fan-out**, not recursion · a task cannot
   `for_each` over its own output. The DAG stays acyclic.
 - If the collection is empty · the task is `skipped` (status `skipped`).
@@ -721,8 +721,8 @@ that admit the consumer ·
 value edge                {success, skipped}
 terminal-observation      {success, failure, skipped, cancelled}
 failure-observation       {failure, skipped}
-control · succeeded       {success}
-control · failed          {failure}
+control · success         {success}
+control · failure         {failure}
 control · skipped         {skipped}
 control · terminal        {success, failure, skipped, cancelled}
 ```
@@ -756,7 +756,7 @@ the verb, not the boundary that feeds it).
 **The migration table** — how the three W2 spellings propagate, next to the
 dead form they replace ·
 
-| producer X settles | `with:` value edge | `after: {x: succeeded}` | `after: {x: terminal}` | *(dead)* `depends_on: [x]` |
+| producer X settles | `with:` value edge | `after: {x: success}` | `after: {x: terminal}` | *(dead)* `depends_on: [x]` |
 |---|---|---|---|---|
 | `success` | run (binding = value) | run | run | ran |
 | `skipped` | **run** (binding = `null`) | **cancelled** | run | ran |
@@ -764,7 +764,7 @@ dead form they replace ·
 | `cancelled` | cancelled | cancelled | **run** (terminal includes cancelled) | cancelled |
 
 Choose knowingly · the value edge keeps the old default (skipped passes ·
-read `null` · the diamond-join unlock) · `succeeded` is the strict gate ·
+read `null` · the diamond-join unlock) · `success` is the strict gate ·
 `terminal` is the always-pattern (the report / cleanup / notify class —
 pair it with a `.status` observation to branch on what happened).
 
@@ -784,8 +784,7 @@ along G_p ·
   that cannot skip is a check error, not a silent never-fires edge.)
 - a status observation compared against a literal outside the vocabulary
   (`success` · `failure` · `skipped` · `cancelled`) can never match — `==`
-  is always false, `!=` always true. Refused · **`NIKA-DAG-007`**, with a
-  did-you-mean fix (`'failed'` → `failure`).
+  is always false, `!=` always true. Refused · **`NIKA-DAG-007`**.
 
 A literal `when: false` alone is **not** a finding — it is the documented
 never-pattern (feature-flag). The task settles `skipped` by explicit
@@ -878,13 +877,13 @@ tasks:
   setup:
     exec: { command: ["./prepare.sh"] }
   analyze_a:
-    after: { setup: succeeded }
+    after: { setup: success }
     infer: { prompt: "Analyze A" }
   analyze_b:
-    after: { setup: succeeded }
+    after: { setup: success }
     infer: { prompt: "Analyze B" }
   analyze_c:
-    after: { setup: succeeded }
+    after: { setup: success }
     infer: { prompt: "Analyze C" }
   merge:
     with:
@@ -1090,9 +1089,9 @@ discouraged form ·
 | Rule | Intent | ✅ The one way | ❌ Discouraged · why |
 |---|---|---|---|
 | `/010` | « B consumes A's output » | a `with:` binding — the data IS the edge | adding a non-tightening `after:` entry next to it (`after: {a: terminal}` beside a value edge changes nothing) |
-| `/002` | « depend on a skippable producer » | decide the skip path: `after: {a: succeeded}` (skip cancels me) or read the value (`with:` · skip passes as `null`) | an `on_error: { skip: true }` producer whose dependents never acknowledge the skip either way |
-| `/003` | « retry on transient failure » | `retry:` · the ONE retry shape (`max_attempts` · `backoff_*` · `on_codes`) | an `after: {a: failed}` duplicate of the failing task · a self-referencing recovery chain |
-| `/004` | « provide a fallback value » | `on_error: { recover: … }` · the route stays *in the failing task* | a second task `after: {a: failed}` for a mere value · use a task only when real *work* runs on failure |
+| `/002` | « depend on a skippable producer » | decide the skip path: `after: {a: success}` (skip cancels me) or read the value (`with:` · skip passes as `null`) | an `on_error: { skip: true }` producer whose dependents never acknowledge the skip either way |
+| `/003` | « retry on transient failure » | `retry:` · the ONE retry shape (`max_attempts` · `backoff_*` · `on_codes`) | an `after: {a: failure}` duplicate of the failing task · a self-referencing recovery chain |
+| `/004` | « provide a fallback value » | `on_error: { recover: … }` · the route stays *in the failing task* | a second task `after: {a: failure}` for a mere value · use a task only when real *work* runs on failure |
 | `/005` | « cleanup that always runs » | `on_finally:` (per task) · or ONE terminal report task | a task with `after: {…: terminal}` on everything — a cleanup smuggled into the graph |
 | `/006` | « time-bound an iteration » | `timeout:` on the `for_each` task · it applies **per iteration** (§for_each semantics) | per-element timing tricks inside the body · a whole-fan-out timer (none exists in v0.1) |
 | `/007` | « cap fan-out concurrency » | `max_parallel:` | manual sharding into N sequential tasks |
@@ -1173,7 +1172,7 @@ workflow whose conformance report is clean.
   ],
   "edges": [
     { "from": "gather", "to": "think", "kind": "value", "binding": "readme" },
-    { "from": "think", "to": "publish", "kind": "control", "predicate": "succeeded" },
+    { "from": "think", "to": "publish", "kind": "control", "predicate": "success" },
     { "from": "gather", "to": "publish", "kind": "recovery" }
   ]
 }
@@ -1209,7 +1208,7 @@ wire contract:
 | `value` | `binding` (the `with:` key that created it) | a `.output` / named-binding reference in `with:` |
 | `terminal-observation` | `binding` | a `.status`/`.duration_ms`/`.started_at`/`.ended_at` reference in `with:` |
 | `failure-observation` | `binding` | an `.error` reference in `with:` |
-| `control` | `predicate` (`succeeded` · `failed` · `skipped` · `terminal`) | an `after:` entry |
+| `control` | `predicate` (`success` · `failure` · `skipped` · `terminal`) | an `after:` entry |
 | `recovery` | — | an `on_error.recover:` reference (source task → declaring task · a parking read, not an ordering edge) |
 | `finally` | — | **reserved** · cleanup units have no runtime identity yet (no events · no trace rows), so W2 emits no `finally` edges — the kind is named so the enum is complete when the trace contract (W5) gives cleanup units identity |
 

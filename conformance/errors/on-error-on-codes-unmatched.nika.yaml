@@ -16,7 +16,7 @@ tasks:
       recover: "should-not-apply"
   after:
     after:
-      fails: succeeded
+      fails: success
     invoke:
       tool: nika:write
       args: { path: "./out/ctrlflow/07_after.json", content: "ran" }

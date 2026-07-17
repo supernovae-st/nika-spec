@@ -16,7 +16,7 @@ tasks:
         message: "This should never run"
 
   write_result:
-    after: { bad_when: succeeded }
+    after: { bad_when: success }
     invoke:
       tool: "nika:write"
       args:

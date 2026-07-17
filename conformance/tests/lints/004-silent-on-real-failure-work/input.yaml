@@ -8,7 +8,7 @@ tasks:
       tool: "nika:fetch"
       args: { url: "https://primary.example.com" }
   mirror:
-    after: { a: failed }
+    after: { a: failure }
     invoke:
       tool: "nika:fetch"
       args: { url: "https://mirror.example.com" }

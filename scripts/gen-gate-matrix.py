@@ -4,7 +4,7 @@
 
 The COMPLETE admission matrix of 03 §gate algebra v2: producer terminal
 state {success · failure · skipped · cancelled} × consumer edge form
-{with-value · with-status · with-error · after:succeeded · after:failed ·
+{with-value · with-status · with-error · after:success · after:failure ·
 after:skipped · after:terminal · when-true · when-false · no-edge} =
 40 cells. Every cell is a PERMANENT fixture:
 
@@ -43,7 +43,7 @@ from semantics import evaluate_text  # noqa: E402
 STATES = ["success", "failure", "skipped", "cancelled"]
 FORMS = [
     "with-value", "with-status", "with-error",
-    "after-succeeded", "after-failed", "after-skipped", "after-terminal",
+    "after-success", "after-failure", "after-skipped", "after-terminal",
     "when-true", "when-false", "no-edge",
 ]
 # Statically-dead cells (03 §static liveness): the producer's reachable
@@ -52,8 +52,8 @@ DEAD_CELLS = {
     ("success", "after-skipped"),
     ("failure", "after-skipped"),
     ("cancelled", "after-skipped"),
-    ("skipped", "after-succeeded"),
-    ("skipped", "after-failed"),
+    ("skipped", "after-success"),
+    ("skipped", "after-failure"),
 }
 
 RUNTIME_DIR = HERE / "conformance" / "tests" / "runtime" / "gates"
@@ -68,7 +68,7 @@ def producer_yaml(state: str) -> str:
         "  seed:",
         f"    exec: {{ command: {seed_cmd} }}",
         "  p:",
-        "    after: { seed: succeeded }",
+        "    after: { seed: success }",
     ]
     if state == "skipped":
         lines.append("    when: false")
@@ -91,12 +91,12 @@ def consumer_yaml(form: str) -> str:
             '    with: { e: "${{ tasks.p.error }}" }',
             '    exec: { command: ["echo", "observation carried"] }',
         ],
-        "after-succeeded": [
-            "    after: { p: succeeded }",
+        "after-success": [
+            "    after: { p: success }",
             '    exec: { command: ["echo", "strict path"] }',
         ],
-        "after-failed": [
-            "    after: { p: failed }",
+        "after-failure": [
+            "    after: { p: failure }",
             '    exec: { command: ["echo", "failure path"] }',
         ],
         "after-skipped": [
@@ -191,16 +191,16 @@ tasks:
     exec: { command: ["true"] }
   c:
     with: { s: "${{ tasks.p.status }}" }
-    when: "${{ with.s != 'failed' }}"
+    when: "${{ with.s != 'done' }}"
     exec: { command: ["echo", "lives but lies"] }
 """
 
 VOCAB_EXPECTED = {
     "valid": False,
     "errors": [{"code": "NIKA-DAG-007", "category": "validation_error"}],
-    "note": "03-dag.md §static liveness · 'failed' is not a status (the "
+    "note": "03-dag.md §static liveness · 'done' is not a status (the "
             "vocabulary is success · failure · skipped · cancelled) — == "
-            "never matches, != always holds · did-you-mean fix: 'failure'.",
+            "never matches, != always holds.",
 }
 
 # Deep-tier numbering continues the hand fixtures (022 is the last one) —
@@ -210,8 +210,8 @@ DEEP_CELLS = [
     ("023-dead-after-skipped-on-success-producer", "success", "after-skipped"),
     ("024-dead-after-skipped-on-failure-producer", "failure", "after-skipped"),
     ("025-dead-after-skipped-on-cancelled-producer", "cancelled", "after-skipped"),
-    ("026-dead-after-succeeded-on-skipped-producer", "skipped", "after-succeeded"),
-    ("027-dead-after-failed-on-skipped-producer", "skipped", "after-failed"),
+    ("026-dead-after-success-on-skipped-producer", "skipped", "after-success"),
+    ("027-dead-after-failure-on-skipped-producer", "skipped", "after-failure"),
 ]
 DEEP_VOCAB = "028-bad-status-literal-vocabulary"
 

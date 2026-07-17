@@ -7,6 +7,6 @@ tasks:
   a:
     infer: { prompt: "x" }
   b:
-    after: { a: succeeded }
+    after: { a: success }
     when: ${{ vars.mode == 'fast' == true }}
     infer: { prompt: "y" }

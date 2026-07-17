@@ -1,0 +1,158 @@
+# pc-light census BEFORE · pin 8e21866 · 2026-07-17
+
+## MIG-predicates · anchored grep -rEn '(after|when):.*(succeeded|failed)' spec/ stdlib/ examples/ templates/ conformance/ design/
+spec/13-outcomes.md:93:- **No new gate predicates.** `after:` keeps its four (succeeded ·
+spec/04-variables.md:175:    after: { test: succeeded }                            # strict gate · no data from test
+spec/03-dag.md:181:(`after: {x: succeeded}` + a value edge = run on `success` only, excluding
+spec/03-dag.md:194:| « B runs only after A worked » (no data) | `after: { a: succeeded }` |
+spec/03-dag.md:210:require success (`after: {a: succeeded}` · a skipped producer now cancels
+spec/03-dag.md:238:  refines it. The old always-pattern (`when: true` to run on a failed
+spec/03-dag.md:574:  gates it (`after: {producer: succeeded}` or a `when:` size check).
+spec/03-dag.md:759:| producer X settles | `with:` value edge | `after: {x: succeeded}` | `after: {x: terminal}` | *(dead)* `depends_on: [x]` |
+spec/03-dag.md:881:    after: { setup: succeeded }
+spec/03-dag.md:884:    after: { setup: succeeded }
+spec/03-dag.md:887:    after: { setup: succeeded }
+spec/03-dag.md:1093:| `/002` | « depend on a skippable producer » | decide the skip path: `after: {a: succeeded}` (skip cancels me) or read the value (`with:` · skip passes as `null`) | an `on_error: { skip: true }` producer whose dependents never acknowledge the skip either way |
+spec/03-dag.md:1094:| `/003` | « retry on transient failure » | `retry:` · the ONE retry shape (`max_attempts` · `backoff_*` · `on_codes`) | an `after: {a: failed}` duplicate of the failing task · a self-referencing recovery chain |
+spec/03-dag.md:1095:| `/004` | « provide a fallback value » | `on_error: { recover: … }` · the route stays *in the failing task* | a second task `after: {a: failed}` for a mere value · use a task only when real *work* runs on failure |
+spec/05-errors.md:109:| `NIKA-DAG-005` | `after:` predicate outside the closed set (`succeeded` · `failed` · `skipped` · `terminal`) | `validation_error` | false |
+spec/05-errors.md:375:    after: { optional_step: succeeded }     # strict gate · a skipped producer cancels this path
+spec/05-errors.md:426:- A task whose edges DO admit on failure still runs · `after: {x: failed}`
+examples/showcase/t2-contract-guard.nika.yaml:14:#   - `after: succeeded` · the memo is control-gated on the assert
+conformance/dag/cycle-reject.nika.yaml:9:    after: { step_b: succeeded }
+conformance/dag/cycle-reject.nika.yaml:13:    after: { step_a: succeeded }
+conformance/dag/undeclared-dep-reject.nika.yaml:9:    after: { nonexistent_task: succeeded }
+conformance/dag/when-false-skips.nika.yaml:6:# SPEC 03 §when: runtime-false → task SKIPPED (not failed); downstream sees it settled.
+conformance/tests/core/dag-topology/012-recover-downstream-deadlock/input.yaml:11:    after: { fetch: succeeded }
+conformance/tests/core/dag-topology/008-valid-diamond/input.yaml:9:    after: { a: succeeded }
+conformance/tests/core/dag-topology/008-valid-diamond/input.yaml:12:    after: { a: succeeded }
+conformance/tests/core/dag-topology/004-self-dependency/input.yaml:7:    after: { a: succeeded }
+conformance/tests/core/dag-topology/003-when-task-ref-illegal/input.yaml:9:    after: { test: succeeded }
+conformance/tests/core/dag-topology/001-cycle/input.yaml:7:    after: { b: succeeded }
+conformance/tests/core/dag-topology/001-cycle/input.yaml:10:    after: { a: succeeded }
+conformance/tests/core/dag-topology/015-cycle-mixed-with-after/input.yaml:11:    after: { a: succeeded }
+conformance/tests/core/dag-topology/002-unresolved-after-target/input.yaml:7:    after: { ghost: succeeded }
+conformance/tests/core/dag-topology/009-valid-tightened-value-edge/input.yaml:11:    after: { fetch: succeeded }
+conformance/tests/runtime/gates/012-skipped-x-with-value/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/037-success-x-when-false/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/040-cancelled-x-when-false/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/036-cancelled-x-when-true/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/030-failure-x-after-terminal/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/027-cancelled-x-after-failed/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/027-cancelled-x-after-failed/input.nika.yaml:14:    after: { p: failed }
+conformance/tests/runtime/gates/039-skipped-x-when-false/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/031-skipped-x-after-terminal/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/026-failure-x-after-failed/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/026-failure-x-after-failed/input.nika.yaml:14:    after: { p: failed }
+conformance/tests/runtime/gates/014-success-x-with-status/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/034-failure-x-when-true/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/021-cancelled-x-with-error/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/017-cancelled-x-with-status/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/011-failure-x-with-value/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/022-success-x-after-succeeded/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/022-success-x-after-succeeded/input.nika.yaml:14:    after: { p: succeeded }
+conformance/tests/runtime/gates/019-failure-x-with-error/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/041-success-x-no-edge/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/025-success-x-after-failed/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/025-success-x-after-failed/input.nika.yaml:14:    after: { p: failed }
+conformance/tests/runtime/gates/015-failure-x-with-status/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/020-skipped-x-with-error/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/044-cancelled-x-no-edge/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/035-skipped-x-when-true/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/024-cancelled-x-after-succeeded/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/024-cancelled-x-after-succeeded/input.nika.yaml:14:    after: { p: succeeded }
+conformance/tests/runtime/gates/043-skipped-x-no-edge/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/032-cancelled-x-after-terminal/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/033-success-x-when-true/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/010-success-x-with-value/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/001-always-pattern/input.nika.yaml:12:    after: { work: succeeded }
+conformance/tests/runtime/gates/018-success-x-with-error/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/042-failure-x-no-edge/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/038-failure-x-when-false/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/013-cancelled-x-with-value/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/023-failure-x-after-succeeded/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/023-failure-x-after-succeeded/input.nika.yaml:14:    after: { p: succeeded }
+conformance/tests/runtime/gates/029-success-x-after-terminal/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/028-skipped-x-after-skipped/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/runtime/gates/016-skipped-x-with-status/input.nika.yaml:11:    after: { seed: succeeded }
+conformance/tests/deep/001-cel-chained-relation/input.yaml:10:    after: { a: succeeded }
+conformance/tests/deep/024-dead-after-skipped-on-failure-producer/input.yaml:11:    after: { seed: succeeded }
+conformance/tests/deep/026-dead-after-succeeded-on-skipped-producer/input.yaml:11:    after: { seed: succeeded }
+conformance/tests/deep/026-dead-after-succeeded-on-skipped-producer/input.yaml:15:    after: { p: succeeded }
+conformance/tests/deep/025-dead-after-skipped-on-cancelled-producer/input.yaml:11:    after: { seed: succeeded }
+conformance/tests/deep/023-dead-after-skipped-on-success-producer/input.yaml:11:    after: { seed: succeeded }
+conformance/tests/deep/027-dead-after-failed-on-skipped-producer/input.yaml:11:    after: { seed: succeeded }
+conformance/tests/deep/027-dead-after-failed-on-skipped-producer/input.yaml:15:    after: { p: failed }
+conformance/tests/deep/028-bad-status-literal-vocabulary/input.yaml:12:    when: "${{ with.s != 'failed' }}"
+conformance/tests/lints/002-silent-when-dependents-acknowledge-skip/input.yaml:12:    after: { a: succeeded }
+conformance/tests/lints/003-silent-when-bodies-differ/input.yaml:11:    after: { a: failed }
+conformance/tests/lints/004-fires-on-literal-jq-fallback-task/input.yaml:11:    after: { a: failed }
+conformance/tests/lints/004-fires-on-echo-fallback-task/input.yaml:9:    after: { a: failed }
+conformance/tests/lints/010-silent-on-tightening-after/input.yaml:11:    after: { a: succeeded }
+conformance/tests/lints/004-silent-on-real-failure-work/input.yaml:11:    after: { a: failed }
+conformance/tests/lints/003-fires-on-failure-guarded-duplicate/input.yaml:11:    after: { a: failed }
+conformance/variables/when-string-literal-reject.nika.yaml:19:    after: { bad_when: succeeded }
+design/v1-constitution.md:311:    after: { build: succeeded }         # control edge: no data consumed
+design/v1-constitution.md:316:    after: { build: succeeded }
+design/v1-constitution.md:434:    after: { decide: succeeded }
+design/v1-constitution.md:532:    after: { task_id: succeeded | failed | skipped | terminal }   # control edges
+design/v1-constitution.md:748:    after: { build: succeeded }
+design/v1-constitution.md:889:    after: { decide: succeeded }
+
+TOTAL: 97
+
+## MIG-predicates · positional multi-line census grep -rEn '^\s+[a-z_][a-z0-9_]*: (succeeded|failed)\s*(#.*)?$' (same scope)
+spec/03-dag.md:40:      tests: succeeded      # ← control edge · state, never data
+spec/03-dag.md:55:    task_b: succeeded           # predicate ∈ succeeded | failed | skipped | terminal
+spec/03-dag.md:141:      tests: succeeded        # run only if tests settled success
+spec/03-dag.md:142:      scan: succeeded
+examples/showcase/t2-contract-guard.nika.yaml:89:      gate: succeeded              # state, no data · the assert passed or the memo is cancelled
+examples/showcase/t4-incident-war-room.nika.yaml:97:      timeline: succeeded
+examples/showcase/t4-incident-war-room.nika.yaml:104:      settle: succeeded
+examples/showcase/t4-incident-war-room.nika.yaml:126:      confirmed: succeeded             # state, no data · recovery proven or no draft
+examples/showcase/t2-release-notes.nika.yaml:78:      changelog: succeeded
+examples/showcase/t2-csv-chart-report.nika.yaml:99:      chart: succeeded
+examples/showcase/t4-ceo-monday-brief.nika.yaml:125:      save: succeeded                # state, no data · read the meter once the brief landed
+examples/showcase/t3-competitor-radar.nika.yaml:89:      save: succeeded
+examples/showcase/t1-meeting-actions.nika.yaml:68:      extract: succeeded
+templates/human-gated-ship.nika.yaml:50:      gates: succeeded              # state, no data · no question until the board is green
+examples/showcase/t4-release-train.nika.yaml:83:      gates_green: succeeded           # state, no data · the timing is only worth taking on a green board
+examples/showcase/t4-release-train.nika.yaml:114:      approved: succeeded
+examples/showcase/t4-release-train.nika.yaml:123:      hold: succeeded
+examples/showcase/t4-release-train.nika.yaml:131:      ship: succeeded
+conformance/dag/failure-cancels-downstream.nika.yaml:15:      step_a: succeeded
+conformance/dag/failure-cancels-downstream.nika.yaml:21:      step_b: succeeded
+conformance/dag/failure-drains-inflight.nika.yaml:25:      fast_fail: succeeded
+conformance/dag/failure-drains-inflight.nika.yaml:26:      slow_sibling: succeeded
+conformance/dag/recover-ref-downstream-reject.nika.yaml:17:      step_a: succeeded
+conformance/tests/deep/007-bare-when-string/input.yaml:9:      check: succeeded
+conformance/tests/lints/nf001-silent-on-genuine-subprocess/input.yaml:10:      test: succeeded
+conformance/tests/lints/007-silent-on-two-task-chain/input.yaml:10:      shard1: succeeded
+conformance/tests/lints/007-silent-on-genuine-pipeline/input.yaml:10:      fetch: succeeded
+conformance/tests/lints/007-silent-on-genuine-pipeline/input.yaml:14:      parse: succeeded
+conformance/tests/lints/007-fires-on-sequential-exec-shards/input.yaml:10:      shard1: succeeded
+conformance/tests/lints/007-fires-on-sequential-exec-shards/input.yaml:14:      shard2: succeeded
+conformance/tests/lints/007-fires-on-invoke-arg-shards/input.yaml:12:      page1: succeeded
+conformance/tests/lints/007-fires-on-invoke-arg-shards/input.yaml:18:      page2: succeeded
+conformance/envelope/secrets-two-sinks-one-sanctioned.nika.yaml:31:      sanctioned_send: succeeded
+conformance/variables/static-type-error-reject.nika.yaml:15:      step: succeeded
+conformance/variables/null-membership-compare.nika.yaml:20:      null_eq_null: succeeded
+conformance/variables/null-membership-compare.nika.yaml:24:      present_ne_null: succeeded
+conformance/variables/null-membership-compare.nika.yaml:28:      null_not_in_int_list: succeeded
+conformance/variables/typed-vars-declarations.nika.yaml:29:      check_string: succeeded
+conformance/variables/typed-vars-declarations.nika.yaml:38:      check_number: succeeded
+conformance/variables/typed-vars-declarations.nika.yaml:47:      check_boolean: succeeded
+conformance/variables/number-continuum.nika.yaml:21:      int_eq_float: succeeded
+conformance/variables/number-continuum.nika.yaml:25:      float_eq_int: succeeded
+conformance/variables/number-continuum.nika.yaml:29:      int_lt_float: succeeded
+conformance/variables/number-continuum.nika.yaml:33:      int_in_float_list: succeeded
+conformance/variables/number-continuum.nika.yaml:37:      float_in_int_list: succeeded
+conformance/variables/number-continuum.nika.yaml:41:      float_neq_other: succeeded
+conformance/verbs/builtin-assert-positive.nika.yaml:21:      check_x: succeeded
+conformance/errors/recover-task-ref-with-edge.nika.yaml:14:      source: succeeded
+design/v1-constitution.md:324:      test: succeeded
+design/v1-constitution.md:325:      bench: succeeded
+design/v1-constitution.md:762:      test: succeeded
+design/v1-constitution.md:763:      bench: succeeded
+conformance/errors/on-error-on-codes-unmatched.nika.yaml:19:      fails: succeeded
+TOTAL-multiline: 53

@@ -457,8 +457,8 @@
             "^[a-z][a-z0-9_]*$": {
               "type": "string",
               "enum": [
-                "succeeded",
-                "failed",
+                "success",
+                "failure",
                 "skipped",
                 "terminal"
               ],

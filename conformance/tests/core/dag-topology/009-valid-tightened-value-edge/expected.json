@@ -1,4 +1,4 @@
 {
   "valid": true,
-  "note": "03-dag.md §after · a succeeded predicate BESIDE a value edge is a meaningful tightening (edges compose by intersection: {success} ∩ {success,skipped} = {success}) · valid."
+  "note": "03-dag.md §after · a success predicate BESIDE a value edge is a meaningful tightening (edges compose by intersection: {success} ∩ {success,skipped} = {success}) · valid."
 }

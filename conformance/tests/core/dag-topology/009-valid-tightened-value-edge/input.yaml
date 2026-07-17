@@ -8,7 +8,7 @@ tasks:
       tool: nika:fetch
       args: { url: "https://example.com", mode: article }
   summarize:
-    after: { fetch: succeeded }
+    after: { fetch: success }
     with:
       content: ${{ tasks.fetch.output }}
     infer:

@@ -9,13 +9,13 @@ tasks:
       args: { url: "https://example.com/page/1" }
   page2:
     after:
-      page1: succeeded
+      page1: success
     invoke:
       tool: "nika:fetch"
       args: { url: "https://example.com/page/2" }
   page3:
     after:
-      page2: succeeded
+      page2: success
     invoke:
       tool: "nika:fetch"
       args: { url: "https://example.com/page/3" }

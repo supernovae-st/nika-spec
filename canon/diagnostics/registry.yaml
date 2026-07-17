@@ -909,16 +909,18 @@ diagnostics:
     introduced_in: C0
     namespace: DAG
     plane: unclassified
-    condition: 'after: predicate outside the closed set (succeeded · failed · skipped · terminal)'
+    condition: 'after: predicate outside the closed set (success · failure · skipped · terminal)'
     outcome_class: failure
     cause: validation_error
     retryable: false
     terminal: true
     payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
     span_required: false
-    teaching: 'after: predicate outside the closed set (succeeded · failed · skipped · terminal) · spec/05-errors.md
+    teaching: 'after: predicate outside the closed set (success · failure · skipped · terminal) · spec/05-errors.md
       (import-c0 · the teaching string mints at C1).'
-    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
+    notes: 'import-c0 (canon-flip) · MIG-predicates (R5 · pc-light · 2026-07-17): the closed-set vocabulary migrated
+      1:1 to the Outcome class spellings (succeeded->success · failed->failure · LAW-GRAMMAR-0231) · condition/teaching
+      re-emitted to canon.yaml in the same gesture · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
       verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
       mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
       is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·

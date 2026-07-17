@@ -1,0 +1,10 @@
+# pc-light census BEFORE · modelref · pin 8e21866
+
+## grep -rn 'model_select|model: { select' (living scope: whole tree minus generated laws-index + canon/laws verbatim ruling records)
+spec/15-proof.md:72:model_select:                   # `model: { select: {require, prefer} }` materialized
+TOTAL living: 1
+
+## receipt-3 accounting: the pc-census-baseline '3 sites' = 1 living (15-proof.md:72) + verbatim ruling-record quotes in canon/laws/model.yaml (kept forever · the law that orders the kill):
+canon/laws/model.yaml:157:      text: "Annexe A-16 phrase 2 verbatim : « La ligne ghost `model: { select: {require, prefer} }` (15:72) est **supprimée**. » Cette loi porte la branche grammaire : le champ model ne parle que la string <provider>/<name> (LAW-SURFACE-0501) · une clé select (et toute forme mapping du champ model) refuse. La ligne 15:72 vivait dans le bloc nika.lock (le champ lock model_select: qui matérialisait la forme ghost) : la surface auteur et sa matérialisation lock meurent ensemble."
+canon/laws/model.yaml:213:      text: "Annexe A-16 phrase 2 verbatim : « La ligne ghost `model: { select: {require, prefer} }` (15:72) est **supprimée**. » Cette loi porte la branche migration : la mention 15:72 (le champ model_select: du bloc nika.lock et son commentaire) meurt dans la cascade, et aucune surface current-facing (spec · canon · schema · docs · exemples · lock format) ne mentionne plus la forme select. FINDING-A : cette migration doc-kill n'a AUCUNE row dans canon/migrations.yaml · row à minter par l'orchestrateur."
+canon/laws/model.yaml:249:      - "Census empirique au pin : l'unique hit vivant est spec/15-proof.md:72 (model_select: · commentaire « `model: { select: {require, prefer} }` materialized » dans le bloc nika.lock). Le census post-cascade rend 0."
