@@ -1,0 +1,4 @@
+=== KILL · broken-law.yaml REPLACES yaml-profile.yaml in a POST-IMPORT copy root (K1 pattern) · compiler v0.2 ===
+REFUSED (schema/reference · exit 2):
+canon/laws/broken-law.yaml · entry[2] (LAW-GRAMMAR-0103) · at / · 'judgment' is a required property
+kill rc=2

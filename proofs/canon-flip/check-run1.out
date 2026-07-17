@@ -1,0 +1,3 @@
+check OK · byte-identical ×3 outputs
+projection projections/laws-index.json sha256:34a9ca4e92b7188176c4fc132267f741224c93c2ad453cd54de8927d98fd9890
+lock canon/ssot.lock sha256:db0cae163fd0295a997fea24c6717ed306d0954f2055f5bcc3f8e2b5145694ea (detached in canon/ssot.lock.sha256)

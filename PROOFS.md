@@ -165,3 +165,82 @@ proofs/           → rejouer les 4 kills + le ×2 byte-identical au premier com
 
 Re-validation à la copie : `python3 scripts/ssot-compiler.py --check` rc=0 · les 4
 kills rc 2/3/2/1 · les digests changent (chemins/pins C0) et se re-scellent au receipt.
+
+---
+
+## §canon-flip · 2026-07-17 · l'import canon.yaml → registres + le gate --check-canon (compiler v0.2)
+
+> DoD C0 items 4-5 amorcés (MIG-canon-yaml · « jamais deux vérités ») · plan
+> `CANON_FLIP_WAVE_PLAN.md`. Le CONTENU de canon.yaml entre dans les registres
+> scellés (verbatim · SSOT-1 §28) · les sections sans foyer adapté entrent au
+> ledger d'exceptions (`canon/EXCEPTIONS.md` · §18) · le compiler v0.2 gagne le
+> mode `--check-canon` (parité registre↔canon.yaml · **rc=5** nouveau code
+> documenté · read-only · zéro réseau · déterministe). Le flip réel (canon.yaml
+> GÉNÉRÉ + `--emit-canon` + test des 70+ lecteurs monorepo) reste l'étape
+> suivante du plan — HORS de cette vague.
+
+### CF-P1 · L'import (9 surfaces gatées · sources verbatim)
+
+```
+verbs (4) + namespaces (5)      → canon/surface.yaml        rows kind=verb/namespace · status active ·
+                                  law-anchored (LAW-SURFACE-0212 · LAW-SURFACE-0201/0221/0222 ·
+                                  LAW-GRAMMAR-0201/0202) · semantics canon.yaml en notes verbatim
+builtins (28)                   → canon/builtins.yaml       id nika:<name> · category/capability/error_plane
+                                  per stdlib/builtins-v0.1.md · 11 external · 17 pure_internal ·
+                                  LAW-AUTH-0311 sur chaque row (+ LAW-TEMPORAL-0411 sur nika:wait)
+templates (10)                  → canon/templates/registry.yaml  digest sha256 RÉEL de chaque source
+                                  (vérifiée sur disque · le placeholder digest-zéro remplacé per sa
+                                  propre déclaration)
+error_codes (82)                → canon/diagnostics/registry.yaml  id+namespace per spec/05-errors.md
+                                  (cross-check canon↔05 = 82/82 identiques · mesuré) · champs fins =
+                                  floors honnêtes déclarés note import-c0 · 15 codes câblés aux lois qui
+                                  les citent · les 2 seeds NIKA-AGENT byte-intouchées · 93 rows total
+mcp.protocol_versions (5)       → canon/features.yaml       runtime_capability · id bijectif
+                                  mcp.protocol.<v · tirets→underscores> · detection_law LAW-CONF-0510
+error_namespaces (21 · partiel) → dérivés des rows (19/21 · IMPL+PROVIDER declared-empty · CF-09)
+outcome_transitions.classes     → COHÉRENT (canon == enum scellé outcome_class == lois gates R5 ·
+                                  terminal jamais une classe per LAW-OUTCOME-0231)
+```
+
+### CF-P2 · Le ledger d'exceptions (SSOT-1 §18 · rien de silencieux)
+
+`canon/EXCEPTIONS.md` · 16 rows (counts=dérivés par le gate · providers +
+extract_modes = home ruling owed · error_categories = pas de champ category
+dans le diagnosticRow scellé · outcome_transitions.legal/payload = table-13
+home owed · 7 vocabulaires studio = authored per operator reco · mcp.tools =
+projection engine-verified · canonical_phrasing = home snippets owed ·
+schema_version = meurt au flip) + le registre des findings CF-01..CF-11. La
+liste de skips du compiler (`CANON_EXCEPTIONS`) et le ledger sont en lockstep.
+
+### CF-P3 · Les preuves (proofs/canon-flip/ · rejouées telles quelles)
+
+```
+(a) check-canon-green.out          python3 scripts/ssot-compiler.py --check-canon → rc=0
+                                   « check-canon OK · one truth · 9 gated surfaces · 16 declared skips »
+(b) mutation-remove-nika-hash.out  la row nika:hash RETIRÉE de canon/builtins.yaml → rc=5 ·
+                                   diagnostic exact : « builtins: canon items with NO registry row: nika:hash »
+    restore-green.out              copy-back byte-exact → rc=0 (cmp = identique)
+(b-bis) mutation-canon-side.out    5e verbe fantôme (ghostverb) injecté dans canon.yaml → rc=5 ·
+                                   « verbs: canon items with NO registry row: ghostverb » · le gate tue
+                                   la seconde vérité DANS LES DEUX SENS · restore byte-exact → rc=0
+(c) check-run1.out / check-run2.out  --check ×2 → rc=0 · sorties byte-identiques (cmp) ·
+                                   projection sha256:34a9ca4e… · lock sha256:db0cae16… (v0.2 re-scellés)
+(d) kill-broken-law.out            broken-law.yaml (asset K1 · judgment retiré) REMPLACE yaml-profile.yaml
+                                   dans une copie racine post-import → rc=2 ·
+                                   « 'judgment' is a required property » · le refus schema survit à v0.2
+```
+
+### CF-P4 · FINDINGS (SSOT-1 §29 · registre complet dans canon/EXCEPTIONS.md)
+
+CF-01 vars/env · dual-truth timeline (v1 live vs R3a E-split) déclaré aux rows ·
+CF-02 duplicate nika:jq pré-import mergé (citation LAW-TEMPORAL-0411 erronée sur
+jq droppée · 0411 réfère builtins:nika:wait) · CF-03 error_plane seeds
+(NIKA-JQ/NIKA-NIKAWAIT) contredisaient le stdlib · corrigés déclarés · CF-04
+table catégories stdlib somme 27 vs total 28 (decide sans row · enum scellé
+`decision`) · CF-05 11 rows NIKA-YAML registry-ahead (namespace YAML absent des
+21) · CF-06 transient engine-assessed × 3 inreprésentable dans le boolean scellé
+(floor false déclaré) · CF-07/08 causes kernel-ahead (budget_exhausted ·
+deadline_exceeded · lois OUTCOME-0403/0402 vs table legal canon) · CF-09
+IMPL/PROVIDER zéro code (underivable) · CF-10 error_categories sans foyer scellé
+(carried en notes greppables `category: <c>`) · CF-11 la table §namespaces de
+spec/05 liste 15 alors que sa propre table de codes en use 21 (prose lag).
