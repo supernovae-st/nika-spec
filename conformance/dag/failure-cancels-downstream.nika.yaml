@@ -12,12 +12,12 @@ tasks:
 
   step_b:
     after:
-      step_a: succeeded
+      step_a: success
     exec:
       command: ["echo", "this", "should", "not", "run"]
 
   step_c:
     after:
-      step_b: succeeded
+      step_b: success
     exec:
       command: ["echo", "this", "should", "not", "run", "either"]

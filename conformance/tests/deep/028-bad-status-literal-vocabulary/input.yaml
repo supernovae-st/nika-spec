@@ -9,5 +9,5 @@ tasks:
     exec: { command: ["true"] }
   c:
     with: { s: "${{ tasks.p.status }}" }
-    when: "${{ with.s != 'failed' }}"
+    when: "${{ with.s != 'done' }}"
     exec: { command: ["echo", "lives but lies"] }

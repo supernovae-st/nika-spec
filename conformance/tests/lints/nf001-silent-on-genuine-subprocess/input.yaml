@@ -7,5 +7,5 @@ tasks:
     exec: { command: ["cargo", "test", "--workspace", "--lib"] }
   nested:
     after:
-      test: succeeded
+      test: success
     exec: { command: ["nika", "run", "subroutine.nika.yaml"] }

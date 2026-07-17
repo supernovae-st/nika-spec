@@ -10,7 +10,7 @@ Sources (locked rulings only — nothing here is invented):
   · mega-plan §W2 (2026-07-13-nika-v1-refonte-2060-mega-plan.md)
   · G11 edge roles: e = (producer, consumer, role, predicate)
   · gate algebra v2: default gate over E_d∪E_c = ALL ∈ {success, skipped} ·
-    after predicates {succeeded|failed|skipped|terminal} · when = business
+    after predicates {success|failure|skipped|terminal} · when = business
     condition POST-gate (the always-pattern migrates to after: {t: terminal})
   · depends_on DIES in W2 (data → with · data-less control → after)
   · when namespaces: {inputs, config, with, item, index} — tasks.* illegal
@@ -20,8 +20,8 @@ semantics.py verbatim — this file only replaces HOW a task's admission gate
 is computed (per-edge predicates instead of the single depends_on set).
 
 WITNESS LEDGER (resolved at the 2026-07-14 window · fixtures on spec#91):
-  W2-Q1  RESOLVED AS THE STOP CLASS · depends_on ≡ after:{t: succeeded} is
-         FALSE on a skipped producer (old gate passed · succeeded cancels ·
+  W2-Q1  RESOLVED AS THE STOP CLASS · depends_on ≡ after:{t: success} is
+         FALSE on a skipped producer (old gate passed · success cancels ·
          a value binding still passes). The codemod is equivalence-or-stop:
          this exact divergence is what the STOP diagnostic prints.
   W2-Q2  RESOLVED · cancelled ∈ terminal (binary witnesses w2q2* · the
@@ -71,8 +71,8 @@ PASS_TERMINAL_OBS = set(TERMINAL)  # any settled state observable (cancelled inc
 # defined-null. A recovered producer settles SUCCESS — the edge still dies.
 PASS_FAILURE_OBS = {FAILURE, SKIPPED}
 AFTER_PREDICATES = {
-    "succeeded": {SUCCESS},
-    "failed": {FAILURE},
+    "success": {SUCCESS},
+    "failure": {FAILURE},
     "skipped": {SKIPPED},
     "terminal": set(TERMINAL),
 }

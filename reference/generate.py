@@ -15,7 +15,7 @@ from __future__ import annotations
 import random
 
 FIELDS = ["output", "output", "output", "status", "error"]  # value-biased mix
-PREDICATES = ["succeeded", "failed", "skipped", "terminal"]
+PREDICATES = ["success", "failure", "skipped", "terminal"]
 
 
 def generate(seed: int) -> str:
@@ -25,7 +25,7 @@ def generate(seed: int) -> str:
     # Statically-LIVE authorship only: the checker refuses a provably-dead
     # task (an edge whose pass-set the producer can never reach — the reach
     # analysis), so a predicate is drawn from what its producer CAN settle:
-    # `skipped` needs a skippable producer · `succeeded`/`failed` need one
+    # `skipped` needs a skippable producer · `success`/`failure` need one
     # that can RUN at all (a `when: false` producer settles only skipped).
     can_skip: dict[int, bool] = {}
     never_runs: dict[int, bool] = {}

@@ -6,5 +6,5 @@
       "category": "validation_error"
     }
   ],
-  "note": "09-types.md \u00a7reserved \u00b7 money lands with the decision core (fixed-point + ISO-4217 \u00b7 never binary floats)."
+  "note": "09-types.md \u00a7reserved \u00b7 bare money is withdrawn (R6) \u2014 an unknown type name refuses \u00b7 a future exact form lives in the research registry, never the public surface."
 }

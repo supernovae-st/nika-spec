@@ -7,5 +7,5 @@ tasks:
     exec: { command: ["./process.sh", "part1"] }
   shard2:
     after:
-      shard1: succeeded
+      shard1: success
     exec: { command: ["./process.sh", "part2"] }

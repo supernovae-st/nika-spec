@@ -68,11 +68,11 @@ t = wf(
 )
 check("dead-path · transitive", status(t, "c") == "cancelled")
 
-# after:{failed} — runs ONLY on failure · cancelled on success (both directions)
-t = wf(f"  a:\n{F}\n  handle:\n    after: {{a: failed}}\n{T}")
-check("after failed · failure admits", status(t, "handle") == "success")
-t = wf(f"  a:\n{T}\n  handle:\n    after: {{a: failed}}\n{T}")
-check("after failed · success cancels", status(t, "handle") == "cancelled")
+# after:{failure} — runs ONLY on failure · cancelled on success (both directions)
+t = wf(f"  a:\n{F}\n  handle:\n    after: {{a: failure}}\n{T}")
+check("after failure · failure admits", status(t, "handle") == "success")
+t = wf(f"  a:\n{T}\n  handle:\n    after: {{a: failure}}\n{T}")
+check("after failure · success cancels", status(t, "handle") == "cancelled")
 
 # after:{terminal} — the always-pattern (runs on success AND on failure)
 for body, want in ((T, "success"), (F, "failure")):
@@ -150,13 +150,13 @@ for name, a_body, want_b in CASES:
 
 # W2-Q1 · THE MIGRATION GAP (RESOLVED as the codemod STOP class): the dead
 # depends_on gate on a skipped producer passed ({success, skipped}); the
-# succeeded predicate cancels there while a value binding still passes.
+# success predicate cancels there while a value binding still passes.
 # The two W2 spellings the codemod offers at the STOP diverge exactly here.
 skip_a = F + "\n    on_error: {skip: true}"
-strict = wf(f"  a:\n{skip_a}\n  b:\n    after: {{a: succeeded}}\n{T}")
+strict = wf(f"  a:\n{skip_a}\n  b:\n    after: {{a: success}}\n{T}")
 value = wf(f"  a:\n{skip_a}\n  b:\n    with: {{x: '${{{{ tasks.a.output }}}}'}}\n{T}")
 check(
-    "W2-Q1 witness · succeeded cancels where the value edge passes (skip)",
+    "W2-Q1 witness · success cancels where the value edge passes (skip)",
     status(strict, "b") == "cancelled" and status(value, "b") == "success",
     f"strict={status(strict, 'b')} value={status(value, 'b')}",
 )

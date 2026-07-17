@@ -7,9 +7,9 @@ tasks:
     exec: { command: ["./fetch.sh"] }
   parse:
     after:
-      fetch: succeeded
+      fetch: success
     exec: { command: ["./parse.sh", "--strict", "input.json"] }
   report:
     after:
-      parse: succeeded
+      parse: success
     exec: { command: ["./report.sh"] }

@@ -4,5 +4,5 @@ workflow:
   id: hello
 tasks:
   a:
-    after: { ghost: succeeded }
+    after: { ghost: success }
     infer: { prompt: "a" }

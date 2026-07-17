@@ -21,3 +21,107 @@ tombstones:
       pattern: "NIKA-PARSE-001"
       scope: to-mint-c1/conformance/yaml-profile
     notes: "Le schema scellé force status: retired sur toute row tombstone (un tombstone EST une retraite) ; retired_in: C1 porte la fenêtre où le kill s'exécute. Réservation du kill : après MIG-yaml-profile, plus aucune fixture yaml-profile ne s'attend au code parse générique pour les classes anchor/alias/merge-key/duplicate-key (R11 point 4 : diagnostic dédié, pas un parse error générique). Le census vise le périmètre yaml-profile, jamais le code générique global."
+  - id: after-participial-predicate-spellings
+    status: retired
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0231"]
+    introduced_in: P-C
+    kind: surface-word
+    retired_in: P-C
+    replaced_by: "grammar:gate_predicate_vocabulary"
+    census_pattern:
+      tool: grep
+      pattern: "(after|when):.*(succeeded|failed)"
+      scope: spec
+    final_census:
+      date: "2026-07-17"
+      count: 0
+    notes: "R5 verbatim : « Choix : (a) after: success | failure | skipped | terminal. » · « Codemod 1:1 mécanique » (succeeded->success · failed->failure · skipped/terminal inchangés · LAW-GRAMMAR-0231). Kill exécuté au leg pc-light (MIG-predicates · 2026-07-17) : spec (17 sites anchored + 4 multi-ligne) · examples · templates · conformance (fixtures + runner + reference + generator gen-gate-matrix + schema JSON + migrate-w2 émetteur) = census 0. Le pattern ancré du receipt pc-census-baseline couvre 6 dirs ; la scope pathLike unique vise spec (surface normative) · les carve-outs documentés : design/v1-constitution.md = frozen draft (S3 · row mig-f5 verbatim · « never edited by this codemod » · régénéré post-window per R9 lois 3-4 · 6 sites y survivent jusqu'à la régénération) · spec/03-dag.md:238 « a failed upstream » = adjectif anglais hors position grammaticale (false-positive du pattern · jamais un prédicat) · les records verbatim canon/laws/* citent les formes mortes à jamais (le record du ruling EST la loi · jamais réécrit)."
+  - id: dag-007-did-you-mean-failed-to-failure
+    status: retired
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0231"]
+    introduced_in: P-C
+    kind: phrase
+    retired_in: P-C
+    census_pattern:
+      tool: grep
+      pattern: "'failed'"
+      scope: spec
+    final_census:
+      date: "2026-07-17"
+      count: 0
+    notes: "R5 verbatim : « la classe did-you-mean 'failed'->failure (DAG-007) meurt ». Le CODE NIKA-DAG-007 survit (il garde le vocabulaire des comparaisons de status · success · failure · skipped · cancelled · per canon/laws/gates.yaml header) ; ce qui meurt = la CLASSE de correction did-you-mean : post-codemod l'auteur n'apprend plus jamais une orthographe participiale, la classe n'a plus d'objet (proof obligation LAW-GRAMMAR-0231). Kill exécuté au leg pc-light (2026-07-17) : spec/03-dag.md:788 (la phrase « with a did-you-mean fix ('failed' -> failure) ») + gen-gate-matrix VOCAB fixture (le literal hors-vocabulaire passe de 'failed' à 'done' · le guard DAG-007 reste exercé · la note expected perd le did-you-mean) + deep/028 régénéré. Un code retiré n'est jamais réutilisé (SSOT-2 B.22) — s'applique ici à la CLASSE : toute future correction didactique sur ce champ est une classe NEUVE. Le did-you-mean TYPE-001 (« did-you-mean when close » · unknown type name) est une autre classe · il survit · hors census (pattern scoped au literal participial quoté)."
+  - id: result-constructor-public-reservation
+    status: retired
+    owner: spec
+    law_ids: ["LAW-SURFACE-0520"]
+    introduced_in: P-C
+    kind: constructor
+    retired_in: P-C
+    census_pattern:
+      tool: grep
+      pattern: "result<"
+      scope: spec
+    final_census:
+      date: "2026-07-17"
+      count: 0
+    notes: "R6 point 1 verbatim : « result<T> -> retirer de la grammaire publique et de la liste des constructeurs réservés. » Kill exécuté au leg pc-light (MIG-constructors · 2026-07-17) : la row de la table réservée 09-types.md:73 + la mention no-generics 09-types.md:393 meurent · en position de type, result refuse désormais comme nom inconnu (NIKA-TYPE-001 · fixture 009-reserved-constructor garde sa polarité négative · sa note wave-claim est morte). « le nom pourra être réévalué uniquement avec un besoin distinct d'Outcome » — jamais réutilisé sans ce besoin démontré (B.22)."
+  - id: secret-constructor-public-reservation
+    status: retired
+    owner: spec
+    law_ids: ["LAW-SURFACE-0521"]
+    introduced_in: P-C
+    kind: constructor
+    retired_in: P-C
+    census_pattern:
+      tool: grep
+      pattern: "secret<"
+      scope: spec
+    notes: "R6 point 2 verbatim : « secret<T> -> retirer de la grammaire publique réservée. La sensibilité reste représentée dans l'IR interne … Un secret reste une store-reference gouvernée, pas une valeur ordinaire enveloppée par l'auteur. » Kill pc-light (2026-07-17) : la row de la table réservée 09-types.md:75 + la mention no-generics 09-types.md:394 meurent · type_core.py ne réserve plus secret (refus nom-inconnu). PAS de final_census : 3 sites secret< SURVIVENT en spec (09-types.md §secrets-never-lower + les deux rows NIKA-TYPE-005 09:380/05:116) — FINDING-E (canon/laws/constructors.yaml header verbatim) : « Le sort de NIKA-TYPE-005 … n'est PAS tranché par R6 : arbitrage owed à la cascade, enregistré ici, jamais décidé silencieusement. » Le census atteint 0 quand cet arbitrage tombe · jamais avant."
+  - id: money-bare-constructor-reservation
+    status: retired
+    owner: spec
+    law_ids: ["LAW-SURFACE-0522"]
+    introduced_in: P-C
+    kind: constructor
+    retired_in: P-C
+    census_pattern:
+      tool: grep
+      pattern: "(returns|type): money"
+      scope: spec
+    final_census:
+      date: "2026-07-17"
+      count: 0
+    notes: "R6 point 4 verbatim : « money -> retirer sous la forme nue money. Conserver uniquement un research candidate pour une future forme exacte … » Kill pc-light (2026-07-17) : la row de la table réservée 09-types.md:76 + la lowering row 09-types.md:226 (« decimal + currency refinements land with the decision core ») meurent avec la forme (LAW-SURFACE-0522 proof obligation). En position de type, money refuse comme nom inconnu · fixture 014-money-reserved garde sa polarité négative (son input conformance/…/014-money-reserved/input.yaml exerce légitimement la forme morte en NEGATIVE · hors scope census spec). Les neuf exigences d'introduction future gardent le research candidate hors surface publique."
+  - id: constructor-wave-landing-mentions
+    status: retired
+    owner: spec
+    law_ids: ["LAW-MIGR-0520"]
+    introduced_in: P-C
+    kind: phrase
+    retired_in: P-C
+    census_pattern:
+      tool: grep
+      pattern: "land with their owning wave|land with their waves|lands? with the decision core"
+      scope: spec
+    final_census:
+      date: "2026-07-17"
+      count: 0
+    notes: "R6 point 5 verbatim : « Supprimer toutes les anciennes mentions : \"lands with W5\" ; \"lands with W-DEC\" ; propriétaires ou vagues closes erronées. » + note de cascade verbatim : « (Cascade : inclut les strings de diagnostic ENGINE — TESTED P7 : result<string> dit encore « lands with outcomes (W5) ».) » Kill pc-light (2026-07-17) sur les surfaces SPEC-repo : table 09-types (Outcome IR (W5) · artifact lanes (W5) · authority wave (W4) · decision core (W-DEC) · l'intro « land with their owning wave ») + lowering row 09:226 + notes fixtures 009/014 + type_core.py RESERVED dict (les quatre wave-strings) + type_core_selftest labels. Portée du pattern per LAW-MIGR-0520 proof obligation 2 : mentions CONSTRUCTEURS seulement · 07-conformance.md:178 (« lands with the reference engine ») + 12-gateway (« land with workflow composition ») ne sont PAS des mentions de constructeur · hors census. RESTES documentés : les « · W4 » des deux rows NIKA-TYPE-005 (FINDING-E · owed) · les strings ENGINE (le leg engine de la cascade · hors spec-repo)."
+  - id: model-select-ghost-form
+    status: retired
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0501", "LAW-MIGR-0501"]
+    introduced_in: P-C
+    kind: field
+    retired_in: P-C
+    replaced_by: "ir:model_string_form"
+    census_pattern:
+      tool: grep
+      pattern: "model_select|model: . select:"
+      scope: spec
+    final_census:
+      date: "2026-07-17"
+      count: 0
+    notes: "Annexe A-16 phrase 2 verbatim : « La ligne ghost `model: { select: {require, prefer} }` (15:72) est supprimée. » Kill exécuté au leg pc-light (MIG-modelref · 2026-07-17) : l'unique hit vivant (LAW-MIGR-0501 proof obligation verbatim : « l'unique hit vivant est spec/15-proof.md:72 ») meurt — le champ lock model_select: ET son commentaire dans le bloc nika.lock (« la surface auteur et sa matérialisation lock meurent ensemble » · LAW-GRAMMAR-0501 · « Le lock format perd le champ model_select: dans le même geste » · LAW-MIGR-0501). La string <provider>/<name> = SEULE surface v1 (LAW-SURFACE-0501) · la var EST l'alias logique (LAW-SURFACE-0502). Le pattern census couvre les deux orthographes (champ lock · forme inline) · le '.' du pattern = la brace (grep -E metachar-safe). Les records verbatim (canon/laws/model.yaml ×3 + laws-index généré) citent la forme morte à jamais — le record du ruling EST la loi (le receipt pc-census-baseline comptait 3 sites : 1 vivant + les citations du record · re-mesure pc-light empirique)."

@@ -36,7 +36,7 @@ templates:
   - file: templates/gate-and-act.nika.yaml
     sha256_16: bcbad5de8db80d3a
   - file: templates/human-gated-ship.nika.yaml
-    sha256_16: c2c3d0baa7f42778
+    sha256_16: 77235a1ba4dabde2
   - file: templates/media-asset-pack.nika.yaml
     sha256_16: 3d3b3bc6835c4524
   - file: templates/website-brief.nika.yaml
@@ -53,7 +53,7 @@ showcase:
     tier: T1
     description: ""
     constructs: [local_model, outputs, schema, typed_vars, with]
-    sha256_16: 75fc05eb1a302ef4
+    sha256_16: f6c96be06b5fd4c4
   - file: examples/showcase/t1-og-images.nika.yaml
     workflow: {'id': 'og-images', 'description': 'Generate the launch OG hero image set into ./assets/og'}
     tier: T1
@@ -89,13 +89,13 @@ showcase:
     tier: T2
     description: ""
     constructs: [local_model, outputs, schema, typed_vars, with]
-    sha256_16: 6cd12e8fd3efcbbc
+    sha256_16: 8c2f13ab4b4e6ae1
   - file: examples/showcase/t2-csv-chart-report.nika.yaml
     workflow: {'id': 'csv-chart-report', 'description': 'CSV → aggregate → rendered bar chart + markdown report · offline · deterministic'}
     tier: T2
     description: ""
     constructs: [outputs, with]
-    sha256_16: 5df1eb22b2dbf4b5
+    sha256_16: 6e34c0bed0312bb9
   - file: examples/showcase/t2-etl-quarantine.nika.yaml
     workflow: {'id': 'etl-quarantine', 'description': 'CSV batch → schema gate → quarantine the bad · aggregate the good'}
     tier: T2
@@ -119,7 +119,7 @@ showcase:
     tier: T2
     description: ""
     constructs: [local_model, outputs, schema, secrets, with]
-    sha256_16: d6edbccb196b4397
+    sha256_16: e2777a1c2d4487d3
   - file: examples/showcase/t2-release-radar.nika.yaml
     workflow: {'id': 'release-radar', 'description': 'dependency release feed → diff vs last run → only the NEW ships'}
     tier: T2
@@ -149,7 +149,7 @@ showcase:
     tier: T3
     description: ""
     constructs: [fail_fast, for_each, local_model, max_parallel, on_error, output, outputs, retry, secrets, timeout, with]
-    sha256_16: 22071cc01d7a8c85
+    sha256_16: 700e4bc53f3f1322
   - file: examples/showcase/t3-config-drift-sentinel.nika.yaml
     workflow: {'id': 'config-drift-sentinel', 'description': 'live config vs sanctioned baseline → typed drift → explained alert'}
     tier: T3
@@ -179,7 +179,7 @@ showcase:
     tier: T4
     description: ""
     constructs: [local_model, on_finally, output, outputs, secrets, thinking, with]
-    sha256_16: 2c78332698d4c800
+    sha256_16: da59e9504eb1c605
   - file: examples/showcase/t4-deep-research-brief.nika.yaml
     workflow: {'id': 'deep-research-brief', 'description': 'plan → budgeted research agent → thinking synthesis → brief on disk'}
     tier: T4
@@ -191,10 +191,10 @@ showcase:
     tier: T4
     description: ""
     constructs: [capture, local_model, on_finally, outputs, retry, schema, secrets, thinking, with]
-    sha256_16: 926cd23e2a7b7524
+    sha256_16: df550b720ee362a7
   - file: examples/showcase/t4-release-train.nika.yaml
     workflow: {'id': 'release-train', 'description': 'parallel gates → human GO → hold until the window → ship · verify · record'}
     tier: T4
     description: ""
     constructs: [capture, on_finally, outputs, retry, secrets, timeout, typed_vars, with]
-    sha256_16: 4fba920fb4c4e932
+    sha256_16: 1214319fa899a6c5

@@ -9,5 +9,5 @@ tasks:
   b:
     with:
       data: "${{ tasks.a.output }}"
-    after: { a: succeeded }
+    after: { a: success }
     exec: { command: ["./b.sh", "${{ with.data }}"] }

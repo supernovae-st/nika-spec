@@ -8,5 +8,5 @@ tasks:
       b_out: ${{ tasks.b.output }}
     infer: { prompt: "a · ${{ with.b_out }}" }
   b:
-    after: { a: succeeded }
+    after: { a: success }
     infer: { prompt: "b" }

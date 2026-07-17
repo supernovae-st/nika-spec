@@ -6,10 +6,10 @@ tasks:
   a:
     exec: { command: ["./prepare.sh"] }
   b:
-    after: { a: succeeded }
+    after: { a: success }
     infer: { prompt: "Analyze branch B" }
   c:
-    after: { a: succeeded }
+    after: { a: success }
     infer: { prompt: "Analyze branch C" }
   d:
     with:

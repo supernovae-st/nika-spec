@@ -6,6 +6,6 @@ tasks:
     exec: { command: ["./check.sh"] }
   deploy:
     after:
-      check: succeeded
+      check: success
     when: "tasks.check.status == 'success'"
     exec: { command: ["./deploy.sh"] }

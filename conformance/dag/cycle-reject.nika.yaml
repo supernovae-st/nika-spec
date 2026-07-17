@@ -6,10 +6,10 @@ workflow:
 # INTENT: trigger NIKA-DAG-001 (control cycle in after: a->b->a)
 tasks:
   step_a:
-    after: { step_b: succeeded }
+    after: { step_b: success }
     exec:
       command: ["echo", "a"]
   step_b:
-    after: { step_a: succeeded }
+    after: { step_a: success }
     exec:
       command: ["echo", "b"]

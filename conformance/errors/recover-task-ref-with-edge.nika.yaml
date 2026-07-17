@@ -11,7 +11,7 @@ tasks:
         expression: ".v"
   risky:
     after:
-      source: succeeded
+      source: success
     exec:
       command: ["exit", "1"]
     on_error:

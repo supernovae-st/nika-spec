@@ -22,8 +22,8 @@ tasks:
           args: { path: "./out/ctrlflow/21_slow.json", content: "slow-drained" }
   join:
     after:
-      fast_fail: succeeded
-      slow_sibling: succeeded
+      fast_fail: success
+      slow_sibling: success
     invoke:
       tool: nika:write
       args: { path: "./out/ctrlflow/21_join.json", content: "join-ran" }

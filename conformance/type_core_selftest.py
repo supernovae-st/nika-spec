@@ -146,10 +146,10 @@ law("nested unions flatten",
     t({"union": [{"union": ["string", "null"]}, "integer"]})
     == t({"union": ["string", "null", "integer"]}))
 
-# ── reserved · money leaves the primitives ──────────────────────────────
-law("money is reserved (W-DEC)", refuses("money", "NIKA-TYPE-001"))
-law("result/artifact/secret reserved", all(refuses(r, "NIKA-TYPE-001")
-                                           for r in ("result", "artifact", "secret")))
+# ── withdrawn + reserved · the R6 group (spec 09 §reserved) ─────────────
+law("money is withdrawn (unknown type name)", refuses("money", "NIKA-TYPE-001"))
+law("result/secret withdrawn · artifact reserved-not-implemented",
+    all(refuses(r, "NIKA-TYPE-001") for r in ("result", "artifact", "secret")))
 
 # ── the regex dialect (locked whitelist · TYPE-006) ─────────────────────
 for pat in ("^abc$", "a|b", "(?:ab)+c*", "[a-z0-9_]{2,8}", r"\d+\.\d{2}",

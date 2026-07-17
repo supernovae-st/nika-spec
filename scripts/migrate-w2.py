@@ -21,15 +21,15 @@ GO rules (mechanically equivalence-preserving):
         no on_error: armor, else STOP;
       · a status-family-only referenced dep (terminal-observation
         pass-set ⊋ the old gate) keeps the old tightness ONLY with a
-        value edge or a succeeded predicate → STOP to choose.
+        value edge or a success predicate → STOP to choose.
   R2  a bare (unreferenced) dep whose producer provably CANNOT skip
-      (no when: · no on_error.skip · no for_each) → after: {d: succeeded}
+      (no when: · no on_error.skip · no for_each) → after: {d: success}
       — {success,skipped} ≡ {success} when skipped is unreachable.
   R3  a dep already referenced through with: (value-role) is redundant →
       it just leaves depends_on.
 
 STOP classes (human decision · the diagnostic names the deltas):
-  S1  skippable producer on a bare dep (W2-Q1: succeeded cancels where the
+  S1  skippable producer on a bare dep (W2-Q1: success cancels where the
       old gate ran · terminal runs where the old gate cancelled · a value
       binding preserves the pass-set but imports data)
   S2  when: references tasks.* (pre-W2 when REPLACED the gate: any
@@ -159,7 +159,7 @@ def plan(doc: dict) -> dict[str, dict]:
                 "S2",
                 tid,
                 "when: references tasks.* — pre-W2 it REPLACED the gate; "
-                "candidates: (a) after:{X: succeeded} if the intent was the "
+                "candidates: (a) after:{X: success} if the intent was the "
                 "strict success gate · (b) after:{X: terminal} + a .status "
                 "observation binding if it was the always/branch pattern · "
                 "(c) hoist the value into with: when the condition reads "
@@ -211,7 +211,7 @@ def plan(doc: dict) -> dict[str, dict]:
                     tid,
                     f"dep {d!r} is backed only by a {sorted(roles)} reference — "
                     "the observation edge admits on MORE states than the old "
-                    "gate; pick: keep tightness via after:{" + d + ": succeeded} "
+                    "gate; pick: keep tightness via after:{" + d + ": success} "
                     "(cancels where the old gate cancelled AND on skipped) or "
                     "accept the wider admission by hand.",
                 )
@@ -222,12 +222,12 @@ def plan(doc: dict) -> dict[str, dict]:
                         "S1",
                         tid,
                         f"bare dep {d!r} on a producer that may SKIP — the old "
-                        "gate ran on skipped; after:{" + d + ": succeeded} would "
+                        "gate ran on skipped; after:{" + d + ": success} would "
                         "cancel there · after:{" + d + ": terminal} would also "
                         "run on failure · a value binding keeps {success,"
                         "skipped} but imports data; a human picks (W2-Q1).",
                     )
-                after[d] = "succeeded"  # R2
+                after[d] = "success"  # R2
                 drop.append(d)
         # hoists: body refs (value/obs/whatever role) move into with
         taken = set(with_block.keys())

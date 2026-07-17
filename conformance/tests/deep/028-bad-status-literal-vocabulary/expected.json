@@ -6,5 +6,5 @@
       "category": "validation_error"
     }
   ],
-  "note": "03-dag.md \u00a7static liveness \u00b7 'failed' is not a status (the vocabulary is success \u00b7 failure \u00b7 skipped \u00b7 cancelled) \u2014 == never matches, != always holds \u00b7 did-you-mean fix: 'failure'."
+  "note": "03-dag.md \u00a7static liveness \u00b7 'done' is not a status (the vocabulary is success \u00b7 failure \u00b7 skipped \u00b7 cancelled) \u2014 == never matches, != always holds."
 }

@@ -1,0 +1,34 @@
+# pc-light census AFTER · MIG-constructors (R6) · 2026-07-17
+
+## result< (same grep as baseline · 6 dirs) — baseline 2
+(zero)
+TOTAL: 0 · UNACCOUNTED: 0
+
+## secret< — baseline 5
+spec/09-types.md:247:  `outputs:` type, a callable-workflow input) may contain `secret<…>`
+spec/09-types.md:384:| `NIKA-TYPE-005` | a secret-carrying type in a lowered position (reserved with `secret<T>` · W4) | `security_error` | false |
+spec/05-errors.md:116:| `NIKA-TYPE-005` | a secret-carrying type in a lowered position (reserved with `secret<T>` · W4) | `security_error` | false |
+RAW TOTAL: 3 · UNACCOUNTED (raw − STOP): 0
+
+## money (bare form · type positions in spec) — baseline 0 (money< probe) · 2 prose rows died (09:76 table + 09:226 lowering)
+(zero in spec · the negative fixture 014 input keeps 'returns: money' by design — rule 3 · polarity negative · NIKA-TYPE-001)
+
+## constructor wave/lands mentions (LAW-MIGR-0520 scope) — all dead in 6 dirs
+(zero)
+
+## STOP-list (R8 law 15 · equivalence-or-stop)
+1. spec/09-types.md:247 (§secrets never lower bullet · 'may contain secret<…> when it lands in W4') · FINDING-E verbatim (canon/laws/constructors.yaml header): « Le sort de NIKA-TYPE-005 (réécrit sur la représentation IR interne de la sensibilité, ou retiré) n'est PAS tranché par R6 : arbitrage owed à la cascade, enregistré ici, jamais décidé silencieusement. » Rewriting the bullet would CHOOSE the rewrite-on-IR branch · a human decision · not this MIG.
+2. spec/09-types.md:384 (NIKA-TYPE-005 row · 'reserved with secret<T> · W4') · same FINDING-E · the row's fate (rewrite vs retire) owed.
+3. spec/05-errors.md:116 (NIKA-TYPE-005 row · same bytes) · same FINDING-E.
+4. canon/diagnostics/registry.yaml NIKA-TYPE-005 row · untouched for the same reason (canon.yaml error_codes row follows it · no re-emit needed this MIG).
+5. ENGINE diagnostic strings (R6 cascade note verbatim · TESTED P7 'result<string>' says 'lands with outcomes (W5)') · the engine leg of the ONE atomic cascade · outside this spec-repo MIG.
+6. eval/results/*.json dated artifacts + canon/laws verbatim ruling records + projections/laws-index.json (generated from laws) · frozen/historical · quote dead forms forever (PATH-LAW spirit).
+
+## MUTATION PROOF
+mutant: 'result<T>' reintroduced into spec/09-types.md no-generics note -> grep result< spec/09-types.md = 1 (SEEN) · reverted -> 0.
+
+## Battery AFTER
+runner.py all rc=0 · 8 selftests OK · ssot-compiler --check rc=0 · --check-canon rc=0 · 6 projectors green (llms re-emitted) · canon.yaml NOT re-emitted (no gated surface moved · TYPE-005 preserved per FINDING-E)
+
+## Registries
+migration row minted: mig-r6-constructor-withdrawals (state: executed · LAW-MIGR-0520 closure gate 'migration-row-minted' advances) · tombstones: result-constructor-public-reservation (final 0) · secret-constructor-public-reservation (NO final_census · 3 FINDING-E sites live) · money-bare-constructor-reservation (final 0) · constructor-wave-landing-mentions (final 0)

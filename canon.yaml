@@ -7,7 +7,7 @@
 #   sealed outcome_class enum) · the 16 ledger sections (canon/EXCEPTIONS.md ·
 #   SSOT-1 §18) stay AUTHORED and are carried verbatim — editing those is legal.
 # regenerate: python3 scripts/ssot-compiler.py --emit-canon
-# body-sha256: a566985e828a0ae531533fc6aed168f19ff3f1f09b891ecc63e848efd1d5d0a1
+# body-sha256: f655211e6eabe973b0f6ef4ecd539e1e34a88a9a7ff42f695368c743f54c8ec0
 #   (digest of every byte below the end-of-header line · detached self-hash per PAA-006)
 # ---- end generated header (SSOT-1 §21-23 · the canon flip · C0)
 # nika canonical registry · the single source of truth for Nika canonical facts
@@ -328,7 +328,7 @@ error_codes:
     # edge (derived, never restated) and a reference outside the boundary is
     # NIKA-VAR-021. The allocation hole is deliberate.
     - { code: NIKA-DAG-004, category: validation_error, transient: "false", failure: "on_error.recover references a task downstream of the declaring task (await would deadlock)" }
-    - { code: NIKA-DAG-005, category: validation_error, transient: "false", failure: "after: predicate outside the closed set (succeeded · failed · skipped · terminal)" }
+    - { code: NIKA-DAG-005, category: validation_error, transient: "false", failure: "after: predicate outside the closed set (success · failure · skipped · terminal)" }
     - { code: NIKA-DAG-006, category: validation_error, transient: "false", failure: "statically dead task — an incoming edge's pass-set excludes every reachable producer state, or the when: gate is false under every reachable upstream combination (gate algebra v2)" }
     - { code: NIKA-DAG-007, category: validation_error, transient: "false", failure: "status compared against a literal outside the vocabulary (success · failure · skipped · cancelled) — == never matches, != always holds" }
     - { code: NIKA-TYPE-001, category: validation_error, transient: "false", failure: "unknown type name (in types: · returns: · an outputs: type) — did-you-mean when close" }

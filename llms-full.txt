@@ -1955,7 +1955,7 @@ nothing), use `after:` ·
 ```yaml
   deploy:
     after:
-      tests: succeeded      # ← control edge · state, never data
+      tests: success        # ← control edge · state, never data
     exec:
       command: ["./deploy.sh"]
 ```
@@ -1970,7 +1970,7 @@ my_task:                        # the map KEY is the identity · snake_case · u
     data: ${{ tasks.task_a.output }}
     config: { foo: "bar" }      # literals are fine — only tasks.* refs create edges
   after:                        # optional · the CONTROL boundary · {producer: predicate}
-    task_b: succeeded           # predicate ∈ succeeded | failed | skipped | terminal
+    task_b: success             # predicate ∈ success | failure | skipped | terminal
   when: ${{ vars.enabled }}     # optional · LOCAL business condition · evaluated POST-gate
   for_each: ${{ with.pages }}   # optional · map this task over a collection (local namespaces)
   retry:                        # optional · retry policy (see 05-errors.md)
@@ -2056,8 +2056,8 @@ boundary. (Same law as a `when:` evaluation error · §Task states.)
 ```yaml
 deploy:
     after:
-      tests: succeeded        # run only if tests settled success
-      scan: succeeded
+      tests: success          # run only if tests settled success
+      scan: success
     exec:
       command: ["./deploy.sh"]
 ```
@@ -2068,8 +2068,8 @@ task ·
 
 | predicate | admits when the producer settles… |
 |---|---|
-| `succeeded` | `success` |
-| `failed` | `failure` |
+| `success` | `success` |
+| `failure` | `failure` |
 | `skipped` | `skipped` |
 | `terminal` | any terminal state — `success` · `failure` · `skipped` · **`cancelled`** (the always-pattern: « run once X is settled, whatever happened » · cancelled IS terminal) |
 
@@ -2096,7 +2096,7 @@ composition law precise.)
 
 **Do not restate a `with:` edge.** An `after:` entry on a producer you
 already bind through `with:` is meaningful ONLY if it *tightens* the gate
-(`after: {x: succeeded}` + a value edge = run on `success` only, excluding
+(`after: {x: success}` + a value edge = run on `success` only, excluding
 the skipped-`null` case). A non-tightening restatement (`after: {x: terminal}`
 next to a value edge) changes nothing and the reference linter warns
 (`one-obvious-way/010`).
@@ -2109,7 +2109,7 @@ language now spells ·
 | the old spelling meant… | the W2 spelling |
 |---|---|
 | « B consumes A's output » | a `with:` binding — the data IS the edge |
-| « B runs only after A worked » (no data) | `after: { a: succeeded }` |
+| « B runs only after A worked » (no data) | `after: { a: success }` |
 | « B runs once A is settled, whatever happened » (the `when: true` pattern) | `after: { a: terminal }` |
 
 A task carrying `depends_on:` is refused at parse time (`NIKA-PARSE-024` ·
@@ -2125,7 +2125,7 @@ codemod is *equivalence-or-stop*, it never guesses.
 `depends_on: [a]` on a producer that may settle `skipped` admitted on
 `{success, skipped}` with no data read. W2 makes you choose: consume the
 value (`with:` · keeps `{success, skipped}` · the skipped value is `null`) ·
-require success (`after: {a: succeeded}` · a skipped producer now cancels
+require success (`after: {a: success}` · a skipped producer now cancels
 you) · or accept every outcome (`after: {a: terminal}`). Choosing is the
 point — the old spelling hid the choice.
 
@@ -2489,7 +2489,7 @@ fail_fast: false                # default true · false = process all even if so
   `variable_error`). **The skipped-upstream corollary** · a value edge
   passes on a skipped producer and its binding reads `null`, so a
   fan-out over that binding fails with `NIKA-VAR-006` unless the author
-  gates it (`after: {producer: succeeded}` or a `when:` size check).
+  gates it (`after: {producer: success}` or a `when:` size check).
 - `for_each` is **bounded fan-out**, not recursion · a task cannot
   `for_each` over its own output. The DAG stays acyclic.
 - If the collection is empty · the task is `skipped` (status `skipped`).
@@ -2639,8 +2639,8 @@ that admit the consumer ·
 value edge                {success, skipped}
 terminal-observation      {success, failure, skipped, cancelled}
 failure-observation       {failure, skipped}
-control · succeeded       {success}
-control · failed          {failure}
+control · success         {success}
+control · failure         {failure}
 control · skipped         {skipped}
 control · terminal        {success, failure, skipped, cancelled}
 ```
@@ -2674,7 +2674,7 @@ the verb, not the boundary that feeds it).
 **The migration table** — how the three W2 spellings propagate, next to the
 dead form they replace ·
 
-| producer X settles | `with:` value edge | `after: {x: succeeded}` | `after: {x: terminal}` | *(dead)* `depends_on: [x]` |
+| producer X settles | `with:` value edge | `after: {x: success}` | `after: {x: terminal}` | *(dead)* `depends_on: [x]` |
 |---|---|---|---|---|
 | `success` | run (binding = value) | run | run | ran |
 | `skipped` | **run** (binding = `null`) | **cancelled** | run | ran |
@@ -2682,7 +2682,7 @@ dead form they replace ·
 | `cancelled` | cancelled | cancelled | **run** (terminal includes cancelled) | cancelled |
 
 Choose knowingly · the value edge keeps the old default (skipped passes ·
-read `null` · the diamond-join unlock) · `succeeded` is the strict gate ·
+read `null` · the diamond-join unlock) · `success` is the strict gate ·
 `terminal` is the always-pattern (the report / cleanup / notify class —
 pair it with a `.status` observation to branch on what happened).
 
@@ -2702,8 +2702,7 @@ along G_p ·
   that cannot skip is a check error, not a silent never-fires edge.)
 - a status observation compared against a literal outside the vocabulary
   (`success` · `failure` · `skipped` · `cancelled`) can never match — `==`
-  is always false, `!=` always true. Refused · **`NIKA-DAG-007`**, with a
-  did-you-mean fix (`'failed'` → `failure`).
+  is always false, `!=` always true. Refused · **`NIKA-DAG-007`**.
 
 A literal `when: false` alone is **not** a finding — it is the documented
 never-pattern (feature-flag). The task settles `skipped` by explicit
@@ -2796,13 +2795,13 @@ tasks:
   setup:
     exec: { command: ["./prepare.sh"] }
   analyze_a:
-    after: { setup: succeeded }
+    after: { setup: success }
     infer: { prompt: "Analyze A" }
   analyze_b:
-    after: { setup: succeeded }
+    after: { setup: success }
     infer: { prompt: "Analyze B" }
   analyze_c:
-    after: { setup: succeeded }
+    after: { setup: success }
     infer: { prompt: "Analyze C" }
   merge:
     with:
@@ -3008,9 +3007,9 @@ discouraged form ·
 | Rule | Intent | ✅ The one way | ❌ Discouraged · why |
 |---|---|---|---|
 | `/010` | « B consumes A's output » | a `with:` binding — the data IS the edge | adding a non-tightening `after:` entry next to it (`after: {a: terminal}` beside a value edge changes nothing) |
-| `/002` | « depend on a skippable producer » | decide the skip path: `after: {a: succeeded}` (skip cancels me) or read the value (`with:` · skip passes as `null`) | an `on_error: { skip: true }` producer whose dependents never acknowledge the skip either way |
-| `/003` | « retry on transient failure » | `retry:` · the ONE retry shape (`max_attempts` · `backoff_*` · `on_codes`) | an `after: {a: failed}` duplicate of the failing task · a self-referencing recovery chain |
-| `/004` | « provide a fallback value » | `on_error: { recover: … }` · the route stays *in the failing task* | a second task `after: {a: failed}` for a mere value · use a task only when real *work* runs on failure |
+| `/002` | « depend on a skippable producer » | decide the skip path: `after: {a: success}` (skip cancels me) or read the value (`with:` · skip passes as `null`) | an `on_error: { skip: true }` producer whose dependents never acknowledge the skip either way |
+| `/003` | « retry on transient failure » | `retry:` · the ONE retry shape (`max_attempts` · `backoff_*` · `on_codes`) | an `after: {a: failure}` duplicate of the failing task · a self-referencing recovery chain |
+| `/004` | « provide a fallback value » | `on_error: { recover: … }` · the route stays *in the failing task* | a second task `after: {a: failure}` for a mere value · use a task only when real *work* runs on failure |
 | `/005` | « cleanup that always runs » | `on_finally:` (per task) · or ONE terminal report task | a task with `after: {…: terminal}` on everything — a cleanup smuggled into the graph |
 | `/006` | « time-bound an iteration » | `timeout:` on the `for_each` task · it applies **per iteration** (§for_each semantics) | per-element timing tricks inside the body · a whole-fan-out timer (none exists in v0.1) |
 | `/007` | « cap fan-out concurrency » | `max_parallel:` | manual sharding into N sequential tasks |
@@ -3091,7 +3090,7 @@ workflow whose conformance report is clean.
   ],
   "edges": [
     { "from": "gather", "to": "think", "kind": "value", "binding": "readme" },
-    { "from": "think", "to": "publish", "kind": "control", "predicate": "succeeded" },
+    { "from": "think", "to": "publish", "kind": "control", "predicate": "success" },
     { "from": "gather", "to": "publish", "kind": "recovery" }
   ]
 }
@@ -3127,7 +3126,7 @@ wire contract:
 | `value` | `binding` (the `with:` key that created it) | a `.output` / named-binding reference in `with:` |
 | `terminal-observation` | `binding` | a `.status`/`.duration_ms`/`.started_at`/`.ended_at` reference in `with:` |
 | `failure-observation` | `binding` | an `.error` reference in `with:` |
-| `control` | `predicate` (`succeeded` · `failed` · `skipped` · `terminal`) | an `after:` entry |
+| `control` | `predicate` (`success` · `failure` · `skipped` · `terminal`) | an `after:` entry |
 | `recovery` | — | an `on_error.recover:` reference (source task → declaring task · a parking read, not an ordering edge) |
 | `finally` | — | **reserved** · cleanup units have no runtime identity yet (no events · no trace rows), so W2 emits no `finally` edges — the kind is named so the enum is complete when the trace contract (W5) gives cleanup units identity |
 
@@ -3333,7 +3332,7 @@ at the boundary ·
 
 ```yaml
 deploy:
-    after: { test: succeeded }                            # strict gate · no data from test
+    after: { test: success }                              # strict gate · no data from test
     with:
       coverage: ${{ tasks.test.output.coverage }}         # value edge · read the number
       artifact: ${{ tasks.build.output.artifact_path }}   # value edge · build → deploy
@@ -3812,7 +3811,7 @@ these from this file alone.
 | `NIKA-DAG-001` | cycle in the precedence graph G_p = E_d ∪ E_c (incl. self-dependency · via `with:`/`after:`) | `validation_error` | false |
 | `NIKA-DAG-002` | `with:`/`after:` references an undeclared task | `validation_error` | false |
 | `NIKA-DAG-004` | `on_error.recover` references a task downstream of the declaring task (await would deadlock) | `validation_error` | false |
-| `NIKA-DAG-005` | `after:` predicate outside the closed set (`succeeded` · `failed` · `skipped` · `terminal`) | `validation_error` | false |
+| `NIKA-DAG-005` | `after:` predicate outside the closed set (`success` · `failure` · `skipped` · `terminal`) | `validation_error` | false |
 | `NIKA-DAG-006` | statically dead task — an incoming edge’s pass-set excludes every reachable producer state, or the `when:` gate is false under every reachable upstream combination ([03 §gate algebra](./03-dag.md#the-gate-algebra-v2-normative)) | `validation_error` | false |
 | `NIKA-DAG-007` | status compared against a literal outside the vocabulary (`success` · `failure` · `skipped` · `cancelled`) — `==` never matches, `!=` always holds | `validation_error` | false |
 | `NIKA-TYPE-001` | unknown type name (in `types:` · `returns:` · an `outputs:` type) — did-you-mean when close | `validation_error` | false |
@@ -4078,7 +4077,7 @@ optional_step:
       skip: true
 
 next:
-    after: { optional_step: succeeded }     # strict gate · a skipped producer cancels this path
+    after: { optional_step: success }       # strict gate · a skipped producer cancels this path
     exec: { command: ["..."] }
 ```
 
@@ -4129,7 +4128,7 @@ blanket kill** ·
   its edges checks the producer's settled state against that edge's
   pass-set. A value edge from the failed task does not admit → the consumer
   is `cancelled`, and the dead path propagates transitively.
-- A task whose edges DO admit on failure still runs · `after: {x: failed}`
+- A task whose edges DO admit on failure still runs · `after: {x: failure}`
   (the failure path) · `after: {x: terminal}` (the **always-pattern**: a
   final notify/report task runs even in a failing workflow) · a
   `.status`/`.error` observation binding.
@@ -5124,15 +5123,20 @@ A **type expression** is one of ·
 | `{ integer: { min?, max? } }` · `{ number: { min?, max? } }` | bounded numerics (inclusive bounds) |
 | `{ string: { pattern?, min_len?, max_len? } }` | refined string (`pattern` is a regular expression **without backreferences or lookaround** — linear-time matchable) |
 
-Three constructors are **declared and reserved** — they parse nowhere in
-v1 and their semantics land with their owning wave ·
+One constructor is **declared and reserved** — it parses nowhere in v1;
+writing it in a type position refuses with an honest diagnostic
+(reserved, not implemented — never a delivery claim) ·
 
-| Reserved | Owner | Why it is named now |
-|---|---|---|
-| `result<T>` | Outcome IR (W5) | a task outcome is a *contract*, not a convention — the slot is reserved so no user type squats the name |
-| `artifact<mime>` | artifact lanes (W5) | `outputs:` already speak it informally; the typed form needs runtime identity first |
-| `secret<T>` | authority wave (W4) | a secret is a *confidentiality*, not a shape — see §secrets never lower |
-| `money` | decision core (W-DEC) | an amount is **fixed-point + ISO-4217 currency, never a binary float** — a `money` that is semantically an empty string would be a lie; the name is reserved until the decision core brings the real representation |
+| Reserved | Owner | Status | Why it is named now |
+|---|---|---|---|
+| `artifact<mime>` | `spec` | **reserved-not-implemented** — activation sits behind a future gate: content digest · canonical media type · size · provenance · storage reference · integrity · lifecycle · composition · receipt projection must ALL be defined before it becomes authorable | `outputs:` already speak it informally; the typed form needs runtime identity first |
+
+`result` · `secret` · bare `money` are **withdrawn** from the public
+grammar and the reserved list (R6): in a type position each refuses as
+an unknown type name — the bare name and any parameterized form alike.
+The ideas survive in the research registry only — outside the public
+surface, never in the grammar. No alias, no runtime placeholder, no
+stub type stands in for them.
 
 ### Closed objects (normative)
 
@@ -5282,7 +5286,6 @@ schema, the editor's completion source. It is total on the v1 grammar ·
 | `path` | `{ "type": "string" }` (the path meaning is Nika-side · no portable format) |
 | `duration` | `{ "type": "string", "pattern": "^[0-9]+(\\.[0-9]+)?(ns\|us\|µs\|ms\|s\|m\|h)([0-9]+(\\.[0-9]+)?(ns\|us\|µs\|ms\|s\|m\|h))*$" }` (the quoted Go-duration of [01](./01-envelope.md)) |
 | `timestamp` | `{ "type": "string", "format": "date-time" }` |
-| `money` | `{ "type": "string" }` (decimal + currency refinements land with the decision core) |
 | `{ enum: E }` | `{ "type": "string", "enum": E }` |
 | `{ integer: {min,max} }` | `{ "type": "integer", "minimum": min, "maximum": max }` (absent bound omitted) · same shape for `number` |
 | `{ string: {pattern,min_len,max_len} }` | `{ "type": "string", "pattern": …, "minLength": …, "maxLength": … }` |
@@ -5449,9 +5452,8 @@ at once. This chapter's grammar binds `types:` and `returns:` today.
 ## What v1 deliberately does not do
 
 - **No recursion** in named types (undecidable walks — `NIKA-TYPE-002`).
-- **No generics / type parameters** (the reserved `result<T>` ·
-  `artifact<mime>` · `secret<T>` are engine-owned constructors, not a
-  user-parameterizable surface).
+- **No generics / type parameters** (the reserved `artifact<mime>` is an
+  engine-owned constructor, not a user-parameterizable surface).
 - **No regex inclusion** judgments (syntactic equality only — honest).
 - **No implicit coercions** — `integer ⊑ number` is the single numeric
   widening; a string is never silently a number.

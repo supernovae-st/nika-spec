@@ -1,0 +1,28 @@
+# pc-light census AFTER · MIG-predicates (R5) · 2026-07-17
+
+## Same anchored grep as baseline · grep -rEn '(after|when):.*(succeeded|failed)' spec/ stdlib/ examples/ templates/ conformance/ design/
+spec/03-dag.md:238:  refines it. The old always-pattern (`when: true` to run on a failed
+conformance/dag/when-false-skips.nika.yaml:6:# SPEC 03 §when: runtime-false → task SKIPPED (not failed); downstream sees it settled.
+design/v1-constitution.md:311:    after: { build: succeeded }         # control edge: no data consumed
+design/v1-constitution.md:316:    after: { build: succeeded }
+design/v1-constitution.md:434:    after: { decide: succeeded }
+design/v1-constitution.md:532:    after: { task_id: succeeded | failed | skipped | terminal }   # control edges
+design/v1-constitution.md:748:    after: { build: succeeded }
+design/v1-constitution.md:889:    after: { decide: succeeded }
+
+RAW TOTAL: 8 · UNACCOUNTED (raw − STOP-list): 0
+
+## STOP-list (equivalence-or-stop · R8 law 15 · every remaining site with its reason)
+1. spec/03-dag.md:238 · 'a failed upstream' = English ADJECTIVE in teaching prose (the dead pre-W2 always-pattern description) · not a predicate literal · census false-positive (the pattern matches because 'when: true' shares the line)
+2. conformance/dag/when-false-skips.nika.yaml:6 · '# … task SKIPPED (not failed)' = English VERB in a fixture comment (mirrors spec 03:408 prose) · not a predicate position
+3-8. design/v1-constitution.md:311,316,434,532,748,889 · FROZEN DRAFT · sealed row mig-f5-stop-completion verbatim: 'S3 design/v1-constitution.md is a frozen draft · regenerated post-window per R9 laws 3-4, never edited by this codemod' · the 4 multi-line sites (324,325,762,763) same class
+
+## Multi-line positional census (yaml map-entry under after:) · 0 outside frozen draft
+design/v1-constitution.md:324,325,762,763 (frozen draft · same S3 class) · all other scopes ZERO
+
+## MUTATION PROOF (run live 2026-07-17 · recorded from session transcript)
+mutant: spec/04-variables.md:175 'after: { test: success }' -> 'after: { test: succeeded }' (ONE old-form reintroduced)
+anchored grep census: 8 -> 9 (the mutant IS seen · spec/04-variables.md:1 new hit) · mutant reverted · census 8
+
+## Battery AFTER (full · same as CI)
+runner.py all rc=0 · 211 PASS (99/99 core · 32/32 stdlib · corpus+deep+lints+runtime-static) · 8 selftests OK · reference/selftest.py OK · gen-type-corpus --check OK · gen-gate-matrix --check clean · ssot-compiler --check rc=0 · --check-canon rc=0 · 6 projectors OK (showcase + llms re-emitted)

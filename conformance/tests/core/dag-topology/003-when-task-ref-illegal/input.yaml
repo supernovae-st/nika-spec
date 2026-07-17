@@ -6,6 +6,6 @@ tasks:
   test:
     exec: { command: ["cargo", "test"] }
   deploy:
-    after: { test: succeeded }
+    after: { test: success }
     when: ${{ tasks.test.duration_ms < 60000 }}
     exec: { command: ["./deploy.sh"] }
