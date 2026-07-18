@@ -132,6 +132,7 @@ nika-spec/
 │   ├── extract-modes-v0.1.md    the fetch extract modes (markdown · article · jq · …)
 │   └── builtins-v0.1.md         the curated builtins (counts live in canon.yaml)
 │
+├── governance/                ← how the standard evolves (NEP-0000 · the template)
 └── registry/                  ← the sharing contract (versioned independently)
     └── registry-v0.1.md         entries · trust model · advisories · machine surfaces
 ```
@@ -241,9 +242,16 @@ Forever after GA · the 5 pillars are locked. Stdlib evolves independently.
 ## Governance
 
 - **Editor** · SuperNovae Studio (Thibaut Melen + Nicolas)
-- **Discussion** · GitHub Issues on this repo
-- **Decisions** · summarized in this repo's CHANGELOG.md
-- **RFC process** · TBD post-v0.1 GA · when external implementations emerge
+- **Evolution** · every change to the standard goes through a **NEP**
+  (Nika Enhancement Proposal) · start at
+  [governance/NEP-0000](./governance/nep-0000-the-nep-process.md) ·
+  propose via [the template](./governance/nep-template.md)
+- **Discussion** · the NEP's pull request (public · no private track)
+- **Decisions** · accepted AND rejected NEPs stay published in
+  [governance/](./governance/) · summaries in CHANGELOG.md
+- **Committee transfer** · when 3-5 independent conformant runtimes
+  exist, authority moves to a joint committee · by NEP, through the
+  same door
 
 ---
 
