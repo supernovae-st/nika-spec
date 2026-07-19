@@ -35,7 +35,7 @@ A higher level **includes** the lower levels.
 An engine claims « Core v0.1-compliant » if it ·
 
 1. **Parses** any valid v0.1 workflow YAML correctly
-   - Accepts exactly `nika: v1` · `workflow: <id>` · rejects any other `nika:` value
+   - Accepts exactly `nika: v1` · a `workflow:` object carrying a kebab-case `id` · rejects any other `nika:` value (a scalar `workflow:` is the dead W1 form · `NIKA-PARSE-020`)
    - Validates the `workflow` identifier kebab-case
    - Validates typed `vars` (type + required) · validates `env` / `secrets` shape
    - Recognizes the 4 verbs (`infer` · `exec` · `invoke` · `agent`)
@@ -199,31 +199,25 @@ behavioral halves when the behavioral fixtures publish.
 ```
 conformance/
 ├── tests/
-│   ├── core/                  # parsing · validation · DAG · variables · errors
-│   │   ├── envelope/
-│   │   ├── verbs-shape/
-│   │   ├── dag-topology/
-│   │   ├── variables/
-│   │   └── errors/
-│   │
+│   ├── core/                  # Level-1 fixtures · parse · validate · DAG · variables · errors
 │   ├── deep/                  # deep-static layer · CEL subset parse · jq compile ·
 │   │                          # durations · schema-meta · when shape · binding purity
-│   ├── runtime/               # verb execution · task fields · events
-│   │   ├── infer/
-│   │   ├── exec/
-│   │   ├── invoke/
-│   │   ├── agent/
-│   │   └── workflow-lifecycle/
-│   │
-│   └── stdlib/                # provider/extract/builtin canonical behavior
-│       ├── providers/
-│       ├── extract-modes/
-│       └── builtins/
+│   ├── lints/                 # advisory-lint fixtures
+│   ├── runtime/               # verb execution · task fields · events (behavioral half)
+│   └── stdlib/                # provider/extract/builtin canonical surface
 │
-└── runner-protocol.md          # how to run the suite against any engine
+├── runner.py                  # the static oracle · `all` is the CI gate
+├── *_core.py                  # per-domain reference evaluators (type · decision ·
+│                              # gateway · outcome · composition · yaml-profile ·
+│                              # proof · projection) + their `*_selftest.py` sweeps
+├── yaml-profile/              # R11 profile fixtures (valid/ + invalid/)
+├── type-corpus/               # the generated type corpus (gen-type-corpus.py)
+└── runner-protocol.md         # how to run the suite against any engine
 ```
 
-Each test is a pair · `input.yaml` (the workflow to feed) + `expected.json` (the expected output or error structure).
+**The directory is the source** — this sketch is a map, not the inventory
+(`python3 conformance/runner.py all` prints the live fixture counts).
+Each fixture is a pair · `input.yaml` (the workflow to feed) + `expected.json` (the expected output or error structure).
 
 For tests that require executing against real LLMs / networks · the suite uses the `mock` provider and HTTP mocks to keep tests deterministic.
 
