@@ -47,6 +47,9 @@ _sys.path.insert(0, str(_Path(__file__).resolve().parent.parent / "conformance")
 from type_core import parse_type as tc_parse  # noqa: E402
 from type_core import fits as tc_fits  # noqa: E402
 
+_sys.path.insert(0, str(_Path(__file__).resolve().parent))  # reference/ · the value core
+from values_core import values_core_errors as _value_errors  # noqa: E402
+
 import re
 
 import yaml
@@ -104,6 +107,13 @@ def parse(text: str) -> dict:
     doc = yaml.safe_load(text)
     if not isinstance(doc, dict) or doc.get("nika") != "v1":
         raise ModelError("envelope: nika: v1 required")
+    # E-split · the value authorities are inputs/config/const/secrets · the dead
+    # forms (vars/env), a foreign namespace read, and a type-violating default
+    # refuse at the envelope (values_core · NIKA-VALUES-001..003 · NIKA-DEFAULT-001).
+    _refusals = _value_errors(doc)
+    if _refusals:
+        r = _refusals[0]
+        raise ModelError(f"{r['code']} · {r['detail']}")
     raw_tasks = doc.get("tasks")
     if not isinstance(raw_tasks, dict) or not raw_tasks:
         raise ModelError("tasks: non-empty map required (W1 · the key IS the identity)")
