@@ -35,8 +35,14 @@ Legs, read off the declared boundary:
 - **① private-data**: `permits.fs.read` is non-empty. (v2 refinement: a
   sensitivity classification over read paths; v1 treats any declared read as ①.)
 - **② untrusted ingress**: the task graph can pull untrusted content into
-  context · a `nika:fetch` builtin, or a tool present in `permits.tools`. (v2:
-  per-tool trust marks from the catalog; v1 treats any fetch/tool as ②.)
+  context · a `nika:fetch` builtin invoked or granted (a glob like `nika:*`
+  covers it), or any `mcp:*` server granted in `permits.tools` —
+  server-provided content is untrusted by construction. First-party LOCAL
+  builtins (`nika:read` · `nika:write` · …) are NOT ingress: a private read
+  is ①'s domain, a write ③'s. (Amended v1.1 · operator review 2026-07-19:
+  the coarse any-grant reading flagged the spec's own permits-fit fixture
+  `deep/014-permits-fit-valid` — `tools: [nika:read, nika:write]` declares
+  no ingress. v2: per-tool trust marks from the catalog.)
 - **③ external egress**: `permits.net.http` is non-empty, OR a `permits.fs.write`
   glob escapes the declared workspace, OR `permits.exec` is enabled.
 
