@@ -10,7 +10,8 @@
 >
 > The IMPORTED sections (gated by `--check-canon` · rc=5 on divergence) are:
 > `verbs` · `namespaces` (→ canon/surface.yaml) · `builtins`
-> (→ canon/builtins.yaml) · `templates` (→ canon/templates/registry.yaml) ·
+> (→ canon/builtins.yaml) · `providers` (→ canon/providers.yaml · parity +
+> kind-per-group) · `templates` (→ canon/templates/registry.yaml) ·
 > `error_codes` (→ canon/diagnostics/registry.yaml) ·
 > `mcp.protocol_versions` (→ canon/features.yaml) · plus the
 > `outcome_transitions.classes` coherence gate and the derivable half of
@@ -19,7 +20,6 @@
 | Section (canon.yaml) | Owner | Deadline | Reason |
 |---|---|---|---|
 | `counts` | C0 | C1 | counts = derived by parity gate (`--check-canon` verifies `count == len(items)` for every counted section, and registry parity for the imported ones) · never copied · the block becomes a pure projection at the flip |
-| `providers` (17) | C0 | C1 | needs registry home ruling (builtins-section vs registre propre · plan row « ruler au flip ») · moonshot (17th · 11th cloud) landed 2026-07-17 via ADR-105 as an authored item in the ledger section (a new provider still edits the authored list, not a sealed row) · the registry home stays owed |
 | `extract_modes` (9) | C0 | C1 | needs registry home ruling (surface vs types · extract = grammaire · plan row) |
 | `error_namespaces` (21 · PARTIAL) | C0 | C1 | 19/21 derived from the imported diagnostic rows and GATED (a row namespace outside the canon set = rc 5) · `NIKA-IMPL` + `NIKA-PROVIDER` carry zero v0.1 codes (canon.yaml AND spec/05-errors.md concrete table) → underivable · reserved-row ruling owed (FINDING CF-09) |
 | `error_categories` (12) | C0 | C1 | the sealed `diagnosticRow` has no category field · each imported row carries its category documentarily in `notes` (greppable `category: <c>`) · registry home ruling owed (FINDING CF-10) |
@@ -92,6 +92,18 @@
   `canon-projectors.py` refuses unknown versions (exit 2) and the monorepo
   derive/fix gates read the marker · retirement rides the C1 projector
   cascade with its own consumer sweep.
+- **CF-14** (C1 · the providers home ruling · session K3 · D-2026-07-17-N6) ·
+  `providers` (17) GRADUATED from this ledger to a sealed registry
+  `canon/providers.yaml` (the home ruling = registre propre · the ledger
+  count drops 16 → 15). The section stays AUTHORED in canon.yaml (carried
+  verbatim by the emitter · NOT registry-rendered · like `error_namespaces`)
+  and is now GATED by `--check-canon`: parity vs the registry ids PLUS a
+  kind-per-group check (each canon group `local`/`cloud`/`test` must equal
+  its row `kind`). Each row carries `kind` + `env_var` per
+  stdlib/providers-v0.1.md and cites LAW-SURFACE-0501 (the model surface is
+  the string `<provider>/<name>`) · `status: reserved` mirrors the C0-import
+  builtins posture. Editing the canon.yaml providers list is no longer a free
+  authored edit · the registry moves with it or the gate goes red.
 
 ## The flip (C0 · `--emit-canon` · SSOT-1 §21-23)
 
@@ -101,7 +113,7 @@ verbs/namespaces from the surface spellings + the notes-carried « … »
 verbatim semantics · builtins/templates from row ids · error_codes fields
 from the import-c0 rows: `condition` == failure text · category/transient
 note greppables · mcp.protocol_versions via the bijective id transform,
-`latest` = max · outcome classes from the sealed enum) and carries the 16
+`latest` = max · outcome classes from the sealed enum) and carries the 15
 ledger sections above + every prose comment + the authored item SEQUENCE
 verbatim from the current file. A GENERATED header tops the file (body
 sha256 · own digest detached per PAA-006). `--check-canon` verifies header

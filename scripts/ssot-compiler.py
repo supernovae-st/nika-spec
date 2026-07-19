@@ -4,7 +4,7 @@
 Contract source: design-pack-pre1/01_STRUCTURED_LAW_SCHEMA.md §6 + PRE1_C0_SCOPE.md §3
 + PRE1_C0_FIRST_72H_PLAN.md T+24h. Sandbox instance: parses canon/laws/*.yaml, validates
 every law entry against schemas/law.schema.json (SEALED, consumed as-is), validates the
-12 registry documents against schemas/registries.schema.json, resolves law refs into the
+13 registry documents against schemas/registries.schema.json, resolves law refs into the
 seeded registries, emits ONE deterministic projection (projections/laws-index.json,
 stable sort by law id, canonical JSON, NFC, LF) plus canon/ssot.lock (leaf digests only,
 digest-dag layer 1, own digest DETACHED in canon/ssot.lock.sha256 per PAA-006).
@@ -35,7 +35,7 @@ Modes
                     failure text · category/transient greppables in notes) · the 2 §27
                     seed rows NIKA-AGENT-001/002 stay template-carried per FINDING CF-12 ·
                     mcp.protocol_versions via the bijective id transform (latest = max) ·
-                    outcome_transitions.classes from the sealed enum) — the 16 ledger
+                    outcome_transitions.classes from the sealed enum) — the 15 ledger
                     sections (canon/EXCEPTIONS.md) + every prose comment + the authored
                     item SEQUENCE are carried VERBATIM from the current file (they stay
                     authored · the ledger says so). A GENERATED header goes on top with
@@ -84,7 +84,7 @@ except ImportError as exc:  # pragma: no cover
 GENERATOR_IDENTITY = "ssot-compiler"
 GENERATOR_VERSION = "0.2.0-sandbox"
 
-# The 13 SSOT components (machine/registries-inventory.json, consumed as-is).
+# The 14 SSOT components (machine/registries-inventory.json, consumed as-is).
 REGISTRY_COMPONENTS = {
     "surface": "canon/surface.yaml",
     "grammar": "canon/grammar.yaml",
@@ -98,6 +98,7 @@ REGISTRY_COMPONENTS = {
     "tombstones": "canon/tombstones.yaml",
     "projections": "canon/projections.yaml",
     "migrations": "canon/migrations.yaml",
+    "providers": "canon/providers.yaml",  # C1 registry home (closed the providers ledger exception)
 }
 LAWS_DIR = "canon/laws"
 PROJECTION_PATH = "projections/laws-index.json"
@@ -301,7 +302,6 @@ CANON_PATH = "canon.yaml"
 # A canon.yaml section neither imported below nor listed here = drift (rc 5).
 CANON_EXCEPTIONS = {
     "counts": "derived by this gate (count == len(items) verified per section) · never copied",
-    "providers": "needs registry home ruling (C1) · see canon/EXCEPTIONS.md",
     "extract_modes": "needs registry home ruling (C1) · see canon/EXCEPTIONS.md",
     "error_categories": "no category field in the sealed diagnosticRow · carried in row notes · ruling owed C1 (CF-10)",
     "outcome_transitions.legal": "table-13 registry home owed C1 · kernel-ahead causes = FINDINGS CF-07/CF-08",
@@ -407,6 +407,19 @@ def check_canon(root):
         divergences.append(f"builtins: duplicate registry rows for {_fmt_set(dupes)} (a second truth)")
     gate("builtins", [f"nika:{n}" for n in _canon_item_names(canon["builtins"])], builtin_ids)
 
+    # providers -> canon/providers.yaml (row id = provider prefix · the C1 registry home)
+    provider_rows = rows("providers")
+    gate("providers", _canon_item_names(canon["providers"]), [r["id"] for r in provider_rows])
+    # kind-per-group · each canon.yaml providers group (local/cloud/test) must equal its rows' kind
+    provider_kind = {r["id"]: r.get("kind") for r in provider_rows}
+    kind_mismatch = [f"{name}(canon:{group} row:{provider_kind.get(name)})"
+                     for group, names in canon["providers"]["items"].items()
+                     for name in names if provider_kind.get(name) != group]
+    if kind_mismatch:
+        divergences.append(f"providers.kind: canon group != registry row kind: {_fmt_set(kind_mismatch)}")
+    else:
+        lines.append(f"PARITY providers.kind · {len(provider_rows)} rows · each kind == its canon group (local/cloud/test)")
+
     # templates -> canon/templates/registry.yaml (row id = item)
     gate("templates", _canon_item_names(canon["templates"]), [r["id"] for r in rows("templates")])
 
@@ -460,7 +473,7 @@ def check_canon(root):
     # generated projection: the GENERATED header must be present and the file must
     # equal its own regeneration byte-for-byte. A manual edit of a generated
     # surface (or a registry moving without re-emission) = rc 5, never silent.
-    # The 16 authored ledger sections are carried verbatim by the emitter —
+    # The 15 authored ledger sections are carried verbatim by the emitter —
     # editing THOSE stays legal and passes this gate.
     canon_bytes = canon_file.read_bytes()
     try:
@@ -550,7 +563,7 @@ def render_canon_header(body):
         f"# generated-by: {GENERATOR_IDENTITY} {GENERATOR_VERSION} (scripts/ssot-compiler.py)",
         "# sources: canon/surface.yaml · canon/builtins.yaml · canon/templates/registry.yaml ·",
         "#   canon/diagnostics/ · canon/features.yaml · schemas/registries.schema.json (the",
-        "#   sealed outcome_class enum) · the 16 ledger sections (canon/EXCEPTIONS.md ·",
+        "#   sealed outcome_class enum) · the 15 ledger sections (canon/EXCEPTIONS.md ·",
         "#   SSOT-1 §18) stay AUTHORED and are carried verbatim — editing those is legal.",
         "# regenerate: python3 scripts/ssot-compiler.py --emit-canon",
         f"# body-sha256: {digest}",
@@ -734,7 +747,7 @@ def _rw_outcome(seg, classes):
 
 def emit_canon_body(root):
     """Regenerate the canon.yaml BODY: gated surfaces re-derived from the registries ·
-    the 16 ledger sections + every prose comment carried verbatim from the current
+    the 15 ledger sections + every prose comment carried verbatim from the current
     file (SSOT-1 §18: they stay authored). Returns bytes (LF · trailing newline)."""
     canon_file = root / CANON_PATH
     if not canon_file.is_file():
@@ -953,7 +966,7 @@ def main(argv):
         (root / CANON_PATH).write_bytes(data)
         print(f"emit-canon OK · {CANON_PATH} {sha256_bytes(data)}")
         print("the flip (SSOT-1 §21-23) · gated surfaces derived from the registries · "
-              "16 ledger sections + prose verbatim · GENERATED header + body-sha256 on top")
+              "15 ledger sections + prose verbatim · GENERATED header + body-sha256 on top")
         return 0
 
     if check_canon_mode:
