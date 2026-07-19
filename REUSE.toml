@@ -12,3 +12,19 @@ path = "**"
 precedence = "closest"
 SPDX-FileCopyrightText = "2026 SuperNovae Studio <nika@supernovae.studio>"
 SPDX-License-Identifier = "Apache-2.0"
+
+# DATA and prose whose CONTENT embeds SPDX-shaped text the extractor
+# would misread (benchmark JSONs record whole template files · the
+# example READMEs describe the fixture header in prose). `override`
+# makes this file's annotation the truth regardless of in-content text.
+[[annotations]]
+path = "eval/results/**"
+precedence = "override"
+SPDX-FileCopyrightText = "2026 SuperNovae Studio <nika@supernovae.studio>"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = ["examples/README.md", "examples/showcase/README.md"]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 SuperNovae Studio <nika@supernovae.studio>"
+SPDX-License-Identifier = "Apache-2.0"

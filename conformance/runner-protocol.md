@@ -2,7 +2,7 @@
 
 > How to run the Nika conformance suite against an engine, and the exact
 > contract of a fixture. The suite is the **machine-checkable definition** of
-> v0.1-compliance. SPDX-License-Identifier: Apache-2.0.
+> v0.1-compliance. SPDX-License-Identifier: Apache-2.0
 
 ---
 

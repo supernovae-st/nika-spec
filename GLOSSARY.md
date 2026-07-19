@@ -8,7 +8,7 @@
 >
 > **The discipline** · qualify an ambiguous term at first mention
 > (« MCP oracle » · « conformance oracle » · « human gate ») · bare
-> afterwards within the same document. SPDX-License-Identifier: Apache-2.0.
+> afterwards within the same document. SPDX-License-Identifier: Apache-2.0
 
 ## oracle
 
