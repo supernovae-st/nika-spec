@@ -20,7 +20,7 @@
 #                       binding validation · closed level / type exclusion)
 #         NIKA-VAR-001  an unresolved `${{ }}` reference (04-variables.md
 #                       §Resolution order) · non-existent task · undeclared
-#                       vars./with./env./secrets. entry · undefined namespace ·
+#                       inputs./config./const./with./secrets. entry · undefined namespace ·
 #                       loop-local item/index outside a for_each task
 #         NIKA-VAR      unclosed `${{` delimiter (validation_error · the
 #                       substitution surface is 04-variables.md's)
@@ -60,6 +60,9 @@ from jsonschema import Draft202012Validator
 from deep_static import deep_static_errors, policy_errors
 from composition_core import composition_errors
 from type_core import type_core_errors
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "reference"))
+from values_core import values_core_errors  # noqa: E402 · the E-split value-authority layer
 
 HERE = pathlib.Path(__file__).resolve().parent
 SPEC_ROOT = HERE.parent
@@ -410,7 +413,7 @@ def _resolution_errors(value, scopes: dict, where: str) -> list[dict]:
             if root in LOOP_LOCALS:
                 if not scopes["in_for_each"]:
                     var_err(f"'{root}' is a for_each loop-local · no for_each here")
-            elif root in ("vars", "env", "secrets", "with"):
+            elif root in ("inputs", "config", "const", "secrets", "with"):
                 if seg and seg not in scopes[root]:
                     var_err(f"{root}.{seg} is not declared")
             elif root == "tasks":
@@ -785,14 +788,16 @@ def cross_ref_errors(doc: dict) -> list[dict]:
     def _keys(v) -> set:
         return set(v.keys()) if isinstance(v, dict) else set()
 
-    vars_keys = _keys(doc.get("vars"))
-    env_keys = _keys(doc.get("env"))
+    inputs_keys = _keys(doc.get("inputs"))
+    config_keys = _keys(doc.get("config"))
+    const_keys = _keys(doc.get("const"))
     secrets_keys = _keys(doc.get("secrets"))
     for tid, t in tasks:
         # tasks-root existence inside a task body is judged by the boundary
         # rules (with:/after: ghosts → DAG-002 · body refs → VAR-021 · the
         # recover ghost check below) — never double-reported as VAR-001.
-        scopes = {"vars": vars_keys, "env": env_keys, "secrets": secrets_keys,
+        scopes = {"inputs": inputs_keys, "config": config_keys, "const": const_keys,
+                  "secrets": secrets_keys,
                   "tasks": idset, "with": _keys(t.get("with")),
                   "in_for_each": "for_each" in t, "tasks_mode": "skip"}
         where = f"task '{tid}'"
@@ -806,7 +811,8 @@ def cross_ref_errors(doc: dict) -> list[dict]:
                 errs.append({"code": "NIKA-VAR-001", "category": "variable_error",
                              "detail": f"task '{tid}' on_error.recover reads "
                                        f"tasks.{r} — a non-existent task"})
-    out_scopes = {"vars": vars_keys, "env": env_keys, "secrets": secrets_keys,
+    out_scopes = {"inputs": inputs_keys, "config": config_keys, "const": const_keys,
+                  "secrets": secrets_keys,
                   "tasks": idset, "with": set(), "in_for_each": False}
     errs.extend(_resolution_errors(doc.get("outputs"), out_scopes, "outputs:"))
     errs.extend(_unclosed_expr_errors(doc.get("outputs"), "outputs:"))
@@ -927,6 +933,7 @@ def validate_workflow(doc: dict, validator: Draft202012Validator,
     errs.extend(cross_ref_errors(doc))
     errs.extend(deep_static_errors(doc))
     errs.extend(type_core_errors(doc))
+    errs.extend(values_core_errors(doc))
     errs.extend(policy_errors(doc))
     errs.extend(composition_errors(doc, base_dir))
     if canon is not None:

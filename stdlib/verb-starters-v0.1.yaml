@@ -37,7 +37,7 @@ verbs:
       hint: "schema: validates the response — type-safe extraction, no prose parsing."
       body: |
         infer:
-          prompt: "Extract the key facts from: ${{ vars.input }}"   # SLOT: what to extract
+          prompt: "Extract the key facts from: ${{ inputs.input }}"   # SLOT: what to extract
           schema:                # the response MUST match — structured output
             type: object
             required: [summary]
@@ -49,7 +49,7 @@ verbs:
       body: |
         infer:
           system: "You are a senior software architect."   # SLOT: the voice
-          prompt: "Research the topic: ${{ vars.topic }}"  # SLOT: the job
+          prompt: "Research the topic: ${{ inputs.topic }}"  # SLOT: the job
           model: ollama/qwen3.5:4b   # SLOT: override · local runs unpriced, never free
           temperature: 0.3
           max_tokens: 2000
@@ -101,7 +101,7 @@ verbs:
       body: |
         agent:
           system: "You are a research assistant."           # SLOT: the voice
-          prompt: "Research the topic: ${{ vars.topic }}"   # SLOT: the mission
+          prompt: "Research the topic: ${{ inputs.topic }}"   # SLOT: the mission
           tools: ["nika:fetch"]   # SLOT: default-deny · least privilege
           max_turns: 10
     - id: agent-typed
@@ -110,7 +110,7 @@ verbs:
       body: |
         agent:
           system: "You are a meticulous analyst."
-          prompt: "Produce findings for: ${{ vars.topic }}"   # SLOT: the mission · name the contract + done condition
+          prompt: "Produce findings for: ${{ inputs.topic }}"   # SLOT: the mission · name the contract + done condition
           tools: ["nika:fetch", "nika:read"]   # SLOT: least privilege
           max_turns: 12
           schema:                # the final message MUST match

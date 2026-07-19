@@ -63,7 +63,10 @@ RUNTIME_NAMESPACES = frozenset({"tasks", "with", "item", "index"})
 # the dead forms · each carries its own teaching (LAW-GRAMMAR-0201 · 0202)
 DEAD_FORMS = {"vars": "NIKA-VALUES-001", "env": "NIKA-VALUES-002"}
 
-_ISLAND = re.compile(r"\$\{\{(.*?)\}\}", re.DOTALL)
+# an unescaped `${{ ... }}` island · a leading backslash (`\${{`) escapes the
+# opener to a literal, exactly as the runner's substitution surface reads it
+# (04-variables.md · EXPR_OPEN) — an escaped island is text, never a reference
+_ISLAND = re.compile(r"(?<!\\)\$\{\{(.*?)\}\}", re.DOTALL)
 _QUOTED = re.compile(r'"(?:[^"\\]|\\.)*"' + r"|'(?:[^'\\]|\\.)*'")
 # a namespace root · a lowercase identifier followed by '.', not itself a member
 _ROOT = re.compile(r"(?<![\w.])([a-z][a-z0-9_]*)\s*\.")
