@@ -83,9 +83,11 @@ has one readable front door.
 ### Relationship to conformance
 
 An accepted Standards Track NEP is not Implemented until the conformance
-suite proves it. The public claim "Nika v1 Compatible" is earned by
-passing the suite, never by declaration. A NEP that cannot state its
-conformance test does not leave Discussion.
+suite proves it. The public claim « Nika v1 Conformant — <Level>
+(spec <commit>) » (the one claim string ·
+[spec/07 §Claiming conformance](../spec/07-conformance.md#claiming-conformance))
+is earned by passing the suite, never by declaration. A NEP that cannot
+state its conformance test does not leave Discussion.
 
 ### What a NEP is not
 

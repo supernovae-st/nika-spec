@@ -145,7 +145,7 @@ nika-spec/
 If you want to implement Nika in your language ·
 
 1. Read [`spec/`](./spec/) (~30 pages · the contract)
-2. Pass [`conformance/`](./conformance/) (test suite · « v0.1-compliant »)
+2. Pass [`conformance/`](./conformance/) — the claim is « **Nika v1 Conformant — <Level> (spec <commit>)** » · earned by the suite, never by declaration
 3. Optionally implement the [`stdlib/`](./stdlib/) (providers + extract + builtins)
 4. Open a PR on this repo to be listed as a conformant impl
 
