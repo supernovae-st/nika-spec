@@ -43,7 +43,7 @@ the tooling ships with tests in the same PR.
 - BCP-14 keywords (MUST/SHOULD/MAY) only in their normative sense.
 - Counts are never hand-written in prose — cite `canon.yaml` or use a
   `<!-- canon:x -->N<!-- /canon -->` marker the projector maintains.
-- One concept, one word — see the spec's naming discipline; qualify
+- One concept, one word — see [GLOSSARY.md](./GLOSSARY.md); qualify
   ambiguous terms at first mention (« MCP oracle » · « conformance
   oracle » · « human gate »).
 - Workflow files are named `<name>.nika.yaml`
