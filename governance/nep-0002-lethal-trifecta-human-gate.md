@@ -41,8 +41,10 @@ Legs, read off the declared boundary:
   glob escapes the declared workspace, OR `permits.exec` is enabled.
 
 Rule: if ①∧②∧③ hold for a path through the DAG, the check emits a new diagnostic
-(proposed `NIKA-SEC-008`, next free in the NIKA-SEC family · final id minted at
-acceptance) with the message "lethal trifecta complete · human gate required",
+(minted **`NIKA-SEC-009`** · SEC-008 is reserved by the AUTH plane —
+`canon/laws/authority.yaml` FINDING-AUTH-02 allocates `NIKA-AUTH-001..005` +
+`NIKA-SEC-008` as c0-proposed, so the trifecta takes the next free id) with the
+message "lethal trifecta complete · human gate required",
 UNLESS a blocking `invoke: nika:prompt` human gate dominates every egress-capable
 task on that path (Rule of Two: with a gate, the third leg is a human decision,
 not an autonomous capability).
