@@ -14,7 +14,7 @@
 |---|---|---|---|
 | **OpenSSF Best Practices** (passing · 67 criteria) | project hygiene, end to end | 🟡 self-assessment below · [.bestpractices.json](../.bestpractices.json) shipped · entry creation = maintainer gesture (GitHub login on bestpractices.dev) | this file §self-assessment |
 | **OpenSSF Scorecard** (20 checks) | supply-chain posture, continuously measured | 🟢 workflow shipped ([scorecard.yml](../.github/workflows/scorecard.yml)) · badge lands after the first published run | §scorecard below |
-| **REUSE 3.3** | machine-readable licensing, file-complete | ✅ `reuse lint` GREEN (the run is the live count) · [REUSE.toml](../REUSE.toml) blanket + overrides · CI job live ([reuse.yml](../.github/workflows/reuse.yml)) | repo root |
+| **REUSE 3.3** | machine-readable licensing, file-complete | ✅ `reuse lint` GREEN (the run is the live count) · [REUSE.toml](../REUSE.toml) blanket + overrides · CI job live ([reuse.yml](../.github/workflows/reuse.yml)) · reuse.software registration = optional maintainer web-form (the CI badge is the sovereign truth) | repo root |
 | **SLSA v1.2 Build** | release provenance | ⏳ engine release train · `actions/attest-build-provenance` = Build L2 on hosted runners · reusable-workflow isolation = L3 | engine-lane brief |
 | **Sigstore / cosign** | release signatures | ⏳ engine release train · keyless `cosign sign-blob --bundle <tarball>.sigstore.json` per release asset (id-token: write) | engine-lane brief |
 | **SBOM** | dependency transparency | ⏳ engine release train (cargo-auditable / cargo-cyclonedx) · N/A for this repo (no built artifacts) | engine-lane brief |

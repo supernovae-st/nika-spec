@@ -14,7 +14,7 @@ Sovereign · multi-provider · local-first.</strong></p>
 
 > **Status** · v0.1.0-draft (working) · **License** · Apache-2.0 ·
 > [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/supernovae-st/nika-spec/badge)](https://scorecard.dev/viewer/?uri=github.com/supernovae-st/nika-spec)
-> [![REUSE status](https://api.reuse.software/badge/github.com/supernovae-st/nika-spec)](https://api.reuse.software/info/github.com/supernovae-st/nika-spec)
+> [![REUSE 3.3](https://github.com/supernovae-st/nika-spec/actions/workflows/reuse.yml/badge.svg)](https://github.com/supernovae-st/nika-spec/actions/workflows/reuse.yml)
 >
 > The language is locked at `nika: v1`, forever. That's the envelope you
 > write in every workflow file; it evolves additively and never breaks (the
