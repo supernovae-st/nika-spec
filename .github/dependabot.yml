@@ -13,3 +13,11 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    # One grouped PR per week — never per-action PRs: the codeql-action
+    # init/analyze pair MUST move together (a split bump leaves the two at
+    # different versions inside one workflow run and CodeQL fails · proven
+    # by the first ungrouped wave, 2026-07-19).
+    groups:
+      github-actions:
+        patterns:
+          - "*"
