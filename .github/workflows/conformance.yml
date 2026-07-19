@@ -85,3 +85,9 @@ jobs:
           python scripts/starters-projector.py --check
           python scripts/authoring-projector.py --check
           python scripts/design-projector.py --check
+
+      # Governance surfaces cite files by relative link (the certifications
+      # matrix · GLOSSARY · CONTRIBUTING) · a deleted target must fail here,
+      # never leave the claim standing. Fixed command · repo files only.
+      - name: Governance refs · every relative md link resolves
+        run: python3 scripts/check-md-refs.py

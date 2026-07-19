@@ -67,9 +67,9 @@ Met or N/A ([.bestpractices.json](../.bestpractices.json)); the one step
 left is the maintainer creating the bestpractices.dev entry (branch
 protection is a Scorecard/silver concern, not a passing criterion).
 
-## Scorecard — expected first-run posture
+## Scorecard · the live posture (the badge is the number · never this prose)
 
-Strong out of the gate: Token-Permissions (top-level least privilege in
+The score is LIVE · the workflow re-publishes on every main push (the badge above and the scorecard.dev viewer are the only current numbers · prose snapshots rot). Strong by construction: Token-Permissions (top-level least privilege in
 all workflows) · Dangerous-Workflow (zero risky triggers · no event data
 in shells) · Pinned-Dependencies (actions SHA-pinned as of this wave ·
 pip HASH-pinned (--require-hashes · .github/requirements.txt · uv pip compile)) · SAST (CodeQL ·
