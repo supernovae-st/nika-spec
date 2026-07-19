@@ -194,10 +194,12 @@ builtins (28)                   → canon/builtins.yaml       id nika:<name> · 
 templates (10)                  → canon/templates/registry.yaml  digest sha256 RÉEL de chaque source
                                   (vérifiée sur disque · le placeholder digest-zéro remplacé per sa
                                   propre déclaration)
-error_codes (82)                → canon/diagnostics/registry.yaml  id+namespace per spec/05-errors.md
-                                  (cross-check canon↔05 = 82/82 identiques · mesuré) · champs fins =
+error_codes (83)                → canon/diagnostics/registry.yaml  id+namespace per spec/05-errors.md
+                                  (cross-check canon↔05 = 83/83 identiques · mesuré) · champs fins =
                                   floors honnêtes déclarés note import-c0 · 15 codes câblés aux lois qui
-                                  les citent · les 2 seeds NIKA-AGENT byte-intouchées · 93 rows total
+                                  les citent · les 2 seeds NIKA-AGENT byte-intouchées · 94 rows total
+                                  (+ NIKA-SEC-009 · import-c2 NEP-0002 · reserved, law_ids [] en
+                                  attendant la famille de lois SEC)
 mcp.protocol_versions (5)       → canon/features.yaml       runtime_capability · id bijectif
                                   mcp.protocol.<v · tirets→underscores> · detection_law LAW-CONF-0510
 error_namespaces (21 · partiel) → dérivés des rows (19/21 · IMPL+PROVIDER declared-empty · CF-09)
