@@ -239,12 +239,20 @@ See `conformance/runner-protocol.md` for the exact JSON wire format.
 
 ## Claiming conformance
 
-To claim « v0.1-compliant » publicly · an engine ·
+The public claim string is **« Nika v1 Conformant — <Level> (spec <commit>) »**
+· Level ∈ `Core` · `Runtime` · `Stdlib v0.1` · the spec commit is the pin
+the suite ran against. One form everywhere — badges · READMEs · listings ·
+release notes. (In normative sentences, « v0.1-compliant » names the level
+*bar* an engine satisfies; the string above is the one public *claim*.)
+
+To make the claim · an engine ·
 
 1. MUST pass the conformance suite at the claimed level
-2. SHOULD document the level (Core · Runtime · or Stdlib v0.1)
+2. MUST name the level and the spec commit in the claim (the format above)
 3. MAY open a PR on [supernovae-st/nika-spec](https://github.com/supernovae-st/nika-spec) to be listed in `CONFORMANT_IMPLEMENTATIONS.md`
 
+The claim is earned by passing the suite, never by declaration
+([NEP-0000 §Relationship to conformance](../governance/nep-0000-the-nep-process.md)).
 The reference implementation [supernovae-st/nika](https://github.com/supernovae-st/nika) targets Stdlib v0.1 conformance.
 
 ---

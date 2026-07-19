@@ -579,6 +579,27 @@ these files) should quote-by-default for the four ambiguous-scalar cases above.
 
 ---
 
+## File naming (normative)
+
+- **Canonical filename** · `<name>.nika.yaml`. Every tool that CREATES a
+  workflow file (`nika new` · `nika init` · scaffolds · templates) MUST
+  emit this form, and every teaching surface writes it.
+- **`.nika.yml`** · accepted by matchers (editors · schema catalogs ·
+  hooks) so no real file is ever orphaned — and taught against: a tool
+  that notices it SHOULD flag « non-canonical filename · rename to
+  `.nika.yaml` » (a dedicated profile diagnostic may be allocated by a
+  future law; the convention is normative today). Tools MUST NOT emit it.
+- **Bare `.nika`** · RESERVED. Never emitted, never claimed by tooling.
+- **Media type** · `application/vnd.nika+yaml` is the reserved media type
+  for workflow documents (vendor-tree registration per RFC 6838 is a
+  post-1.0 gesture). Do not invent alternatives.
+
+One suffix, one grammar: a split-suffix ecosystem (`.yml` and `.yaml`
+both canonical) fragments globs, schema catalogs and CI matchers
+forever — that lesson is upstream, and this door closes pre-1.0.
+
+---
+
 ## Examples
 
 ### Minimal
