@@ -4,4 +4,4 @@ workflow:
   id: hello
 tasks:
   a:
-    infer: { prompt: "Running at ${{ env.MISSING }} verbosity" }
+    infer: { prompt: "Running at ${{ config.MISSING }} verbosity" }

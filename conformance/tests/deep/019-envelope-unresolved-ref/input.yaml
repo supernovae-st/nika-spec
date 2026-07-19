@@ -1,7 +1,7 @@
 nika: v1
 workflow:
   id: deep-019
-model: "${{ vars.nope }}"
+model: "${{ inputs.nope }}"
 tasks:
   a:
     infer: { prompt: "hi" }

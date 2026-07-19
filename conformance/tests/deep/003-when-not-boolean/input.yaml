@@ -1,9 +1,9 @@
 nika: v1
 workflow:
   id: deep-003
-vars:
+const:
   threshold: 5
 tasks:
   a:
-    when: ${{ vars.threshold }}
+    when: ${{ const.threshold }}
     infer: { prompt: "x" }

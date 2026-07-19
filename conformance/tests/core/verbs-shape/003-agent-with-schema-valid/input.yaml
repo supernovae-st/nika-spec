@@ -2,12 +2,12 @@
 nika: v1
 workflow:
   id: review
-vars:
+inputs:
   pr: { type: string, required: true }
 tasks:
   review:
     agent:
-      prompt: "Review ${{ vars.pr }}"
+      prompt: "Review ${{ inputs.pr }}"
       tools: ["nika:read", "nika:done"]
       schema:
         type: object

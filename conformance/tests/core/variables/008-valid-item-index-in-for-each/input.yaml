@@ -2,7 +2,7 @@
 nika: v1
 workflow:
   id: translate
-vars:
+const:
   source: "Hello world"
 tasks:
   translate:
@@ -11,4 +11,4 @@ tasks:
       locale: ${{ item }}
       n: ${{ index }}
     infer:
-      prompt: "Translate to locale '${{ with.locale }}' (#${{ with.n }}) · ${{ vars.source }}"
+      prompt: "Translate to locale '${{ with.locale }}' (#${{ with.n }}) · ${{ const.source }}"

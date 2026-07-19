@@ -6,5 +6,5 @@
       "category": "variable_error"
     }
   ],
-  "note": "01-envelope.md \u00a7env + 04-variables.md \u00a7Resolution order \u00b7 env.X resolves against the envelope env: block \u00b7 no env: block declares MISSING \u2192 unresolved \u2192 NIKA-VAR-001. (Whether env.X may ALSO fall back to the OS environment at runtime is a spec hole \u00b7 statically only the declared block is checkable.)"
+  "note": "04-variables.md \u00a7Resolution order \u00b7 config.X resolves against the envelope config: block (R3a \u00b7 the config: authority succeeds the dead env:) \u00b7 no config: block declares MISSING \u2192 unresolved \u2192 NIKA-VAR-001."
 }

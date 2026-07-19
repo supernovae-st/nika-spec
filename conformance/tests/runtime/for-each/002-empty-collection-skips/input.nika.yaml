@@ -3,11 +3,11 @@ nika: v1
 workflow:
   id: rt-foreach-empty-skips
 model: mock/echo
-vars:
+const:
   items: []
 tasks:
   work:
-    for_each: ${{ vars.items }}
+    for_each: ${{ const.items }}
     infer: { prompt: "never runs" }
   reader:
     with:

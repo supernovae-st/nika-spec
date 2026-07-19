@@ -3,14 +3,14 @@ nika: v1
 workflow:
   id: research-pipeline
 model: mock/echo
-vars:
+inputs:
   topic:
     type: string
     required: true
 tasks:
   research:
     infer:
-      prompt: "Research ${{ vars.topic }}"
+      prompt: "Research ${{ inputs.topic }}"
   summarize:
     with:
       research: ${{ tasks.research.output }}

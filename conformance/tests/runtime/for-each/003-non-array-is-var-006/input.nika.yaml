@@ -3,9 +3,9 @@ nika: v1
 workflow:
   id: rt-foreach-non-array
 model: mock/echo
-vars:
+const:
   not_a_list: "just a string"
 tasks:
   work:
-    for_each: ${{ vars.not_a_list }}
+    for_each: ${{ const.not_a_list }}
     infer: { prompt: "never runs" }

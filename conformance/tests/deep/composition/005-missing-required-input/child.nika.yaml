@@ -1,8 +1,8 @@
 nika: v1
 workflow:
   id: comp-005-child
-vars:
+inputs:
   url: { type: string, required: true }
 tasks:
   fetch:
-    exec: { command: ["echo", "${{ vars.url }}"] }
+    exec: { command: ["echo", "${{ inputs.url }}"] }
