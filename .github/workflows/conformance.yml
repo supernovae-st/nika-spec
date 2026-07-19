@@ -33,6 +33,12 @@ jobs:
       - name: Install runner deps
         run: pip install "pyyaml~=6.0" "jsonschema~=4.0"
 
+      # Ruff lints the Python oracle + projectors (config in ruff.toml · the
+      # F-rules catch real defects; the repo's compact E-style is ignored).
+      # Fixed command · no user-controlled strings reach the shell.
+      - name: Ruff (tooling lint)
+        run: pip install "ruff~=0.14" && ruff check .
+
       # jq is the oracle's compile check for workflow-supplied jq expressions
       # (nika:jq · fetch.jq · output bindings). Absent, those go UNVERIFIED and
       # the runner warns — so the gate installs it explicitly rather than lean

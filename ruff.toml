@@ -1,0 +1,11 @@
+# Ruff configuration · tooling lint for the Python conformance oracle + projectors.
+#
+# The F-rules are the bug catchers (unused imports, undefined names, unused
+# locals) — they run everywhere and must stay green. The ignored E-rules are
+# the repo's existing compact style: `l` loop aliases (E741), lambda bindings
+# (E731), semicolon-joined statements (E702), grouped imports (E401), and long
+# lines (E501). This lints for real defects, not for reformatting the codebase.
+
+[lint]
+select = ["E", "F", "W"]
+ignore = ["E741", "E731", "E702", "E401", "E501"]
