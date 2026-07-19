@@ -27,3 +27,10 @@ abstract: >-
   JSON Schema, and a governed evolution process (NEPs). The reference
   engine is a separate repository (supernovae-st/nika,
   AGPL-3.0-or-later).
+references:
+  - type: software
+    title: "Nika reference engine (nika)"
+    repository-code: "https://github.com/supernovae-st/nika"
+    license: AGPL-3.0-or-later
+    authors:
+      - name: "SuperNovae Studio"
