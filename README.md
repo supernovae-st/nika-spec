@@ -84,7 +84,7 @@ graph TD
   classDef infer fill:#5b8cff22,stroke:#5b8cff,color:#5b8cff
 ```
 
-Run `nika graph <file>` on any workflow and paste the output; it renders on GitHub as-is.
+Run `nika inspect <file> --format mermaid` on any workflow and paste the output; it renders on GitHub as-is.
 
 ---
 
@@ -120,11 +120,12 @@ nika-spec/
 │
 ├── schemas/                   ← machine-readable JSON Schemas
 ├── examples/                  ← foundation + showcase workflows (the versioned pack)
-├── templates/                 ← 6 instantiable skeletons · the agent authoring path
+├── templates/                 ← instantiable skeletons · the agent authoring path
 ├── conformance/               ← test suite for any implementation (3 static tiers)
 ├── eval/                      ← the agent-authoring benchmark (protocol vs routing vs freeform)
 ├── scripts/                   ← projectors (docs · website · pack stay byte-derived)
-├── canon.yaml                 ← machine-readable counts + registries (THE source)
+├── canon/                     ← the SSOT registries (laws · diagnostics · surface)
+├── canon.yaml                 ← machine-readable counts · GENERATED from canon/ since C0
 ├── AGENTS.md                  ← the deterministic authoring protocol (agents start here)
 │
 ├── stdlib/                    ← versioned independently
@@ -164,9 +165,9 @@ The reference engine is installable and runs workflows end-to-end today ·
   `cargo install nika` joins brew + curl as an install path at 1.0)
 - Exposes the engine's static oracle via MCP server (`nika mcp`) for harness
   integration (Claude Code · Cursor · Hermes · etc.). The MCP surface is
-  read-only, <!-- canon:mcp_tools -->9<!-- /canon --> tools (`nika_check` · `nika_explain` · `nika_schema` ·
-  `nika_examples` · `nika_template` · `nika_canon` · `nika_catalog` ·
-  `nika_tools`); execution stays behind `nika run`.
+  read-only, <!-- canon:mcp_tools -->9<!-- /canon --> tools (`nika_check` · `nika_inspect` · `nika_explain` ·
+  `nika_schema` · `nika_examples` · `nika_template` · `nika_canon` ·
+  `nika_catalog` · `nika_tools`); execution stays behind `nika run`.
 - Engine-free alternative · the [conformance oracle](./conformance/) in this
   repo validates any workflow statically
   (`python3 conformance/runner.py validate <file>`)
@@ -231,7 +232,7 @@ CI failure, not a maybe).
 
 ## Status
 
-- v0.1.0-draft · spec drafted · 7 foundation + 20 showcase examples + 6 templates · workflow.schema.json · 83 static conformance fixtures across three tiers (core · deep · stdlib surface; `python3 conformance/runner.py all` is the live count), every example gated in CI · runtime/behavioral conformance pending
+- v0.1.0-draft · spec drafted · 7 foundation + 26 showcase examples + 10 templates · workflow.schema.json · 83 static conformance fixtures across three tiers (core · deep · stdlib surface; `python3 conformance/runner.py all` is the live count), every example gated in CI · runtime/behavioral conformance pending
 - v0.1.0 GA · target August 2026 (after spec review + examples +
   conformance suite + schemas)
 

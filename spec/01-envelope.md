@@ -76,16 +76,27 @@ outputs:
 
 ## YAML profile (normative)
 
-A workflow file is **YAML 1.2 · core schema**. Two consequences authors hit ·
+A workflow file is **YAML 1.2 · core schema**, restricted by the **Nika
+YAML profile** (the R11 law set · [`canon/laws/yaml-profile.yaml`](../canon/laws/yaml-profile.yaml)).
+Two consequences authors hit ·
 
-- **Anchors & aliases (`&x` / `*x`) are fully supported**: they are core
-  YAML · they resolve BEFORE validation (the schema sees the expanded
-  document) · legitimate for de-duplicating repeated blocks (a shared
-  `retry:` policy · a common `with:` shape).
-- **Merge keys (`<<:`) are NOT part of the contract**: YAML 1.2 dropped
-  them (they were a 1.1 extension) · parser support varies · a portable
-  workflow MUST NOT use them · the reference linter rejects them at check
-  time (`NIKA-PARSE` · `validation_error`).
+- **Anchors & aliases (`&x` / `*x`) are FORBIDDEN**: the profile refuses
+  an anchor even when it is never referenced (LAW-GRAMMAR-0101/0102 ·
+  dedicated diagnostics `NIKA-YAML-001` / `NIKA-YAML-002`; the reference
+  engine already refuses them at parse). What a Nika file shows a reviewer
+  IS what the engine sees — aliasing expands invisible bytes into the
+  document and opens the reference-bomb class, so repeated blocks are
+  repeated in the source, not aliased.
+- **Merge keys (`<<:`) are FORBIDDEN too**: YAML 1.2 dropped them (they
+  were a 1.1 extension) · parser support varies · a portable workflow
+  MUST NOT use them · refused with `NIKA-YAML-003` (LAW-GRAMMAR-0103).
+
+The complete closed profile (duplicate keys · custom tags · non-string
+keys · NaN/Infinity · depth and size caps · UTF-8 NFC · no BOM) is the
+R11 law set above; its dedicated prose chapter ships with the
+law-projection wave. Until then the law file is normative and
+[05-errors](./05-errors.md#error-code-namespaces) allocates the
+`NIKA-YAML` namespace.
 
 (YAML 1.2 core also kills the 1.1 traps: `no` is a string, not `false` ·
 `3:22` is a string, not sexagesimal. The quoted-duration rule of

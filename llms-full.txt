@@ -90,7 +90,7 @@ graph TD
   classDef infer fill:#5b8cff22,stroke:#5b8cff,color:#5b8cff
 ```
 
-Run `nika graph <file>` on any workflow and paste the output; it renders on GitHub as-is.
+Run `nika inspect <file> --format mermaid` on any workflow and paste the output; it renders on GitHub as-is.
 
 ---
 
@@ -126,11 +126,12 @@ nika-spec/
 │
 ├── schemas/                   ← machine-readable JSON Schemas
 ├── examples/                  ← foundation + showcase workflows (the versioned pack)
-├── templates/                 ← 6 instantiable skeletons · the agent authoring path
+├── templates/                 ← instantiable skeletons · the agent authoring path
 ├── conformance/               ← test suite for any implementation (3 static tiers)
 ├── eval/                      ← the agent-authoring benchmark (protocol vs routing vs freeform)
 ├── scripts/                   ← projectors (docs · website · pack stay byte-derived)
-├── canon.yaml                 ← machine-readable counts + registries (THE source)
+├── canon/                     ← the SSOT registries (laws · diagnostics · surface)
+├── canon.yaml                 ← machine-readable counts · GENERATED from canon/ since C0
 ├── AGENTS.md                  ← the deterministic authoring protocol (agents start here)
 │
 ├── stdlib/                    ← versioned independently
@@ -170,9 +171,9 @@ The reference engine is installable and runs workflows end-to-end today ·
   `cargo install nika` joins brew + curl as an install path at 1.0)
 - Exposes the engine's static oracle via MCP server (`nika mcp`) for harness
   integration (Claude Code · Cursor · Hermes · etc.). The MCP surface is
-  read-only, <!-- canon:mcp_tools -->9<!-- /canon --> tools (`nika_check` · `nika_explain` · `nika_schema` ·
-  `nika_examples` · `nika_template` · `nika_canon` · `nika_catalog` ·
-  `nika_tools`); execution stays behind `nika run`.
+  read-only, <!-- canon:mcp_tools -->9<!-- /canon --> tools (`nika_check` · `nika_inspect` · `nika_explain` ·
+  `nika_schema` · `nika_examples` · `nika_template` · `nika_canon` ·
+  `nika_catalog` · `nika_tools`); execution stays behind `nika run`.
 - Engine-free alternative · the [conformance oracle](./conformance/) in this
   repo validates any workflow statically
   (`python3 conformance/runner.py validate <file>`)
@@ -237,7 +238,7 @@ CI failure, not a maybe).
 
 ## Status
 
-- v0.1.0-draft · spec drafted · 7 foundation + 20 showcase examples + 6 templates · workflow.schema.json · 83 static conformance fixtures across three tiers (core · deep · stdlib surface; `python3 conformance/runner.py all` is the live count), every example gated in CI · runtime/behavioral conformance pending
+- v0.1.0-draft · spec drafted · 7 foundation + 26 showcase examples + 10 templates · workflow.schema.json · 83 static conformance fixtures across three tiers (core · deep · stdlib surface; `python3 conformance/runner.py all` is the live count), every example gated in CI · runtime/behavioral conformance pending
 - v0.1.0 GA · target August 2026 (after spec review + examples +
   conformance suite + schemas)
 
@@ -798,16 +799,27 @@ outputs:
 
 ## YAML profile (normative)
 
-A workflow file is **YAML 1.2 · core schema**. Two consequences authors hit ·
+A workflow file is **YAML 1.2 · core schema**, restricted by the **Nika
+YAML profile** (the R11 law set · [`canon/laws/yaml-profile.yaml`](../canon/laws/yaml-profile.yaml)).
+Two consequences authors hit ·
 
-- **Anchors & aliases (`&x` / `*x`) are fully supported**: they are core
-  YAML · they resolve BEFORE validation (the schema sees the expanded
-  document) · legitimate for de-duplicating repeated blocks (a shared
-  `retry:` policy · a common `with:` shape).
-- **Merge keys (`<<:`) are NOT part of the contract**: YAML 1.2 dropped
-  them (they were a 1.1 extension) · parser support varies · a portable
-  workflow MUST NOT use them · the reference linter rejects them at check
-  time (`NIKA-PARSE` · `validation_error`).
+- **Anchors & aliases (`&x` / `*x`) are FORBIDDEN**: the profile refuses
+  an anchor even when it is never referenced (LAW-GRAMMAR-0101/0102 ·
+  dedicated diagnostics `NIKA-YAML-001` / `NIKA-YAML-002`; the reference
+  engine already refuses them at parse). What a Nika file shows a reviewer
+  IS what the engine sees — aliasing expands invisible bytes into the
+  document and opens the reference-bomb class, so repeated blocks are
+  repeated in the source, not aliased.
+- **Merge keys (`<<:`) are FORBIDDEN too**: YAML 1.2 dropped them (they
+  were a 1.1 extension) · parser support varies · a portable workflow
+  MUST NOT use them · refused with `NIKA-YAML-003` (LAW-GRAMMAR-0103).
+
+The complete closed profile (duplicate keys · custom tags · non-string
+keys · NaN/Infinity · depth and size caps · UTF-8 NFC · no BOM) is the
+R11 law set above; its dedicated prose chapter ships with the
+law-projection wave. Until then the law file is normative and
+[05-errors](./05-errors.md#error-code-namespaces) allocates the
+`NIKA-YAML` namespace.
 
 (YAML 1.2 core also kills the 1.1 traps: `no` is a string, not `false` ·
 `3:22` is a string, not sexagesimal. The quoted-duration rule of
@@ -3776,8 +3788,18 @@ Error codes follow the format `NIKA-<NAMESPACE>-<NNN>` where namespace is 2-9 up
 | `NIKA-TYPE` | Type core · contracts · lowering ([09-types.md](./09-types.md)) | 001-199 (001-099 static · 101+ runtime) |
 | `NIKA-CANCEL` | Task or workflow cancellation | 001-099 |
 | `NIKA-IMPL` | Engine internal errors | 001-099 |
+| `NIKA-YAML` | YAML profile refusals (anchors · aliases · merge keys · tags · caps · encoding — the R11 law set · [01 §YAML profile](./01-envelope.md#yaml-profile-normative) · pedagogical upgrades of the `NIKA-PARSE` floor) | 001-099 |
+| `NIKA-COMP` | Composition (`invoke: workflow:` · [14-composition](./14-composition.md)) | 001-099 |
+| `NIKA-DECIDE` | Decision bundles + evidence (`nika:decide` · [11-decision](./11-decision.md)) | 001-099 |
+| `NIKA-PORT` | Gateway artifacts (deployment bundle · lowering · fidelity · [12-gateway](./12-gateway.md)) | 001-099 |
+| `NIKA-POLICY` | `policy:` hard-rule violations ([10-authority](./10-authority.md)) | 001-099 |
+| `NIKA-ASSERT` | `assert:` obligations ([15-proof](./15-proof.md)) | 001-099 |
+| `NIKA-LOCK` | `nika.lock` pin violations ([15-proof](./15-proof.md)) | 001-099 |
+| `NIKA-REG` | Registry client refusals (resolve · digest · advisory · [registry-v0.1](../registry/registry-v0.1.md) · allocated for the reference engine's `registry:` resolver — engine ADR-106) | 001-099 |
 
-A v0.1-compliant engine MUST use these namespaces for the canonical categories. New error codes MAY be added in minor bumps (additive · never repurposed).
+This table allocates every namespace in use; the machine registry
+([`canon/diagnostics/registry.yaml`](../canon/diagnostics/registry.yaml))
+carries the per-code rows. A v0.1-compliant engine MUST use these namespaces for the canonical categories. New error codes MAY be added in minor bumps (additive · never repurposed).
 
 ### Concrete v0.1 codes · the normative floor
 
@@ -4415,7 +4437,7 @@ A higher level **includes** the lower levels.
 An engine claims « Core v0.1-compliant » if it ·
 
 1. **Parses** any valid v0.1 workflow YAML correctly
-   - Accepts exactly `nika: v1` · `workflow: <id>` · rejects any other `nika:` value
+   - Accepts exactly `nika: v1` · a `workflow:` object carrying a kebab-case `id` · rejects any other `nika:` value (a scalar `workflow:` is the dead W1 form · `NIKA-PARSE-020`)
    - Validates the `workflow` identifier kebab-case
    - Validates typed `vars` (type + required) · validates `env` / `secrets` shape
    - Recognizes the 4 verbs (`infer` · `exec` · `invoke` · `agent`)
@@ -4579,31 +4601,25 @@ behavioral halves when the behavioral fixtures publish.
 ```
 conformance/
 ├── tests/
-│   ├── core/                  # parsing · validation · DAG · variables · errors
-│   │   ├── envelope/
-│   │   ├── verbs-shape/
-│   │   ├── dag-topology/
-│   │   ├── variables/
-│   │   └── errors/
-│   │
+│   ├── core/                  # Level-1 fixtures · parse · validate · DAG · variables · errors
 │   ├── deep/                  # deep-static layer · CEL subset parse · jq compile ·
 │   │                          # durations · schema-meta · when shape · binding purity
-│   ├── runtime/               # verb execution · task fields · events
-│   │   ├── infer/
-│   │   ├── exec/
-│   │   ├── invoke/
-│   │   ├── agent/
-│   │   └── workflow-lifecycle/
-│   │
-│   └── stdlib/                # provider/extract/builtin canonical behavior
-│       ├── providers/
-│       ├── extract-modes/
-│       └── builtins/
+│   ├── lints/                 # advisory-lint fixtures
+│   ├── runtime/               # verb execution · task fields · events (behavioral half)
+│   └── stdlib/                # provider/extract/builtin canonical surface
 │
-└── runner-protocol.md          # how to run the suite against any engine
+├── runner.py                  # the static oracle · `all` is the CI gate
+├── *_core.py                  # per-domain reference evaluators (type · decision ·
+│                              # gateway · outcome · composition · yaml-profile ·
+│                              # proof · projection) + their `*_selftest.py` sweeps
+├── yaml-profile/              # R11 profile fixtures (valid/ + invalid/)
+├── type-corpus/               # the generated type corpus (gen-type-corpus.py)
+└── runner-protocol.md         # how to run the suite against any engine
 ```
 
-Each test is a pair · `input.yaml` (the workflow to feed) + `expected.json` (the expected output or error structure).
+**The directory is the source** — this sketch is a map, not the inventory
+(`python3 conformance/runner.py all` prints the live fixture counts).
+Each fixture is a pair · `input.yaml` (the workflow to feed) + `expected.json` (the expected output or error structure).
 
 For tests that require executing against real LLMs / networks · the suite uses the `mock` provider and HTTP mocks to keep tests deterministic.
 
