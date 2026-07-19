@@ -4,7 +4,7 @@
 nika: v1
 workflow:
   id: nan-scalar
-vars:
+const:
   ratio:
     type: number
     default: .nan

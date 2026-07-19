@@ -3,11 +3,11 @@ nika: v1
 workflow:
   id: foreach-index-binding
 # COVERS: ${{ index }} 0-based positional binding aligns exactly with input order.
-vars:
+const:
   items: ["zero", "one", "two", "three", "four"]
 tasks:
   loop:
-    for_each: ${{ vars.items }}
+    for_each: ${{ const.items }}
     with:
       name: ${{ item }}
       i: ${{ index }}

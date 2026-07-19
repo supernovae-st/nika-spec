@@ -2,11 +2,11 @@
 nika: v1
 workflow:
   id: e19-var-unresolved
-# INTENT: NIKA-VAR-001 — reference to undeclared vars key
-# No vars block declared, so vars.nonexistent_key is undefined
+# INTENT: NIKA-VAR-001 — reference to undeclared inputs key
+# No inputs block declared, so inputs.nonexistent_key is undefined
 tasks:
   step:
     invoke:
       tool: "nika:log"
       args:
-        message: "${{ vars.nonexistent_key }}"
+        message: "${{ inputs.nonexistent_key }}"

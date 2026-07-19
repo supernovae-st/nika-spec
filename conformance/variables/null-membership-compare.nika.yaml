@@ -9,7 +9,7 @@ nika: v1
 workflow:
   id: c18-null-membership-and-compare
 
-vars:
+const:
   present: 7
 
 tasks:
@@ -18,7 +18,7 @@ tasks:
   present_ne_null:
     after:
       null_eq_null: success
-    invoke: { tool: "nika:assert", args: { condition: "${{ vars.present != null }}", message: "7 != null is true" } }
+    invoke: { tool: "nika:assert", args: { condition: "${{ const.present != null }}", message: "7 != null is true" } }
   null_not_in_int_list:
     after:
       present_ne_null: success

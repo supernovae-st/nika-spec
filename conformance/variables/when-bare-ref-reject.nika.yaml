@@ -4,12 +4,12 @@ workflow:
   id: when-bare-ref-reject
 # SPEC 03 §when shape rules: a statically-non-boolean-SHAPED root (bare reference, no
 # relation/boolean operator) MUST be rejected at parse time NIKA-VAR-005.
-# `when: ${{ vars.threshold }}` is a bare reference → check should FAIL with NIKA-VAR-005.
-vars:
+# `when: ${{ const.threshold }}` is a bare reference → check should FAIL with NIKA-VAR-005.
+const:
   threshold: { type: integer, default: 5 }
 tasks:
   t:
-    when: ${{ vars.threshold }}
+    when: ${{ const.threshold }}
     invoke:
       tool: nika:write
       args: { path: "./out/ctrlflow/14_t.json", content: "ran" }

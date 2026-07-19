@@ -8,13 +8,13 @@ nika: v1
 workflow:
   id: c02-string-vs-number-coercion
 
-vars:
+const:
   num: 42
   str: "42"
 
 tasks:
   gate:
-    when: "${{ vars.num == vars.str }}"          # 42 == "42" → cross-type → NIKA-VAR-006 expected
+    when: "${{ const.num == const.str }}"          # 42 == "42" → cross-type → NIKA-VAR-006 expected
     invoke:
       tool: "nika:write"
       args: { path: "./out/cel/c02-ran.json", content: { gate_passed: true }, create_dirs: true }

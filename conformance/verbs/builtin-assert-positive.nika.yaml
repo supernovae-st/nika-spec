@@ -5,7 +5,7 @@ nika: v1
 workflow:
   id: w05-assert-cel-true
 
-vars:
+const:
   x: 42
 
 tasks:
@@ -13,7 +13,7 @@ tasks:
     invoke:
       tool: "nika:assert"
       args:
-        condition: "${{ vars.x == 42 }}"
+        condition: "${{ const.x == 42 }}"
         message: "x must equal 42"
 
   write_result:

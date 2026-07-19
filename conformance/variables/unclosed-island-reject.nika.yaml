@@ -12,5 +12,5 @@ tasks:
       tool: "nika:write"
       args:
         path: "./out/cel/c17-ran.json"
-        content: { v: "broken ${{ vars.x " }       # opener with no closing }}
+        content: { v: "broken ${{ inputs.x " }       # opener with no closing }}
         create_dirs: true

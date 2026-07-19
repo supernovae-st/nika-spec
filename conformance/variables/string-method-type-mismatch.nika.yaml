@@ -7,12 +7,12 @@ nika: v1
 workflow:
   id: c15-string-method-type-mismatch
 
-vars:
+const:
   n: 12345
 
 tasks:
   gate:
-    when: "${{ vars.n.contains('23') }}"         # .contains on a number → type error
+    when: "${{ const.n.contains('23') }}"         # .contains on a number → type error
     invoke:
       tool: "nika:write"
       args: { path: "./out/cel/c15-ran.json", content: { ran: true }, create_dirs: true }

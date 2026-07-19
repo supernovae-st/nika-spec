@@ -5,7 +5,7 @@ nika: v1
 workflow:
   id: w18-typed-vars
 
-vars:
+const:
   username:
     type: string
     default: "alice"
@@ -21,7 +21,7 @@ tasks:
     invoke:
       tool: "nika:assert"
       args:
-        condition: "${{ vars.username == 'alice' }}"
+        condition: "${{ const.username == 'alice' }}"
         message: "username must be alice"
 
   check_number:
@@ -30,7 +30,7 @@ tasks:
     invoke:
       tool: "nika:assert"
       args:
-        condition: "${{ vars.score > 90 }}"
+        condition: "${{ const.score > 90 }}"
         message: "score must be > 90"
 
   check_boolean:
@@ -39,7 +39,7 @@ tasks:
     invoke:
       tool: "nika:assert"
       args:
-        condition: "${{ vars.enabled == true }}"
+        condition: "${{ const.enabled == true }}"
         message: "enabled must be true"
 
   write_result:
@@ -50,7 +50,7 @@ tasks:
       args:
         path: "./out/data-validation/w18-typed-vars.json"
         content:
-          username: "${{ vars.username }}"
-          score: ${{ vars.score }}
-          enabled: ${{ vars.enabled }}
+          username: "${{ const.username }}"
+          score: ${{ const.score }}
+          enabled: ${{ const.enabled }}
         create_dirs: true

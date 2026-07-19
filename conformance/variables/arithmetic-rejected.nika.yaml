@@ -6,13 +6,13 @@ nika: v1
 workflow:
   id: c03-arithmetic-rejected
 
-vars:
+const:
   a: 2
   b: 3
 
 tasks:
   gate:
-    when: "${{ vars.a + vars.b > 4 }}"           # `+` is not in the grammar → parse reject
+    when: "${{ const.a + const.b > 4 }}"           # `+` is not in the grammar → parse reject
     invoke:
       tool: "nika:write"
       args: { path: "./out/cel/c03-ran.json", content: { ran: true }, create_dirs: true }

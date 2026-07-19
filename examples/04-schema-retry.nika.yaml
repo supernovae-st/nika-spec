@@ -17,7 +17,7 @@ workflow:
   id: schema-retry
 
 model: mock/echo
-vars:
+inputs:
   text:
     type: string
     required: true
@@ -26,7 +26,7 @@ vars:
 tasks:
   extract:
     infer:
-      prompt: "Extract named entities from · ${{ vars.text }}"
+      prompt: "Extract named entities from · ${{ inputs.text }}"
       schema:                          # structured output · the contract the model must satisfy
         type: object
         required: [entities]
@@ -55,7 +55,6 @@ tasks:
 outputs:
   entities:
     value: ${{ tasks.extract.output.entities }}
-    type: array
     description: "The extracted named entities"
   summary:
     value: ${{ tasks.report.output }}

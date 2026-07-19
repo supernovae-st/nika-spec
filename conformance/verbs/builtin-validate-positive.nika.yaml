@@ -5,7 +5,7 @@ nika: v1
 workflow:
   id: w01-validate-valid-object
 
-vars:
+const:
   doc:
     name: "Alice"
     age: 30
@@ -15,7 +15,7 @@ tasks:
     invoke:
       tool: "nika:validate"
       args:
-        data: ${{ vars.doc }}
+        data: ${{ const.doc }}
         schema:
           type: object
           required: [name, age]

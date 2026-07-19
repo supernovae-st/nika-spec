@@ -15,7 +15,7 @@ nika: v1
 workflow:
   id: c26-error-field-surface
 
-vars:
+const:
   num: 42
   str: "42"
 
@@ -23,7 +23,7 @@ tasks:
   fail_var:
     invoke:
       tool: "nika:assert"
-      args: { condition: "${{ vars.num == vars.str }}", message: "cross-type → VAR-006 at args eval" }
+      args: { condition: "${{ const.num == const.str }}", message: "cross-type → VAR-006 at args eval" }
     on_error:
       skip: true
   capture:

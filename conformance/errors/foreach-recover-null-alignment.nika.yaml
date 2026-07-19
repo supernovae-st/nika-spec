@@ -5,11 +5,11 @@ workflow:
 # COVERS: per-iteration on_error: { recover: null } -> failed iters become null at index.
 # Then a fan-in aggregator partitions good vs null (the locales pattern).
 # items 0..5, indices 1 and 4 fail -> null. Assert: good count 4, null count 2.
-vars:
+const:
   items: [0, 1, 2, 3, 4, 5]
 tasks:
   loop:
-    for_each: ${{ vars.items }}
+    for_each: ${{ const.items }}
     max_parallel: 3
     with: { v: "${{ item }}" }
     on_error:

@@ -8,11 +8,11 @@ workflow:
 # (exit 1, no marker); others → /usr/bin/touch (marker written).
 # Markers: 10_iter_a + 10_iter_c + 10_iter_d present (all non-failing ran despite the
 # failure in the middle); FAILHERE marker absent. Parent fails (exit!=0) AFTER all complete.
-vars:
+const:
   items: { type: array, default: ["a", "FAILHERE", "c", "d"] }
 tasks:
   mapped:
-    for_each: ${{ vars.items }}
+    for_each: ${{ const.items }}
     max_parallel: 1
     fail_fast: false
     exec:

@@ -5,7 +5,7 @@ workflow:
 
 # Export — the typed callable-contract return (outputs:). Question under test:
 # does `nika run` PRINT the outputs object? (spec 01-envelope:378 says it does.)
-vars:
+const:
   base:
     type: integer
     default: 10

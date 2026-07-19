@@ -4,7 +4,7 @@
 nika: v1
 workflow:
   id: anchor-unreferenced
-vars:
+const:
   retries: &shared
     type: number
     default: 2

@@ -23,7 +23,7 @@ workflow:
 
 model: ollama/qwen3.5:4b   # the whole review runs offline · zero cloud
 
-vars:
+inputs:
   contract_path:
     type: string
     required: true
@@ -33,7 +33,7 @@ tasks:
   contract:
     invoke:
       tool: "nika:read"
-      args: { path: "${{ vars.contract_path }}" }
+      args: { path: "${{ inputs.contract_path }}" }
 
   clauses:
     with:
@@ -106,6 +106,5 @@ tasks:
 outputs:
   clauses:
     value: ${{ tasks.clauses.output.clauses }}
-    type: array
     description: "Typed risk-bearing clauses, verbatim quotes"
   memo: ${{ tasks.memo.output }}

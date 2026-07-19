@@ -8,11 +8,11 @@ workflow:
 # edge — every settled state admits) → RUNS and reads status "skipped".
 # Markers: 13_gated.json ABSENT (when false → skipped);
 #          13_down.json present (the observation edge passes on skipped).
-vars:
+const:
   flag: { type: boolean, default: false }
 tasks:
   gated:
-    when: ${{ vars.flag == true }}
+    when: ${{ const.flag == true }}
     invoke:
       tool: nika:write
       args: { path: "./out/ctrlflow/13_gated.json", content: "gated-ran" }
