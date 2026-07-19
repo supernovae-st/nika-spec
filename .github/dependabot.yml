@@ -13,6 +13,16 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+  # The hash-pinned CI toolchain (.github/requirements.txt · uv pip
+  # compile --generate-hashes) · dependabot advances the pins + hashes.
+  - package-ecosystem: "pip"
+    directory: "/.github"
+    schedule:
+      interval: "weekly"
+    groups:
+      pip:
+        patterns:
+          - "*"
     # One grouped PR per week — never per-action PRs: the codeql-action
     # init/analyze pair MUST move together (a split bump leaves the two at
     # different versions inside one workflow run and CodeQL fails · proven

@@ -1,7 +1,8 @@
 # Contributing to the Nika spec
 
-Thanks for wanting to improve the standard. Two doors, depending on what
-you are changing:
+Thanks for wanting to improve the standard. This project follows the
+[Contributor Covenant](./CODE_OF_CONDUCT.md). Two doors, depending on
+what you are changing:
 
 ## Normative changes → a NEP
 
