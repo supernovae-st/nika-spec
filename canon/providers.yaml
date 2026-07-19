@@ -1,0 +1,154 @@
+registry_document_format: 1
+$comment: 'C1 registry home for the 17 canonical providers · closes the canon.yaml providers
+  ledger exception (the providers home ruling · session K3 · D-2026-07-17-N6). Prose home
+  stdlib/providers-v0.1.md · one row per provider prefix (the sole surface of the model field
+  is the string <provider>/<name> · LAW-SURFACE-0501). kind (local|cloud|test) + env_var mirror
+  the doc provider table · the model prefix IS the local/cloud/test signal. Presentation order
+  local-first (sovereignty default) then cloud (mistral before anthropic · supernovae-alignment
+  Rule 3) then test · counts are order-independent. Gate: ssot-compiler --check-canon (parity vs
+  canon.yaml providers spellings + kind-per-group).'
+providers:
+  - id: ollama
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0501
+    introduced_in: C1
+    kind: local
+    env_var: ""
+  - id: lmstudio
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0501
+    introduced_in: C1
+    kind: local
+    env_var: ""
+  - id: llamacpp
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0501
+    introduced_in: C1
+    kind: local
+    env_var: ""
+  - id: localai
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0501
+    introduced_in: C1
+    kind: local
+    env_var: ""
+  - id: vllm
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0501
+    introduced_in: C1
+    kind: local
+    env_var: ""
+  - id: mistral
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0501
+    introduced_in: C1
+    kind: cloud
+    env_var: MISTRAL_API_KEY
+  - id: anthropic
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0501
+    introduced_in: C1
+    kind: cloud
+    env_var: ANTHROPIC_API_KEY
+  - id: openai
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0501
+    introduced_in: C1
+    kind: cloud
+    env_var: OPENAI_API_KEY
+  - id: gemini
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0501
+    introduced_in: C1
+    kind: cloud
+    env_var: GOOGLE_API_KEY
+  - id: deepseek
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0501
+    introduced_in: C1
+    kind: cloud
+    env_var: DEEPSEEK_API_KEY
+  - id: xai
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0501
+    introduced_in: C1
+    kind: cloud
+    env_var: XAI_API_KEY
+  - id: groq
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0501
+    introduced_in: C1
+    kind: cloud
+    env_var: GROQ_API_KEY
+  - id: openrouter
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0501
+    introduced_in: C1
+    kind: cloud
+    env_var: OPENROUTER_API_KEY
+    notes: Promoted from the openai escape hatch 2026-06-10 (D-2026-06-10-N2) · a named prefix lets
+      openrouter and vanilla openai coexist in one engine config · the cross-vendor gateway.
+  - id: huggingface
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0501
+    introduced_in: C1
+    kind: cloud
+    env_var: HF_TOKEN
+    notes: Promoted 2026-07-05 (ADR-104 · the hub-router access category · the openrouter precedent) ·
+      one HF_TOKEN reaches 100+ open-weights across 18 backend providers at passthrough prices.
+  - id: nvidia
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0501
+    introduced_in: C1
+    kind: cloud
+    env_var: NVIDIA_API_KEY
+    notes: Promoted 2026-07-05 (ADR-104) · the Nemotron 3 family · self-hosted NIM containers expose the
+      same OpenAI-compatible surface, so one prefix covers cloud AND sovereign self-host.
+  - id: moonshot
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0501
+    introduced_in: C1
+    kind: cloud
+    env_var: MOONSHOT_API_KEY
+    notes: Added 2026-07-17 (ADR-105 · the frontier open-weight access category · the openrouter + ADR-104
+      precedent) · the Kimi family (Kimi K3 · a thinking model · weights open on the same window).
+  - id: mock
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0501
+    introduced_in: C1
+    kind: test
+    env_var: ""

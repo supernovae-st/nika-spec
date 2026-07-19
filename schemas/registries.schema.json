@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "nika:design-pack-pre1:registries:1",
-  "title": "Registry DOCUMENT schema — R2R (PAA-004): the ROOT is a closed discriminated single-family document ({registry_document_format:1, <family>: [rows…]}); an unknown family, an empty document, a multi-family document, a wrong root form and a missing/wrong format marker are all schema-refused. The 12 family row defs stay SELF-CONTAINED closed schemas (additionalProperties:false at every depth, active rows require ≥1 law_id, ids format-checked per family).",
+  "title": "Registry DOCUMENT schema — R2R (PAA-004): the ROOT is a closed discriminated single-family document ({registry_document_format:1, <family>: [rows…]}); an unknown family, an empty document, a multi-family document, a wrong root form and a missing/wrong format marker are all schema-refused. The 13 family row defs stay SELF-CONTAINED closed schemas (additionalProperties:false at every depth, active rows require ≥1 law_id, ids format-checked per family).",
   "$comment": "A registry document carries EXACTLY ONE family (one document = one canonical file per machine/registries-inventory.json — the oneOf below enforces exactly-one). Every family def is complete on its own (no allOf property-merging) so additionalProperties closure is exact. Shared field SHAPES live in $defs and are referenced as property VALUES only. Referential integrity of law_ids (the cited law EXISTS) is the validator harness's job (tests/validate_design_pack.py) — JSON Schema checks format, the harness checks existence.",
   "$defs": {
     "commentMeta": {
@@ -1152,6 +1152,63 @@
         }
       ]
     },
+    "providerRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "status",
+        "owner",
+        "law_ids",
+        "introduced_in",
+        "kind",
+        "env_var"
+      ],
+      "properties": {
+        "$comment": {
+          "$ref": "#/$defs/commentMeta"
+        },
+        "id": {
+          "$ref": "#/$defs/machineId"
+        },
+        "status": {
+          "$ref": "#/$defs/lifecycle"
+        },
+        "owner": {
+          "$ref": "#/$defs/ownerEnum"
+        },
+        "law_ids": {
+          "$ref": "#/$defs/lawIds"
+        },
+        "introduced_in": {
+          "$ref": "#/$defs/introducedIn"
+        },
+        "replaced_by": {
+          "$ref": "#/$defs/replacedBy"
+        },
+        "notes": {
+          "$ref": "#/$defs/notes"
+        },
+        "kind": {
+          "enum": [
+            "local",
+            "cloud",
+            "test"
+          ],
+          "$comment": "the local/cloud/test class · the model prefix IS this signal (stdlib/providers-v0.1.md) · MUST match the canon.yaml providers group (--check-canon gate)"
+        },
+        "env_var": {
+          "type": "string",
+          "pattern": "^([A-Z][A-Z0-9_]*)?$",
+          "$comment": "the auth env var name (cloud · e.g. MISTRAL_API_KEY) · empty string for local + test (localhost or fixture · no key)"
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/activeNeedsLaw"
+        }
+      ]
+    },
     "documentaryText": {
       "type": "string",
       "minLength": 1,
@@ -1255,6 +1312,13 @@
       "items": {
         "$ref": "#/$defs/migrationRow"
       }
+    },
+    "providers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/providerRow"
+      }
     }
   },
   "oneOf": [
@@ -1316,6 +1380,11 @@
     {
       "required": [
         "migrations"
+      ]
+    },
+    {
+      "required": [
+        "providers"
       ]
     }
   ]
