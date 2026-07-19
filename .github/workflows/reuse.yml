@@ -1,0 +1,24 @@
+# REUSE 3.3 compliance gate (reuse.software) · machine-readable licensing
+# stays file-complete. Proven green locally before this job was armed
+# (never ship a red gate). Zero run: steps · every step a SHA-pinned
+# uses: · no event data reaches any shell.
+
+name: REUSE compliance
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reuse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: REUSE lint
+        uses: fsfe/reuse-action@676e2d560c9a403aa252096d99fcab3e1132b0f5 # v6.0.0

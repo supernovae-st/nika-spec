@@ -6,7 +6,7 @@
 > programs below are the badges we EARN from the ecosystem's own
 > verifiers. Primary-source research receipt: 2026-07-19 (live fetches ·
 > bestpractices.dev · securityscorecards.dev · reuse.software · slsa.dev ·
-> docs.github.com). SPDX-License-Identifier: Apache-2.0.
+> docs.github.com). SPDX-License-Identifier: Apache-2.0
 
 ## The matrix
 
@@ -14,7 +14,7 @@
 |---|---|---|---|
 | **OpenSSF Best Practices** (passing · 67 criteria) | project hygiene, end to end | 🟡 self-assessment below · entry creation = maintainer gesture (GitHub login on bestpractices.dev) | this file §self-assessment |
 | **OpenSSF Scorecard** (20 checks) | supply-chain posture, continuously measured | 🟢 workflow shipped ([scorecard.yml](../.github/workflows/scorecard.yml)) · badge lands after the first published run | §scorecard below |
-| **REUSE 3.3** | machine-readable licensing, file-complete | 🟢 [REUSE.toml](../REUSE.toml) blanket + `LICENSES/Apache-2.0.txt` · CI `reuse lint` job = follow-up (fsfe/reuse-action) | repo root |
+| **REUSE 3.3** | machine-readable licensing, file-complete | ✅ `reuse lint` GREEN (1034/1034) · [REUSE.toml](../REUSE.toml) blanket + overrides · CI job live ([reuse.yml](../.github/workflows/reuse.yml)) | repo root |
 | **SLSA v1.2 Build** | release provenance | ⏳ engine release train · `actions/attest-build-provenance` = Build L2 on hosted runners · reusable-workflow isolation = L3 | engine-lane brief |
 | **Sigstore / cosign** | release signatures | ⏳ engine release train · keyless `cosign sign-blob --bundle <tarball>.sigstore.json` per release asset (id-token: write) | engine-lane brief |
 | **SBOM** | dependency transparency | ⏳ engine release train (cargo-auditable / cargo-cyclonedx) · N/A for this repo (no built artifacts) | engine-lane brief |

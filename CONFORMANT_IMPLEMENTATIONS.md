@@ -5,7 +5,7 @@
 > pinned spec commit · per [spec/07-conformance.md](spec/07-conformance.md)
 > §Claiming conformance. The claim string is « **Nika v1 Conformant —
 > <Level> (spec <commit>)** » · one form everywhere.
-> SPDX-License-Identifier: Apache-2.0.
+> SPDX-License-Identifier: Apache-2.0
 
 | Implementation | Language | Core | Runtime | Stdlib | Spec commit | Verified |
 |---|---|---|---|---|---|---|

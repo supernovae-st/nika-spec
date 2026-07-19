@@ -2,7 +2,7 @@
 
 > How Nika artifacts are shared: the entry format, the trust model, and
 > the surfaces any conformant registry MUST serve. Versioned independently
-> of the language (like the stdlib). SPDX-License-Identifier: Apache-2.0.
+> of the language (like the stdlib). SPDX-License-Identifier: Apache-2.0
 >
 > Reference implementation:
 > [supernovae-st/nika-registry](https://github.com/supernovae-st/nika-registry).
