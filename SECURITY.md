@@ -16,7 +16,10 @@ within v1. Only the latest tagged release and `main` receive fixes.
 **Please do not report security vulnerabilities through public GitHub
 issues, discussions, or pull requests.**
 
-Send an email to **security@supernovae.studio** with ·
+Report privately via **GitHub Security Advisories** — the **Report a
+vulnerability** button under this repository's **Security** tab (private
+vulnerability reporting is enabled) — which is the preferred channel. Or
+send an email to **security@supernovae.studio** with ·
 
 - A description of the issue (e.g. a fixture/schema input that crashes or
   bypasses the conformance oracle · a schema served with unsafe defaults)

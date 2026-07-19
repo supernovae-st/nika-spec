@@ -35,7 +35,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(HERE / "conformance"))
 from type_core import (  # noqa: E402
-    assignable, consistent, fits, lower, parse_type, subtype,
+    assignable, consistent, lower, parse_type, subtype,
 )
 
 CORPUS = HERE / "conformance" / "type-corpus" / "corpus.jsonl"
@@ -306,7 +306,6 @@ def main() -> int:
     if args.write:
         CORPUS.parent.mkdir(parents=True, exist_ok=True)
         CORPUS.write_text(rendered)
-        n_types = sum(1 for line in rendered.splitlines() if '"kind": "type"' in line or '"kind":"type"' in line)
         print(f"corpus: {N_TYPES} types · {N_PAIRS} judged pairs → {CORPUS.relative_to(HERE)}")
         return 0
     if not CORPUS.is_file() or CORPUS.read_text() != rendered:

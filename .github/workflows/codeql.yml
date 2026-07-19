@@ -1,0 +1,43 @@
+# CodeQL · static security analysis for the Python conformance oracle +
+# projector tooling — the only executable code this spec repo ships. No build
+# step: Python is analyzed in place. Results publish to GitHub code scanning
+# (OpenSSF Scorecard's SAST check reads them).
+#
+# Security note: top-level least privilege (contents: read) · the analyze job
+# elevates only security-events: write for the SARIF upload · every step is a
+# SHA-pinned `uses:` with zero `run:` steps, so no event data reaches a shell ·
+# push (main) + PR + weekly schedule triggers only.
+
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '24 3 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: CodeQL analyze · python
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      security-events: write # upload CodeQL SARIF to code scanning
+      contents: read # checkout
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@8aad20d150bbac5944a9f9d289da16a4b0d87c1e # v4.36.2
+        with:
+          languages: python
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@8aad20d150bbac5944a9f9d289da16a4b0d87c1e # v4.36.2
+        with:
+          category: "/language:python"

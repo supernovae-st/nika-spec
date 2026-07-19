@@ -1,0 +1,15 @@
+# Dependabot · keeps the SHA-pinned GitHub Actions current. Every `uses:` in
+# .github/workflows/ is pinned to a full commit SHA (Scorecard's
+# Pinned-Dependencies posture); this ecosystem opens the weekly PR that advances
+# those pins to the next tagged SHA.
+#
+# No pip ecosystem · this repo ships no Python manifest (no requirements.txt /
+# pyproject.toml / setup.py). The conformance-runner and projector deps are
+# version-pinned inline in the workflow `pip install` lines, so there is no
+# directory for the pip ecosystem to track.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

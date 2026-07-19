@@ -12,7 +12,7 @@
 
 | Program | What it proves | Status | Evidence / next |
 |---|---|---|---|
-| **OpenSSF Best Practices** (passing · 67 criteria) | project hygiene, end to end | 🟡 self-assessment below · entry creation = maintainer gesture (GitHub login on bestpractices.dev) | this file §self-assessment |
+| **OpenSSF Best Practices** (passing · 67 criteria) | project hygiene, end to end | 🟡 self-assessment below · [.bestpractices.json](../.bestpractices.json) shipped · entry creation = maintainer gesture (GitHub login on bestpractices.dev) | this file §self-assessment |
 | **OpenSSF Scorecard** (20 checks) | supply-chain posture, continuously measured | 🟢 workflow shipped ([scorecard.yml](../.github/workflows/scorecard.yml)) · badge lands after the first published run | §scorecard below |
 | **REUSE 3.3** | machine-readable licensing, file-complete | ✅ `reuse lint` GREEN (1034/1034) · [REUSE.toml](../REUSE.toml) blanket + overrides · CI job live ([reuse.yml](../.github/workflows/reuse.yml)) | repo root |
 | **SLSA v1.2 Build** | release provenance | ⏳ engine release train · `actions/attest-build-provenance` = Build L2 on hosted runners · reusable-workflow isolation = L3 | engine-lane brief |
@@ -43,37 +43,45 @@ Against the 67 passing criteria (live list, criteria/0):
 - **Closed by this wave** · contribution + contribution_requirements +
   test_policy + tests_are_added → [CONTRIBUTING.md](../CONTRIBUTING.md)
   (the corpus-case-with-every-normative-change rule IS the test policy).
-- **Open gaps (tracked)** ·
-  1. `vulnerability_report_private` — enable GitHub private vulnerability
-     reporting (repo Settings · maintainer gesture) and cite it in
-     SECURITY.md.
-  2. `static_analysis` — justification path: the conformance oracle
-     statically analyzes every artifact this repo ships; the Python
-     tooling itself gets a linter (ruff) as a follow-up.
+- **Closed by this hardening wave (2026-07-19)** ·
+  1. `vulnerability_report_private` — GitHub private vulnerability reporting
+     is **enabled** on the repo and cited in [SECURITY.md](../SECURITY.md)
+     (GitHub Security Advisories = the preferred private channel).
+  2. `static_analysis` — **ruff** lints the Python tooling on every push/PR
+     ([conformance.yml](../.github/workflows/conformance.yml) · config
+     [ruff.toml](../ruff.toml)) and **CodeQL**
+     ([codeql.yml](../.github/workflows/codeql.yml)) adds security SAST;
+     the conformance oracle already statically analyzes every artifact this
+     repo ships.
   3. `.bestpractices.json` — the repo-side machine self-assessment file
-     (the badge app imports it) · follow-up once the entry exists.
+     ([.bestpractices.json](../.bestpractices.json)) is **shipped** (the
+     badge app imports it once the entry exists).
 - **N/A block** · all 9 `crypto_*` (no crypto shipped) · `build*` (no
   build step — markdown + Python scripts run in place) ·
   `dynamic_analysis_unsafe` (no memory-unsafe language) ·
   `release_notes_vulns` (no CVEs to date).
 
-Verdict: **passing is clearable now**; the entry creation + the two
-settings gestures are maintainer-side.
+Verdict: **passing is clearable now** — every code-closable criterion is
+Met or N/A ([.bestpractices.json](../.bestpractices.json)); the one step
+left is the maintainer creating the bestpractices.dev entry (branch
+protection is a Scorecard/silver concern, not a passing criterion).
 
 ## Scorecard — expected first-run posture
 
 Strong out of the gate: Token-Permissions (top-level least privilege in
 all workflows) · Dangerous-Workflow (zero risky triggers · no event data
 in shells) · Pinned-Dependencies (actions SHA-pinned as of this wave ·
-pip version-pinned) · CI-Tests · License · Security-Policy · Maintained.
+pip version-pinned) · SAST (CodeQL ·
+[codeql.yml](../.github/workflows/codeql.yml)) · Dependency-Update-Tool
+(Dependabot · [dependabot.yml](../.github/dependabot.yml)) · CI-Tests ·
+License · Security-Policy · Maintained.
 
 Known deductions, tracked honestly:
 
 | Check | Why | Move |
 |---|---|---|
-| Branch-Protection | not yet enabled on `main` | maintainer gesture (require PR + `static gate` status check) |
+| Branch-Protection | not yet enabled on `main` | maintainer gesture (require PR + `static gate` status check) · time it **after** the pre-1.0 gate's direct-push ceremonies, or enable with admin bypass — a hard require-PR rule would break the sister-lane ceremony pushes |
 | Code-Review | small-maintainer reality — self-merged PRs | NEP discussions mitigate · improves with contributors |
-| SAST | no CodeQL job | candidate follow-up (Python scripts only) |
 | Signed-Releases / Packaging / SBOM / Fuzzing | no released artifacts from this repo | N/A-class for a spec repo (the engine train carries them) |
 | CII-Best-Practices | badge not yet registered | §Best Practices above |
 
@@ -83,12 +91,16 @@ Badge (after first published run) ·
 ## Maintainer gestures (queued · settings-side · not automatable from here)
 
 1. **bestpractices.dev** — log in with GitHub · create the entry for
-   `supernovae-st/nika-spec` · walk the §self-assessment above.
+   `supernovae-st/nika-spec` · the [.bestpractices.json](../.bestpractices.json)
+   shipped this wave pre-fills the answers.
 2. **Branch protection on `main`** — require PRs + the `static gate ·
    core + stdlib surface + examples` check (Scorecard's Branch-Protection
-   + Code-Review both read it).
-3. **Private vulnerability reporting** — repo Settings → Security →
-   enable · then cite in SECURITY.md.
+   + Code-Review both read it). Time this **after** the pre-1.0 gate's
+   direct-push ceremonies, or enable it with admin bypass — a hard
+   require-PR rule would break the sister-lane ceremony pushes.
+
+Done this wave · **private vulnerability reporting** is enabled (repo
+Settings → Security) and cited in [SECURITY.md](../SECURITY.md).
 
 ## Related
 
