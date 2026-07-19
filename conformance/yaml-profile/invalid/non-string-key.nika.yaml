@@ -4,7 +4,7 @@
 nika: v1
 workflow:
   id: non-string-key
-vars:
+const:
   m:
     type: object
     default:

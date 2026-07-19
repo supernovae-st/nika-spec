@@ -3,12 +3,12 @@ nika: v1
 workflow:
   id: e22-builtin-assert-fail
 # INTENT: NIKA-BUILTIN-ASSERT-001 — assert condition is false
-vars:
+const:
   value: 5
 tasks:
   assert_step:
     invoke:
       tool: "nika:assert"
       args:
-        condition: ${{ vars.value > 100 }}
+        condition: ${{ const.value > 100 }}
         message: "value must be > 100"

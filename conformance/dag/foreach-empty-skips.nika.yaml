@@ -7,11 +7,11 @@ workflow:
 # A skipped for_each → a downstream VALUE edge admits (pass-set {success,skipped})
 # and its binding reads defined-null. Markers: 08_iter_*.json ABSENT (no
 # iterations ran); 08_after.json present with the null payload visible.
-vars:
+const:
   empty_list: { type: array, default: [] }
 tasks:
   mapped:
-    for_each: ${{ vars.empty_list }}
+    for_each: ${{ const.empty_list }}
     invoke:
       tool: nika:write
       args: { path: "./out/ctrlflow/08_iter_${{ index }}.json", content: "${{ item }}" }

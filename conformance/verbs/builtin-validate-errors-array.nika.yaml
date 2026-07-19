@@ -5,7 +5,7 @@ workflow:
   description: "nika:validate on DELIBERATELY-invalid data → must return { valid:false, errors:[...] } as a REPORT, not fail the task"
 model: mock/echo
 
-vars:
+const:
   # severity is not in the schema enum + category is the wrong type → should be reported invalid
   bad_record: { category: 12345, severity: "EXPLODING" }
 
@@ -14,7 +14,7 @@ tasks:
     invoke:
       tool: "nika:validate"
       args:
-        data: "${{ vars.bad_record }}"
+        data: "${{ const.bad_record }}"
         format: json
         schema:
           type: object

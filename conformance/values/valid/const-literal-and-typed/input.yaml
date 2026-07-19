@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: const-forms
+const:
+  greeting: "hello"
+  retries: 3
+  limits: { max: 10, min: 1 }
+  pi: { type: number, value: 3.14 }
+tasks:
+  note:
+    invoke:
+      tool: "nika:log"
+      args:
+        message: "${{ const.greeting }} · retries ${{ const.retries }} · pi ${{ const.pi }}"

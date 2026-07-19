@@ -6,5 +6,5 @@
       "category": "variable_error"
     }
   ],
-  "note": "04-variables.md \u00b7 vars resolve to entries declared in the envelope vars: block \u00b7 'topik' is not declared (the declared key is 'topic') \u00b7 unresolved \u2192 NIKA-VAR-001."
+  "note": "04-variables.md \u00b7 const reads resolve to entries declared in the envelope const: block \u00b7 'topik' is not declared (the declared key is 'topic') \u00b7 unresolved \u2192 NIKA-VAR-001."
 }

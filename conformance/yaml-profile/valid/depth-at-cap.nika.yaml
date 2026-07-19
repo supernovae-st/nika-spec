@@ -3,7 +3,7 @@
 nika: v1
 workflow:
   id: depth-at-cap
-vars:
+const:
   payload:
     type: object
     default:

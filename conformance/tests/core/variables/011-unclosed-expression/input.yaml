@@ -2,8 +2,8 @@
 nika: v1
 workflow:
   id: hello
-vars:
+const:
   topic: "Rust"
 tasks:
   a:
-    infer: { prompt: "Research ${{ vars.topic" }
+    infer: { prompt: "Research ${{ const.topic" }

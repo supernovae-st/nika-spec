@@ -36,7 +36,7 @@ def call(target, args=None, returns=None, permits=None):
 
 
 # ── COMP-001 · single-doc, no reader needed ─────────────────────────────
-law("templated target → COMP-001", "NIKA-COMP-001" in codes(call("./sub-${{ vars.x }}.yaml")))
+law("templated target → COMP-001", "NIKA-COMP-001" in codes(call("./sub-${{ inputs.x }}.yaml")))
 law("unpinned registry → COMP-001", "NIKA-COMP-001" in codes(call("registry:acme/audit")))
 law("pinned registry → clean (single doc)", not codes(call("registry:acme/audit@1.0.0")))
 law("a bare tool: invoke is not composition", not codes(
@@ -47,7 +47,7 @@ law("a bare tool: invoke is not composition", not codes(
 with tempfile.TemporaryDirectory() as td:
     base = Path(td)
     (base / "child.nika.yaml").write_text(
-        "nika: v1\nworkflow: { id: c }\nvars: { url: { type: string, required: true } }\n"
+        "nika: v1\nworkflow: { id: c }\ninputs: { url: { type: string, required: true } }\n"
         "tasks: { fetch: { exec: { command: [echo, hi] } } }\n"
         "outputs: { report: { value: \"x\", type: string } }\n")
     law("missing required child input → COMP-004",

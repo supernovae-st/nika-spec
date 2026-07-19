@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-VALUES-001",
+      "category": "validation_error"
+    }
+  ],
+  "note": "R3a · LAW-GRAMMAR-0201 · the vars: envelope field is dead · classify each use into inputs (typed) or const (literal) · the teaching is NIKA-VALUES-001, never a generic parse error."
+}

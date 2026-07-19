@@ -2,10 +2,10 @@
 nika: v1
 workflow:
   id: swap-backend
-vars:
+const:
   model: { type: string, default: "anthropic/claude-sonnet-4-6" }
 tasks:
   ask:
     infer:
-      model: "${{ vars.model }}"
+      model: "${{ const.model }}"
       prompt: "hello"

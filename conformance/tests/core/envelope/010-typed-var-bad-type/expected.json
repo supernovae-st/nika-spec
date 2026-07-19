@@ -6,5 +6,5 @@
       "category": "validation_error"
     }
   ],
-  "note": "01-envelope.md \u00a7vars \u00b7 typed form \u00b7 type is one of string \u00b7 number \u00b7 integer \u00b7 boolean \u00b7 array \u00b7 object \u00b7 'text' is rejected."
+  "note": "09-types.md \u00b7 an inputs declaration type speaks the full TypeExpr (R3b \u00b7 LAW-GRAMMAR-0211 \u00b7 the flat 6-enum is dead \u00b7 LAW-SURFACE-0211) \u00b7 'text' is neither a primitive nor a PascalCase type reference \u00b7 rejected."
 }

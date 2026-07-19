@@ -2,8 +2,8 @@
 nika: v1
 workflow:
   id: hello
-vars:
+const:
   topic: "Rust async runtimes"
 tasks:
   a:
-    infer: { prompt: "Research ${{ vars.topik }}" }
+    infer: { prompt: "Research ${{ const.topik }}" }

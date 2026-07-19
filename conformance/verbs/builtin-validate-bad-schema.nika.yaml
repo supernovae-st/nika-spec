@@ -8,7 +8,7 @@ nika: v1
 workflow:
   id: w37-validate-bad-schema
 
-vars:
+const:
   doc:
     name: "Alice"
 
@@ -17,7 +17,7 @@ tasks:
     invoke:
       tool: "nika:validate"
       args:
-        data: ${{ vars.doc }}
+        data: ${{ const.doc }}
         schema:
           type: not_a_real_json_schema_type
 

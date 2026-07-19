@@ -1,12 +1,12 @@
 nika: v1
 workflow:
   id: deep-001
-vars:
+const:
   mode: "fast"
 tasks:
   a:
     infer: { prompt: "x" }
   b:
     after: { a: success }
-    when: ${{ vars.mode == 'fast' == true }}
+    when: ${{ const.mode == 'fast' == true }}
     infer: { prompt: "y" }

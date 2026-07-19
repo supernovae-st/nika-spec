@@ -7,7 +7,7 @@ nika: v1
 workflow:
   id: w24-check-vs-runtime-gap
 
-vars:
+const:
   data:
     value: 42
 
@@ -16,7 +16,7 @@ tasks:
     invoke:
       tool: "nika:jq"
       args:
-        input: ${{ vars.data }}
+        input: ${{ const.data }}
         expression: ".nonexistent_key | .nested_path"
 
   write_result:

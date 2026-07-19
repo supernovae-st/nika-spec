@@ -3,11 +3,11 @@ nika: v1
 workflow:
   id: rt-foreach-null-placeholder
 model: mock/echo
-vars:
+const:
   items: ["alpha", "BOOM", "gamma"]
 tasks:
   work:
-    for_each: ${{ vars.items }}
+    for_each: ${{ const.items }}
     fail_fast: false
     on_error:
       recover: null

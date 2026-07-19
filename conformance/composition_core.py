@@ -111,19 +111,21 @@ def _load_child(base_dir, target: str):
 
 
 def _typed_call(parent_task: dict, args, child: dict, where: str) -> list[dict]:
-    """COMP-004 · parent args fit child vars(inputs) · child outputs fit
-    parent returns — the assignable relation of spec 09, composed."""
+    """COMP-004 · parent args fit child inputs · child outputs fit
+    parent returns — the assignable relation of spec 09, composed. The child's
+    caller contract is its `inputs:` block (R3a · the E-split · the typed half
+    of the dead `vars:` · `const:` literals are internal, never caller-supplied)."""
     errs: list[dict] = []
-    child_vars = child.get("vars") if isinstance(child.get("vars"), dict) else {}
+    child_inputs = child.get("inputs") if isinstance(child.get("inputs"), dict) else {}
     args = args if isinstance(args, dict) else {}
-    for name, decl in child_vars.items():
+    for name, decl in child_inputs.items():
         required = isinstance(decl, dict) and decl.get("required") is True
         if required and name not in args and not (isinstance(decl, dict) and "default" in decl):
             errs.append(_err("NIKA-COMP-004",
                              f"{where} · required child input {name!r} is not "
                              "supplied by args (spec 14 law 2)"))
     for name, val in args.items():
-        decl = child_vars.get(name)
+        decl = child_inputs.get(name)
         if not isinstance(decl, dict) or "type" not in decl:
             continue
         try:

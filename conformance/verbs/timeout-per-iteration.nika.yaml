@@ -5,14 +5,14 @@ workflow:
 # INTENT: for_each with timeout per iteration — slow iterations time out
 permits:
   exec: ["sleep"]
-vars:
+const:
   items:
     - "one"
     - "two"
     - "three"
 tasks:
   slow_iter:
-    for_each: ${{ vars.items }}
+    for_each: ${{ const.items }}
     timeout: "1s"
     fail_fast: false
     exec:

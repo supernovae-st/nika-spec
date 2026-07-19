@@ -3,12 +3,12 @@ nika: v1
 workflow:
   id: rt-recover-feeds-bindings
 model: mock/echo
-vars:
+const:
   fallback: { data: { title: "cached title" } }
 tasks:
   fetchish:
     on_error:
-      recover: ${{ vars.fallback }}
+      recover: ${{ const.fallback }}
     output:
       title: ".data.title"
     invoke:

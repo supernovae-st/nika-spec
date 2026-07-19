@@ -8,11 +8,11 @@ workflow:
 # /usr/bin/false (exit 1, no marker); normal items run /usr/bin/touch (marker written).
 # fail_fast default(true): iterations after FAILHERE must NOT run.
 # Markers: 09_iter_a + 09_iter_b present; 09_iter_d ABSENT (aborted). exit!=0.
-vars:
+const:
   items: { type: array, default: ["a", "b", "FAILHERE", "d"] }
 tasks:
   mapped:
-    for_each: ${{ vars.items }}
+    for_each: ${{ const.items }}
     max_parallel: 1
     exec:
       command:

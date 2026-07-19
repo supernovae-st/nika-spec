@@ -29,7 +29,7 @@ laws:
 
   - id: LAW-SURFACE-0201
     slug: values/four-authority-family
-    status: reserved
+    status: active
     owner: spec
     domain: SURFACE
     title: "La famille des autorites de valeur est exactement inputs, config, const, secrets"
@@ -70,9 +70,9 @@ laws:
         id: value_authority_family
     diagnostics: ["NIKA-VALUES-003"]
     fixtures:
-      - to-mint-c1/conformance/values/valid/four-authority-namespaces
+      - conformance/values/valid/four-authority-namespaces
     negative_fixtures:
-      - to-mint-c1/conformance/values/invalid/foreign-value-namespace
+      - conformance/values/invalid/foreign-value-namespace
     projections: ["prose:04-variables", "prose:01-envelope", "schema", "cli:check", "lsp", "mcp", "sdk"]
     implementation_surfaces:
       - engine:nika-schema
@@ -94,7 +94,7 @@ laws:
 
   - id: LAW-GRAMMAR-0201
     slug: values/vars-envelope-field-dead
-    status: reserved
+    status: active
     owner: spec
     domain: GRAMMAR
     title: "Le champ d'enveloppe vars est une forme morte, refuse avec teaching de classification"
@@ -130,9 +130,9 @@ laws:
           cardinality: forbidden
     diagnostics: ["NIKA-VALUES-001"]
     fixtures:
-      - to-mint-c1/conformance/values/valid/inputs-block-replaces-vars
+      - conformance/values/valid/inputs-block-replaces-vars
     negative_fixtures:
-      - to-mint-c1/conformance/values/invalid/vars-block-dead
+      - conformance/values/invalid/vars-block-dead
     projections: ["prose:01-envelope", "prose:04-variables", "schema", "cli:check", "lsp", "mcp", "sdk"]
     implementation_surfaces:
       - engine:nika-schema
@@ -151,7 +151,7 @@ laws:
 
   - id: LAW-GRAMMAR-0202
     slug: values/env-envelope-field-dead
-    status: reserved
+    status: active
     owner: spec
     domain: GRAMMAR
     title: "Le champ d'enveloppe env est une forme morte, refuse avec teaching de classification"
@@ -187,9 +187,9 @@ laws:
           cardinality: forbidden
     diagnostics: ["NIKA-VALUES-002"]
     fixtures:
-      - to-mint-c1/conformance/values/valid/config-block-replaces-env
+      - conformance/values/valid/config-block-replaces-env
     negative_fixtures:
-      - to-mint-c1/conformance/values/invalid/env-block-dead
+      - conformance/values/invalid/env-block-dead
     projections: ["prose:01-envelope", "prose:04-variables", "schema", "cli:check", "lsp", "mcp", "sdk"]
     implementation_surfaces:
       - engine:nika-schema
@@ -210,7 +210,7 @@ laws:
 
   - id: LAW-SURFACE-0202
     slug: values/one-authority-one-spelling-no-alias
-    status: reserved
+    status: active
     owner: spec
     domain: SURFACE
     title: "Une valeur a exactement une autorite et une orthographe, aucun alias, aucune deuxieme syntaxe"

@@ -5,7 +5,7 @@ nika: v1
 workflow:
   id: unicode-nfc
   description: café émis en NFC
-vars:
+const:
   ratio:
     type: number
     default: 3.14

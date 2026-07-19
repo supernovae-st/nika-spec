@@ -25,7 +25,7 @@ laws:
 
   - id: LAW-GRAMMAR-0211
     slug: types/io-type-field-speaks-full-typeexpr
-    status: reserved
+    status: active
     owner: spec
     domain: GRAMMAR
     title: "Le champ type des declarations inputs et outputs parle le TypeExpr complet de 09-types"
@@ -94,7 +94,7 @@ laws:
 
   - id: LAW-SURFACE-0211
     slug: types/six-enum-dead-bool-single-spelling
-    status: reserved
+    status: active
     owner: spec
     domain: SURFACE
     title: "Le sous-langage 6-enum est mort et le type booleen garde une seule orthographe, celle du Type Core"
@@ -158,7 +158,7 @@ laws:
 
   - id: LAW-TYPE-0211
     slug: types/defaults-validate-against-declared-type
-    status: reserved
+    status: active
     owner: spec
     domain: TYPE
     title: "La validation des defaults contre leur type declare est obligatoire au check"
@@ -201,9 +201,9 @@ laws:
           id: io_declared_types
     diagnostics: ["NIKA-DEFAULT-001"]
     fixtures:
-      - to-mint-c1/conformance/types/valid/default-conforms-to-type
+      - conformance/values/valid/default-conforms-to-type
     negative_fixtures:
-      - to-mint-c1/conformance/types/invalid/default-type-mismatch
+      - conformance/values/invalid/default-type-mismatch
     projections: ["prose:09-types", "prose:01-envelope", "schema", "cli:check", "lsp", "mcp", "sdk"]
     implementation_surfaces:
       - engine:nika-schema
@@ -216,6 +216,7 @@ laws:
     proof_obligations:
       - "La fixture negative default-type-mismatch reproduit le P0 exact du ruling (`{type: integer, default: \"abc\"}`) et refuse au check sur toutes les surfaces : le trou qui « passait check ET run » est structurellement ferme."
       - "R3b verbatim : « widen + valider les defaults » — la validation est OBLIGATOIRE, jamais un mode permissif ni un warning-only."
+      - "Reutilisation B3 (C2 flip) : le meme code NIKA-DEFAULT-001 couvre aussi la soundness d une constante typee const: { type, value } (reference values_core.py _default_errors) · meme classe (une valeur declaree conforme a son type declare), aucun second code minte pour la variante const."
     closure_gates:
       - p0-default-soundness-hole-closed
       - fixture-parity
@@ -224,7 +225,7 @@ laws:
 
   - id: LAW-SURFACE-0212
     slug: types/callable-mcp-contract-exposes-true-shapes
-    status: reserved
+    status: active
     owner: spec
     domain: SURFACE
     title: "Le contrat callable et la surface MCP exposent les vraies formes de types"

@@ -2,12 +2,12 @@
 nika: v1
 workflow:
   id: one-data-language
-vars:
+inputs:
   payload: { type: string, required: true }
 tasks:
   shape:
     invoke:
       tool: "nika:jq"
       args:
-        input: "${{ vars.payload }}"
+        input: "${{ inputs.payload }}"
         expression: "map(select(.active)) | length"

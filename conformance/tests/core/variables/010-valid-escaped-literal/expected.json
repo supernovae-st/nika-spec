@@ -1,4 +1,4 @@
 {
   "valid": true,
-  "note": "04-variables.md \u00a7Escaping \u00b7 \\\\${{ embeds a literal ${{ \u00b7 the engine MUST honor it \u00b7 vars.x here is documentation text, not a reference \u00b7 valid (no vars: block needed)."
+  "note": "04-variables.md \u00a7Escaping \u00b7 \\\\${{ embeds a literal ${{ \u00b7 the engine MUST honor it \u00b7 inputs.x here is documentation text, not a reference \u00b7 valid (no inputs: block needed)."
 }

@@ -6,12 +6,12 @@ nika: v1
 workflow:
   id: c16-matches-reserved
 
-vars:
+const:
   s: "hello"
 
 tasks:
   gate:
-    when: "${{ vars.s.matches('h.*o') }}"        # matches() reserved → parse error
+    when: "${{ const.s.matches('h.*o') }}"        # matches() reserved → parse error
     invoke:
       tool: "nika:write"
       args: { path: "./out/cel/c16-ran.json", content: { ran: true }, create_dirs: true }

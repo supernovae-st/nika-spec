@@ -2,10 +2,10 @@
 nika: v1
 workflow:
   id: hello
-vars:
+inputs:
   topic:
     type: text
     required: true
 tasks:
   a:
-    infer: { prompt: "Research ${{ vars.topic }}" }
+    infer: { prompt: "Research ${{ inputs.topic }}" }

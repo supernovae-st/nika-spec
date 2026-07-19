@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: inputs-block
+inputs:
+  topic: { type: string, required: true, description: "the subject to summarize" }
+  max_words: { type: integer, default: 200 }
+tasks:
+  write:
+    infer:
+      prompt: "Summarize ${{ inputs.topic }} in ${{ inputs.max_words }} words"

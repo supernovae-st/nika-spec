@@ -6,13 +6,13 @@ model: mock/echo
 permits:
   net: { http: ["api.example.com"] }
   tools: ["nika:jq", "nika:fetch"]
-vars:
+const:
   hosts: ["https://forbidden.example.org/data"]
 tasks:
   pick:
     invoke:
       tool: "nika:jq"
-      args: { input: "${{ vars.hosts }}", expression: ".[0]" }
+      args: { input: "${{ const.hosts }}", expression: ".[0]" }
   fetcher:
     with:
       pick: ${{ tasks.pick.output }}
