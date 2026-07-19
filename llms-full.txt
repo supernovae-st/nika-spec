@@ -18,7 +18,9 @@
 <p align="center"><strong>A declarative YAML language for orchestrating AI workflows.<br>
 Sovereign · multi-provider · local-first.</strong></p>
 
-> **Status** · v0.1.0-draft (working) · **License** · Apache-2.0
+> **Status** · v0.1.0-draft (working) · **License** · Apache-2.0 ·
+> [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/supernovae-st/nika-spec/badge)](https://scorecard.dev/viewer/?uri=github.com/supernovae-st/nika-spec)
+> [![REUSE status](https://api.reuse.software/badge/github.com/supernovae-st/nika-spec)](https://api.reuse.software/info/github.com/supernovae-st/nika-spec)
 >
 > The language is locked at `nika: v1`, forever. That's the envelope you
 > write in every workflow file; it evolves additively and never breaks (the
@@ -132,6 +134,8 @@ nika-spec/
 ├── scripts/                   ← projectors (docs · website · pack stay byte-derived)
 ├── canon/                     ← the SSOT registries (laws · diagnostics · surface)
 ├── canon.yaml                 ← machine-readable counts · GENERATED from canon/ since C0
+├── GLOSSARY.md                ← one word, one meaning (the disambiguation surface)
+├── CONTRIBUTING.md            ← the two doors (NEP for normative · PR for the rest)
 ├── AGENTS.md                  ← the deterministic authoring protocol (agents start here)
 │
 ├── stdlib/                    ← versioned independently
@@ -139,7 +143,7 @@ nika-spec/
 │   ├── extract-modes-v0.1.md    the fetch extract modes (markdown · article · jq · …)
 │   └── builtins-v0.1.md         the curated builtins (counts live in canon.yaml)
 │
-├── governance/                ← how the standard evolves (NEP-0000 · the template)
+├── governance/                ← how the standard evolves (NEP-0000 · certifications matrix)
 └── registry/                  ← the sharing contract (versioned independently)
     └── registry-v0.1.md         entries · trust model · advisories · machine surfaces
 ```
@@ -150,6 +154,7 @@ nika-spec/
 
 If you want to implement Nika in your language ·
 
+0. Skim [`GLOSSARY.md`](./GLOSSARY.md) — one word, one meaning (oracle · gate · golden · predicate-vs-status)
 1. Read [`spec/`](./spec/) (~30 pages · the contract)
 2. Pass [`conformance/`](./conformance/) — the claim is « **Nika v1 Conformant — <Level> (spec <commit>)** » · earned by the suite, never by declaration
 3. Optionally implement the [`stdlib/`](./stdlib/) (providers + extract + builtins)
