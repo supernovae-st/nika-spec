@@ -1,0 +1,14 @@
+# REUSE 3.3 (reuse.software) · machine-readable licensing for the whole
+# repository. One blanket annotation: everything in this repo is
+# Apache-2.0 (the spec · examples · templates · conformance suite ·
+# schemas · scripts — README §License). License text: LICENSES/Apache-2.0.txt
+# (REUSE naming) — the root LICENSE file is the same text at the
+# GitHub-conventional path.
+
+version = 1
+
+[[annotations]]
+path = "**"
+precedence = "closest"
+SPDX-FileCopyrightText = "2026 SuperNovae Studio <nika@supernovae.studio>"
+SPDX-License-Identifier = "Apache-2.0"
