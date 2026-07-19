@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-DEFAULT-001",
+      "category": "validation_error"
+    }
+  ],
+  "note": "R3b · LAW-TYPE-0211 · the P0 soundness hole · { type: integer, default: 'abc' } passed check AND run before · it now refuses at check with NIKA-DEFAULT-001."
+}

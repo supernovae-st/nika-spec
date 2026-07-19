@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "R3a · const: carries a bare literal (string · number · object) or a typed { type, value } constant whose value conforms to its type (NIKA-DEFAULT-001)."
+}

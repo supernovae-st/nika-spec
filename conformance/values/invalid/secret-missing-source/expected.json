@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "validation_error"
+    }
+  ],
+  "note": "R8 · secrets.source is REQUIRED at the schema · a store reference without declared provenance refuses (D-2026-07-19 · the corpus is already 23/23 clean · this is the guard fixture)."
+}

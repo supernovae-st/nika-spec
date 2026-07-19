@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: secret-no-source
+secrets:
+  api_key:
+    key: "prod/api"
+tasks:
+  note:
+    invoke:
+      tool: "nika:log"
+      args:
+        message: "static"

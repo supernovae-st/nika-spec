@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: foreign-namespace
+inputs:
+  region: { type: string, required: true }
+tasks:
+  note:
+    invoke:
+      tool: "nika:log"
+      args:
+        message: "deploy to ${{ params.region }}"
