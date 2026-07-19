@@ -1852,6 +1852,37 @@ diagnostics:
       mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
       is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
       span obligation not stated by the source → span_required false.'
+  - id: NIKA-SEC-009
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: SEC
+    plane: check
+    condition: 'lethal trifecta complete — the declared boundary grants private
+      read (fs.read non-empty) + untrusted ingress (a nika:fetch builtin invoked
+      or granted · any mcp:* server granted) + external egress (net.http non-empty
+      · an escaping fs.write glob · exec enabled), and no blocking invoke: nika:prompt
+      (no default:) dominates an egress-capable task (NEP-0002 · the Rule of Two
+      as a static check)'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: true
+    teaching: 'lethal trifecta complete · human gate required — gate the egress
+      path behind a blocking invoke: nika:prompt (no default: arg) dominating
+      every path to each egress-capable task, or narrow a permit to drop a leg
+      (NEP-0002 · one finding per ungated egress task).'
+    notes: 'import-c2 (NEP-0002) · category: security_error · transient: false (minted
+      by governance/nep-0002-lethal-trifecta-human-gate.md · v1.1 leg ② 2026-07-19) ·
+      SEC-008 stays allocated to the AUTH plane (canon/laws/authority.yaml
+      FINDING-AUTH-02), so the trifecta takes the next free id · reference
+      implementation nika#637 (the nika-cap judge · check-plane refusal, exit 2) ·
+      reserved, not active: the executable LAW row lands when the canon mints
+      the SEC law family · the engine projection names the witness task and
+      anchors its span → span_required true.'
   - id: NIKA-TIMEOUT-001
     status: reserved
     owner: spec
