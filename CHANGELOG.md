@@ -14,6 +14,45 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **File naming law** (01 §File naming · normative · #124) —
+  `<name>.nika.yaml` is the canonical filename and the only form tools
+  emit · `.nika.yml` is accepted by matchers and taught against (never
+  emitted) · bare `.nika` is reserved · `application/vnd.nika+yaml` is
+  the reserved media type (RFC 6838 vendor tree · post-1.0 gesture).
+- **One claim string** (07 §Claiming · #124) — the public conformance
+  claim has one form: « Nika v1 Conformant — <Level> (spec <commit>) »
+  (NEP-0000 · the implementations registry · the README implementers
+  path all cite it; « v0.1-compliant » stays the level bar's name in
+  normative sentences).
+- **GLOSSARY.md** (#126) — the disambiguation surface: canonical
+  referents for the overloaded words (oracle ×2 public referents ·
+  gate ×5 senses · golden · predicate-vs-status · paused/human-gate/
+  nika:prompt · upstream/downstream cone) + the qualified-first-mention
+  discipline.
+- **Governance & supply-chain surfaces** (#125 · #128 · #130 · #135 ·
+  #137) — `governance/certifications.md` (the external-standards
+  matrix) · CONTRIBUTING.md (the two doors + the corpus-case test
+  policy) · REUSE 3.3 compliance (REUSE.toml + LICENSES/ + CI gate) ·
+  OpenSSF Scorecard + CodeQL + ruff + grouped Dependabot workflows
+  (SHA-pinned) · `.bestpractices.json` self-assessment · README badges.
+
+### Changed
+
+- **05 §Error code namespaces** (#123) — the table now allocates every
+  namespace in use (15 → 22): `NIKA-YAML` · `NIKA-COMP` · `NIKA-DECIDE`
+  · `NIKA-PORT` · `NIKA-POLICY` · `NIKA-ASSERT` · `NIKA-LOCK` join,
+  plus `NIKA-REG` allocated for the reference engine's `registry:`
+  resolver (engine ADR-106).
+- **01 §YAML profile** (#123) — the prose caught the sealed R11 law
+  set: anchors & aliases are FORBIDDEN (LAW-GRAMMAR-0101/0102 ·
+  `NIKA-YAML-001/002` · the shipped engine already refuses them at
+  parse); the earlier « fully supported » paragraph taught the opposite
+  of the law and of the binary.
+- **07 §Core conformance** (#123) — the Core bullet drops the dead W1
+  scalar `workflow: <id>` (NIKA-PARSE-020) · the fixture-tree sketch
+  becomes a live-dir map (lints tier · per-domain evaluators ·
+  yaml-profile fixtures · type corpus).
+
 - `skills:` on the `agent:` verb — the engine becomes an
   [Agent Skills](https://agentskills.io) **consumer** (the format
   `nika init` already produces): explicit static `SKILL.md` paths (no
