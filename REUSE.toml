@@ -28,3 +28,11 @@ path = ["examples/README.md", "examples/showcase/README.md"]
 precedence = "override"
 SPDX-FileCopyrightText = "2026 SuperNovae Studio <nika@supernovae.studio>"
 SPDX-License-Identifier = "Apache-2.0"
+
+# The Contributor Covenant is CC-BY-4.0 (its own license · attribution
+# preserved in the file's footer) — the blanket must not misdeclare it.
+[[annotations]]
+path = "CODE_OF_CONDUCT.md"
+precedence = "override"
+SPDX-FileCopyrightText = "Coraline Ada Ehmke · Contributor Covenant contributors"
+SPDX-License-Identifier = "CC-BY-4.0"

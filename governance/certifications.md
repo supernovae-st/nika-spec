@@ -24,6 +24,7 @@
 | **tree-sitter grammar** | native editor grammars (Zed · Neovim) | ⏳ demand-gated · self-servable (publish grammar + nvim-treesitter `lua/parsers.lua` PR · quality bar, no usage threshold) | editor-demand trigger |
 | **BCP 14** | normative language | ✅ [07 §Notation](../spec/07-conformance.md#notation) | — |
 | **SemVer · Keep-a-Changelog · NEP process** | versioning + evolution discipline | ✅ VERSION · CHANGELOG.md · [governance/](./nep-0000-the-nep-process.md) | — |
+| **CITATION.cff · Code of Conduct** | citability + community posture | ✅ [CITATION.cff](../CITATION.cff) (cffconvert-valid) · [Contributor Covenant 2.1](../CODE_OF_CONDUCT.md) (CC-BY-4.0 declared in REUSE) | repo root |
 
 ## OpenSSF Best Practices — passing self-assessment (2026-07-19)
 
@@ -71,7 +72,7 @@ protection is a Scorecard/silver concern, not a passing criterion).
 Strong out of the gate: Token-Permissions (top-level least privilege in
 all workflows) · Dangerous-Workflow (zero risky triggers · no event data
 in shells) · Pinned-Dependencies (actions SHA-pinned as of this wave ·
-pip version-pinned) · SAST (CodeQL ·
+pip HASH-pinned (--require-hashes · .github/requirements.txt · uv pip compile)) · SAST (CodeQL ·
 [codeql.yml](../.github/workflows/codeql.yml)) · Dependency-Update-Tool
 (Dependabot · [dependabot.yml](../.github/dependabot.yml)) · CI-Tests ·
 License · Security-Policy · Maintained.

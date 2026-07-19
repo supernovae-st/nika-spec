@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: >-
+  If you reference the Nika workflow language in academic or technical
+  work, please cite this specification.
+title: "Nika: the workflow language for AI — language specification"
+type: software
+authors:
+  - name: "SuperNovae Studio"
+    website: "https://supernovae.studio"
+  - family-names: "Melen"
+    given-names: "Thibaut"
+repository-code: "https://github.com/supernovae-st/nika-spec"
+url: "https://nika.sh"
+license: Apache-2.0
+keywords:
+  - workflow language
+  - AI workflows
+  - declarative YAML
+  - static analysis
+  - capability security
+  - language specification
+abstract: >-
+  The canonical specification of the Nika workflow language: a
+  declarative YAML language for AI workflows (the nika: v1 envelope,
+  four verbs, a derived DAG, one expression syntax, a typed error
+  model), with a machine-checkable conformance suite, a canonical
+  JSON Schema, and a governed evolution process (NEPs). The reference
+  engine is a separate repository (supernovae-st/nika,
+  AGPL-3.0-or-later).
