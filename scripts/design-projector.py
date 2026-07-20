@@ -45,7 +45,11 @@ TOKENS_PATH = SPEC_ROOT / "design" / "tokens.yaml"
 
 CANON_VERBS = ("infer", "exec", "invoke", "agent")
 HEX_RE = re.compile(r"^#[0-9a-f]{6}$")
-BINDINGS = ("color", "codicon", "fa", "glyph", "icon")
+BINDINGS = ("color", "text", "codicon", "fa", "glyph", "icon")
+# icons.features · keys stay TS-identifier-safe (bare object keys in the
+# generated module) · values are codicon slugs (kebab). Deliberate asymmetry.
+FEATURE_KEY_RE = re.compile(r"^[a-z][a-z0-9_]*$")
+CODICON_RE = re.compile(r"^[a-z][a-z0-9-]*$")
 
 
 def load_tokens() -> dict:
@@ -68,11 +72,12 @@ def load_tokens() -> dict:
                 print(f"design-projector · verb {name} missing binding `{b}`",
                       file=sys.stderr)
                 sys.exit(2)
-        if not HEX_RE.match(v["color"]):
-            print(f"design-projector · verb {name} color {v['color']!r} is not "
-                  "a lowercase #rrggbb", file=sys.stderr)
-            sys.exit(2)
-    for k in ("ok", "fail"):
+        for b in ("color", "text"):
+            if not HEX_RE.match(v[b]):
+                print(f"design-projector · verb {name} {b} {v[b]!r} is not "
+                      "a lowercase #rrggbb", file=sys.stderr)
+                sys.exit(2)
+    for k in ("ok", "fail", "fail_text"):
         if not HEX_RE.match(tokens.get("severity", {}).get(k, "")):
             print(f"design-projector · severity.{k} missing or malformed",
                   file=sys.stderr)
@@ -88,11 +93,21 @@ def load_tokens() -> dict:
                   file=sys.stderr)
             sys.exit(2)
     color = tokens.get("brand", {}).get("color", {})
-    for k in ("bg", "accent", "accent_strong", "accent_bright"):
+    for k in ("bg", "bg_base", "bg_elevated", "accent", "accent_strong",
+              "accent_bright"):
         if not HEX_RE.match(color.get(k, "")):
             print(f"design-projector · brand.color.{k} missing or malformed",
                   file=sys.stderr)
             sys.exit(2)
+    feats = tokens.get("icons", {}).get("features", {})
+    if not feats or not all(
+        FEATURE_KEY_RE.match(k or "") and CODICON_RE.match(v or "")
+        for k, v in feats.items()
+    ):
+        print("design-projector · icons.features must be a non-empty map of "
+              "feature slugs (ts-identifier-safe) to codicon ids (kebab)",
+              file=sys.stderr)
+        sys.exit(2)
     for k in ("ice", "glow", "ink"):
         if not HEX_RE.match(color.get("mark", {}).get(k, "")):
             print(f"design-projector · brand.color.mark.{k} missing or malformed",
@@ -102,6 +117,18 @@ def load_tokens() -> dict:
     if not re.match(r"^[0-9a-f]{2}$", alpha):
         print("design-projector · rules.mermaid_fill_alpha must be 2 hex digits",
               file=sys.stderr)
+        sys.exit(2)
+    apca = tokens.get("rules", {}).get("contrast_apca", {})
+    if not all(isinstance(apca.get(k), int) and apca.get(k) > 0
+               for k in ("body", "glyph", "nontext")):
+        print("design-projector · rules.contrast_apca needs positive integer "
+              "Lc floors (body · glyph · nontext)", file=sys.stderr)
+        sys.exit(2)
+    grid = tokens.get("rules", {}).get("icon_grid", {})
+    if not (isinstance(grid.get("size"), int) and grid.get("size") > 0
+            and grid.get("style") and grid.get("fill")):
+        print("design-projector · rules.icon_grid needs size (px int) · "
+              "style · fill", file=sys.stderr)
         sys.exit(2)
     order = tokens.get("presentation", {}).get("providers_order", [])
     if not order or len(set(order)) != len(order) or not all(
@@ -151,8 +178,15 @@ def render_ts(tokens: dict) -> str:
     ]
     for n in CANON_VERBS:
         lines.append(f"  {n}: {_rgb(verbs[n]['color'])},")
+    feats = tokens["icons"]["features"]
+    fmap = " ".join(f"{k}: '{feats[k]}'," for k in feats)
     lines += [
         "}",
+        "",
+        "/** the verb hues re-anchored for BODY COPY — clear rules.contrast_apca",
+        " *  .body (APCA Lc >= 60) on NIKA_BRAND.bgBase AND bgElevated; invoke",
+        " *  clears at its base hue, so its ramp is the identity. */",
+        f"export const NIKA_VERB_TEXT = {{ {vmap('text')} }} as const",
         "",
         f"export const NIKA_VERB_GLYPH = {{ {vmap('glyph')} }} as const",
         f"export const NIKA_VERB_CODICON = {{ {vmap('codicon')} }} as const",
@@ -160,7 +194,14 @@ def render_ts(tokens: dict) -> str:
         "/** nika.sh ontology ids (public/brand/icons.json) */",
         f"export const NIKA_VERB_ICON = {{ {vmap('icon')} }} as const",
         "",
+        "/** per-FEATURE codicon bindings (icons.features · an OPEN set, unlike",
+        " *  the 4 verbs) — drawn on the icon_grid contract: 16px · filled ·",
+        " *  currentColor. cost = credit-card interim (bespoke SVG is owed). */",
+        f"export const NIKA_FEATURE_CODICON = {{ {fmap} }} as const",
+        "",
         f"export const NIKA_SEVERITY = {{ ok: '{sev['ok']}', fail: '{sev['fail']}' }} as const",
+        "/** the severity pair's body-copy ramp (fail only — ok has no consumer yet) */",
+        f"export const NIKA_SEVERITY_TEXT = {{ fail: '{sev['fail_text']}' }} as const",
         "",
         "/** the LIVE run-state palette — done/failed ARE severity (one storage,",
         " *  aliased here); running deliberately equals the infer hue. The vscode",
@@ -171,6 +212,9 @@ def render_ts(tokens: dict) -> str:
         "",
         "export const NIKA_BRAND = {",
         f"  bg: '{c['bg']}',",
+        "  /** the two proving planes every *_TEXT ramp clears (APCA floors) */",
+        f"  bgBase: '{c['bg_base']}',",
+        f"  bgElevated: '{c['bg_elevated']}',",
         f"  accent: '{c['accent']}',",
         f"  accentStrong: '{c['accent_strong']}',",
         f"  accentBright: '{c['accent_bright']}',",
@@ -315,7 +359,8 @@ def main() -> int:
         print("· docs root absent · skipped")
 
     if ok:
-        print("✓ design tokens in sync · 4 verbs · severity · status · brand core")
+        print("✓ design tokens in sync · 4 verbs · text ramps · severity · "
+              "status · brand core · feature icons")
     return 0 if ok else 1
 
 
