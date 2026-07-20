@@ -56,6 +56,7 @@ for wf in "$HERE"/*/*.nika.yaml; do
   printf '%s' "$expected" | grep -qiE 'at CHECK|at parse' && stage=CHECK
   printf '%s' "$expected" | grep -qiE 'check or run' && stage=EITHER
   gate=""; printf '%s' "$expected" | grep -qi 'check-reject (gate verdict)' && gate=1
+  checkonly=""; printf '%s' "$expected" | grep -qi 'check-pass (static only)' && checkonly=1
   # negative iff a code is declared and the header does not promise exit 0
   # ('exit 0' alone — recovered-class headers all start "exit 0 — …"; matching
   # bare 'recovered' would false-trip on prose like "Unrecovered failure")
@@ -63,9 +64,15 @@ for wf in "$HERE"/*/*.nika.yaml; do
 
   cout="$("$ENGINE" check "$wf" 2>&1)"; cc=$?
   rout=""; rc=0
-  if [ $cc -eq 0 ]; then rout="$(cd "$HERE" && "$ENGINE" run "$wf" 2>&1)"; rc=$?; fi
+  if [ $cc -eq 0 ] && [ -z "$checkonly" ]; then rout="$(cd "$HERE" && "$ENGINE" run "$wf" 2>&1)"; rc=$?; fi
 
-  if [ -n "$divergent" ]; then
+  if [ -n "$checkonly" ]; then
+    # positive static-only class: the check must pass; the run is never
+    # attempted (the fixture would pause on a human gate or touch the
+    # network — the runtime half lives in tests/runtime, not here).
+    if [ $cc -eq 0 ]; then v=PASS; pass=$((pass+1))
+    else v=BUG; bug=$((bug+1)); echo "BUG    $rel (expected check-pass static only · check refused)"; fi
+  elif [ -n "$divergent" ]; then
     # asserts the SPEC: green (exit 0 + recover honored) = conformant;
     # the reference engine's current behavior reports DIVERGENT.
     if [ $cc -eq 0 ] && [ $rc -eq 0 ]; then v=PASS; pass=$((pass+1))
