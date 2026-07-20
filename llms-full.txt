@@ -7076,11 +7076,38 @@ authors and tooling ·
 A minimal Core engine MAY reuse the published JSON Schema for the first layer
 and add the cross-reference checks for the second.
 
-## Running (planned CLI)
+## Running
+
+### Third-party mode (available today · `runner.py --engine`)
+
+Any engine proves itself against the suite BY COMMAND, never by
+linkage — the reference runner drives it per fixture:
+
+```bash
+pip install -r conformance/requirements.txt
+python3 conformance/runner.py run conformance/tests/core   --engine "<your-validate-command>"
+```
+
+The contract of `<your-validate-command>`: it receives the workflow
+path as its **final argument** and prints the wire-shape verdict JSON
+on **stdout** — `{"valid": bool, "errors": [{"code"|"namespace",
+"category", "detail"}]}` (the shape above). The process exit code is
+free — the JSON is the verdict. An engine whose native output differs
+wraps itself in a small adapter script (the Bowtie harness pattern).
+A missing command, a timeout, or a non-JSON reply fails LOUD as a
+`harness_error` — never a silent pass.
+
+Self-test of the mode (the reference oracle driven as if external —
+byte-parity with the internal path):
+
+```bash
+python3 conformance/runner.py run conformance/tests/core   --engine "python3 conformance/runner.py validate"
+```
+
+### Native CLI (planned)
 
 ```bash
 nika conformance run conformance/tests/core      # one level
-nika conformance run conformance/tests           # all levels
 # any engine · same fixtures
 <engine> conformance run conformance/tests/core
 ```
