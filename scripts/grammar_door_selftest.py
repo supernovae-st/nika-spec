@@ -19,7 +19,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from grammar_door import DoorRefusal, downcast_w2  # noqa: E402
+from grammar_door import DoorRefusal, downcast_w2, downcast_w105  # noqa: E402
 
 SPEC_ROOT = Path(__file__).resolve().parent.parent
 
@@ -147,7 +147,58 @@ def main() -> int:
         if downcast_w2(w2, f.name + "@2") != w2:
             fail(f"{f.name} · not idempotent")
 
-    print(f"grammar-door selftest ✓ golden + stop-list + {len(pack)} pack files")
+    # ── the w105 target · golden + stop-list + pack sweep ──────────────
+    W105_IN = (
+        "nika: v1\nworkflow:\n  id: g\nmodel: mock/echo\n"
+        "inputs:\n  text:\n    type: string\nconst:\n  n: 1\n"
+        "tasks:\n  a:\n    exec: { shell: \"echo hi\" }\n"
+        "  b:\n    after:\n      a: success\n"
+        "    infer: { prompt: \"${{ inputs.text }} ${{ const.n }}\" }\n"
+        "  c:\n    after: { b: failure }\n    exec: { shell: \"echo bye\" }\n"
+    )
+    W105_OUT = (
+        "nika: v1\nworkflow:\n  id: g\nmodel: mock/echo\n"
+        "vars:\n  text:\n    type: string\n  n: 1\n"
+        "tasks:\n  a:\n    exec: { shell: \"echo hi\" }\n"
+        "  b:\n    after:\n      a: succeeded\n"
+        "    infer: { prompt: \"${{ vars.text }} ${{ vars.n }}\" }\n"
+        "  c:\n    after: { b: failed }\n    exec: { shell: \"echo bye\" }\n"
+    )
+    got105 = downcast_w105(W105_IN, "w105-golden")
+    if got105 != W105_OUT:
+        import difflib
+        fail("w105 golden mismatch\n" + "\n".join(difflib.unified_diff(
+            W105_OUT.splitlines(), got105.splitlines(), "want", "got", lineterm="")))
+    if downcast_w105(got105, "w105@2") != got105:
+        fail("w105 not idempotent")
+    try:
+        downcast_w105("nika: v1\nworkflow:\n  id: x\nconfig:\n  a: 1\ntasks:\n  t:\n    exec: { shell: \"true\" }\n", "stop")
+        fail("w105: config: must refuse")
+    except DoorRefusal:
+        pass
+    # types:/policy: pass through at w105 (the 0.105 schema carries them)
+    keep = "nika: v1\nworkflow:\n  id: x\ntypes:\n  T:\n    kind: string\ntasks:\n  t:\n    exec: { shell: \"true\" }\n"
+    if "types:" not in downcast_w105(keep, "keep"):
+        fail("w105 must keep types:")
+    for f in pack:
+        text = f.read_text()
+        lines = text.splitlines()
+        for i, line in enumerate(lines):
+            if line.startswith("nika:"):
+                text = "\n".join(lines[i:]).rstrip() + "\n"
+                break
+        try:
+            w105 = downcast_w105(text, f.name)
+        except DoorRefusal as e:
+            fail(f"w105 pack refusal · {e}")
+        if re.search(r"^(inputs|const):", w105, re.M):
+            fail(f"{f.name} · value block survived the w105 door")
+        if re.search(r"^\s{6}[A-Za-z0-9_-]+:\s*(success|failure)\s*(#.*)?$", w105, re.M):
+            fail(f"{f.name} · ratified predicate survived the w105 door")
+        if downcast_w105(w105, f.name + "@2") != w105:
+            fail(f"{f.name} · w105 not idempotent")
+
+    print(f"grammar-door selftest ✓ golden + stop-list + {len(pack)} pack files (w2 + w105 targets)")
     return 0
 
 

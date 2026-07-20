@@ -29,6 +29,14 @@
 #
 # Idempotent · a W2 document (scalar workflow · list tasks · vars) passes
 # through byte-identical.
+#
+# TARGETS · `downcast_w2` serves the 0.104-era dialect (all five transforms).
+# `downcast_w105` serves the RELEASED 0.105 dialect (measured on the release
+# binary 2026-07-20 · map envelope + task map + after: already speak) — only
+# two transforms remain: inputs/const → one vars block (+ ref rewrite) and
+# the ratified predicate names fold to the released set (success→succeeded ·
+# failure→failed). `types:`/`policy:` pass through (0.105 schema carries
+# them) · `config:` stays on the STOP-list (no released twin yet).
 
 from __future__ import annotations
 
@@ -224,6 +232,91 @@ def downcast_w2(text: str, name: str = "<inline>") -> str:
             out.append(line)
 
     # ── 4 · reference rewrite · inside ${{ }} only ────────────────────
+    def _rewrite(m: re.Match[str]) -> str:
+        return re.sub(r"\b(inputs|const)\.", "vars.", m.group(0))
+
+    return TEMPLATE_REF.sub(_rewrite, "\n".join(out).rstrip() + "\n")
+
+
+PREDICATES_RATIFIED_TO_RELEASED = {"success": "succeeded", "failure": "failed"}
+
+W105_STOP_TOP_KEYS = ("config",)
+
+AFTER_INLINE = re.compile(r"^(\s{4}after:\s*\{)([^}]*)(\}.*)$")
+AFTER_CHILD = re.compile(r"^(\s{6}[A-Za-z0-9_-]+:\s*)([a-z]+)(\s*(?:#.*)?)$")
+
+
+def _fold_predicates(lines: list[str]) -> list[str]:
+    """Rewrite ratified predicate names to the released set — ONLY inside
+    task-level `after:` blocks (map children at indent 6 · inline flow map)."""
+    out: list[str] = []
+    in_after = False
+    for line in lines:
+        m = AFTER_INLINE.match(line)
+        if m:
+            body = re.sub(
+                r"\b(success|failure)\b",
+                lambda w: PREDICATES_RATIFIED_TO_RELEASED[w.group(0)],
+                m.group(2),
+            )
+            out.append(m.group(1) + body + m.group(3))
+            in_after = False
+            continue
+        if re.match(r"^\s{4}after:\s*(#.*)?$", line):
+            in_after = True
+            out.append(line)
+            continue
+        if in_after:
+            c = AFTER_CHILD.match(line)
+            if c and c.group(2) in PREDICATES_RATIFIED_TO_RELEASED:
+                out.append(c.group(1) + PREDICATES_RATIFIED_TO_RELEASED[c.group(2)] + c.group(3))
+                continue
+            if not c and line.strip() and not line.lstrip().startswith("#"):
+                in_after = False
+        out.append(line)
+    return out
+
+
+def downcast_w105(text: str, name: str = "<inline>") -> str:
+    """ratified → the RELEASED 0.105 dialect. Two transforms + STOP-list."""
+    lines = text.splitlines()
+    blocks = _block_ranges(lines)
+
+    for key, _rest, start, _end in blocks:
+        if key in W105_STOP_TOP_KEYS:
+            _refuse(name, start, f"`{key}:` has no released twin (w105 STOP-list)")
+
+    drop: set[int] = set()
+    replace: dict[int, list[str]] = {}
+
+    # inputs + const → one merged vars block (same fold as w2 · values only)
+    value_blocks = [b for b in blocks if b[0] in ("inputs", "const")]
+    if value_blocks:
+        first = value_blocks[0]
+        merged: list[str] = ["vars:"]
+        for _key, rest, start, end in value_blocks:
+            if rest.strip():
+                _refuse(name, start, f"flow-style `{_key}:` block")
+            merged.extend(lines[start + 1 : end])
+        replace[first[2]] = merged
+        for i in range(first[2] + 1, first[3]):
+            drop.add(i)
+        for _key, _rest, start, end in value_blocks[1:]:
+            for i in range(start, end):
+                drop.add(i)
+            j = start - 1
+            if j >= 0 and not lines[j].strip() and j not in replace:
+                drop.add(j)
+
+    out: list[str] = []
+    for i, line in enumerate(lines):
+        if i in replace:
+            out.extend(replace[i])
+        elif i not in drop:
+            out.append(line)
+
+    out = _fold_predicates(out)
+
     def _rewrite(m: re.Match[str]) -> str:
         return re.sub(r"\b(inputs|const)\.", "vars.", m.group(0))
 
