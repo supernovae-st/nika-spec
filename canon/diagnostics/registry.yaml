@@ -2003,3 +2003,44 @@ diagnostics:
       mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
       is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
       span obligation not stated by the source → span_required false.'
+  - id: NIKA-DRIFT-001
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: DRIFT
+    plane: check
+    condition: 'declared-but-unused — a vars:/env:/secrets: name or a permits:
+      entry (exec program · tool glob · net host · fs path) that nothing in
+      the body references (advisory check hint · never fails the audit — the
+      reverse direction, used-but-undeclared, is the hard NIKA-VAR-001/NIKA-DAG-002/NIKA-SEC-004
+      surface)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: false
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'declared-but-unused — remove the declaration (or reference it):
+      a vars:/env:/secrets: name nothing reads is smell, a permits: entry nothing
+      uses widens the stated boundary for nothing. Advisory — never fails the
+      audit; the reverse direction (used-but-undeclared) is the hard NIKA-VAR-001/NIKA-DAG-002/NIKA-SEC-004
+      surface, so no NIKA-DRIFT-002 exists.'
+    notes: 'import-c2 (engine nika#661 · the check drift family) · category:
+      validation_error · transient: false (the note greppables the compiler
+      re-renders · canon.yaml + spec/05-errors.md verbatim) · reserved, not
+      active: the executable LAW row lands when the canon mints the DRIFT law
+      family · plane check (the nika check static ladder) · terminal=FALSE
+      — the first non-terminal row: the hint never fails the workflow (advisory
+      · the report''s is_clean ignores hints), so the import-c0 unhandled-floor
+      (terminal=true) does not apply · span obligation: none (a workflow-level
+      finding · the engine reports task `-`) · reference implementation nika#661
+      (merged 1f362691b · crates/nika-cli/src/verbs/check/drift.rs · the CLI-edge
+      pass — nika-schema sat AT the 15k prod-LOC cap) · no NIKA-DRIFT-002:
+      used-but-undeclared is already hard end to end (NIKA-VAR-001 on every
+      island surface · NIKA-DAG-002 · NIKA-SEC-004 category-level), an unemittable
+      code would be dead weight · the no-duplication law is structural (hard
+      codes name references, drift names declarations — never the same yaml
+      site) · a dynamic consumer POISONS the used set (a shell-form exec ·
+      a dynamic URL/path · an agent: whitelist — glob ⊆ glob undecidable)
+      and the category stays silent rather than risk a false positive.'

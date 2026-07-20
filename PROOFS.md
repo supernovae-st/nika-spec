@@ -200,9 +200,12 @@ error_codes (83)                → canon/diagnostics/registry.yaml  id+namespac
                                   les citent · les 2 seeds NIKA-AGENT byte-intouchées · 94 rows total
                                   (+ NIKA-SEC-009 · import-c2 NEP-0002 · reserved, law_ids [] en
                                   attendant la famille de lois SEC)
+                                  (+ NIKA-DRIFT-001 · import-c2 nika#661 · reserved, law_ids [] en
+                                  attendant la famille de lois DRIFT · terminal:false — le premier
+                                  row non-terminal : hint advisory, jamais un échec du workflow)
 mcp.protocol_versions (5)       → canon/features.yaml       runtime_capability · id bijectif
                                   mcp.protocol.<v · tirets→underscores> · detection_law LAW-CONF-0510
-error_namespaces (21 · partiel) → dérivés des rows (19/21 · IMPL+PROVIDER declared-empty · CF-09)
+error_namespaces (22 · partiel) → dérivés des rows (20/22 · IMPL+PROVIDER declared-empty · CF-09)
 outcome_transitions.classes     → COHÉRENT (canon == enum scellé outcome_class == lois gates R5 ·
                                   terminal jamais une classe per LAW-OUTCOME-0231)
 ```
