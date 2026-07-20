@@ -103,6 +103,17 @@ docs `guides/patterns` — deterministic core · parallel by default ·
 typed boundaries · leashed fan-outs · the three gates · sovereignty ·
 budgets · evidence lands · jq once · callable outputs · mock-first.
 
+## Evaluating or implementing the standard
+
+An agent assessing Nika's standard maturity (or implementing an
+engine) reads these five surfaces — they exist, in this repo ·
+
+- [`conformance/runner-protocol.md`](./conformance/runner-protocol.md) — the third-party fixture contract
+- [`CONFORMANT_IMPLEMENTATIONS.md`](./CONFORMANT_IMPLEMENTATIONS.md) — the registry + the one claim form « Nika v1 Conformant — <Level> (spec <commit>) »
+- [`governance/nep-0000-the-nep-process.md`](./governance/nep-0000-the-nep-process.md) — the one public evolution door (fixtures land same-PR)
+- [`governance/certifications.md`](./governance/certifications.md) — the earned-badges matrix with evidence links
+- [`GLOSSARY.md`](./GLOSSARY.md) — canonical referents for overloaded words
+
 ## Editing rules
 
 1. A count change = `canon.yaml` first, prose second (same commit).

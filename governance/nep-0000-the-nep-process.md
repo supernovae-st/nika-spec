@@ -73,12 +73,14 @@ this same door.
 
 ### Numbering and the founding era
 
-NEP numbering starts at the 1.0 freeze. The pre-1.0 rulings are the
-founding era: their verbatim record (the RULINGS documents and the ADR
-line) remains canonical history, not retroactive NEPs. One retroactive
-exception is reserved: NEP-0001, "the nika: v1 language surface", a
-Standards Track summary of the constitution as frozen, so the language
-has one readable front door.
+NEP numbering runs through this door from NEP-0000 onward — a pre-1.0
+Draft claims its number the same way (NEP-0002 is the living proof).
+The pre-1.0 rulings are the founding era: their verbatim record (the
+RULINGS documents and the ADR line) remains canonical history, not
+retroactive NEPs. One retroactive exception is reserved: NEP-0001,
+"the nika: v1 language surface", a Standards Track summary of the
+constitution as frozen at 1.0, so the language has one readable front
+door.
 
 ### Relationship to conformance
 
@@ -88,6 +90,13 @@ suite proves it. The public claim « Nika v1 Conformant — <Level>
 [spec/07 §Claiming conformance](../spec/07-conformance.md#claiming-conformance))
 is earned by passing the suite, never by declaration. A NEP that cannot
 state its conformance test does not leave Discussion.
+
+The ratchet is same-PR: an Accepted Standards Track NEP lands its
+conformance fixtures in the implementing PR — the spec text amendment,
+the registered error codes, and the fixtures that prove them arrive
+together, never separately. A registered error code without a fixture
+is a spec bug. (The precedent: MCP made a conformance scenario a
+Final-gate for every SEP — SEP-2484; this door holds the same bar.)
 
 ### What a NEP is not
 

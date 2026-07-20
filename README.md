@@ -149,10 +149,11 @@ nika-spec/
 If you want to implement Nika in your language ·
 
 0. Skim [`GLOSSARY.md`](./GLOSSARY.md) — one word, one meaning (oracle · gate · golden · predicate-vs-status)
-1. Read [`spec/`](./spec/) (~30 pages · the contract)
-2. Pass [`conformance/`](./conformance/) — the claim is « **Nika v1 Conformant — <Level> (spec <commit>)** » · earned by the suite, never by declaration
-3. Optionally implement the [`stdlib/`](./stdlib/) (providers + extract + builtins)
-4. Open a PR on this repo to be listed as a conformant impl
+1. Read [`spec/`](./spec/) (the contract · 17 chapters)
+2. Run the suite per the [runner protocol](./conformance/runner-protocol.md) — declarative fixtures (`input.yaml` + `expected.json`), needing only a YAML+JSON parser to understand · `pip install -r conformance/requirements.txt && python3 conformance/runner.py all` exercises the reference oracle
+3. Pass it — the claim is « **Nika v1 Conformant — <Level> (spec <commit>)** » · one form (spec/07 §Claiming) · earned by the suite, never by declaration
+4. Optionally implement the [`stdlib/`](./stdlib/) (providers + extract + builtins)
+5. Open a PR adding your row to [`CONFORMANT_IMPLEMENTATIONS.md`](./CONFORMANT_IMPLEMENTATIONS.md) — the registry (pinned spec commit + reproducible command)
 
 **License**: this spec is **Apache-2.0** with patent grant. Use it freely.
 

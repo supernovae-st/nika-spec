@@ -13,7 +13,10 @@ directly, the maintainers included.
 | NEP | Title | Type | Status |
 |---|---|---|---|
 | [0000](nep-0000-the-nep-process.md) | The NEP Process | Process | Active |
+| [0002](nep-0002-lethal-trifecta-human-gate.md) | Lethal-trifecta human gate | Standards Track | Draft |
 
-NEP numbering starts at the 1.0 freeze. The pre-1.0 rulings are the
-founding era: their verbatim record stays canonical history. NEP-0001,
-"the nika: v1 language surface", is the one reserved retroactive entry.
+Numbering runs through this door from NEP-0000 onward — pre-1.0 drafts
+included (NEP-0002 is the living proof). The pre-1.0 RULINGS and the ADR
+line are the founding era: their verbatim record stays canonical history,
+not retroactive NEPs. NEP-0001, "the nika: v1 language surface", is the
+one reserved retroactive entry, minted at the 1.0 freeze.

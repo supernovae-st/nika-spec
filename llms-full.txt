@@ -155,10 +155,11 @@ nika-spec/
 If you want to implement Nika in your language ·
 
 0. Skim [`GLOSSARY.md`](./GLOSSARY.md) — one word, one meaning (oracle · gate · golden · predicate-vs-status)
-1. Read [`spec/`](./spec/) (~30 pages · the contract)
-2. Pass [`conformance/`](./conformance/) — the claim is « **Nika v1 Conformant — <Level> (spec <commit>)** » · earned by the suite, never by declaration
-3. Optionally implement the [`stdlib/`](./stdlib/) (providers + extract + builtins)
-4. Open a PR on this repo to be listed as a conformant impl
+1. Read [`spec/`](./spec/) (the contract · 17 chapters)
+2. Run the suite per the [runner protocol](./conformance/runner-protocol.md) — declarative fixtures (`input.yaml` + `expected.json`), needing only a YAML+JSON parser to understand · `pip install -r conformance/requirements.txt && python3 conformance/runner.py all` exercises the reference oracle
+3. Pass it — the claim is « **Nika v1 Conformant — <Level> (spec <commit>)** » · one form (spec/07 §Claiming) · earned by the suite, never by declaration
+4. Optionally implement the [`stdlib/`](./stdlib/) (providers + extract + builtins)
+5. Open a PR adding your row to [`CONFORMANT_IMPLEMENTATIONS.md`](./CONFORMANT_IMPLEMENTATIONS.md) — the registry (pinned spec commit + reproducible command)
 
 **License**: this spec is **Apache-2.0** with patent grant. Use it freely.
 
@@ -5641,6 +5642,1872 @@ value MUST conform to its declared type — checked, never warnings
 - [04 · Variables](./04-variables.md) — the static walk `returns:`
   sharpens
 - [05 · Errors](./05-errors.md) — the `NIKA-TYPE` registry rows
+
+<!-- ═══ spec/10-authority.md ═══ -->
+
+# 10 · Authority
+
+> A workflow's authority is **declared in the file and judged before a
+> token is spent** — three blocks, three questions, never conflated:
+> [`permits:`](./01-envelope.md#permits--optional--the-declared-capability-boundary)
+> says what the workflow **may touch** (capability) · `policy:` says in
+> what **order and shape** it may act (law · this chapter) ·
+> [`secrets:` + `egress:`](./01-envelope.md#egress--optional--sanctioned-destinations-declassification)
+> say where a sensitive value **may go** (flow). The three compose
+> without overlap; none is negotiation material for a model.
+>
+> One law binds them: **required ⊆ permitted**. What a task's body
+> requires (computed statically, never declared by hand) must fit inside
+> what the file grants. A violation is a check refusal with a **witness**
+> — the task, the effect, and (for flows) the exact taint path.
+
+---
+
+## The effect vocabulary (normative · closed)
+
+An **effect** is a class of interaction with the world outside the run.
+The v1 vocabulary is exactly the capability surface of
+[01 §permits](./01-envelope.md#permits--optional--the-declared-capability-boundary)
+— **four categories** (this table is the one vocabulary the checker, the
+inference, the certificate, and `policy:` rules all speak — one voice,
+never a parallel list):
+
+| Effect category | Carried by | Granted by |
+|---|---|---|
+| `fs` (read · write) | `nika:read` · `nika:grep` · `nika:write` · `nika:edit` · file-writing media builtins | `permits.fs.read` / `permits.fs.write` (path globs) |
+| `net` | `nika:fetch` · `nika:notify` (webhook) · any URL-reaching builtin | `permits.net.http` (host allowlist · SSRF floor beneath) |
+| `exec` | the `exec:` verb | `permits.exec` (`false` · `true` · program allowlist) |
+| `tools` | the `invoke:` verb surface | `permits.tools` (id globs) |
+
+Two derived facts the engine computes and no author writes:
+
+- **A task's required effects** — from its verb and its arguments (the
+  builtin classification table is normative for the stdlib: each
+  catalog entry declares which category it carries and which argument
+  names its target). `infer:` with no tools is **pure compute**: zero
+  required effects (provider egress is governed by the secrets flow
+  rules, not by a capability category).
+- **The workflow's needed boundary** — the union of its tasks' required
+  effects, as a `permits:` block (`nika check --infer-permits` prints
+  it; the round-trip law holds: the inferred block re-checks clean).
+
+**Required ⊆ permitted is judged twice** (per 01 §permits): statically
+at `nika check` (an escape = refusal before any token) and at run time
+(`NIKA-SEC-004` — the dynamic cases a static check cannot see).
+
+## The `policy:` block · *optional · named workflow law*
+
+`permits:` bounds capability; nothing bounded **order and shape** — «
+no shell after an untrusted fetch », « a human signs before anything
+irreversible », « only these providers » were checkable only by eyeball.
+`policy:` names those laws next to the workflow:
+
+```yaml
+policy:
+  require:
+    human_gate_before: [exec, write]   # these effect classes sit behind a human
+  forbid:
+    exec_after: [net]                  # order law · no shell downstream of the network
+  allow:
+    providers: [ollama, mistral]       # infer/agent provider allowlist
+  limits:
+    max_tasks: 50                      # workflow-shape bound
+  prefer:                              # SOFT · recorded, never judged (v1)
+    providers: [ollama]
+  optimize: cost                       # SOFT · recorded, never judged (v1)
+```
+
+**Grammar (normative · closed at every level).** `policy:` is a mapping
+of up to six **families**. Unknown families and unknown rule names are
+refusals (`NIKA-PARSE`-class): the rule set is closed per minor —
+patterns are named after the incidents they prevent, raw temporal logic
+is never exposed.
+
+| Family | Nature | v1 rules (closed) |
+|---|---|---|
+| `require:` | **hard** · judged at check | `human_gate_before: [<effect-class>…]` |
+| `forbid:` | **hard** · judged at check | `exec_after: [<effect-class>…]` |
+| `allow:` | **hard** · judged at check | `providers: [<provider>…]` |
+| `limits:` | **hard** · judged at check | `max_tasks: <positive integer>` |
+| `prefer:` | **soft** · parsed, recorded, NOT judged | `providers: [<provider>…]` (ordered) |
+| `optimize:` | **soft** · parsed, recorded, NOT judged | `cost` \| `latency` \| `quality` |
+
+`<effect-class>` is the closed set `exec · write · net · tools` — the
+effect vocabulary above with `fs` split at its grain of harm (`write`;
+reads are not gateable in v1). Soft families are **inert by design** in
+v1: the solver that would satisfy them is research surface, and a
+constraint that cannot be judged must never look judged — the check
+records them (a hint names them as recorded-not-judged) and nothing
+else.
+
+**Semantics of the hard rules (normative · statically decided on the
+graph — the same derived graph every judge reads, [03](./03-dag.md))** ·
+
+- `require.human_gate_before: [C…]` — every task carrying an effect of
+  a listed class has, among its ancestors (data ∪ control edges), a
+  **human gate**: an `invoke:` of `nika:prompt`. The pause is the
+  consent (exit 4 · resume with the answer · [02](./02-verbs.md)).
+- `forbid.exec_after: [C…]` — no `exec:` task is a descendant of a task
+  carrying an effect of a listed class. The order law reads the graph,
+  not the schedule: any path counts, `after:` edges included.
+- `allow.providers: [P…]` — every `infer:`/`agent:` task's provider
+  (the segment of `model:` before `/`, or the run's default model when
+  the task names none) is in the list. A provider that cannot be
+  determined statically (a templated `model:`) is a violation under a
+  declared allowlist — **fail-closed**, pin the literal (same doctrine
+  as the permits argv rule: judge the shape you can actually verify).
+- `limits.max_tasks: N` — the workflow declares at most N tasks.
+
+**A violation is `NIKA-POLICY-001`** (`security_error` · check-time ·
+before any token). The diagnostic names the rule, the offending task,
+and the witness — for order rules, the path (`fetch_page → summarize →
+deploy`); for gate rules, the missing ancestor; for provider rules, the
+offending literal. Policy violations are never fed back to an `agent:`
+model: organizational law is not negotiation material.
+
+**Composition** · `policy:` and `permits:` are orthogonal judges over
+one body: permits answers *may this task touch X at all*, policy
+answers *may it do so here, in this order, unattended*. A body must
+satisfy **both**. (`allow.providers` deliberately covers the one
+authority `permits:` does not — the provider surface; capability stays
+permits' ground, and no policy rule re-spells a permits grant.)
+
+## Secret flow refusals carry their codes (normative)
+
+The flow rules themselves live in
+[01 §egress](./01-envelope.md#egress--optional--sanctioned-destinations-declassification)
+and are unchanged. This chapter names their wire codes — the two
+refusal classes were report-only until W4:
+
+| Code | Class | Witness (in the diagnostic) |
+|---|---|---|
+| `NIKA-SEC-006` | a `secrets.<name>` value reaches an **unsanctioned sink** (an `exec:` argument · an `invoke:` payload · an `infer:`/`agent:` prompt) | the **taint path**, source-first (`secrets.api_key → with.tok → tasks.call.output → exec`) + the exact `egress: [{ to: "<sink>" }]` clause that would sanction it |
+| `NIKA-SEC-007` | a tainted value reaches the **workflow boundary** (`outputs:` — where a result leaves the run) | the taint path into the `outputs:` entry |
+
+Both are `security_error`, check-time, blocking. The taint path is not
+decoration: it is the **minimal witness** that lets an author decide
+sanction-or-fix without re-deriving the flow by eye. The secret's
+*value* never appears in any diagnostic.
+
+## The certificate names its effects (normative)
+
+`nika check --json` already emits a resource certificate
+([05](./05-errors.md) · attempts · llm calls · effect calls · spend).
+W4 adds the **authority projection** — `certificate.effects`:
+
+```json
+{
+  "effects": {
+    "boundary_declared": true,
+    "needed": { "fs": { "read": ["./data/**"] }, "exec": ["git"] },
+    "escapes": 0
+  }
+}
+```
+
+`needed` is the inferred boundary (the same object `--infer-permits`
+prints) · `boundary_declared` says whether the file carries a
+`permits:` block · `escapes` is the count of required-outside-permitted
+violations (0 in any clean report — the field exists so a certificate
+consumer never has to re-derive it). The certificate stays a
+projection: the judge is the check ladder, never the JSON.
+
+## Errors (the `NIKA-POLICY` namespace · new in this chapter)
+
+| Code | Category | Meaning |
+|---|---|---|
+| `NIKA-POLICY-001` | `security_error` | a hard `policy:` rule is violated (the diagnostic names rule + task + witness) |
+
+`NIKA-SEC-006` / `NIKA-SEC-007` join the existing `NIKA-SEC` namespace
+([05](./05-errors.md)).
+
+## One obvious way (normative for linters)
+
+- A capability boundary is spelled `permits:` — `policy.allow` never
+  re-spells a permits grant (providers is the one allow rule, because
+  permits has no provider category).
+- A human gate is `invoke: { tool: "nika:prompt" }` — the pause IS the
+  consent mechanism; a `when:` on a `config` flag is not a gate.
+- Soft families record intent (`prefer` · `optimize`) — an engine that
+  cannot honor them MUST still accept them (they are never judged, so
+  they can never refuse).
+
+## What v1 deliberately does not do
+
+- **No solver.** Soft constraints are recorded, not satisfied —
+  Pareto/unsat-core surfaces are research (the constraint that cannot
+  be judged must never look judged).
+- **No runtime policy.** Every v1 rule is decidable at `nika check` on
+  the graph; rules whose truth needs runtime data are out of scope,
+  deliberately (the check stays the pre-token audit).
+- **No new verbs, no `approve:`.** The human gate rides the existing
+  `nika:prompt` pause; a dedicated approval surface (delegation ·
+  quorum · `via:`) is future work with its own chapter.
+- **No policy inheritance.** A file's law is the file's — composition
+  across `invoke: workflow:` calls stays the callee's own policy (the
+  ceiling algebra is reserved, unwired).
+
+## Related
+
+- [01 · Envelope](./01-envelope.md) — `permits:` (capability) ·
+  `secrets:`/`egress:` (flow) — the two blocks this chapter composes with
+- [03 · DAG](./03-dag.md) — the derived graph every order rule reads
+- [05 · Errors](./05-errors.md) — the error registry (POLICY + SEC rows)
+- [09 · Types](./09-types.md) — `returns:`/`types:` (the value contract;
+  orthogonal to authority)
+
+<!-- ═══ spec/11-decision.md ═══ -->
+
+# 11 · Decision
+
+> A typed, bounded, secured, traced workflow can still *decide* by
+> fuzzy rules. Constraining the OUTPUT (a closed enum) is not defining
+> the DECISION (why `high` rather than `medium`). This chapter makes
+> the decision a **contract**: a portable, versioned **Decision
+> Bundle** owned by the consuming organization — Nika is a *reference
+> implementation* of the contract, never its prison.
+>
+> Three algebras, never fused:
+> [`permits:`](./10-authority.md) is *authority* (required ⊆ permitted)
+> · [`policy:`](./10-authority.md) is *law* (the shape of allowed
+> action) · a **decision** is *judgment* —
+> `D = Evaluate(Bundle, EvidenceSnapshot)` — deterministic, explained,
+> appealable. **The model never decides** — the law is this chapter's:
+> `infer:`/`agent:` may produce closed, cited semantic *facts*; the
+> decision kernel applies the rubric.
+
+---
+
+## The Decision Bundle · *a portable artifact · `decision_bundle_format: 1`*
+
+A bundle is ONE JSON document (produced by hand or by tooling — it is
+**data**, never code) with six mandatory regions:
+
+| Region | Carries |
+|---|---|
+| `manifest` | `id` · `version` (semver) · `owner` · `license` · `valid_until` · the bundle's own `digest` (blake3 of the canonical JSON of everything below) |
+| `evidence_schema` | the evidence keys the rules may read: required/optional · a [09-types](./09-types.md) type per key · authorized `sources` · `ttl` · minimum `integrity` (the lattice below) · what missingness means |
+| `transforms` | named, **bounded** feature transforms (`clamp` · `linear` · `bucket`) — integer-only by construction (a log-shaped curve is an explicit `bucket` table: honest, and byte-equal across evaluators) — every transform is total on its declared input range and refuses outside it |
+| `rules` | the decision rules: named **dimensions**, fixed-point weights, thresholds, dominance, abstention (the Decision IR below) |
+| `governance` | `never_automatic: [outcome…]` · `override` (append-only, reason required) · `appeal` · `human_required` triggers · expiration |
+| `fixtures` | golden cases the bundle MUST ship: positive · negative · **ambiguous** · **contradictory** · adversarial — a bundle without a contradictory fixture cannot prove its `Conflict` handling |
+
+`explanations` (reason-code templates) is optional but recommended:
+the explanation is the FORMULA (term-by-term contributions), never a
+post-hoc narrative.
+
+**Ownership law.** The bundle format is Apache-2.0 and
+engine-independent. The proof is executable (§the second evaluator):
+a stdlib-Python interpreter, living beside the bundle, must produce
+**byte-equal** decision JSON against the engine on the bundle's own
+fixtures. The `portable` label is *earned by that proof*, never
+declared.
+
+## Evidence IR (normative · G14)
+
+One evidence item is
+
+```
+e = (key, value, source, observed_at, digest,
+     confidentiality, integrity,
+     quality { freshness · completeness · independence_group })
+```
+
+- **Two orthogonal lattices, never fused** — confidentiality
+  (`public ⊑ internal ⊑ confidential ⊑ secret` — the flow lattice of
+  [10 §secret flow](./10-authority.md)) × **integrity**
+  (`untrusted ⊑ observed ⊑ verified ⊑ authoritative`). The content of
+  a PR is a *datum to analyze*, never an instruction — structural
+  anti-prompt-injection: rules read evidence VALUES; no evidence value
+  ever becomes rule text.
+- `completeness` is a closed enum: `complete · paginated_partial ·
+  source_down · permission_denied` — a partial read is a FACT the
+  rules may weigh, never silently promoted to complete.
+- `independence_group` names the correlation group; redundant signals
+  share a group and a **contribution cap** (anti-Goodhart: ten mirrors
+  of one signal never outvote one independent signal).
+
+An **EvidenceSnapshot** is the frozen set at time `t`:
+`Snapshot(E, t)` carries `t`, source cursors, digests, and the list of
+*missing* required keys. `D = Evaluate(B, Snapshot(E, t))` — a rerun
+at `t'` is a NEW decision with a new receipt, append-only, never a
+rewrite.
+
+## Four-valued logic (normative · Belnap)
+
+Rule predicates evaluate in `{True, False, Unknown, Conflict}`:
+
+- **Unknown ≠ False ≠ 0.** A missing/expired evidence key makes
+  predicates over it `Unknown`; arithmetic over it contributes an
+  **interval**, never an invented zero.
+- **Conflict** arises when two sources at `authoritative` integrity
+  disagree on one key. A Conflict on a *required* key forces the
+  `human_required` outcome and carries a **witness** (both values,
+  both sources, both digests). The contradiction classes
+  (freshness · source · semantic · unresolved) ride the receipt.
+
+## Decision IR (normative · G15)
+
+The rules region is a **pure, total, bounded, typed** program over the
+snapshot — no I/O, no clock, no randomness, no unbounded recursion,
+and **no binary floats**:
+
+- **Fixed-point everywhere**: weights and thresholds are integer
+  basis-points (`8735` = 87.35%) — the `usd_micros` precedent of the
+  [cost certificate](./05-errors.md), generalized. Two evaluators can
+  only be byte-equal when no float ever rounds.
+- **Scores are VECTORS** of named dimensions (e.g. `priority` ·
+  `review_burden` · `change_risk` · `evidence_quality`), each mapping
+  to a lane — never one universal scalar. Contributions are exposed
+  term-by-term (the explanation IS the formula).
+- **Declared monotonicity** per (dimension, evidence key):
+  `increases · decreases · none`. A bundle whose fixtures violate a
+  declared monotonicity is **refused at publication** — the law is
+  property-tested, not prose.
+- **Interval propagation + robust dominance**: Unknown-bearing inputs
+  propagate as intervals; `A > B` only when `inf(A) > sup(B)`,
+  otherwise the pair is *« incomparable with the available evidence »*
+  — never a false total order.
+- **Bounded discontinuities**: any step function (a secret leak, a
+  release workflow, a DB migration) is explicit in the rules and
+  carries its own fixture; everything else is locally Lipschitz (the
+  bundle declares the bound; fixtures probe it).
+- **Identity counterfactual invariance**: the same patch under a
+  different author name/tenure yields the same *technical* decision —
+  identity keys are declared `identity: true` in the evidence schema
+  and MUST NOT feed technical dimensions (fixture-enforced).
+
+## Outcomes and abstention (normative · G16)
+
+The outcome enum is closed:
+`recommend · defer · human_required · opted_out · overridden`.
+
+**Abstention is a safety property, first-class**: `defer` (not enough
+evidence *yet* — TTL/completeness driven) and `human_required`
+(Conflict, never-automatic outcome, or a governance trigger) are
+successful evaluations, never errors. `overridden` is append-only with
+a mandatory reason and the original decision preserved. Actions listed
+in `governance.never_automatic` can never ride a bare `recommend`.
+
+## The Decision Receipt (normative)
+
+Every evaluation emits a receipt:
+
+```
+bundle {id · version · digest} + snapshot {t · cursors · digests · missing}
++ per-dimension contributions (term by term) + intervals
++ outcome + conflicts/witnesses + override (if any)
++ determination provenance
+```
+
+**Determination provenance** names the commitments that *decided*
+between admissible outcomes (which threshold, which dominance test,
+which governance trigger) — on top of data provenance. Receipts come
+in a PUBLIC and a PRIVATE form linked by digests: publishing the
+decision never forces publishing sensitive evidence.
+
+## `nika:decide` · *the deterministic kernel as a builtin*
+
+Decision evaluation reaches a workflow as a **pure builtin** (a tool
+under `invoke:` — [no fifth verb, ever](./02-verbs.md)):
+
+```yaml
+tasks:
+  triage:
+    invoke:
+      tool: "nika:decide"
+      args:
+        bundle: "./decisions/pr-triage.bundle.json"   # path or inline object
+        evidence: "${{ tasks.collect.output }}"       # the snapshot items
+    returns: DecisionResult   # the receipt shape · typed via 09-types
+```
+
+- The builtin is **pure compute**: zero required effects (the bundle
+  path read is declared like any `fs.read`; an inline bundle needs no
+  filesystem at all). Collection stays `invoke:`/`exec:`; semantic
+  facts stay `infer:` (closed, cited, uncertainty-carrying); the
+  kernel applies the rubric. **The LLM never decides.**
+- Arg-shape violations are `NIKA-BUILTIN`-class like every builtin.
+  Bundle-law violations are their own namespace:
+
+| Code | Category | Meaning |
+|---|---|---|
+| `NIKA-DECIDE-001` | `validation_error` | the bundle is malformed or violates its own laws (bad fixed-point, undeclared evidence key in rules, monotonicity fixture failure, missing contradictory fixture) |
+| `NIKA-DECIDE-002` | `validation_error` | the evidence snapshot does not satisfy the bundle's evidence schema (type misfit · unauthorized source · integrity below the declared floor) |
+
+Both are deterministic refusals — same inputs, same refusal, both
+evaluators.
+
+## The second evaluator (normative · G18)
+
+The reference interpreter is **stdlib Python, engine-free**, designed
+to live *in the bundle owner's repo*:
+`conformance/decision_core.py` in this spec is the canonical copy.
+Conformance for any engine:
+
+```
+for every bundle fixture:  JSON_engine == JSON_reference   (byte-equal)
+```
+
+The comparison is on **canonical JSON** (sorted keys, no spaces, raw
+UTF-8) of the full receipt. This proof is what makes the semantics
+belong to the BUNDLE, not to a hidden engine detail.
+
+## The validation protocol (normative for bundle publication · G17)
+
+A bundle that claims production quality ships its protocol *inside
+the bundle*: an annotated corpus (≥2 human annotators) · metrics per
+output type (binary → confusion + Cohen's κ · ordinal → weighted-κ +
+MAE · rankings → Kendall τ · multi-annotator → Krippendorff α) ·
+**coverage AND abstention rate always reported beside any score** ·
+drift watched by re-running the corpus at every bundle bump ·
+promotion thresholds written IN the bundle. The spec defines the
+protocol; executing it belongs to each bundle's owners — an engine
+never fakes it.
+
+## One obvious way (normative for linters)
+
+- A decision is `nika:decide` over a bundle — never an `infer:` whose
+  prompt says « decide » (the closed-enum output would be a decision
+  with no contract; linters hint toward the bundle).
+- Money-like weights are basis-points integers — a float weight in a
+  bundle is `NIKA-DECIDE-001`, teaching the fixed-point spelling.
+
+## What v1 deliberately does not do
+
+- **No workflow-level declaration block.** How a bundle is declared
+  first-class in a workflow (`decisions:`?) is an authoring-surface
+  decision — it goes to the operator tournament (witness #6); the
+  builtin path/inline forms are complete without it.
+- **No solver, no learning.** Soft-constraint solving stays LAB (10 §);
+  selective/conformal prediction layers are LAB — calibrated research,
+  never the deterministic kernel, never presented as a guarantee.
+- **No cross-bundle composition.** One evaluation, one bundle;
+  delegation/composition of decisions is W-COMP ground.
+
+## Related
+
+- [10 · Authority](./10-authority.md) — permits (authority) · policy
+  (law) — the two algebras this one completes
+- [09 · Types](./09-types.md) — evidence value types · `returns:` on
+  the decide task
+- [05 · Errors](./05-errors.md) — the registry (DECIDE rows)
+- [02 · Verbs](./02-verbs.md) — four verbs forever; `nika:decide` is a
+  tool under `invoke:`
+
+<!-- ═══ spec/12-gateway.md ═══ -->
+
+# 12 · Gateway
+
+> Nika is the semantic execution kernel that **connects** agentic
+> standards without reinventing them: a skill, an agent profile, or a
+> workflow from any ecosystem enters Nika, is understood, typed,
+> secured, locked, executed and attested — without losing its
+> semantics and **without gaining invisible authority**.
+>
+> The contracts in this chapter are **backend-neutral by law**: no
+> enforcement backend, agent runtime, or vendor is named anywhere in
+> this spec, and the entry fixture for any conforming abstraction is
+> *« the same plan, two backends, comparable reports »*. Nika stays
+> the semantic truth; a backend enforces, it never redefines.
+
+---
+
+## Five categories, never confused (normative)
+
+| Category | Is | Is NOT |
+|---|---|---|
+| **Tool** | one atomic capability (builtin · MCP · API) | a place to hide a workflow |
+| **Workflow** | a typed, composable computation (the callable contract) | a tool with steps |
+| **Skill** | procedural KNOWLEDGE — explains *how* | an authority grant of any kind |
+| **Agent profile** | portable agentic configuration | a permission, a budget, or a memory |
+| **Pack** | a signed distributable unit {workflows · skills · agents · schemas · assets · manifest · lock · attestations · fixtures} | a running thing |
+
+A skill **never** grants authority. Disclosure of a tool changes the
+model's *context*, never its *authority* — the four sets are ordered
+and the order is the law (`NIKA-PORT` class when violated):
+
+```
+T_presented ⊆ T_discoverable ⊆ T_authorized ⊆ T_installed
+```
+
+## The Deployment Bundle · *`deployment_bundle_format: 1`*
+
+A **compiled, portable artifact** (a projection of a Pack — never
+authored by hand): everything a host needs to run a workflow the way
+its author proved it.
+
+| Region | Carries |
+|---|---|
+| `manifest` | id · version · owner · the semantic hashes of every workflow it ships |
+| `lock` | every dependency **pinned by digest** (spec pin · tool versions · provider catalog snapshot · schemas) — nothing resolves at run time |
+| `authority` | the DECLARED boundary: the `permits:`/`policy:` blocks verbatim + the inferred needed-effects projection (10 §certificate) |
+| `contracts` | the callable contracts (types · returns · inputs/outputs) of every entry workflow |
+| `backend_requirements` | the MINIMUM capability set a backend must attest before this bundle runs (see below) — with per-requirement `on_absent: refuse \| degrade_declared` |
+| `attestations` | reserved (W6 — signatures · provenance · SBOM refs) |
+| `lifecycle` | reserved (W5 — DeploymentLifecycleIR) |
+
+The bundle is DATA. Signing it proves *origin*, never *safety*
+(`signature ≠ safety` — the separation laws below).
+
+## ExecutionBackend · the enforcement contract (normative)
+
+An execution backend is anything that can *enforce* a compiled
+authority boundary around a run (a sandbox · a container profile · an
+OS policy layer). The contract has four verbs, and every one of them
+returns **evidence**, not vibes:
+
+```
+capabilities()  → BackendCapabilities
+lower(plan)     → EnforcementPlan + PolicyLoweringReport
+load(plan)      → EffectivePolicySnapshot        (the READBACK)
+observe(run)    → BackendReceiptFragment          (reserved W6)
+```
+
+**BackendCapabilities** — for every capability the kernel may ask
+(fs-path confinement · network host allowlists · exec program
+allowlists · process isolation · secret masking), the backend answers:
+
+```
+support ∈ { exact · partial · absent · unknown }
+× guarantee (the G27 strength enum — unchanged, never extended here)
+× scope (what exactly is covered)
+× assumptions (kernel versions · privileges · platform)
+× evidence (how the claim was verified — a doc pin · a probe result)
+```
+
+`unknown` is an honest answer and is **never promoted** to anything
+else. A backend that cannot attest a `backend_requirements` entry
+refuses the bundle (or degrades **declaredly** when the bundle allows
+it) — a silent downgrade is the one forbidden move.
+
+**The five policy states** (never conflated · the readback is
+mandatory):
+
+```
+Requested → Compiled → Loaded → Effective → Observed
+```
+
+What the author wrote (Requested) is compiled to a backend plan
+(Compiled), loaded into the mechanism (Loaded), read **back** from the
+mechanism as ground truth (Effective), and finally compared against
+what actually happened (Observed · W6). A divergence between any two
+adjacent states is a **typed diff with a witness** — decision and
+receipt, never a shrug.
+
+**PolicyLoweringReport** — lowering a Nika policy onto a backend
+mechanism is classified per rule:
+
+```
+exact · restrictive_safe · permissive_unsafe · unsupported · unknown
+```
+
+The soundness law is the enforcement twin of the type-side lowering
+law: `Behaviors(BackendPolicy) ⊆ Behaviors(NikaPolicy)`. A
+`restrictive_safe` lowering (the backend blocks MORE than asked) is
+sound and reported; **`permissive_unsafe` is a REFUSAL** (the backend
+would allow what the policy forbids — running anyway would make the
+file lie); `unknown` is never promoted to safe. Every non-`exact` row
+carries the divergence witness.
+
+## AgentRuntimeAdapter · the import/export contract (normative)
+
+An agent runtime adapter connects a foreign agentic ecosystem
+(profiles · skills · sub-agent conventions) to Nika. Two artifacts are
+mandatory on every import, and they are the whole honesty of the
+gateway:
+
+- **FidelityReport** — per imported element, the 6-value fidelity enum
+  (`exact · adapted · lossy · unsupported · ambiguous ·
+  security_restricted`): what survived translation, what didn't, and
+  what was *deliberately* restricted. `lossy` names what was lost;
+  `ambiguous` names both readings and refuses to guess.
+- **AuthorityDelta** — the authority the element would have had in its
+  home runtime vs the authority it has under Nika: ambient credentials
+  it can no longer reach · prompt-only conventions that became
+  enforced boundaries · default-on capabilities that became
+  default-deny. **Import must never *gain* authority**; every loss and
+  every hardening is listed, none is silent.
+
+The five delegation notions stay separated (reserved to composition —
+the vocabulary is normative now, the mechanics land with workflow
+composition): `DelegationPreference` (a prompt hint) ≠
+`DelegationAuthority` (an enforced grant) ≠ `DelegationContract` ≠
+`DelegationBudget` ≠ `DelegationReceipt`. A runtime whose delegation
+control is prompt-guidance-only imports as *preference*, never as
+*authority* — the AuthorityDelta says so.
+
+## The separation laws (normative · one voice with 10/11)
+
+```
+disclosure        ≠ authorization
+delegation pref.  ≠ delegation authority
+compaction        ≠ canonical memory
+requested policy  ≠ effective policy
+logs              ≠ attestation
+signature         ≠ safety
+backend           ≠ semantic truth
+```
+
+And the containment laws every gateway judgment enforces:
+
+```
+EffectiveAuthority ⊆ PermittedAuthority
+Authority(child)   ⊆ Authority(parent)
+Strength(Claim)    ≤ Strength(Evidence)
+```
+
+No ambient credentials. No ambient memory. No silent permissive
+lowering. No best-effort presented as hard enforcement.
+
+## Errors (the `NIKA-PORT` namespace · new in this chapter)
+
+| Code | Category | Meaning |
+|---|---|---|
+| `NIKA-PORT-001` | `validation_error` | a gateway artifact (bundle · capabilities report · lowering report · fidelity report · authority delta) is malformed or violates its laws (an unknown promoted · a permissive_unsafe row without refusal · a disclosure set violating the ⊆ chain · a child authority exceeding its parent) |
+| `NIKA-PORT-002` | `security_error` | a lowering is `permissive_unsafe` — the backend would allow what the policy forbids; the run is refused with the divergence witness |
+
+## What v1 deliberately does not do
+
+- **No backend is named.** Reference adapters live in engine/ecosystem
+  space, pinned by digest at build; the spec never depends on one.
+- **No runtime adapter mechanics.** This chapter is the CONTRACT layer;
+  sandbox lifecycle, event ingestion, and live adapters are engine
+  work gated on their own waves.
+- **No delegation mechanics.** The five notions are vocabulary here;
+  contracts and budgets land with workflow composition.
+- **No attestation.** `attestations` and `observe()` are reserved (the
+  proof wave) — a log is not an attestation, and this chapter refuses
+  to pretend otherwise.
+
+## Related
+
+- [10 · Authority](./10-authority.md) — the boundary this chapter
+  compiles and lowers
+- [11 · Decision](./11-decision.md) — the receipt discipline the
+  lowering/fidelity reports follow
+- [09 · Types](./09-types.md) — the callable contracts a bundle ships
+- [06 · Stdlib contract](./06-stdlib-contract.md) — the tool surface
+  the disclosure sets order
+
+<!-- ═══ spec/13-outcomes.md ═══ -->
+
+# 13 · Outcomes
+
+> Every task settles in exactly one of **four terminal classes** —
+> that much has been law since the graph chapter. What was missing is
+> the **why**: a timeout, an exhausted retry budget, a recovered
+> failure and a plain success all looked alike one level down. The
+> Outcome IR names the second axis: `Outcome = TerminalClass × Cause ×
+> Payload` — **gates stay simple on the CLASS, precision lives on the
+> CAUSE, and no ad-hoc flag ever grows again**.
+>
+> One table is normative, machine-readable in `canon.yaml`
+> (`outcome_transitions`), and consumed by the runtime, the trace, and
+> the assertion layer — the SAME table, parity-tested, never three
+> private copies.
+
+---
+
+## The Outcome IR (normative)
+
+```
+Outcome = (class, cause, payload)
+```
+
+- **`class`** — the four terminal classes, unchanged from
+  [03](./03-dag.md): `success · failure · skipped · cancelled`.
+  **Every edge predicate and gate reads the class alone** (the W2
+  pass-sets are untouched — this chapter adds no admission power).
+- **`cause`** — the closed second axis (below). A cause never
+  influences an edge: two tasks settling `failure(timeout)` and
+  `failure(retry_exhausted)` open exactly the same edges.
+- **`payload`** — what the record carries, by class (below).
+
+## The transition table (normative · the ONE source is `canon.yaml`)
+
+| class | legal causes | meaning |
+|---|---|---|
+| `success` | `normal` | the verb completed |
+| `success` | `recovered` | the task failed, its `on_error: recover` chain settled it — the record keeps `recovered_from` (the original error) |
+| `failure` | `verb_error` | the verb refused/errored and no retry remained (attempts = 1 when no `retry:`) |
+| `failure` | `timeout` | the task's `timeout:` budget elapsed ([03](./03-dag.md) · `NIKA-TIMEOUT-001`) |
+| `failure` | `retry_exhausted` | every attempt failed and the policy admitted no more |
+| `skipped` | `gate` | the `when:` gate (or the default gate's decision) evaluated false — a decision, not a defect; `.error` reads defined-`null` |
+| `skipped` | `error_skip` | `on_error: skip` fired — the PRESERVED error rides `.error` ([03 §fields](./03-dag.md)) |
+| `cancelled` | `upstream` | the default gate became unsatisfiable (an upstream failure/cancellation propagated) |
+| `cancelled` | `operator` | the run was cancelled from outside (user signal · `NIKA-CANCEL-001`) |
+| `cancelled` | `budget` | the run crossed `--max-cost-usd`: this task was UNSTARTED when the cap hit (in-flight work completes and is counted · [05](./05-errors.md) `NIKA-RUN-1704`) |
+
+**Any (class, cause) pair outside this table is an engine bug, never a
+state** — the reference evaluator refuses it, the engine's own table
+is parity-tested against the canon's, and the trace validator (the
+proof wave) will refuse a trace that carries one.
+
+## Payload (normative · by class)
+
+| class | payload |
+|---|---|
+| `success` | `value` · `attempts` · `recovered_from?` (the original error when cause = `recovered`) |
+| `failure` | `error` (code · message · transient) · `attempts` |
+| `skipped` | `error?` (present iff cause = `error_skip` — the preserved error; defined-`null` under `gate`) |
+| `cancelled` | `reason` (the cause, spelled) |
+
+`attempts` counts every attempt including the settling one. No other
+field exists — a new fact about a settle is a new CAUSE row (one
+table), never a boolean beside the record.
+
+## `trace_format: 2` (normative)
+
+The cause axis changes what a trace line MEANS: a format-1 consumer
+ignoring an additive `cause` field would read `failure(timeout)` and
+`failure(retry_exhausted)` as the same old failure — semantic
+incompatibility under readable JSON, the
+[`graph_format: 2` precedent](./03-dag.md). So the trace format bumps:
+
+- format-2 lines carry `outcome: {class, cause}` (+ the payload per
+  class) on every terminal task event;
+- format-1 stays what it was — a photograph of the pre-W5 world;
+  engines do not emit it past this chapter;
+- machine formats version independently — **the language stays
+  `nika: v1`**, forever.
+
+## One obvious way (normative for linters)
+
+- Branching on *why* something failed reads the record's `cause`
+  (`${{ tasks.x.cause }}` is a terminal-observation field, same
+  pass-set as `.status` · [03 §fields](./03-dag.md)) — never a string
+  match on an error message.
+- A gate that only needs *whether* reads `.status` / the `after:`
+  predicates, as always — the class is the boundary, the cause is the
+  detail.
+
+## What v1 deliberately does not do
+
+- **No new gate predicates.** `after:` keeps its four (success ·
+  failure · skipped · terminal) — cause-level admission would couple
+  scheduling to diagnostics (the separation this chapter exists to
+  protect).
+- **No cause taxonomy growth without a wave.** The set is closed; a
+  new cause is a spec amendment with its transition row, its payload
+  law, and its parity fixture.
+- **No resource algebra, no `stop:` sugar, no remote-agent lifecycle.**
+  Owned by their own windows (the receipt names them); this chapter is
+  the outcome NOYAU the rest consumes.
+
+## Related
+
+- [03 · DAG](./03-dag.md) — the four classes · the pass-sets this
+  chapter leaves untouched
+- [05 · Errors](./05-errors.md) — the error registry the failure
+  payload carries
+- [11 · Decision](./11-decision.md) — the receipt discipline
+  (determination provenance) the outcome record follows
+
+<!-- ═══ spec/14-composition.md ═══ -->
+
+# 14 · Composition
+
+> A workflow can call another workflow — as a **typed, bounded,
+> authority-contained** step, not as a shell-out. The form is a tagged
+> union on the verb you already know: `invoke:` carries **exactly one**
+> of `tool:` or `workflow:`. No fifth verb, no magic `nika:workflow`
+> builtin, no path-shaped `target:` string — the field IS the
+> semantics, the same command/shell law generalized.
+>
+> **A word of discipline.** Everything below is the CONTRACT. An engine
+> may say a composition is *specified* the moment it parses and checks;
+> it may only say *proven* once it has demonstrated, together, on real
+> child execution: static resolution · typed I/O · effect containment ·
+> inherited budgets · cycle detection · the trace forest · nested
+> receipts · semantic resume · and reference-model parity. Until that
+> whole receipt exists, « proven » is not a word this contract lets an
+> implementation use.
+
+---
+
+## The form (normative)
+
+```yaml
+tasks:
+  audit:
+    invoke:
+      workflow: "./audits/site-audit.nika.yaml"   # a STATIC path …
+      args:                                        # … or registry:owner/name@version (pinned)
+        url: "${{ inputs.target }}"
+    returns: AuditReport      # the child's typed outputs — composed, not re-declared
+```
+
+- `invoke:` is a **tagged union** — exactly one of `tool:` | `workflow:`,
+  plus `args:`. Both present, or neither, is a validation error
+  (`NIKA-PARSE` · the same shape as two verbs on one task).
+- `workflow:` is a **static target**: a filesystem path OR a pinned
+  `registry:owner/name@version`. A `${{ }}`-templated target is refused
+  at check — a call graph you cannot draw before the run is a call
+  graph you cannot bound (`NIKA-COMP-001`).
+
+## The CallableContract (normative · G20)
+
+Everything invocable — a builtin, an MCP tool, a local child, a
+registry child, a pure decision, a structured human interaction — has
+ONE shape:
+
+```
+Callable<I, O, E, ε, ρ, δ>
+   I  inputs (typed)      O  outputs (typed)     E  error surface
+   ε  effects             ρ  resources           δ  the guarantee levels
+```
+
+A child's contract is **DERIVED from its body, never annotated**: its
+`I`/`O` are the child's `inputs:`/`outputs:` ([09](./09-types.md)), its
+`ε` the inferred effect boundary ([10](./10-authority.md)), its `ρ` the
+symbolic certificate ([05](./05-errors.md)), its `E` the codes its body
+can raise. The parent's checker consumes the contract; the parent never
+restates it. One catalog serves every surface (checker · runtime ·
+agent · LSP · MCP · registry · lockfile) — the partial-view drift of
+today's separate invoke/agent/LSP tables ends here.
+
+## The ten laws (normative · G22 · constitution §10.3)
+
+A composition is well-formed iff **all ten** hold:
+
+1. **Static target** — the callee is resolvable before the run (path or
+   pinned registry ref · never templated).
+2. **Typed call** — the parent's `args:` fit the child's `inputs:` and
+   the child's `outputs:` fit the parent's `returns:` (the assignable
+   relation of [09](./09-types.md) · one type core, composed).
+3. **Zero implicit authority** — `Authority(child) ⊆ Authority(parent)
+   ∩ declared`. A child never gains a capability the parent lacks, and
+   never more than the call-site declares. Import-side, this is the
+   containment law of [12](./12-gateway.md).
+4. **Effect containment** — the child's effect boundary is a subset of
+   the parent's; a child effect outside it is `NIKA-COMP-002` at check,
+   `NIKA-SEC-004` at run.
+5. **Resources summed** — the child's symbolic certificate composes into
+   the parent's (`Bound(parent) ⊇ Bound(parent-own) + Bound(child)` —
+   two `Bound`s sum to a `Bound`, the algebra closes).
+6. **Inherited deadlines/budgets** — the child runs under `min(parent
+   remaining, child declared)` for time and cost; a child cannot outlive
+   or outspend its caller.
+7. **Acyclic call graph** — the static call graph is acyclic; a literal
+   self-launch or a static cycle is refused at check (`NIKA-COMP-003`).
+   The runtime depth cap (`NIKA-SEC-003`) is **defense in depth**, not
+   the primary guard — a templated target that could recurse is
+   bounded there, fail-closed.
+8. **Trace forest** — the child keeps its OWN hash-chain; the parent's
+   trace records the child's `{semantic_hash, plan_id, trace_id,
+   chain_head, outcome}` (the [13](./13-outcomes.md) Outcome, composed)
+   — a forest of chains, never one flattened stream.
+9. **Composed receipts** — nested receipts compose by Merkle: the
+   parent's receipt commits to the child's receipt digest, so a proof
+   of the whole contains a proof of each part.
+10. **Semantic cache identity** — a child result is cached by the
+    child's **semantic identity** (its canonical Semantic IR · W6),
+    never by its path or the call site — two call sites that resolve to
+    the same semantic child share the cache; the same path resolving to
+    two different bodies does not.
+
+## Agent capability closure (normative · G25)
+
+An `agent:` task's reachable surface has TWO public fields, kept
+separate: `tools:` and `workflows:`. Internally they are one tagged
+`CapabilitySet`; a glob resolves to an EXACT set in the lockfile
+(hashed and shown). An agent can never reach a path-shaped or dynamic
+target — the closure is static, the same law as the top-level form.
+
+## Errors (the `NIKA-COMP` namespace · new in this chapter)
+
+| Code | Category | Meaning |
+|---|---|---|
+| `NIKA-COMP-001` | `validation_error` | a `workflow:` target is not statically resolvable (templated · malformed · unpinned registry ref) |
+| `NIKA-COMP-002` | `security_error` | the child's effect boundary exceeds the parent ∩ declared (law 3/4) |
+| `NIKA-COMP-003` | `validation_error` | the static call graph is not acyclic (self-launch · cycle · law 7) |
+| `NIKA-COMP-004` | `validation_error` | the typed call does not compose (args ⋢ inputs, or outputs ⋢ returns · law 2) |
+
+`NIKA-SEC-003` (run-recursion depth) stays the runtime backstop for the
+templated-target case.
+
+## `nika:run` and the sibling-run workaround (normative note)
+
+The composition floor of today — `exec: nika run sub.yaml --output json`
++ `capture: stdout` ([08](./08-out-of-scope.md)) — is **superseded, not
+contradicted**: the native `invoke: workflow:` form gives the same
+sibling run its typed contract, its effect containment, and its trace
+forest, none of which survive a process boundary. The workaround stays
+valid; the native form is what a linter recommends.
+
+## What v1 deliberately does not do
+
+- **No dynamic dispatch.** A target is static — no computed workflow
+  names, ever (the acyclicity and the cost story both depend on it).
+- **No cross-workflow orchestration language.** Nika composes typed
+  calls; a pipeline-of-workflows scheduler is a different problem
+  ([08](./08-out-of-scope.md) · Temporal/Airflow class · out forever).
+- **No session callables yet.** `Callable` reserves `Session`
+  (protocol-shaped) beside today's `Unary`; the v1 form is unary.
+- **No rewrite/e-graph equivalence.** Semantic-equivalence rewriting of
+  compositions is LAB (never auto · benchmark before any core
+  dependency).
+
+## Related
+
+- [09 · Types](./09-types.md) — the typed call (law 2)
+- [10 · Authority](./10-authority.md) — effect containment (laws 3/4)
+- [12 · Gateway](./12-gateway.md) — the import-side containment this
+  generalizes
+- [13 · Outcomes](./13-outcomes.md) — the child Outcome the trace forest
+  records
+
+<!-- ═══ spec/15-proof.md ═══ -->
+
+# 15 · Proof
+
+> Everything before this chapter made a workflow *checkable*. This
+> chapter makes a run *provable and portable*: a **canonical semantic
+> identity** (the hash of what the workflow MEANS, not how it is
+> spelled), a **single lock** that pins every dependency by digest,
+> **assertions** the author writes and the engine judges at an honest
+> level, and **one receipt** into which the certificate, the trace
+> verdict, the assertions, and the lock digest all fold — so the
+> Decision Receipt (11) and the registry certificate become
+> *instances* of one shape, never three.
+>
+> This is the last pre-1.0 chapter. It closes the loop the language
+> opened: `nika: v1` in, a signed honest proof out.
+
+---
+
+## The semantic hash (normative · G13)
+
+A workflow's identity is the hash of its **desugared, versioned
+Semantic IR** — never the source YAML text, never a reordered map:
+
+```
+H_semantic = H( domain ‖ format_version ‖ JCS(SemanticIR) )
+```
+
+- **The Semantic IR** is the source after: parsing finished · sugar
+  lowered · normative defaults expanded · types normalized (chapter 09
+  canonical forms) · graphs made explicit (the derived edges of 03) ·
+  references resolved · units normalized (durations → ns, sizes →
+  bytes) · Unicode NFC · keys sorted · spans and comments removed. Two
+  files that MEAN the same workflow lower to the **same** IR; two files
+  that mean different workflows do not.
+- **JCS** is RFC 8785 (JSON Canonicalization Scheme) — the one byte
+  encoding. It fixes number handling explicitly (JCS alone serializes
+  numbers as ES6 doubles, which would collapse distinct integers; the
+  IR carries integers as strings where that matters, the chapter-09
+  and chapter-05 precedent).
+- **Domain separation is strict.** Every hash names its domain so a
+  value can never be reinterpreted across roles:
+  `source · canonical · semantic · plan · trace · artifact · receipt`.
+  A trace-domain hash never collides usefully with a semantic-domain
+  hash even over identical bytes.
+- **Merkle by task** — each task's semantic subtree hashes
+  independently (seed: the ResumeKey's JCS+blake3 definition hash,
+  generalized); the workflow hash commits to the task hashes, and a
+  composed child (14) folds in as a subtree. A proof of the whole
+  contains a proof of each part.
+- **`canonical()` is idempotent**: `canonical(canonical(x)) ==
+  canonical(x)` — property-pinned.
+- **The correct property** (never overstated): semantically-different
+  programs produce different canonical encodings. Collision resistance
+  of the underlying hash is a **cryptographic assumption**, stated as
+  such — not a promise this spec makes.
+
+Cache and resume are **re-keyed semantically**: a result is reused iff
+the semantic identity matches — the same law the composition cache
+(14 §law 10) was waiting on.
+
+## `nika.lock` · *the single lock (normative · F7)*
+
+One lockfile pins everything a run resolves, by **digest**:
+
+```yaml
+# nika.lock · generated · never hand-edited
+lock_format: 1
+providers:                      # every model pinned by content digest
+  "anthropic/claude-…": { digest: "blake3:…" }
+tools:                          # builtin + MCP surface versions
+registry:                       # every registry: ref pinned owner/name@version + digest
+policy:                         # the resolved policy decisions (10)
+```
+
+- **Pin by default**: a run resolves ONLY what the lock pins; an
+  unpinned dependency is a refusal (`NIKA-LOCK-001`). Nothing floats.
+- The lock is generated (`nika lock`), never authored — hand-editing a
+  digest is a lie the check catches (the lock's own hash covers it).
+- It unifies the prior manifest lock + the pin-by-default rule into one
+  file — the local boundary of the same supply chain the gateway (12)
+  and the distribution work extend.
+
+## `assert:` · *the author's obligations (normative)*
+
+A task or workflow declares assertions the engine judges — distinct
+from `nika:assert` (the single-condition fail-fast builtin): `assert:`
+is a **closed vocabulary of properties**, each judged at an honest
+level:
+
+```yaml
+assert:
+  - no_secret_egress                       # no secret reaches an unsanctioned sink (10)
+  - eventually: { task: deploy, state: success }
+  - before: { first: gate, second: deploy }
+  - bounded: { task: crawl, max_iterations: 100 }
+  - resource: { cost_usd: { max: 5.00 } }
+```
+
+| Property | What it claims |
+|---|---|
+| `no_secret_egress` | the flow laws of [10](./10-authority.md) hold across the whole run |
+| `eventually{task,state}` | the named task reaches the named terminal state (the Outcome of [13](./13-outcomes.md)) |
+| `before{first,second}` | an ordering law on the derived graph (03) |
+| `bounded{task,max_iterations}` | a `for_each`/agent loop stays under its cap |
+| `resource{cost_usd:{max}}` | the symbolic certificate's cost bound (05) holds |
+
+**The three levels (claim ≤ evidence · normative)**:
+
+- **`StaticProof`** — decidable at `nika check` on the graph/IR (an
+  ordering law, a static bound). The strongest, and only claimable when
+  the check genuinely decides it.
+- **`TraceVerified`** — decided by `nika trace verify` against a
+  completed run's trace (13 · the Outcome IR). What only the trace can
+  see is judged there, never optimistically promoted to `StaticProof`.
+- **`Unknown`** — honestly unresolved (a property no static check and
+  no available trace settles). Never dressed up.
+
+`nika trace verify` learns to judge assertions: it reports each
+assertion with its achieved level, and a `StaticProof` claim that the
+IR cannot actually decide is itself a refusal (`NIKA-ASSERT-001` — an
+assertion mis-leveled). Bounded/statistical assertions stay LAB
+(calibrated research · never presented as a guarantee).
+
+## `receipt_format: 1` · *the one receipt (normative)*
+
+A run's receipt folds four things into one shape:
+
+```
+receipt = (
+  certificate     # the check certificate (05 · attempts · effects · cost bound)
+  trace_verdict   # the trace-verify result (13 Outcome + chain integrity)
+  assertions      # each assert: judged with its level
+  lock_digest     # the nika.lock digest this run resolved under
+)
+```
+
+- The [Decision Receipt](./11-decision.md) and the registry certificate
+  become **instances** of this shape — one voice, three surfaces.
+- Receipts come in a PUBLIC and a PRIVATE form linked by digests (the
+  [11 §receipt](./11-decision.md) discipline): a proof can be shown
+  without exposing sensitive evidence.
+- The receipt is domain-separated (`receipt` domain) and Merkle-linked
+  to the semantic hash it proves: given a receipt you can verify it
+  proves *this* workflow and no other.
+
+## Distribution (normative note · the local boundary · G35)
+
+A distributable pack ships as an OCI content-addressed artifact with
+Sigstore signatures, in-toto/SLSA attestations, an SBOM, an admission
+policy, and transparency — one voice with the gateway's backend
+attestations ([12](./12-gateway.md)). **`nika.lock` and the local
+receipt are the LOCAL ends of that same chain**; the OCI/signature
+machinery is the distribution window's own work. Signing proves origin,
+never safety ([12](./12-gateway.md) separation laws).
+
+## Errors (the `NIKA-LOCK` / `NIKA-ASSERT` namespaces · new here)
+
+| Code | Category | Meaning |
+|---|---|---|
+| `NIKA-LOCK-001` | `validation_error` | a dependency resolved that the lock does not pin, or a hand-edited lock digest does not match (pin-by-default · the lock's own hash catches the edit) |
+| `NIKA-ASSERT-001` | `validation_error` | an `assert:` claims a level the evidence does not support (a `StaticProof` the IR cannot decide · a mis-leveled obligation) |
+
+## One obvious way (normative for linters)
+
+- A cache/resume key is the semantic hash — never the file path, never
+  the source bytes (14 §law 10, generalized here).
+- A dependency is pinned in `nika.lock` — a floating version in a
+  workflow is a refusal, not a warning.
+- An assertion states the level it earns — `StaticProof` is a claim
+  the check must be able to keep.
+
+## What v1 deliberately does not do
+
+- **No OCI/signature machinery in the language.** Distribution is a
+  dedicated window; the spec pins the local boundary (lock + receipt).
+- **No statistical/bounded assertion levels shipped.** They stay LAB —
+  a calibrated confidence is never a proof.
+- **No hand-authored lock.** The lock is generated; editing it is a
+  refusal.
+
+## Related
+
+- [05 · Errors](./05-errors.md) — the certificate the receipt folds in
+- [10 · Authority](./10-authority.md) — `no_secret_egress` · the pin chain
+- [11 · Decision](./11-decision.md) — the Decision Receipt, now an instance
+- [13 · Outcomes](./13-outcomes.md) — the Outcome `nika trace verify` reads
+- [14 · Composition](./14-composition.md) — the semantic cache this hash unblocks
+
+<!-- ═══ spec/16-projections.md ═══ -->
+
+# 16 · Projections
+
+> The first fifteen chapters define what a workflow *is* and what a run
+> *proves*. This chapter defines what a tool *sees*: the **oracle
+> surface** — the single, versioned, read-only projection of a workflow
+> that the CLI, the language server, and the MCP tool all serve **byte
+> for byte the same**. One truth, many lenses.
+>
+> This is the first chapter of the post-1.0, additive arc. Everything it
+> adds is a **projection over the frozen `nika: v1` IR** — never a change
+> to the language. A projection is a *view*; the thing viewed does not
+> move.
+
+---
+
+## The one projection (normative)
+
+There is **one canonical projection** of a workflow — the graph of
+[03](./03-dag.md) (`graph_format: 2`) — and every surface serves *that same
+projection*. `nika inspect --format json` (CLI), `nika/semanticDocument`
+(LSP), and the `nika_inspect` MCP tool all carry the **byte-identical**
+canonical projection; the surfaces differ only in what presentation they
+wrap around it.
+
+A **semantic document** is the LSP-side surface: the canonical projection
+*verbatim*, plus the source spans a client needs to link graph nodes back
+to text, plus — when the graph cannot be built — the one-word reason why.
+It is a **superset** of the bare projection (the CLI and MCP serve the
+projection without editor spans), and it is the **growth point** of the
+oracle: holes, actions, and capabilities land here (§the additive arc),
+which is why it carries its own version.
+
+```
+semantic_document = (
+  semantic_document_format   # the surface's OWN version (this chapter)
+  graph?                     # the canonical projection (03 · graph_format: 2) · absent when unbuildable
+  reason?                    # WHY graph is absent · one word · closed vocabulary · omitted when graph is present
+  spans                      # task id → the range of its declaring `id` token
+)
+```
+
+- **`semantic_document_format: 1`** — the surface names its **own**
+  version, independent of the nested `graph.graph_format`. Until now the
+  document versioned itself *implicitly* through `graph.graph_format: 2`;
+  a projection that will grow additive fields (holes · actions ·
+  capabilities · §the additive arc) needs a version of its own so a
+  consumer can reason about the *surface* without unwrapping the graph.
+- **`graph`** is the canonical projection of [03](./03-dag.md) *verbatim*
+  (`graph_format: 2` · the derived edges · the reference identity). The
+  semantic document never re-derives it — it carries it.
+- **`spans`** map each task id to the LSP range of its declaring `id`
+  token, so a canvas or a lens links a node back to source without
+  re-scanning YAML.
+
+## `reason` · *why the graph is absent (normative · closed)*
+
+When the graph cannot be projected, `graph` is null and `reason` names
+why in **one word**, from a closed vocabulary — never a sentence, never a
+duplicate of a diagnostic (the details live in the diagnostics lane, [05](./05-errors.md)):
+
+| `reason` | Meaning |
+|---|---|
+| `parse` | the source did not parse — there is no tree to project |
+| `findings` | the source parsed but a check finding blocks a sound graph |
+
+The set is **closed**: a new reason is an additive change that bumps
+`semantic_document_format`. `reason` is omitted entirely when `graph` is
+present (a healthy document carries no reason key) — presence is the
+signal, not a sentinel value.
+
+## The triangle law (normative)
+
+The **canonical projection** has **exactly one producer** and is served,
+byte-identical, by three surfaces:
+
+```
+nika inspect --format json     ┐  the canonical projection (graph_format: 2)
+nika/semanticDocument (LSP)     ├─ byte-identical · one projection, three lenses
+nika_inspect (MCP)              ┘  (the LSP additionally wraps editor spans)
+```
+
+- The three MUST serve the **same canonical-projection bytes** for the
+  same input — a lens that drifts is a bug, tested by parity, not by
+  convention. The LSP's semantic document carries that same projection
+  *verbatim* and adds spans (a presentation superset, not a re-derivation);
+  the CLI and MCP serve the projection without editor spans.
+- Each surface is a **typed contract**, not a JSON bag: renaming a field
+  breaks the producer's compilation (and the law tests) before it can
+  break a consumer silently.
+
+## Read discipline (normative)
+
+- **A projection always answers.** The request is a *read*, never a
+  judgment. A malformed document still returns a semantic document — with
+  a `reason` and whatever spans it could recover — never an error. Judgment
+  lives in `nika check` (05), never in the projection.
+- **Structure only.** The projection carries names, shapes, spans, and
+  derived structure — **never** a `config` value, a secret, or resolved
+  material ([10](./10-authority.md) flow laws hold here too). A projection
+  that leaked a secret would be a sink; it is not one, by construction.
+- **A projection is a view over the frozen IR.** It never mutates, never
+  re-orders, never re-interprets the workflow. Given the same source it is
+  deterministic — the same bytes, every time.
+
+## The additive arc (normative · forward-compat)
+
+This surface is the plug-board for the post-1.0 oracle work. Every future
+field is **additive under the version key**, and every future field is a
+**projection or an edit-proposal over the frozen v1 IR** — never a new
+piece of the language:
+
+- **Additive-field discipline.** A new optional field (holes · actions ·
+  capabilities) bumps `semantic_document_format` and is `skip`-omitted when
+  empty. A consumer that ignores an additive field still reads the whole
+  older surface correctly — the same forward-compat the `graph_format: 2`
+  envelope already keeps (03). A consumer MUST ignore fields it does not
+  know, never fail on them.
+- **Capabilities are negotiated, not assumed.** A client announces which
+  extensions it understands under `experimental.nika.*`; the server offers
+  an extension only when the client asked. An un-negotiated field is never
+  sent.
+- **Projection, never grammar.** No field on this surface adds syntax a
+  workflow author writes. Holes describe *where a workflow is incomplete*;
+  actions describe *an edit a tool could apply*; both are computed **from**
+  the v1 IR and validated **against** it. The language stays frozen (the
+  1.0 contract) while the oracle around it grows.
+
+## What v1 deliberately does not do (yet)
+
+The following are **named** here so the surface reserves room for them,
+and **specified in their own later windows** — not shipped by this chapter:
+
+- **`holes`** — typed descriptions of where a workflow is incomplete (a
+  missing `prompt:`, an unfilled output), each anchored to a span,
+  including spans for **absent** fields. (`nika/holes` · `nika/fillHole`.)
+- **`actions`** — `SemanticAction`s: edit proposals a tool can apply,
+  each carrying its own verification (apply-in-memory → re-check → delta)
+  so an action is never offered that `nika check` would then reject.
+- **`witness`** on a finding — the computed DAG/taint path that justifies
+  it, promoted from thrown-away intermediate to payload.
+- **`pathToRunnable`** and the planner over actions — a route from an
+  incomplete document to a checkable one, searched by BFS/Dijkstra (an
+  admissible A* only once its heuristic law is written).
+
+Each stays out of the shipped surface until its window proves it. Naming
+them is a reservation, never a promise they exist.
+
+## One obvious way (normative for linters)
+
+- A tool that shows structure reads the semantic document — it does not
+  re-parse the YAML itself (one producer, one truth).
+- The version a surface reasons about is `semantic_document_format` — the
+  nested `graph.graph_format` versions the graph, not the document.
+- An unknown field on the surface is ignored, never rejected (additive
+  forward-compat).
+
+## Related
+
+- [03 · DAG](./03-dag.md) — the `graph_format: 2` projection this carries
+- [05 · Errors](./05-errors.md) — the diagnostics lane (judgment lives there, not here)
+- [10 · Authority](./10-authority.md) — the flow laws the projection also obeys (structure only)
+- [15 · Proof](./15-proof.md) — the semantic identity the projected graph commits to
+
+<!-- ═══ conformance/runner-protocol.md ═══ -->
+
+# Conformance runner protocol
+
+> How to run the Nika conformance suite against an engine, and the exact
+> contract of a fixture. The suite is the **machine-checkable definition** of
+> v0.1-compliance. SPDX-License-Identifier: Apache-2.0
+
+---
+
+## Fixture layout
+
+Each test case is a directory holding two files ·
+
+```
+conformance/tests/<level>/<group>/<NNN-name>/
+├── input.yaml       the workflow under test (carries an SPDX header)
+└── expected.json    the expected verdict
+```
+
+`<level>` ∈ `core` · `runtime` · `stdlib`. `<group>` is the spec area
+(`envelope` · `verbs-shape` · `dag-topology` · `variables` · `errors` · …).
+
+## `expected.json` contract
+
+```jsonc
+{
+  "valid": false,                        // does the workflow pass parse + validation?
+  "errors": [                            // present iff valid=false · the engine MUST emit at least one matching error
+    { "code": "NIKA-DAG-001",            //   match by exact code when given …
+      "category": "validation_error" }   //   … OR by namespace + category when only those are given
+  ],
+  "note": "human-readable rationale"     // optional · documentation only · not asserted
+}
+```
+
+(A `mode:` field appeared in early fixtures · it is **reserved, never
+asserted** by the reference runner — strict mode is the test default.)
+
+### The emitted wire shape
+
+A conformant validator emits ·
+
+```json
+{ "valid": false,
+  "errors": [
+    { "namespace": "NIKA-VAR", "category": "validation_error", "detail": "…" },
+    { "code": "NIKA-BUILTIN-DONE-001", "namespace": "NIKA-BUILTIN",
+      "category": "validation_error", "detail": "…" }
+  ] }
+```
+
+Each error carries `namespace` + `category` (+ `code` when an exact
+registered code applies) + a prescriptive `detail` (repair loops converge
+on it).
+
+### Matching rule (an expected entry vs the emitted set)
+
+An expected entry **matches** when ANY of ·
+- it has a `code` and an emitted error's `code` equals it;
+- it has a `namespace` and EITHER an emitted `code` starts with
+  `<namespace>-` OR an emitted `namespace` equals it (most static-layer
+  errors carry `namespace` without an exact `code` — `category` is
+  **advisory** on this path · asserted only via the category-only form
+  below);
+- it has ONLY a `category` and an emitted error's `category` equals it.
+
+## Suite layout · the tiers the reference runner executes
+
+```
+conformance/tests/core/      schema shape · DAG cross-refs · variables · errors
+conformance/tests/deep/      the deep-static layer · CEL EBNF parse · jq compile ·
+                             durations · schema-meta · when-form · binding purity ·
+                             builtin arg shapes (jq expression · wait XOR · write
+                             content · done placement)
+conformance/tests/stdlib/    stdlib static surface · provider prefixes · extract
+                             modes · builtin names (canon.yaml-derived)
+```
+
+(`tests/runtime/` carries the behavioral CONTRACT today — fixture shape ·
+run.json invocation · expected-run.json assertions · determinism rules ·
+see [tests/runtime/README.md](tests/runtime/README.md) — the fixtures
+execute when the reference engine's vertical slice lands ·
+[07](../spec/07-conformance.md#suite-status--v01-honest). They use
+`input.nika.yaml`, NOT `input.yaml`, so the static `all` gate ignores
+them by construction.)
+
+`conformance/tests/lints/` is the **linter-conformance corpus** (the
+03-dag one-obvious-way table is « normative for linters ») · per case
+`input.yaml` + `expected-lints.json` (`{"lints": [{"rule", "task"}]}` ·
+exact ordered equality · fires/silent pairs pin the precision
+contract). Engines with a linter walk it (the reference engine's
+`lints_one_obvious_way` suite); the Python oracle ships no linter, so
+the static `all` gate does not run this tier.
+
+Runner subcommands · `validate <file>` (one verdict JSON) · `run <dir>`
+(one tier) · `examples <dir>` (every example must validate) · **`all`**
+(the CI gate · core + stdlib + deep + examples + showcase + templates ·
+exit non-zero on any failure).
+
+## Pass criteria (per fixture)
+
+1. Parse + statically validate `input.yaml`.
+2. If `expected.valid == true` · the engine MUST accept (zero errors).
+3. If `expected.valid == false` · the engine MUST reject, and **EVERY
+   entry** in `expected.errors` MUST match the emitted set (per the
+   matching rule above) — a fixture listing two expected errors asserts
+   both.
+4. Stdlib BEHAVIORAL fixtures (post-announce) additionally compare
+   execution output (a future `output.json` companion · the `mock`
+   provider for determinism).
+
+The engine MUST exit non-zero if any fixture in the claimed level fails.
+
+## The stdlib STATIC-surface layer (`tests/stdlib/`)
+
+Stdlib v0.1 fixtures split the level in two halves ·
+
+- **static surface** (populated · runner-executable today) — the names + shapes
+  half · a literal `model:` must be `<provider>/<name>` with a canonical
+  provider prefix (→ `NIKA-PROVIDER`) · `nika:*` tools come from the closed
+  canonical builtin set (schema enum) · a literal `nika:fetch` `mode:` must be
+  a canonical extract mode and a `jq:` argument requires `mode: jq`
+  (→ `NIKA-BUILTIN`). The canonical lists derive from [`canon.yaml`](../canon.yaml) ·
+  dynamic `${{ }}` values are skipped (runtime's job).
+- **behavioral** (post-announce · lands with the reference engine) — execution
+  semantics under the `mock` provider + HTTP mocks · a future `output.json`
+  companion per fixture.
+
+These fixtures bind **Stdlib-level claims only** — a Core-only engine does not
+run them (a Core engine has no provider/builtin knowledge by design).
+
+## Two static layers in `core`
+
+Core fixtures split by *what catches the violation* — useful for engine
+authors and tooling ·
+
+- **schema-checkable** — caught by the JSON Schema alone
+  (`schemas/workflow.schema.json` · e.g. `nika` const · id patterns ·
+  exactly-one-verb · `additionalProperties` · `timeout` pattern). A YAML+JSON-Schema
+  validator passes these with zero engine code.
+- **engine-parse** — *cross-reference* rules the schema structurally cannot
+  express, requiring the engine's DAG/variable resolver ·
+  - cycle detection, including self-dependency (`NIKA-DAG-001`)
+  - an unresolved `with:`/`after:` edge target (`NIKA-DAG-002`)
+  - a `tasks.*` reference outside the boundary — `when:` · `for_each:` · any
+    verb body · a non-parent `on_finally` read (`NIKA-VAR-021` · per
+    [04-variables.md](../spec/04-variables.md) §the reference boundary ·
+    the fix is machine-applicable: hoist into `with:`)
+  - a dead `depends_on:` (`NIKA-PARSE-024`) · an unknown `after:` predicate
+    (`NIKA-DAG-005`)
+  - an unresolved `${{ }}` reference (`NIKA-VAR-001` · per
+    [04-variables.md](../spec/04-variables.md) §Resolution order) · a
+    non-existent task · an undeclared `vars.` / `with.` / `env.` / `secrets.`
+    entry · an undefined namespace (`${{ foo.bar }}`) · a loop-local
+    (`item` / `index`) outside a `for_each` task
+  - an unclosed `${{` delimiter (`NIKA-VAR` · `validation_error` · the
+    substitution surface belongs to 04-variables.md · `\${{` escapes)
+  - a duplicate task id (`NIKA-PARSE` · `validation_error` · per
+    [03-dag.md](../spec/03-dag.md) ids are unique within the workflow)
+
+A minimal Core engine MAY reuse the published JSON Schema for the first layer
+and add the cross-reference checks for the second.
+
+## Running (planned CLI)
+
+```bash
+nika conformance run conformance/tests/core      # one level
+nika conformance run conformance/tests           # all levels
+# any engine · same fixtures
+<engine> conformance run conformance/tests/core
+```
+
+Output (planned) ·
+
+```
+PASS  core/envelope/001-valid-minimal
+PASS  core/dag-topology/003-when-reference-without-depends-on (NIKA-DAG-003)
+FAIL  core/dag-topology/001-cycle (expected NIKA-DAG-001, got NIKA-PARSE-007)
+...
+Summary · 13/14 passed · 1 failed
+```
+
+## Adoption
+
+Non-SuperNovae engines (Python · Go · TS) run this same suite to validate
+conformance · open a PR on `supernovae-st/nika-spec` to be listed in
+`CONFORMANT_IMPLEMENTATIONS.md`.
+
+---
+
+🦋 *The suite is the contract · machine-checkable forever.*
+
+<!-- ═══ CONFORMANT_IMPLEMENTATIONS.md ═══ -->
+
+# Conformant implementations
+
+> Registry of engines that pass the [conformance suite](conformance/runner-protocol.md).
+> A row is added (or upgraded) only with a verifiable run of the suite at a
+> pinned spec commit · per [spec/07-conformance.md](spec/07-conformance.md)
+> §Claiming conformance. The claim string is « **Nika v1 Conformant —
+> <Level> (spec <commit>)** » · one form everywhere.
+> SPDX-License-Identifier: Apache-2.0
+
+| Implementation | Language | Core | Runtime | Stdlib | Spec commit | Verified |
+|---|---|---|---|---|---|---|
+| [nika](https://github.com/supernovae-st/nika) (reference engine) | Rust | ✅ 57/57 core fixtures (`cargo test -p nika-schema --test conformance_core` · the 2026-06-11 hardening gaps closed in [nika#121](https://github.com/supernovae-st/nika/pull/121)) | — (no runtime crates yet) | — | `6c18927` lineage | 2026-06-11 |
+
+## How to be listed
+
+1. Run the suite against your engine ·
+   `<engine> conformance run conformance/tests/<level>` (or validate each
+   fixture per the [runner protocol](conformance/runner-protocol.md)).
+2. Open a PR on [supernovae-st/nika-spec](https://github.com/supernovae-st/nika-spec)
+   adding a row · include the spec commit you ran against and a reproducible
+   command or CI link.
+3. Levels are claimed independently · `Core` alone is a valid claim.
+
+---
+
+🦋 *The suite is the contract · machine-checkable forever.*
+
+<!-- ═══ governance/nep-0000-the-nep-process.md ═══ -->
+
+# NEP-0000 · The NEP Process
+
+- **NEP**: 0000
+- **Title**: The NEP Process
+- **Author**: SuperNovae Studio maintainers
+- **Status**: Active (process NEP · never Final)
+- **Type**: Process
+- **Created**: 2026-07-18
+
+## Abstract
+
+A NEP (Nika Enhancement Proposal) is the public, numbered document through
+which every evolution of the Nika standard is proposed, discussed and
+decided. Nobody amends the standard directly, the maintainers included.
+This document defines the process itself: the lifecycle, the template, who
+decides, and how the process evolves.
+
+The lineage is deliberate: [PEP 1](https://peps.python.org/pep-0001/)
+governs Python this way, the
+[KEP process](https://github.com/kubernetes/enhancements/blob/master/keps/sig-architecture/0000-kep-process/README.md)
+governs Kubernetes (itself taken from Rust's RFCs, themselves shaped by
+PEPs), and the [TC39 stages](https://tc39.es/process-document/) govern
+JavaScript. A standard earns trust when its evolution has one public door.
+
+## Motivation
+
+Three effects, proven by the processes above:
+
+1. **Credible neutrality.** A third-party vendor proposes an evolution
+   through the same door the maintainers use. That is the condition for
+   rival runtimes to adopt the spec at all.
+2. **Fork resistance.** Fragmentation, relicensing, capture and dialects
+   share one antidote: a public evolution process nobody can confiscate.
+3. **A navigable freeze.** Post-1.0 the surface is frozen, additive only.
+   Without a proposal process, frozen means dead. With one, frozen means
+   stable and governed: the NEP is the vehicle of every legal addition.
+
+## Specification
+
+### Lifecycle
+
+```
+Draft → Discussion → Accepted | Rejected → Implemented → Final
+```
+
+- **Draft**: a PR adding `governance/nep-NNNN-<slug>.md` from the template.
+  The number is the next free integer, claimed by the PR itself.
+- **Discussion**: public, in the PR and its linked issue. There is no
+  private track.
+- **Accepted / Rejected**: decided per the Decision authority below.
+  A rejected NEP stays published with its rationale. The record of noes
+  is worth as much as the record of yeses: it prevents relitigating.
+- **Implemented**: the reference engine ships it behind a green
+  conformance suite, and the spec text is amended by the NEP's cascade.
+- **Final**: the amendment is part of the frozen surface. Process NEPs
+  (like this one) stay **Active** instead: they may be amended by a
+  successor NEP.
+
+### Types
+
+- **Standards Track**: changes the language surface, the stdlib contract,
+  the conformance suite or the trace format.
+- **Process**: changes how Nika evolves (this document is one).
+- **Informational**: records a design position without changing anything.
+
+### Decision authority
+
+Today: the SuperNovae Studio maintainers, by explicit written acceptance
+in the NEP's PR. Tomorrow: when three to five independent vendors ship
+conformant runtimes, authority transfers to a technical committee they
+seat together. That transfer is itself a Process NEP, proposed through
+this same door.
+
+### Numbering and the founding era
+
+NEP numbering runs through this door from NEP-0000 onward — a pre-1.0
+Draft claims its number the same way (NEP-0002 is the living proof).
+The pre-1.0 rulings are the founding era: their verbatim record (the
+RULINGS documents and the ADR line) remains canonical history, not
+retroactive NEPs. One retroactive exception is reserved: NEP-0001,
+"the nika: v1 language surface", a Standards Track summary of the
+constitution as frozen at 1.0, so the language has one readable front
+door.
+
+### Relationship to conformance
+
+An accepted Standards Track NEP is not Implemented until the conformance
+suite proves it. The public claim « Nika v1 Conformant — <Level>
+(spec <commit>) » (the one claim string ·
+[spec/07 §Claiming conformance](../spec/07-conformance.md#claiming-conformance))
+is earned by passing the suite, never by declaration. A NEP that cannot
+state its conformance test does not leave Discussion.
+
+The ratchet is same-PR: an Accepted Standards Track NEP lands its
+conformance fixtures in the implementing PR — the spec text amendment,
+the registered error codes, and the fixtures that prove them arrive
+together, never separately. A registered error code without a fixture
+is a spec bug. (The precedent: MCP made a conformance scenario a
+Final-gate for every SEP — SEP-2484; this door holds the same bar.)
+
+### What a NEP is not
+
+- Not a bug report: defects in the engine go to the engine tracker.
+- Not documentation: docs follow the spec, they do not amend it.
+- Not a fork of authority: a NEP the maintainers (today) or the committee
+  (tomorrow) rejected does not become a dialect. Divergent runtimes lose
+  the compatibility claim per the conformance rule.
+
+## How to propose
+
+1. Copy `governance/nep-template.md` to `governance/nep-NNNN-<slug>.md`
+   (next free number).
+2. Fill every section. "Rejected alternatives" and "Compatibility impact"
+   are mandatory: an empty alternatives section means the design was not
+   explored.
+3. Open the PR. Discussion happens there. Silence is not consent: a NEP
+   advances only by explicit acceptance.
+
+## Rejected alternatives
+
+- **GitHub issues as the process**: issues have no lifecycle, no template
+  discipline, and vanish from the reading order. A numbered file in git
+  is citable forever.
+- **RFC-style mailing list**: the studio is small and the audience is
+  developer-first. The PR is where the diff and the debate share a page.
+- **Waiting until vendors exist to define the process**: the process must
+  predate its first external user, or the first external proposal arrives
+  with no door to knock on. Foundations land before the peak.
+
+## Compatibility impact
+
+None. This NEP is additive: it creates `governance/` and binds nothing
+retroactively. The pre-1.0 gate (rulings, migrations, conformance work)
+proceeds unchanged.
+
+<!-- ═══ governance/certifications.md ═══ -->
+
+# Certifications & external-standards posture
+
+> How the Nika standard holds itself to the same bar it asks of engines.
+> « Nika v1 Conformant » is the badge WE grant (earned by the suite ·
+> [07 §Claiming](../spec/07-conformance.md#claiming-conformance)); the
+> programs below are the badges we EARN from the ecosystem's own
+> verifiers. Primary-source research receipt: 2026-07-19 (live fetches ·
+> bestpractices.dev · securityscorecards.dev · reuse.software · slsa.dev ·
+> docs.github.com). SPDX-License-Identifier: Apache-2.0
+
+## The matrix
+
+| Program | What it proves | Status | Evidence / next |
+|---|---|---|---|
+| **OpenSSF Best Practices** (passing · 67 criteria) | project hygiene, end to end | 🟡 self-assessment below · [.bestpractices.json](../.bestpractices.json) shipped · entry creation = maintainer gesture (GitHub login on bestpractices.dev) | this file §self-assessment |
+| **OpenSSF Scorecard** (20 checks) | supply-chain posture, continuously measured | 🟢 workflow shipped ([scorecard.yml](../.github/workflows/scorecard.yml)) · badge lands after the first published run | §scorecard below |
+| **REUSE 3.3** | machine-readable licensing, file-complete | ✅ `reuse lint` GREEN (the run is the live count) · [REUSE.toml](../REUSE.toml) blanket + overrides · CI job live ([reuse.yml](../.github/workflows/reuse.yml)) · reuse.software registration = optional maintainer web-form (the CI badge is the sovereign truth) | repo root |
+| **SLSA v1.2 Build** | release provenance | ⏳ engine release train · `actions/attest-build-provenance` = Build L2 on hosted runners · reusable-workflow isolation = L3 | engine-lane brief |
+| **Sigstore / cosign** | release signatures | ⏳ engine release train · keyless `cosign sign-blob --bundle <tarball>.sigstore.json` per release asset (id-token: write) | engine-lane brief |
+| **SBOM** | dependency transparency | ⏳ engine release train (cargo-auditable / cargo-cyclonedx) · N/A for this repo (no built artifacts) | engine-lane brief |
+| **IANA media type** | `application/vnd.nika+yaml` | ⏳ post-1.0 gesture · vendor tree · RFC 6838 §5.6 template · submit at iana.org/form/media-types | [01 §File naming](../spec/01-envelope.md#file-naming-normative) |
+| **SchemaStore** | editor validation everywhere | ✅ live (« Nika workflow » · `*.nika.yaml` + `*.nika.yml` matchers) | schemastore catalog |
+| **GitHub Linguist** | language recognition | ⛔ honestly gated · needs ~2000 in-the-wild files/year (forks excluded) · not claimable today | adoption trigger |
+| **tree-sitter grammar** | native editor grammars (Zed · Neovim) | ⏳ demand-gated · self-servable (publish grammar + nvim-treesitter `lua/parsers.lua` PR · quality bar, no usage threshold) | editor-demand trigger |
+| **BCP 14** | normative language | ✅ [07 §Notation](../spec/07-conformance.md#notation) | — |
+| **SemVer · Keep-a-Changelog · NEP process** | versioning + evolution discipline | ✅ VERSION · CHANGELOG.md · [governance/](./nep-0000-the-nep-process.md) | — |
+| **CITATION.cff · Code of Conduct** | citability + community posture | ✅ [CITATION.cff](../CITATION.cff) (cffconvert-valid) · [Contributor Covenant 2.1](../CODE_OF_CONDUCT.md) (CC-BY-4.0 declared in REUSE) | repo root |
+
+## OpenSSF Best Practices — passing self-assessment (2026-07-19)
+
+Against the 67 passing criteria (live list, criteria/0):
+
+- **Met by existing structure** · description/interact/license trio
+  (README · Apache-2.0 OSI · LICENSE at root) · docs pair (README + spec/)
+  · sites_https · discussion (issues/PRs) · english · maintained ·
+  repo_public/track/interim/distributed · version_unique/semver/tags
+  (VERSION + tags) · release_notes (CHANGELOG.md) · report_process/
+  tracker/archive (GitHub issues) · vulnerability_report_process
+  (SECURITY.md) · test + test_invocation + test_continuous_integration
+  (conformance suite + selftests + conformance.yml) · delivery_mitm
+  (https everywhere) · no_leaked_credentials (registry-grade R5 hygiene) ·
+  know_secure_design / know_common_errors (maintainers) ·
+  vulnerabilities_fixed_60_days (none open).
+- **Closed by this wave** · contribution + contribution_requirements +
+  test_policy + tests_are_added → [CONTRIBUTING.md](../CONTRIBUTING.md)
+  (the corpus-case-with-every-normative-change rule IS the test policy).
+- **Closed by this hardening wave (2026-07-19)** ·
+  1. `vulnerability_report_private` — GitHub private vulnerability reporting
+     is **enabled** on the repo and cited in [SECURITY.md](../SECURITY.md)
+     (GitHub Security Advisories = the preferred private channel).
+  2. `static_analysis` — **ruff** lints the Python tooling on every push/PR
+     ([conformance.yml](../.github/workflows/conformance.yml) · config
+     [ruff.toml](../ruff.toml)) and **CodeQL**
+     ([codeql.yml](../.github/workflows/codeql.yml)) adds security SAST;
+     the conformance oracle already statically analyzes every artifact this
+     repo ships.
+  3. `.bestpractices.json` — the repo-side machine self-assessment file
+     ([.bestpractices.json](../.bestpractices.json)) is **shipped** (the
+     badge app imports it once the entry exists).
+- **N/A block** · all 9 `crypto_*` (no crypto shipped) · `build*` (no
+  build step — markdown + Python scripts run in place) ·
+  `dynamic_analysis_unsafe` (no memory-unsafe language) ·
+  `release_notes_vulns` (no CVEs to date).
+
+Verdict: **passing is clearable now** — every code-closable criterion is
+Met or N/A ([.bestpractices.json](../.bestpractices.json)); the one step
+left is the maintainer creating the bestpractices.dev entry (branch
+protection is a Scorecard/silver concern, not a passing criterion).
+
+## Scorecard · the live posture (the badge is the number · never this prose)
+
+The score is LIVE · the workflow re-publishes on every main push (the badge above and the scorecard.dev viewer are the only current numbers · prose snapshots rot). Strong by construction: Token-Permissions (top-level least privilege in
+all workflows) · Dangerous-Workflow (zero risky triggers · no event data
+in shells) · Pinned-Dependencies (actions SHA-pinned as of this wave ·
+pip HASH-pinned (--require-hashes · .github/requirements.txt · uv pip compile)) · SAST (CodeQL ·
+[codeql.yml](../.github/workflows/codeql.yml)) · Dependency-Update-Tool
+(Dependabot · [dependabot.yml](../.github/dependabot.yml)) · CI-Tests ·
+License · Security-Policy · Maintained.
+
+Known deductions, tracked honestly:
+
+| Check | Why | Move |
+|---|---|---|
+| Branch-Protection | not yet enabled on `main` | maintainer gesture (require PR + `static gate` status check) · time it **after** the pre-1.0 gate's direct-push ceremonies, or enable with admin bypass — a hard require-PR rule would break the sister-lane ceremony pushes |
+| Code-Review | small-maintainer reality — self-merged PRs | NEP discussions mitigate · improves with contributors |
+| Signed-Releases / Packaging / SBOM / Fuzzing | no released artifacts from this repo | N/A-class for a spec repo (the engine train carries them) |
+| CII-Best-Practices | badge not yet registered | §Best Practices above |
+
+Badge (after first published run) ·
+`[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/supernovae-st/nika-spec/badge)](https://scorecard.dev/viewer/?uri=github.com/supernovae-st/nika-spec)`
+
+## Maintainer gestures (queued · settings-side · not automatable from here)
+
+1. **bestpractices.dev** — log in with GitHub · create the entry for
+   `supernovae-st/nika-spec` · the [.bestpractices.json](../.bestpractices.json)
+   shipped this wave pre-fills the answers.
+2. **Branch protection on `main`** — require PRs + the `static gate ·
+   core + stdlib surface + examples` check (Scorecard's Branch-Protection
+   + Code-Review both read it). Time this **after** the pre-1.0 gate's
+   direct-push ceremonies, or enable it with admin bypass — a hard
+   require-PR rule would break the sister-lane ceremony pushes.
+
+Done this wave · **private vulnerability reporting** is enabled (repo
+Settings → Security) and cited in [SECURITY.md](../SECURITY.md).
+
+## Related
+
+- [07-conformance §Claiming](../spec/07-conformance.md#claiming-conformance) — the claim we grant
+- [NEP-0000](./nep-0000-the-nep-process.md) — how the standard evolves
+- [SECURITY.md](../SECURITY.md) · [CONTRIBUTING.md](../CONTRIBUTING.md) · [REUSE.toml](../REUSE.toml)
+
+<!-- ═══ GLOSSARY.md ═══ -->
+
+# Glossary · one word, one meaning
+
+> Normative vocabulary of the Nika standard. This file exists for the
+> words that carry MORE than one sense across the estate: it pins the
+> canonical referents and the discipline for using them. Definitions of
+> ordinary constructs live in their spec chapters — this is the
+> disambiguation surface, not a second spec.
+>
+> **The discipline** · qualify an ambiguous term at first mention
+> (« MCP oracle » · « conformance oracle » · « human gate ») · bare
+> afterwards within the same document. SPDX-License-Identifier: Apache-2.0
+
+## oracle
+
+A component you QUESTION and that answers with a VERDICT, never an
+action — the established computer-science sense (test oracle · Turing's
+oracle machine · random oracle). Two public referents in the Nika estate:
+
+- **conformance oracle** — this repo's static evaluator
+  (`conformance/runner.py` + the per-domain `*_core.py`): validates any
+  workflow or fixture against the spec, engine-free.
+- **MCP oracle** (also « the engine's static oracle ») — the reference
+  engine's read-only MCP server (`nika mcp` · <!-- canon:mcp_tools -->9<!-- /canon --> tools): validates and
+  teaches, never executes.
+
+Never write a bare « the oracle » where both could be meant. (Engine
+internals use further qualified senses — SSRF range oracle · test
+oracle — those never appear unqualified in spec prose.)
+
+## gate
+
+Five senses live under this word; each keeps its qualifier:
+
+- **gate algebra / GATE-v2** — the DAG admission rule: every incoming
+  edge's producer must settle inside that edge's pass-set
+  ([03 §gate algebra](./spec/03-dag.md#the-gate-algebra-v2-normative)).
+- **human gate** — the human-in-the-loop pause: an `invoke:` of
+  `nika:prompt` ([10-authority](./spec/10-authority.md) · never a verb,
+  never an `approve:`).
+- **check gate** (engine surface) — a stage of the static-check ladder
+  (PARSE · TOOLS · PERMITS · SECRETS …) reported per finding.
+- **CI / quality gates** — repository automation (non-normative ·
+  everyday sense).
+- **gateway** — chapter [12](./spec/12-gateway.md): the backend-neutral
+  execution contracts. A gateway is not a gate.
+
+## golden
+
+- **the golden** (engine `nika test`) — the committed
+  `<file>.golden.json` a mock-provider run's typed `outputs:` are
+  compared against (pin → diff → CI).
+- **golden fixtures** (this repo) — expected-output cases the
+  conformance corpus and decision bundles ship
+  ([11 §fixtures](./spec/11-decision.md)).
+
+Other repos' « goldens » (visual-regression snapshots · parity tests)
+are their own local senses — not this contract.
+
+## binding · edge · the two doors
+
+A **binding** is a `${{ … }}` expression resolved against a typed scope.
+A `with:` binding that references `${{ tasks.X.* }}` IS a typed **data
+edge** (« the binding IS the edge » — never restate a dependency). Tasks
+connect through exactly **two doors**: `with:` (data) and `after:`
+(control) ([03](./spec/03-dag.md)). « Wires » is presentation-layer
+vocabulary for the same edges — fine on canvases, not in normative prose.
+
+## predicate (after:) vs status
+
+An `after:` entry names a **predicate** over the producer's settle —
+exactly `success` · `failure` · `skipped` · `terminal` (the R5 closed
+set). A task's **status** is the settled value — `success` · `failure` ·
+`skipped` · `cancelled`. Same nouns by design (a predicate names the
+class it admits); `terminal` exists only as a predicate, `cancelled`
+only as a status.
+
+## launch inputs (inputs · `--var`)
+
+A workflow's declared inputs are its typed `inputs:`; the caller supplies values
+at launch (`nika run <file> --var key=value` · repeatable). « Launch
+inputs » is the collective noun. Distinct from `const:` (fixed values baked
+into the file) · from `with:` (per-task bindings) and from `config:`
+(non-sensitive runtime config supplied by the deployment).
+
+## paused · human gate · nika:prompt
+
+One mechanism, three layers, three words — never interchangeable:
+**`nika:prompt`** is the TOOL (a blocking confirm under `invoke:`) ·
+the **human gate** is the CONCEPT (a task that parks the run on a
+human) · **`paused`** is the STATE (the durable pause: the trace
+records `workflow_paused`, the engine exits `4`, the answer rides
+`--resume <trace> --answer <task>=<value>`).
+
+## upstream cone · downstream cone
+
+The transitive ancestors (upstream) or descendants (downstream) of a
+task in the precedence graph — `nika run --task <id>` runs one task
+plus its upstream cone. These two are the canonical forms; « blast
+cone » · « transitive cone » · « ancestor cone » are non-canonical
+synonyms to avoid in new prose.
+
+## claim string
+
+« **Nika v1 Conformant — <Level> (spec <commit>)** » — the ONE public
+conformance claim ([07 §Claiming](./spec/07-conformance.md#claiming-conformance)).
+« v0.1-compliant » in normative sentences names the level *bar*, not
+the claim.
+
+## canonical filename
+
+`<name>.nika.yaml` ([01 §File naming](./spec/01-envelope.md#file-naming-normative)).
+`.nika.yml` is accepted-and-taught-against · bare `.nika` is reserved ·
+the reserved media type is `application/vnd.nika+yaml`.
+
+## envelope · pillar · stdlib · pack
+
+The **envelope** is the header contract (`nika: v1` + `workflow:` ·
+[01](./spec/01-envelope.md)). The **5 pillars** are the immutable core
+(envelope · verbs · DAG · variables · errors). The **stdlib** (providers
+· extract modes · builtins) versions independently. The **pack** is the
+versioned examples+templates bundle every engine embeds
+(`examples/manifest.yaml` · hash-pinned).
 
 <!-- ═══ stdlib/builtins-v0.1.md ═══ -->
 
