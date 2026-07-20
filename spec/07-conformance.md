@@ -37,7 +37,7 @@ An engine claims « Core v0.1-compliant » if it ·
 1. **Parses** any valid v0.1 workflow YAML correctly
    - Accepts exactly `nika: v1` · a `workflow:` object carrying a kebab-case `id` · rejects any other `nika:` value (a scalar `workflow:` is the dead W1 form · `NIKA-PARSE-020`)
    - Validates the `workflow` identifier kebab-case
-   - Validates typed `vars` (type + required) · validates `env` / `secrets` shape
+   - Validates typed `inputs` (type + required) · validates `config` / `const` / `secrets` shape
    - Recognizes the 4 verbs (`infer` · `exec` · `invoke` · `agent`)
    - Rejects unknown top-level fields with a clear error OR ignores with warning (engine's choice · documented behavior)
 
@@ -51,10 +51,10 @@ An engine claims « Core v0.1-compliant » if it ·
    - Computes topological waves for parallel execution
 
 3. **Resolves variable references** correctly (static · reference-resolution · NOT runtime evaluation)
-   - `${{ vars.x }}` resolves to a declared envelope `vars:` entry
+   - `${{ inputs.x }}` · `${{ const.x }}` resolve to declared envelope `inputs:` / `const:` entries
    - `${{ with.x }}` resolves to a declared task `with:` key
    - `${{ tasks.X.field }}` resolves to a declared upstream task + a valid field name
-   - `${{ env.X }}` · `${{ secrets.X }}` resolve to declared namespaces
+   - `${{ config.X }}` · `${{ secrets.X }}` resolve to declared namespaces
    - `when:` and `for_each:` expressions are valid **CEL** (the v0.1 subset · see 03-dag) and their references **resolve to known namespaces**: Core parses but does NOT *evaluate* them (no execution = no `tasks.X.status` to compare against · that is Runtime's job)
    - `output:` bindings are valid **jq** expressions (the one data language · see 04-variables) · `${{ }}` never appears inside a binding
    - Reports undefined references with `NIKA-VAR-001` · static expression violations with `NIKA-VAR-005` (the deep-static layer · CEL subset parse · jq compile · `when:` boolean shape)

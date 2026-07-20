@@ -53,7 +53,7 @@ my_task:                        # the map KEY is the identity · snake_case · u
     config: { foo: "bar" }      # literals are fine — only tasks.* refs create edges
   after:                        # optional · the CONTROL boundary · {producer: predicate}
     task_b: success             # predicate ∈ success | failure | skipped | terminal
-  when: ${{ vars.enabled }}     # optional · LOCAL business condition · evaluated POST-gate
+  when: ${{ inputs.enabled }}   # optional · LOCAL business condition · evaluated POST-gate
   for_each: ${{ with.pages }}   # optional · map this task over a collection (local namespaces)
   retry:                        # optional · retry policy (see 05-errors.md)
     max_attempts: 3
@@ -224,7 +224,7 @@ notify:
 
 `when:` decides **whether an admitted task runs**. It is evaluated *after*
 the gate (§gate algebra) and it reads **local namespaces only** ·
-`vars` · `env` · `with` · and the `for_each` locals `item` / `index`.
+`inputs` · `config` · `const` · `with` · and the `for_each` locals `item` / `index`.
 A `tasks.*` reference inside `when:` is refused at parse time
 (`NIKA-VAR-021` · « hoist it into `with:` » — the binding creates the edge,
 `when:` reads the binding).
@@ -256,7 +256,7 @@ DSL would be none of those.
 **The v0.1 subset** (the only CEL features a conformant engine must support) ·
 
 ```
-identifier / field access   vars.topic · with.content · item.url
+identifier / field access   inputs.topic · with.content · item.url
 index access                with.pages[0] · obj['key-with-dash']
 comparison                  == · != · < · <= · > · >=
 boolean                     && · || · !
@@ -336,8 +336,9 @@ STRING   = /'([^'\\]|\\.)*'/ | /"([^"\\]|\\.)*"/ ;   (* escapes · \\ \' \" \n \
    `validation_error`); an expression that passes the static shape check
    but evaluates non-boolean fails at evaluation (`NIKA-VAR-006` ·
    `variable_error`). See §`when:` shape rules below.
-6. **Identifier roots resolve against the namespaces** · the 5 global
-   namespaces (`vars` · `with` · `tasks` · `env` · `secrets`) plus the two
+6. **Identifier roots resolve against the namespaces** · the 6 global
+   namespaces (`inputs` · `config` · `const` · `secrets` · `with` · `tasks`)
+   plus the two
    `for_each` loop-locals (`item` · `index`) per
    [04-variables.md](./04-variables.md) §Resolution order — and the `tasks`
    root is legal ONLY on the boundary surfaces
@@ -355,16 +356,16 @@ the meaning of an expression that parses today. The conditional `?:`, the
 
 ```yaml
 # pick a model / a path / a prompt by condition — anywhere a value is taken
-model:  ${{ vars.env == 'prod' ? 'mistral/mistral-large' : 'ollama/qwen3.5:9b' }}
-prompt: ${{ has(vars.style) ? vars.style : 'be concise' }}
+model:  ${{ inputs.env == 'prod' ? 'mistral/mistral-large' : 'ollama/qwen3.5:9b' }}
+prompt: ${{ has(inputs.style) ? inputs.style : 'be concise' }}
 when:   ${{ with.scan_log.contains('ERROR') }}      # branch on substring · the log arrived via with:
 ```
 
-**Namespaces are CEL variables** · the <!-- canon:namespaces -->5<!-- /canon --> namespaces (`vars` · `with` · `tasks`
-· `env` · `secrets`) are bound as top-level CEL variables — `tasks.*` on the
+**Namespaces are CEL variables** · the <!-- canon:namespaces -->6<!-- /canon --> namespaces (`inputs` · `config`
+· `const` · `secrets` · `with` · `tasks`) are bound as top-level CEL variables — `tasks.*` on the
 boundary surfaces only. **Inside a `for_each` task body, two
 more scoped CEL variables are bound** · `item` (the current element) and `index`
-(its 0-based position), available ONLY within that task (the <!-- canon:namespaces -->5<!-- /canon --> namespaces are
+(its 0-based position), available ONLY within that task (the <!-- canon:namespaces -->6<!-- /canon --> namespaces are
 global · `item`/`index` are for_each-local · see `for_each` below).
 
 #### The binding is the edge — no invisible edges
@@ -410,10 +411,10 @@ A `when:` expression evaluates to a boolean. If `false`, the task is
 Common patterns ·
 
 ```yaml
-when: ${{ vars.env == 'production' }}
+when: ${{ inputs.env == 'production' }}
 when: ${{ with.coverage > 80 }}                       # the number arrived via with:
 when: ${{ size(with.findings) > 0 }}
-when: ${{ has(vars.style) && vars.style != 'none' }}
+when: ${{ has(inputs.style) && inputs.style != 'none' }}
 when: ${{ item.kind == 'article' }}                   # for_each-local
 ```
 
@@ -436,7 +437,7 @@ Anything else is rejected.
 **Parse time (MUST · `NIKA-VAR-005` · `validation_error`)**: statically
 non-boolean-SHAPED roots are rejected before any execution ·
 ```yaml
-when: ${{ vars.threshold }}                    # ❌ bare reference · no relation/boolean operator
+when: ${{ inputs.threshold }}                  # ❌ bare reference · no relation/boolean operator
 when: ${{ with.report }}                       # ❌ bare reference
 when: ${{ 'production' }}                      # ❌ bare literal
 when: "literal string"                          # ❌ neither ${{ }} nor a YAML boolean
@@ -449,9 +450,9 @@ pass could not see) fails when evaluated.
 
 For non-boolean values · use explicit comparison ·
 ```yaml
-when: ${{ vars.threshold > 0 }}                # explicit > comparison
-when: ${{ vars.message != "" }}                # empty string check
-when: ${{ size(vars.items) > 0 }}              # collection size check
+when: ${{ inputs.threshold > 0 }}              # explicit > comparison
+when: ${{ inputs.message != "" }}              # empty string check
+when: ${{ size(inputs.items) > 0 }}            # collection size check
 ```
 
 ---
@@ -472,7 +473,7 @@ scrape_all:
 
 `for_each` runs the task **once per element** of the collection. Inside the
 task body, `${{ item }}` resolves to the current element (and `${{ index }}`
-to its zero-based position). The collection is a literal list, a `vars.*`
+to its zero-based position). The collection is a literal list, an `inputs.*`
 list, or an upstream array imported through `with:` — the **matrix /
 fan-out** pattern familiar from GitHub Actions.
 
@@ -494,7 +495,7 @@ sequential iteration · set `max_parallel: 1` ·
 
 ```yaml
 process_in_order:
-    for_each: ${{ vars.items }}
+    for_each: ${{ inputs.items }}
     max_parallel: 1                              # iterations run one-at-a-time, in order
     exec:
       command: ["process", "${{ item }}"]
@@ -503,7 +504,7 @@ process_in_order:
 #### `max_parallel:` · *optional · cap concurrent iterations*
 
 ```yaml
-for_each: ${{ vars.urls }}     # 1000 URLs
+for_each: ${{ inputs.urls }}   # 1000 URLs
 max_parallel: 5                # at most 5 in-flight at any time
 ```
 
@@ -518,7 +519,7 @@ max_parallel: 5                # at most 5 in-flight at any time
 #### `fail_fast:` · *optional · abort-on-error policy*
 
 ```yaml
-for_each: ${{ vars.urls }}
+for_each: ${{ inputs.urls }}
 fail_fast: false                # default true · false = process all even if some fail
 ```
 
@@ -1051,9 +1052,9 @@ completes · REGARDLESS of outcome (success · failure · timeout · cancel).
 #### Use cases
 
 ```yaml
-# 1 · cleanup temp files (scratch_dir declared in envelope vars:)
+# 1 · cleanup temp files (scratch_dir declared in envelope const:)
 on_finally:
-  - exec: { command: ["rm", "-rf", "${{ vars.scratch_dir }}"] }   # argv: the var cannot break out
+  - exec: { command: ["rm", "-rf", "${{ const.scratch_dir }}"] }   # argv: the constant cannot break out
 
 # 2 · always-emit completion event
 on_finally:

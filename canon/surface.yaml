@@ -1,8 +1,10 @@
 registry_document_format: 1
 $comment: 'C0 sandbox skeleton + canon-flip import 2026-07-17 · seed row = nika version marker (R11 point 16) ·
-  §27 law-minted reserved rows · + 4 verb rows + 5 namespace rows imported verbatim from canon.yaml (gate: ssot-compiler
-  --check-canon). canon.yaml namespaces clause carried verbatim: « loop-locals item/index are for_each-scoped locals
-  · NOT a 6th namespace » (spec/04-variables.md).'
+  §27 law-minted reserved rows · + 4 verb rows + 6 namespace rows (gate: ssot-compiler
+  --check-canon). E-split cascade (C2 · R3a · LAW-SURFACE-0201): the dead vars/env spellings left for
+  canon/tombstones.yaml (replaced_by, never silently) · the four-authority family inputs/config/const/secrets
+  plus the runtime namespaces with/tasks are the rows. canon.yaml namespaces clause: « loop-locals item/index
+  are for_each-scoped locals · NOT a 7th namespace » (spec/04-variables.md).'
 surface:
   - id: nika_version_marker
     status: reserved
@@ -249,21 +251,62 @@ surface:
     notes: 'Import-c0 (canon-flip) · canon.yaml verbs semantic verbatim: « Multi-turn agentic loop · tool calling
       · guardrails » · the count is 4, absolute · immutable forever (D-2026-05-22-N18 · spec/02-verbs.md) · law
       anchor: the callable contract surface (LAW-SURFACE-0212).'
-  - id: namespace_vars
+  - id: namespace_inputs
     status: active
     owner: spec
     law_ids:
       - LAW-SURFACE-0201
-      - LAW-GRAMMAR-0201
-    introduced_in: C0
-    spelling: vars
+    introduced_in: C2
+    spelling: inputs
     kind: namespace
     family: namespace
     exposure: authorable
-    notes: 'Import-c0 (canon-flip) · live v1 namespace per canon.yaml namespaces (LOCKED at v1 · spec/04-variables.md).
-      FINDING CF-01: kernel law LAW-GRAMMAR-0201 (R3a) declares the vars spelling a DEAD FORM at the refonte cascade
-      (E-split inputs/config/const/secrets · classify-not-rename) · both truths are timeline-scoped (v1 live vs
-      refonte target) · the row carries the LIVE v1 surface · the cascade retires it with a replaced_by, never silently.'
+    notes: 'Minted at the E-split prose cascade (C2 · R3a · LAW-SURFACE-0201 · the four-authority family closed at
+      inputs/config/const/secrets) · the typed-parameter authority · each entry a typed declaration whose type:
+      speaks the full TypeExpr of 09-types (R3b · LAW-GRAMMAR-0211) · a required:true value lands here per the
+      E-split total rule · read as ${{ inputs.X }} · succeeds the typed half of the dead vars spelling
+      (tombstone vars-namespace-spelling · classify-not-rename, never a bulk rename).'
+  - id: namespace_config
+    status: active
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0201
+    introduced_in: C2
+    spelling: config
+    kind: namespace
+    family: namespace
+    exposure: authorable
+    notes: 'Minted at the E-split prose cascade (C2 · R3a · LAW-SURFACE-0201) · the non-sensitive runtime-config
+      authority · supplied by the deployment or environment · may appear in logs (a credential never lands here —
+      that is secrets) · each entry a typed declaration (R3b) · read as ${{ config.X }} · succeeds the dead env
+      spelling (tombstone env-namespace-spelling).'
+  - id: namespace_const
+    status: active
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0201
+    introduced_in: C2
+    spelling: const
+    kind: namespace
+    family: namespace
+    exposure: authorable
+    notes: 'Minted at the E-split prose cascade (C2 · R3a · LAW-SURFACE-0201) · the named-constant authority ·
+      a bare literal or a typed { type, value } whose value MUST conform to type: (R3b · LAW-TYPE-0211 ·
+      NIKA-DEFAULT-001) · everything not required:true lands here per the E-split total rule · read as
+      ${{ const.X }} · succeeds the literal half of the dead vars spelling (tombstone vars-namespace-spelling).'
+  - id: namespace_secrets
+    status: active
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0201
+    introduced_in: C0
+    spelling: secrets
+    kind: namespace
+    family: namespace
+    exposure: authorable
+    notes: Import-c0 (canon-flip) · live v1 namespace per canon.yaml (spec/04-variables.md) · member of the R3a
+      four-authority family (LAW-SURFACE-0201 · inputs/config/const/secrets) · the one v1 namespace the E-split
+      keeps verbatim.
   - id: namespace_with
     status: active
     owner: spec
@@ -289,30 +332,3 @@ surface:
     exposure: authorable
     notes: Import-c0 (canon-flip) · live v1 namespace per canon.yaml (spec/04-variables.md) · the task-record/out
       projection trees are governed by LAW-SURFACE-0221 + LAW-SURFACE-0222.
-  - id: namespace_env
-    status: active
-    owner: spec
-    law_ids:
-      - LAW-SURFACE-0201
-      - LAW-GRAMMAR-0202
-    introduced_in: C0
-    spelling: env
-    kind: namespace
-    family: namespace
-    exposure: authorable
-    notes: 'Import-c0 (canon-flip) · live v1 namespace per canon.yaml namespaces (LOCKED at v1 · spec/04-variables.md).
-      FINDING CF-01: kernel law LAW-GRAMMAR-0202 (R3a) declares the env spelling a DEAD FORM at the refonte cascade
-      (E-split · classify-not-rename) · timeline-scoped dual truth · the row carries the LIVE v1 surface.'
-  - id: namespace_secrets
-    status: active
-    owner: spec
-    law_ids:
-      - LAW-SURFACE-0201
-    introduced_in: C0
-    spelling: secrets
-    kind: namespace
-    family: namespace
-    exposure: authorable
-    notes: Import-c0 (canon-flip) · live v1 namespace per canon.yaml (spec/04-variables.md) · member of the R3a
-      four-authority family (LAW-SURFACE-0201 · inputs/config/const/secrets) · the one v1 namespace the E-split
-      keeps verbatim.

@@ -366,12 +366,16 @@ A `with:` binding's type is **derived, never declared** ·
   record of [05](./05-errors.md) (an `object`, `additional: true`).
 - Producer without `returns:` → the binding is `Unknown` (gradual).
 
-The **workflow-contract halves stay flat for now** · typed `vars:` and
-typed `outputs:` keep their flat closed enum (`string · number · integer
-· boolean · array · object` · [01](./01-envelope.md)) until the
-input-authority window (G9) widens BOTH halves to this grammar in one
-deliberate break — the callable contract never speaks two type languages
-at once. This chapter's grammar binds `types:` and `returns:` today.
+The **workflow-contract halves speak this grammar too** · the `type:` field
+of typed `inputs:` and typed `outputs:` is the full TypeExpr above (R3b ·
+LAW-GRAMMAR-0211 · the input-authority window landed: BOTH halves widened in
+one deliberate break — the callable contract never speaks two type languages
+at once). The flat 6-enum (`string` · `number` · `integer` · `boolean` ·
+`array` · `object`) is dead, and `bool` is the one boolean spelling (the
+JSON-Schema `{ "type": "boolean" }` lowering is a machine projection, never
+an authorable spelling). Every declared `default:` and every typed `const:`
+value MUST conform to its declared type — checked, never warnings
+(`NIKA-DEFAULT-001`).
 
 ## Errors (the `NIKA-TYPE` namespace · new in this chapter)
 
@@ -406,7 +410,7 @@ at once. This chapter's grammar binds `types:` and `returns:` today.
 
 ## Related
 
-- [01 · Envelope](./01-envelope.md) — typed `vars:` (the callable-input
+- [01 · Envelope](./01-envelope.md) — typed `inputs:` (the callable-input
   half) · `outputs:` (the return half)
 - [02 · Verbs](./02-verbs.md) — `returns:`/`decode:` rows per verb ·
   `schema:` the hatch

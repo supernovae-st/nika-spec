@@ -80,7 +80,7 @@ autocomplete + validation via a `yaml-language-server` modeline:
 - [Envelope]({RAW}/spec/01-envelope.md): the `nika: v1` marker · top-level shape
 - [Verbs]({RAW}/spec/02-verbs.md): the four closed verbs · infer · exec · invoke · agent
 - [DAG]({RAW}/spec/03-dag.md): the two doors — with: data edges · after: control · gate v2 · fan-out
-- [Variables]({RAW}/spec/04-variables.md): the five namespaces · CEL + jq expressions
+- [Variables]({RAW}/spec/04-variables.md): the six namespaces (four value authorities + two runtime) · CEL + jq expressions
 - [Errors]({RAW}/spec/05-errors.md): the NIKA-XXX code contract · {c["error_namespaces"]} namespaces
 - [Stdlib contract]({RAW}/spec/06-stdlib-contract.md): {c["builtins"]} builtins · {c["providers"]} providers · {c["extract_modes"]} extract modes
 - [Conformance]({RAW}/spec/07-conformance.md): three levels · the fixture suite · editor tooling

@@ -92,10 +92,10 @@ Run `nika inspect <file> --format mermaid` on any workflow and paste the output;
 
 ## The 5 pillars · immutable forever
 
-1. **Envelope**: one line · `nika: v1` + `workflow:` header (+ typed `vars` · `env` · `secrets`)
+1. **Envelope**: one line · `nika: v1` + `workflow:` header (+ typed `inputs` · `config` · `const` · `secrets`)
 2. **The 4 verbs**: `infer:` (LLM) · `exec:` (shell) · `invoke:` (tools/MCP) · `agent:` (autonomous loop)
 3. **DAG shape**: tasks + `with:` data edges + `after:` control + `when` + `for_each`
-4. **Variables**: one `${{ ... }}` syntax · <!-- canon:namespaces -->5<!-- /canon --> namespaces (`vars` · `with` · `tasks` · `env` · `secrets`)
+4. **Variables**: one `${{ ... }}` syntax · <!-- canon:namespaces -->6<!-- /canon --> namespaces (`inputs` · `config` · `const` · `secrets` · `with` · `tasks`)
 5. **Error model**: `NIKA-<NS>-<NNN>` codes · retry semantics · structured output
 
 These 5 things never change. Everything else (providers · builtins ·
@@ -111,10 +111,10 @@ See [spec/](./spec/) for the full specification.
 nika-spec/
 ├── spec/                      ← THE specification (~30 pages markdown)
 │   ├── 00-overview.md           one-page vision
-│   ├── 01-envelope.md           nika: v1 + workflow + typed vars/env/secrets
+│   ├── 01-envelope.md           nika: v1 + workflow + typed inputs/config/const/secrets
 │   ├── 02-verbs.md              the 4 verbs · signatures + semantics
 │   ├── 03-dag.md                tasks · with/after edges · when · for_each
-│   ├── 04-variables.md          ${{ }} · 5 namespaces · vars/with/tasks/env/secrets
+│   ├── 04-variables.md          ${{ }} · 6 namespaces · inputs/config/const/secrets/with/tasks
 │   ├── 05-errors.md             error codes · retry · structured output
 │   ├── 06-stdlib-contract.md    how the stdlib versions independently
 │   ├── 07-conformance.md        what « v0.1-compliant » means

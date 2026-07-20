@@ -38,17 +38,20 @@ model: ollama/qwen3.5:4b         # optional · anthropic/claude-sonnet-4-6 for c
 types:
   Summary: { object: { title: string, bullets: { array: string } } }
 
-# Inputs · available as ${{ vars.<name> }} · untyped OR typed
-vars:
-  output_dir: "./output"                 # untyped · the value is the default
-  topic:                                 # typed · enables schema-gen + validation
+# Typed workflow inputs · supplied by the caller at launch · available as ${{ inputs.<name> }}
+inputs:
+  topic:                                 # every entry is typed (the full TypeExpr of 09-types)
     type: string
     required: true
     description: "Subject to research"
 
-# Non-sensitive runtime config · available as ${{ env.<name> }}
-env:
-  LOG_LEVEL: info
+# Named constants · fixed values baked into the workflow · available as ${{ const.<name> }}
+const:
+  output_dir: "./output"                 # bare literal
+
+# Non-sensitive runtime config · supplied by the deployment · available as ${{ config.<name> }}
+config:
+  log_level: { type: string, default: "info" }
 
 # Sensitive values · vault-backed · masked in logs · available as ${{ secrets.<name> }}
 secrets:
@@ -197,66 +200,95 @@ the JSON-Schema lowering are the whole of [09-types.md](./09-types.md);
 the envelope only owns the block's position. Unknown names are
 `NIKA-TYPE-001` · recursion is `NIKA-TYPE-002`.
 
-### `vars` · *optional · workflow inputs · untyped OR typed*
+### `inputs` · *optional · typed workflow inputs*
 
 ```yaml
-vars:
-  # Untyped form — the value IS the default
-  output_dir: "./output"
-  base_url: "https://example.com"
-
-  # Typed form — enables validation + schema generation
+inputs:
   topic:
-    type: string                 # string · number · integer · boolean · array · object
-    required: true               # default false
-    default: "Rust async 2026"   # used when the caller omits it
+    type: string                 # the full TypeExpr of 09-types.md · named types · unions · shapes · refinements
+    required: true               # default false · the caller MUST supply a value
+    default: "Rust async 2026"   # used when the caller omits it · MUST conform to type:
     description: "Subject to research"
 ```
 
-Inputs available in every task via `${{ vars.<name> }}` substitution.
+Inputs available in every task via `${{ inputs.<name> }}` substitution.
 
-The **untyped form** (`name: value`) is the value's default, simplest for
-a workflow you run yourself. The **typed form** (`name: { type, required,
-default, description }`) lets the engine validate inputs and
-**generate a callable schema**: this is what powers `nika.run_workflow`
-over MCP (a caller like an agent host sees the typed inputs and knows
-exactly what to pass) and UI generation. Simple stays simple; power is
-there when a workflow becomes a reusable, callable unit. Typed `vars:` are
-the **input** half of that callable contract; typed [`outputs:`](#outputs--optional--the-workflows-return-value--untyped-or-typed)
+Every entry is a **typed declaration** (`type:` required). The type speaks
+the **full TypeExpr** of [09-types.md](./09-types.md) — the flat 6-enum
+(`string` · `number` · `integer` · `boolean` · `array` · `object`) is dead
+and `bool` is the one boolean spelling (R3b · LAW-GRAMMAR-0211). An unknown
+type name or a form outside the grammar refuses `NIKA-TYPE-001`; a
+`default:` that does not conform to its `type:` refuses at check
+(`NIKA-DEFAULT-001` · the P0 soundness hole is closed). Typed `inputs:` let
+the engine validate what a caller passes and **generate a callable schema**:
+this is what powers `nika.run_workflow` over MCP (a caller like an agent
+host sees the typed inputs and knows exactly what to pass) and UI
+generation. Typed `inputs:` are the **input** half of that callable
+contract; typed [`outputs:`](#outputs--optional--the-workflows-return-value--untyped-or-typed)
 (below) are the **output** half.
-
-**The discriminator (normative)** · a var whose value is an **object
-carrying a string `type:` key** IS a typed declaration: `type:` must then be
-one of the closed enum (`string` · `number` · `integer` · `boolean` · `array`
-· `object`) or the workflow is rejected (`NIKA-PARSE` · `validation_error`).
-An untyped object default that legitimately contains a `type` key
-(`config: { type: "custom" }` would be misread) MUST use the typed form
-explicitly · `config: { type: object, default: { type: "custom" } }`.
 
 **Supplying values at launch** · the caller provides inputs when starting
 the run; how is an engine CLI concern. The reference engine's surface ·
 `nika run flow.nika.yaml --var topic="Rust async 2026"` (repeatable · one
 `--var key=value` per input). A supplied value **overrides** a declared
-`default:` and **satisfies** a `required: true` var (conformance rule 5
+`default:` and **satisfies** a `required: true` input (conformance rule 5
 below · a missing required input rejects before execution). A value parses
 as JSON when it parses (`--var limit=5` is a number · `--var deep=true` a
 boolean) · else it rides as a string. An **unknown key is refused** before
 the run, with the declared set listed: a typo that silently did nothing
 would be the worst outcome. The file stays the contract · every input a
-caller can pass is declared in `vars:`.
+caller can pass is declared in `inputs:`.
+
+### `config` · *optional · non-sensitive runtime config*
+
+```yaml
+config:
+  log_level: { type: string, default: "info" }
+  region:    { type: string }                     # no default · the deployment supplies it
+```
+
+Non-sensitive configuration available via `${{ config.<name> }}`, supplied
+by the deployment or environment (engine launch concern · `default:` is the
+declared fallback). Each entry is a typed declaration (`type:` required ·
+full TypeExpr · a `default:` MUST conform · `NIKA-DEFAULT-001`). Values may
+appear in logs and traces. For anything secret, use `secrets:` instead.
+
+**Declared-only · no ambient OS fallback** · a `${{ config.X }}` read
+resolves ONLY against this block (an undeclared entry is `NIKA-VAR-001`):
+the engine never silently reads the OS environment — every value a workflow
+depends on is visible in the file (sovereignty + portability).
+
+### `const` · *optional · named constants*
+
+```yaml
+const:
+  output_dir: "./output"              # bare literal · any YAML value
+  retries: 3
+  window:                             # typed constant · object carrying BOTH type and value
+    type: integer
+    value: 30                         # MUST conform to type: (NIKA-DEFAULT-001)
+```
+
+Fixed values baked into the workflow, available via `${{ const.<name> }}`.
+Either a **bare literal** or a **typed constant** `{ type, value }` (the
+`type:` speaks the full TypeExpr; the `value:` MUST conform to it).
+The discriminator (normative) · an object carrying BOTH `type` and `value`
+keys IS a typed constant; an object missing either key is a bare literal
+object constant — so a literal that legitimately contains a `type` key
+(`settings: { type: "custom" }`) is never misread. Constants are immutable
+across the run and never caller-supplied: a value the caller may override
+is an `inputs:` declaration, not a constant.
 
 See [04-variables.md](./04-variables.md) for the full substitution grammar.
 
-### `env` · *optional · non-sensitive runtime config*
-
-```yaml
-env:
-  LOG_LEVEL: info
-  REGION: eu-west
-```
-
-Non-sensitive configuration available via `${{ env.<name> }}`. Values may
-appear in logs and traces. For anything secret, use `secrets:` instead.
+> **Dead forms (rejected with a classification teaching · the E-split ·
+> R3a).** The pre-flip `vars:` and `env:` envelope fields are dead:
+> `vars:` refuses `NIKA-VALUES-001`, `env:` refuses `NIKA-VALUES-002`.
+> Classify each old use into the authority its role commands — a typed
+> parameter is an `inputs:` declaration, a fixed value is a `const:` entry,
+> non-sensitive runtime configuration is a `config:` declaration, a
+> governed store reference is a `secrets:` entry (classify-not-rename ·
+> no alias survives · LAW-SURFACE-0201/0202 · LAW-GRAMMAR-0201/0202).
 
 ### `secrets` · *optional · vault-backed · masked*
 
@@ -289,10 +321,10 @@ resolved secret values in logs, traces, and journal events.
 | `env` | name of an OS environment variable | 12-factor / CI secrets |
 | `file` | path to a file holding the value | Docker / k8s mounted secrets |
 
-The `env` / `secrets` split is the modern secure-workflow default: non-sensitive
-config in `env:` (appears in logs), masked references in `secrets:` (never
-logged). Note `source: env` reads a *secret* from an env var and still masks
-it, which is different from the plain `env:` block.
+The `config` / `secrets` split is the modern secure-workflow default: non-sensitive
+config in `config:` (appears in logs), masked references in `secrets:` (never
+logged). Note `source: env` reads a *secret* from an OS env var and still masks
+it, which is different from the plain `config:` block.
 
 #### `egress` · *optional · sanctioned destinations (declassification)*
 
@@ -486,12 +518,12 @@ outputs:
   # Typed form — declares the return shape · powers the callable-workflow output schema
   report:
     value: ${{ tasks.write_report.output }}
-    type: string                # flat enum today — widens to 09-types.md with typed vars: (G9 · one break)
+    type: string                # the full TypeExpr of 09-types.md (R3b · one type language on both halves)
     description: "The final markdown brief"
 ```
 
 `outputs:` declares **what the workflow returns**, the symmetric twin of
-`vars:` (what it takes in). Each entry is a name bound to a
+`inputs:` (what it takes in). Each entry is a name bound to a
 `${{ tasks.<id>.output }}` reference (or any `${{ ... }}` expression), in the
 **untyped form** (bare reference) or the **typed form**
 (`{ value, type, description }`).
@@ -501,10 +533,10 @@ This single block serves three consumers ·
 - **`nika run`**: prints this object as the workflow result (without `outputs:`,
   the CLI result is engine-defined and implicit).
 - **`nika.run_workflow` over MCP**: a caller (agent host · parent workflow)
-  receives exactly this shape. Together with typed `vars:` it forms the
+  receives exactly this shape. Together with typed `inputs:` it forms the
   **complete callable contract** · typed in, typed out.
 - **Schema generation**: typed outputs generate the *output half* of the
-  callable schema (typed `vars:` generate the input half).
+  callable schema (typed `inputs:` generate the input half).
 
 If `outputs:` is omitted, the workflow still runs; its result is
 engine-defined (a reusable/callable workflow SHOULD declare `outputs:`). The
@@ -558,12 +590,12 @@ avoid the classic YAML 1.1 footguns that bite generated configs:
 number, boolean, or date, **quote it**. When in doubt, quote.
 
 **Expressions** · a bare `${{ … }}` reference is a safe plain scalar
-(`prompt: ${{ vars.topic }}` is fine). But **quote** any expression that
+(`prompt: ${{ inputs.topic }}` is fine). But **quote** any expression that
 contains `:` `#` `[` `{` `,` or `>` so YAML does not misparse it ·
 
 ```yaml
 when: "${{ tasks.x.status == 'ok' && tasks.y.count > 3 }}"   # quoted · contains > and :
-prompt: ${{ vars.topic }}                                    # bare ok · no special chars
+prompt: ${{ inputs.topic }}                                  # bare ok · no special chars
 ```
 
 A conformant engine parses YAML 1.2. Authoring tools (and the AI writing
@@ -625,7 +657,7 @@ workflow:
   description: "Research a topic and write a markdown brief"
 
 model: anthropic/claude-sonnet-4-6
-vars:
+inputs:
   topic:
     type: string
     required: true
@@ -637,7 +669,7 @@ vars:
 tasks:
   research:
     infer:
-      prompt: "Research the topic · ${{ vars.topic }} · in 5 paragraphs"
+      prompt: "Research the topic · ${{ inputs.topic }} · in 5 paragraphs"
 
   write:
     with:
@@ -645,7 +677,7 @@ tasks:
     invoke:
       tool: "nika:write"
       args:
-        path: "${{ vars.output_path }}"
+        path: "${{ inputs.output_path }}"
         content: "${{ with.content }}"
 ```
 
@@ -658,9 +690,9 @@ A v0.1-compliant engine MUST ·
 1. Reject any workflow missing `nika:` or `workflow:` with a clear error
 2. Accept exactly `nika: v1` · reject any other value (`v1.0` · `1` · `v2` …) with a clear error
 3. Validate `workflow` identifier kebab-case format
-4. Make workflow-level `model`, `vars`, `env`, `secrets` available to all tasks as defaults
-5. Validate typed `vars` (type + required) before execution · reject missing required inputs
-6. Validate each typed `outputs` value against its declared `type:` at run end · a value that does not match its declared type fails the run (`NIKA-VAR-009` · `validation_error`): the callable contract is enforced on BOTH halves (typed in via `vars`, typed out via `outputs`) · symmetric with rule 5
+4. Make workflow-level `model`, `inputs`, `config`, `const`, `secrets` available to all tasks as defaults
+5. Validate typed `inputs` (type + required) before execution · reject missing required inputs · refuse every declared `default:` / typed `const:` value that does not conform to its declared `type:` (`NIKA-DEFAULT-001`)
+6. Validate each typed `outputs` value against its declared `type:` at run end · a value that does not match its declared type fails the run (`NIKA-VAR-009` · `validation_error`): the callable contract is enforced on BOTH halves (typed in via `inputs`, typed out via `outputs`) · symmetric with rule 5
 7. Mask resolved `secrets` values in all logs · traces · journal events
 8. Enforce a declared `permits:` block on both surfaces: refuse statically-detectable escapes at check time, and fail any runtime effect outside the boundary with `NIKA-SEC-004` · once `permits:` is present every category is default-deny unless listed
 

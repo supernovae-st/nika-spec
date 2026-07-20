@@ -42,10 +42,10 @@ template matching the OUTER shape.
    else. The recurring ones:
    - `NIKA-DAG-003` → you referenced `${{ tasks.X }}` without
      the boundary. Hoist the reference into `with:` — the binding IS the edge.
-   - `NIKA-VAR-001` → undeclared `vars./with./secrets.` name. Declare
-     it in the envelope or fix the typo. A declared `required: true` var
-     is supplied at launch · `nika run <file> --var name=value`
-     (repeatable).
+   - `NIKA-VAR-001` → undeclared `inputs./config./const./secrets./with.` name.
+     Declare it in the matching envelope authority or fix the typo. A
+     declared `required: true` input is supplied at launch ·
+     `nika run <file> --var name=value` (repeatable).
    - `NIKA-PROVIDER` → `model:` must be `<provider>/<name>` with a
      canonical prefix (`canon.yaml` providers).
 6. **Re-check until valid** · zero errors = done. Never ship unchecked.

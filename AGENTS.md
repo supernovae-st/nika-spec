@@ -47,6 +47,12 @@ INTENT ──route──▶ TEMPLATE ──fill──▶ DRAFT ──check──
    `NIKA-DAG-001` = break the dependency cycle ·
    `NIKA-DAG-002` = a `with:`/`after:` entry names a task that doesn't exist ·
    `NIKA-VAR-021` = a `tasks.*` reference outside the boundary — hoist it into `with:` ·
+   `NIKA-VALUES-001` / `NIKA-VALUES-002` = a dead `vars:` / `env:` block (or
+   `${{ vars.X }}` / `${{ env.X }}` read) — classify each use: typed parameter
+   → `inputs:` · fixed value → `const:` · non-sensitive runtime config →
+   `config:` · store reference → `secrets:` ·
+   `NIKA-VALUES-003` = a `${{ }}` value read outside the four authorities
+   (`inputs` · `config` · `const` · `secrets`) — the namespace is closed ·
    `NIKA-DAG-004` = your `recover:` points DOWNSTREAM of the failing
    task (deadlock) — recover from an upstream or independent source ·
    `NIKA-VAR-001` = declare the name or fix the typo ·
