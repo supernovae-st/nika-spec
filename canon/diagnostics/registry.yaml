@@ -1841,10 +1841,11 @@ diagnostics:
     plane: check
     condition: 'lethal trifecta complete — the declared boundary grants private
       read (fs.read non-empty) + untrusted ingress (a nika:fetch builtin invoked
-      or granted · any mcp:* server granted) + external egress (net.http non-empty
-      · an escaping fs.write glob · exec enabled), and no blocking invoke: nika:prompt
-      (no default:) dominates an egress-capable task (NEP-0002 · the Rule of Two
-      as a static check)'
+      · an mcp:* tool invoked · an agent: whose whitelist admits ingress) +
+      external egress (net.http non-empty · an escaping fs.write glob · exec
+      enabled), the untrusted content REACHES an egress-capable task''s effect
+      surface (a realized flow), and no blocking invoke: nika:prompt (no
+      default:) dominates it (NEP-0002 v2.0 · the Rule of Two as a static check)'
     outcome_class: failure
     cause: security_error
     retryable: false
@@ -1853,13 +1854,16 @@ diagnostics:
     span_required: true
     teaching: 'lethal trifecta complete · human gate required — gate the egress
       path behind a blocking invoke: nika:prompt (no default: arg) dominating
-      every path to each egress-capable task, or narrow a permit to drop a leg
-      (NEP-0002 · one finding per ungated egress task).'
+      every path to each egress-capable task the untrusted content reaches, or
+      narrow a permit to drop a leg (NEP-0002 v2.0 · one finding per ungated
+      tainted egress task, witness-named source → sink).'
     notes: 'import-c2 (NEP-0002) · category: security_error · transient: false (minted
-      by governance/nep-0002-lethal-trifecta-human-gate.md · v1.1 leg ② 2026-07-19) ·
-      SEC-008 stays allocated to the AUTH plane (canon/laws/authority.yaml
-      FINDING-AUTH-02), so the trifecta takes the next free id · reference
-      implementation nika#637 (the nika-cap judge · check-plane refusal, exit 2) ·
+      by governance/nep-0002-lethal-trifecta-human-gate.md · v2.0 realized-flow
+      2026-07-20, supersedes v1.1 leg ② 2026-07-19) · SEC-008 stays allocated
+      to the AUTH plane (canon/laws/authority.yaml FINDING-AUTH-02), so the
+      trifecta takes the next free id · reference implementation nika#637 (v1
+      judge) + the v2 content-taint pass (the integrity half of the IFC
+      lattice · infer/agent outputs carry taint · exec opacity clause) ·
       reserved, not active: the executable LAW row lands when the canon mints
       the SEC law family · the engine projection names the witness task and
       anchors its span → span_required true.'
