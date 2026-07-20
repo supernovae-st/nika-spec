@@ -53,15 +53,21 @@ SHOWCASE = SPEC_ROOT / "examples" / "showcase"
 # (the website applies the same law at serve time via src/lib/w1-to-w2.ts).
 # Flips to identity at the release train: NIKA_SERVED_GRAMMAR=wnew.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from grammar_door import downcast_w2  # noqa: E402
+from grammar_door import downcast_w2, downcast_w105  # noqa: E402
 
-SERVED_GRAMMAR = os.environ.get("NIKA_SERVED_GRAMMAR", "w2")
+# The default = the grammar the LATEST RELEASED binary speaks (w105 since
+# v0.105.0 · 2026-07-20). Override per bake: w2 (0.104 era) · wnew (identity ·
+# the post-train flip). The release-heal ratchet derives this from the
+# release itself (R2) — until then the default moves WITH the train.
+SERVED_GRAMMAR = os.environ.get("NIKA_SERVED_GRAMMAR", "w105")
 
 
 def served(yaml_text: str, fname: str) -> str:
-    """The grammar a docs reader copies · w2 through the door pre-train."""
+    """The grammar a docs reader copies · the released dialect via the door."""
     if SERVED_GRAMMAR == "wnew":
         return yaml_text
+    if SERVED_GRAMMAR == "w105":
+        return downcast_w105(yaml_text, fname)
     return downcast_w2(yaml_text, fname)
 
 BEGIN = re.compile(r"\{/\* showcase:begin ([a-z0-9-]+\.nika\.yaml) \*/\}")
