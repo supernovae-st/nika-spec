@@ -253,7 +253,7 @@ CI failure, not a maybe).
 
 ## Status
 
-- v0.1.0-draft · spec drafted · 7 foundation + 26 showcase examples + 10 templates · workflow.schema.json · 83 static conformance fixtures across three tiers (core · deep · stdlib surface; `python3 conformance/runner.py all` is the live count), every example gated in CI · runtime/behavioral conformance pending
+- v0.1.0-draft · spec drafted · 7 foundation + 26 showcase examples + 10 templates · workflow.schema.json · 185 static conformance fixtures (core · deep · stdlib surface · the value-authority lanes `values`/`types`/`gates`; `python3 conformance/runner.py all` is the live count), every example gated in CI · runtime/behavioral conformance pending
 - v0.1.0 GA · target August 2026 (after spec review + examples +
   conformance suite + schemas)
 

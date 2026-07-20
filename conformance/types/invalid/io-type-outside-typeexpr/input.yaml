@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: io-type-outside-typeexpr
+inputs:
+  ratio: { type: float }
+tasks:
+  note:
+    invoke:
+      tool: "nika:log"
+      args:
+        message: "${{ inputs.ratio }}"

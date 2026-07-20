@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-DAG-005",
+      "category": "validation_error"
+    }
+  ],
+  "note": "R5 · LAW-GRAMMAR-0231 · the predicate set is CLOSED (success · failure · skipped · terminal): `completed` is not in it — an unknown predicate at after: refuses NIKA-DAG-005."
+}

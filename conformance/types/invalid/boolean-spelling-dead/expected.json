@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-TYPE-001",
+      "category": "validation_error"
+    }
+  ],
+  "note": "R3b · LAW-SURFACE-0211 · the `boolean` spelling died WITH the 6-enum sublanguage: it only ever existed inside it, and the Type Core spells the primitive `bool`. One spelling per type — `boolean` at an io position refuses NIKA-TYPE-001, never an alias."
+}

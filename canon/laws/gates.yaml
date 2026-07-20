@@ -74,10 +74,10 @@ laws:
             id: gate_predicate_vocabulary
     diagnostics: ["NIKA-GATE-001"]
     fixtures:
-      - to-mint-c1/conformance/gates/valid/after-class-spellings
+      - conformance/gates/valid/after-class-spellings
     negative_fixtures:
-      - to-mint-c1/conformance/gates/invalid/after-participial-spelling-dead
-      - to-mint-c1/conformance/gates/invalid/after-unknown-predicate
+      - conformance/gates/invalid/after-participial-spelling-dead
+      - conformance/gates/invalid/after-unknown-predicate
     projections: ["prose:03-dag", "schema", "cli:check", "lsp", "mcp", "sdk"]
     implementation_surfaces:
       - engine:nika-schema

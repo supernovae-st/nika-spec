@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: after-unknown-predicate
+tasks:
+  build:
+    exec: { command: ["cargo", "build"] }
+  deploy:
+    after: { build: completed }
+    exec: { command: ["./deploy.sh"] }

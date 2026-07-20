@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-DAG-005",
+      "category": "validation_error"
+    }
+  ],
+  "note": "R5 · LAW-GRAMMAR-0231 · the participial spellings are dead: `succeeded` mapped 1:1 to `success` in the codemod (succeeded->success · failed->failure · skipped/terminal unchanged) and no alias survives — a participle at after: refuses NIKA-DAG-005, and the did-you-mean 'failed'->failure class died with it."
+}

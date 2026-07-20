@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-TYPE-001",
+      "category": "validation_error"
+    }
+  ],
+  "note": "R3b · LAW-GRAMMAR-0211 · an io type: outside the closed TypeExpr grammar refuses at an inputs: declaration — `float` is none of the 10 primitives, a declared PascalCase name, or a composite form. The type core names the class (NIKA-TYPE-001) at every io position, never the schema pattern alone."
+}

@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "R3b · LAW-GRAMMAR-0211 · the io type: field speaks the full TypeExpr of 09-types on BOTH halves (inputs: and outputs:) — a union of a bounded numeric and a closed enum · a refined string (pattern in the locked dialect) · nullability spelled union: [string, null]. The 6-enum sublanguage is dead; the default conforms (NIKA-DEFAULT-001 stays silent)."
+}

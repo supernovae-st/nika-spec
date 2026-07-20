@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: after-class-spellings
+tasks:
+  produce:
+    exec: { command: ["echo", "seed"] }
+    on_error: { skip: true }
+  on_success:
+    after: { produce: success }
+    exec: { command: ["echo", "ok"] }
+  on_failure:
+    after: { produce: failure }
+    exec: { command: ["echo", "ko"] }
+  on_skipped:
+    after: { produce: skipped }
+    exec: { command: ["echo", "skip"] }
+  on_terminal:
+    after: { produce: terminal }
+    exec: { command: ["echo", "done"] }

@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "R3b · LAW-SURFACE-0211 · one spelling per type: the boolean is `bool` at every value-authority position (inputs · config · typed const · typed outputs) — the JSON-Schema `{ \"type\": \"boolean\" }` lowering is a machine projection, never an authorable spelling."
+}
