@@ -1,0 +1,15 @@
+# Expected: exit 0 — a two-file acyclic composition; the boundary twin of self-launch-cycle.
+# Parent calls a leaf child by static path; the call graph is a straight
+# line, drawable before the run (spec 14 law 7 satisfied).
+nika: v1
+workflow:
+  id: comp03-parent-child-acyclic
+  description: "SOUND: parent invokes a leaf child once — acyclic static call graph, check PASSES"
+
+permits:
+  exec: ["echo"]
+
+tasks:
+  delegate:
+    invoke:
+      workflow: "./child-static-echo.nika.yaml"
