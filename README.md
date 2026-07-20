@@ -146,13 +146,16 @@ nika-spec/
 
 ## Lineage
 
-Conceived through private prototypes (summer 2025) · **first commit
-January 1, 2026** · 79 versions in the 103-day exploration era (public
-[crates.io trail](https://crates.io/crates/nika/versions) from March) ·
-**rewritten from scratch April 13, 2026** — the Diamond era, an orphan
-branch; the version line continues because the language is the
-continuity. Every dated claim is re-proven in CI against its source of
-truth: [`timeline/timeline.yaml`](./timeline/timeline.yaml).
+Three eras, one continuous version line. An *exploration* era of
+private prototypes through **summer 2025** (before git) · the
+**brouillon** era from the **first commit on January 1, 2026** (on the
+branch literally named `brouillon`): 79 versions in 103 days, a public
+[crates.io trail](https://crates.io/crates/nika/versions) from March,
+a 138K-line monolith · then the **Diamond** era from **April 13, 2026**
+— rewritten from scratch, an orphan branch, the version line continuing
+because the language is the continuity. Every dated claim is re-proven
+in CI against its source of truth:
+[`timeline/timeline.yaml`](./timeline/timeline.yaml).
 
 ---
 

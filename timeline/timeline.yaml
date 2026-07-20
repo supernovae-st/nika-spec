@@ -2,21 +2,29 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 # SSOT for the project's history, releases, and forward gates. Every
-# surface that tells the story (site /timeline · READMEs · changelog era
-# notes) derives from THIS file — never the reverse.
+# surface that tells the story (site /timeline · READMEs · changelog
+# era notes) derives from THIS file — never the reverse.
 #
 # The honesty contract: every entry carries an `evidence` block with a
 # `class`. Provable classes (git-tag · github-release · github-commit ·
-# crates-io · github-pr) are RE-PROVEN by timeline/verify.py in CI —
+# github-pr · crates-io) are RE-PROVEN by timeline/verify.py in CI —
 # a claim whose proof stops resolving turns the gate red. Unprovable
 # classes (testimony · private-archive) are permitted, labeled, and
 # never counted as proof: a reader always sees which kind of truth
 # they are holding.
 #
+# The three eras (operator-locked 2026-07-20):
+#   exploration · summer 2025 → end 2025 · private prototypes, before git
+#   brouillon   · 2026-01-01 → 2026-04-13 · the git draft era (the branch
+#                 is literally named `brouillon`) · 0.1 → 0.79 · public
+#                 crates.io spine in March · a 138K-line monolith
+#   diamond     · 2026-04-13 → today · rewrite from scratch · the clean
+#                 language · orphan branch · the version line continues
+#
 # The future carries NO dates. Forward motion is expressed as GATES —
-# conditions that must hold — per the readiness discipline (a launch
-# ships when ready, never on a date). Timeline entries are append-only;
-# a correction adds a note, it never silently rewrites.
+# conditions that must hold (a launch ships when ready, never on a
+# date). Entries are append-only; a correction adds a note, it never
+# silently rewrites.
 
 schema_version: 1
 last_updated: "2026-07-20"
@@ -29,62 +37,75 @@ evidence_classes:
   github-pr: "a merged PR on a public supernovae-st repo · verified via the GitHub API"
   crates-io: "a published version on crates.io (yanked versions remain listed forever) · verified via the crates.io API"
   scorecard: "an OpenSSF Scorecard result · verified via the scorecard API (score moves weekly · the entry records a dated reading)"
-  private-archive: "a commit/tag in the private legacy archive (the pre-rewrite era) · SHA recorded · auditable under access, not publicly resolvable"
+  private-archive: "a commit/tag in the private legacy archive (the brouillon branch) · SHA recorded · auditable under access, not publicly resolvable"
   testimony: "the maintainer's dated account · no mechanical proof exists or is claimed"
 
 eras:
-  - id: conception
-    span: "summer 2025 → 2025-12"
-    title: "Conception"
+  - id: exploration
+    span: "summer 2025 → end 2025"
+    title: "Exploration"
     story: >-
-      The ideas take shape through private prototypes and throwaway
-      experiments on the maintainer's machine and private repos —
-      before the language has a repo, a name in git, or a single
-      committed line.
+      The idea takes shape through private prototypes and throwaway
+      vibe-code experiments — on the maintainer's machine and private
+      repos, before the language has a public repo, a name in git, or
+      a single committed line. The question being circled: repeatable
+      AI work should live in files, reviewed and re-run, not evaporate
+      into chats.
     evidence: { class: testimony }
 
-  - id: exploration
+  - id: brouillon
     span: "2026-01-01 → 2026-04-13"
-    title: "The exploration era (0.1 → 0.79)"
+    title: "The brouillon era (0.1 → 0.79)"
     story: >-
-      79 minor versions in 103 days. The language finds its shape by
-      shipping: templating, DAG validation, providers, tools — a
-      138K-line monolith and 192 tags later, the team knows exactly
-      what the language wants to be, and exactly why the engine must
-      be rebuilt to carry it.
-    evidence: { class: private-archive, note: "the full branch + 192 tags live in the private legacy archive · the crates.io trail below is the public spine of this era" }
+      The language goes to git — on a branch literally named
+      `brouillon` (draft). 79 minor versions in 103 days: templating,
+      DAG validation, providers, tools, check-before-run. A 138K-line
+      monolith and 192 tags. Seven of those versions ship publicly to
+      crates.io through March. By the end the team knows exactly what
+      the language wants to be — and exactly why the engine must be
+      rebuilt to carry it.
+    evidence: { class: private-archive, note: "the full branch + 192 tags live in the private archive · the crates.io trail below is this era's public spine" }
 
   - id: diamond
     span: "2026-04-13 → today"
-    title: "The Diamond era (rewrite from scratch)"
+    title: "The Diamond era (the clean language)"
     story: >-
-      An orphan branch — zero shared history with the exploration
-      code. Craft, not extraction: every crate re-enters through a
-      12-gate admission. The version line continues (0.80 picks up
-      where 0.79 stopped) because the LANGUAGE is the continuity;
-      the engine is the rewrite.
+      A rewrite from scratch on an orphan branch — zero shared history
+      with the brouillon code. Craft, not extraction: every crate
+      re-enters through a 12-gate admission. The version line continues
+      (0.80 picks up where 0.79 stopped) because the LANGUAGE is the
+      continuity; the engine is the rewrite. This is where the
+      specification, the conformance suite, and the standard surfaces
+      are built.
     evidence: { class: github-commit, repo: supernovae-st/nika, sha: 0cc7b74235c896f16d326795786a7f7b40241c43 }
 
 entries:
-  # ── conception ────────────────────────────────────────────────────
+  # ── exploration · summer 2025 → end 2025 (private, before git) ─────
   - date: "2025-08"
     precision: month
     type: milestone
     title: "Private prototypes begin"
-    detail: "Vibe-code experiments and private-repo brainstorms circle the idea: repeatable AI work should live in files, not chats."
+    detail: "Vibe-code experiments and private-repo brainstorms on the maintainer's machine circle the idea: repeatable AI work belongs in files, not chats. No public repo, no git history yet."
     evidence: { class: testimony }
 
-  # ── exploration era ───────────────────────────────────────────────
+  - date: "2025-11"
+    precision: month
+    type: milestone
+    title: "The shape settles"
+    detail: "Through late 2025 the private experiments converge on a declarative file, verbs, and a check-before-run discipline — the pillars the public engine will carry."
+    evidence: { class: testimony }
+
+  # ── brouillon · 2026-01-01 → 2026-04-13 (git · 0.1 → 0.79) ─────────
   - date: "2026-01-01"
     type: milestone
     title: "First commit · « initial nika v0.1 with strict templating system »"
-    detail: "The language is born on New Year's Day, 21:29 CET."
+    detail: "The language enters git on New Year's Day 2026, 21:29 CET, on the branch named brouillon."
     component: engine
     evidence: { class: private-archive, sha: 2d17d85ed }
 
   - date: "2026-01-01"
     type: milestone
-    title: "DAG validation lands, hours later"
+    title: "DAG validation lands, nineteen minutes later"
     detail: "The second commit of day one already carries the spine: workflows are DAGs, validated before they run."
     component: engine
     evidence: { class: private-archive, sha: a17cfbb91 }
@@ -93,9 +114,21 @@ entries:
     type: release
     version: "0.20.0"
     title: "First public release on crates.io"
-    detail: "The exploration era goes public. Seven versions ship to crates.io in March — later yanked in favor of the rewrite, but the dated trail is permanent."
+    detail: "The brouillon era goes public. The crate is registered and the first version ships — the start of a March trail later yanked in favor of the rewrite, but permanently timestamped."
     component: engine
     evidence: { class: crates-io, crate: nika, version: "0.20.0" }
+
+  - date: "2026-03-05"
+    type: release
+    version: "0.21.0"
+    component: engine
+    evidence: { class: crates-io, crate: nika, version: "0.21.0" }
+
+  - date: "2026-03-12"
+    type: release
+    version: "0.27.0"
+    component: engine
+    evidence: { class: crates-io, crate: nika, version: "0.27.0" }
 
   - date: "2026-03-21"
     type: release
@@ -103,27 +136,42 @@ entries:
     component: engine
     evidence: { class: crates-io, crate: nika, version: "0.35.4" }
 
+  - date: "2026-03-22"
+    type: release
+    version: "0.38.0"
+    component: engine
+    evidence: { class: crates-io, crate: nika, version: "0.38.0" }
+
   - date: "2026-03-26"
     type: release
     version: "0.47.1"
-    title: "Last crates.io release of the exploration era"
-    detail: "Six releases in twenty-two days — the era's peak cadence, publicly timestamped."
+    title: "Last crates.io release of the brouillon era"
+    detail: "Seven versions ship to crates.io in twenty-two days (0.20.0 → 0.47.1) — the era's public cadence, every date permanent even after the yank."
     component: engine
     evidence: { class: crates-io, crate: nika, version: "0.47.1" }
 
   - date: "2026-04-05"
     type: milestone
     title: "v0.71 · the monolith peaks"
-    detail: "The exploration engine reaches ~138K lines. The lesson is complete: the language deserves a cleaner carrier."
+    detail: "The brouillon engine reaches ~138K lines across a single crate. The lesson is complete: the language deserves a cleaner carrier."
     component: engine
-    evidence: { class: private-archive, note: "version bump commit in the legacy archive · 2026-04-05" }
+    evidence: { class: private-archive, note: "version bump commit in the brouillon archive · 2026-04-05" }
 
-  # ── diamond era ───────────────────────────────────────────────────
+  - date: "2026-04-13"
+    type: milestone
+    title: "v0.79.3 · the brouillon era closes"
+    detail: "The final draft-era version. The branch stays as read-only reference — read via `git show`, never modified — while the rewrite begins the same day."
+    component: engine
+    era: brouillon
+    evidence: { class: private-archive, note: "the brouillon branch tip · preserved read-only" }
+
+  # ── diamond · 2026-04-13 → today (rewrite from scratch) ────────────
   - date: "2026-04-13"
     type: milestone
     title: "The rewrite begins · Diamond genesis"
-    detail: "An orphan branch is initialized and 0.80.0-alpha tags the same day. Rewrite from scratch — craft, not extraction — while the exploration branch keeps running as reference."
+    detail: "An orphan branch is initialized and 0.80.0-alpha tags the same day. Rewrite from scratch — craft, not extraction — 12-gate crate admission from the first line."
     component: engine
+    era: diamond
     evidence: { class: github-commit, repo: supernovae-st/nika, sha: 0cc7b74235c896f16d326795786a7f7b40241c43 }
 
   - date: "2026-04-13"
@@ -132,6 +180,7 @@ entries:
     title: "First Diamond tag"
     detail: "The version line continues from 0.79 — the language is the continuity, the engine is the rewrite."
     component: engine
+    era: diamond
     evidence: { class: github-release, repo: supernovae-st/nika, tag: v0.80.0-alpha.1 }
 
   - date: "2026-05-22"
@@ -171,7 +220,7 @@ entries:
 
   - date: "2026-07-18"
     type: milestone
-    title: "Governance gains its one public door (NEP process)"
+    title: "Governance gains its one public door (the NEP process)"
     detail: "Nobody amends the standard directly, maintainers included. Authority transfer to a technical committee is written down from day one."
     component: spec
     evidence: { class: github-pr, repo: supernovae-st/nika-spec, pr: 120 }
@@ -186,11 +235,11 @@ entries:
     type: milestone
     title: "The standard hardening day"
     detail: >-
-      One day, six merged PRs across engine and spec: least-privilege
-      workflow tokens · SLSA provenance as a release asset ·
-      security-insights · the agent-facing surfaces finally tell the
-      standard (llms.txt) · the three mute security classes gain
-      proven fixture pairs (secrets-to-outputs · lethal trifecta ·
+      One day, several merged PRs across engine and spec:
+      least-privilege workflow tokens · SLSA provenance as a release
+      asset · security-insights · the agent-facing surfaces finally
+      tell the standard (llms.txt) · the three mute security classes
+      gain proven fixture pairs (secrets-to-outputs · lethal trifecta ·
       self-launch) · the conformance runner drives ANY engine by
       command (--engine · 99/99 self-test).
     component: standard
@@ -199,7 +248,7 @@ entries:
   - date: "2026-07-20"
     type: milestone
     title: "OpenSSF Scorecard reads 7.3"
-    detail: "Up from 6.5 the same morning. The declared bar: the official 1.0 does not ship below 10/10."
+    detail: "Up from 6.5 the same morning (least-privilege tokens + patched dependencies landed). The declared bar: the official 1.0 does not ship below 10/10."
     component: standard
     evidence: { class: scorecard, repo: github.com/supernovae-st/nika, reading: "7.3" }
 
@@ -212,13 +261,21 @@ gates:
       - "the release-candidate gate is green"
       - "design partners run real workflows and their feedback rounds land"
 
+  - id: scorecard-10
+    title: "OpenSSF Scorecard 10/10"
+    conditions:
+      - "every mechanical check at 10 (token permissions · signed releases · pinned deps · vulnerabilities · SAST)"
+      - "a second reviewer so code-review and branch-protection clear"
+      - "the best-practices badge earned"
+    note: "The declared pre-condition of the official 1.0."
+
   - id: v1
     title: "1.0.0 · the first official launch"
     conditions:
       - "rc gate green + feedback rounds absorbed"
       - "real traction, honestly measured"
       - "a launch crafted to the same bar as the language"
-      - "OpenSSF Scorecard at the declared bar (10/10)"
+      - "the Scorecard bar met (10/10)"
 
   - id: second-implementation
     title: "The second independent implementation"
