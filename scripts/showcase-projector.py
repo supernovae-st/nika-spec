@@ -47,6 +47,23 @@ except ImportError:
 SPEC_ROOT = Path(__file__).resolve().parent.parent
 SHOWCASE = SPEC_ROOT / "examples" / "showcase"
 
+# ── the served-grammar door (docs targets only) ──────────────────────
+# The pack is authored in the RATIFIED grammar; docs are a BAKED visitor
+# surface, so the yaml a reader copies must run on the RELEASED binary
+# (the website applies the same law at serve time via src/lib/w1-to-w2.ts).
+# Flips to identity at the release train: NIKA_SERVED_GRAMMAR=wnew.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from grammar_door import downcast_w2  # noqa: E402
+
+SERVED_GRAMMAR = os.environ.get("NIKA_SERVED_GRAMMAR", "w2")
+
+
+def served(yaml_text: str, fname: str) -> str:
+    """The grammar a docs reader copies · w2 through the door pre-train."""
+    if SERVED_GRAMMAR == "wnew":
+        return yaml_text
+    return downcast_w2(yaml_text, fname)
+
 BEGIN = re.compile(r"\{/\* showcase:begin ([a-z0-9-]+\.nika\.yaml) \*/\}")
 END = "{/* showcase:end */}"
 DAG_BEGIN = re.compile(r"\{/\* showcase:dag-begin ([a-z0-9-]+\.nika\.yaml) \*/\}")
@@ -500,7 +517,7 @@ def project_docs_page(page: Path, workflows: dict[str, str], templates: dict[str
             print(f"showcase-projector · {page.name} references unknown {fname}",
                   file=sys.stderr)
             sys.exit(2)
-        return f"\n```yaml {fname}\n{workflows[fname]}```\n"
+        return f"\n```yaml {fname}\n{served(workflows[fname], fname)}```\n"
 
     def dag_for(fname):
         if fname not in workflows:
@@ -514,7 +531,7 @@ def project_docs_page(page: Path, workflows: dict[str, str], templates: dict[str
             print(f"showcase-projector · {page.name} references unknown template {fname}",
                   file=sys.stderr)
             sys.exit(2)
-        return f"\n```yaml {fname}\n{templates[fname]}```\n"
+        return f"\n```yaml {fname}\n{served(templates[fname], fname)}```\n"
 
     text, d1 = _replace_blocks(text, BEGIN, END, page.name, yaml_for)
     text, d2 = _replace_blocks(text, DAG_BEGIN, DAG_END, page.name, dag_for)
