@@ -1,0 +1,5 @@
+# Reference conformance runner dependencies (conformance/runner.py).
+# One venv, one command:
+#   python3 -m venv .venv && . .venv/bin/activate && pip install -r conformance/requirements.txt
+pyyaml>=6.0,<7
+jsonschema>=4.21,<5

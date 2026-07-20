@@ -21,6 +21,24 @@ autocomplete + validation via a `yaml-language-server` modeline:
 - [Conformance](https://raw.githubusercontent.com/supernovae-st/nika-spec/main/spec/07-conformance.md): three levels · the fixture suite · editor tooling
 - [Out of scope](https://raw.githubusercontent.com/supernovae-st/nika-spec/main/spec/08-out-of-scope.md): what Nika deliberately does not do
 - [Types](https://raw.githubusercontent.com/supernovae-st/nika-spec/main/spec/09-types.md): the decidable type core · types: · returns: · decode:
+- [Authority](https://raw.githubusercontent.com/supernovae-st/nika-spec/main/spec/10-authority.md): permits: capability · policy: law · secrets/egress flow · required ⊆ permitted
+- [Decision](https://raw.githubusercontent.com/supernovae-st/nika-spec/main/spec/11-decision.md): the decision surface · receipts as verdict carriers
+- [Gateway](https://raw.githubusercontent.com/supernovae-st/nika-spec/main/spec/12-gateway.md): run gates · pause/resume · the human door
+- [Outcomes](https://raw.githubusercontent.com/supernovae-st/nika-spec/main/spec/13-outcomes.md): terminal states · success/failure predicates
+- [Composition](https://raw.githubusercontent.com/supernovae-st/nika-spec/main/spec/14-composition.md): cross-file composition rules
+- [Proof](https://raw.githubusercontent.com/supernovae-st/nika-spec/main/spec/15-proof.md): receipts · hash chain · replay
+- [Projections](https://raw.githubusercontent.com/supernovae-st/nika-spec/main/spec/16-projections.md): derived surfaces · one source, many views
+
+## Standard
+
+The spec ships as an open standard surface: a public conformance suite,
+one claim form, one governance door.
+
+- [Conformance runner protocol](https://raw.githubusercontent.com/supernovae-st/nika-spec/main/conformance/runner-protocol.md): run the suite against ANY engine · fixture contract (input.yaml + expected.json)
+- [Conformant implementations](https://raw.githubusercontent.com/supernovae-st/nika-spec/main/CONFORMANT_IMPLEMENTATIONS.md): the registry · claim form « Nika v1 Conformant — <Level> (spec <commit>) » · how to be listed
+- [NEP process](https://raw.githubusercontent.com/supernovae-st/nika-spec/main/governance/nep-0000-the-nep-process.md): the one public door for evolving the standard · nobody amends it directly, maintainers included
+- [Certifications](https://raw.githubusercontent.com/supernovae-st/nika-spec/main/governance/certifications.md): the earned-badges matrix (Scorecard · REUSE · SLSA · best-practices) with evidence links
+- [Glossary](https://raw.githubusercontent.com/supernovae-st/nika-spec/main/GLOSSARY.md): canonical referents for overloaded words (oracle · gate · golden · …)
 
 ## Reference
 

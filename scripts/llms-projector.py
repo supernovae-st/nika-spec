@@ -41,6 +41,18 @@ FULL_ORDER = [
     "spec/07-conformance.md",
     "spec/08-out-of-scope.md",
     "spec/09-types.md",
+    "spec/10-authority.md",
+    "spec/11-decision.md",
+    "spec/12-gateway.md",
+    "spec/13-outcomes.md",
+    "spec/14-composition.md",
+    "spec/15-proof.md",
+    "spec/16-projections.md",
+    "conformance/runner-protocol.md",
+    "CONFORMANT_IMPLEMENTATIONS.md",
+    "governance/nep-0000-the-nep-process.md",
+    "governance/certifications.md",
+    "GLOSSARY.md",
     "stdlib/builtins-v0.1.md",
     "stdlib/providers-v0.1.md",
     "stdlib/extract-modes-v0.1.md",
@@ -86,6 +98,24 @@ autocomplete + validation via a `yaml-language-server` modeline:
 - [Conformance]({RAW}/spec/07-conformance.md): three levels · the fixture suite · editor tooling
 - [Out of scope]({RAW}/spec/08-out-of-scope.md): what Nika deliberately does not do
 - [Types]({RAW}/spec/09-types.md): the decidable type core · types: · returns: · decode:
+- [Authority]({RAW}/spec/10-authority.md): permits: capability · policy: law · secrets/egress flow · required ⊆ permitted
+- [Decision]({RAW}/spec/11-decision.md): the decision surface · receipts as verdict carriers
+- [Gateway]({RAW}/spec/12-gateway.md): run gates · pause/resume · the human door
+- [Outcomes]({RAW}/spec/13-outcomes.md): terminal states · success/failure predicates
+- [Composition]({RAW}/spec/14-composition.md): cross-file composition rules
+- [Proof]({RAW}/spec/15-proof.md): receipts · hash chain · replay
+- [Projections]({RAW}/spec/16-projections.md): derived surfaces · one source, many views
+
+## Standard
+
+The spec ships as an open standard surface: a public conformance suite,
+one claim form, one governance door.
+
+- [Conformance runner protocol]({RAW}/conformance/runner-protocol.md): run the suite against ANY engine · fixture contract (input.yaml + expected.json)
+- [Conformant implementations]({RAW}/CONFORMANT_IMPLEMENTATIONS.md): the registry · claim form « Nika v1 Conformant — <Level> (spec <commit>) » · how to be listed
+- [NEP process]({RAW}/governance/nep-0000-the-nep-process.md): the one public door for evolving the standard · nobody amends it directly, maintainers included
+- [Certifications]({RAW}/governance/certifications.md): the earned-badges matrix (Scorecard · REUSE · SLSA · best-practices) with evidence links
+- [Glossary]({RAW}/GLOSSARY.md): canonical referents for overloaded words (oracle · gate · golden · …)
 
 ## Reference
 
