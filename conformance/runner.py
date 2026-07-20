@@ -53,6 +53,8 @@
 # Deps · pyyaml · jsonschema. Exit non-zero on any failure (CI contract).
 
 from __future__ import annotations
+import shlex
+import subprocess
 import sys, json, re, pathlib
 import yaml
 from jsonschema import Draft202012Validator
@@ -957,8 +959,50 @@ def _matches(expected_err: dict, emitted: list[dict]) -> bool:
     return False
 
 
+def validate_via_engine(engine_cmd: list[str], path: pathlib.Path) -> dict:
+    """Third-party mode · the fixture is judged by an EXTERNAL engine, by
+    command, never by linkage. Contract (runner-protocol §wire shape): the
+    command receives the workflow path as its final argument and prints the
+    verdict JSON on stdout — {"valid": bool, "errors": [{"code"|"namespace",
+    "category", "detail"}]}. The exit code is free (the JSON is the verdict).
+    Engines with a different native output wrap themselves in a tiny
+    adapter script — the Bowtie harness pattern."""
+    try:
+        proc = subprocess.run(
+            engine_cmd + [str(path)],
+            capture_output=True, text=True, timeout=120,
+        )
+    except FileNotFoundError:
+        return {"valid": None, "errors": [{"namespace": "RUNNER",
+                "category": "harness_error",
+                "detail": f"engine command not found: {engine_cmd[0]}"}]}
+    except subprocess.TimeoutExpired:
+        return {"valid": None, "errors": [{"namespace": "RUNNER",
+                "category": "harness_error",
+                "detail": "engine timed out after 120s"}]}
+    out = proc.stdout.strip()
+    start = out.find("{")
+    if start < 0:
+        return {"valid": None, "errors": [{"namespace": "RUNNER",
+                "category": "harness_error",
+                "detail": f"engine emitted no JSON verdict (stdout: {out[:120]!r} · stderr: {proc.stderr.strip()[:120]!r})"}]}
+    try:
+        verdict = json.loads(out[start:])
+    except json.JSONDecodeError as e:
+        return {"valid": None, "errors": [{"namespace": "RUNNER",
+                "category": "harness_error",
+                "detail": f"engine verdict is not valid JSON: {e}"}]}
+    if not isinstance(verdict.get("valid"), bool):
+        return {"valid": None, "errors": [{"namespace": "RUNNER",
+                "category": "harness_error",
+                "detail": "engine verdict lacks a boolean 'valid' field"}]}
+    verdict.setdefault("errors", [])
+    return verdict
+
+
 def run_fixtures(fixtures_dir: pathlib.Path, validator: Draft202012Validator,
-                 canon: dict | None = None) -> int:
+                 canon: dict | None = None,
+                 engine_cmd: list[str] | None = None) -> int:
     inputs = sorted(fixtures_dir.rglob("input.yaml"))
     if not inputs:
         # A tier that finds zero fixtures must NOT report "0/0 passed · exit 0":
@@ -970,7 +1014,10 @@ def run_fixtures(fixtures_dir: pathlib.Path, validator: Draft202012Validator,
     for inp in inputs:
         rel = inp.parent.relative_to(fixtures_dir.parent)
         exp = json.loads((inp.parent / "expected.json").read_text())
-        verdict = validate_text(inp.read_text(), validator, canon, base_dir=inp.parent)
+        if engine_cmd:
+            verdict = validate_via_engine(engine_cmd, inp)
+        else:
+            verdict = validate_text(inp.read_text(), validator, canon, base_dir=inp.parent)
         ok = verdict["valid"] == exp["valid"]
         if ok and not exp["valid"]:
             # at least one expected error must match an emitted one
@@ -1002,6 +1049,14 @@ def run_examples(examples_dir: pathlib.Path, validator: Draft202012Validator,
 
 
 def main(argv: list[str]) -> int:
+    engine_cmd = None
+    if "--engine" in argv:
+        i = argv.index("--engine")
+        if i + 1 >= len(argv):
+            print("--engine requires a command string", file=sys.stderr)
+            return 2
+        engine_cmd = shlex.split(argv[i + 1])
+        argv = argv[:i] + argv[i + 2:]
     validator = load_schema()
     canon = load_canon()
     if len(argv) >= 2 and argv[1] == "validate" and len(argv) == 3:
@@ -1010,7 +1065,7 @@ def main(argv: list[str]) -> int:
         return 0 if v["valid"] else 1
     if len(argv) >= 2 and argv[1] == "run":
         d = pathlib.Path(argv[2]) if len(argv) == 3 else HERE / "tests" / "core"
-        return run_fixtures(d, validator, canon)
+        return run_fixtures(d, validator, canon, engine_cmd=engine_cmd)
     if len(argv) == 3 and argv[1] == "examples":
         return run_examples(pathlib.Path(argv[2]), validator, canon)
     if len(argv) == 2 and argv[1] == "all":
@@ -1018,11 +1073,11 @@ def main(argv: list[str]) -> int:
         # every example executed as a conformance input (each must be valid).
         rc = 0
         print("== tests/core ==")
-        rc |= run_fixtures(HERE / "tests" / "core", validator, canon)
+        rc |= run_fixtures(HERE / "tests" / "core", validator, canon, engine_cmd=engine_cmd)
         print("\n== tests/stdlib (static surface) ==")
-        rc |= run_fixtures(HERE / "tests" / "stdlib", validator, canon)
+        rc |= run_fixtures(HERE / "tests" / "stdlib", validator, canon, engine_cmd=engine_cmd)
         print("\n== tests/deep (CEL parse · jq compile · durations · schema-meta) ==")
-        rc |= run_fixtures(HERE / "tests" / "deep", validator, canon)
+        rc |= run_fixtures(HERE / "tests" / "deep", validator, canon, engine_cmd=engine_cmd)
         print("\n== examples (each example = a conformance input) ==")
         rc |= run_examples(SPEC_ROOT / "examples", validator, canon)
         showcase = SPEC_ROOT / "examples" / "showcase"
