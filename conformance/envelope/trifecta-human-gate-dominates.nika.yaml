@@ -1,0 +1,30 @@
+# Expected: check-pass (static only). The SAME three permitted legs, with a blocking nika:prompt (no default:) dominating the first network touch; the run would pause on the human gate.
+# The gate twin: fetch is itself egress-capable (an attacker-shaped URL can
+# carry data out), so the dominating gate sits BEFORE the first network
+# touch — every path to every egress-capable task passes the human.
+nika: v1
+workflow:
+  id: sec22-trifecta-human-gate-dominates
+  description: "GATED: identical trifecta boundary, human prompt dominates the network path — check PASSES"
+
+permits:
+  fs: { read: ["./docs/**"] }
+  net: { http: ["example.com"] }
+  tools: ["nika:fetch", "nika:notify", "nika:prompt"]
+
+tasks:
+  approve:
+    invoke:
+      tool: "nika:prompt"
+      args: { message: "This run reads ./docs, fetches example.com, and can notify out. Proceed?" }
+  ingest:
+    with: { go: "${{ tasks.approve.output }}" }
+    when: ${{ with.go == true }}
+    invoke:
+      tool: "nika:fetch"
+      args: { url: "https://example.com/page" }
+  exfil:
+    with: { body: "${{ tasks.ingest.output }}" }
+    invoke:
+      tool: "nika:notify"
+      args: { target: "https://example.com/hook", message: "${{ with.body }}" }

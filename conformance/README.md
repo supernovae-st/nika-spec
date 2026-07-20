@@ -26,6 +26,7 @@ line is normative for the file; other comments are context.
 | `# Expected: NIKA-XXX-NNN (check or run).` | negative · either stage may catch it (a stricter check is conformant) |
 | `# Expected: check-reject (gate verdict).` | negative · the static check MUST refuse (nonzero exit) — no specific wire code required. Used for the permits/secrets/tools boundary gates, which report a human verdict (`✖ PERMITS …` / `✖ SECRETS …` / `✖ TOOLS …`) rather than a NIKA code. An engine that additionally surfaces a wire code (e.g. `NIKA-SEC-004` per spec 05) is equally conformant. |
 | `# Expected: exit 0 — …` | positive · the workflow completes clean (includes the *recovered* class: an internal error recovered via `on_error` — workflow-level success) |
+| `# Expected: check-pass (static only). …` | positive · the static check MUST pass; the run is never attempted (the fixture would pause on a human gate or reach the network — its runtime half belongs to `tests/runtime`) |
 
 Runner contract beyond headers: create `out/<family>/` sink dirs before the
 loop (files write only under `./out/` · `run.sh` does this) and export the
