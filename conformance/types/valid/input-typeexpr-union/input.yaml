@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: io-typeexpr-union
+inputs:
+  limit:
+    type: { union: [{ integer: { min: 1, max: 100 } }, { enum: ["auto"] }] }
+    default: "auto"
+    description: "a bounded integer OR the closed enum literal · the full TypeExpr at an io position"
+  shape:
+    type: { string: { pattern: "^[a-z][a-z0-9-]*$", max_len: 64 } }
+    required: true
+tasks:
+  note:
+    invoke:
+      tool: "nika:log"
+      args:
+        message: "${{ inputs.limit }} ${{ inputs.shape }}"
+outputs:
+  echo:
+    value: ${{ tasks.note.output }}
+    type: { union: [string, null] }

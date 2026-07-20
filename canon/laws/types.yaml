@@ -70,10 +70,10 @@ laws:
     diagnostics: ["NIKA-TYPE-001"]
     fixtures:
       - conformance/tests/core/types/008-composed-types-valid
-      - to-mint-c1/conformance/types/valid/input-typeexpr-union
+      - conformance/types/valid/input-typeexpr-union
     negative_fixtures:
       - conformance/tests/core/types/002-unknown-type-name
-      - to-mint-c1/conformance/types/invalid/io-type-outside-typeexpr
+      - conformance/types/invalid/io-type-outside-typeexpr
     projections: ["prose:09-types", "prose:01-envelope", "schema", "cli:check", "lsp", "mcp", "sdk"]
     implementation_surfaces:
       - engine:nika-schema
@@ -137,9 +137,9 @@ laws:
         id: bool_primitive_spelling
     diagnostics: []
     fixtures:
-      - to-mint-c1/conformance/types/valid/bool-spelling
+      - conformance/types/valid/bool-spelling
     negative_fixtures:
-      - to-mint-c1/conformance/types/invalid/boolean-spelling-dead
+      - conformance/types/invalid/boolean-spelling-dead
     projections: ["prose:09-types", "prose:01-envelope", "schema", "cli:check", "docs"]
     implementation_surfaces:
       - engine:nika-schema

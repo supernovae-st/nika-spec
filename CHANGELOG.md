@@ -35,6 +35,22 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   policy) · REUSE 3.3 compliance (REUSE.toml + LICENSES/ + CI gate) ·
   OpenSSF Scorecard + CodeQL + ruff + grouped Dependabot workflows
   (SHA-pinned) · `.bestpractices.json` self-assessment · README badges.
+- **The C2 predicate vocabularies gain their law-cited conformance lanes**
+  (W0 · the predicates lane) — the reference type core now judges the
+  `type:` of every value declaration (`inputs:` · `config:` · typed
+  `const:` · typed `outputs:`) with the same parser as `types:`/`returns:`
+  (R3b · LAW-GRAMMAR-0211 · one type truth: an unknown name or a form
+  outside the grammar refuses `NIKA-TYPE-001` at the io position, the
+  regex dialect `NIKA-TYPE-006` included) — before this, only the schema
+  pattern layer refused there. Seven fixtures the canon laws named at
+  import land: `conformance/types/` (`input-typeexpr-union` ·
+  `bool-spelling` valid · `io-type-outside-typeexpr` ·
+  `boolean-spelling-dead` invalid) and `conformance/gates/`
+  (`after-class-spellings` valid · `after-participial-spelling-dead` ·
+  `after-unknown-predicate` invalid · R5 · LAW-GRAMMAR-0231). The three
+  value-authority lanes (`values` · `types` · `gates`) join
+  `conformance/runner.py all` — the values lane was previously exercised
+  only out-of-gate — and the law files cite the minted paths.
 
 ### Changed
 

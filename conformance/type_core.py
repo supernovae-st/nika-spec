@@ -372,6 +372,45 @@ def type_core_errors(doc: dict) -> list[dict]:
             except TypeError_ as e:
                 errs.append(err(e.code, e.detail))
 
+    # ── the io declaration positions (R3b · LAW-GRAMMAR-0211) ────────────
+    # The `type:` of typed inputs:/config:/const:/outputs: speaks the SAME
+    # full TypeExpr as types:/returns: — one type truth, every declaration
+    # position judged by the same parser. The schema's pattern layer refuses
+    # these too (NIKA-PARSE), but the prose and the law name the class
+    # (NIKA-TYPE-001 · NIKA-TYPE-006 for the regex dialect) — the type core
+    # owns it at every io position, never the schema alone.
+    for auth in ("inputs", "config"):
+        block = doc.get(auth)
+        if isinstance(block, dict):
+            for name, decl in block.items():
+                if isinstance(decl, dict) and "type" in decl:
+                    try:
+                        parse_type(decl["type"], names, f"{auth}.{name}.type")
+                    except TypeError_ as e:
+                        errs.append(err(e.code, e.detail))
+    raw_const = doc.get("const")
+    if isinstance(raw_const, dict):
+        for name, decl in raw_const.items():
+            # the typed-constant discriminator (01-envelope · normative): an
+            # object carrying BOTH `type` and `value` IS a typed constant —
+            # an object missing either key is a bare literal (its `type` key
+            # is data, never a declaration).
+            if isinstance(decl, dict) and "type" in decl and "value" in decl:
+                try:
+                    parse_type(decl["type"], names, f"const.{name}.type")
+                except TypeError_ as e:
+                    errs.append(err(e.code, e.detail))
+    raw_outputs = doc.get("outputs")
+    if isinstance(raw_outputs, dict):
+        for name, decl in raw_outputs.items():
+            # typed form { value, type, description } · the untyped form is
+            # a bare ${{ }} reference (a string · skipped by isinstance).
+            if isinstance(decl, dict) and "type" in decl:
+                try:
+                    parse_type(decl["type"], names, f"outputs.{name}.type")
+                except TypeError_ as e:
+                    errs.append(err(e.code, e.detail))
+
     tasks = doc.get("tasks")
     if not isinstance(tasks, dict):
         return errs

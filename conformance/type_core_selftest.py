@@ -248,6 +248,38 @@ law("order · open widens into a freer open (F_b ⊆ F_a)",
 law("order · open ⋢ closed rides assignable too",
     not assignable(OPEN0, CLOSED_AOPT, N))
 
+# ── the io declaration walk (R3b · LAW-GRAMMAR-0211 · one type truth) ───
+# The type: of typed inputs:/config:/const:/outputs: is judged by the SAME
+# parser as types:/returns: — every declaration position, one type truth.
+from type_core import type_core_errors  # noqa: E402
+
+
+def _io_codes(doc) -> list:
+    return [e["code"] for e in type_core_errors(doc)]
+
+
+_BASE = {"workflow": {"id": "x"},
+         "tasks": {"a": {"exec": {"command": ["true"]}}}}
+
+law("io · inputs.type full TypeExpr admits (union + refinements)",
+    _io_codes({**_BASE, "inputs": {
+        "limit": {"type": {"union": [{"integer": {"min": 1, "max": 9}},
+                                     {"enum": ["auto"]}]}},
+        "shape": {"type": {"string": {"pattern": "^[a-z]+$"}}}}}) == [])
+law("io · unknown name at inputs refuses NIKA-TYPE-001",
+    "NIKA-TYPE-001" in _io_codes({**_BASE, "inputs": {"x": {"type": "Summary"}}}))
+law("io · the dead boolean spelling refuses at config",
+    "NIKA-TYPE-001" in _io_codes({**_BASE, "config": {"x": {"type": "boolean"}}}))
+law("io · a typed const's type is judged · a bare literal's type key never is",
+    "NIKA-TYPE-001" in _io_codes({**_BASE, "const": {"w": {"type": "float", "value": 1}}})
+    and _io_codes({**_BASE, "const": {"settings": {"type": "custom"}}}) == [])
+law("io · a typed outputs entry's type is judged",
+    "NIKA-TYPE-001" in _io_codes(
+        {**_BASE, "outputs": {"o": {"value": "${{ tasks.a.output }}", "type": "float"}}}))
+law("io · the regex dialect fires at an io position too (NIKA-TYPE-006)",
+    "NIKA-TYPE-006" in _io_codes(
+        {**_BASE, "inputs": {"x": {"type": {"string": {"pattern": "(?=a)"}}}}}))
+
 bad = [n for n, ok in CHECKS if not ok]
 print(f"type-core selftest · {len(CHECKS) - len(bad)}/{len(CHECKS)} laws hold")
 for n in bad:
