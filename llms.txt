@@ -39,6 +39,7 @@ one claim form, one governance door.
 - [NEP process](https://raw.githubusercontent.com/supernovae-st/nika-spec/main/governance/nep-0000-the-nep-process.md): the one public door for evolving the standard · nobody amends it directly, maintainers included
 - [Certifications](https://raw.githubusercontent.com/supernovae-st/nika-spec/main/governance/certifications.md): the earned-badges matrix (Scorecard · REUSE · SLSA · best-practices) with evidence links
 - [Glossary](https://raw.githubusercontent.com/supernovae-st/nika-spec/main/GLOSSARY.md): canonical referents for overloaded words (oracle · gate · golden · …)
+- [Timeline](https://raw.githubusercontent.com/supernovae-st/nika-spec/main/timeline/timeline.yaml): the one verifiable record — eras · releases · milestones · forward gates (every provable claim re-proven in CI)
 
 ## Reference
 

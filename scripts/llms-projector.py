@@ -116,6 +116,7 @@ one claim form, one governance door.
 - [NEP process]({RAW}/governance/nep-0000-the-nep-process.md): the one public door for evolving the standard · nobody amends it directly, maintainers included
 - [Certifications]({RAW}/governance/certifications.md): the earned-badges matrix (Scorecard · REUSE · SLSA · best-practices) with evidence links
 - [Glossary]({RAW}/GLOSSARY.md): canonical referents for overloaded words (oracle · gate · golden · …)
+- [Timeline]({RAW}/timeline/timeline.yaml): the one verifiable record — eras · releases · milestones · forward gates (every provable claim re-proven in CI)
 
 ## Reference
 
