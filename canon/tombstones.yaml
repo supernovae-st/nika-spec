@@ -125,3 +125,48 @@ tombstones:
       date: "2026-07-17"
       count: 0
     notes: "Annexe A-16 phrase 2 verbatim : « La ligne ghost `model: { select: {require, prefer} }` (15:72) est supprimée. » Kill exécuté au leg pc-light (MIG-modelref · 2026-07-17) : l'unique hit vivant (LAW-MIGR-0501 proof obligation verbatim : « l'unique hit vivant est spec/15-proof.md:72 ») meurt — le champ lock model_select: ET son commentaire dans le bloc nika.lock (« la surface auteur et sa matérialisation lock meurent ensemble » · LAW-GRAMMAR-0501 · « Le lock format perd le champ model_select: dans le même geste » · LAW-MIGR-0501). La string <provider>/<name> = SEULE surface v1 (LAW-SURFACE-0501) · la var EST l'alias logique (LAW-SURFACE-0502). Le pattern census couvre les deux orthographes (champ lock · forme inline) · le '.' du pattern = la brace (grep -E metachar-safe). Les records verbatim (canon/laws/model.yaml ×3 + laws-index généré) citent la forme morte à jamais — le record du ruling EST la loi (le receipt pc-census-baseline comptait 3 sites : 1 vivant + les citations du record · re-mesure pc-light empirique)."
+  - id: vars-namespace-spelling
+    status: retired
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0201", "LAW-SURFACE-0201"]
+    introduced_in: C2
+    kind: surface-word
+    retired_in: C2
+    replaced_by: "surface:value_authority_family"
+    census_pattern:
+      tool: grep
+      pattern: "vars:"
+      scope: spec
+    final_census:
+      date: "2026-07-19"
+      count: 0
+    notes: "R3a verbatim : « vars/env meurent. » + « Codemod classify-not-rename (equivalence-or-stop). » Le spelling vars (champ d'enveloppe + namespace d'expression ${{ vars.X }}) est une forme morte : chaque usage est CLASSE vers l'autorite que son role reel commande (typed parameter -> inputs: · fixed value -> const: · E-split total rule : required:true lands in inputs, everything else in const), jamais renomme en bloc. Kill C2 : le flip atomique #142 a deplace les surfaces machine (schema · values_core · fixtures · templates · examples) ; CETTE cascade deplace la prose d'enseignement (spec/01-envelope · spec/04-variables · les chapitres satellites) et la row surface (remplacee par surface:value_authority_family · jamais silencieusement). Le refus vivant enseigne la classification : NIKA-VALUES-001 (vars:) · jamais un parse error generique. Census scope spec (la surface d'enseignement normative) · carve-outs documentes : les fixtures de refus dead-form (conformance/values/invalid/vars-block-dead · elles ENSEIGNENT la forme morte, c'est leur role) · les records verbatim canon/laws/* (le record du ruling EST la loi) · les scripts codemod/migration · les logs FINDINGS dates (records historiques) — tous gardent l'ancienne orthographe a dessein."
+  - id: env-namespace-spelling
+    status: retired
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0202", "LAW-SURFACE-0201"]
+    introduced_in: C2
+    kind: surface-word
+    retired_in: C2
+    replaced_by: "surface:value_authority_family"
+    census_pattern:
+      tool: grep
+      pattern: "env:"
+      scope: spec
+    notes: "R3a verbatim : « vars/env meurent. » Le spelling env (champ d'enveloppe + namespace d'expression ${{ env.X }}) est une forme morte : la classification est celle du role reel de chaque usage (non-sensitive runtime configuration -> config: · governed store reference -> secrets: · classify-not-rename · la loi ne grave AUCUNE table de mapping globale). Kill C2 avec la cascade prose (meme geste que vars-namespace-spelling). Le refus vivant : NIKA-VALUES-002. PAS de final_census : le pattern env: en scope spec garde des hits LEGITIMES post-cascade — exec.env (le champ subprocess de 02-verbs · scope different, meme mot) · secrets source: env (une provenance de secret, masquee) · les mentions de la forme morte dans les enseignements de refus (la note dead-forms de 01-envelope) — le census se lit a la main, jamais au grep brut. exec.env ≠ l'ancienne env: d'enveloppe : la note de desambiguation de 02-verbs porte desormais config:."
+  - id: nika-parse-015
+    status: retired
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0211"]
+    introduced_in: C2
+    kind: diagnostic
+    retired_in: C2
+    replaced_by: "diagnostics:NIKA-TYPE-001"
+    census_pattern:
+      tool: grep
+      pattern: "typed vars: declaration malformed"
+      scope: spec
+    final_census:
+      date: "2026-07-19"
+      count: 0
+    notes: "R3b verbatim : « le sous-langage 6-enum meurt (PARSE-015 class retirée), boolean↔bool meurt avec lui. » La classe typed-vars-declaration-malformed n'a plus d'objet : le champ type des declarations inputs/outputs parle le TypeExpr complet de 09-types (LAW-GRAMMAR-0211) — ce que PARSE-015 refusait (les formes riches) est admis, ce qui reste hors TypeExpr refuse via le code existant NIKA-TYPE-001 (meme classe inconnue · aucun second code minte · SSOT-2 B.21/B.22). Kill C2 : la row canon.yaml error_codes gagne le commentaire RETIRED (le trou d'allocation est delibere · meme precedent que NIKA-PARSE-016) · la row du registre diagnostics sort pour cette tombe · la table 05-errors gagne la note retired. Le code NIKA-PARSE-015 n'est JAMAIS reutilise (B.22). Census pattern = la string d'enseignement exacte (la classe, pas le nom du code : la note retired de 05-errors cite NIKA-PARSE-015 a jamais, comme PARSE-016 avant elle)."

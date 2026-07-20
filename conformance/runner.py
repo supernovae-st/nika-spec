@@ -80,7 +80,7 @@ STR_LIT = re.compile(r"'[^']*'|\"[^\"]*\"")
 # An identifier ROOT (not preceded by `.`) + its first dotted segment if any.
 ROOT_ID = re.compile(r"(?<![.\w])([A-Za-z_][A-Za-z0-9_]*)(?:\.([A-Za-z_][A-Za-z0-9_]*))?")
 CEL_BUILTINS = {"true", "false", "null", "in", "size"}  # v0.1 CEL subset · 03-dag.md
-LOOP_LOCALS = {"item", "index"}  # for_each-scoped locals · 04-variables.md §5 namespaces
+LOOP_LOCALS = {"item", "index"}  # for_each-scoped locals · 04-variables.md §namespaces
 # Body fields where a `tasks.X` ref is OUTSIDE the boundary (NIKA-VAR-021 ·
 # 04 §the reference boundary) · with:/after: are the edge doors · on_error.
 # recover reads a fallback source · on_finally reads its PARENT only ·
@@ -421,7 +421,7 @@ def _resolution_errors(value, scopes: dict, where: str) -> list[dict]:
                     continue  # boundary surfaces report DAG-002/VAR-021 instead
                 if seg and seg not in scopes["tasks"]:
                     var_err(f"tasks.{seg} references a non-existent task")
-            elif seg:  # dotted unknown root · not one of the 5 namespaces
+            elif seg:  # dotted unknown root · not one of the 6 namespaces
                 var_err(f"'{root}.{seg}' uses an undefined namespace '{root}'")
             # bare unknown identifiers are tolerated (conservative · CEL terms)
     return errs
@@ -820,7 +820,7 @@ def cross_ref_errors(doc: dict) -> list[dict]:
     # The envelope `model:` is the template slot every author fills first — a
     # `${{ }}` template is legal there (schema-permissive), so an unresolved
     # ref must be caught the same as one in a task body. It was not: a typo'd
-    # `model: "${{ vars.nope }}"` sailed through while the identical ref inside
+    # `model: "${{ inputs.nope }}"` sailed through while the identical ref inside
     # a task raised NIKA-VAR-001 (04-variables §Resolution order).
     errs.extend(_resolution_errors(doc.get("model"), out_scopes, "(envelope) model:"))
     errs.extend(_unclosed_expr_errors(doc.get("model"), "(envelope) model:"))

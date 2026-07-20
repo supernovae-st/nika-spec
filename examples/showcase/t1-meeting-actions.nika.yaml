@@ -7,7 +7,7 @@
 # as typed JSON your task tracker can actually import.
 #
 # Demonstrates ·
-#   - typed `vars:` · `transcript_path` is required · the engine validates inputs
+#   - typed `inputs:` · `transcript_path` is required · the engine validates inputs
 #   - `infer.schema:` · structured output: the model MUST return this shape
 #   - `${{ tasks.X.output.actions }}` · indexing into a schema-validated object
 #   - `nika:log` · human-readable diagnostics on the event stream

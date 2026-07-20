@@ -74,12 +74,13 @@ set). A task's **status** is the settled value — `success` · `failure` ·
 class it admits); `terminal` exists only as a predicate, `cancelled`
 only as a status.
 
-## launch inputs (vars · `--var`)
+## launch inputs (inputs · `--var`)
 
-A workflow's declared inputs are its `vars:`; the caller supplies values
+A workflow's declared inputs are its typed `inputs:`; the caller supplies values
 at launch (`nika run <file> --var key=value` · repeatable). « Launch
-inputs » is the collective noun. Distinct from `with:` (per-task
-bindings) and from `env:` (non-sensitive runtime config).
+inputs » is the collective noun. Distinct from `const:` (fixed values baked
+into the file) · from `with:` (per-task bindings) and from `config:`
+(non-sensitive runtime config supplied by the deployment).
 
 ## paused · human gate · nika:prompt
 

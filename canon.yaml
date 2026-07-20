@@ -7,7 +7,7 @@
 #   sealed outcome_class enum) · the 15 ledger sections (canon/EXCEPTIONS.md ·
 #   SSOT-1 §18) stay AUTHORED and are carried verbatim — editing those is legal.
 # regenerate: python3 scripts/ssot-compiler.py --emit-canon
-# body-sha256: 5e3df3467323c5acd41af84e7d66ba6a88fbf981322ef3a1faa65ff39e518a57
+# body-sha256: 5d11c0ee3e7f2b91e4a4aeaab0790c2c97dad332d3d91dbf150a8da9a5fbceca
 #   (digest of every byte below the end-of-header line · detached self-hash per PAA-006)
 # ---- end generated header (SSOT-1 §21-23 · the canon flip · C0)
 # nika canonical registry · the single source of truth for Nika canonical facts
@@ -58,14 +58,14 @@ schema_version: 1
 # fast grep-based projection checks (the projector reads `count:` lines).
 counts:
   verbs: 4
-  namespaces: 5
+  namespaces: 6
   builtins: 28
   providers: 17
   extract_modes: 9
   templates: 10
   error_namespaces: 21
   error_categories: 12
-  error_codes: 83
+  error_codes: 82
   pillars: 5
   # ---- extended v0.2 · 2026-05-27 · lifecycle + diamond + steal + severity
   lifecycle_product: 4
@@ -111,18 +111,22 @@ verbs:
     - { name: agent,  semantic: "Multi-turn agentic loop · tool calling · guardrails" }
 
 # ---------------------------------------------------------------- namespaces
-# The 5 substitution namespaces · LOCKED at v1 (spec/04-variables.md ·
-# loop-locals item/index are for_each-scoped locals · NOT a 6th namespace).
+# The 6 substitution namespaces · LOCKED at v1 (spec/04-variables.md · the
+# four value authorities inputs/config/const/secrets — the E-split family
+# (R3a · LAW-SURFACE-0201) that succeeded the dead vars/env spellings at C2 —
+# plus the runtime namespaces with/tasks · loop-locals item/index are
+# for_each-scoped locals · NOT a 7th namespace).
 namespaces:
-  count: 5
+  count: 6
   immutable: true
   reference: spec/04-variables.md
   items:
-    - vars
+    - inputs
+    - config
+    - const
+    - secrets
     - with
     - tasks
-    - env
-    - secrets
 
 # ---------------------------------------------------------------- builtins
 # Post atomic-language audit · 42→27→26→25→22 (-20 · -48% · zero functional loss) → 23 (compose added 2026-06-13 · ADR-093 · agent-loop self-check intrinsic, loop-only like done) → 24 (image_generate added 2026-07-05 · the first stdlib §Media graduate · openai/gemini/mock · assets land on disk, never inline) → 25 (tts_generate added 2026-07-05 · §Audio · local/openai/elevenlabs/mock · sovereign-first) → 26 (image_fx added 2026-07-09 · §Media graduate #3 · the `image editing` deferred row · deterministic artistic effects · byte-identical artifacts · recipe-in-chunk · zero-dep) → 27 (chart added 2026-07-09 · §Media graduate #4 · deterministic zero-dep renderer · byte-identical SVG · sha256 → trace chain).
@@ -288,7 +292,7 @@ error_categories:
 # check binds the prose table to it (same row set · same fields).
 # transient · false | engine-assessed
 error_codes:
-  count: 83
+  count: 82
   reference: spec/05-errors.md
   items:
     - { code: NIKA-PARSE-001, category: parse_error, transient: "false", failure: "the YAML itself does not parse (syntax error)" }
@@ -305,7 +309,11 @@ error_codes:
     - { code: NIKA-PARSE-012, category: validation_error, transient: "false", failure: "on_error: block violates the spec shape (fields mutually exclusive)" }
     - { code: NIKA-PARSE-013, category: validation_error, transient: "false", failure: "with:/output: binding uses a reserved name (output · status · error · started_at · ended_at · duration_ms)" }
     - { code: NIKA-PARSE-014, category: validation_error, transient: "false", failure: "secrets: entry is not a store reference — inline literals forbidden" }
-    - { code: NIKA-PARSE-015, category: validation_error, transient: "false", failure: "typed vars: declaration malformed (type in string/number/integer/boolean/array/object)" }
+    # NIKA-PARSE-015 · RETIRED (never reuse) — the typed-vars 6-enum class died
+    # with the E-split (R3b · LAW-GRAMMAR-0211): the type: field of inputs/
+    # outputs declarations speaks the full TypeExpr of 09-types · what PARSE-015
+    # refused is admitted · what stays outside TypeExpr refuses via NIKA-TYPE-001.
+    # The allocation hole is deliberate.
     # NIKA-PARSE-016 · RETIRED (never reuse) — the jq-binding-contains-template
     # class folded into NIKA-VAR-005 (static expression violation) at the
     # deep-conformance registry remap · the allocation hole is deliberate.
@@ -339,7 +347,7 @@ error_codes:
     - { code: NIKA-TYPE-005, category: security_error, transient: "false", failure: "a secret-carrying type in a lowered position (reserved with secret<T> · W4)" }
     - { code: NIKA-TYPE-006, category: validation_error, transient: "false", failure: "regex pattern outside the locked dialect (backreference · lookaround · named group · inline flags · lazy/possessive · word-boundary · unicode-class — spec 09 §the regex dialect)" }
     - { code: NIKA-TYPE-101, category: validation_error, transient: "false", failure: "run-time contract violation — the decoded value does not fit returns: (exec:/invoke: lane)" }
-    - { code: NIKA-VAR-001, category: variable_error, transient: "false", failure: "unresolved reference (unknown namespace entry · undeclared env/vars key)" }
+    - { code: NIKA-VAR-001, category: variable_error, transient: "false", failure: "unresolved reference (unknown namespace entry · undeclared inputs/config/const/secrets/with key)" }
     - { code: NIKA-VAR-002, category: variable_error, transient: "false", failure: "binding cardinality — a jq binding emitted zero or multiple values" }
     - { code: NIKA-VAR-003, category: validation_error, transient: "false", failure: "provably-invalid path into a declared schema (static walk)" }
     - { code: NIKA-VAR-004, category: variable_error, transient: "false", failure: "jq runtime error while evaluating a binding" }

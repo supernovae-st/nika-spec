@@ -535,27 +535,6 @@ diagnostics:
       mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
       is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
       span obligation not stated by the source → span_required false.'
-  - id: NIKA-PARSE-015
-    status: reserved
-    owner: spec
-    law_ids: []
-    introduced_in: C0
-    namespace: PARSE
-    plane: unclassified
-    condition: 'typed vars: declaration malformed (type in string/number/integer/boolean/array/object)'
-    outcome_class: failure
-    cause: validation_error
-    retryable: false
-    terminal: true
-    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
-    span_required: false
-    teaching: 'typed vars: declaration malformed (type in string/number/integer/boolean/array/object) · spec/05-errors.md
-      (import-c0 · the teaching string mints at C1).'
-    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
-      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
-      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
-      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
-      span obligation not stated by the source → span_required false.'
   - id: NIKA-PARSE-017
     status: reserved
     owner: spec
@@ -1132,15 +1111,16 @@ diagnostics:
     introduced_in: C0
     namespace: VAR
     plane: unclassified
-    condition: unresolved reference (unknown namespace entry · undeclared env/vars key)
+    condition: unresolved reference (unknown namespace entry · undeclared inputs/config/const/secrets/with key)
     outcome_class: failure
     cause: variable_error
     retryable: false
     terminal: true
     payload_schema: to-mint-c1/diagnostics/payloads/variable_error.schema.json
     span_required: false
-    teaching: unresolved reference (unknown namespace entry · undeclared env/vars key) · spec/05-errors.md (import-c0
-      · the teaching string mints at C1).
+    teaching: unresolved reference (unknown namespace entry · undeclared inputs/config/const/secrets/with key) ·
+      spec/05-errors.md (import-c0 · the teaching string mints at C1 · the undeclared-key vocabulary flipped with
+      the E-split prose cascade C2 — env/vars died into the four-authority family · LAW-SURFACE-0201).
     notes: 'import-c0 (canon-flip) · category: variable_error · transient: false (canon.yaml + spec/05-errors.md
       verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
       mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
