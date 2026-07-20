@@ -1,0 +1,240 @@
+# The Nika timeline · the one verifiable record
+# SPDX-License-Identifier: Apache-2.0
+#
+# SSOT for the project's history, releases, and forward gates. Every
+# surface that tells the story (site /timeline · READMEs · changelog era
+# notes) derives from THIS file — never the reverse.
+#
+# The honesty contract: every entry carries an `evidence` block with a
+# `class`. Provable classes (git-tag · github-release · github-commit ·
+# crates-io · github-pr) are RE-PROVEN by timeline/verify.py in CI —
+# a claim whose proof stops resolving turns the gate red. Unprovable
+# classes (testimony · private-archive) are permitted, labeled, and
+# never counted as proof: a reader always sees which kind of truth
+# they are holding.
+#
+# The future carries NO dates. Forward motion is expressed as GATES —
+# conditions that must hold — per the readiness discipline (a launch
+# ships when ready, never on a date). Timeline entries are append-only;
+# a correction adds a note, it never silently rewrites.
+
+schema_version: 1
+last_updated: "2026-07-20"
+verifier: timeline/verify.py
+
+evidence_classes:
+  git-tag: "a tag in THIS repo (nika-spec) · verified locally"
+  github-release: "a release tag on a public supernovae-st repo · verified via the GitHub API"
+  github-commit: "a commit on a public supernovae-st repo · verified via the GitHub API"
+  github-pr: "a merged PR on a public supernovae-st repo · verified via the GitHub API"
+  crates-io: "a published version on crates.io (yanked versions remain listed forever) · verified via the crates.io API"
+  scorecard: "an OpenSSF Scorecard result · verified via the scorecard API (score moves weekly · the entry records a dated reading)"
+  private-archive: "a commit/tag in the private legacy archive (the pre-rewrite era) · SHA recorded · auditable under access, not publicly resolvable"
+  testimony: "the maintainer's dated account · no mechanical proof exists or is claimed"
+
+eras:
+  - id: conception
+    span: "summer 2025 → 2025-12"
+    title: "Conception"
+    story: >-
+      The ideas take shape through private prototypes and throwaway
+      experiments on the maintainer's machine and private repos —
+      before the language has a repo, a name in git, or a single
+      committed line.
+    evidence: { class: testimony }
+
+  - id: exploration
+    span: "2026-01-01 → 2026-04-13"
+    title: "The exploration era (0.1 → 0.79)"
+    story: >-
+      79 minor versions in 103 days. The language finds its shape by
+      shipping: templating, DAG validation, providers, tools — a
+      138K-line monolith and 192 tags later, the team knows exactly
+      what the language wants to be, and exactly why the engine must
+      be rebuilt to carry it.
+    evidence: { class: private-archive, note: "the full branch + 192 tags live in the private legacy archive · the crates.io trail below is the public spine of this era" }
+
+  - id: diamond
+    span: "2026-04-13 → today"
+    title: "The Diamond era (rewrite from scratch)"
+    story: >-
+      An orphan branch — zero shared history with the exploration
+      code. Craft, not extraction: every crate re-enters through a
+      12-gate admission. The version line continues (0.80 picks up
+      where 0.79 stopped) because the LANGUAGE is the continuity;
+      the engine is the rewrite.
+    evidence: { class: github-commit, repo: supernovae-st/nika, sha: 0cc7b74235c896f16d326795786a7f7b40241c43 }
+
+entries:
+  # ── conception ────────────────────────────────────────────────────
+  - date: "2025-08"
+    precision: month
+    type: milestone
+    title: "Private prototypes begin"
+    detail: "Vibe-code experiments and private-repo brainstorms circle the idea: repeatable AI work should live in files, not chats."
+    evidence: { class: testimony }
+
+  # ── exploration era ───────────────────────────────────────────────
+  - date: "2026-01-01"
+    type: milestone
+    title: "First commit · « initial nika v0.1 with strict templating system »"
+    detail: "The language is born on New Year's Day, 21:29 CET."
+    component: engine
+    evidence: { class: private-archive, sha: 2d17d85ed }
+
+  - date: "2026-01-01"
+    type: milestone
+    title: "DAG validation lands, hours later"
+    detail: "The second commit of day one already carries the spine: workflows are DAGs, validated before they run."
+    component: engine
+    evidence: { class: private-archive, sha: a17cfbb91 }
+
+  - date: "2026-03-04"
+    type: release
+    version: "0.20.0"
+    title: "First public release on crates.io"
+    detail: "The exploration era goes public. Seven versions ship to crates.io in March — later yanked in favor of the rewrite, but the dated trail is permanent."
+    component: engine
+    evidence: { class: crates-io, crate: nika, version: "0.20.0" }
+
+  - date: "2026-03-21"
+    type: release
+    version: "0.35.4"
+    component: engine
+    evidence: { class: crates-io, crate: nika, version: "0.35.4" }
+
+  - date: "2026-03-26"
+    type: release
+    version: "0.47.1"
+    title: "Last crates.io release of the exploration era"
+    detail: "Six releases in twenty-two days — the era's peak cadence, publicly timestamped."
+    component: engine
+    evidence: { class: crates-io, crate: nika, version: "0.47.1" }
+
+  - date: "2026-04-05"
+    type: milestone
+    title: "v0.71 · the monolith peaks"
+    detail: "The exploration engine reaches ~138K lines. The lesson is complete: the language deserves a cleaner carrier."
+    component: engine
+    evidence: { class: private-archive, note: "version bump commit in the legacy archive · 2026-04-05" }
+
+  # ── diamond era ───────────────────────────────────────────────────
+  - date: "2026-04-13"
+    type: milestone
+    title: "The rewrite begins · Diamond genesis"
+    detail: "An orphan branch is initialized and 0.80.0-alpha tags the same day. Rewrite from scratch — craft, not extraction — while the exploration branch keeps running as reference."
+    component: engine
+    evidence: { class: github-commit, repo: supernovae-st/nika, sha: 0cc7b74235c896f16d326795786a7f7b40241c43 }
+
+  - date: "2026-04-13"
+    type: release
+    version: "0.80.0-alpha.1"
+    title: "First Diamond tag"
+    detail: "The version line continues from 0.79 — the language is the continuity, the engine is the rewrite."
+    component: engine
+    evidence: { class: github-release, repo: supernovae-st/nika, tag: v0.80.0-alpha.1 }
+
+  - date: "2026-05-22"
+    type: milestone
+    title: "The specification becomes its own public repo"
+    detail: "nika-spec is born under Apache-2.0 with a patent grant: five pillars locked (envelope · four verbs · DAG · variables · errors). The spec is the standard surface; the engine is one implementation of it."
+    component: spec
+    evidence: { class: github-commit, repo: supernovae-st/nika-spec, sha: 7d471ab }
+
+  - date: "2026-05-23"
+    type: milestone
+    title: "The conformance suite is seeded"
+    detail: "Declarative fixtures (input.yaml + expected.json) and the runner protocol: the machine-checkable definition of the language, runnable by any engine."
+    component: spec
+    evidence: { class: github-commit, repo: supernovae-st/nika-spec, note: "conformance/runner-protocol.md creation commit · 2026-05-23" }
+
+  - date: "2026-06-21"
+    type: release
+    version: "0.90.0"
+    title: "0.90 · the usable engine"
+    detail: "brew install works; the four verbs, seventeen providers, static check and traces are live. The public can run the language."
+    component: engine
+    evidence: { class: github-release, repo: supernovae-st/nika, tag: v0.90.0 }
+
+  - date: "2026-07-12"
+    type: release
+    version: "0.100.0"
+    component: engine
+    evidence: { class: github-release, repo: supernovae-st/nika, tag: v0.100.0 }
+
+  - date: "2026-07-17"
+    type: milestone
+    title: "The spec reaches 147 numbered laws · pre-1.0 gate C0 closes"
+    detail: "Every normative sentence is a numbered, greppable law; canon.yaml is generated and byte-gated against drift."
+    component: spec
+    evidence: { class: github-commit, repo: supernovae-st/nika-spec, sha: d048313 }
+
+  - date: "2026-07-18"
+    type: milestone
+    title: "Governance gains its one public door (NEP process)"
+    detail: "Nobody amends the standard directly, maintainers included. Authority transfer to a technical committee is written down from day one."
+    component: spec
+    evidence: { class: github-pr, repo: supernovae-st/nika-spec, pr: 120 }
+
+  - date: "2026-07-20"
+    type: release
+    version: "0.105.0"
+    component: engine
+    evidence: { class: github-release, repo: supernovae-st/nika, tag: v0.105.0 }
+
+  - date: "2026-07-20"
+    type: milestone
+    title: "The standard hardening day"
+    detail: >-
+      One day, six merged PRs across engine and spec: least-privilege
+      workflow tokens · SLSA provenance as a release asset ·
+      security-insights · the agent-facing surfaces finally tell the
+      standard (llms.txt) · the three mute security classes gain
+      proven fixture pairs (secrets-to-outputs · lethal trifecta ·
+      self-launch) · the conformance runner drives ANY engine by
+      command (--engine · 99/99 self-test).
+    component: standard
+    evidence: { class: github-pr, repo: supernovae-st/nika-spec, pr: 154 }
+
+  - date: "2026-07-20"
+    type: milestone
+    title: "OpenSSF Scorecard reads 7.3"
+    detail: "Up from 6.5 the same morning. The declared bar: the official 1.0 does not ship below 10/10."
+    component: standard
+    evidence: { class: scorecard, repo: github.com/supernovae-st/nika, reading: "7.3" }
+
+gates:
+  # The future · conditions, never dates. A gate flips when its
+  # conditions hold — the timeline gains a dated entry at that moment.
+  - id: rc
+    title: "1.0.0-rc.N · design partners"
+    conditions:
+      - "the release-candidate gate is green"
+      - "design partners run real workflows and their feedback rounds land"
+
+  - id: v1
+    title: "1.0.0 · the first official launch"
+    conditions:
+      - "rc gate green + feedback rounds absorbed"
+      - "real traction, honestly measured"
+      - "a launch crafted to the same bar as the language"
+      - "OpenSSF Scorecard at the declared bar (10/10)"
+
+  - id: second-implementation
+    title: "The second independent implementation"
+    conditions:
+      - "an engine we did not write passes the public suite (Core level) at a pinned spec commit"
+      - "its row lands in CONFORMANT_IMPLEMENTATIONS.md with a reproducible command"
+    note: "The north metric of the standard track: 0 → 1 → 3."
+
+  - id: spec-freeze
+    title: "/spec/v1.0.0 · the freeze"
+    conditions:
+      - "the grammar refonte lands and its cascade is green"
+      - "the reserve/specify/refuse checklist is fully resolved"
+      - "exit criteria published · six months of zero normative change outside the NEP door proves the freeze"
+
+  - id: connectome-era
+    title: "The Connectome era"
+    conditions:
+      - "opens after 1.0 · un-numbered until declared"

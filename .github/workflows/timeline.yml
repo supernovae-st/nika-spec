@@ -1,0 +1,31 @@
+# The timeline gate · every provable claim in timeline/timeline.yaml is
+# re-proven against its source of truth (git tags · GitHub API ·
+# crates.io API). A claim whose proof stops resolving turns this red —
+# the timeline never carries a broken proof. Zero run: event data ·
+# every step a SHA-pinned uses:.
+
+name: timeline
+
+on:
+  push:
+    branches: [main]
+    paths: ['timeline/**']
+  pull_request:
+    paths: ['timeline/**']
+  schedule:
+    - cron: '17 6 * * 1' # weekly re-proof — external sources can move
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Verify every provable claim
+        run: |
+          python3 -m pip install --quiet pyyaml
+          python3 timeline/verify.py

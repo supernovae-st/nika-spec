@@ -144,6 +144,18 @@ nika-spec/
 
 ---
 
+## Lineage
+
+Conceived through private prototypes (summer 2025) · **first commit
+January 1, 2026** · 79 versions in the 103-day exploration era (public
+[crates.io trail](https://crates.io/crates/nika/versions) from March) ·
+**rewritten from scratch April 13, 2026** — the Diamond era, an orphan
+branch; the version line continues because the language is the
+continuity. Every dated claim is re-proven in CI against its source of
+truth: [`timeline/timeline.yaml`](./timeline/timeline.yaml).
+
+---
+
 ## For implementers
 
 If you want to implement Nika in your language ·
