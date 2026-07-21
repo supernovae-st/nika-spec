@@ -13,6 +13,10 @@ conformance suite's meaning, or the trace formats goes through a **NEP**
 [the template](./governance/nep-template.md), open a PR. Nobody amends
 the standard directly — the maintainers included.
 
+Not sure it deserves a NEP yet? Ideate first in the engine's
+[Ideas discussions](https://github.com/supernovae-st/nika/discussions/categories/ideas) —
+the fastest lane to pressure-test a language idea before writing one.
+
 ## Everything else → a plain PR
 
 Errata (prose contradicting the corpus), typos, teaching improvements,
