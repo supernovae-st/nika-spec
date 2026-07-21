@@ -27,7 +27,7 @@
 # silently rewrites.
 
 schema_version: 1
-last_updated: "2026-07-20"
+last_updated: "2026-07-21"
 verifier: timeline/verify.py
 
 evidence_classes:
@@ -205,6 +205,13 @@ entries:
     component: engine
     evidence: { class: github-release, repo: supernovae-st/nika, tag: v0.90.0 }
 
+  - date: "2026-07-06"
+    type: milestone
+    title: "The registry opens"
+    detail: "supernovae-st/nika-registry goes public at its root commit: shared workflows, none taken on trust. Every entry is machine re-proven in CI: pinned sha256 · conformance oracle · engine cert."
+    component: registry
+    evidence: { class: github-commit, repo: supernovae-st/nika-registry, sha: 9f79981021d257c09975be81e13549e645d4bb89 }
+
   - date: "2026-07-12"
     type: release
     version: "0.100.0"
@@ -251,6 +258,20 @@ entries:
     detail: "Up from 6.5 the same morning (least-privilege tokens + patched dependencies landed). The declared bar: the official 1.0 does not ship below 10/10."
     component: standard
     evidence: { class: scorecard, repo: github.com/supernovae-st/nika, reading: "7.3" }
+
+  - date: "2026-07-20"
+    type: milestone
+    title: "The record itself ships"
+    detail: "timeline/timeline.yaml and verify.py land in the spec: the project's history becomes one machine-verified SSOT. Every provable claim is re-proven in CI: push · PR · weekly cron."
+    component: spec
+    evidence: { class: github-pr, repo: supernovae-st/nika-spec, pr: 155 }
+
+  - date: "2026-07-20"
+    type: milestone
+    title: "Releases earn their front page"
+    detail: "Release notes render from the changelog section: What · Install · Verify · Provenance. Verify carries SHA256SUMS · gh attestation · the SLSA intoto asset."
+    component: engine
+    evidence: { class: github-pr, repo: supernovae-st/nika, pr: 664 }
 
 gates:
   # The future · conditions, never dates. A gate flips when its
