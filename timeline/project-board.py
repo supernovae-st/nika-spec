@@ -140,8 +140,14 @@ def rest(token: str, method: str, path: str, body: dict | None = None) -> dict |
 
 
 def slug_match(gate_title: str, milestone_title: str) -> bool:
+    """Exact match first (case-insensitive, the `gate · ` prefix stripped):
+    the prefix heuristic alone seated `1.0.0` on the `1.0.0-rc.N`
+    milestone (substring collision, caught on the first live run)."""
+    ms = milestone_title.lower().removeprefix("gate · ").strip()
+    if ms == gate_title.strip().lower():
+        return True
     head = gate_title.split("·")[0].strip().lower()
-    return head[:18] in milestone_title.lower()
+    return head[:18] in ms and not ms.startswith(head + "-")
 
 
 def sync_issues(token: str, doc: dict) -> dict[str, dict]:
