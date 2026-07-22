@@ -140,8 +140,14 @@ def rest(token: str, method: str, path: str, body: dict | None = None) -> dict |
 
 
 def slug_match(gate_title: str, milestone_title: str) -> bool:
+    """Exact match first (case-insensitive, the `gate · ` prefix stripped):
+    the prefix heuristic alone seated `1.0.0` on the `1.0.0-rc.N`
+    milestone (substring collision, caught on the first live run)."""
+    ms = milestone_title.lower().removeprefix("gate · ").strip()
+    if ms == gate_title.strip().lower():
+        return True
     head = gate_title.split("·")[0].strip().lower()
-    return head[:18] in milestone_title.lower()
+    return head[:18] in ms and not ms.startswith(head + "-")
 
 
 def sync_issues(token: str, doc: dict) -> dict[str, dict]:
@@ -203,13 +209,21 @@ def sync_issues(token: str, doc: dict) -> dict[str, dict]:
 
 
 def link_repos(token: str, project_id: str) -> None:
+    """Loud by law: the first live run swallowed a link failure and the
+    repo Projects tabs stayed empty with a green run. Every repo prints
+    its verdict; 'already linked' is the only quiet success."""
     for repo in REPOS:
         rid = gql(token, 'query($n:String!){repository(owner:"%s",name:$n){id}}' % ORG, {"n": repo})["repository"]["id"]
         try:
             gql(token, "mutation($p:ID!,$r:ID!){linkProjectV2ToRepository(input:{projectId:$p,repositoryId:$r}){repository{id}}}",
                 {"p": project_id, "r": rid})
-        except SystemExit:
-            pass  # already linked
+            print(f"linked project to {repo}")
+        except SystemExit as err:
+            msg = str(err)
+            if "already linked" in msg.lower():
+                print(f"already linked: {repo}")
+            else:
+                print(f"::warning::link to {repo} FAILED: {msg[:300]}")
 
 
 def main() -> None:
