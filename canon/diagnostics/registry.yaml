@@ -2044,3 +2044,88 @@ diagnostics:
       site) · a dynamic consumer POISONS the used set (a shell-form exec ·
       a dynamic URL/path · an agent: whitelist — glob ⊆ glob undecidable)
       and the category stays silent rather than risk a false positive.'
+  - id: NIKA-AUTH-006
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0324
+    introduced_in: C0
+    namespace: AUTH
+    plane: unclassified
+    condition: 'no permits: block declared and the body has effects — absent = zero authority (F-O8 · NEP-0003)'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: false
+    teaching: 'absent = zero authority (NEP-0003) · every effect is refused at check before any token, and at run via NIKA-SEC-004 defense-in-depth · fix: nika check --infer-permits writes the tightest block (permits: {} is the legal declared zero).'
+    notes: 'nep-0003 (2026-07-22) · category: security_error · transient: false (canon.yaml verbatim) · registered from the engine vendored canon (downstream drift closed).'
+  - id: NIKA-VALUES-001
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-GRAMMAR-0201
+    introduced_in: C0
+    namespace: VALUES
+    plane: unclassified
+    condition: 'vars: is a dead envelope field (R3a · the E-split)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'a typed parameter is an `inputs:` declaration, a fixed value is a `const:` entry (classify-not-rename · equivalence-or-stop · never a bulk rename).'
+    notes: 'r3a e-split · category: validation_error · transient: false (canon.yaml verbatim) · registered from the engine vendored canon (downstream drift closed).'
+  - id: NIKA-VALUES-002
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-GRAMMAR-0202
+    introduced_in: C0
+    namespace: VALUES
+    plane: unclassified
+    condition: 'env: is a dead envelope field (R3a · the E-split)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'non-sensitive runtime configuration is a `config:` declaration, a governed store reference is a `secrets:` entry.'
+    notes: 'r3a e-split · category: validation_error · transient: false (canon.yaml verbatim) · registered from the engine vendored canon (downstream drift closed).'
+  - id: NIKA-VALUES-003
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0201
+    introduced_in: C0
+    namespace: VALUES
+    plane: unclassified
+    condition: 'a value-namespace read outside the four-authority family (R3a · LAW-SURFACE-0201)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'the authorities are exactly inputs · config · const · secrets (rides alongside NIKA-VAR-001 — the layered oracle emits both).'
+    notes: 'r3a e-split · category: validation_error · transient: false (canon.yaml verbatim) · registered from the engine vendored canon (downstream drift closed).'
+  - id: NIKA-DEFAULT-001
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-TYPE-0211
+    introduced_in: C0
+    namespace: DEFAULT
+    plane: unclassified
+    condition: 'a declared default (inputs · config) or typed const value does not conform to its declared type (R3b · LAW-TYPE-0211)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'the P0 soundness hole — a value that passed check and failed at run — is closed at check · same code covers const, no second mint.'
+    notes: 'r3b · category: validation_error · transient: false (canon.yaml verbatim) · registered from the engine vendored canon (downstream drift closed).'
