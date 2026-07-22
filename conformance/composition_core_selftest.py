@@ -46,8 +46,11 @@ law("a bare tool: invoke is not composition", not codes(
 # ── the reader laws via a temp tree ─────────────────────────────────────
 with tempfile.TemporaryDirectory() as td:
     base = Path(td)
+    # the child DECLARES its own boundary (NEP-0003 law 6 · a child that
+    # touches the world declares it, in its own file)
     (base / "child.nika.yaml").write_text(
-        "nika: v1\nworkflow: { id: c }\ninputs: { url: { type: string, required: true } }\n"
+        "nika: v1\nworkflow: { id: c }\npermits: { exec: [echo] }\n"
+        "inputs: { url: { type: string, required: true } }\n"
         "tasks: { fetch: { exec: { command: [echo, hi] } } }\n"
         "outputs: { report: { value: \"x\", type: string } }\n")
     law("missing required child input → COMP-004",
@@ -62,9 +65,24 @@ with tempfile.TemporaryDirectory() as td:
         "NIKA-COMP-002" in codes(
             call("./child.nika.yaml", args={"url": "u"},
                  permits={"net": {"http": ["api.example.com"]}}), base))
-    law("valid composition → clean",
+    law("valid composition → clean (parent grants ∩ child declares)",
         not codes(call("./child.nika.yaml", args={"url": "u"},
-                       returns={"object": {"report": "string"}}), base))
+                       returns={"object": {"report": "string"}},
+                       permits={"exec": ["echo"]}), base))
+    # NEP-0003 · the zero wall, both directions
+    (base / "bare-child.nika.yaml").write_text(
+        "nika: v1\nworkflow: { id: bc }\n"
+        "tasks: { run: { exec: { command: [echo, hi] } } }\n")
+    law("absent parent block = zero wall → COMP-002 (NEP-0003 law 5)",
+        "NIKA-COMP-002" in codes(call("./child.nika.yaml"), base))
+    law("child without block under permitted parent → COMP-002 (law 6)",
+        "NIKA-COMP-002" in codes(
+            call("./bare-child.nika.yaml", permits={"exec": ["echo"]}), base))
+    (base / "pure-child.nika.yaml").write_text(
+        "nika: v1\nworkflow: { id: pc }\n"
+        "tasks: { think: { infer: { prompt: pure } } }\n")
+    law("pure child under absent parent → clean",
+        not codes(call("./pure-child.nika.yaml"), base))
 
     # self-launch + cycle
     (base / "self.nika.yaml").write_text(
