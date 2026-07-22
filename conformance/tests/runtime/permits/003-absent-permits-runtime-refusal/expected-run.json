@@ -1,0 +1,13 @@
+{
+ "workflow_state": "failure",
+ "tasks": {
+  "pick": {
+   "status": "success"
+  },
+  "fetcher": {
+   "status": "failure",
+   "error_code": "NIKA-SEC-004"
+  }
+ },
+ "note": "NEP-0003 law 3 · a DYNAMIC fetch url under an ABSENT permits: block · the static judge cannot see the resolved host (01 §permits) · the runtime boundary refuses the effect NIKA-SEC-004 (defense in depth) · nika:jq is pure internal, so pick succeeds (law 4)"
+}

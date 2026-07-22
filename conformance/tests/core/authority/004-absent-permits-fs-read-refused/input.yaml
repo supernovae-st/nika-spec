@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: t-absent-read
+tasks:
+  load:
+    invoke:
+      tool: nika:read
+      args: { path: "./data/input.json" }

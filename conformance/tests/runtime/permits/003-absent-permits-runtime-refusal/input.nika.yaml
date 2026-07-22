@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: rt-permits-absent-runtime-refusal
+model: mock/echo
+const:
+  hosts: ["https://forbidden.example.org/data"]
+tasks:
+  pick:
+    invoke:
+      tool: "nika:jq"
+      args: { input: "${{ const.hosts }}", expression: ".[0]" }
+  fetcher:
+    with:
+      pick: ${{ tasks.pick.output }}
+    invoke:
+      tool: "nika:fetch"
+      args:
+        url: "${{ with.pick }}"
+        mode: text

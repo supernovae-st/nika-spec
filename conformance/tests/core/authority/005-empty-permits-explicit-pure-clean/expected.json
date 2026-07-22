@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "NEP-0003 EMPTY definition · permits: {} is the authored spelling of zero authority · provenance declared · pairs with the runtime golden conformance/tests/runtime/permits/002-empty-permits-pure-compute."
+}

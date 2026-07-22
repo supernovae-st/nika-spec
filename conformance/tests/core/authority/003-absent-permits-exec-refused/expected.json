@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-AUTH-006", "category": "security_error" }
+  ],
+  "note": "NEP-0003 law 1 · the exec verb requires the exec capability · absent block = zero authority · this is the F-O8 fail-case verbatim."
+}
