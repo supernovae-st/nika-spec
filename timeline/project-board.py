@@ -209,13 +209,21 @@ def sync_issues(token: str, doc: dict) -> dict[str, dict]:
 
 
 def link_repos(token: str, project_id: str) -> None:
+    """Loud by law: the first live run swallowed a link failure and the
+    repo Projects tabs stayed empty with a green run. Every repo prints
+    its verdict; 'already linked' is the only quiet success."""
     for repo in REPOS:
         rid = gql(token, 'query($n:String!){repository(owner:"%s",name:$n){id}}' % ORG, {"n": repo})["repository"]["id"]
         try:
             gql(token, "mutation($p:ID!,$r:ID!){linkProjectV2ToRepository(input:{projectId:$p,repositoryId:$r}){repository{id}}}",
                 {"p": project_id, "r": rid})
-        except SystemExit:
-            pass  # already linked
+            print(f"linked project to {repo}")
+        except SystemExit as err:
+            msg = str(err)
+            if "already linked" in msg.lower():
+                print(f"already linked: {repo}")
+            else:
+                print(f"::warning::link to {repo} FAILED: {msg[:300]}")
 
 
 def main() -> None:
