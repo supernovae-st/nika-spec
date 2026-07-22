@@ -2061,6 +2061,40 @@ diagnostics:
     span_required: false
     teaching: 'absent = zero authority (NEP-0003) · every effect is refused at check before any token, and at run via NIKA-SEC-004 defense-in-depth · fix: nika check --infer-permits writes the tightest block (permits: {} is the legal declared zero).'
     notes: 'nep-0003 (2026-07-22) · category: security_error · transient: false (canon.yaml verbatim) · registered from the engine vendored canon (downstream drift closed).'
+  - id: NIKA-AUTH-007
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0325
+    introduced_in: C1
+    namespace: AUTH
+    plane: unclassified
+    condition: 'an interpolation reaches a permit bound (host · glob · program) — a bound MUST be a literal, the boundary would be self-serve (F-O1 · NEP-0004)'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: false
+    teaching: 'a permit bound is the wall itself: write the literal host/glob/program (net: { http: ["api.example.com"] }) and gate the data in the body — the re-gate (NIKA-AUTH-008) checks the value against the declared bound.'
+    notes: 'nep-0004 (2026-07-22) · category: security_error · transient: false (canon.yaml verbatim) · minted by the F-O1 spec lane · the engine emission lands with the re-gate flip (F-O1 PR-2/3).'
+  - id: NIKA-AUTH-008
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0325
+    introduced_in: C1
+    namespace: AUTH
+    plane: unclassified
+    condition: 'an untrusted value reaches a permitted verb''s argument and its canonical resolved form escapes the step''s permit — re-gate refused (F-O1 · NEP-0004)'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: false
+    teaching: 'the category grant says nothing about the resolved value · keep the value inside the boundary (the diagnostic carries the taint path source-first + the canonical form + the escaped bound), or declare declassify: on the task — the only door, and never a permit bypass.'
+    notes: 'nep-0004 (2026-07-22) · category: security_error · transient: false (canon.yaml verbatim) · minted by the F-O1 spec lane · the run-time twin of this refusal is NIKA-SEC-004 (defense in depth, NEP-0003 law 3 provenance) · the engine emission lands with the re-gate flip (F-O1 PR-2/3).'
   - id: NIKA-VALUES-001
     status: reserved
     owner: spec
