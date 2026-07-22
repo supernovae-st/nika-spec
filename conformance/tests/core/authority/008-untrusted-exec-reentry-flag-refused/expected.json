@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-AUTH-008", "category": "security_error" }
+  ],
+  "note": "NEP-0004 law 2 + the exec canonical form · the step permit covers the program find (argv[0]) · the untrusted tail token resolves to the re-entry class (--exec spawns a sub-command) which the permit does not list · refusal, the door is declassify: or an explicit flags grant (not in v1) · the argv form is the shape an allowlist can verify (01 §permits)."
+}

@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: t-untrusted-host-under-fetch-permit
+permits:
+  net: { http: ["api.example.com"] }
+  tools: ["nika:fetch"]
+inputs:
+  host: { type: string, default: "evil.example.com" }
+tasks:
+  grab:
+    invoke:
+      tool: nika:fetch
+      args: { url: "https://${{ inputs.host }}/data" }

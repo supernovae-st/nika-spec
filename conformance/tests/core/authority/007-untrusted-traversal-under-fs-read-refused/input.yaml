@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: t-untrusted-traversal-under-fs-read
+permits:
+  fs: { read: ["datasets/**"] }
+  tools: ["nika:read"]
+inputs:
+  p: { type: string, default: "../../etc/passwd" }
+tasks:
+  load:
+    invoke:
+      tool: nika:read
+      args: { path: "${{ inputs.p }}" }

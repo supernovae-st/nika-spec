@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "NEP-0004 law 6 · const is author-baked, Integ=trusted · no re-gate needed · a secrets.* value behaves identically on Integ and stays masked in the receipt (Conf is the orthogonal axis, 10 §secret flows)."
+}

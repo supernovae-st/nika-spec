@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-AUTH-008", "category": "security_error" }
+  ],
+  "note": "NEP-0004 law 2 · the verb CATEGORY (net fetch) is granted · the canonical host of the resolved URL (evil.example.com) is not covered by the bound api.example.com · a category grant says nothing about the resolved value."
+}

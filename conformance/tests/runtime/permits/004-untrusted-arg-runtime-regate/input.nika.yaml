@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: rt-permits-untrusted-arg-regate
+model: mock/echo
+permits:
+  fs: { read: ["datasets/**"] }
+  tools: ["nika:read"]
+inputs:
+  p: { type: string }
+tasks:
+  load:
+    invoke:
+      tool: nika:read
+      args: { path: "${{ inputs.p }}" }

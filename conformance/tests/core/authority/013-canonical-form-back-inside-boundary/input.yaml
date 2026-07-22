@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: t-canonical-back-inside-boundary
+permits:
+  fs: { read: ["datasets/**"] }
+  tools: ["nika:read"]
+inputs:
+  p: { type: string, default: "datasets/../datasets/q3.csv" }
+tasks:
+  load:
+    invoke:
+      tool: nika:read
+      args: { path: "${{ inputs.p }}" }

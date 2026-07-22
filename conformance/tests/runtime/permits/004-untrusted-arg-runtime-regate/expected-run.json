@@ -1,0 +1,10 @@
+{
+ "workflow_state": "failure",
+ "tasks": {
+  "load": {
+   "status": "failure",
+   "error_code": "NIKA-SEC-004"
+  }
+ },
+ "note": "NEP-0004 laws 2+4 · caller-supplied at launch, no default: the static twin DEFERS (valid at check, the report SHOULD list the deferred re-gate) · the run re-gate canonicalizes the resolved value, the escape is refused NIKA-SEC-004 (defense in depth, the NEP-0003 law 3 provenance) · the run.json inputs-threading key follows the harness convention of run.json carrying the launch invocation (vars/env per tests/runtime/README.md · inputs joins it with the engine flip)"
+}

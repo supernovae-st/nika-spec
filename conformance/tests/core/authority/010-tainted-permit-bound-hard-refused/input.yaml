@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: t-tainted-permit-bound
+permits:
+  net: { http: ["${{ inputs.host }}"] }
+  tools: ["nika:fetch"]
+inputs:
+  host: { type: string, default: "api.example.com" }
+tasks:
+  grab:
+    invoke:
+      tool: nika:fetch
+      args: { url: "https://${{ inputs.host }}/data" }

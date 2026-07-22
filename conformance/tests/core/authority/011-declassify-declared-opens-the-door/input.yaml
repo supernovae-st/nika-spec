@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: t-declassify-declared-opens-door
+permits:
+  fs: { read: ["datasets/**", "vendor/**"] }
+  tools: ["nika:read"]
+inputs:
+  p: { type: string, default: "vendor/q3.csv" }
+tasks:
+  load:
+    invoke:
+      tool: nika:read
+      args: { path: "${{ inputs.p }}" }
+    declassify:
+      - from: inputs.p
+        to: trusted
+        because: "vendor inventory path, deployment-controlled, reviewed at release time"
