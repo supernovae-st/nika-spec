@@ -17,7 +17,7 @@ const:
   source: "./README.md"             # SLOT: your input — README.md exists in ANY repo, so the
 permits:
   tools: ["nika:read", "nika:write"]
-  fs: { write: ["./output.md"] }
+  fs: { read: ["./README.md"], write: ["./output.md"] }
 
                                     # skeleton runs green BEFORE you point it at real data
 
