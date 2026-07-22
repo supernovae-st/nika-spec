@@ -155,7 +155,8 @@ a 138K-line monolith · then the **Diamond** era from **April 13, 2026**
 — rewritten from scratch, an orphan branch, the version line continuing
 because the language is the continuity. Every dated claim is re-proven
 in CI against its source of truth:
-[`timeline/timeline.yaml`](./timeline/timeline.yaml).
+[`timeline/timeline.yaml`](./timeline/timeline.yaml), rendered with the
+forward gates at [nika.sh/timeline](https://nika.sh/timeline).
 
 ---
 
