@@ -2,6 +2,8 @@
 nika: v1
 workflow:
   id: narrate-sovereign
+permits:
+  tools: ["nika:tts_generate"]
 tasks:
   narrate:
     invoke:

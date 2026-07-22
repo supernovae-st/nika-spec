@@ -2,6 +2,8 @@
 nika: v1
 workflow:
   id: hello
+permits:
+  exec: ["./long-running.sh"]
 tasks:
   long_task:
     timeout: "1h30m"

@@ -1,6 +1,8 @@
 nika: v1
 workflow:
   id: comp-007-child
+permits:
+  exec: ["echo"]
 inputs:
   url: { type: string, required: true }
 tasks:

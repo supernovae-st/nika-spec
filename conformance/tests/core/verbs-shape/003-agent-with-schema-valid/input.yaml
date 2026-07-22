@@ -4,6 +4,8 @@ workflow:
   id: review
 inputs:
   pr: { type: string, required: true }
+permits:
+  tools: ["nika:done", "nika:read"]
 tasks:
   review:
     agent:

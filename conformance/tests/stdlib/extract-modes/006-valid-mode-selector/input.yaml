@@ -2,6 +2,9 @@
 nika: v1
 workflow:
   id: read-selector
+permits:
+  tools: ["nika:fetch"]
+  net: { http: ["example.com"] }
 tasks:
   get:
     invoke:

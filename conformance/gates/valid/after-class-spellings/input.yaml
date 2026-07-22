@@ -2,6 +2,8 @@
 nika: v1
 workflow:
   id: after-class-spellings
+permits:
+  exec: ["echo"]
 tasks:
   produce:
     exec: { command: ["echo", "seed"] }

@@ -46,6 +46,9 @@ const:
   question:
     type: string
     default: "Explain, in five lines, why a workflow should be audited before it runs."
+permits:
+  tools: ["nika:jq", "nika:write"]
+  fs: { write: ["./bench/model-bench.md"] }
 
 tasks:
   ask_incumbent:

@@ -2,6 +2,9 @@
 nika: v1
 workflow:
   id: api-extract
+permits:
+  tools: ["nika:fetch"]
+  net: { http: ["api.example.com"] }
 tasks:
   get:
     invoke:

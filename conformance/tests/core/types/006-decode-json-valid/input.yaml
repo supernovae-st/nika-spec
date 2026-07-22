@@ -2,6 +2,8 @@
 nika: v1
 workflow:
   id: t
+permits:
+  exec: ["jq"]
 tasks:
   stats:
     exec:
