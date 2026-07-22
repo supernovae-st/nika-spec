@@ -35,22 +35,99 @@ import yaml
 
 ORG = "supernovae-st"
 TITLE = "Nika · the road (a projection)"
-SHORT = "Projected from timeline/timeline.yaml: gates carry conditions, never dates. Hand edits are overwritten."
+SHORT = "Projected from timeline/timeline.yaml: the whole record (every dated claim) plus the forward gates. Hand edits are overwritten."
 README = (
     "## This board is a projection\n\n"
-    "Derived from [`timeline/timeline.yaml`](https://github.com/supernovae-st/nika-spec/blob/main/timeline/timeline.yaml) "
-    "· the machine-verified SSOT whose provable claims are re-proven in CI "
-    "(push · PR · weekly). **Hand edits are overwritten on the next sync**; "
+    "Derived from [`timeline/timeline.yaml`](https://github.com/supernovae-st/nika-spec/blob/main/timeline/timeline.yaml), "
+    "the machine-verified SSOT whose provable claims are re-proven in CI "
+    "(push, PR, weekly). **Hand edits are overwritten on the next sync**; "
     "to move the road, move the record (a NEP for normative changes, a PR for the rest).\n\n"
+    "### The fields\n\n"
+    "| Field | Meaning |\n|---|---|\n"
+    "| **Stage** | gate (conditions open) or shipped (in the record) |\n"
+    "| **Era** | ✧ exploration · ✎ brouillon · ◆ diamond · ◇ ahead |\n"
+    "| **Kind** | release · milestone · gate |\n"
+    "| **Proof** | ✓ proven (re-proven in CI) · recorded · ○ labeled (testimony, honestly) |\n"
+    "| **When** | the dated past. Gates carry no date by law: on the roadmap view the future is literally unplaced |\n"
+    "| **Order** | one sequence, oldest claim to farthest gate |\n\n"
+    "### The views to save (60 seconds, once)\n\n"
+    "1. **The rail** · Table · group by Stage · sort by Order · fields: Title, Kind, Era, Proof, When\n"
+    "2. **The road** · Board · columns by Stage\n"
+    "3. **The record** · Roadmap · date field When · the past sits on the axis, the gates deliberately do not\n"
+    "4. **By proof** · Table · group by Proof: the honesty contract at a glance\n\n"
     "Gates carry **conditions, never dates**. When a gate flips, the record gains "
-    "a dated, proven entry: and the item here moves to shipped.\n\n"
+    "a dated, proven entry and its issue closes itself.\n\n"
     "Rendered for humans: https://nika.sh/timeline · the exhaustive ship log: "
     "https://nika.sh/changelog"
 )
+
 STAGE_FIELD = "Stage"
 STAGE_GATE = "gate · conditions open"
 STAGE_SHIPPED = "shipped · in the record"
 SHIPPED_COUNT = 3
+
+PROVEN_CLASSES = {"crates-io", "github-release", "github-commit", "github-pr", "git-tag"}
+RECORDED_CLASSES = {"scorecard"}
+ERA_LABEL = {"exploration": "✧ exploration", "brouillon": "✎ brouillon", "diamond": "◆ diamond"}
+ERA_AHEAD = "◇ ahead"
+FIELD_SELECTS = {
+    "Era": [
+        ("✧ exploration", "GRAY", "private prototypes, testimony class"),
+        ("✎ brouillon", "ORANGE", "the named draft, 0.1 to 0.79.3"),
+        ("◆ diamond", "BLUE", "rewritten from scratch, real semver"),
+        ("◇ ahead", "PURPLE", "the gates: conditions, never dates"),
+    ],
+    "Kind": [
+        ("release", "GREEN", "a tagged release"),
+        ("milestone", "BLUE", "a dated claim of the record"),
+        ("gate", "YELLOW", "a forward condition"),
+    ],
+    "Proof": [
+        ("✓ proven", "GREEN", "re-proven in CI against a public source"),
+        ("· recorded", "YELLOW", "a recorded reading"),
+        ("○ labeled", "GRAY", "testimony or private archive, honestly labeled"),
+    ],
+}
+
+
+def era_of(entry: dict) -> str:
+    if entry.get("era"):
+        return ERA_LABEL[entry["era"]]
+    d = str(entry["date"])
+    if d < "2026-01-01":
+        return ERA_LABEL["exploration"]
+    if d < "2026-04-13":
+        return ERA_LABEL["brouillon"]
+    return ERA_LABEL["diamond"]
+
+
+def proof_of(entry: dict) -> str:
+    cls = (entry.get("evidence") or {}).get("class", "")
+    if cls in PROVEN_CLASSES:
+        return "✓ proven"
+    if cls in RECORDED_CLASSES:
+        return "· recorded"
+    return "○ labeled"
+
+
+def proof_url(entry: dict) -> str | None:
+    ev = entry.get("evidence") or {}
+    repo, cls = ev.get("repo"), ev.get("class", "")
+    if repo and ev.get("tag"):
+        return f"https://github.com/{repo}/releases/tag/{ev['tag']}"
+    if repo and ev.get("sha"):
+        return f"https://github.com/{repo}/commit/{ev['sha']}"
+    if repo and ev.get("pr"):
+        return f"https://github.com/{repo}/pull/{ev['pr']}"
+    if cls == "crates-io" and entry.get("version"):
+        return f"https://crates.io/crates/nika/{entry['version']}"
+    return None
+
+
+def when_of(entry: dict) -> str:
+    d = str(entry["date"])
+    return f"{d}-15" if len(d) == 7 else d
+
 
 API = "https://api.github.com/graphql"
 
@@ -74,43 +151,57 @@ def gql(token: str, query: str, variables: dict | None = None) -> dict:
 
 
 def desired_items(doc: dict) -> list[dict]:
+    """The WHOLE record (every dated entry) plus the gates, in time order.
+    Each item carries the field set the views slice on: Stage, Era, Kind,
+    Proof, Status, When (past only: the future has no date by law), Order.
+    Entry details are SSOT citations and keep their own punctuation."""
     items: list[dict] = []
-    for i, gate in enumerate(doc.get("gates", []), start=1):
-        lines = [f"- {c}" for c in gate.get("conditions", [])]
-        if gate.get("note"):
-            lines += ["", f"_{gate['note']}_"]
-        lines += ["", "SSOT: `timeline/timeline.yaml` · rendered: https://nika.sh/timeline#gates"]
+    for e in sorted(doc.get("entries", []), key=lambda e: str(e["date"])):
+        rel = e.get("type") == "release"
+        if e.get("title") and e.get("version"):
+            title = f"v{e['version']} · {e['title']}"
+        elif e.get("version"):
+            title = f"v{e['version']}"
+        else:
+            title = e["title"]
+        lines = []
+        if e.get("detail"):
+            lines.append(e["detail"])
+        url = proof_url(e)
+        cls = (e.get("evidence") or {}).get("class", "evidence")
+        lines.append("")
+        lines.append(f"Proof class: {cls}" + (f" · {url}" if url else " (labeled, never dressed as proof)"))
+        if e.get("precision") == "month":
+            lines.append("Date carries month precision; the roadmap seats it mid-month.")
         items.append(
             {
-                "title": f"{i:02d} · {gate['title']}",
-                "body": "\n".join(lines),
-                "stage": STAGE_GATE,
-            }
-        )
-    # entries live TOP-LEVEL in the SSOT (each carries its era: field);
-    # the website's vendor script is what groups them under eras. Release
-    # rows carry no prose by design (the verifier proves them against the
-    # API; the story lives in the changelog): the item derives its whole
-    # body from the evidence.
-    releases = [e for e in doc.get("entries", []) if e.get("type") == "release"]
-    for e in sorted(releases, key=lambda e: str(e["date"]))[-SHIPPED_COUNT:]:
-        ev = e.get("evidence") or {}
-        proof = (
-            f"https://github.com/{ev['repo']}/releases/tag/{ev['tag']}"
-            if ev.get("repo") and ev.get("tag")
-            else "https://nika.sh/changelog"
-        )
-        items.append(
-            {
-                "title": f"v{e['version']} · shipped {e['date']}",
-                "body": f"A dated, machine-proven claim of the record ({ev.get('class', 'evidence')}).\n\n"
-                f"Proof: {proof}\nThe story: https://nika.sh/changelog",
+                "title": title,
+                "body": "\n".join(lines).strip(),
                 "stage": STAGE_SHIPPED,
+                "era": era_of(e),
+                "kind": "release" if rel else "milestone",
+                "proof": proof_of(e),
+                "status": "Done",
+                "when": when_of(e),
             }
         )
+    for gate in doc.get("gates", []):
+        items.append(
+            {
+                "title": f"gate · {gate['title']}",
+                "body": gate_body(gate["id"], gate),
+                "stage": STAGE_GATE,
+                "era": ERA_AHEAD,
+                "kind": "gate",
+                "proof": None,
+                "status": "Todo",
+                "when": None,
+                "gate_id": gate["id"],
+            }
+        )
+    for i, it in enumerate(items, start=1):
+        it["order"] = i
     return items
-
-
 
 
 # ── v2 · the gates as REAL tracking issues (the Rust project-goals law) ──────
@@ -150,6 +241,20 @@ def slug_match(gate_title: str, milestone_title: str) -> bool:
     return head[:18] in ms and not ms.startswith(head + "-")
 
 
+def gate_body(gid: str, gate: dict) -> str:
+    """One writer for the tracking-issue body: sync_issues posts it and
+    desired_items fingerprints it. Two writers drifted on the marker and
+    the sync recreated the whole board every run (caught live)."""
+    lines = [f"<!-- projected:gate:{gid} -->",
+             "**A forward gate of the record: conditions, never dates.**", ""]
+    lines += [f"- [ ] {c}" for c in gate.get("conditions", [])]
+    if gate.get("note"):
+        lines += ["", f"_{gate['note']}_"]
+    lines += ["", "SSOT: [`timeline/timeline.yaml`](https://github.com/supernovae-st/nika-spec/blob/main/timeline/timeline.yaml) · rendered: https://nika.sh/timeline#gates",
+              "", "_Projected from the record; hand edits are overwritten. When this gate flips, the record gains a dated proven entry and this issue closes itself._"]
+    return "\n".join(lines)
+
+
 def sync_issues(token: str, doc: dict) -> dict[str, dict]:
     """Project one tracking issue per gate; close leftovers. Returns
     gate id -> {node_id, html_url} for the board layer."""
@@ -176,14 +281,7 @@ def sync_issues(token: str, doc: dict) -> dict[str, dict]:
             (REPOS[0], None),
         )
         repo, ms = seat
-        lines = [f"<!-- projected:gate:{gid} -->",
-                 "**A forward gate of the record: conditions, never dates.**", ""]
-        lines += [f"- [ ] {c}" for c in gate.get("conditions", [])]
-        if gate.get("note"):
-            lines += ["", f"_{gate['note']}_"]
-        lines += ["", "SSOT: [`timeline/timeline.yaml`](https://github.com/supernovae-st/nika-spec/blob/main/timeline/timeline.yaml) · rendered: https://nika.sh/timeline#gates",
-                  "", "_Projected from the record; hand edits are overwritten. When this gate flips, the record gains a dated proven entry and this issue closes itself._"]
-        body = "\n".join(lines)
+        body = gate_body(gid, gate)
         if gid in existing:
             erepo, it = existing.pop(gid)
             if it["title"] != title or (it.get("body") or "") != body or (ms and (it.get("milestone") or {}).get("number") != ms["number"]):
@@ -226,6 +324,158 @@ def link_repos(token: str, project_id: str) -> None:
                 print(f"::warning::link to {repo} FAILED: {msg[:300]}")
 
 
+FIELDS_QUERY = (
+    "query($p:ID!){node(id:$p){... on ProjectV2{fields(first:50){nodes{"
+    "... on ProjectV2Field{id name dataType}"
+    "... on ProjectV2SingleSelectField{id name dataType options{id name}}}}}}}"
+)
+
+
+def ensure_fields(token: str, pid: str) -> dict:
+    """Find or create the custom fields; realign select options on drift.
+    Returns {name: {id, opts?}} including the built-in Status field."""
+    have = {
+        f["name"]: f
+        for f in gql(token, FIELDS_QUERY, {"p": pid})["node"]["fields"]["nodes"]
+        if f
+    }
+    out: dict[str, dict] = {}
+    for name, opts in FIELD_SELECTS.items():
+        want = [{"name": n, "color": c, "description": d} for n, c, d in opts]
+        f = have.get(name)
+        if f is None:
+            f = gql(
+                token,
+                "mutation($p:ID!,$n:String!,$o:[ProjectV2SingleSelectFieldOptionInput!]!)"
+                "{createProjectV2Field(input:{projectId:$p,dataType:SINGLE_SELECT,name:$n,singleSelectOptions:$o})"
+                "{projectV2Field{... on ProjectV2SingleSelectField{id name options{id name}}}}}",
+                {"p": pid, "n": name, "o": want},
+            )["createProjectV2Field"]["projectV2Field"]
+            print(f"field created: {name}")
+        elif [o["name"] for o in f.get("options", [])] != [o[0] for o in opts]:
+            f = gql(
+                token,
+                "mutation($f:ID!,$o:[ProjectV2SingleSelectFieldOptionInput!]!)"
+                "{updateProjectV2Field(input:{fieldId:$f,singleSelectOptions:$o})"
+                "{projectV2Field{... on ProjectV2SingleSelectField{id name options{id name}}}}}",
+                {"f": f["id"], "o": want},
+            )["updateProjectV2Field"]["projectV2Field"]
+            print(f"field realigned: {name}")
+        out[name] = {"id": f["id"], "opts": {o["name"]: o["id"] for o in f["options"]}}
+    for name, dtype in (("When", "DATE"), ("Order", "NUMBER")):
+        f = have.get(name)
+        if f is None:
+            f = gql(
+                token,
+                "mutation($p:ID!,$n:String!){createProjectV2Field(input:{projectId:$p,dataType:%s,name:$n})"
+                "{projectV2Field{... on ProjectV2Field{id name}}}}" % dtype,
+                {"p": pid, "n": name},
+            )["createProjectV2Field"]["projectV2Field"]
+            print(f"field created: {name}")
+        out[name] = {"id": f["id"]}
+    status = have.get("Status")
+    if status and status.get("options"):
+        out["Status"] = {"id": status["id"], "opts": {o["name"]: o["id"] for o in status["options"]}}
+    stage = have.get(STAGE_FIELD)
+    if stage and stage.get("options"):
+        out[STAGE_FIELD] = {"id": stage["id"], "opts": {o["name"]: o["id"] for o in stage["options"]}}
+    return out
+
+
+def set_value(token: str, pid: str, item_id: str, field: dict, value: dict) -> None:
+    gql(
+        token,
+        "mutation($p:ID!,$i:ID!,$f:ID!,$v:ProjectV2FieldValue!)"
+        "{updateProjectV2ItemFieldValue(input:{projectId:$p,itemId:$i,fieldId:$f,value:$v}){projectV2Item{id}}}",
+        {"p": pid, "i": item_id, "f": field["id"], "v": value},
+    )
+
+
+def apply_fields(token: str, pid: str, item_id: str, d: dict, fields: dict) -> None:
+    plan = [
+        (STAGE_FIELD, d["stage"]),
+        ("Era", d["era"]),
+        ("Kind", d["kind"]),
+        ("Proof", d.get("proof")),
+        ("Status", d.get("status")),
+    ]
+    for fname, val in plan:
+        f = fields.get(fname)
+        if f and val and val in f.get("opts", {}):
+            set_value(token, pid, item_id, f, {"singleSelectOptionId": f["opts"][val]})
+    if d.get("when") and "When" in fields:
+        set_value(token, pid, item_id, fields["When"], {"date": d["when"]})
+    if d.get("order") is not None and "Order" in fields:
+        set_value(token, pid, item_id, fields["Order"], {"number": d["order"]})
+
+
+ITEMS_QUERY = (
+    "query($p:ID!){node(id:$p){... on ProjectV2{items(first:60){nodes{id "
+    "fieldValues(first:20){nodes{"
+    "... on ProjectV2ItemFieldSingleSelectValue{name field{... on ProjectV2SingleSelectField{name}}}"
+    "... on ProjectV2ItemFieldDateValue{date field{... on ProjectV2Field{name}}}"
+    "... on ProjectV2ItemFieldNumberValue{number field{... on ProjectV2Field{name}}}}}"
+    "content{... on DraftIssue{title body} ... on Issue{title body}}}}}}}"
+)
+
+
+def snapshot_items(token: str, pid: str) -> list[dict]:
+    nodes = gql(token, ITEMS_QUERY, {"p": pid})["node"]["items"]["nodes"]
+    out = []
+    for node in nodes:
+        c = node.get("content") or {}
+        vals: dict = {}
+        for v in node["fieldValues"]["nodes"]:
+            if not v or "field" not in v:
+                continue
+            fname = (v.get("field") or {}).get("name")
+            if "name" in v and fname:
+                vals[fname] = v["name"]
+            elif "date" in v and fname:
+                vals[fname] = str(v["date"])
+            elif "number" in v and fname:
+                vals[fname] = int(v["number"])
+        out.append(
+            {
+                "id": node["id"],
+                "title": c.get("title"),
+                "body": (c.get("body") or "").strip(),
+                "vals": vals,
+            }
+        )
+    return out
+
+
+def fingerprint(d: dict) -> tuple:
+    return (
+        d["title"],
+        d["body"].strip(),
+        d["stage"],
+        d["era"],
+        d["kind"],
+        d.get("proof"),
+        d.get("status"),
+        d.get("when"),
+        d.get("order"),
+    )
+
+
+def current_fingerprint(snap: dict) -> tuple:
+    v = snap["vals"]
+    return (
+        snap["title"],
+        snap["body"],
+        v.get(STAGE_FIELD),
+        v.get("Era"),
+        v.get("Kind"),
+        v.get("Proof"),
+        v.get("Status"),
+        v.get("When"),
+        v.get("Order"),
+    )
+
+
+
 def main() -> None:
     token = os.environ.get("BOARD_PROJECT_TOKEN", "")
     if not token:
@@ -235,8 +485,6 @@ def main() -> None:
     gate_issues = sync_issues(token, doc)
 
     org = gql(token, '{organization(login:"%s"){id}}' % ORG)["organization"]["id"]
-
-    # find-or-create the project by exact title
     found = gql(
         token,
         'query($q:String!){organization(login:"%s"){projectsV2(first:20,query:$q){nodes{id title number}}}}'
@@ -251,7 +499,6 @@ def main() -> None:
             {"o": org, "t": TITLE},
         )["createProjectV2"]["projectV2"]
         print(f"created project #{project['number']}")
-
     pid = project["id"]
     link_repos(token, pid)
     gql(
@@ -259,70 +506,23 @@ def main() -> None:
         "mutation($p:ID!,$s:String!,$r:String!){updateProjectV2(input:{projectId:$p,public:true,shortDescription:$s,readme:$r}){projectV2{id}}}",
         {"p": pid, "s": SHORT, "r": README},
     )
+    fields = ensure_fields(token, pid)
 
-    # ensure the Stage single-select field
-    fields = gql(
-        token,
-        "query($p:ID!){node(id:$p){... on ProjectV2{fields(first:30){nodes{... on ProjectV2SingleSelectField{id name options{id name}}}}}}}",
-        {"p": pid},
-    )["node"]["fields"]["nodes"]
-    stage = next((f for f in fields if f and f.get("name") == STAGE_FIELD), None)
-    if stage is None:
-        stage = gql(
-            token,
-            'mutation($p:ID!){createProjectV2Field(input:{projectId:$p,dataType:SINGLE_SELECT,name:"%s",'
-            'singleSelectOptions:[{name:"%s",color:YELLOW,description:"the future, as conditions"},'
-            '{name:"%s",color:GREEN,description:"flipped: a dated, proven entry"}]})'
-            "{projectV2Field{... on ProjectV2SingleSelectField{id name options{id name}}}}}"
-            % (STAGE_FIELD, STAGE_GATE, STAGE_SHIPPED),
-            {"p": pid},
-        )["createProjectV2Field"]["projectV2Field"]
-    option_id = {o["name"]: o["id"] for o in stage["options"]}
-
-    # current items (drafts only: anything else is a hand edit, wiped)
-    current = gql(
-        token,
-        "query($p:ID!){node(id:$p){... on ProjectV2{items(first:100){nodes{id fieldValues(first:10){nodes{"
-        "... on ProjectV2ItemFieldSingleSelectValue{name field{... on ProjectV2SingleSelectField{name}}}}}"
-        "content{... on DraftIssue{title body}}}}}}}",
-        {"p": pid},
-    )["node"]["items"]["nodes"]
-
-    def snapshot(node: dict) -> dict | None:
-        c = node.get("content") or {}
-        if "title" not in c:
-            return None  # non-draft content = a hand edit
-        st = next(
-            (
-                v.get("name")
-                for v in node["fieldValues"]["nodes"]
-                if v and (v.get("field") or {}).get("name") == STAGE_FIELD
-            ),
-            None,
-        )
-        return {"title": c["title"], "body": (c.get("body") or "").strip(), "stage": st}
-
-    snaps = [snapshot(n) for n in current]
-    same = len(snaps) == len(desired) and all(
-        s is not None
-        and s["title"] == d["title"]
-        and s["body"] == d["body"].strip()
-        and s["stage"] == d["stage"]
-        for s, d in zip(snaps, desired)
-    )
-    if same:
+    snaps = snapshot_items(token, pid)
+    if len(snaps) == len(desired) and all(
+        current_fingerprint(s) == fingerprint(d) for s, d in zip(snaps, desired)
+    ):
         print(f"board already equals the record · {len(desired)} items · quiet")
         return
 
-    for node in current:
+    for snap in snaps:
         gql(
             token,
             "mutation($p:ID!,$i:ID!){deleteProjectV2Item(input:{projectId:$p,itemId:$i}){deletedItemId}}",
-            {"p": pid, "i": node["id"]},
+            {"p": pid, "i": snap["id"]},
         )
-    gate_ids = [g["id"] for g in doc.get("gates", [])]
-    for i, d in enumerate(desired):
-        node = gate_issues.get(gate_ids[i]) if i < len(gate_ids) else None
+    for d in desired:
+        node = gate_issues.get(d.get("gate_id", ""))
         if node:
             item = gql(
                 token,
@@ -335,13 +535,24 @@ def main() -> None:
                 "mutation($p:ID!,$t:String!,$b:String!){addProjectV2DraftIssue(input:{projectId:$p,title:$t,body:$b}){projectItem{id}}}",
                 {"p": pid, "t": d["title"], "b": d["body"]},
             )["addProjectV2DraftIssue"]["projectItem"]
+        apply_fields(token, pid, item["id"], d, fields)
+
+    gates_n = sum(1 for d in desired if d["kind"] == "gate")
+    proven_n = sum(1 for d in desired if d.get("proof") == "✓ proven")
+    try:
         gql(
             token,
-            "mutation($p:ID!,$i:ID!,$f:ID!,$o:String!){updateProjectV2ItemFieldValue("
-            "input:{projectId:$p,itemId:$i,fieldId:$f,value:{singleSelectOptionId:$o}}){projectV2Item{id}}}",
-            {"p": pid, "i": item["id"], "f": stage["id"], "o": option_id[d["stage"]]},
+            "mutation($p:ID!,$b:String!){createProjectV2StatusUpdate(input:{projectId:$p,status:ON_TRACK,body:$b}){statusUpdate{id}}}",
+            {
+                "p": pid,
+                "b": f"Re-projected from the record: {len(desired) - gates_n} dated claims ({proven_n} proven in CI) and {gates_n} gates ahead. v1 is the culmination; gates carry conditions, never dates.",
+            },
         )
-    print(f"board projected · {len(desired)} items ({len(desired) - SHIPPED_COUNT} gates + {SHIPPED_COUNT} shipped)")
+    except SystemExit as err:
+        print(f"::warning::status update FAILED: {str(err)[:200]}")
+    print(
+        f"board projected · {len(desired)} items ({gates_n} gates + {len(desired) - gates_n} record claims, {proven_n} proven)"
+    )
 
 
 if __name__ == "__main__":
