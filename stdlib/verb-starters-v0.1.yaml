@@ -58,6 +58,7 @@ verbs:
     - id: exec-argv
       label: "command · argv"
       hint: "The default: execve, no shell — an interpolated value can never break out of its argument."
+      permits: "{exec: [cargo]}"   # NEP-0003 · the starter declares its boundary
       body: |
         exec:
           command: ["cargo", "test", "--workspace", "--lib"]   # SLOT: program + args · each element substituted independently
@@ -70,6 +71,7 @@ verbs:
     - id: exec-captured
       label: "capture structured"
       hint: "cwd + structured capture — stdout, stderr and the exit code become fields."
+      permits: "{exec: [git]}"   # NEP-0003 · the starter declares its boundary
       body: |
         exec:
           command: ["git", "status", "--short"]   # SLOT: program + args
@@ -80,6 +82,7 @@ verbs:
     - id: invoke-builtin
       label: "builtin tool"
       hint: "nika:<tool> — pick from the embedded catalog; args are tool-specific."
+      permits: "{tools: ['nika:read'], fs: {read: ['./README.md']}}"   # NEP-0003 · the starter declares its boundary
       body: |
         invoke:
           tool: "nika:read"       # SLOT: pick from the catalog
@@ -88,6 +91,7 @@ verbs:
     - id: invoke-mcp
       label: "MCP tool"
       hint: "mcp:<server>/<tool> — the server comes from the engine's MCP registry."
+      permits: "{tools: ['mcp:browser/navigate']}"   # NEP-0003 · the starter declares its boundary
       body: |
         invoke:
           tool: "mcp:browser/navigate"   # SLOT: mcp:<server>/<tool>
@@ -98,6 +102,7 @@ verbs:
     - id: agent-tools
       label: "agent + tools"
       hint: "The multi-turn loop — tools are default-deny, grant the least set explicitly."
+      permits: "{tools: ['nika:fetch']}"   # NEP-0003 · the starter declares its boundary
       body: |
         agent:
           system: "You are a research assistant."           # SLOT: the voice
@@ -107,6 +112,7 @@ verbs:
     - id: agent-typed
       label: "agent → typed final"
       hint: "schema: validates the FINAL message — name the contract in the prompt so the loop lands on it."
+      permits: "{tools: ['nika:fetch', 'nika:read']}"   # NEP-0003 · the starter declares its boundary
       body: |
         agent:
           system: "You are a meticulous analyst."
