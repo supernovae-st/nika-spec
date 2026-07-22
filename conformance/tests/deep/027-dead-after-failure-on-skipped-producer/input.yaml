@@ -4,6 +4,7 @@
 nika: v1
 workflow:
   id: gate-skipped-x-after-failure
+permits: {exec: ["true", "false", "echo"]}
 tasks:
   seed:
     exec: { command: ["true"] }

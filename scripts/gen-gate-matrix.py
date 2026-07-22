@@ -130,6 +130,8 @@ def cell_workflow(state: str, form: str) -> str:
         "nika: v1",
         "workflow:",
         f"  id: gate-{state}-x-{form}",
+        # NEP-0003 · the cell declares its boundary (the generator's exec set)
+        "permits: {exec: [\"true\", \"false\", \"echo\"]}",
         "tasks:",
         producer_yaml(state),
         consumer_yaml(form),
@@ -186,6 +188,7 @@ VOCAB_FIXTURE = """\
 nika: v1
 workflow:
   id: gate-bad-status-literal
+permits: {exec: ["true", "echo"]}
 tasks:
   p:
     exec: { command: ["true"] }

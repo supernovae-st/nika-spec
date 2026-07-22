@@ -4,6 +4,7 @@
 nika: v1
 workflow:
   id: gate-bad-status-literal
+permits: {exec: ["true", "echo"]}
 tasks:
   p:
     exec: { command: ["true"] }
