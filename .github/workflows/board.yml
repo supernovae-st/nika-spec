@@ -1,0 +1,60 @@
+# The board projection · the org Projects board follows the record.
+# timeline/timeline.yaml is the SSOT; timeline/project-board.py makes the
+# board EQUAL to it (gates as condition-items · the last releases as
+# shipped) — hand edits are overwritten by construction, so the board
+# can never rot into the stale-meta-surface anti-pattern.
+#
+# SECURITY: zero run: event data · every step a SHA-pinned uses: · the
+# token reaches the script through env only. GITHUB_TOKEN cannot write
+# org-level Projects v2, so the sync runs on BOARD_PROJECT_TOKEN (a
+# fine-grained PAT scoped to org projects, write) and SKIPS with a
+# notice when the secret is absent (the tap-key guard pattern).
+
+name: board
+
+on:
+  push:
+    branches: [main]
+    paths: ['timeline/**']
+  schedule:
+    - cron: '29 7 * * 1' # weekly · after the timeline re-proof
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: board-projection
+  cancel-in-progress: false
+
+jobs:
+  project:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Guard on the board token
+        id: guard
+        env:
+          BOARD_KEY: ${{ secrets.BOARD_PROJECT_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -n "${BOARD_KEY:-}" ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::BOARD_PROJECT_TOKEN unset — the board projection is skipped. Provision a fine-grained PAT (org projects: write) to arm it."
+          fi
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        if: steps.guard.outputs.ok == 'true'
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        if: steps.guard.outputs.ok == 'true'
+        with:
+          python-version: '3.12'
+      - name: Project the board from the record
+        if: steps.guard.outputs.ok == 'true'
+        env:
+          BOARD_PROJECT_TOKEN: ${{ secrets.BOARD_PROJECT_TOKEN }}
+        run: |
+          set -euo pipefail
+          pip install --quiet pyyaml==6.0.3
+          python3 timeline/project-board.py
