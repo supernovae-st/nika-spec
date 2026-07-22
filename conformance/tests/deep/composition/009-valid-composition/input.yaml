@@ -1,6 +1,8 @@
 nika: v1
 workflow:
   id: comp-009-valid
+permits:
+  exec: ["echo"]
 tasks:
   call:
     invoke:

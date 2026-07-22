@@ -36,6 +36,11 @@
 #                 checkable surface: invoke tools + agent whitelists vs
 #                 permits.tools globs · exec: presence/argv-program vs
 #                 permits.exec · static fetch hosts vs permits.net.http
+#   ABSENT-PERMITS when the block is ABSENT, DeclaredPermits := ∅
+#                 (NEP-0003 · LAW-AUTH-0324) · any statically visible
+#                 effect is NIKA-AUTH-006 before any token · pure compute
+#                 passes · the null spelling is refused prescriptively ·
+#                 computed resources defer to the runtime NIKA-SEC-004
 #
 # Emitted errors reuse the canonical namespaces (NIKA-VAR for expression
 # surface · NIKA-PARSE for shape rules · runner-protocol.md matching).
@@ -317,6 +322,158 @@ def _as_dict(value) -> dict:
     return value if isinstance(value, dict) else {}
 
 
+# ── ABSENT-PERMITS tables (NEP-0003 · LAW-AUTH-0324) ─────────────────────
+# One voice with canon/builtins.yaml capability_classification (LAW-AUTH-0311):
+# pure/internal builtins carry ZERO required effects — a file invoking only
+# them is pure compute and passes under an absent block (law 4).
+_PURE_INTERNAL_TOOLS = {
+    "nika:assert", "nika:compose", "nika:convert", "nika:date",
+    "nika:decide", "nika:done", "nika:emit", "nika:hash", "nika:inspect",
+    "nika:jq", "nika:json_diff", "nika:json_merge_patch", "nika:log",
+    "nika:prompt", "nika:uuid", "nika:validate", "nika:wait",
+}
+# The external builtin's effect class is judged on its RESOURCE arg, exactly
+# like PERMITS-FIT: a static url/path/program is a check-time refusal
+# (NIKA-AUTH-006) · a computed one is the runtime boundary's (NIKA-SEC-004 ·
+# law 3 · « the static judge cannot see a host computed at run time »).
+_ABSENT_NET_TOOLS = {"nika:fetch", "nika:notify"}
+_ABSENT_FS_READ_TOOLS = {"nika:read", "nika:glob", "nika:grep"}
+_ABSENT_FS_WRITE_TOOLS = {"nika:write", "nika:edit"}
+
+
+def _static_str(v) -> str | None:
+    return v if isinstance(v, str) and _is_static(v) else None
+
+
+def _task_required_absent(t: dict) -> set[str]:
+    """The effect classes a task STATICALLY requires (NEP-0003 law 1 ·
+    Required ⊆ Declared judged with Declared := ∅). Only statically visible
+    resources count — a computed host/path/program defers to the runtime
+    refusal (law 3). Pure/internal builtins and pure agents require nothing."""
+    req: set[str] = set()
+    if "exec" in t:
+        cmd = _as_dict(t.get("exec")).get("command")
+        prog = cmd[0] if isinstance(cmd, list) and cmd else None
+        if _static_str(prog) is not None:
+            req.add("exec")
+    inv = t.get("invoke")
+    if isinstance(inv, dict):
+        tool = _static_str(inv.get("tool"))
+        if tool is not None and tool not in _PURE_INTERNAL_TOOLS:
+            args = _as_dict(inv.get("args"))
+            if tool in _ABSENT_NET_TOOLS:
+                if _static_str(args.get("url")) is not None:
+                    req.add("net")
+            elif tool in _ABSENT_FS_READ_TOOLS or tool in _ABSENT_FS_WRITE_TOOLS:
+                if _static_str(args.get("path")) is not None:
+                    req.add("fs")
+            else:
+                req.add("tools")  # chart · image_* · tts · mcp:* · unknown
+    ag = t.get("agent")
+    if isinstance(ag, dict):
+        for w in ag.get("tools") or []:
+            if _static_str(w) is not None and not w.startswith("!") \
+                    and w not in _PURE_INTERNAL_TOOLS:
+                req.add("tools")
+    return req
+
+
+def _infer_permits_block(tasks: list) -> dict:
+    """The minimal permits: block that re-checks clean — the repair the
+    NIKA-AUTH-006 detail carries inline (NEP-0003 law 2 · paste-able). The
+    tools list names every statically-invoked tool (pure included ·
+    PERMITS-FIT default-denies any omitted tool once a block exists)."""
+    tools: list[str] = []
+    programs: list[str] = []
+    hosts: list[str] = []
+    reads: list[str] = []
+    writes: list[str] = []
+
+    def keep(lst: list, v: str | None) -> None:
+        if v is not None and v not in lst:
+            lst.append(v)
+
+    for _tid, t in tasks:
+        if "exec" in t:
+            cmd = _as_dict(t.get("exec")).get("command")
+            prog = cmd[0] if isinstance(cmd, list) and cmd else None
+            keep(programs, _static_str(prog))
+        inv = t.get("invoke")
+        if isinstance(inv, dict):
+            tool = _static_str(inv.get("tool"))
+            if tool is not None:
+                keep(tools, tool)
+                args = _as_dict(inv.get("args"))
+                if tool in _ABSENT_NET_TOOLS:
+                    import urllib.parse
+                    url = _static_str(args.get("url"))
+                    if url is not None:
+                        keep(hosts, urllib.parse.urlparse(url).hostname or url)
+                elif tool in _ABSENT_FS_READ_TOOLS:
+                    keep(reads, _static_str(args.get("path")))
+                elif tool in _ABSENT_FS_WRITE_TOOLS:
+                    keep(writes, _static_str(args.get("path")))
+        ag = t.get("agent")
+        if isinstance(ag, dict):
+            for w in ag.get("tools") or []:
+                if isinstance(w, str) and not w.startswith("!"):
+                    keep(tools, _static_str(w))
+    block: dict = {}
+    if tools:
+        block["tools"] = sorted(tools)
+    if programs:
+        block["exec"] = sorted(programs)
+    if hosts:
+        block["net"] = {"http": sorted(hosts)}
+    fs: dict = {}
+    if reads:
+        fs["read"] = sorted(reads)
+    if writes:
+        fs["write"] = sorted(writes)
+    if fs:
+        block["fs"] = fs
+    return block
+
+
+def _flow_yaml(obj: dict) -> str:
+    import yaml
+    return yaml.safe_dump(obj, default_flow_style=True, sort_keys=False,
+                          width=10 ** 6).strip()
+
+
+def absent_permits_errors(doc: dict, tasks: list) -> list[dict]:
+    """NEP-0003 / LAW-AUTH-0324 · an ABSENT permits: block declares zero
+    authority (DeclaredPermits := ∅, provenance: absent). Any non-empty
+    static Required is a check refusal NIKA-AUTH-006 before any token
+    (laws 1-2 · the detail carries the inferred block, ready to paste).
+    The null spelling is refused outright, prescriptively (one obvious
+    way). Pure compute (Required := ∅) passes (law 4). A PRESENT block is
+    PERMITS-FIT's, below — untouched."""
+    if "permits" not in doc:
+        inferred = _infer_permits_block(tasks)
+        errs: list[dict] = []
+        for tid, t in tasks:
+            req = _task_required_absent(t)
+            if req:
+                errs.append({
+                    "code": "NIKA-AUTH-006", "namespace": "NIKA-AUTH",
+                    "category": "security_error",
+                    "detail": f"task '{tid}' requires {', '.join(sorted(req))} "
+                              "outside the declared boundary · this file has no "
+                              "permits: block · absent means zero authority "
+                              "(NEP-0003) · add the inferred boundary (re-checks "
+                              f"clean): permits: {_flow_yaml(inferred)}"})
+        return errs
+    if doc["permits"] is None:
+        return [{"code": "NIKA-AUTH-006", "namespace": "NIKA-AUTH",
+                 "category": "security_error",
+                 "detail": "permits: is null · the null spelling is refused "
+                           "(NEP-0003 · one obvious way) · write permits: {} "
+                           "for declared-zero authority, or name the boundary "
+                           "your effects need"}]
+    return []
+
+
 def deep_static_errors(doc: dict) -> list[dict]:
     errs: list[dict] = []
     if not isinstance(doc, dict):
@@ -488,6 +645,10 @@ def deep_static_errors(doc: dict) -> list[dict]:
                          "detail": f"task '{tid}' · nika:done is the agent-loop completion "
                                    "sentinel · valid ONLY inside an agent: tools whitelist · "
                                    "never a standalone invoke (02 §loop semantics)"})
+
+    # ABSENT-PERMITS · NEP-0003 (LAW-AUTH-0324) · absent block = zero
+    # authority · judged BEFORE the fit (a present block is PERMITS-FIT's)
+    errs.extend(absent_permits_errors(doc, tasks))
 
     # PERMITS-FIT · the declared boundary must contain the body (01 §permits)
     permits = doc.get("permits")

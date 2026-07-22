@@ -2,6 +2,9 @@
 nika: v1
 workflow:
   id: site-crawl
+permits:
+  tools: ["nika:fetch"]
+  net: { http: ["example.com"] }
 tasks:
   crawl:
     invoke:

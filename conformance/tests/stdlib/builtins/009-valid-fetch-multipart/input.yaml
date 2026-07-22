@@ -8,6 +8,9 @@ secrets:
     key: QRCODE_AI_API_KEY
     egress:
       - to: "nika:fetch"
+permits:
+  tools: ["nika:fetch"]
+  net: { http: ["api.example.com"] }
 tasks:
   upload:
     invoke:

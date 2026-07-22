@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-AUTH-006", "category": "security_error" }
+  ],
+  "note": "NEP-0003 laws 1-2 · absent block = DeclaredPermits := ∅ · net is required and ∉ ∅ · refusal before any token · the detail carries the inferred permits block inline."
+}

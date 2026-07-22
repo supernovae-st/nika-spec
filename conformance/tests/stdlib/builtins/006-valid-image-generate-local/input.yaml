@@ -2,6 +2,8 @@
 nika: v1
 workflow:
   id: og-hero-sovereign
+permits:
+  tools: ["nika:image_generate"]
 tasks:
   hero:
     invoke:

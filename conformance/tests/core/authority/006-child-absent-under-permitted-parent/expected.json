@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-COMP-002", "category": "security_error" }
+  ],
+  "note": "NEP-0003 law 6 · the child's own Declared := ∅ · its exec effect exceeds it · the parent's grants never flow down implicitly · containment monotone, inter = child (spec 14 laws 3/4)."
+}

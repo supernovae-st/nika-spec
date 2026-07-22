@@ -10,7 +10,9 @@
 #   NIKA-COMP-002  the child's effect boundary exceeds the parent
 #                  (coarse effect classes · exec/net/write/tools · the
 #                  same table policy_errors reads · child needs an
-#                  effect the parent's permits: do not grant)
+#                  effect the parent's permits: do not grant ·
+#                  NEP-0003: containment = parent ∩ child-declared, an
+#                  absent block on either side is the zero wall)
 #   NIKA-COMP-003  the static call graph is not acyclic (self-launch ·
 #                  cycle · cap the depth fail-closed)
 #   NIKA-COMP-004  the typed call does not compose (parent args ⋢ child
@@ -76,12 +78,13 @@ def _effect_classes(doc: dict) -> set[str]:
     return out
 
 
-def _parent_granted(doc: dict) -> set[str]:
-    """The effect classes the parent's permits: block grants (absent
-    block = today's behavior · everything granted · spec 01)."""
+def _declared_grants(doc: dict) -> set[str]:
+    """The effect classes a permits: block grants. NEP-0003 /
+    LAW-AUTH-0324: an ABSENT block declares zero authority
+    (DeclaredPermits := ∅ · the zero wall) — never the ambient floor."""
     permits = doc.get("permits")
     if not isinstance(permits, dict):
-        return {"exec", "net", "write", "tools"}  # no boundary declared
+        return set()  # absent or null · zero authority (NEP-0003)
     granted: set[str] = set()
     ex = permits.get("exec")
     if ex is True or isinstance(ex, list):
@@ -209,7 +212,7 @@ def composition_errors(doc: dict, base_dir=None) -> list[dict]:
     if not isinstance(doc, dict):
         return []
     errs: list[dict] = []
-    parent_effects_granted = _parent_granted(doc)
+    parent_granted = _declared_grants(doc)
     for tid, task in _tasks(doc):
         if not isinstance(task, dict):
             continue
@@ -242,14 +245,17 @@ def composition_errors(doc: dict, base_dir=None) -> list[dict]:
         errs.extend(_acyclic(base_dir, target, child))
         # COMP-004 · typed call
         errs.extend(_typed_call(task, args, child, where))
-        # COMP-002 · effect containment (coarse · declared/inferred child ⊆ parent)
+        # COMP-002 · effect containment (coarse · child needs ⊆ parent ∩
+        # child-declared · NEP-0003 law 6: the parent's grants never flow
+        # down implicitly — a child that touches the world declares it)
         child_needs = _effect_classes(child)
-        exceeds = child_needs - parent_effects_granted
+        exceeds = child_needs - (parent_granted & _declared_grants(child))
         if exceeds:
             errs.append(_err("NIKA-COMP-002",
                              f"{where} · child needs effect(s) {sorted(exceeds)} the "
-                             "parent's permits: do not grant (Authority(child) ⊆ "
-                             "parent ∩ declared · spec 14 laws 3/4)"))
+                             "boundary does not grant (Authority(child) ⊆ parent ∩ "
+                             "child-declared · absent block = ∅ · NEP-0003 · "
+                             "spec 14 laws 3/4)"))
     # de-dup (a cycle can be reported once per entry)
     seen, out = set(), []
     for e in errs:

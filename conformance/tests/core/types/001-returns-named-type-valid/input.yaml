@@ -8,6 +8,8 @@ types:
       title: string
       bullets: { array: string }
       score: { integer: { min: 0, max: 100 } }
+permits:
+  exec: ["cat"]
 tasks:
   fetch:
     exec: { command: ["cat", "article.txt"] }

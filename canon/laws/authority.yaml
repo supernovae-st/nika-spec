@@ -47,6 +47,14 @@
 # verbatim reproduisent les bytes des rulings, em dashes inclus quand la source en
 # porte (précédent : le pilote R11 cite la note P5 avec ses em dashes).
 #
+# FINDING-AUTH-06 (LAW-AUTH-0324 · post-C0) : la loi « absent = zéro autorité »
+# arrive par NEP-0003 (lane F-O8 · ratifiée op 2026-07-22), hors import C0 :
+# première loi du groupe au statut active. Elle tombstone LAW-AUTH-0306 (status
+# retired · replaced_by LAW-AUTH-0324 · le verbatim R12 points 8+9 reste cité dans
+# la row retirée, mémoire du processus) et laisse LAW-AUTH-0307 (published : bloc
+# explicite même vide) strictement plus forte que le floor. NIKA-AUTH-006 rejoint
+# les codes c0-proposed de FINDING-AUTH-02 (renumérotables avant C1).
+#
 # Directive de clôture R12, verbatim : « Grave cette loi dans le ruling, le canon, la
 # conformance, le manifest de capabilities, le modèle de référence, le runtime et les
 # receipts avant implémentation. » Ce fichier est l'étape canon de cette gravure.
@@ -387,16 +395,19 @@ laws:
       - effective-equals-intersection
 
   # ── R12 points 8 + 9 · draft sans permits : inferred, jamais un floor ─────────
+  # TOMBSTONED 2026-07-22 · NEP-0003 la remplace : voir LAW-AUTH-0324 en bas de file.
 
   - id: LAW-AUTH-0306
     slug: authority/draft-absent-permits-inferred
-    status: reserved
+    status: retired
+    replaced_by: LAW-AUTH-0324
+    deprecated: "2026-07-22"
     owner: spec
     domain: AUTH
     title: "En draft sans bloc permits, la declaration est l'inference elle-meme, jamais un floor ambiant"
     prose_projection:
       chapters: ["10-authority", "01-envelope"]
-      text: "R12 point 8 verbatim : « En mode local/draft, si `permits:` est absent : DeclaredPermits := RequiredCapabilities · declaration_provenance := inferred. L'autorité reste exactement bornée aux capacités inférées. » · R12 point 9 verbatim : « L'absence de `permits:` ne signifie jamais \"ambient floor\" ni accès général aux capacités du runner. » Note de clôture du ruling, verbatim : « (SUPERSEDE : le two-mode « permits absent = engine floor ambiant » de 01:382-384 est ABOLI.) »"
+      text: "R12 point 8 verbatim : « En mode local/draft, si `permits:` est absent : DeclaredPermits := RequiredCapabilities · declaration_provenance := inferred. L'autorité reste exactement bornée aux capacités inférées. » · R12 point 9 verbatim : « L'absence de `permits:` ne signifie jamais \"ambient floor\" ni accès général aux capacités du runner. » Note de clôture du ruling, verbatim : « (SUPERSEDE : le two-mode « permits absent = engine floor ambiant » de 01:382-384 est ABOLI.) » TOMBSTONE 2026-07-22 : remplacée par LAW-AUTH-0324 (NEP-0003, ratifié op 2026-07-22) · l'absence déclare ∅, jamais l'inférence; le grant égal au requis était le floor ambiant en costume d'inférence."
     inputs:
       - registry: ir
         id: required_capabilities
@@ -1418,3 +1429,78 @@ laws:
     closure_gates:
       - egress-sole-declassification-form
       - f2-hardenings-shipped
+
+  # ── NEP-0003 (F-O8 · ratifié op 2026-07-22) · absent = zéro autorité ─────────
+
+  - id: LAW-AUTH-0324
+    slug: authority/absent-permits-zero-authority
+    status: active
+    owner: spec
+    domain: AUTH
+    title: "Un bloc permits absent declare l'ensemble vide : tout effet requis est refuse au check, avant tout token"
+    prose_projection:
+      chapters: ["01-envelope", "10-authority"]
+      text: "NEP-0003 (ratifié op 2026-07-22 · lane F-O8), Specification verbatim : « an absent `permits:` block means DeclaredPermits := ∅ (provenance: absent), in draft and published profiles alike, for top-level and composed workflows alike. » · NEP-0003 loi 6 verbatim : « the parent's grants never flow down implicitly (containment is monotone · inter = child) » · NEP-0003 loi 5 verbatim : « absent IS a wall, the zero wall. » Cette loi remplace LAW-AUTH-0306 (retired · le grant égal au requis était le floor ambiant en costume d'inférence) : sous bloc absent, tout Required non vide est un refus de check NIKA-AUTH-006 avant tout token (le detail porte le bloc inféré, prêt à coller), toute tentative d'effet au run échoue la tâche NIKA-SEC-004 (défense en profondeur), et l'enfant sans bloc sous parent permis viole NIKA-COMP-002. `permits: {}` explicite reste le zéro DÉCLARÉ légal (pur compute · VERT avec hint); le partiel est inchangé (default-deny par catégorie omise · 01 §permits); la grammaire garde la clé optionnelle (LAW-AUTH-0320 · changement sémantique seul)."
+    inputs:
+      - registry: ir
+        id: required_capabilities
+        role: required
+      - registry: ir
+        id: declared_permits_block
+        role: required
+    premises:
+      - operator: absent
+        operands:
+          - registry: ir
+            id: declared_permits_block
+        quantifier: forall
+      - operator: equals
+        operands:
+          - registry: ir
+            id: declared_permits
+          - registry: ir
+            id: empty_capability_set
+        quantifier: forall
+    conclusion:
+      verdict: derive
+      derives:
+        registry: ir
+        id: declared_permits
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: declared_permits
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["DeclaredPermits", "RequiredCapabilities"]
+      relation: equality
+      pipeline_stage: permits_check
+    diagnostics: ["NIKA-AUTH-006", "NIKA-SEC-004", "NIKA-COMP-002"]
+    fixtures:
+      - conformance/tests/core/authority/001-absent-permits-pure-compute-clean
+      - conformance/tests/core/authority/005-empty-permits-explicit-pure-clean
+    negative_fixtures:
+      - conformance/tests/core/authority/002-absent-permits-fetch-refused
+      - conformance/tests/core/authority/003-absent-permits-exec-refused
+      - conformance/tests/core/authority/004-absent-permits-fs-read-refused
+      - conformance/tests/core/authority/006-child-absent-under-permitted-parent
+      - conformance/tests/runtime/permits/003-absent-permits-runtime-refusal
+    projections: ["prose:01-envelope", "prose:10-authority", "cli:check", "cli:inspect", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:authority_core.py
+      - cli:nika-check
+      - conformance:authority-suite
+    introduced_in: C1
+    proof_obligations:
+      - "NEP-0003 loi 4 verbatim : « A workflow whose Required is ∅ (pure compute: infer without tools · CEL · pure/internal builtins per the builtin classification table) with an absent block MUST pass check; the report SHOULD carry an informational hint naming `permits: {}` as the explicit form. » Les fixtures 001 (absent + pur · VERT) et 005 (permits: {} + pur · VERT · la forme déclarée du zéro) prouvent que le zéro légal ne casse aucun pur."
+      - "NEP-0003 lois 1-2 : tout Required non vide sous bloc absent est un refus NIKA-AUTH-006 avant tout token · les fixtures 002 (fetch) · 003 (exec) · 004 (fs.read) observent le refus. Loi 6 : la fixture 006 prouve que les grants du parent ne descendent JAMAIS implicitement (NIKA-COMP-002 · containment monotone, inter = enfant). Loi 3 : la paire runtime/permits/003 porte la défense en profondeur (NIKA-SEC-004 au run sur hôte calculé, le cas dynamique que le check ne voit pas)."
+      - "Census dérivé F-O8 (2026-07-22) : 226/409 workflows du repo spec · 31/73 engine · 6/11 playground portent des effets sans bloc et cassent au flip; la migration (codemod permits-explicit-v1 · equivalence-or-stop · précédent LAW-AUTH-0321 · + nika check --infer-permits, la round-trip law) ferme le gate blockless-effect-census-zero AVANT que le checker ne flippe (stratégie flag-day ratifiée : le codemod dans la même PR que le flip)."
+    closure_gates:
+      - absent-means-zero-check-refusal
+      - draft-inference-floor-tombstoned
+      - blockless-effect-census-zero

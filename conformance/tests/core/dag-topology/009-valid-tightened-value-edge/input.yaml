@@ -2,6 +2,9 @@
 nika: v1
 workflow:
   id: chain
+permits:
+  tools: ["nika:fetch"]
+  net: { http: ["example.com"] }
 tasks:
   fetch:
     invoke:

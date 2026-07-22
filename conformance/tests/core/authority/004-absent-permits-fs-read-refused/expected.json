@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-AUTH-006", "category": "security_error" }
+  ],
+  "note": "NEP-0003 law 1 · nika:read is class external, requires fs (canon/builtins.yaml) · fs ∉ ∅ under an absent block."
+}

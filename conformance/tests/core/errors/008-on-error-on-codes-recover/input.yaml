@@ -1,6 +1,9 @@
 nika: v1
 workflow:
   id: core-on-codes
+permits:
+  tools: ["nika:fetch"]
+  net: { http: ["slow.example.com"] }
 tasks:
   slow_fetch:
     invoke: { tool: "nika:fetch", args: { url: "https://slow.example.com" } }

@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "NEP-0003 law 4 · absent permits + empty Required = GREEN · infer without tools is pure compute (01 §permits · 10 §effects) · the report SHOULD hint permits: {} as the explicit form."
+}

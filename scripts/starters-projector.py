@@ -79,7 +79,7 @@ def load_starters() -> dict:
     return data
 
 
-def scaffold(starter_id: str, body: str) -> str:
+def scaffold(starter_id: str, body: str, permits: str | None = None) -> str:
     """Wrap a verb block in the minimal valid workflow the oracle can judge."""
     inputs_found = sorted(set(INPUT_RE.findall(body)))
     out = [
@@ -94,6 +94,9 @@ def scaffold(starter_id: str, body: str) -> str:
         # (the caller supplies it) · the probe declares each as a string input
         out.append("inputs:")
         out.extend(f"  {v}: {{ type: string }}" for v in inputs_found)
+    if permits:
+        # NEP-0003 · the starter carries its declared boundary (absent = zero)
+        out.append(f"permits: {permits}")
     out.append("tasks:")
     out.append("  probe:")
     out.extend(("    " + line) if line.strip() else line
@@ -113,7 +116,7 @@ def prove(data: dict) -> None:
     bad = 0
     for verb in CANON_VERBS:
         for s in data["verbs"][verb]:
-            verdict = validate_text(scaffold(s["id"], s["body"]), validator, canon)
+            verdict = validate_text(scaffold(s["id"], s["body"], s.get("permits")), validator, canon)
             if not verdict["valid"]:
                 bad += 1
                 for err in verdict["errors"]:

@@ -2,6 +2,9 @@
 nika: v1
 workflow:
   id: core-when-true
+permits:
+  tools: ["nika:notify"]
+  exec: ["./build.sh"]
 tasks:
   build:
     exec: { command: ["./build.sh"] }

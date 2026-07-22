@@ -2,6 +2,8 @@ nika: v1
 workflow:
   id: w1-object-form
   description: The W1 envelope · identity and metadata live in one object
+permits:
+  exec: ["true"]
 tasks:
   hello:
     exec:

@@ -2,6 +2,8 @@
 nika: v1
 workflow:
   id: diamond
+permits:
+  exec: ["./prepare.sh"]
 tasks:
   a:
     exec: { command: ["./prepare.sh"] }

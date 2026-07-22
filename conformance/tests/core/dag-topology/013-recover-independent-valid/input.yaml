@@ -2,6 +2,10 @@
 nika: v1
 workflow:
   id: dag-recover-independent
+permits:
+  tools: ["nika:fetch", "nika:read"]
+  net: { http: ["api.example.com"] }
+  fs: { read: ["./fixtures/cached.json"] }
 tasks:
   cached:
     invoke: { tool: "nika:read", args: { path: "./fixtures/cached.json" } }

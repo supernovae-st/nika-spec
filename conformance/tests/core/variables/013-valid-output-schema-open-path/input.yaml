@@ -6,6 +6,8 @@
 nika: v1
 workflow:
   id: schema-path-open
+permits:
+  exec: ["./dump.sh", "report"]
 tasks:
   extract:
     infer:
