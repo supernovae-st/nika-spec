@@ -49,14 +49,21 @@ The law (MUST):
    workflow and every settled task, and the closed-per-minor kind
    vocabulary. A wire change that breaks a version-2 reader MUST bump
    `trace_format`; additive fields and kinds MUST NOT.
-2. **The witness is required.** Every permit decision · the exec
-   program gate, the tool grant, the fs and net boundary enforcements,
-   the taint re-gate (NEP-0004), the environment composition
-   (NEP-0005), the data-as-code sink (NEP-0006) · emits one
+2. **The witness is required.** Every permit decision taken at the
+   dispatch boundary · the exec program gate, the tool grant, the taint
+   re-gate (NEP-0004), the environment composition (NEP-0005 · the
+   passed names), the data-as-code sink (NEP-0006) · emits one
    `permit_checked` frame naming the gate, the decision
    (`allow` | `deny`), the law applied, and the task. Granted decisions
    are witnessed, not only refusals: an auditor reconstructs WHAT
-   authority was exercised, not only what was blocked.
+   authority was exercised, not only what was blocked. The
+   per-operation fs and net enforcement decisions live INSIDE the
+   builtin sinks (canonicalize-then-confine walks the real filesystem ·
+   a dispatch-side pre-witness could claim allow where the sink then
+   refuses a symlink escape, a lying witness): their refusals already
+   surface as typed task failures, and their allow-side witness is the
+   DECLARED v1 residual · it lands with the builtin-journal plumbing,
+   never as a dishonest pre-computation.
 3. **Old journals stay readable, honestly.** The witness requirement is
    behavioral (a conformance requirement on the engine), not a wire
    bump: `trace_format` stays 2. A verifier reading a journal that

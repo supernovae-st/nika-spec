@@ -109,11 +109,14 @@ Per-task terminal frames carry the task's witness fields (the observed
 
 ## The permit witness (normative · REQUIRED · NEP-0007)
 
-Every permit decision the run takes is a `permit_checked` frame ·
-granted AND refused alike: the exec program gate, the tool grant, the
-fs and net boundary enforcements, the taint re-gate
-([10](./10-authority.md) · NEP-0004), and the environment composition
-(NEP-0005 · the passed names). The frame's fields name the `gate` (the
+Every permit decision taken at the dispatch boundary is a
+`permit_checked` frame · granted AND refused alike: the exec program
+gate, the tool grant, the taint re-gate ([10](./10-authority.md) ·
+NEP-0004), the environment composition (NEP-0005 · the passed names),
+and the data-as-code sink (NEP-0006). The per-operation fs/net
+enforcement decisions live inside the builtin sinks (their refusals
+surface as typed task failures; their allow-side witness is the
+declared v1 residual · NEP-0007 law 2). The frame's fields name the `gate` (the
 bound consulted), the `decision` (`allow` \| `deny`), the `why` (the
 law applied), and the `task`. This is a CONFORMANCE requirement on the
 ENGINE, not a wire bump: the frame grammar is unchanged (one more kind
