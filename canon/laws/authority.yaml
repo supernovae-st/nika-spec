@@ -1826,3 +1826,53 @@ laws:
     closure_gates:
       - net-wildcard-check-refusal
       - egress-proxy-permit-bound-engine-flip
+  - id: LAW-AUTH-0330
+    slug: authority/effective-path-identity
+    status: active
+    owner: spec
+    domain: AUTH
+    title: "Un grant de path nomme une identité effective, re-jugée au dispatch · échappée = refus attesté, jamais rewrite · parité plateforme"
+    prose_projection:
+      chapters: ["01-envelope"]
+      text: "NEP-0009 (lane H2 · 2026-07-23) · un grant fs.read/fs.write n'est pas un préfixe-string monté aveuglément : au dispatch l'engine résout le préfixe littéral en son identité effective (plus long ancêtre existant canonicalisé + queue lexicale) et la re-juge contre le set DÉCLARÉ · une identité qui échappe est REFUSÉE avant spawn (classe NIKA-SEC-004) et attestée au journal (fs.path_mismatch · préfixe jugé + cible résolue) · JAMAIS de rewrite-to-canonical silencieux (le receipt ne ment pas · jugé = monté) · le même verdict tient sur chaque arm d'enforcement (path-walk kernel · projection mount) · un grant write dont la cible n'existe pas encore reste légal (jugé sur l'ancêtre sain) · la fenêtre résiduelle parallèle est déclarée (le fd-pin --bind-fd la ferme · follow-on nommé)."
+    inputs:
+      - registry: ir
+        id: declared_permits
+        role: required
+    premises:
+      - operator: member_of
+        operands:
+          - registry: ir
+            id: effective_path_identity
+          - registry: ir
+            id: declared_fs_boundary
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: effective_path_identity
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["DeclaredPermits", "EffectiveAuthority"]
+      relation: subset
+      pipeline_stage: permits_check
+    diagnostics: ["NIKA-SEC-004"]
+    fixtures: []
+    negative_fixtures: []
+    projections: ["prose:01-envelope", "cli:check"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - cli:nika-check
+    introduced_in: C1
+    proof_obligations:
+      - "NEP-0009 lois 1-3 : la preuve exécutable vit côté engine (le tier runtime est un contrat post-announce) · le PoC plant-pivot (fs.write /workspace · rm+ln -s $HOME/.ssh /workspace/data · puis fs.read /workspace/data · cat) est REFUSÉ avant spawn · fs.path_mismatch au journal · zéro octet lu · zéro event exec pour le read · la paire unitaire prouve le refus d'échappée ET l'admission write-inexistant (le regression guard du fold resolve_effective)."
+      - "NEP-0009 loi 4 : la paire de parité plateforme (jail proof linux bwrap · twin macOS seatbelt DENY à l'open) est assertée en CI matrix · le lint check-side (WARN-dur nommant la cible résolue) est non-load-bearing par construction (le plant est un fait de run · le re-gate est le mur)."
+    closure_gates:
+      - symlink-regate-dispatch-refusal
+      - platform-parity-symlink-pair
