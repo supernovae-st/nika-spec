@@ -54,9 +54,18 @@ def resolve_target(env_var: str, sibling: str, filename: str):
     env = os.environ.get(env_var)
     if env:
         return Path(env) / filename
-    candidate = SPEC_ROOT.parent / sibling
-    if candidate.is_dir():
-        return candidate / filename
+    # Sibling layouts differ per host checkout: flat (`../docs/`) or
+    # repo-container (`../../docs/repo/` — the spec itself lives one level
+    # deeper as `spec/repo/` there, hence the extra parent).
+    head, _, tail = sibling.partition("/")
+    candidates = (
+        SPEC_ROOT.parent / sibling,
+        SPEC_ROOT.parent.parent / sibling,
+        SPEC_ROOT.parent.parent / head / "repo" / tail,
+    )
+    for candidate in candidates:
+        if candidate.is_dir():
+            return candidate / filename
     return None
 
 
