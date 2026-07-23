@@ -1,0 +1,10 @@
+{
+ "workflow_state": "failure",
+ "tasks": {
+  "grab": {
+   "status": "failure",
+   "error_code": "NIKA-SEC-004"
+  }
+ },
+ "note": "NEP-0006 laws 3-4 · caller-supplied at launch, no default: the static classifier DEFERS (valid at check) · the run twin classifies the RESOLVED URL path and refuses NIKA-SEC-004 (one runtime refusal voice · the detail names the class and the inert: door) · defense in depth, the NEP-0003 law 3 provenance."
+}
