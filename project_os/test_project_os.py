@@ -31,6 +31,7 @@ from project_os.model import (
     SIGNAL_ATTENTION,
     SIGNAL_QUEUED,
     SIGNAL_READY,
+    STATUS_IN_PROGRESS,
     accountable,
     block_state,
     ci_state,
@@ -167,7 +168,7 @@ class ReconcileTests(unittest.TestCase):
                 "dataType": "SINGLE_SELECT",
                 "options": [
                     {"id": "O4", "name": "Todo"},
-                    {"id": "O5", "name": "In progress"},
+                    {"id": "O5", "name": STATUS_IN_PROGRESS},
                     {"id": "O6", "name": "Done"},
                 ],
             },
@@ -279,7 +280,7 @@ class ReconcileTests(unittest.TestCase):
             body="",
             fields={
                 "SSOT ID": "github:pr:supernovae-st/nika#1",
-                "Status": "In progress",
+                "Status": STATUS_IN_PROGRESS,
             },
             content_id="ISSUE",
             content_kind="PullRequest",

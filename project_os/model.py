@@ -71,6 +71,7 @@ SIGNAL_ACTIVE = "▶ active"
 SIGNAL_QUEUED = "⏭ queued"
 SIGNAL_READY = "✓ ready"
 SIGNAL_SETTLED = "● settled"
+STATUS_IN_PROGRESS = "In Progress"
 PROVEN_CLASSES = {
     "crates-io",
     "github-release",
@@ -352,7 +353,7 @@ def issue_item(
         "Era": ERA_AHEAD,
         "Kind": KIND_ISSUE,
         "Proof": "◌ pending",
-        "Status": "In progress" if has_owner else "Todo",
+        "Status": STATUS_IN_PROGRESS if has_owner else "Todo",
         "Pole": pole_from_labels(label_names(issue)),
         "Horizon": HORIZON_NOW if has_owner else HORIZON_NEXT,
         "Certainty": CERTAINTY_COMMITTED,
@@ -446,7 +447,7 @@ def pull_request_item(
         "Era": ERA_AHEAD,
         "Kind": KIND_PULL_REQUEST,
         "Proof": "◌ pending",
-        "Status": "In progress",
+        "Status": STATUS_IN_PROGRESS,
         "Pole": pole_from_labels(label_names(pull)),
         "Horizon": HORIZON_NOW,
         "Certainty": CERTAINTY_COMMITTED,

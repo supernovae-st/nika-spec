@@ -291,6 +291,17 @@ def live_findings(
                     f"live field options drift: {field['name']} "
                     f"{actual_options} != {expected_options}"
                 )
+        allowed_values = field.get("allowed_values", [])
+        if allowed_values:
+            actual_options = {
+                option["name"] for option in current.get("options", [])
+            }
+            missing = sorted(set(allowed_values) - actual_options)
+            if missing:
+                findings.append(
+                    f"live built-in options drift: {field['name']} "
+                    f"is missing {missing}"
+                )
     actual_views = views_snapshot(
         client, definition["organization"], definition["number"]
     )
