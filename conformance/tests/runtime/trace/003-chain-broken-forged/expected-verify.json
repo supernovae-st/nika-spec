@@ -1,0 +1,4 @@
+{
+ "verdict": "forged",
+ "note": "17 §the chain · ONE byte edited inside frame 3's payload (stamp → stomp · the JSON stays valid, the fixture isolates the hash law) · frame 4's chain no longer matches frame 3's exact bytes, so the walk breaks there and every later link with it · FORGED · the chain proves sequence integrity, authorship stays the seal/anchor rails of 15."
+}
