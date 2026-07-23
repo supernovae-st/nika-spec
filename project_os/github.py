@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import json
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
@@ -27,28 +29,71 @@ class GitHubError(RuntimeError):
 
 
 class GitHub:
-    def __init__(self, token: str):
+    def __init__(
+        self,
+        token: str,
+        *,
+        sleep: Callable[[float], None] = time.sleep,
+        mutation_interval: float = 0.25,
+        retry_delays: tuple[float, ...] = (10, 30, 60, 120),
+    ):
         self.token = token
+        self.sleep = sleep
+        self.mutation_interval = mutation_interval
+        self.retry_delays = retry_delays
 
-    def graphql(self, query: str, variables: dict[str, Any] | None = None) -> dict[str, Any]:
-        request = urllib.request.Request(
-            GRAPHQL_API,
-            data=json.dumps({"query": query, "variables": variables or {}}).encode(),
-            headers={
-                "Authorization": f"Bearer {self.token}",
-                "Content-Type": "application/json",
-                "User-Agent": USER_AGENT,
-            },
-        )
-        try:
-            with urllib.request.urlopen(request, timeout=30) as response:
-                result = json.loads(response.read())
-        except urllib.error.HTTPError as error:
-            detail = error.read().decode(errors="replace")[:800]
-            raise GitHubError(f"graphql HTTP {error.code}: {detail}") from error
-        if result.get("errors"):
-            raise GitHubError(f"graphql: {json.dumps(result['errors'])[:1200]}")
-        return result["data"]
+    def graphql(
+        self,
+        query: str,
+        variables: dict[str, Any] | None = None,
+        *,
+        mutation_cost: int | None = None,
+    ) -> dict[str, Any]:
+        if mutation_cost is None:
+            mutation_cost = 1 if query.lstrip().startswith("mutation") else 0
+        payload = json.dumps(
+            {"query": query, "variables": variables or {}}
+        ).encode()
+        for attempt in range(len(self.retry_delays) + 1):
+            request = urllib.request.Request(
+                GRAPHQL_API,
+                data=payload,
+                headers={
+                    "Authorization": f"Bearer {self.token}",
+                    "Content-Type": "application/json",
+                    "User-Agent": USER_AGENT,
+                },
+            )
+            try:
+                with urllib.request.urlopen(request, timeout=30) as response:
+                    result = json.loads(response.read())
+            except urllib.error.HTTPError as error:
+                detail = error.read().decode(errors="replace")[:800]
+                secondary = (
+                    error.code == 403
+                    and "secondary rate limit" in detail.lower()
+                )
+                retry_after = error.headers.get("Retry-After")
+                error.close()
+                if not secondary or attempt >= len(self.retry_delays):
+                    raise GitHubError(
+                        f"graphql HTTP {error.code}: {detail}"
+                    ) from error
+                header_delay = (
+                    float(retry_after)
+                    if retry_after and retry_after.isdigit()
+                    else 0
+                )
+                self.sleep(max(self.retry_delays[attempt], header_delay))
+                continue
+            if result.get("errors"):
+                raise GitHubError(
+                    f"graphql: {json.dumps(result['errors'])[:1200]}"
+                )
+            if mutation_cost:
+                self.sleep(self.mutation_interval * mutation_cost)
+            return result["data"]
+        raise GitHubError("graphql retry budget exhausted")
 
     def rest(
         self,
@@ -431,7 +476,7 @@ def apply_field_changes(
         )
     if selections:
         query = f"mutation({','.join(declarations)}){{{''.join(selections)}}}"
-        client.graphql(query, variables)
+        client.graphql(query, variables, mutation_cost=len(selections))
 
 
 def add_item(client: GitHub, project_id: str, desired: DesiredItem) -> ActualItem:

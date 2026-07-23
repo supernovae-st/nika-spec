@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
+import io
 import pathlib
+import urllib.error
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import yaml
 
-from project_os.github import ActualItem, reconcile
+from project_os.github import ActualItem, GitHub, reconcile
 from project_os.model import (
     BLOCK_BLOCKED,
     BLOCK_BLOCKING,
@@ -223,6 +225,50 @@ class ReconcileTests(unittest.TestCase):
             actions,
         )
         self.assertFalse(any("delete" in action for action in actions))
+
+
+class GitHubClientTests(unittest.TestCase):
+    def test_graphql_retries_a_secondary_rate_limit(self) -> None:
+        throttled = urllib.error.HTTPError(
+            "https://api.github.com/graphql",
+            403,
+            "Forbidden",
+            {"Retry-After": "7"},
+            io.BytesIO(
+                b'{"message":"You have exceeded a secondary rate limit."}'
+            ),
+        )
+        response = MagicMock()
+        response.__enter__.return_value.read.return_value = (
+            b'{"data":{"viewer":{"login":"nika"}}}'
+        )
+        sleeps: list[float] = []
+        client = GitHub("token", sleep=sleeps.append)
+        with patch(
+            "project_os.github.urllib.request.urlopen",
+            side_effect=[throttled, response],
+        ):
+            result = client.graphql("query { viewer { login } }")
+        self.assertEqual(result["viewer"]["login"], "nika")
+        self.assertEqual(sleeps, [10])
+
+    def test_graphql_paces_aliased_mutations_by_cost(self) -> None:
+        response = MagicMock()
+        response.__enter__.return_value.read.return_value = (
+            b'{"data":{"one":{},"two":{},"three":{},"four":{}}}'
+        )
+        sleeps: list[float] = []
+        client = GitHub(
+            "token",
+            sleep=sleeps.append,
+            mutation_interval=0.25,
+        )
+        with patch(
+            "project_os.github.urllib.request.urlopen",
+            return_value=response,
+        ):
+            client.graphql("mutation { one two three four }", mutation_cost=4)
+        self.assertEqual(sleeps, [1.0])
 
 
 if __name__ == "__main__":
