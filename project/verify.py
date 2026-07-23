@@ -131,10 +131,15 @@ def live_findings(
     actual_views = views_snapshot(
         client, definition["organization"], definition["number"]
     )
-    actual_pairs = [(view["name"], view["layout"]) for view in actual_views]
-    expected_pairs = [
+    # GitHub returns views in creation order, not their saved tab order. The
+    # public API therefore proves membership and layout, while browser QA owns
+    # the visual ordering contract.
+    actual_pairs = sorted(
+        (view["name"], view["layout"]) for view in actual_views
+    )
+    expected_pairs = sorted(
         (view["name"], LAYOUTS[view["layout"]]) for view in manifest["views"]
-    ]
+    )
     if actual_pairs != expected_pairs:
         findings.append(
             f"live views differ: expected {expected_pairs}, found {actual_pairs}"

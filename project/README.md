@@ -35,4 +35,6 @@ BOARD_PROJECT_TOKEN=... python3 timeline/project-board.py --apply
 
 GitHub does not expose view and Insights creation through its public
 API. Their complete browser recipe lives in `project-os.yaml`, and the
-live audit verifies every view property that GitHub does expose.
+live audit verifies every view property that GitHub does expose. View
+membership and layouts are API-verifiable; saved tab order remains a
+browser QA check because the API returns creation order.
