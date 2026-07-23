@@ -1,0 +1,13 @@
+nika: v1
+workflow:
+  id: golden-trace
+model: mock/echo
+permits:
+  exec: ["echo"]
+  env: ["NIKA_GOLDEN_CANARY"]
+tasks:
+  think:
+    infer: { prompt: "the golden run · one infer" }
+  stamp:
+    after: { think: success }
+    exec: { command: ["echo", "sealed"] }

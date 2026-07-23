@@ -1,0 +1,4 @@
+{
+ "verdict": "finding",
+ "note": "NEP-0007 law 3 · the SAME journal judged under the required-witness rule: the run exercised effects (an exec task settled) and carries zero permit_checked frames · FINDING (the witness is absent · the journal predates NEP-0007 or the engine is not conformant) · never FORGED (the chain still binds every line) · never a crash."
+}
