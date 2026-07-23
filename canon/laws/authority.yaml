@@ -1771,3 +1771,58 @@ laws:
       - permit-witness-engine-flip
       - trace-verify-required-witness
       - check-run-equivalence-suite
+  - id: LAW-AUTH-0329
+    slug: authority/egress-permit-bound
+    status: active
+    owner: spec
+    domain: AUTH
+    title: "Le proxy egress sandboxé est la projection exacte du permit net.http (hôtes exacts · DNS côté proxy · floor ports normatif · une allowlist par run · zéro dead grant)"
+    prose_projection:
+      chapters: ["01-envelope"]
+      text: "NEP-0008 (lane F-P5 · 2026-07-23), les 5 lois : (1) exact-host — toute entrée portant un `*` hors le bare `*` est refusée au check (NIKA-AUTH-010 · un glob délègue le permit à l'opérateur de zone · autorité ambiante) ; (2) DNS résolu par le proxy, jamais par le client — la fence rend le resolver du confiné fail-closed et le proxy re-check chaque adresse résolue contre le floor DANS la boucle de dial (NIKA-SEC-005 · zéro fenêtre resolve-then-connect) ; (3) le floor ports est normatif — aucun permit ne le surclasse ; (4) one run, one allowlist — une seconde projection distincte refuse fail-closed (conflicting_boundary) ; (5) une entrée exacte floor-blocked est un dead grant inerte refusé au check sous la parité floor (NIKA-SEC-005 · le twin net de NIKA-AUTH-009). Le proxy est TLS-blind : il jure host+port+octets, jamais le contenu, et tout verdict (allowed · refused · bytes relayed) est journalisé. Le bare `*` reste l'échappatoire explicite (NetPolicy::Allow)."
+    inputs:
+      - registry: ir
+        id: declared_permits
+        role: required
+    premises:
+      - operator: member_of
+        operands:
+          - registry: ir
+            id: egress_boundary_entry
+          - registry: ir
+            id: exact_host_names
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: exact_host_names
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["DeclaredPermits", "EffectiveAuthority"]
+      relation: subset
+      pipeline_stage: permits_check
+    diagnostics: ["NIKA-AUTH-010", "NIKA-SEC-005"]
+    fixtures: []
+    negative_fixtures:
+      - conformance/tests/core/authority/025-net-http-wildcard-refused
+      - conformance/tests/core/authority/026-net-dead-grant-floor-blocked
+    projections: ["prose:01-envelope", "cli:check"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:deep_static.py
+      - cli:nika-check
+      - conformance:authority-suite
+    introduced_in: C1
+    proof_obligations:
+      - "NEP-0008 loi 1 : la fixture 025 observe le refus du wildcard (`*.github.com` · NIKA-AUTH-010 · security_error) · le bare `*` reste légal (l'échappatoire explicite · NetPolicy::Allow). Census dérivé au flip (2026-07-23) : zéro fixture trackée (0/73) n'use le wildcard dans net.http · la casse du refus est mesurée nulle."
+      - "NEP-0008 loi 5 : la fixture 026 observe le dead grant (169.254.169.254 déclaré · NIKA-SEC-005 · la parité floor · le twin net de NIKA-AUTH-009 pré-existant à permits_fit.rs « Dead grants ») · une entrée loopback exacte (localhost · 127/8 · ::1) n'est JAMAIS un dead grant (la déclassification de l'auteur · #395)."
+      - "NEP-0008 lois 2-4 : la loi DNS-proxy-side + re-check par adresse au dial est prouvée engine-side par le test dial_upstream du stopgap #703 devenu loi · la loi one-run-one-allowlist par le refus conflicting_boundary épinglé · le floor ports par le test DANGEROUS_EGRESS_PORTS · le metering (bytes relayed) par l'event Closed de l'observer egress."
+    closure_gates:
+      - net-wildcard-check-refusal
+      - egress-proxy-permit-bound-engine-flip

@@ -2137,6 +2137,23 @@ diagnostics:
     span_required: false
     teaching: 'the dangerous-name floor (dynamic-linker injection · shell startup sourcing · tool command hooks · interpreter pre-exec hooks · IFS) is never passable · remove the entry: pass authored data through the task env: map, or pass a non-dangerous engine variable by its exact name.'
     notes: 'nep-0005 (2026-07-23) · category: security_error · transient: false (canon.yaml verbatim) · minted by the F-O4 spec lane · the AUTH family carries the defects of the boundary block itself (006 absent · 007 non-literal bound · 008 re-gate escape · 009 dead grant) · the engine emission lands with the env composition flip (F-O4 engine lane).'
+  - id: NIKA-AUTH-010
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0329
+    introduced_in: C1
+    namespace: AUTH
+    plane: unclassified
+    condition: 'a permits net.http: entry carries the *. subdomain wildcard · the grant delegates the boundary to the zone operator (every host under the suffix, present and future) — refused: name exact hosts, or the bare * when allow-all is genuinely intended (F-P5 · NEP-0008)'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: false
+    teaching: 'a glob delegates the permit to the zone operator (ambient authority · every host under the suffix, present and future · invariant 1) · name exact hosts, or use the bare * for explicit full egress (NEP-0008 law 1).'
+    notes: 'nep-0008 (2026-07-23) · category: security_error · transient: false (canon.yaml verbatim) · minted by the F-P5 spec lane · the AUTH family carries the defects of the boundary block itself (006 absent · 007 non-literal bound · 008 re-gate escape · 009 dead grant env · 010 wildcard net) · the dead-grant net twin rides NIKA-SEC-005 (the floor parity · permits_fit.rs « Dead grants »), never a new code · the engine emission lands with the egress permit-bound lane (F-P5 engine PR).'
   - id: NIKA-VALUES-001
     status: reserved
     owner: spec
