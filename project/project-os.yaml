@@ -194,7 +194,7 @@ built_in_fields:
     type: SINGLE_SELECT
     writer: projector
     visibility: flow
-    allowed_values: [Todo, "In progress", Done]
+    allowed_values: [Todo, "In Progress", Done]
 
 views:
   - name: "🧭 Command · the rail"
