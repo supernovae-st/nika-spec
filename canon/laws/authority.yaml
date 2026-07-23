@@ -1504,3 +1504,79 @@ laws:
       - absent-means-zero-check-refusal
       - draft-inference-floor-tombstoned
       - blockless-effect-census-zero
+
+  # ── NEP-0004 (F-O1 · ratifié op 2026-07-22) · le taint de paramétrisation de permit ──
+
+  - id: LAW-AUTH-0325
+    slug: authority/permit-parameterization-taint
+    status: active
+    owner: spec
+    domain: AUTH
+    title: "Une valeur untrusted n'atteint jamais une borne de permit, et n'atteint l'argument d'un verbe permis qu'au travers du re-gate"
+    prose_projection:
+      chapters: ["10-authority", "01-envelope"]
+      text: "NEP-0004 (ratifié op 2026-07-22 · lane F-O1), Specification verbatim : « An untrusted value that reaches a permit BOUND (the host/glob/program literal inside `permits:`) is a hard refusal: the boundary itself would be self-serve. An untrusted value that reaches a permitted verb's ARGUMENT is re-gated: the engine canonicalizes the RESOLVED value first, then matches it against the STEP's permit, and refuses when the canonical form escapes. One explicit `declassify:` declaration is the only door, and it lands in the receipt. » · NEP-0004 loi 4 verbatim : « An untrusted value NOT resolvable at check (no default) defers: the file stays valid, the runtime re-gate is mandatory » · NEP-0004 loi 6 verbatim : « Declassify is not a permit bypass. » Cette loi est additive sur LAW-AUTH-0324 (absent = zéro autorité) : sous bloc PRÉSENT, toute interpolation atteignant une BORNE est un refus dur NIKA-AUTH-007 avant tout token (la borne DOIT être un littéral · rejet statique pur), toute valeur untrusted (inputs.* · config.* · sorties fetch/tool · propagation monotone) atteignant l'ARGUMENT d'un verbe permis est re-gatée sur la valeur RÉSOLUE canonique contre le permit du STEP (refus NIKA-AUTH-008 au check quand résolvable · NIKA-SEC-004 au run sinon, la défense en profondeur jumelle de NEP-0003 loi 3), le non-résoluble statiquement DÉFÈRE au runtime (jamais un refus statique), et le `declassify:` déclaré sur la tâche (from/to: trusted/because: · receipt-enregistré) est la SEULE porte qui lève la loi de taint · la valeur est ensuite matchée comme un littéral, toujours À L'INTÉRIEUR de la borne."
+    inputs:
+      - registry: ir
+        id: declared_permits
+        role: required
+      - registry: ir
+        id: required_capabilities
+        role: required
+      - registry: ir
+        id: value_integrity_labels
+        role: required
+    premises:
+      - operator: absent
+        operands:
+          - registry: ir
+            id: interpolation_in_permit_bound
+        quantifier: forall
+      - operator: member_of
+        operands:
+          - registry: ir
+            id: canonical_resolved_untrusted_argument
+          - registry: ir
+            id: step_permit_coverage
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: step_permit_coverage
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["DeclaredPermits", "RequiredCapabilities"]
+      relation: subset
+      pipeline_stage: permits_check
+    diagnostics: ["NIKA-AUTH-007", "NIKA-AUTH-008", "NIKA-SEC-004"]
+    fixtures:
+      - conformance/tests/core/authority/011-declassify-declared-opens-the-door
+      - conformance/tests/core/authority/012-trusted-value-passes
+      - conformance/tests/core/authority/013-canonical-form-back-inside-boundary
+    negative_fixtures:
+      - conformance/tests/core/authority/007-untrusted-traversal-under-fs-read-refused
+      - conformance/tests/core/authority/008-untrusted-exec-reentry-flag-refused
+      - conformance/tests/core/authority/009-untrusted-host-under-fetch-permit-refused
+      - conformance/tests/core/authority/010-tainted-permit-bound-hard-refused
+      - conformance/tests/runtime/permits/004-untrusted-arg-runtime-regate
+    projections: ["prose:10-authority", "prose:01-envelope", "cli:check", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:deep_static.py
+      - cli:nika-check
+      - conformance:authority-suite
+    introduced_in: C1
+    proof_obligations:
+      - "NEP-0004 loi 1 verbatim : « An engine MUST refuse any interpolation source reaching a permit bound, at check when statically visible and before any token · NIKA-AUTH-007 ». La fixture 010 prouve le rejet statique pur (la borne interpolée est refusée même quand son défaut matcherait : la canonicalisation n'a plus rien contre quoi matcher). Census au flip : zéro bloc permits interpolé dans le corpus (grep ${{ sous permits: = 0) · la loi lie l'authoring nouveau, jamais le corpus shipé."
+      - "NEP-0004 loi 2 verbatim : « An engine MUST re-gate every untrusted value reaching a verb argument under a present permit: canonicalize the resolved value, match against the step's permit, refuse on escape · NIKA-AUTH-008 at check when the value is resolvable there, NIKA-SEC-004 at run otherwise ». Les fixtures 007 (traversal fs) · 008 (re-entry exec) · 009 (hôte fetch) observent le refus au check; 013 prouve le pivot canonicaliser-D'ABORD (datasets/../datasets/q3.csv -> datasets/q3.csv VERT · un prefix-matcher fausse-positive ici alors que 007 partage la même forme de préfixe); la paire runtime/permits/004 porte le cas dynamique (défaut absent -> DEFER au check, re-gate obligatoire au run, NIKA-SEC-004)."
+      - "NEP-0004 lois 5-6 verbatim : « A declassify: entry MUST name from: (one binding), to: trusted, and because: (non-empty justification); the receipt MUST record it with its evidence » · « Declassify is not a permit bypass ». La fixture 011 prouve que la porte déclarée lève la loi de taint SEULE (la valeur est matchée comme un littéral et reste dans la borne); la fixture 012 prouve que const.* (author-baked, Integ=trusted) ne déclenche aucun re-gate. Census de la surface re-gate au 2026-07-22 : 11 occurrences inputs.*/config.* sous bloc présent dans le corpus, TOUTES sans défaut (loi 4 DEFER) · zéro fichier existant ne flippe."
+    closure_gates:
+      - permit-bound-literality-check-refusal
+      - untrusted-argument-regate-static-twin
+      - runtime-regate-engine-flip

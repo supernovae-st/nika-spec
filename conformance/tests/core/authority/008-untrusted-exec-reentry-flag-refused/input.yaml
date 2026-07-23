@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: t-untrusted-exec-reentry-flag
+permits:
+  exec: ["find"]
+inputs:
+  extra: { type: string, default: "--exec" }
+tasks:
+  search:
+    exec: { command: ["find", ".", "-name", "report", "${{ inputs.extra }}"] }

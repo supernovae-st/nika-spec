@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "NEP-0004 law 2 + the canonical-form definition · the RAW string spells .. yet canonicalizes to datasets/q3.csv, inside the bound · proves canonicalize-first: a substring or prefix matcher false-positives here while 007 (the true escape) shares the same prefix shape."
+}

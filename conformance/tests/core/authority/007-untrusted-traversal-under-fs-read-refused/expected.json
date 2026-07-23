@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-AUTH-008", "category": "security_error" }
+  ],
+  "note": "NEP-0004 law 2 · inputs.p is untrusted (caller-suppliable) and resolvable via its default · the canonical form of ../../etc/passwd escapes fs.read [datasets/**] · re-gate refused at check · the detail carries the taint path source-first (inputs.p -> args.path) · the tool grant isolates the re-gate (the verb IS permitted, the value is not)."
+}

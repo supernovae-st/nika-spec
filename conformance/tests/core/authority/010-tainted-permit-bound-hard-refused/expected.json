@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-AUTH-007", "category": "security_error" }
+  ],
+  "note": "NEP-0004 law 1 · a permit bound MUST be a literal · interpolation reaches the bound itself, the boundary would be self-serve (the default even matches: irrelevant, canonicalization has nothing left to match against) · hard refusal before any token."
+}

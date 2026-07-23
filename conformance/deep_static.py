@@ -474,6 +474,211 @@ def absent_permits_errors(doc: dict, tasks: list) -> list[dict]:
     return []
 
 
+# ── PERMIT-TAINT tables (NEP-0004 · LAW-AUTH-0325) ──────────────────────
+# The fit (PERMITS-FIT below) proves Required ⊆ Declared on CATEGORIES;
+# this law binds the VALUES flowing under a present block. Integ=untrusted
+# at check: inputs.* (caller-supplied) and config.* (deployment-supplied) —
+# the two roots resolvable at check via their declared defaults. Fetch/tool
+# results, with:/tasks.* derivations, and every default-less ref DEFER to
+# the run-time re-gate (law 4 · NIKA-SEC-004), never a check error.
+_TAINT_FS_READ_TOOLS = {"nika:read", "nika:glob", "nika:grep"}
+_TAINT_FS_WRITE_TOOLS = {"nika:write", "nika:edit"}
+_TAINT_NET_TOOLS = {"nika:fetch", "nika:notify"}
+# The exec re-entry class (10 §the permit-parameterization taint): a token
+# that re-enters a command interpreter is never covered by a program
+# allowlist unless the permit lists the token itself.
+_TAINT_REENTRY_TOKENS = {"--exec", "--execdir", "-exec", "-execdir", "-c", "eval"}
+_TAINT_UNTRUSTED_ROOTS = ("inputs", "config")
+
+
+class _DeferRegate(Exception):
+    """A reference stays dynamic at check (no default · declassified ·
+    trusted root) → NEP-0004 law 4 DEFERs to the run-time re-gate."""
+
+
+def _taint_declassified(t: dict) -> set[str]:
+    """The bindings a task-level declassify: raises to trusted (law 5 · the
+    only door). Shape enforcement is the schema's; the oracle reads the
+    `from` set tolerantly (a malformed entry is the schema's finding)."""
+    out: set[str] = set()
+    entries = t.get("declassify")
+    if isinstance(entries, list):
+        for e in entries:
+            if isinstance(e, dict) and isinstance(e.get("from"), str):
+                out.add(e["from"])
+    return out
+
+
+def _resolve_untrusted(s: str, inputs: dict, config: dict,
+                       declassified: set) -> tuple:
+    """Resolve the UNTRUSTED ${{ }} references of a verb-argument string at
+    check. Returns (resolved, taint_paths) when ≥1 untrusted ref resolves
+    and no reference stays dynamic · (None, []) when nothing untrusted
+    appears (a trusted string — the plain fit judges it, never this law)
+    or when any reference defers (law 4 · the run-time re-gate is
+    mandatory). Substituting only the untrusted defaults keeps the honest
+    file green: literal/const/secrets references never reach this law."""
+    paths: list[str] = []
+
+    def sub(m) -> str:
+        body = m.group(1).strip()
+        root, _, rest = body.partition(".")
+        name = re.split(r"[.\[]", rest, maxsplit=1)[0] if rest else ""
+        if root not in _TAINT_UNTRUSTED_ROOTS or not name:
+            raise _DeferRegate  # trusted root (const · secrets) or dynamic
+        binding = f"{root}.{name}"
+        if binding in declassified:
+            raise _DeferRegate  # the declassify: door · trusted here
+        decl = (inputs if root == "inputs" else config).get(name)
+        default = decl.get("default") if isinstance(decl, dict) else None
+        if not isinstance(default, str):
+            raise _DeferRegate  # no default → caller-supplied at launch
+        paths.append(binding)
+        return default
+
+    try:
+        resolved = EXPR_BODY.sub(sub, s)
+    except _DeferRegate:
+        return None, []
+    return (resolved, paths) if paths else (None, [])
+
+
+def _taint_canonical_path(p: str) -> str:
+    """The fs canonical form (10 §canonical form) · lexical normalization
+    against the run base: `.`/`..` resolved, separators collapsed. A
+    leading `..` escapes the base lexically and can never re-enter a
+    declared glob — the comparison is the canonical string against the
+    glob, never a raw prefix (`datasets/../datasets/q3.csv` IS inside
+    `datasets/**`; `../../etc/passwd` is not)."""
+    import posixpath
+    return posixpath.normpath(p)
+
+
+def _taint_canonical_host(url: str):
+    """The net canonical form · lowercase, IDNA→punycode, trailing dot
+    stripped (ports never participate in permits · 01 §permits)."""
+    import urllib.parse
+    host = urllib.parse.urlparse(url).hostname
+    if not host:
+        return None
+    host = host.lower().rstrip(".")
+    try:
+        host = host.encode("idna").decode("ascii")
+    except (UnicodeError, ValueError):
+        pass
+    return host
+
+
+def _taint_globbed(value: str, globs) -> bool:
+    """Match against the LITERAL bounds only — an interpolated bound is law
+    1's refusal (NIKA-AUTH-007), never something to match against."""
+    import fnmatch
+    return any(isinstance(g, str) and not EXPR_BODY.search(g)
+               and fnmatch.fnmatchcase(value, g) for g in globs or [])
+
+
+def permit_taint_errors(doc: dict, tasks: list) -> list[dict]:
+    """NEP-0004 / LAW-AUTH-0325 · the permit-parameterization taint. Law 1:
+    an interpolation reaching a permit BOUND is a hard refusal
+    (NIKA-AUTH-007 · the bound MUST be a literal, the boundary would be
+    self-serve). Law 2: an untrusted value (inputs.* · config.*) reaching a
+    permitted verb's ARGUMENT is re-gated on its canonical RESOLVED form
+    against the STEP's permit (NIKA-AUTH-008 · the detail carries the taint
+    path source-first, the canonical form, and the escaped bound). Law 4:
+    the unresolvable DEFERs to the run-time re-gate (NIKA-SEC-004) — never
+    a check error. Runs only under a PRESENT block (absent/null is
+    NEP-0003's ground, judged above)."""
+    permits = doc.get("permits")
+    if not isinstance(permits, dict):
+        return []
+    errs: list[dict] = []
+
+    # Law 1 · bound literality (the wall is declared, never interpolated)
+    for path, s in _walk(permits):
+        if EXPR_BODY.search(s):
+            errs.append({"code": "NIKA-AUTH-007", "namespace": "NIKA-AUTH",
+                         "category": "security_error",
+                         "detail": f"permit bound 'permits.{path}' is interpolated, not "
+                                   "literal · a bound is the wall itself (NEP-0004 law 1) · "
+                                   "declare the host/glob/program and gate the value in the "
+                                   "body (the NIKA-AUTH-008 re-gate checks it there)"})
+
+    # Law 2 · the re-gate (canonicalize the RESOLVED value first)
+    inputs = _as_dict(doc.get("inputs"))
+    config = _as_dict(doc.get("config"))
+    fs = permits.get("fs") if isinstance(permits.get("fs"), dict) else {}
+    read_globs = fs.get("read") if isinstance(fs.get("read"), list) else []
+    write_globs = fs.get("write") if isinstance(fs.get("write"), list) else []
+    net = permits.get("net") if isinstance(permits.get("net"), dict) else {}
+    host_globs = net.get("http") if isinstance(net.get("http"), list) else []
+    exec_rule = permits.get("exec", False)
+
+    def regate(tid, paths, argname, resolved, canonical, covered, bound_desc):
+        if covered:
+            return
+        errs.append({"code": "NIKA-AUTH-008", "namespace": "NIKA-AUTH",
+                     "category": "security_error",
+                     "detail": f"task '{tid}' passes an untrusted value that escapes the "
+                               f"step permit (NEP-0004 law 2) · taint path: "
+                               f"{' , '.join(paths)} -> {argname} · resolved (default): "
+                               f"{resolved!r} -> canonical {canonical!r} ∉ {bound_desc} · "
+                               "fix: keep the value inside the boundary · or declare "
+                               "declassify: on the task (the only door)"})
+
+    for tid, t in tasks:
+        declassified = _taint_declassified(t)
+        inv = t.get("invoke")
+        if isinstance(inv, dict):
+            tool = inv.get("tool")
+            args = _as_dict(inv.get("args"))
+            if tool in _TAINT_FS_READ_TOOLS or tool in _TAINT_FS_WRITE_TOOLS:
+                is_read = tool in _TAINT_FS_READ_TOOLS
+                globs = read_globs if is_read else write_globs
+                v = args.get("path")
+                if isinstance(v, str) and EXPR_BODY.search(v):
+                    resolved, paths = _resolve_untrusted(v, inputs, config, declassified)
+                    if resolved is not None:
+                        canon = _taint_canonical_path(resolved)
+                        regate(tid, paths, f"args.path ({tool})", resolved, canon,
+                               _taint_globbed(canon, globs),
+                               f"fs.{'read' if is_read else 'write'} {globs}")
+            elif tool in _TAINT_NET_TOOLS:
+                v = args.get("url")
+                if isinstance(v, str) and EXPR_BODY.search(v):
+                    resolved, paths = _resolve_untrusted(v, inputs, config, declassified)
+                    if resolved is not None:
+                        host = _taint_canonical_host(resolved)
+                        if host is not None:
+                            regate(tid, paths, f"args.url ({tool})", resolved, host,
+                                   _taint_globbed(host, host_globs),
+                                   f"net.http {host_globs}")
+        if "exec" in t and isinstance(exec_rule, list):
+            body = t.get("exec")
+            cmd = body.get("command") if isinstance(body, dict) else None
+            if isinstance(cmd, list):
+                for i, el in enumerate(cmd):
+                    if not isinstance(el, str) or not EXPR_BODY.search(el):
+                        continue
+                    resolved, paths = _resolve_untrusted(el, inputs, config, declassified)
+                    if resolved is None:
+                        continue
+                    if i == 0:
+                        # the program itself is data → re-gate against the allowlist
+                        regate(tid, paths, "argv[0] (exec)", resolved, resolved,
+                               resolved in exec_rule, f"exec {exec_rule}")
+                    elif resolved in _TAINT_REENTRY_TOKENS and resolved not in exec_rule:
+                        errs.append({"code": "NIKA-AUTH-008", "namespace": "NIKA-AUTH",
+                                     "category": "security_error",
+                                     "detail": f"task '{tid}' passes an untrusted value that "
+                                               f"escapes the step permit (NEP-0004 law 2) · "
+                                               f"taint path: {' , '.join(paths)} -> argv[{i}] (exec) "
+                                               f"· resolved (default): {resolved!r} is the re-entry "
+                                               f"class, never covered unless listed ∉ exec "
+                                               f"{exec_rule} · fix: drop the token · or declare "
+                                               "declassify: on the task (the only door)"})
+    return errs
+
+
 def deep_static_errors(doc: dict) -> list[dict]:
     errs: list[dict] = []
     if not isinstance(doc, dict):
@@ -649,6 +854,10 @@ def deep_static_errors(doc: dict) -> list[dict]:
     # ABSENT-PERMITS · NEP-0003 (LAW-AUTH-0324) · absent block = zero
     # authority · judged BEFORE the fit (a present block is PERMITS-FIT's)
     errs.extend(absent_permits_errors(doc, tasks))
+
+    # PERMIT-TAINT · NEP-0004 (LAW-AUTH-0325) · bound literality + the
+    # untrusted-argument re-gate under a PRESENT block
+    errs.extend(permit_taint_errors(doc, tasks))
 
     # PERMITS-FIT · the declared boundary must contain the body (01 §permits)
     permits = doc.get("permits")

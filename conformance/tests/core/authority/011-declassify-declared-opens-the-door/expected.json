@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "NEP-0004 laws 5-6 · declassify: lifts the TAINT law only · the value is then matched like a literal and vendor/q3.csv sits inside the declared boundary (no permit bypass) · the receipt MUST carry the declassify event: from, taint path, because, value digest (asserted at run, engine flip)."
+}
