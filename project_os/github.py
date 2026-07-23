@@ -9,7 +9,12 @@ import urllib.request
 from dataclasses import dataclass
 from typing import Any
 
-from .model import DesiredItem, extract_marker
+from .model import (
+    DesiredItem,
+    PROJECTION_ORPHANED,
+    PROJECTION_QUARANTINED,
+    extract_marker,
+)
 
 
 GRAPHQL_API = "https://api.github.com/graphql"
@@ -690,7 +695,11 @@ def reconcile(
     for actual in actual_items:
         if actual.item_id in used:
             continue
-        state = "Orphaned" if actual.ssot_id else "Quarantined"
+        state = (
+            PROJECTION_ORPHANED
+            if actual.ssot_id
+            else PROJECTION_QUARANTINED
+        )
         if actual.fields.get("Projection state") == state:
             continue
         label = actual.ssot_id or actual.title or actual.item_id
