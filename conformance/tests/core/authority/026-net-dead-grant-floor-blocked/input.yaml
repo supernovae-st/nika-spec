@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: t-net-dead-grant-floor-blocked
+permits:
+  net: { http: ["169.254.169.254"] }
+  exec: ["curl"]
+tasks:
+  fetch:
+    exec: { command: ["curl", "-sS", "http://169.254.169.254/latest/meta-data"] }

@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-SEC-005", "category": "security_error" }
+  ],
+  "note": "NEP-0008 law 5 · an exact entry naming a floor-blocked target can never take effect (the always-on SSRF floor refuses it before the allowlist is consulted) · an inert dead grant refused at check under the floor parity (NIKA-SEC-005 · the class the engine has always spoken) · only an exact loopback literal may be declassified."
+}

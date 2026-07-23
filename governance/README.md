@@ -14,6 +14,7 @@ directly, the maintainers included.
 |---|---|---|---|
 | [0000](nep-0000-the-nep-process.md) | The NEP Process | Process | Active |
 | [0002](nep-0002-lethal-trifecta-human-gate.md) | Lethal-trifecta human gate | Standards Track | Draft |
+| [0008](nep-0008-egress-permit-bound.md) | The sandboxed egress proxy is the permit's exact projection | Standards Track | Draft |
 
 Numbering runs through this door from NEP-0000 onward — pre-1.0 drafts
 included (NEP-0002 is the living proof). The pre-1.0 RULINGS and the ADR
