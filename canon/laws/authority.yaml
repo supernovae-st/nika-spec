@@ -1580,3 +1580,65 @@ laws:
       - permit-bound-literality-check-refusal
       - untrusted-argument-regate-static-twin
       - runtime-regate-engine-flip
+  - id: LAW-AUTH-0326
+    slug: authority/env-permit-dimension
+    status: active
+    owner: spec
+    domain: AUTH
+    title: "L'environnement d'un processus enfant est composé (floor + passthrough déclaré + map de tâche), jamais hérité"
+    prose_projection:
+      chapters: ["01-envelope", "02-verbs"]
+      text: "NEP-0005 (ratifié op 2026-07-22 · lane F-O4), Specification verbatim : « A child process environment MUST be composed, never inherited. With no `env:` category (or no `permits:` block at all · NEP-0003), the child sees at most the runner env floor plus the task's explicit `env:` map. » · loi 2 verbatim : « Presence in the list grants REACH; the engine environment supplies the value or nothing. » · loi 3 verbatim : « A name on the dangerous-name floor is never passable. » La catégorie `env:` est une famille du bloc (fs · net · exec · tools · env) : liste de NOMS exacts (forme POSIX · zéro glob · une borne est un littéral, LAW-AUTH-0325 s'applique · NIKA-AUTH-007), le floor runner (PATH · HOME · TMPDIR · LANG · LC_ALL · TZ · USER · LOGNAME) est le PLAFOND normatif de l'implicite, une entrée nommant le floor dangereux est un dead grant inerte flagué au check NIKA-AUTH-009, la composition (14) prend l'intersection exacte enfant ∩ parent, et la map `env:` de la tâche (02-verbs §exec) reste des valeurs authored appliquées PAR-DESSUS le passthrough, toujours sous le floor dangereux. `env:` n'est jamais inféré (les lectures d'environnement d'un subprocess sont opaques · le mode de casse est l'erreur PROPRE de l'outil enfant, la réparation une ligne env: [NOM])."
+    inputs:
+      - registry: ir
+        id: declared_permits
+        role: required
+      - registry: ir
+        id: child_process_environment
+        role: required
+    premises:
+      - operator: member_of
+        operands:
+          - registry: ir
+            id: child_environment_name
+          - registry: ir
+            id: composed_environment_names
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: composed_environment_names
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["DeclaredPermits", "EffectiveAuthority"]
+      relation: subset
+      pipeline_stage: permits_check
+    diagnostics: ["NIKA-AUTH-009", "NIKA-AUTH-007"]
+    fixtures:
+      - conformance/tests/core/authority/016-env-passthrough-declared-passes
+      - conformance/tests/core/authority/017-env-declared-zero-passes
+      - conformance/tests/runtime/permits/006-env-passthrough-reaches-child
+    negative_fixtures:
+      - conformance/tests/core/authority/014-env-bound-interpolated-refused
+      - conformance/tests/core/authority/015-env-dangerous-dead-grant-refused
+      - conformance/tests/runtime/permits/005-undeclared-env-empty-at-spawn
+    projections: ["prose:01-envelope", "prose:02-verbs", "cli:check", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:deep_static.py
+      - cli:nika-check
+      - conformance:authority-suite
+    introduced_in: C1
+    proof_obligations:
+      - "NEP-0005 loi 1 verbatim : « A child process environment MUST be composed, never inherited ». Les contrats runtime/permits/005-006 portent la paire entière : même workflow, même canari planté dans l'environnement MOTEUR (run.json env) · sans catégorie env: la sortie est ABSENT (le floor seul compose) · avec env: [NIKA_RT_CANARY] la valeur traverse. La preuve exécutable vit dans la batterie engine (le tier runtime est un contrat post-announce)."
+      - "NEP-0005 lois 3-4 : la fixture 015 observe le dead grant (LD_PRELOAD déclaré · NIKA-AUTH-009 · le floor dangereux n'est jamais passable) · la fixture 014 observe la littéralité de la borne env (island · NIKA-AUTH-007 · LAW-AUTH-0325 couvre toutes les catégories). Les fixtures 016-017 prouvent que le passthrough déclaré et le zéro déclaré (env: []) restent verts."
+      - "Census dérivé F-O4 (2026-07-23 · engine 042aeaf95 · spec 38614d2) : zéro workflow des corpus (engine 29 exec · spec 180 conformance + 11 examples) ne lit l'environnement ambiant dans une commande ($VAR · printenv) · le flag-day de composition casse environ 0 fichier · le résiduel déclaré est le taint des VALEURS de la map env: de tâche (lane F-O1 · regate.rs docs) et la projection env vers le profil OS (lane F-O2)."
+    closure_gates:
+      - env-composed-never-inherited-engine-flip
+      - env-dead-grant-check-refusal

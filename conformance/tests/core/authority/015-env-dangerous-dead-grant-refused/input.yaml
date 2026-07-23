@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: t-env-dangerous-dead-grant
+permits:
+  exec: true
+  env: ["LD_PRELOAD"]
+tasks:
+  build:
+    exec: { shell: "echo ok" }

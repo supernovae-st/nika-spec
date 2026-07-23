@@ -679,6 +679,51 @@ def permit_taint_errors(doc: dict, tasks: list) -> list[dict]:
     return errs
 
 
+# NEP-0005 / LAW-AUTH-0326 · the environment permit. The dangerous-name
+# floor an engine strips unconditionally · the reference mirrors the
+# engine's canonical `DANGEROUS_ENV_VARS` list (nika-kernel-core
+# io/process.rs · 31 names, mechanically extracted at the F-O4 lane) ·
+# the engine/reference differential (LAW-AUTH-0319) keeps the two lists
+# honest. Bound literality for `env:` entries (law 4 · NIKA-AUTH-007)
+# rides the generic permit-bound walk in permit_taint_errors.
+_ENV_DANGEROUS_NAMES = frozenset({
+    "LD_PRELOAD", "LD_LIBRARY_PATH", "LD_AUDIT", "GCONV_PATH",
+    "DYLD_INSERT_LIBRARIES", "DYLD_LIBRARY_PATH", "DYLD_FRAMEWORK_PATH",
+    "DYLD_FALLBACK_LIBRARY_PATH", "DYLD_FALLBACK_FRAMEWORK_PATH",
+    "BASH_ENV", "ENV", "GIT_SSH_COMMAND", "GIT_SSH", "GIT_EXTERNAL_DIFF",
+    "GIT_PAGER", "GIT_PROXY_COMMAND", "GIT_CONFIG_GLOBAL",
+    "GIT_CONFIG_SYSTEM", "GIT_TEMPLATE_DIR", "LESSOPEN", "HOSTALIASES",
+    "TERMINFO", "TERMINFO_DIRS", "TERMCAP", "PYTHONSTARTUP", "PYTHONPATH",
+    "PERL5OPT", "PERL5LIB", "RUBYOPT", "NODE_OPTIONS", "IFS",
+})
+
+
+def env_dead_grant_errors(doc: dict) -> list[dict]:
+    """NEP-0005 / LAW-AUTH-0326 law 3 · a permits env: entry naming a
+    dangerous-floor variable is an inert dead grant (the engine strips
+    the name unconditionally, the grant can never take effect) ·
+    NIKA-AUTH-009 at check. An interpolated entry is law 4's ground
+    (NIKA-AUTH-007 · the generic bound walk), never judged here."""
+    permits = doc.get("permits")
+    if not isinstance(permits, dict):
+        return []
+    entries = permits.get("env")
+    if not isinstance(entries, list):
+        return []
+    errs: list[dict] = []
+    for i, name in enumerate(entries):
+        if isinstance(name, str) and name in _ENV_DANGEROUS_NAMES:
+            errs.append({"code": "NIKA-AUTH-009", "namespace": "NIKA-AUTH",
+                         "category": "security_error",
+                         "detail": f"permit entry 'permits.env[{i}]' names the "
+                                   f"dangerous-floor variable {name!r} · the engine strips "
+                                   "this name unconditionally, the grant can never take "
+                                   "effect (an inert dead grant · NEP-0005 law 3) · remove "
+                                   "the entry: pass authored data through the task env: map, "
+                                   "or a non-dangerous engine variable by its exact name"})
+    return errs
+
+
 def deep_static_errors(doc: dict) -> list[dict]:
     errs: list[dict] = []
     if not isinstance(doc, dict):
@@ -858,6 +903,10 @@ def deep_static_errors(doc: dict) -> list[dict]:
     # PERMIT-TAINT · NEP-0004 (LAW-AUTH-0325) · bound literality + the
     # untrusted-argument re-gate under a PRESENT block
     errs.extend(permit_taint_errors(doc, tasks))
+
+    # ENV-DEAD-GRANT · NEP-0005 (LAW-AUTH-0326) · a dangerous-floor name
+    # in permits.env: is an inert dead grant (NIKA-AUTH-009)
+    errs.extend(env_dead_grant_errors(doc))
 
     # PERMITS-FIT · the declared boundary must contain the body (01 §permits)
     permits = doc.get("permits")

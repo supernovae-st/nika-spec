@@ -279,6 +279,21 @@
             "type": "string"
           },
           "description": "Allowed nika:/mcp: tool ids · globs ok."
+        },
+        "env": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+              },
+              {
+                "pattern": "\\$\\{\\{"
+              }
+            ]
+          },
+          "description": "Engine env names passed through to child processes · exact POSIX names, no globs · composed with the runner env floor, never inherited (spec/01-envelope.md §permits · NEP-0005). An interpolated entry passes the shape gate and is refused as a non-literal bound (NIKA-AUTH-007)."
         }
       }
     },

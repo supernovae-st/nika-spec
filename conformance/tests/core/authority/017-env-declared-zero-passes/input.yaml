@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: t-env-declared-zero
+permits:
+  exec: true
+  env: []
+tasks:
+  hermetic:
+    exec: { shell: "echo ok" }

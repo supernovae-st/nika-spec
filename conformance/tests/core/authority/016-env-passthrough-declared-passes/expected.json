@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "NEP-0005 laws 1-2 · one exact name, one greppable grant · the engine environment supplies the value at spawn or nothing (absence is never an error, never a synthesized empty string) · the runner env floor rides beneath every declared list."
+}

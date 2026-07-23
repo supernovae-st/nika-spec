@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-AUTH-009", "category": "security_error" }
+  ],
+  "note": "NEP-0005 law 3 · the dangerous-name floor is never passable · the entry is an inert dead grant (the engine strips the name unconditionally, the grant can never take effect) · flagged at check, the SSRF dead-grant teaching applied to the env plane."
+}

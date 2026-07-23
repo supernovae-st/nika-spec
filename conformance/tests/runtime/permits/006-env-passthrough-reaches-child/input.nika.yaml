@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: rt-permits-env-passthrough
+permits:
+  exec: true
+  env: ["NIKA_RT_CANARY"]
+tasks:
+  probe:
+    exec: { shell: "echo ${NIKA_RT_CANARY:-ABSENT}" }

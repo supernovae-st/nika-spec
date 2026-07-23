@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: t-env-bound-interpolated
+permits:
+  exec: true
+  env: ["${{ inputs.key }}"]
+inputs:
+  key: { type: string, default: "API_TOKEN" }
+tasks:
+  probe:
+    exec: { shell: "echo ok" }

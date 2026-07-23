@@ -156,7 +156,7 @@ untrusted values under a `permits:` block (NEP-0004 · LAW-AUTH-0325):
 
 | Code | Class | Witness (in the diagnostic) |
 |---|---|---|
-| `NIKA-AUTH-007` | an interpolation reaches a **permit bound** (a host, glob, or program literal inside `permits:`) | the bound's own path (`net.http[0]`) — a bound MUST be a literal: the boundary would be self-serve, there is nothing left to canonicalize against |
+| `NIKA-AUTH-007` | an interpolation reaches a **permit bound** (a host, glob, program, or env-name literal inside `permits:` · NEP-0005 counts `env:` entries among the bounds) | the bound's own path (`net.http[0]`) — a bound MUST be a literal: the boundary would be self-serve, there is nothing left to canonicalize against |
 | `NIKA-AUTH-008` | an untrusted value reaches a permitted verb's **argument** and its canonical resolved form escapes the step's permit | the **taint path**, source-first (`inputs.p → args.path`) + the resolved value, its canonical form, and the bound it escaped |
 
 Both are `security_error`, check-time, blocking. The **re-gate** never
