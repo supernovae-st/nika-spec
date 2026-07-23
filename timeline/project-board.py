@@ -52,7 +52,7 @@ README = (
     "| **Order** | one sequence, oldest claim to farthest gate |\n\n"
     "### The views to save (60 seconds, once)\n\n"
     "1. **The rail** · Table · group by Stage · sort by Order · fields: Title, Kind, Era, Proof, When\n"
-    "2. **The road** · Board · columns by Stage\n"
+    "2. **The road** · Board · column by Era: the four ages side by side\n"
     "3. **The record** · Roadmap · date field When · the past sits on the axis, the gates deliberately do not\n"
     "4. **By proof** · Table · group by Proof: the honesty contract at a glance\n\n"
     "Gates carry **conditions, never dates**. When a gate flips, the record gains "
