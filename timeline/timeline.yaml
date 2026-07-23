@@ -81,14 +81,16 @@ eras:
 
 entries:
   # ── exploration · summer 2025 → end 2025 (private, before git) ─────
-  - date: "2025-08"
+  - id: private-prototypes-begin
+    date: "2025-08"
     precision: month
     type: milestone
     title: "Private prototypes begin"
     detail: "Vibe-code experiments and private-repo brainstorms on the maintainer's machine circle the idea: repeatable AI work belongs in files, not chats. No public repo, no git history yet."
     evidence: { class: testimony }
 
-  - date: "2025-11"
+  - id: shape-settles
+    date: "2025-11"
     precision: month
     type: milestone
     title: "The shape settles"
@@ -96,21 +98,24 @@ entries:
     evidence: { class: testimony }
 
   # ── brouillon · 2026-01-01 → 2026-04-13 (git · 0.1 → 0.79) ─────────
-  - date: "2026-01-01"
+  - id: first-commit-v0-1
+    date: "2026-01-01"
     type: milestone
     title: "First commit · « initial nika v0.1 with strict templating system »"
     detail: "The language enters git on New Year's Day 2026, 21:29 CET, on the branch named brouillon."
     component: engine
     evidence: { class: private-archive, sha: 2d17d85ed }
 
-  - date: "2026-01-01"
+  - id: dag-validation-day-one
+    date: "2026-01-01"
     type: milestone
     title: "DAG validation lands, nineteen minutes later"
     detail: "The second commit of day one already carries the spine: workflows are DAGs, validated before they run."
     component: engine
     evidence: { class: private-archive, sha: a17cfbb91 }
 
-  - date: "2026-03-04"
+  - id: release-0-20-0
+    date: "2026-03-04"
     type: release
     version: "0.20.0"
     title: "First public release on crates.io"
@@ -118,31 +123,36 @@ entries:
     component: engine
     evidence: { class: crates-io, crate: nika, version: "0.20.0" }
 
-  - date: "2026-03-05"
+  - id: release-0-21-0
+    date: "2026-03-05"
     type: release
     version: "0.21.0"
     component: engine
     evidence: { class: crates-io, crate: nika, version: "0.21.0" }
 
-  - date: "2026-03-12"
+  - id: release-0-27-0
+    date: "2026-03-12"
     type: release
     version: "0.27.0"
     component: engine
     evidence: { class: crates-io, crate: nika, version: "0.27.0" }
 
-  - date: "2026-03-21"
+  - id: release-0-35-4
+    date: "2026-03-21"
     type: release
     version: "0.35.4"
     component: engine
     evidence: { class: crates-io, crate: nika, version: "0.35.4" }
 
-  - date: "2026-03-22"
+  - id: release-0-38-0
+    date: "2026-03-22"
     type: release
     version: "0.38.0"
     component: engine
     evidence: { class: crates-io, crate: nika, version: "0.38.0" }
 
-  - date: "2026-03-26"
+  - id: release-0-47-1
+    date: "2026-03-26"
     type: release
     version: "0.47.1"
     title: "Last crates.io release of the brouillon era"
@@ -150,14 +160,16 @@ entries:
     component: engine
     evidence: { class: crates-io, crate: nika, version: "0.47.1" }
 
-  - date: "2026-04-05"
+  - id: monolith-peaks-v0-71
+    date: "2026-04-05"
     type: milestone
     title: "v0.71 · the monolith peaks"
     detail: "The brouillon engine reaches ~138K lines across a single crate. The lesson is complete: the language deserves a cleaner carrier."
     component: engine
     evidence: { class: private-archive, note: "version bump commit in the brouillon archive · 2026-04-05" }
 
-  - date: "2026-04-13"
+  - id: brouillon-closes-v0-79-3
+    date: "2026-04-13"
     type: milestone
     title: "v0.79.3 · the brouillon era closes"
     detail: "The final draft-era version. The branch stays as read-only reference — read via `git show`, never modified — while the rewrite begins the same day."
@@ -166,7 +178,8 @@ entries:
     evidence: { class: private-archive, note: "the brouillon branch tip · preserved read-only" }
 
   # ── diamond · 2026-04-13 → today (rewrite from scratch) ────────────
-  - date: "2026-04-13"
+  - id: diamond-genesis
+    date: "2026-04-13"
     type: milestone
     title: "The rewrite begins · Diamond genesis"
     detail: "An orphan branch is initialized and 0.80.0-alpha tags the same day. Rewrite from scratch — craft, not extraction — 12-gate crate admission from the first line."
@@ -174,7 +187,8 @@ entries:
     era: diamond
     evidence: { class: github-commit, repo: supernovae-st/nika, sha: 0cc7b74235c896f16d326795786a7f7b40241c43 }
 
-  - date: "2026-04-13"
+  - id: release-0-80-0-alpha-1
+    date: "2026-04-13"
     type: release
     version: "0.80.0-alpha.1"
     title: "First Diamond tag"
@@ -183,21 +197,24 @@ entries:
     era: diamond
     evidence: { class: github-release, repo: supernovae-st/nika, tag: v0.80.0-alpha.1 }
 
-  - date: "2026-05-22"
+  - id: spec-public-repo
+    date: "2026-05-22"
     type: milestone
     title: "The specification becomes its own public repo"
     detail: "nika-spec is born under Apache-2.0 with a patent grant: five pillars locked (envelope · four verbs · DAG · variables · errors). The spec is the standard surface; the engine is one implementation of it."
     component: spec
     evidence: { class: github-commit, repo: supernovae-st/nika-spec, sha: 7d471ab }
 
-  - date: "2026-05-23"
+  - id: conformance-suite-seeded
+    date: "2026-05-23"
     type: milestone
     title: "The conformance suite is seeded"
     detail: "Declarative fixtures (input.yaml + expected.json) and the runner protocol: the machine-checkable definition of the language, runnable by any engine."
     component: spec
     evidence: { class: github-commit, repo: supernovae-st/nika-spec, note: "conformance/runner-protocol.md creation commit · 2026-05-23" }
 
-  - date: "2026-06-21"
+  - id: release-0-90-0
+    date: "2026-06-21"
     type: release
     version: "0.90.0"
     title: "0.90 · the usable engine"
@@ -205,40 +222,46 @@ entries:
     component: engine
     evidence: { class: github-release, repo: supernovae-st/nika, tag: v0.90.0 }
 
-  - date: "2026-07-06"
+  - id: registry-opens
+    date: "2026-07-06"
     type: milestone
     title: "The registry opens"
     detail: "supernovae-st/nika-registry goes public at its root commit: shared workflows, none taken on trust. Every entry is machine re-proven in CI: pinned sha256 · conformance oracle · engine cert."
     component: registry
     evidence: { class: github-commit, repo: supernovae-st/nika-registry, sha: 9f79981021d257c09975be81e13549e645d4bb89 }
 
-  - date: "2026-07-12"
+  - id: release-0-100-0
+    date: "2026-07-12"
     type: release
     version: "0.100.0"
     component: engine
     evidence: { class: github-release, repo: supernovae-st/nika, tag: v0.100.0 }
 
-  - date: "2026-07-17"
+  - id: numbered-laws-c0
+    date: "2026-07-17"
     type: milestone
     title: "The spec reaches 147 numbered laws · pre-1.0 gate C0 closes"
     detail: "Every normative sentence is a numbered, greppable law; canon.yaml is generated and byte-gated against drift."
     component: spec
     evidence: { class: github-commit, repo: supernovae-st/nika-spec, sha: d048313 }
 
-  - date: "2026-07-18"
+  - id: nep-process
+    date: "2026-07-18"
     type: milestone
     title: "Governance gains its one public door (the NEP process)"
     detail: "Nobody amends the standard directly, maintainers included. Authority transfer to a technical committee is written down from day one."
     component: spec
     evidence: { class: github-pr, repo: supernovae-st/nika-spec, pr: 120 }
 
-  - date: "2026-07-20"
+  - id: release-0-105-0
+    date: "2026-07-20"
     type: release
     version: "0.105.0"
     component: engine
     evidence: { class: github-release, repo: supernovae-st/nika, tag: v0.105.0 }
 
-  - date: "2026-07-20"
+  - id: standard-hardening-day
+    date: "2026-07-20"
     type: milestone
     title: "The standard hardening day"
     detail: >-
@@ -252,21 +275,24 @@ entries:
     component: standard
     evidence: { class: github-pr, repo: supernovae-st/nika-spec, pr: 154 }
 
-  - date: "2026-07-20"
+  - id: scorecard-7-3
+    date: "2026-07-20"
     type: milestone
     title: "OpenSSF Scorecard reads 7.3"
     detail: "Up from 6.5 the same morning (least-privilege tokens + patched dependencies landed). The declared bar: the official 1.0 does not ship below 10/10."
     component: standard
     evidence: { class: scorecard, repo: github.com/supernovae-st/nika, reading: "7.3" }
 
-  - date: "2026-07-20"
+  - id: record-ships
+    date: "2026-07-20"
     type: milestone
     title: "The record itself ships"
     detail: "timeline/timeline.yaml and verify.py land in the spec: the project's history becomes one machine-verified SSOT. Every provable claim is re-proven in CI: push · PR · weekly cron."
     component: spec
     evidence: { class: github-pr, repo: supernovae-st/nika-spec, pr: 155 }
 
-  - date: "2026-07-20"
+  - id: release-notes-front-page
+    date: "2026-07-20"
     type: milestone
     title: "Releases earn their front page"
     detail: "Release notes render from the changelog section: What · Install · Verify · Provenance. Verify carries SHA256SUMS · gh attestation · the SLSA intoto asset."
@@ -340,4 +366,3 @@ gates:
       - "the grammar refonte lands and its cascade is green"
       - "the reserve/specify/refuse checklist is fully resolved"
       - "exit criteria published · six months of zero normative change outside the NEP door proves the freeze"
-

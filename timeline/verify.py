@@ -19,6 +19,7 @@
 
 import json
 import pathlib
+import re
 import subprocess
 import sys
 import urllib.request
@@ -35,6 +36,7 @@ UA = {"User-Agent": "nika-timeline-verify (https://github.com/supernovae-st/nika
 PROVABLE = {"git-tag", "github-release", "github-commit", "github-pr", "crates-io"}
 UNPROVABLE = {"testimony", "private-archive"}
 RECORDED = {"scorecard"}
+STABLE_ID = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
 
 def fetch_json(url: str):
@@ -121,8 +123,18 @@ def main(argv: list[str]) -> int:
     doc = yaml.safe_load((ROOT / "timeline" / "timeline.yaml").read_text())
     declared = set(doc.get("evidence_classes", {}))
     rows = []
+    seen_ids: set[str] = set()
     for section in ("eras", "entries"):
         for e in doc.get(section, []):
+            stable_id = e.get("id")
+            if not stable_id or not STABLE_ID.fullmatch(stable_id):
+                rows.append(("BAD-SHAPE", e.get("title", "?"),
+                             f"{section} item needs a stable kebab-case id"))
+                continue
+            if stable_id in seen_ids:
+                rows.append(("BAD-SHAPE", stable_id, "stable id is duplicated"))
+                continue
+            seen_ids.add(stable_id)
             cls = (e.get("evidence") or {}).get("class")
             if cls not in declared:
                 rows.append(("BAD-SHAPE", e.get("title", e.get("id", "?")),
@@ -131,6 +143,14 @@ def main(argv: list[str]) -> int:
             v, d = check(e, offline)
             rows.append((v, e.get("title") or e.get("id") or e.get("version", "?"), d))
     for g in doc.get("gates", []):
+        stable_id = g.get("id")
+        if not stable_id or not STABLE_ID.fullmatch(stable_id):
+            rows.append(("BAD-SHAPE", str(stable_id or "?"),
+                         "gate needs a stable kebab-case id"))
+        elif stable_id in seen_ids:
+            rows.append(("BAD-SHAPE", stable_id, "stable id is duplicated"))
+        else:
+            seen_ids.add(stable_id)
         if "date" in g:
             rows.append(("BAD-SHAPE", g.get("id", "?"), "a gate carries a DATE — the future has conditions, never dates"))
         if not g.get("conditions"):

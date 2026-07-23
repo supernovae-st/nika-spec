@@ -1,0 +1,48 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# Nika Project OS · deterministic local audit.
+#
+# Started from the canonical exec-pipeline example. The checks run in parallel
+# because they share no mutable state. There is no model task and no network.
+#
+# EXEC LEDGER ·
+# | task | command | why no native path | unlock that removes it |
+# | contract | python3 project/verify.py --offline | executes the repository's contract verifier | expose a Nika builtin for repository test commands |
+# | timeline | python3 timeline/verify.py --offline | executes the timeline proof harness | expose a Nika builtin for repository test commands |
+# | unit | python3 -m unittest ... | executes Python unit tests | expose a Nika builtin for repository test commands |
+
+nika: v1
+workflow:
+  id: project-os-audit
+  description: "Prove the Project OS contract, timeline shape and incremental reconciler without network or model spend."
+
+permits:
+  exec: ["python3"]
+
+tasks:
+  contract:
+    timeout: "1m"
+    exec:
+      command: ["python3", "project/verify.py", "--offline"]
+      cwd: "."
+      capture: structured
+
+  timeline:
+    timeout: "1m"
+    exec:
+      command: ["python3", "timeline/verify.py", "--offline"]
+      cwd: "."
+      capture: structured
+
+  unit:
+    timeout: "1m"
+    exec:
+      command: ["python3", "-m", "unittest", "discover", "-s", "project_os", "-p", "test_*.py"]
+      cwd: "."
+      capture: structured
+
+outputs:
+  contract: ${{ tasks.contract.output }}
+  timeline: ${{ tasks.timeline.output }}
+  unit: ${{ tasks.unit.output }}

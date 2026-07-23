@@ -1,0 +1,249 @@
+# Nika Project OS · projection contract
+# SPDX-License-Identifier: Apache-2.0
+#
+# This file defines the public GitHub Project surface. It is not a second
+# backlog. Every field names its writer, every view names its purpose, and
+# browser-only settings are explicit because GitHub does not expose view
+# creation or editing through the public API.
+
+schema_version: 2
+
+project:
+  organization: supernovae-st
+  number: 3
+  title: "Nika · the road (a projection)"
+  public: true
+  repositories: [nika, nika-spec]
+  short_description: "One public operating surface for Nika · record, gates, issues, pull requests and releases · projected from their real sources."
+
+sources:
+  timeline:
+    path: timeline/timeline.yaml
+    owns: [record, gates, proof, past_dates, sequence]
+  github_issues:
+    repositories: [nika, nika-spec]
+    state: open
+    exclude_labels: [gate]
+    owns: [title, status, assignees, milestone, dependencies]
+  github_pull_requests:
+    repositories: [nika, nika-spec]
+    state: open
+    owns: [title, review, checks, assignees, milestone]
+  github_releases:
+    repositories: [nika, nika-spec]
+    state: published
+    limit_per_repository: 12
+    owns: [tag, published_at, prerelease]
+
+identity:
+  field: "SSOT ID"
+  marker: "nika-project-os:ssot:"
+  unknown_items: quarantine
+  removed_managed_items: retain_as_orphan
+  destructive_rebuild: forbidden
+
+fields:
+  - { name: "SSOT ID", type: TEXT, writer: projector, visibility: audit }
+  - name: Type
+    type: SINGLE_SELECT
+    writer: projector
+    options:
+      - [Record, GRAY, "a dated claim from the record"]
+      - [Gate, PURPLE, "conditions ahead, never a date"]
+      - [Issue, BLUE, "public work tracked by a GitHub issue"]
+      - ["Pull request", ORANGE, "integration and review work"]
+      - [Release, GREEN, "a published artifact"]
+  - name: Stage
+    type: SINGLE_SELECT
+    writer: projector
+    options:
+      - ["shipped · in the record", GREEN, "a dated claim in the record"]
+      - ["gate · conditions open", PURPLE, "a gate with no target date"]
+      - ["work · active", BLUE, "an open issue"]
+      - ["review · integrating", ORANGE, "an open pull request"]
+      - ["release · published", GREEN, "a published release"]
+  - name: Era
+    type: SINGLE_SELECT
+    writer: projector
+    options:
+      - ["✧ exploration", GRAY, "private prototypes and testimony"]
+      - ["✎ brouillon", ORANGE, "the named draft era"]
+      - ["◆ diamond", BLUE, "the clean rewrite and real semver"]
+      - ["◇ ahead", PURPLE, "conditions ahead, never dates"]
+  - name: Kind
+    type: SINGLE_SELECT
+    writer: projector
+    options:
+      - [release, GREEN, "a tagged release"]
+      - [milestone, BLUE, "a dated claim of the record"]
+      - [gate, PURPLE, "a forward condition"]
+      - [issue, BLUE, "a public issue"]
+      - [pull-request, ORANGE, "a pull request"]
+  - name: Proof
+    type: SINGLE_SELECT
+    writer: projector
+    options:
+      - ["✓ proven", GREEN, "re-proven against a public source"]
+      - ["· recorded", YELLOW, "a dated reading"]
+      - ["○ labeled", GRAY, "testimony or private archive, honestly labeled"]
+      - ["◌ pending", PURPLE, "a gate or work item not yet proven"]
+  - { name: When, type: DATE, writer: timeline, visibility: narrative }
+  - { name: Order, type: NUMBER, writer: projector, visibility: narrative }
+  - name: Pole
+    type: SINGLE_SELECT
+    writer: projector
+    options:
+      - ["01 · product", PURPLE, "product intent and experience"]
+      - ["02 · engineering", BLUE, "language, engine and tooling"]
+      - ["03 · growth", GREEN, "adoption and discovery"]
+      - ["04 · identity", PINK, "brand and voice"]
+      - ["05 · community", ORANGE, "contributors and ecosystem"]
+      - ["06 · revenue", YELLOW, "sustainability"]
+      - ["07 · operations", GRAY, "day-two operation"]
+      - ["08 · chronicle", PINK, "the public record"]
+      - ["09 · data", BLUE, "measurement and evidence"]
+  - name: Priority
+    type: SINGLE_SELECT
+    writer: human
+    options:
+      - [Urgent, RED, "attention now"]
+      - [High, ORANGE, "next important outcome"]
+      - [Medium, YELLOW, "normal priority"]
+      - [Low, GRAY, "valuable, not current"]
+  - name: Effort
+    type: SINGLE_SELECT
+    writer: human
+    options:
+      - [High, ORANGE, "large or uncertain"]
+      - [Medium, YELLOW, "bounded multi-step work"]
+      - [Low, GREEN, "small and well understood"]
+  - name: Horizon
+    type: SINGLE_SELECT
+    writer: projector
+    options:
+      - [Now, RED, "active or under review"]
+      - [Next, ORANGE, "the next explicit gate"]
+      - [Later, GRAY, "valuable, not active"]
+      - [Record, GREEN, "already in the record"]
+  - name: Certainty
+    type: SINGLE_SELECT
+    writer: projector
+    options:
+      - [Proven, GREEN, "machine-reproven"]
+      - [Committed, BLUE, "accepted public work"]
+      - [Exploring, PURPLE, "still being shaped"]
+      - [Unknown, GRAY, "information intentionally absent"]
+  - { name: Start, type: DATE, writer: github, visibility: planning }
+  - { name: Target, type: DATE, writer: github, visibility: planning }
+  - { name: Release, type: TEXT, writer: projector, visibility: planning }
+  - { name: Accountable, type: TEXT, writer: projector, visibility: planning }
+  - name: "Block state"
+    type: SINGLE_SELECT
+    writer: projector
+    options:
+      - [Clear, GREEN, "no open dependency"]
+      - [Blocked, RED, "blocked by at least one open issue"]
+      - [Blocking, ORANGE, "blocks at least one open issue"]
+      - [Both, PURPLE, "blocked and blocking"]
+      - [Unknown, GRAY, "dependency state unavailable"]
+  - name: "Projection state"
+    type: SINGLE_SELECT
+    writer: projector
+    options:
+      - [Synced, GREEN, "equals its source"]
+      - [Drifted, YELLOW, "known field drift"]
+      - [Orphaned, ORANGE, "managed source left the active set"]
+      - [Quarantined, PURPLE, "unknown item preserved for review"]
+  - name: "Review state"
+    type: SINGLE_SELECT
+    writer: projector
+    options:
+      - ["Not applicable", GRAY, "not a pull request"]
+      - [Draft, GRAY, "not ready for review"]
+      - ["Review needed", YELLOW, "ready, no decisive review"]
+      - [Approved, GREEN, "review approved"]
+      - ["Changes requested", RED, "review requested changes"]
+  - name: "CI state"
+    type: SINGLE_SELECT
+    writer: projector
+    options:
+      - ["Not applicable", GRAY, "not a pull request"]
+      - [Pending, YELLOW, "checks are queued or running"]
+      - [Green, GREEN, "all visible checks pass"]
+      - [Red, RED, "at least one visible check failed"]
+      - [Unknown, GRAY, "check state unavailable"]
+
+views:
+  - name: "🧭 Command · the rail"
+    layout: TABLE
+    purpose: "The human starting point · active work, owner, priority and next horizon."
+    filter: "-Type:Record -Type:Release"
+    group_by: Stage
+    sort: [{ field: Priority, direction: asc }, { field: Order, direction: asc }]
+    fields: [Title, Type, Priority, Accountable, Horizon, "Block state", Target]
+  - name: "🦋 Flow"
+    layout: BOARD
+    purpose: "The active flow · Todo, In progress and Done with lean cards."
+    filter: "Type:Issue,Pull request,Gate"
+    column_by: Status
+    group_by: Pole
+    fields: [Type, Priority, Accountable, "Block state"]
+  - name: "🌌 Horizon · the road"
+    layout: ROADMAP
+    purpose: "Work with real dates plus undated gates that remain visibly conditional."
+    start: Start
+    target: Target
+    sort: [{ field: Order, direction: asc }]
+    fields: [Type, Horizon, Release, Accountable]
+  - name: "🧬 Missions"
+    layout: TABLE
+    purpose: "Native issue hierarchy · parent, sub-issues and progress without a second task model."
+    filter: "Type:Issue,Gate"
+    group_by: Pole
+    sort: [{ field: Priority, direction: asc }]
+    fields: [Title, Parent issue, "Sub-issues progress", Type, Priority, Accountable, Status]
+  - name: "⛓ Blockers"
+    layout: TABLE
+    purpose: "Only dependency pressure · blocked, blocking or both."
+    filter: "-Block state:Clear -Block state:Unknown"
+    group_by: "Block state"
+    fields: [Title, Type, Priority, Accountable, Repository, Target]
+  - name: "📦 Releases · the record"
+    layout: ROADMAP
+    purpose: "The public release train and the full dated record."
+    filter: "Type:Record,Release,Gate"
+    start: When
+    target: When
+    zoom: year
+    sort: [{ field: Order, direction: asc }]
+    fields: [Title, Kind, Era, Proof, Release]
+  - name: "🔍 Review"
+    layout: TABLE
+    purpose: "Open pull requests · review decision, CI and accountable human."
+    filter: "Type:Pull request"
+    group_by: "Review state"
+    fields: [Title, Repository, "Review state", "CI state", Accountable, Target]
+  - name: "🛡 Quality · by proof"
+    layout: TABLE
+    purpose: "The honesty contract plus projection drift and public quality work."
+    group_by: Proof
+    sort: [{ field: Order, direction: asc }]
+    fields: [Title, Type, Kind, Era, When, "Projection state", "CI state"]
+
+insights:
+  - { name: "By era", chart: BAR, x: Era, group_by: Kind }
+  - { name: "The honesty contract", chart: BAR, x: Proof }
+  - { name: "Flow mix", chart: BAR, x: Status, group_by: Type }
+  - { name: "Work by pole", chart: BAR, x: Pole, group_by: Type }
+
+automation:
+  on_timeline_change: reconcile
+  on_issue_change: reconcile
+  on_pull_request_change: reconcile
+  on_release_change: reconcile
+  full_reconcile: "17 */6 * * *"
+  external_reproof: "17 6 * * 1"
+  browser_only:
+    - views
+    - insights
+    - built_in_workflows

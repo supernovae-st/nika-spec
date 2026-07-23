@@ -1,38 +1,96 @@
-# The board projection · the org Projects board follows the record.
-# timeline/timeline.yaml is the SSOT; timeline/project-board.py makes the
-# board EQUAL to it (gates as condition-items · the last releases as
-# shipped) — hand edits are overwritten by construction, so the board
-# can never rot into the stale-meta-surface anti-pattern.
+# Nika Project OS · prove locally, then reconcile the public Project.
 #
-# SECURITY: zero run: event data · every step a SHA-pinned uses: · the
-# token reaches the script through env only. GITHUB_TOKEN cannot write
-# org-level Projects v2, so the sync runs on BOARD_PROJECT_TOKEN (a
-# fine-grained PAT scoped to org projects, write) and SKIPS with a
-# notice when the secret is absent (the tap-key guard pattern).
+# timeline/timeline.yaml owns the record and gates. GitHub Issues, pull
+# requests and releases own live work. project/project-os.yaml owns only the
+# projection contract. The reconciler is incremental and never deletes a
+# Project item.
+#
+# SECURITY: zero interpolation of event data in run steps. Every third-party
+# action is SHA-pinned. BOARD_PROJECT_TOKEN reaches Python through env only.
+# GITHUB_TOKEN cannot write an organization Project, so a missing fine-grained
+# token renders a notice and skips the live leg without weakening the audit.
 
-name: board
+name: project-os
 
 on:
   push:
     branches: [main]
-    paths: ['timeline/**']
+    paths:
+      - "timeline/**"
+      - "project/**"
+      - "project_os/**"
+      - ".github/workflows/board.yml"
+  pull_request:
+    paths:
+      - "timeline/**"
+      - "project/**"
+      - "project_os/**"
+      - ".github/workflows/board.yml"
+  issues:
+    types:
+      - opened
+      - edited
+      - closed
+      - reopened
+      - assigned
+      - unassigned
+      - labeled
+      - unlabeled
+      - milestoned
+      - demilestoned
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - closed
+      - reopened
+      - ready_for_review
+      - converted_to_draft
+      - review_requested
+      - review_request_removed
+  release:
+    types: [published, edited, deleted]
+  repository_dispatch:
+    types: [nika-project-os-sync]
   schedule:
-    - cron: '29 7 * * 1' # weekly · after the timeline re-proof
+    - cron: "17 */6 * * *"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: board-projection
+  group: project-os
   cancel-in-progress: false
 
 jobs:
-  project:
+  audit:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Guard on the board token
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Install the pinned audit environment
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet --require-hashes -r .github/requirements.txt
+      - name: Prove Project OS offline
+        run: |
+          set -euo pipefail
+          python3 project/verify.py --offline
+          python3 timeline/verify.py --offline
+          python3 -m unittest discover -s project_os -p "test_*.py"
+          ruff check project_os project/verify.py timeline/project-board.py timeline/verify.py
+
+  reconcile:
+    if: github.event_name != 'pull_request'
+    needs: audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Guard on the Project token
         id: guard
         env:
           BOARD_KEY: ${{ secrets.BOARD_PROJECT_TOKEN }}
@@ -42,19 +100,23 @@ jobs:
             echo "ok=true" >> "$GITHUB_OUTPUT"
           else
             echo "ok=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::BOARD_PROJECT_TOKEN unset — the board projection is skipped. Provision a fine-grained PAT (org projects: write) to arm it."
+            echo "::notice::BOARD_PROJECT_TOKEN unset · Project OS reconciliation skipped"
           fi
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         if: steps.guard.outputs.ok == 'true'
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         if: steps.guard.outputs.ok == 'true'
         with:
-          python-version: '3.12'
-      - name: Project the board from the record
+          python-version: "3.12"
+      - name: Install the pinned projector environment
+        if: steps.guard.outputs.ok == 'true'
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet --require-hashes -r .github/requirements.txt
+      - name: Reconcile Project OS
         if: steps.guard.outputs.ok == 'true'
         env:
           BOARD_PROJECT_TOKEN: ${{ secrets.BOARD_PROJECT_TOKEN }}
         run: |
           set -euo pipefail
-          pip install --quiet pyyaml==6.0.3
-          python3 timeline/project-board.py
+          python3 timeline/project-board.py --apply
