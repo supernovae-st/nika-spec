@@ -1704,3 +1704,70 @@ laws:
     closure_gates:
       - data-as-code-check-refusal
       - inert-door-engine-flip
+  - id: LAW-AUTH-0328
+    slug: authority/trace-format-and-equivalence
+    status: active
+    owner: spec
+    domain: AUTH
+    title: "Le journal de run est un chapitre normatif versionné · chaque décision de permit est un frame requis · l'équivalence check-run se prouve par oracle différentiel"
+    prose_projection:
+      chapters: ["17-trace", "07-conformance"]
+      text: "NEP-0007 (ratifié op 2026-07-22 · lane F-O6 · la décision pré-gel witness/format/oracle adoptée), Specification verbatim : « A conformant engine writes the run journal exactly as 17 · Trace specifies » · loi 2 verbatim : « Every permit decision · emits one permit_checked frame naming the gate, the decision (allow | deny), the law applied, and the task. Granted decisions are witnessed, not only refusals » · loi 3 verbatim : « A verifier reading a journal that exercised effects with zero permit-decision frames MUST report a FINDING · never FORGED (the chain still binds), never a crash » · loi 4 verbatim : « The conformance suite replays the same inputs through BOTH evaluators · the static checker and the running engine · and FAILS on any verdict divergence » · loi 5 verbatim : « Coverage is derived · no coverage figure is ever hand-written ». Le chapitre 17 grave le wire OBSERVÉ (trace_format: 2 · frames NDJSON · chaîne sha256 sur les octets exacts de la ligne précédente · genesis taggé · le manifeste prologue · le vocabulaire fermé-par-minor de 27 kinds · la loi additive kind-inconnu-toléré) · le witness est une exigence COMPORTEMENTALE (jamais un bump de wire) · la loi de mapping (refus AUTH au check ⇒ refus pré-prologue · DEFER ⇒ NIKA-SEC-004 au run · check propre ⇒ run dans la frontière) déclare ses hors-scope (pause · resume · cancel) au lieu de les forcer."
+    inputs:
+      - registry: ir
+        id: declared_permits
+        role: required
+      - registry: ir
+        id: run_journal_frames
+        role: required
+    premises:
+      - operator: member_of
+        operands:
+          - registry: ir
+            id: permit_decision
+          - registry: ir
+            id: witnessed_trace_frames
+        quantifier: forall
+      - operator: equals
+        operands:
+          - registry: ir
+            id: checker_verdict
+          - registry: ir
+            id: engine_verdict
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: true
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: witnessed_trace_frames
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["DeclaredPermits", "EffectiveAuthority"]
+      relation: equality
+      pipeline_stage: permits_check
+    diagnostics: ["NIKA-SEC-004"]
+    fixtures:
+      - conformance/tests/runtime/trace/001-golden-chained-journal
+    negative_fixtures:
+      - conformance/tests/runtime/trace/002-witness-absent-finding
+      - conformance/tests/runtime/trace/003-chain-broken-forged
+    projections: ["prose:17-trace", "prose:07-conformance", "cli:trace", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:proof_core.py
+      - cli:nika-trace
+      - conformance:trace-suite
+    introduced_in: C1
+    proof_obligations:
+      - "NEP-0007 loi 1 : le golden 001 est un run RÉEL (2 tasks · 8 frames · produit par l'engine au pin F-O7 · chaîne sha256 vérifiable de bout en bout · head scellé) · le chapitre 17 grave EXACTEMENT ce wire (prologue manifest · trace_format: 2 · le vocabulaire) · toute divergence chapitre↔golden est un bug de spec par construction."
+      - "NEP-0007 lois 2-3 : le contrat 002 rejoue le MÊME golden sous la règle REQUIRED-witness (le run exerce des effets · zéro frame permit_checked · verdict FINDING jamais FORGED · la chaîne tient) · l'émission engine atterrit avec la lane F-O6 côté moteur (le kind est réservé depuis ADR-092 · le câblage est additif) · le contrat 003 casse UN octet et attend FORGED (la chaîne fait son travail)."
+      - "NEP-0007 lois 4-5 : la suite d'équivalence est engine-side (elle exige les deux évaluateurs) · elle rejoue le corpus core/authority + runtime/permits par le checker ET le moteur sous la loi de mapping et FAIL sur toute divergence · la couverture (familles × plans × fixtures) est IMPRIMÉE par la suite · aucun chiffre de couverture n'est écrit à la main dans la spec ni dans la zone."
+    closure_gates:
+      - permit-witness-engine-flip
+      - trace-verify-required-witness
+      - check-run-equivalence-suite
