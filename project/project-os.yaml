@@ -281,3 +281,18 @@ automation:
     - views
     - insights
     - built_in_workflows
+  ui_guardian:
+    skill: nika-project-os-ui
+    preflight: project/project-os-audit.nika.yaml
+    cadence: daily
+    repairs: [views, insights]
+    observes: [built_in_workflows]
+    forbids:
+      - items
+      - field_values
+      - field_options
+      - project_readme
+      - project_description
+      - repository_links
+      - workflows
+      - gate_dates
