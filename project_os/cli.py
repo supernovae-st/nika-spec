@@ -35,6 +35,7 @@ def load_yaml(path: pathlib.Path) -> dict[str, Any]:
 def render_readme(manifest: dict[str, Any]) -> str:
     fields = manifest["fields"]
     views = manifest["views"]
+    insights = manifest["insights"]
     sources = manifest["sources"]
     signal = next(field for field in fields if field["name"] == "Signal")
     lines = [
@@ -65,6 +66,20 @@ def render_readme(manifest: dict[str, Any]) -> str:
     for view in views:
         lines.append(
             f"| **{view['name']}** | {view['layout'].title()} | {view['purpose']} |"
+        )
+    lines.extend(
+        [
+            "",
+            "### 📈 Pulse",
+            "",
+            "| Chart | X axis | Group |",
+            "|---|---|---|",
+        ]
+    )
+    for insight in insights:
+        lines.append(
+            f"| **{insight['name']}** | `{insight['x']}` | "
+            f"`{insight.get('group_by', 'none')}` |"
         )
     lines.extend(
         [
