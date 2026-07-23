@@ -25,6 +25,22 @@ from project_os.model import timeline_items  # noqa: E402
 
 
 VALID_WRITERS = {"projector", "timeline", "github", "human"}
+RESERVED_FIELD_NAMES = {
+    "Assignees",
+    "Closed",
+    "Created",
+    "Labels",
+    "Linked pull requests",
+    "Milestone",
+    "Parent issue",
+    "Repository",
+    "Reviewers",
+    "Status",
+    "Sub-issues progress",
+    "Title",
+    "Type",
+    "Updated",
+}
 LAYOUTS = {
     "TABLE": "TABLE_LAYOUT",
     "BOARD": "BOARD_LAYOUT",
@@ -45,6 +61,11 @@ def offline_findings(
     names = [field["name"] for field in manifest.get("fields", [])]
     if len(names) != len(set(names)):
         findings.append("Project field names must be unique")
+    collisions = sorted(set(names) & RESERVED_FIELD_NAMES)
+    if collisions:
+        findings.append(
+            f"custom fields collide with GitHub reserved names: {collisions}"
+        )
     for field in manifest.get("fields", []):
         if field.get("writer") not in VALID_WRITERS:
             findings.append(f"{field.get('name')}: invalid writer")
@@ -77,7 +98,7 @@ def offline_findings(
     if len(identities) != len(set(identities)):
         findings.append("normalized SSOT IDs must be unique")
     for item in normalized:
-        if item.fields["Type"] == "Gate":
+        if item.fields["Item type"] == "Gate":
             for date_field in ("When", "Start", "Target"):
                 if item.fields.get(date_field):
                     findings.append(

@@ -44,7 +44,7 @@ identity:
 
 fields:
   - { name: "SSOT ID", type: TEXT, writer: projector, visibility: audit }
-  - name: Type
+  - name: "Item type"
     type: SINGLE_SELECT
     writer: projector
     options:
@@ -177,41 +177,41 @@ views:
   - name: "🧭 Command · the rail"
     layout: TABLE
     purpose: "The human starting point · active work, owner, priority and next horizon."
-    filter: "-Type:Record -Type:Release"
+    filter: "-Item type:Record -Item type:Release"
     group_by: Stage
     sort: [{ field: Priority, direction: asc }, { field: Order, direction: asc }]
-    fields: [Title, Type, Priority, Accountable, Horizon, "Block state", Target]
+    fields: [Title, "Item type", Priority, Accountable, Horizon, "Block state", Target]
   - name: "🦋 Flow"
     layout: BOARD
     purpose: "The active flow · Todo, In progress and Done with lean cards."
-    filter: "Type:Issue,Pull request,Gate"
+    filter: "Item type:Issue,Pull request,Gate"
     column_by: Status
     group_by: Pole
-    fields: [Type, Priority, Accountable, "Block state"]
+    fields: ["Item type", Priority, Accountable, "Block state"]
   - name: "🌌 Horizon · the road"
     layout: ROADMAP
     purpose: "Work with real dates plus undated gates that remain visibly conditional."
     start: Start
     target: Target
     sort: [{ field: Order, direction: asc }]
-    fields: [Type, Horizon, Release, Accountable]
+    fields: ["Item type", Horizon, Release, Accountable]
   - name: "🧬 Missions"
     layout: TABLE
     purpose: "Native issue hierarchy · parent, sub-issues and progress without a second task model."
-    filter: "Type:Issue,Gate"
+    filter: "Item type:Issue,Gate"
     group_by: Pole
     sort: [{ field: Priority, direction: asc }]
-    fields: [Title, Parent issue, "Sub-issues progress", Type, Priority, Accountable, Status]
+    fields: [Title, Parent issue, "Sub-issues progress", "Item type", Priority, Accountable, Status]
   - name: "⛓ Blockers"
     layout: TABLE
     purpose: "Only dependency pressure · blocked, blocking or both."
     filter: "-Block state:Clear -Block state:Unknown"
     group_by: "Block state"
-    fields: [Title, Type, Priority, Accountable, Repository, Target]
+    fields: [Title, "Item type", Priority, Accountable, Repository, Target]
   - name: "📦 Releases · the record"
     layout: ROADMAP
     purpose: "The public release train and the full dated record."
-    filter: "Type:Record,Release,Gate"
+    filter: "Item type:Record,Release,Gate"
     start: When
     target: When
     zoom: year
@@ -220,7 +220,7 @@ views:
   - name: "🔍 Review"
     layout: TABLE
     purpose: "Open pull requests · review decision, CI and accountable human."
-    filter: "Type:Pull request"
+    filter: "Item type:Pull request"
     group_by: "Review state"
     fields: [Title, Repository, "Review state", "CI state", Accountable, Target]
   - name: "🛡 Quality · by proof"
@@ -228,13 +228,13 @@ views:
     purpose: "The honesty contract plus projection drift and public quality work."
     group_by: Proof
     sort: [{ field: Order, direction: asc }]
-    fields: [Title, Type, Kind, Era, When, "Projection state", "CI state"]
+    fields: [Title, "Item type", Kind, Era, When, "Projection state", "CI state"]
 
 insights:
   - { name: "By era", chart: BAR, x: Era, group_by: Kind }
   - { name: "The honesty contract", chart: BAR, x: Proof }
-  - { name: "Flow mix", chart: BAR, x: Status, group_by: Type }
-  - { name: "Work by pole", chart: BAR, x: Pole, group_by: Type }
+  - { name: "Flow mix", chart: BAR, x: Status, group_by: "Item type" }
+  - { name: "Work by pole", chart: BAR, x: Pole, group_by: "Item type" }
 
 automation:
   on_timeline_change: reconcile
