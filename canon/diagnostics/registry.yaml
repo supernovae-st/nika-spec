@@ -1832,6 +1832,31 @@ diagnostics:
       mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
       is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
       span obligation not stated by the source → span_required false.'
+  - id: NIKA-SEC-008
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0327
+    introduced_in: C1
+    namespace: SEC
+    plane: check
+    condition: 'data-as-code sink · a nika:fetch resolved URL path names a code-bearing class (serialized-executable
+      · script/interpreter · executable binary/module · the closed NEP-0006 list) and the task declares no inert:
+      door · the read hides an execution sink (F-O7 · NEP-0006)'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: true
+    teaching: 'a code-bearing artifact is a program, not data · model the acquisition as the exec it feeds (exec:
+      + a program permit · reviewable authority) · or declare the read inert on the task (inert: "<because>" ·
+      non-empty · it lifts the sink law only, never the host boundary or the SSRF floor) · the unresolvable URL
+      defers to the run twin (NIKA-SEC-004 on the resolved URL).'
+    notes: 'nep-0006 (2026-07-23) · category: security_error · transient: false (canon.yaml verbatim) · minted by
+      the F-O7 spec lane · the slot the F-O1 analysis confirmed free (001-007 + 009 taken) · the engine emission
+      lands with the classifier flip (F-O7 engine lane) · the run-time twin stays NIKA-SEC-004 (one runtime
+      refusal voice · defense in depth).'
   - id: NIKA-SEC-009
     status: reserved
     owner: spec
