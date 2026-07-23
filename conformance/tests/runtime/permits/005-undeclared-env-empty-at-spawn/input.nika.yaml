@@ -6,4 +6,4 @@ permits:
   exec: true
 tasks:
   probe:
-    exec: { command: ["sh", "-c", "echo ${NIKA_RT_CANARY:-ABSENT}"] }
+    exec: { command: ["printenv", "NIKA_RT_CANARY"] }

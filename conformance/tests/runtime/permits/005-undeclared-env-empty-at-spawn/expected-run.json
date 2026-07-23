@@ -1,10 +1,10 @@
 {
- "workflow_state": "success",
+ "workflow_state": "failure",
  "tasks": {
   "probe": {
-   "status": "success",
-   "output": "ABSENT"
+   "status": "failure",
+   "error_code": "NIKA-EXEC-001"
   }
  },
- "note": "NEP-0005 law 1 · the harness plants the canary in the ENGINE environment (run.json env per tests/runtime/README.md) · no env: category, so the child composes floor-only and the canary never crosses · the shell parameter default proves the absence: composition is silent, the tool speaks."
+ "note": "NEP-0005 law 1 · the harness plants the canary in the ENGINE environment (run.json env) · no env: category, so the child composes floor-only and the canary never crosses · printenv exits 1 on the absent name — the FAILURE IS the absence proof (a shell-parameter default would need an inline eval the exec floor refuses · the floor stays on top of the probe too)."
 }
