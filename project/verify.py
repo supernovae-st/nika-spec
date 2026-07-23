@@ -174,8 +174,8 @@ def offline_findings(
             )
     insights = manifest.get("insights", [])
     insight_names = [insight["name"] for insight in insights]
-    if len(insights) > 5:
-        findings.append("Pulse allows at most five focused Insights charts")
+    if len(insights) > 6:
+        findings.append("Pulse allows at most six focused Insights charts")
     if len(insight_names) != len(set(insight_names)):
         findings.append("Insight names must be unique")
     for insight in insights:

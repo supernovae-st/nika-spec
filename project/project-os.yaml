@@ -10,7 +10,7 @@ schema_version: 3
 
 visual_grammar:
   law: "Every projector-owned classification carries one stable semantic sigil. The sigil carries meaning; color only reinforces it."
-  density: "Eight lenses plus Pulse. No duplicate navigation surface."
+  density: "Eight lenses plus a six-chart Pulse. No duplicate navigation surface."
   signal: "Signal is derived attention. Priority and Effort remain human overrides."
 
 project:
@@ -203,6 +203,7 @@ views:
     filter: 'Item-type:"🧩 Issue","🔀 Pull request","🚪 Gate"'
     column_by: Status
     group_by: Pole
+    sort: [{ field: Order, direction: asc }]
     fields: ["Item type", Signal, Accountable, "Block state", "CI state"]
   - name: "🌌 Horizon · the road"
     layout: ROADMAP
@@ -249,15 +250,18 @@ views:
     layout: TABLE
     purpose: "The honesty contract plus projection drift and public quality work."
     group_by: Proof
-    sort: [{ field: Order, direction: asc }]
+    sort:
+      - { field: When, direction: asc }
+      - { field: Order, direction: asc }
     fields: [Title, "Item type", Era, When, "Projection state", "CI state", Updated]
 
 insights:
   - { name: "🌈 Era × kind", chart: BAR, x: Era, group_by: Kind }
-  - { name: "🛡 Proof contract", chart: BAR, x: Proof }
+  - { name: "🎯 Status pulse", chart: BAR, x: Status }
   - { name: "🦋 Flow × type", chart: BAR, x: Status, group_by: "Item type" }
   - { name: "🧭 Pole × signal", chart: BAR, x: Pole, group_by: Signal }
   - { name: "🚨 Signal mix", chart: BAR, x: Signal, group_by: "Item type" }
+  - { name: "🛡 Proof contract", chart: BAR, x: Proof }
 
 automation:
   on_timeline_change: reconcile

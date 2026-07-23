@@ -3,7 +3,7 @@
 **One public operating surface. Zero second backlog.**
 
 `project-os.yaml` is the projection contract. It declares the sources,
-field writers, visual grammar, eight lenses, Pulse charts and automation.
+field writers, visual grammar, eight lenses, six Pulse charts and automation.
 `timeline/timeline.yaml` remains the source of the record and gates.
 GitHub Issues, pull requests and releases remain the sources of live work.
 
