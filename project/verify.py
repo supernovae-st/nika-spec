@@ -220,6 +220,33 @@ def offline_findings(
         findings.append("destructive rebuild must be forbidden")
     if manifest.get("identity", {}).get("unknown_items") != "quarantine":
         findings.append("unknown items must be quarantined")
+    automation = manifest.get("automation", {})
+    guardian = automation.get("ui_guardian", {})
+    if guardian.get("skill") != "nika-project-os-ui":
+        findings.append("UI guardian must use nika-project-os-ui")
+    if guardian.get("preflight") != "project/project-os-audit.nika.yaml":
+        findings.append("UI guardian must use the canonical Nika preflight")
+    if set(guardian.get("repairs", [])) != {"views", "insights"}:
+        findings.append("UI guardian may repair only views and insights")
+    if set(guardian.get("observes", [])) != {"built_in_workflows"}:
+        findings.append("built-in workflows must remain observe-only")
+    required_forbidden = {
+        "items",
+        "field_values",
+        "field_options",
+        "project_readme",
+        "project_description",
+        "repository_links",
+        "workflows",
+        "gate_dates",
+    }
+    missing_forbidden = sorted(
+        required_forbidden - set(guardian.get("forbids", []))
+    )
+    if missing_forbidden:
+        findings.append(
+            f"UI guardian is missing forbidden surfaces {missing_forbidden}"
+        )
 
     try:
         normalized = timeline_items(timeline)
