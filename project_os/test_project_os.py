@@ -35,7 +35,7 @@ class ModelTests(unittest.TestCase):
         items = timeline_items(timeline)
         identities = [item.ssot_id for item in items]
         self.assertEqual(len(identities), len(set(identities)))
-        gates = [item for item in items if item.fields["Type"] == "Gate"]
+        gates = [item for item in items if item.fields["Item type"] == "Gate"]
         self.assertTrue(gates)
         for gate in gates:
             self.assertNotIn("When", gate.fields)

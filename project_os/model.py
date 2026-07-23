@@ -170,7 +170,7 @@ def timeline_items(doc: dict[str, Any]) -> list[DesiredItem]:
         is_release = entry.get("type") == "release"
         fields = {
             "SSOT ID": ssot_id,
-            "Type": "Release" if is_release else "Record",
+            "Item type": "Release" if is_release else "Record",
             "Stage": STAGE_SHIPPED,
             "Era": era_of(entry),
             "Kind": "release" if is_release else "milestone",
@@ -205,7 +205,7 @@ def timeline_items(doc: dict[str, Any]) -> list[DesiredItem]:
         title = f"gate · {gate['title']}"
         fields = {
             "SSOT ID": ssot_id,
-            "Type": "Gate",
+            "Item type": "Gate",
             "Stage": STAGE_GATE,
             "Era": ERA_AHEAD,
             "Kind": "gate",
@@ -288,7 +288,7 @@ def issue_item(
     target = (milestone.get("due_on") or "")[:10] or None
     fields = {
         "SSOT ID": ssot_id,
-        "Type": "Issue",
+        "Item type": "Issue",
         "Stage": STAGE_WORK,
         "Era": ERA_AHEAD,
         "Kind": "issue",
@@ -365,7 +365,7 @@ def pull_request_item(
     target = (milestone.get("due_on") or "")[:10] or None
     fields = {
         "SSOT ID": ssot_id,
-        "Type": "Pull request",
+        "Item type": "Pull request",
         "Stage": STAGE_REVIEW,
         "Era": ERA_AHEAD,
         "Kind": "pull-request",
@@ -410,7 +410,7 @@ def release_item(repo: str, release: dict[str, Any], order: int) -> DesiredItem:
     )
     fields = {
         "SSOT ID": ssot_id,
-        "Type": "Release",
+        "Item type": "Release",
         "Stage": STAGE_RELEASE,
         "Era": ERA_LABEL["diamond"],
         "Kind": "release",
