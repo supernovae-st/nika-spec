@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-SEC-008", "category": "security_error" }
+  ],
+  "note": "NEP-0006 law 1 · the script/interpreter class · one fixture per class keeps the two mirrored lists (reference oracle · engine) honest through the LAW-AUTH-0319 differential."
+}

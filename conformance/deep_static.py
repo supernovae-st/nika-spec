@@ -724,6 +724,117 @@ def env_dead_grant_errors(doc: dict) -> list[dict]:
     return errs
 
 
+# NEP-0006 / LAW-AUTH-0327 · the data-as-code sink. The v1 code-bearing
+# classes are CLOSED and normative (the exact list ships in the NEP · only
+# a NEP amends it) · the reference mirrors the engine's list and the
+# per-class fixtures keep the two honest (LAW-AUTH-0319 differential).
+_CODE_BEARING_CLASSES = {
+    "serialized-executable": {
+        ".pkl", ".pickle", ".dill", ".joblib", ".pt", ".pth", ".ckpt",
+    },
+    "script/interpreter": {
+        ".py", ".sh", ".bash", ".zsh", ".ps1", ".bat", ".cmd", ".rb",
+        ".pl", ".php", ".js", ".mjs", ".ipynb",
+    },
+    "executable binary/module": {
+        ".exe", ".dll", ".so", ".dylib", ".wasm", ".jar",
+    },
+}
+
+
+def _code_bearing_class(url: str):
+    """The (class, extension) of a code-bearing URL path, or None. The
+    classification reads the PATH only (query/fragment carry no verdict ·
+    NEP-0006 law 4), case-insensitively on the final extension."""
+    import urllib.parse
+    import posixpath
+    path = urllib.parse.urlparse(url).path
+    ext = posixpath.splitext(path)[1].lower()
+    if not ext:
+        return None
+    for cls, exts in _CODE_BEARING_CLASSES.items():
+        if ext in exts:
+            return cls, ext
+    return None
+
+
+def _resolve_static_url(v: str, doc: dict):
+    """Resolve a fetch url at check when every island is const.* or an
+    inputs.*/config.* entry carrying a declared default (the NEP-0004
+    resolution rules extended to the trusted const root · the SINK law
+    classifies the artifact, trust is not the question here). Returns the
+    resolved string, or None when any island stays dynamic (law 3 · the
+    run twin owns it)."""
+    if "${{" not in v:
+        return v
+    inputs = _as_dict(doc.get("inputs"))
+    config = _as_dict(doc.get("config"))
+    consts = _as_dict(doc.get("const"))
+
+    class _Dyn(Exception):
+        pass
+
+    def sub(m) -> str:
+        body = m.group(1).strip()
+        root, _, rest = body.partition(".")
+        name = re.split(r"[.\[]", rest, maxsplit=1)[0] if rest else ""
+        if not name:
+            raise _Dyn
+        if root == "const":
+            decl = consts.get(name)
+            if isinstance(decl, str):
+                return decl
+            if isinstance(decl, dict) and isinstance(decl.get("value"), str):
+                return decl["value"]
+            raise _Dyn
+        if root in ("inputs", "config"):
+            decl = (inputs if root == "inputs" else config).get(name)
+            default = decl.get("default") if isinstance(decl, dict) else None
+            if isinstance(default, str):
+                return default
+            raise _Dyn
+        raise _Dyn
+
+    try:
+        return EXPR_BODY.sub(sub, v)
+    except _Dyn:
+        return None
+
+
+def data_as_code_errors(doc: dict, tasks: list) -> list[dict]:
+    """NEP-0006 / LAW-AUTH-0327 · a nika:fetch whose resolved URL path
+    names a code-bearing class is refused (NIKA-SEC-008) unless the task
+    declares the inert: door (non-empty · the shape gate is the schema's).
+    The unresolvable defers to the run twin (NIKA-SEC-004 · law 3)."""
+    errs: list[dict] = []
+    for tid, t in tasks:
+        inv = t.get("invoke")
+        if not isinstance(inv, dict) or inv.get("tool") != "nika:fetch":
+            continue
+        door = t.get("inert")
+        if isinstance(door, str) and door:
+            continue  # the declared door · law 2 (empty = the schema's refusal)
+        args = _as_dict(inv.get("args"))
+        v = args.get("url")
+        if not isinstance(v, str):
+            continue
+        resolved = _resolve_static_url(v, doc)
+        if resolved is None:
+            continue  # dynamic · the run twin owns it (law 3)
+        hit = _code_bearing_class(resolved)
+        if hit is None:
+            continue
+        cls, ext = hit
+        errs.append({"code": "NIKA-SEC-008", "namespace": "NIKA-SEC",
+                     "category": "security_error",
+                     "detail": f"task '{tid}' fetches a code-bearing artifact ({cls} class "
+                               f"· `{ext}`) · {resolved} is a program, not data: the read "
+                               "hides an execution sink (NEP-0006 law 1) · fix: model the "
+                               "acquisition as the exec it feeds (exec: + a program permit) "
+                               "· or declare the read inert on the task (inert: \"<because>\")"})
+    return errs
+
+
 def deep_static_errors(doc: dict) -> list[dict]:
     errs: list[dict] = []
     if not isinstance(doc, dict):
@@ -907,6 +1018,10 @@ def deep_static_errors(doc: dict) -> list[dict]:
     # ENV-DEAD-GRANT · NEP-0005 (LAW-AUTH-0326) · a dangerous-floor name
     # in permits.env: is an inert dead grant (NIKA-AUTH-009)
     errs.extend(env_dead_grant_errors(doc))
+
+    # DATA-AS-CODE · NEP-0006 (LAW-AUTH-0327) · a code-bearing fetch is
+    # refused unless the task declares the inert: door (NIKA-SEC-008)
+    errs.extend(data_as_code_errors(doc, tasks))
 
     # PERMITS-FIT · the declared boundary must contain the body (01 §permits)
     permits = doc.get("permits")

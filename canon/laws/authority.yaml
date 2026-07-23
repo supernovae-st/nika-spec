@@ -1642,3 +1642,65 @@ laws:
     closure_gates:
       - env-composed-never-inherited-engine-flip
       - env-dead-grant-check-refusal
+  - id: LAW-AUTH-0327
+    slug: authority/data-as-code-sink
+    status: active
+    owner: spec
+    domain: AUTH
+    title: "Un fetch d'artefact code-porteur n'est jamais innocent : refus au check sauf lecture déclarée inerte"
+    prose_projection:
+      chapters: ["10-authority"]
+      text: "NEP-0006 (ratifié op 2026-07-22 · lane F-O7), Specification verbatim : « An engine MUST refuse at check a `nika:fetch` whose resolved URL path names a code-bearing class · NIKA-SEC-008 » · loi 2 verbatim : « The task-level `inert:` declaration lifts law 1 for its task. It never lifts the `net.http` boundary, the SSRF floor, or the NEP-0004 taint re-gate » · loi 3 verbatim : « An engine MUST refuse the same class at run on the RESOLVED URL (NIKA-SEC-004 · defense in depth) ». Les trois classes v1 sont FERMÉES et normatives (sérialisé-exécutable dont le désérialiseur exécute au load · script/interpréteur · binaire/module exécutable · la liste exacte au NEP · seule une NEP l'amende) · la classification lit le PATH seul (query/fragment sans verdict · le sniffing d'octets = résiduel déclaré v1) · l'URL non-résoluble au check DÉFÈRE au jumeau runtime (jamais un refus statique) · la porte honnête est une ligne greppable par tâche (because non-vide) et la réparation inverse est de modéliser l'acquisition comme l'exec qu'elle nourrit, sous un program-permit que la review voit."
+    inputs:
+      - registry: ir
+        id: declared_permits
+        role: required
+      - registry: ir
+        id: fetch_resolved_url
+        role: required
+    premises:
+      - operator: member_of
+        operands:
+          - registry: ir
+            id: code_bearing_fetch
+          - registry: ir
+            id: inert_declared_or_exec_modeled
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: fetch_artifact_class
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["RequiredCapabilities", "DeclaredPermits"]
+      relation: subset
+      pipeline_stage: permits_check
+    diagnostics: ["NIKA-SEC-008", "NIKA-SEC-004"]
+    fixtures:
+      - conformance/tests/core/authority/020-fetch-inert-data-passes
+      - conformance/tests/core/authority/021-inert-door-declared-passes
+    negative_fixtures:
+      - conformance/tests/core/authority/018-fetch-code-bearing-serialized-refused
+      - conformance/tests/core/authority/019-fetch-code-bearing-script-refused
+      - conformance/tests/core/authority/022-inert-door-empty-refused
+      - conformance/tests/runtime/permits/007-fetch-code-bearing-runtime-refusal
+    projections: ["prose:10-authority", "cli:check", "sdk"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:deep_static.py
+      - cli:nika-check
+      - conformance:authority-suite
+    introduced_in: C1
+    proof_obligations:
+      - "NEP-0006 loi 1 : les fixtures 018 (classe sérialisé-exécutable · .pkl) et 019 (classe script · .sh) observent le refus NIKA-SEC-008 au check sur URL littérale · la fixture 020 prouve que la donnée inerte (csv · json) reste verte · une fixture par classe garde les deux listes miroir (oracle Python · engine Rust) honnêtes par le différentiel LAW-AUTH-0319."
+      - "NEP-0006 lois 2 : la fixture 021 prouve la porte (inert avec because non-vide · le .pkl passe) · la fixture 022 prouve que la porte vide est refusée (le because EST la substance) · la porte ne lève JAMAIS le boundary net.http (le host doit rester permis · les fixtures le déclarent)."
+      - "NEP-0006 lois 3-4 : le contrat runtime/permits/007 porte le cas dynamique (URL input sans défaut · DEFER au check · refus NIKA-SEC-004 au run sur l'URL résolue) · census à engine 7cf8d2ba7 / spec aa96468 · zéro workflow corpus ne fetch une URL code-porteuse · la seule bascule est la fixture adversariale engine f1-02 (install.sh) qui DEVIENT la preuve vivante (reclassée · le pattern f3-03 de F-O1)."
+    closure_gates:
+      - data-as-code-check-refusal
+      - inert-door-engine-flip

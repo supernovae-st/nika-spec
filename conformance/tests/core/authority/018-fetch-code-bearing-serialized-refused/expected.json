@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-SEC-008", "category": "security_error" }
+  ],
+  "note": "NEP-0006 law 1 · the serialized-executable class (the deserializer runs code at load · the HF loader-RCE vector) · the host being permitted says nothing: the read hides an execution sink · both repairs ride the diagnostic (model as exec · or declare inert:)."
+}

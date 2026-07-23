@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: t-inert-door-empty
+permits:
+  net: { http: ["data.example.com"] }
+  tools: ["nika:fetch"]
+tasks:
+  archive:
+    invoke:
+      tool: nika:fetch
+      args: { url: "https://data.example.com/models/legacy.pkl" }
+    inert: ""
