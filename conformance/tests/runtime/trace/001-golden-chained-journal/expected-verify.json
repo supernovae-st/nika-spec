@@ -1,4 +1,4 @@
 {
- "verdict": "finding",
- "note": "the REAL golden · 2 tasks · 8 frames · produced by the engine at the F-O7 pin (trace_format: 2 · the prologue manifest · the chain walks end to end, head sealed) · verdict FINDING and not clean, honestly: this run exercised effects (an exec) and predates the NEP-0007 witness, so zero permit_checked frames exist · the moment the engine lane lands, a fresh golden with witness frames replaces this one and the verdict flips to clean (the swap is the engine flip's proof)."
+ "verdict": "clean",
+ "note": "the REAL golden · 2 tasks · 10 frames · produced by the engine WITH the NEP-0007 witness (trace_format: 2 · the prologue manifest · the chain walks end to end) · the permit_checked pair rides between task_started and the terminal — the exec program gate (gate: echo · allow) and the env composition (gate: NIKA_GOLDEN_CANARY · allow) · verdict CLEAN: the run exercised effects AND carries its witness, exactly what the required-witness rule asks · the pre-witness 8-frame golden (verdict finding) lives in git history — the swap IS the engine flip's proof."
 }

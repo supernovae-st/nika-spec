@@ -6,5 +6,5 @@
    "output": "passed-through"
   }
  },
- "note": "NEP-0005 law 2 · the declared name passes exactly this engine variable through · the pair with 005 is the whole law: same workflow, same canary, one declared line flips ABSENT to the value."
+ "note": "NEP-0005 law 2 · the declared name passes exactly this engine variable through · printenv prints the composed value · the pair with 005 is the whole law: same probe, same canary, one declared line flips the exit-1 absence into the value."
 }
