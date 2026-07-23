@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-SEC-008", "category": "security_error" }
+  ],
+  "note": "NEP-0006 law 1 (as amended 2026-07-23 · the red-team bypass): the verdict reads the decoded final segment exactly once (RFC 3986 §2.3 · the origin resolver decodes once too) · legacy%2epkl ≡ legacy.pkl ≡ the serialized-executable class · double-encoded %252e stays inert by design."
+}

@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: t-fetch-versioned-native
+permits:
+  net: { http: ["data.example.com"] }
+  tools: ["nika:fetch"]
+tasks:
+  grab:
+    invoke:
+      tool: nika:fetch
+      args: { url: "https://data.example.com/lib/libevil.so.1.2.3" }

@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-SEC-008", "category": "security_error" }
+  ],
+  "note": "NEP-0006 law 1 (as amended 2026-07-23): lib.so.1.2.3 IS the on-disk shape dlopen loads · the trailing .N groups strip before the native-class match · a versioned non-native name (model.pt.2) stays inert (not a convention)."
+}

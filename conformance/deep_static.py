@@ -749,12 +749,23 @@ def _code_bearing_class(url: str):
     import urllib.parse
     import posixpath
     path = urllib.parse.urlparse(url).path
+    # O7-A · the encoded-extension bypass (red team 2026-07-23): classify
+    # the DECODED final segment exactly once (the origin decodes once too
+    # · RFC 3986 §2.3) · `%2e` ≡ `.` and double-encoded `%252e` stays inert.
+    path = urllib.parse.unquote(path)
+    # O7-B · the versioned native form (`lib.so.1.2` IS what dlopen loads)
+    # · strip trailing `.N` groups before the native-class match.
+    native_base = path.rstrip("0123456789.")
     ext = posixpath.splitext(path)[1].lower()
     if not ext:
         return None
     for cls, exts in _CODE_BEARING_CLASSES.items():
         if ext in exts:
             return cls, ext
+    if native_base != path:
+        native_ext = posixpath.splitext(native_base)[1].lower()
+        if native_ext in _CODE_BEARING_CLASSES.get("executable binary/module", ()):
+            return "executable binary/module", native_ext
     return None
 
 
