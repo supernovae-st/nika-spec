@@ -7,4 +7,4 @@ permits:
   env: ["NIKA_RT_CANARY"]
 tasks:
   probe:
-    exec: { shell: "echo ${NIKA_RT_CANARY:-ABSENT}" }
+    exec: { command: ["sh", "-c", "echo ${NIKA_RT_CANARY:-ABSENT}"] }

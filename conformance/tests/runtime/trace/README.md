@@ -1,11 +1,12 @@
-# Trace verify contracts · RESERVED (post-announce)
+# Trace verify contracts · LIVE (engine-consumed)
 
 The execution-half contracts of [17 · Trace](../../../spec/17-trace.md)
 (NEP-0007): a REAL journal (`trace.ndjson` · produced by a conformant
 engine · chained · byte-verifiable) plus the verify verdict the walk
 MUST reach. The static gate ignores this tier (no `input.yaml`); the
-executable proof lands engine-side with the F-O6 lane (`nika trace
-verify`).
+executable proof is engine-side (`nika trace verify` · the reference
+engine replays every fixture in its conformance battery and holds the
+verdict).
 
 ## Contract shape
 
