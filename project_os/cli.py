@@ -36,15 +36,16 @@ def render_readme(manifest: dict[str, Any]) -> str:
     fields = manifest["fields"]
     views = manifest["views"]
     sources = manifest["sources"]
+    signal = next(field for field in fields if field["name"] == "Signal")
     lines = [
-        "## Nika Project OS",
+        "## 🦋 Nika Project OS",
         "",
-        "This Project is a public projection, not another backlog. "
+        "**One public operating surface. Zero second backlog.** "
         "The record, issues, pull requests and releases stay authoritative in "
         "their own sources. Hand edits to projector-owned fields are repaired "
         "on the next reconciliation.",
         "",
-        "### The SSOT map",
+        "### 🧬 The SSOT map",
         "",
         "| Source | Owns |",
         "|---|---|",
@@ -55,7 +56,7 @@ def render_readme(manifest: dict[str, Any]) -> str:
     lines.extend(
         [
             "",
-            "### The lenses",
+            "### 🪞 Eight lenses, one truth",
             "",
             "| Lens | Layout | Purpose |",
             "|---|---|---|",
@@ -68,7 +69,21 @@ def render_readme(manifest: dict[str, Any]) -> str:
     lines.extend(
         [
             "",
-            "### The field contract",
+            "### 🚨 Read Signal first",
+            "",
+            "`Signal` is derived attention. It never replaces the human-owned "
+            "`Priority` or `Effort` fields.",
+            "",
+            "| Signal | Meaning |",
+            "|---|---|",
+        ]
+    )
+    for option in signal["options"]:
+        lines.append(f"| **{option[0]}** | {option[2]} |")
+    lines.extend(
+        [
+            "",
+            "### 🎛 The field contract",
             "",
             "| Field | Writer |",
             "|---|---|",
@@ -79,15 +94,17 @@ def render_readme(manifest: dict[str, Any]) -> str:
     lines.extend(
         [
             "",
-            "### Safety",
+            "### 🔒 Projection laws",
             "",
             "- Reconciliation is incremental. The projector never wipes the Project.",
             "- Unknown items are quarantined, not deleted.",
             "- Removed managed items are retained as orphans, preserving Insights history.",
             "- Gates carry conditions, never dates.",
+            "- Every projector-owned classification carries one stable semantic sigil.",
+            "- Priority and Effort remain explicit human decisions.",
             "- Views and Insights are browser-only GitHub state. Their exact recipe is versioned in [`project/project-os.yaml`](https://github.com/supernovae-st/nika-spec/blob/main/project/project-os.yaml).",
             "",
-            "Record: [`timeline/timeline.yaml`](https://github.com/supernovae-st/nika-spec/blob/main/timeline/timeline.yaml) · rendered timeline: https://nika.sh/timeline",
+            "📜 Record: [`timeline/timeline.yaml`](https://github.com/supernovae-st/nika-spec/blob/main/timeline/timeline.yaml) · rendered timeline: https://nika.sh/timeline",
         ]
     )
     return "\n".join(lines)

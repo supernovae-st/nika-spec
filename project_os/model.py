@@ -9,17 +9,68 @@ from typing import Any, Iterable
 
 ORG = "supernovae-st"
 MARKER_PREFIX = "nika-project-os:ssot:"
-STAGE_GATE = "gate · conditions open"
-STAGE_SHIPPED = "shipped · in the record"
-STAGE_WORK = "work · active"
-STAGE_REVIEW = "review · integrating"
-STAGE_RELEASE = "release · published"
+ITEM_RECORD = "📜 Record"
+ITEM_GATE = "🚪 Gate"
+ITEM_ISSUE = "🧩 Issue"
+ITEM_PULL_REQUEST = "🔀 Pull request"
+ITEM_RELEASE = "📦 Release"
+STAGE_GATE = "🚪 gate · conditions open"
+STAGE_SHIPPED = "✅ shipped · in the record"
+STAGE_WORK = "🛠 work · active"
+STAGE_REVIEW = "🔍 review · integrating"
+STAGE_RELEASE = "📦 release · published"
 ERA_AHEAD = "◇ ahead"
 ERA_LABEL = {
     "exploration": "✧ exploration",
     "brouillon": "✎ brouillon",
     "diamond": "◆ diamond",
 }
+KIND_RELEASE = "📦 release"
+KIND_MILESTONE = "◆ milestone"
+KIND_GATE = "🚪 gate"
+KIND_ISSUE = "🧩 issue"
+KIND_PULL_REQUEST = "🔀 pull request"
+POLE_PRODUCT = "01 · 🧭 product"
+POLE_ENGINEERING = "02 · ⚙ engineering"
+POLE_GROWTH = "03 · 🌱 growth"
+POLE_IDENTITY = "04 · ✦ identity"
+POLE_COMMUNITY = "05 · 🤝 community"
+POLE_REVENUE = "06 · ◈ revenue"
+POLE_OPERATIONS = "07 · 🧰 operations"
+POLE_CHRONICLE = "08 · 📜 chronicle"
+POLE_DATA = "09 · 📊 data"
+HORIZON_NOW = "● now"
+HORIZON_NEXT = "→ next"
+HORIZON_LATER = "⋯ later"
+HORIZON_RECORD = "✓ record"
+CERTAINTY_PROVEN = "✓ proven"
+CERTAINTY_COMMITTED = "◆ committed"
+CERTAINTY_UNKNOWN = "? unknown"
+BLOCK_CLEAR = "✓ clear"
+BLOCK_BLOCKED = "⛓ blocked"
+BLOCK_BLOCKING = "⇢ blocking"
+BLOCK_BOTH = "⛓ both"
+BLOCK_UNKNOWN = "? unknown"
+PROJECTION_SYNCED = "✓ synced"
+PROJECTION_DRIFTED = "△ drifted"
+PROJECTION_ORPHANED = "◌ orphaned"
+PROJECTION_QUARANTINED = "◇ quarantined"
+REVIEW_NOT_APPLICABLE = "· not applicable"
+REVIEW_DRAFT = "✎ draft"
+REVIEW_NEEDED = "◌ review needed"
+REVIEW_APPROVED = "✓ approved"
+REVIEW_CHANGES_REQUESTED = "! changes requested"
+CI_NOT_APPLICABLE = "· not applicable"
+CI_PENDING = "◌ pending"
+CI_GREEN = "✓ green"
+CI_RED = "✗ red"
+CI_UNKNOWN = "? unknown"
+SIGNAL_ATTENTION = "🚨 attention"
+SIGNAL_REVIEW = "👀 review"
+SIGNAL_ACTIVE = "▶ active"
+SIGNAL_QUEUED = "⏭ queued"
+SIGNAL_READY = "✓ ready"
+SIGNAL_SETTLED = "● settled"
 PROVEN_CLASSES = {
     "crates-io",
     "github-release",
@@ -153,10 +204,10 @@ def gate_body(gate: dict[str, Any], ssot_id: str) -> str:
 
 def certainty_for_proof(proof: str) -> str:
     if proof == "✓ proven":
-        return "Proven"
+        return CERTAINTY_PROVEN
     if proof == "○ labeled":
-        return "Unknown"
-    return "Committed"
+        return CERTAINTY_UNKNOWN
+    return CERTAINTY_COMMITTED
 
 
 def timeline_items(doc: dict[str, Any]) -> list[DesiredItem]:
@@ -170,24 +221,25 @@ def timeline_items(doc: dict[str, Any]) -> list[DesiredItem]:
         is_release = entry.get("type") == "release"
         fields = {
             "SSOT ID": ssot_id,
-            "Item type": "Release" if is_release else "Record",
+            "Item type": ITEM_RELEASE if is_release else ITEM_RECORD,
             "Stage": STAGE_SHIPPED,
             "Era": era_of(entry),
-            "Kind": "release" if is_release else "milestone",
+            "Kind": KIND_RELEASE if is_release else KIND_MILESTONE,
             "Proof": proof,
             "Status": "Done",
             "When": when,
             "Order": order,
-            "Pole": "08 · chronicle" if entry.get("component") is None else "02 · engineering",
-            "Horizon": "Record",
+            "Pole": POLE_CHRONICLE if entry.get("component") is None else POLE_ENGINEERING,
+            "Horizon": HORIZON_RECORD,
             "Certainty": certainty_for_proof(proof),
             "Start": when,
             "Target": when,
             "Release": f"v{entry['version']}" if entry.get("version") else None,
-            "Block state": "Clear",
-            "Projection state": "Synced",
-            "Review state": "Not applicable",
-            "CI state": "Not applicable",
+            "Block state": BLOCK_CLEAR,
+            "Projection state": PROJECTION_SYNCED,
+            "Review state": REVIEW_NOT_APPLICABLE,
+            "CI state": CI_NOT_APPLICABLE,
+            "Signal": SIGNAL_SETTLED,
         }
         items.append(
             DesiredItem(
@@ -205,21 +257,22 @@ def timeline_items(doc: dict[str, Any]) -> list[DesiredItem]:
         title = f"gate · {gate['title']}"
         fields = {
             "SSOT ID": ssot_id,
-            "Item type": "Gate",
+            "Item type": ITEM_GATE,
             "Stage": STAGE_GATE,
             "Era": ERA_AHEAD,
-            "Kind": "gate",
+            "Kind": KIND_GATE,
             "Proof": "◌ pending",
             "Status": "Todo",
             "Order": offset + index,
-            "Pole": "01 · product",
-            "Horizon": "Next" if index == 1 else "Later",
-            "Certainty": "Committed",
+            "Pole": POLE_PRODUCT,
+            "Horizon": HORIZON_NEXT if index == 1 else HORIZON_LATER,
+            "Certainty": CERTAINTY_COMMITTED,
             "Release": gate["title"].split(" · ", 1)[0],
-            "Block state": "Clear",
-            "Projection state": "Synced",
-            "Review state": "Not applicable",
-            "CI state": "Not applicable",
+            "Block state": BLOCK_CLEAR,
+            "Projection state": PROJECTION_SYNCED,
+            "Review state": REVIEW_NOT_APPLICABLE,
+            "CI state": CI_NOT_APPLICABLE,
+            "Signal": SIGNAL_QUEUED,
         }
         items.append(
             DesiredItem(
@@ -241,20 +294,20 @@ def label_names(item: dict[str, Any]) -> set[str]:
 
 def pole_from_labels(labels: Iterable[str]) -> str:
     mapping = {
-        "product": "01 · product",
-        "engineering": "02 · engineering",
-        "growth": "03 · growth",
-        "identity": "04 · identity",
-        "community": "05 · community",
-        "revenue": "06 · revenue",
-        "operations": "07 · operations",
-        "chronicle": "08 · chronicle",
-        "data": "09 · data",
+        "product": POLE_PRODUCT,
+        "engineering": POLE_ENGINEERING,
+        "growth": POLE_GROWTH,
+        "identity": POLE_IDENTITY,
+        "community": POLE_COMMUNITY,
+        "revenue": POLE_REVENUE,
+        "operations": POLE_OPERATIONS,
+        "chronicle": POLE_CHRONICLE,
+        "data": POLE_DATA,
     }
     for label in labels:
         if label.startswith("pole/") and label[5:] in mapping:
             return mapping[label[5:]]
-    return "02 · engineering"
+    return POLE_ENGINEERING
 
 
 def accountable(item: dict[str, Any]) -> str | None:
@@ -267,14 +320,14 @@ def accountable(item: dict[str, Any]) -> str | None:
 
 def block_state(blocked_by: int | None, blocking: int | None) -> str:
     if blocked_by is None or blocking is None:
-        return "Unknown"
+        return BLOCK_UNKNOWN
     if blocked_by and blocking:
-        return "Both"
+        return BLOCK_BOTH
     if blocked_by:
-        return "Blocked"
+        return BLOCK_BLOCKED
     if blocking:
-        return "Blocking"
-    return "Clear"
+        return BLOCK_BLOCKING
+    return BLOCK_CLEAR
 
 
 def issue_item(
@@ -286,25 +339,32 @@ def issue_item(
     ssot_id = f"github:issue:{ORG}/{repo}#{issue['number']}"
     milestone = issue.get("milestone") or {}
     target = (milestone.get("due_on") or "")[:10] or None
+    dependency_state = block_state(blocked_by, blocking)
+    has_owner = bool(issue.get("assignees"))
     fields = {
         "SSOT ID": ssot_id,
-        "Item type": "Issue",
+        "Item type": ITEM_ISSUE,
         "Stage": STAGE_WORK,
         "Era": ERA_AHEAD,
-        "Kind": "issue",
+        "Kind": KIND_ISSUE,
         "Proof": "◌ pending",
-        "Status": "In progress" if issue.get("assignees") else "Todo",
+        "Status": "In progress" if has_owner else "Todo",
         "Pole": pole_from_labels(label_names(issue)),
-        "Horizon": "Now" if issue.get("assignees") else "Next",
-        "Certainty": "Committed",
+        "Horizon": HORIZON_NOW if has_owner else HORIZON_NEXT,
+        "Certainty": CERTAINTY_COMMITTED,
         "Start": issue.get("created_at", "")[:10] or None,
         "Target": target,
         "Release": milestone.get("title"),
         "Accountable": accountable(issue),
-        "Block state": block_state(blocked_by, blocking),
-        "Projection state": "Synced",
-        "Review state": "Not applicable",
-        "CI state": "Not applicable",
+        "Block state": dependency_state,
+        "Projection state": PROJECTION_SYNCED,
+        "Review state": REVIEW_NOT_APPLICABLE,
+        "CI state": CI_NOT_APPLICABLE,
+        "Signal": (
+            SIGNAL_ATTENTION
+            if dependency_state in {BLOCK_BLOCKED, BLOCK_BOTH}
+            else SIGNAL_ACTIVE if has_owner else SIGNAL_QUEUED
+        ),
     }
     return DesiredItem(
         ssot_id=ssot_id,
@@ -319,7 +379,7 @@ def issue_item(
 
 def review_state(pull: dict[str, Any], reviews: list[dict[str, Any]]) -> str:
     if pull.get("draft"):
-        return "Draft"
+        return REVIEW_DRAFT
     latest: dict[str, str] = {}
     for review in reviews:
         user = (review.get("user") or {}).get("login")
@@ -328,19 +388,19 @@ def review_state(pull: dict[str, Any], reviews: list[dict[str, Any]]) -> str:
             latest[user] = state
     states = set(latest.values())
     if "CHANGES_REQUESTED" in states:
-        return "Changes requested"
+        return REVIEW_CHANGES_REQUESTED
     if "APPROVED" in states:
-        return "Approved"
-    return "Review needed"
+        return REVIEW_APPROVED
+    return REVIEW_NEEDED
 
 
 def ci_state(checks: list[dict[str, Any]] | None) -> str:
     if checks is None:
-        return "Unknown"
+        return CI_UNKNOWN
     if not checks:
-        return "Unknown"
+        return CI_UNKNOWN
     if any(check.get("status") != "completed" for check in checks):
-        return "Pending"
+        return CI_PENDING
     bad = {
         "action_required",
         "cancelled",
@@ -350,8 +410,18 @@ def ci_state(checks: list[dict[str, Any]] | None) -> str:
         "timed_out",
     }
     if any(check.get("conclusion") in bad for check in checks):
-        return "Red"
-    return "Green"
+        return CI_RED
+    return CI_GREEN
+
+
+def pull_request_signal(pull: dict[str, Any], review: str, ci: str) -> str:
+    if review == REVIEW_CHANGES_REQUESTED or ci == CI_RED:
+        return SIGNAL_ATTENTION
+    if review == REVIEW_APPROVED and ci == CI_GREEN:
+        return SIGNAL_READY
+    if pull.get("draft"):
+        return SIGNAL_ACTIVE
+    return SIGNAL_REVIEW
 
 
 def pull_request_item(
@@ -363,25 +433,28 @@ def pull_request_item(
     ssot_id = f"github:pr:{ORG}/{repo}#{pull['number']}"
     milestone = pull.get("milestone") or {}
     target = (milestone.get("due_on") or "")[:10] or None
+    review = review_state(pull, reviews)
+    ci = ci_state(checks)
     fields = {
         "SSOT ID": ssot_id,
-        "Item type": "Pull request",
+        "Item type": ITEM_PULL_REQUEST,
         "Stage": STAGE_REVIEW,
         "Era": ERA_AHEAD,
-        "Kind": "pull-request",
+        "Kind": KIND_PULL_REQUEST,
         "Proof": "◌ pending",
         "Status": "In progress",
         "Pole": pole_from_labels(label_names(pull)),
-        "Horizon": "Now",
-        "Certainty": "Committed",
+        "Horizon": HORIZON_NOW,
+        "Certainty": CERTAINTY_COMMITTED,
         "Start": pull.get("created_at", "")[:10] or None,
         "Target": target,
         "Release": milestone.get("title"),
         "Accountable": accountable(pull),
-        "Block state": "Clear",
-        "Projection state": "Synced",
-        "Review state": review_state(pull, reviews),
-        "CI state": ci_state(checks),
+        "Block state": BLOCK_CLEAR,
+        "Projection state": PROJECTION_SYNCED,
+        "Review state": review,
+        "CI state": ci,
+        "Signal": pull_request_signal(pull, review, ci),
     }
     return DesiredItem(
         ssot_id=ssot_id,
@@ -410,24 +483,25 @@ def release_item(repo: str, release: dict[str, Any], order: int) -> DesiredItem:
     )
     fields = {
         "SSOT ID": ssot_id,
-        "Item type": "Release",
+        "Item type": ITEM_RELEASE,
         "Stage": STAGE_RELEASE,
         "Era": ERA_LABEL["diamond"],
-        "Kind": "release",
+        "Kind": KIND_RELEASE,
         "Proof": "✓ proven",
         "Status": "Done",
         "When": published or None,
         "Order": order,
-        "Pole": "02 · engineering",
-        "Horizon": "Record",
-        "Certainty": "Proven",
+        "Pole": POLE_ENGINEERING,
+        "Horizon": HORIZON_RECORD,
+        "Certainty": CERTAINTY_PROVEN,
         "Start": published or None,
         "Target": published or None,
         "Release": tag,
-        "Block state": "Clear",
-        "Projection state": "Synced",
-        "Review state": "Not applicable",
-        "CI state": "Not applicable",
+        "Block state": BLOCK_CLEAR,
+        "Projection state": PROJECTION_SYNCED,
+        "Review state": REVIEW_NOT_APPLICABLE,
+        "CI state": CI_NOT_APPLICABLE,
+        "Signal": SIGNAL_SETTLED,
     }
     return DesiredItem(
         ssot_id=ssot_id,
