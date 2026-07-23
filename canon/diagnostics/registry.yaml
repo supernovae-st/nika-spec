@@ -2069,14 +2069,14 @@ diagnostics:
     introduced_in: C1
     namespace: AUTH
     plane: unclassified
-    condition: 'an interpolation reaches a permit bound (host · glob · program) — a bound MUST be a literal, the boundary would be self-serve (F-O1 · NEP-0004)'
+    condition: 'an interpolation reaches a permit bound (host · glob · program · env name) — a bound MUST be a literal, the boundary would be self-serve (F-O1 · NEP-0004 · env per NEP-0005)'
     outcome_class: failure
     cause: security_error
     retryable: false
     terminal: true
     payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
     span_required: false
-    teaching: 'a permit bound is the wall itself: write the literal host/glob/program (net: { http: ["api.example.com"] }) and gate the data in the body — the re-gate (NIKA-AUTH-008) checks the value against the declared bound.'
+    teaching: 'a permit bound is the wall itself: write the literal host/glob/program/env-name (net: { http: ["api.example.com"] } · env: ["CI_COMMIT_SHA"]) and gate the data in the body — the re-gate (NIKA-AUTH-008) checks the value against the declared bound.'
     notes: 'nep-0004 (2026-07-22) · category: security_error · transient: false (canon.yaml verbatim) · minted by the F-O1 spec lane · the engine emission lands with the re-gate flip (F-O1 PR-2/3).'
   - id: NIKA-AUTH-008
     status: reserved
@@ -2095,6 +2095,23 @@ diagnostics:
     span_required: false
     teaching: 'the category grant says nothing about the resolved value · keep the value inside the boundary (the diagnostic carries the taint path source-first + the canonical form + the escaped bound), or declare declassify: on the task — the only door, and never a permit bypass.'
     notes: 'nep-0004 (2026-07-22) · category: security_error · transient: false (canon.yaml verbatim) · minted by the F-O1 spec lane · the run-time twin of this refusal is NIKA-SEC-004 (defense in depth, NEP-0003 law 3 provenance) · the engine emission lands with the re-gate flip (F-O1 PR-2/3).'
+  - id: NIKA-AUTH-009
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0326
+    introduced_in: C1
+    namespace: AUTH
+    plane: unclassified
+    condition: 'a permits env: entry names a dangerous-floor variable · the engine strips the name unconditionally, the grant can never take effect: an inert dead grant (F-O4 · NEP-0005)'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: false
+    teaching: 'the dangerous-name floor (dynamic-linker injection · shell startup sourcing · tool command hooks · interpreter pre-exec hooks · IFS) is never passable · remove the entry: pass authored data through the task env: map, or pass a non-dangerous engine variable by its exact name.'
+    notes: 'nep-0005 (2026-07-23) · category: security_error · transient: false (canon.yaml verbatim) · minted by the F-O4 spec lane · the AUTH family carries the defects of the boundary block itself (006 absent · 007 non-literal bound · 008 re-gate escape · 009 dead grant) · the engine emission lands with the env composition flip (F-O4 engine lane).'
   - id: NIKA-VALUES-001
     status: reserved
     owner: spec
