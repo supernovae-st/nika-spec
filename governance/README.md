@@ -20,6 +20,7 @@ directly, the maintainers included.
 | [0006](nep-0006-data-as-code-sink.md) | The data-as-code sink: a fetch of a code-bearing artifact is never innocent | Standards Track | Draft |
 | [0007](nep-0007-trace-format-and-equivalence.md) | The trace leaves the private dialect: a normative journal, a required witness, a differential oracle | Standards Track | Draft |
 | [0008](nep-0008-egress-permit-bound.md) | The sandboxed egress proxy is the permit's exact projection | Standards Track | Draft |
+| [0009](nep-0009-effective-path-identity.md) | A path grant names an effective path identity, re-judged at dispatch | Standards Track | Draft |
 
 Numbering runs through this door from NEP-0000 onward — pre-1.0 drafts
 included (NEP-0002 is the living proof). The pre-1.0 RULINGS and the ADR
