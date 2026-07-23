@@ -1,0 +1,10 @@
+{
+ "workflow_state": "success",
+ "tasks": {
+  "probe": {
+   "status": "success",
+   "output": "passed-through"
+  }
+ },
+ "note": "NEP-0005 law 2 · the declared name passes exactly this engine variable through · the pair with 005 is the whole law: same workflow, same canary, one declared line flips ABSENT to the value."
+}

@@ -1,0 +1,10 @@
+{
+ "workflow_state": "success",
+ "tasks": {
+  "probe": {
+   "status": "success",
+   "output": "ABSENT"
+  }
+ },
+ "note": "NEP-0005 law 1 · the harness plants the canary in the ENGINE environment (run.json env per tests/runtime/README.md) · no env: category, so the child composes floor-only and the canary never crosses · the shell parameter default proves the absence: composition is silent, the tool speaks."
+}

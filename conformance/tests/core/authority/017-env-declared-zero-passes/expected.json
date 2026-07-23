@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "NEP-0005 law 1 · env: [] is the authored spelling of « no passthrough », identical in effect to omitting the category (default-deny once the block is present) · the child sees the runner env floor plus the task env: map, nothing else."
+}

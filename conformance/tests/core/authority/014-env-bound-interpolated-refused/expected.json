@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-AUTH-007", "category": "security_error" }
+  ],
+  "note": "NEP-0005 law 4 + LAW-AUTH-0325 · a bound is a literal in EVERY category, the env list included · interpolation reaches the bound itself, hard refusal before any token (the default resolving to a clean name is irrelevant: there is nothing left to match against)."
+}
