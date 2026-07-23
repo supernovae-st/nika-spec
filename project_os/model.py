@@ -310,12 +310,16 @@ def pole_from_labels(labels: Iterable[str]) -> str:
     return POLE_ENGINEERING
 
 
-def accountable(item: dict[str, Any]) -> str | None:
+def accountable(
+    item: dict[str, Any], *, include_author: bool = False
+) -> str | None:
     assignees = [actor["login"] for actor in item.get("assignees", [])]
     if assignees:
         return ", ".join(sorted(assignees))
-    user = item.get("user") or {}
-    return user.get("login")
+    if include_author:
+        user = item.get("user") or {}
+        return user.get("login")
+    return None
 
 
 def block_state(blocked_by: int | None, blocking: int | None) -> str:
@@ -449,7 +453,7 @@ def pull_request_item(
         "Start": pull.get("created_at", "")[:10] or None,
         "Target": target,
         "Release": milestone.get("title"),
-        "Accountable": accountable(pull),
+        "Accountable": accountable(pull, include_author=True),
         "Block state": BLOCK_CLEAR,
         "Projection state": PROJECTION_SYNCED,
         "Review state": review,

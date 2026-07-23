@@ -33,7 +33,7 @@ def load_yaml(path: pathlib.Path) -> dict[str, Any]:
 
 
 def render_readme(manifest: dict[str, Any]) -> str:
-    fields = manifest["fields"]
+    fields = manifest["fields"] + manifest.get("built_in_fields", [])
     views = manifest["views"]
     insights = manifest["insights"]
     sources = manifest["sources"]
@@ -152,6 +152,9 @@ def main(argv: list[str] | None = None) -> int:
     manifest = load_yaml(MANIFEST_PATH)
     timeline = load_yaml(TIMELINE_PATH)
     project_definition = manifest["project"]
+    field_definitions = (
+        manifest["fields"] + manifest.get("built_in_fields", [])
+    )
     client = GitHub(token)
     try:
         project = load_project(
@@ -205,7 +208,7 @@ def main(argv: list[str] | None = None) -> int:
             project["id"],
             desired,
             fields,
-            manifest["fields"],
+            field_definitions,
             apply=apply,
         )
     except (GitHubError, OSError, ValueError) as error:

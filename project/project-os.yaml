@@ -189,6 +189,13 @@ fields:
       - ["✗ red", RED, "at least one visible check failed"]
       - ["? unknown", GRAY, "check state unavailable"]
 
+built_in_fields:
+  - name: Status
+    type: SINGLE_SELECT
+    writer: projector
+    visibility: flow
+    allowed_values: [Todo, "In progress", Done]
+
 views:
   - name: "🧭 Command · the rail"
     layout: TABLE

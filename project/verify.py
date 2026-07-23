@@ -124,8 +124,28 @@ def offline_findings(
                         findings.append(
                             f"{field.get('name')}: {option!r} lacks a semantic sigil"
                         )
+    built_in_fields = manifest.get("built_in_fields", [])
+    built_in_names = [field["name"] for field in built_in_fields]
+    if len(built_in_names) != len(set(built_in_names)):
+        findings.append("built-in field names must be unique")
+    unknown_built_ins = sorted(
+        set(built_in_names) - RESERVED_FIELD_NAMES
+    )
+    if unknown_built_ins:
+        findings.append(
+            f"unknown GitHub built-in fields: {unknown_built_ins}"
+        )
+    overlap = sorted(set(names) & set(built_in_names))
+    if overlap:
+        findings.append(
+            f"fields cannot be both custom and built-in: {overlap}"
+        )
+    for field in built_in_fields:
+        if field.get("writer") not in VALID_WRITERS:
+            findings.append(f"{field.get('name')}: invalid writer")
     field_definitions = {
-        field["name"]: field for field in manifest.get("fields", [])
+        field["name"]: field
+        for field in manifest.get("fields", []) + built_in_fields
     }
     signal = field_definitions.get("Signal")
     if not signal or signal.get("writer") != "projector":
@@ -222,8 +242,8 @@ def offline_findings(
                 continue
             options = {
                 option[0] for option in definition.get("options", [])
-            }
-            if value not in options:
+            } or set(definition.get("allowed_values", []))
+            if options and value not in options:
                 findings.append(
                     f"{item.ssot_id}: {field_name} value {value!r} "
                     "is absent from the manifest"
@@ -242,7 +262,10 @@ def live_findings(
     if project["title"] != definition["title"]:
         findings.append("live project title differs from the contract")
     live_fields = project_fields(client, project["id"])
-    for field in manifest["fields"]:
+    live_definitions = (
+        manifest["fields"] + manifest.get("built_in_fields", [])
+    )
+    for field in live_definitions:
         current = live_fields.get(field["name"])
         if current is None:
             findings.append(f"live field missing: {field['name']}")
@@ -255,6 +278,7 @@ def live_findings(
         if (
             field["type"] == "SINGLE_SELECT"
             and field.get("writer") != "human"
+            and field.get("options")
         ):
             expected_options = [
                 option[0] for option in field.get("options", [])

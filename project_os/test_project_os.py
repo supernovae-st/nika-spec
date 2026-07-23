@@ -31,6 +31,7 @@ from project_os.model import (
     SIGNAL_ATTENTION,
     SIGNAL_QUEUED,
     SIGNAL_READY,
+    accountable,
     block_state,
     ci_state,
     extract_marker,
@@ -128,6 +129,25 @@ class ModelTests(unittest.TestCase):
             SIGNAL_ATTENTION,
         )
 
+    def test_accountable_does_not_invent_issue_ownership(self) -> None:
+        unassigned = {
+            "assignees": [],
+            "user": {"login": "issue-author"},
+        }
+        self.assertIsNone(accountable(unassigned))
+        self.assertEqual(
+            accountable(unassigned, include_author=True),
+            "issue-author",
+        )
+        assigned = {
+            "assignees": [
+                {"login": "nika"},
+                {"login": "thibaut"},
+            ],
+            "user": {"login": "issue-author"},
+        }
+        self.assertEqual(accountable(assigned), "nika, thibaut")
+
 
 class ReconcileTests(unittest.TestCase):
     def setUp(self) -> None:
@@ -142,11 +162,25 @@ class ReconcileTests(unittest.TestCase):
                     {"id": "O3", "name": PROJECTION_QUARANTINED},
                 ],
             },
+            "Status": {
+                "id": "F3",
+                "dataType": "SINGLE_SELECT",
+                "options": [
+                    {"id": "O4", "name": "Todo"},
+                    {"id": "O5", "name": "In progress"},
+                    {"id": "O6", "name": "Done"},
+                ],
+            },
         }
         self.definitions = [
             {"name": "SSOT ID", "type": "TEXT", "writer": "projector"},
             {
                 "name": "Projection state",
+                "type": "SINGLE_SELECT",
+                "writer": "projector",
+            },
+            {
+                "name": "Status",
                 "type": "SINGLE_SELECT",
                 "writer": "projector",
             },
@@ -225,6 +259,44 @@ class ReconcileTests(unittest.TestCase):
             actions,
         )
         self.assertFalse(any("delete" in action for action in actions))
+
+    def test_projector_repairs_the_native_status_field(self) -> None:
+        actual = ActualItem(
+            item_id="ITEM",
+            content_id="ISSUE",
+            content_kind="PullRequest",
+            title="Ready pull request",
+            body="",
+            url="https://github.com/supernovae-st/nika/pull/1",
+            fields={
+                "SSOT ID": "github:pr:supernovae-st/nika#1",
+                "Status": "Todo",
+            },
+        )
+        desired = DesiredItem(
+            ssot_id="github:pr:supernovae-st/nika#1",
+            title="Ready pull request",
+            body="",
+            fields={
+                "SSOT ID": "github:pr:supernovae-st/nika#1",
+                "Status": "In progress",
+            },
+            content_id="ISSUE",
+            content_kind="PullRequest",
+        )
+        with patch("project_os.github.snapshot_items", return_value=[actual]):
+            actions = reconcile(
+                object(),
+                "PROJECT",
+                [desired],
+                self.fields,
+                self.definitions,
+                apply=False,
+            )
+        self.assertIn(
+            "field github:pr:supernovae-st/nika#1 · Status",
+            actions,
+        )
 
 
 class GitHubClientTests(unittest.TestCase):
