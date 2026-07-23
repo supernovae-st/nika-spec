@@ -46,6 +46,7 @@
 # surface · NIKA-PARSE for shape rules · runner-protocol.md matching).
 
 from __future__ import annotations
+import ipaddress
 import re
 import shutil
 import subprocess
@@ -724,6 +725,94 @@ def env_dead_grant_errors(doc: dict) -> list[dict]:
     return errs
 
 
+# NEP-0008 / LAW-AUTH-0328 · the sandboxed egress proxy is the permit's
+# exact projection. Two check laws mirror the engine (the LAW-AUTH-0319
+# differential keeps engine and reference honest) · the `*` wildcard
+# outside the bare `*` entry is refused (NIKA-AUTH-010) and an exact
+# entry naming a floor-blocked target is an inert dead grant
+# (NIKA-AUTH-011). The mirror covers the STATIC classes only · a hostname
+# that merely RESOLVES to a blocked address is the runtime dial's half
+# (the proxy-side per-address check), never the static check's.
+_NET_METADATA_HOSTNAMES = frozenset({"metadata.google.internal", "metadata.goog"})
+
+
+def _net_host_static_blocked(entry: str) -> bool:
+    """Mirror of the engine's `host_is_blocked` (nika-types net.rs): the
+    localhost family (RFC 6761 · any `*.localhost` label), a cloud-metadata
+    hostname, or a literal address that is not a public unicast (loopback ·
+    private · link-local · CGN · documentation · reserved). Case-insensitive
+    and trailing-FQDN-dot normalized, v6 brackets stripped."""
+    trimmed = entry.strip().rstrip(".")
+    last_label = trimmed.rsplit(".", 1)[-1]
+    if last_label.lower() == "localhost":
+        return True
+    if trimmed.lower() in _NET_METADATA_HOSTNAMES:
+        return True
+    literal = trimmed.lstrip("[").rstrip("]")
+    try:
+        ip = ipaddress.ip_address(literal)
+    except ValueError:
+        return False
+    return not ip.is_global
+
+
+def _is_exact_loopback_literal(entry: str) -> bool:
+    """Mirror of the engine's closed declassification vocabulary: the bare
+    `localhost` name · a 127/8 v4 literal · v6 `::1` (bracketed or bare).
+    NEVER a glob, NEVER the `*.localhost` family, never another range."""
+    trimmed = entry.strip().rstrip(".")
+    if trimmed.lower() == "localhost":
+        return True
+    literal = trimmed.lstrip("[").rstrip("]")
+    try:
+        return ipaddress.ip_address(literal).is_loopback
+    except ValueError:
+        return False
+
+
+def net_egress_boundary_errors(doc: dict) -> list[dict]:
+    """NEP-0008 laws 1 + 5 · a `*` in a net.http entry (any position but
+    the whole bare-`*` entry) is refused at check (NIKA-AUTH-010) · an
+    exact entry naming a floor-blocked target is an inert dead grant
+    (NIKA-SEC-005 · the floor-parity class the engine has always spoken ·
+    permits_fit.rs « Dead grants ») · an exact loopback literal is NOT a
+    dead grant (it is the author's explicit declassification of the floor
+    for that host only). An interpolated entry is NEP-0004's ground
+    (NIKA-AUTH-007 · the generic bound walk), never judged here."""
+    permits = doc.get("permits")
+    if not isinstance(permits, dict):
+        return []
+    net = permits.get("net")
+    if not isinstance(net, dict):
+        return []
+    entries = net.get("http")
+    if not isinstance(entries, list):
+        return []
+    errs: list[dict] = []
+    for i, entry in enumerate(entries):
+        if not isinstance(entry, str):
+            continue
+        if "*" in entry and entry != "*":
+            errs.append({"code": "NIKA-AUTH-010", "namespace": "NIKA-AUTH",
+                         "category": "security_error",
+                         "detail": f"permit entry 'permits.net.http[{i}]' carries a wildcard "
+                                   f"({entry!r}) · a glob delegates the permit to the zone "
+                                   "operator (ambient authority · NEP-0008 law 1) · name exact "
+                                   "hosts, or use the bare '*' for explicit full egress"})
+            continue
+        if (entry != "*" and _net_host_static_blocked(entry)
+                and not _is_exact_loopback_literal(entry)):
+            errs.append({"code": "NIKA-SEC-005", "namespace": "NIKA-SEC",
+                         "category": "security_error",
+                         "detail": f"permit entry 'permits.net.http[{i}]' names the "
+                                   f"floor-blocked target {entry!r} · the always-on SSRF floor "
+                                   "refuses it before the allowlist is consulted, the grant can "
+                                   "never take effect (an inert dead grant · NEP-0008 law 5 · "
+                                   "the floor parity) · remove the entry (only an exact "
+                                   "loopback literal may be declassified)"})
+    return errs
+
+
 # NEP-0006 / LAW-AUTH-0327 · the data-as-code sink. The v1 code-bearing
 # classes are CLOSED and normative (the exact list ships in the NEP · only
 # a NEP amends it) · the reference mirrors the engine's list and the
@@ -1029,6 +1118,11 @@ def deep_static_errors(doc: dict) -> list[dict]:
     # ENV-DEAD-GRANT · NEP-0005 (LAW-AUTH-0326) · a dangerous-floor name
     # in permits.env: is an inert dead grant (NIKA-AUTH-009)
     errs.extend(env_dead_grant_errors(doc))
+
+    # NET-EGRESS-BOUNDARY · NEP-0008 (LAW-AUTH-0328) · the wildcard is
+    # refused (NIKA-AUTH-010) · a floor-blocked entry is an inert dead
+    # grant (NIKA-AUTH-011)
+    errs.extend(net_egress_boundary_errors(doc))
 
     # DATA-AS-CODE · NEP-0006 (LAW-AUTH-0327) · a code-bearing fetch is
     # refused unless the task declares the inert: door (NIKA-SEC-008)

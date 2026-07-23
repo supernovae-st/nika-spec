@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: t-net-http-wildcard-refused
+permits:
+  net: { http: ["*.github.com"] }
+  exec: ["curl"]
+tasks:
+  fetch:
+    exec: { command: ["curl", "-sS", "https://api.github.com/zen"] }

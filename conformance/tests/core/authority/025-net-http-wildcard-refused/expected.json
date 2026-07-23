@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-AUTH-010", "category": "security_error" }
+  ],
+  "note": "NEP-0008 law 1 · the wildcard delegates the permit to the zone operator (ambient authority) · exact hosts only, the bare '*' stays the explicit escape · refused at check."
+}
