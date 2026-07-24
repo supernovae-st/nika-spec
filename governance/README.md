@@ -21,6 +21,7 @@ directly, the maintainers included.
 | [0007](nep-0007-trace-format-and-equivalence.md) | The trace leaves the private dialect: a normative journal, a required witness, a differential oracle | Standards Track | Draft |
 | [0008](nep-0008-egress-permit-bound.md) | The sandboxed egress proxy is the permit's exact projection | Standards Track | Draft |
 | [0009](nep-0009-effective-path-identity.md) | A path grant names an effective path identity, re-judged at dispatch | Standards Track | Draft |
+| [0010](nep-0010-run-entropy-clock.md) | Every source of randomness and time is declared at the envelope's `run:` block | Standards Track | Draft |
 
 Numbering runs through this door from NEP-0000 onward — pre-1.0 drafts
 included (NEP-0002 is the living proof). The pre-1.0 RULINGS and the ADR
