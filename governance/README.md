@@ -22,6 +22,7 @@ directly, the maintainers included.
 | [0008](nep-0008-egress-permit-bound.md) | The sandboxed egress proxy is the permit's exact projection | Standards Track | Draft |
 | [0009](nep-0009-effective-path-identity.md) | A path grant names an effective path identity, re-judged at dispatch | Standards Track | Draft |
 | [0010](nep-0010-run-entropy-clock.md) | Every source of randomness and time is declared at the envelope's `run:` block | Standards Track | Draft |
+| [0011](nep-0011-run-lifecycle-attestation.md) | The run's lifecycle is attested: boot manifest, teardown seal, verifier-borne incomplete | Standards Track | Draft |
 
 Numbering runs through this door from NEP-0000 onward — pre-1.0 drafts
 included (NEP-0002 is the living proof). The pre-1.0 RULINGS and the ADR
