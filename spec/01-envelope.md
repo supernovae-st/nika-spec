@@ -616,7 +616,12 @@ refused in both parse modes, like `permits:`).
   legal pairs are `ambient × system` (the status quo) and
   `none | seeded × virtual` (the deterministic states). A declared
   contradiction (`ambient × virtual` · `none | seeded × system`) is
-  refused at parse (`NIKA-PARSE-019`).
+  refused at parse (`NIKA-PARSE-026` · `NIKA-PARSE-027`). The
+  contradiction is judged on the DECLARED pair: `clock: virtual` alone
+  (entropy left implicit) stays legal — a test configuration that makes
+  no determinism claim. And `entropy: none` with a structural randomness
+  source consumed (a live retry jitter · `nika:uuid`) is refused at
+  check (`NIKA-PARSE-028`).
 - **One run, one clock**: the declaration lives at the envelope, never
   per task — a run has exactly one entropy source and one clock, so the
   composition stays auditable.
