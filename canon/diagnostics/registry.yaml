@@ -704,6 +704,40 @@ diagnostics:
       mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
       is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
       span obligation not stated by the source → span_required false.'
+  - id: NIKA-PARSE-026
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-TEMPORAL-0435
+    introduced_in: C1
+    namespace: PARSE
+    plane: unclassified
+    condition: 'a declared entropy x clock contradiction · entropy: ambient paired with clock: virtual — the ambient declaration contradicts the determinism demand (NEP-0010 · F-P3)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'the dimensions couple · byte-identical journals need deterministic TIME as much as deterministic randomness · the only legal pairs are ambient x system (the status quo) and none|seeded x virtual (the deterministic states) · drop the virtual clock, or declare the deterministic pair.'
+    notes: 'nep-0010 (2026-07-23) · category: validation_error · transient: false (canon.yaml verbatim) · minted by the F-P3 spec lane · the engine parses with the registered generic NIKA-PARSE-019 until this mint lands (the commit names the follow-up) · the mirror contradiction is NIKA-PARSE-027.'
+  - id: NIKA-PARSE-027
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-TEMPORAL-0435
+    introduced_in: C1
+    namespace: PARSE
+    plane: unclassified
+    condition: 'a declared entropy x clock contradiction · entropy: none | seeded paired with clock: system — deterministic journals cannot ride the wall clock (NEP-0010 · F-P3)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'byte-identical journals require deterministic TIME as much as deterministic randomness · a seeded or none entropy declaration must pair with clock: virtual (NEP-0010) · the wall clock leaks wall time into the journal and the promise dies.'
+    notes: 'nep-0010 (2026-07-23) · category: validation_error · transient: false (canon.yaml verbatim) · minted by the F-P3 spec lane · the mirror contradiction is NIKA-PARSE-026.'
   - id: NIKA-PARSE-025
     status: reserved
     owner: spec
