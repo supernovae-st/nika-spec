@@ -1944,3 +1944,52 @@ laws:
     closure_gates:
       - stop-sampling-reservation-held
       - fixture-parity
+  - id: LAW-TEMPORAL-0435
+    slug: temporal/run-entropy-clock-declared
+    status: active
+    owner: spec
+    domain: TEMPORAL
+    title: "Le run déclare son entropie et son horloge (run:) · les dimensions couplent · ambient×system ou none|seeded×virtual"
+    prose_projection:
+      chapters: ["01-envelope"]
+      text: "NEP-0010 (lane F-P3 · 2026-07-23) · toute source d'aléa et de temps qu'un run consomme est DÉCLARÉE, jamais ambiante · le bloc run: (optionnel · absent = ambient+system · le statu quo) porte entropy: none | ambient | { seeded: <u64> } et clock: system | virtual · seeded(N) force les seams déterministes (2 runs du même fichier à N égal = journaux BYTE-identiques) · none exige le déterminisme strict (tout aléa structurel = finding) · ambient est le statu quo honnête · virtual substitue l'horloge virtuelle injectée (un timeout: ρ se lit contre l'horloge déclarée) · LES DIMENSIONS COUPLENT · les journaux byte-identiques exigent le TEMPS déterministe autant que l'aléa · les seules paires légales sont ambient×system et none|seeded×virtual · la contradiction déclarée (ambient×virtual = NIKA-PARSE-026 · none|seeded×system = NIKA-PARSE-027) est refusée au parse · one run = one clock (l'enveloppe, jamais par task)."
+    inputs:
+      - registry: ir
+        id: run_declaration
+        role: required
+    premises:
+      - operator: member_of
+        operands:
+          - registry: ir
+            id: entropy_clock_pair
+          - registry: ir
+            id: legal_determinism_pairs
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: entropy_clock_pair
+      independent_judgment: true
+    domain_payload:
+      kind: temporal
+      measure: resource_budget
+      composition: independent
+    diagnostics: ["NIKA-PARSE-026", "NIKA-PARSE-027"]
+    fixtures: []
+    negative_fixtures: []
+    projections: ["prose:01-envelope", "schema", "cli:check"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - cli:nika-check
+    introduced_in: C1
+    proof_obligations:
+      - "NEP-0010 lois 1-3 · la fixture phare vit côté engine · entropy: seeded(42) × 2 runs = journaux BYTE-identiques (le DeterministicStamper seq→uuid·+10ms le rend vrai) · la paire seeded(42) vs seeded(43) DIVERGE là où vit l'aléa (la fixture byte-identique est non-vacante) · entropy: none + une source d'aléa structurelle consommée = finding · run: absent = le statu quo (regression guard)."
+      - "NEP-0010 loi 4 · les deux contradictions déclarées sont refusées au parse (ambient×virtual · none|seeded×system) · l'engine parle le générique NIKA-PARSE-019 jusqu'au mint 026/027 (son commit nomme le follow-up · cette loi EST le follow-up) · le bloc run: est un set fermé (une clé typo est refusée dans les DEUX modes de parse · le précédent permits:/policy:)."
+    closure_gates:
+      - run-entropy-clock-declared
+      - seeded-journals-byte-identical

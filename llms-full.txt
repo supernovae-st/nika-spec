@@ -1342,6 +1342,38 @@ maps, nothing else). That property is checkable BEFORE the run.
 whitelist scopes ONE task's tools; `permits.tools` scopes the WHOLE workflow
 (the union ceiling). An agent may never be granted a tool outside `permits`.
 
+### `run` · *optional · the run's entropy + clock declaration*
+
+```yaml
+run:
+  entropy: ambient          # none | ambient | { seeded: <u64> }
+  clock: system             # system | virtual
+```
+
+Every source of randomness and time a run consumes is **declared, never
+ambient** (normative · NEP-0010). The block is optional; absent, the run
+behaves exactly as `entropy: ambient` + `clock: system` (the status quo).
+The key set is closed (`{entropy, clock}` only — a typo'd declaration is
+refused in both parse modes, like `permits:`).
+
+- **`entropy: { seeded: N }`** forces the deterministic seams and pins the
+  run's seed: two runs of the same file with the same `N` produce
+  **byte-identical journals**. `entropy: none` demands strict determinism
+  (any structural randomness is a finding). `entropy: ambient` is the
+  honest status quo — legal, and named as what it is.
+- **`clock: virtual`** substitutes the engine's injected virtual clock for
+  wall time: a `timeout:` budget reads against the declared clock, and
+  time becomes a contract input.
+- **The dimensions couple** (normative): byte-identical journals require
+  deterministic TIME as much as deterministic randomness, so the only
+  legal pairs are `ambient × system` (the status quo) and
+  `none | seeded × virtual` (the deterministic states). A declared
+  contradiction (`ambient × virtual` · `none | seeded × system`) is
+  refused at parse (`NIKA-PARSE-019`).
+- **One run, one clock**: the declaration lives at the envelope, never
+  per task — a run has exactly one entropy source and one clock, so the
+  composition stays auditable.
+
 ### `tasks` · **required · a non-empty MAP · the key IS the identity**
 
 ```yaml
