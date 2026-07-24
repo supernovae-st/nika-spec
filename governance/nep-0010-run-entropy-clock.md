@@ -71,9 +71,13 @@ The law (MUST):
    only legal pairs are `ambient × system` (the status quo) and
    `none | seeded × virtual` (the deterministic states): a declared
    contradiction (`ambient × virtual` · `none | seeded × system`) is
-   refused at parse (`NIKA-PARSE-019`). A declaration of strict
-   determinism (`none`) combined with a consumed randomness source is
-   refused at check. A `timeout:` budget against an undeclared clock
+   refused at parse (`NIKA-PARSE-026` · `NIKA-PARSE-027`). The
+   contradiction is judged on the DECLARED pair — `clock: virtual`
+   alone (entropy left implicit) stays legal: it is a test
+   configuration that makes no determinism claim. A declaration of
+   strict determinism (`none`) combined with a consumed randomness
+   source (a live retry jitter · `nika:uuid`) is refused at check
+   (`NIKA-PARSE-028`). A `timeout:` budget against an undeclared clock
    earns an honesty finding — never a refusal (the status quo cannot
    turn red overnight).
 5. **One run, one clock.** The declaration lives at the envelope, never

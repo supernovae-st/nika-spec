@@ -721,6 +721,23 @@ diagnostics:
     span_required: false
     teaching: 'the dimensions couple · byte-identical journals need deterministic TIME as much as deterministic randomness · the only legal pairs are ambient x system (the status quo) and none|seeded x virtual (the deterministic states) · drop the virtual clock, or declare the deterministic pair.'
     notes: 'nep-0010 (2026-07-23) · category: validation_error · transient: false (canon.yaml verbatim) · minted by the F-P3 spec lane · the engine parses with the registered generic NIKA-PARSE-019 until this mint lands (the commit names the follow-up) · the mirror contradiction is NIKA-PARSE-027.'
+  - id: NIKA-PARSE-028
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-TEMPORAL-0435
+    introduced_in: C1
+    namespace: PARSE
+    plane: unclassified
+    condition: 'entropy: none declares strict determinism while a structural randomness source is consumed (a live retry jitter · nika:uuid) — the strict declaration cannot hold (NEP-0010 · F-P3 · judged at check)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'entropy: none promises zero consumed randomness · a live retry jitter (attempts > 1 with backoff) or nika:uuid consumes some by construction · relax the declaration to ambient, or remove the source.'
+    notes: 'nep-0010 (2026-07-23) · category: validation_error · transient: false (canon.yaml verbatim) · minted by the F-P3 spec lane · judged at CHECK (the two parse contradictions are NIKA-PARSE-026/027) · only a LIVE source is judged (a dead jitter consumes nothing).'
   - id: NIKA-PARSE-027
     status: reserved
     owner: spec

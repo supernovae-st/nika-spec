@@ -1952,7 +1952,7 @@ laws:
     title: "Le run déclare son entropie et son horloge (run:) · les dimensions couplent · ambient×system ou none|seeded×virtual"
     prose_projection:
       chapters: ["01-envelope"]
-      text: "NEP-0010 (lane F-P3 · 2026-07-23) · toute source d'aléa et de temps qu'un run consomme est DÉCLARÉE, jamais ambiante · le bloc run: (optionnel · absent = ambient+system · le statu quo) porte entropy: none | ambient | { seeded: <u64> } et clock: system | virtual · seeded(N) force les seams déterministes (2 runs du même fichier à N égal = journaux BYTE-identiques) · none exige le déterminisme strict (tout aléa structurel = finding) · ambient est le statu quo honnête · virtual substitue l'horloge virtuelle injectée (un timeout: ρ se lit contre l'horloge déclarée) · LES DIMENSIONS COUPLENT · les journaux byte-identiques exigent le TEMPS déterministe autant que l'aléa · les seules paires légales sont ambient×system et none|seeded×virtual · la contradiction déclarée (ambient×virtual = NIKA-PARSE-026 · none|seeded×system = NIKA-PARSE-027) est refusée au parse · one run = one clock (l'enveloppe, jamais par task)."
+      text: "NEP-0010 (lane F-P3 · 2026-07-23) · toute source d'aléa et de temps qu'un run consomme est DÉCLARÉE, jamais ambiante · le bloc run: (optionnel · absent = ambient+system · le statu quo) porte entropy: none | ambient | { seeded: <u64> } et clock: system | virtual · seeded(N) force les seams déterministes (2 runs du même fichier à N égal = journaux BYTE-identiques) · none exige le déterminisme strict (tout aléa structurel = finding) · ambient est le statu quo honnête · virtual substitue l'horloge virtuelle injectée (un timeout: ρ se lit contre l'horloge déclarée) · LES DIMENSIONS COUPLENT · les journaux byte-identiques exigent le TEMPS déterministe autant que l'aléa · les seules paires légales sont ambient×system et none|seeded×virtual · la contradiction déclarée (ambient×virtual = NIKA-PARSE-026 · none|seeded×system = NIKA-PARSE-027) est refusée au parse · la contradiction est jugée sur la paire DÉCLARÉE (clock: virtual seul · entropie implicite · reste LÉGAL · une config de test sans claim δ) · entropy: none × une source d'aléa structurelle consommée (jitter de retry vivant · nika:uuid) = NIKA-PARSE-028 au check · one run = one clock (l'enveloppe, jamais par task)."
     inputs:
       - registry: ir
         id: run_declaration
@@ -1979,7 +1979,7 @@ laws:
       kind: temporal
       measure: resource_budget
       composition: independent
-    diagnostics: ["NIKA-PARSE-026", "NIKA-PARSE-027"]
+    diagnostics: ["NIKA-PARSE-026", "NIKA-PARSE-027", "NIKA-PARSE-028"]
     fixtures: []
     negative_fixtures: []
     projections: ["prose:01-envelope", "schema", "cli:check"]
@@ -1989,7 +1989,7 @@ laws:
     introduced_in: C1
     proof_obligations:
       - "NEP-0010 lois 1-3 · la fixture phare vit côté engine · entropy: seeded(42) × 2 runs = journaux BYTE-identiques (le DeterministicStamper seq→uuid·+10ms le rend vrai) · la paire seeded(42) vs seeded(43) DIVERGE là où vit l'aléa (la fixture byte-identique est non-vacante) · entropy: none + une source d'aléa structurelle consommée = finding · run: absent = le statu quo (regression guard)."
-      - "NEP-0010 loi 4 · les deux contradictions déclarées sont refusées au parse (ambient×virtual · none|seeded×system) · l'engine parle le générique NIKA-PARSE-019 jusqu'au mint 026/027 (son commit nomme le follow-up · cette loi EST le follow-up) · le bloc run: est un set fermé (une clé typo est refusée dans les DEUX modes de parse · le précédent permits:/policy:)."
+      - "NEP-0010 loi 4 · les deux contradictions déclarées sont refusées au parse (ambient×virtual · none|seeded×system) · jugées sur la paire DÉCLARÉE (clock: virtual seul reste légal · écart honnête de la lane · une config de test sans claim δ) · entropy: none × source d'aléa vivante = refus au check (NIKA-PARSE-028 · seul un jitter VIVANT est jugé · attempts > 1 avec backoff > 0) · le bloc run: est un set fermé (une clé typo est refusée dans les DEUX modes de parse · le précédent permits:/policy:)."
     closure_gates:
       - run-entropy-clock-declared
       - seeded-journals-byte-identical
