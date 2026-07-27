@@ -13,6 +13,21 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    # One grouped PR per week — never per-action PRs: the codeql-action
+    # init/analyze pair MUST move together (a split bump leaves the two at
+    # different versions inside one workflow run and CodeQL fails · proven
+    # by the first ungrouped wave, 2026-07-19).
+    #
+    # This block lived under the `pip` entry below until 2026-07-27, one
+    # level too deep. YAML took it as a second `groups:` key on `pip`, the
+    # github-actions ecosystem got no grouping at all, and the lesson above
+    # never took effect: PR #204 bumped `init` alone and the run died on
+    # « Loaded a configuration file for version '4.37.3', but running
+    # version '4.37.1' » — the exact failure this comment describes.
+    groups:
+      github-actions:
+        patterns:
+          - "*"
   # The hash-pinned CI toolchain (.github/requirements.txt · uv pip
   # compile --generate-hashes) · dependabot advances the pins + hashes.
   - package-ecosystem: "pip"
@@ -21,13 +36,5 @@ updates:
       interval: "weekly"
     groups:
       pip:
-        patterns:
-          - "*"
-    # One grouped PR per week — never per-action PRs: the codeql-action
-    # init/analyze pair MUST move together (a split bump leaves the two at
-    # different versions inside one workflow run and CodeQL fails · proven
-    # by the first ungrouped wave, 2026-07-19).
-    groups:
-      github-actions:
         patterns:
           - "*"
