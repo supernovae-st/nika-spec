@@ -793,27 +793,29 @@ def main() -> int:
                           file=sys.stderr)
                     rc = 1
 
-        # Parity check (both modes) · the 05-errors.md prose table rows must
-        # equal the canon registry (code + category + transient · the prose
-        # stays human-authoritative · canon stays machine-SSOT · this binds them).
-        prose = (SPEC_ROOT / "spec" / "05-errors.md").read_text()
-        rows = {}
-        for line in prose.splitlines():
-            if line.startswith("| `NIKA-") and line.count("|") >= 5:
-                cells = [c.strip() for c in line.strip("|").split("|")]
-                code = cells[0].strip("`")
-                cat = cells[2].strip("`")
-                trans = cells[3].replace("`", "").strip()
-                rows[code] = (cat, "engine-assessed" if "assessed" in trans else trans)
-        canon_rows = {e["code"]: (e["category"], e["transient"])
-                      for e in canon["error_codes"]["items"]}
-        if rows != canon_rows:
-            only_prose = sorted(set(rows) - set(canon_rows))
-            only_canon = sorted(set(canon_rows) - set(rows))
-            mismatch = sorted(k for k in set(rows) & set(canon_rows) if rows[k] != canon_rows[k])
-            print(f"showcase-projector · ERROR-REGISTRY PARITY · prose-only={only_prose} "
-                  f"canon-only={only_canon} field-mismatch={mismatch}", file=sys.stderr)
-            rc = 1
+
+    canon = yaml.safe_load((SPEC_ROOT / "canon.yaml").read_text())
+    # Parity check (both modes) · the 05-errors.md prose table rows must
+    # equal the canon registry (code + category + transient · the prose
+    # stays human-authoritative · canon stays machine-SSOT · this binds them).
+    prose = (SPEC_ROOT / "spec" / "05-errors.md").read_text()
+    rows = {}
+    for line in prose.splitlines():
+        if line.startswith("| `NIKA-") and line.count("|") >= 5:
+            cells = [c.strip() for c in line.strip("|").split("|")]
+            code = cells[0].strip("`")
+            cat = cells[2].strip("`")
+            trans = cells[3].replace("`", "").strip()
+            rows[code] = (cat, "engine-assessed" if "assessed" in trans else trans)
+    canon_rows = {e["code"]: (e["category"], e["transient"])
+                  for e in canon["error_codes"]["items"]}
+    if rows != canon_rows:
+        only_prose = sorted(set(rows) - set(canon_rows))
+        only_canon = sorted(set(canon_rows) - set(rows))
+        mismatch = sorted(k for k in set(rows) & set(canon_rows) if rows[k] != canon_rows[k])
+        print(f"showcase-projector · ERROR-REGISTRY PARITY · prose-only={only_prose} "
+              f"canon-only={only_canon} field-mismatch={mismatch}", file=sys.stderr)
+        rc = 1
 
     # TARGET 7 · docs error-codes page · managed tables from the canon registry.
     err_page = docs_root / "reference" / "error-codes.mdx"
