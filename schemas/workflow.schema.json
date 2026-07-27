@@ -29,6 +29,7 @@
           "description": "Workflow id · kebab-case · the document-type discriminator (W1: the envelope became an object)."
         },
         "description": {
+          "description": "Free-form prose about the workflow · documentation for whoever reads the file, never read by the engine (spec/01-envelope.md).",
           "type": "string"
         }
       },
@@ -69,6 +70,7 @@
             "description": "The value used when the caller supplies none · MUST conform to `type:` (R3b · LAW-TYPE-0211 · NIKA-DEFAULT-001 · the P0 soundness hole is closed at check)."
           },
           "description": {
+            "description": "Free-form prose about this input · what a caller is being asked for. Documentation only — the contract is `type` and `required`.",
             "type": "string"
           }
         }
@@ -91,6 +93,7 @@
             "description": "The value used when the deployment supplies none · MUST conform to `type:` (NIKA-DEFAULT-001)."
           },
           "description": {
+            "description": "Free-form prose about this config value · where a deployment is expected to get it. Documentation only — the contract is `type`.",
             "type": "string"
           }
         }
@@ -125,6 +128,7 @@
               "description": "The constant value · MUST conform to `type:` (NIKA-DEFAULT-001)."
             },
             "description": {
+              "description": "Free-form prose about this constant · why the value is what it is. Documentation only — the contract is `type` and `value`.",
               "type": "string"
             }
           },
@@ -458,6 +462,7 @@
                 "description": "The output's type · the full TypeExpr of 09-types (R3b · LAW-GRAMMAR-0211 · the flat 6-enum is dead alongside the inputs half · LAW-SURFACE-0211)."
               },
               "description": {
+                "description": "Free-form prose about this output · what a caller receives. Documentation only — the contract is `value` and `type`.",
                 "type": "string"
               }
             }
@@ -546,6 +551,7 @@
           "description": "for_each abort-on-error · default true."
         },
         "retry": {
+          "description": "Retry policy for this task · `{ max_attempts, backoff_ms, backoff_strategy, backoff_max_ms, jitter, on_codes }`. Retries run BEFORE `on_error` sees anything — the catch handles the last error only (spec/05-errors.md §Retry policy).",
           "$ref": "#/$defs/retry"
         },
         "on_error": {
@@ -654,6 +660,7 @@
           "type": "string"
         },
         "system": {
+          "description": "System prompt · the standing instruction, sent ahead of `prompt:` and unchanged by it.",
           "type": "string"
         },
         "model": {
@@ -677,6 +684,7 @@
           "description": "JSON Schema · structured output contract."
         },
         "thinking": {
+          "description": "Extended thinking · `{ enabled, budget_tokens }` — reasoning the model may spend before it answers (spec/02-verbs.md §infer).",
           "type": "object",
           "additionalProperties": false,
           "properties": {
@@ -689,6 +697,7 @@
           }
         },
         "vision": {
+          "description": "Image inputs for the call · each entry `{ source: file | url, path | url }` · the images `prompt:` is allowed to refer to.",
           "type": "array",
           "items": {
             "type": "object",
@@ -724,18 +733,22 @@
           "minItems": 1
         },
         "cwd": {
+          "description": "Working directory for the subprocess · default = the engine's own cwd.",
           "type": "string"
         },
         "env": {
+          "description": "OS environment variables for THIS subprocess · a key→value map applied over the composed environment. Nothing is inherited — the ambient environment reaches a task only through `permits.env` (spec/01-envelope.md §permits).",
           "type": "object",
           "additionalProperties": {
             "type": "string"
           }
         },
         "stdin": {
+          "description": "Data written to the command's standard input · may interpolate `${{ }}`.",
           "type": "string"
         },
         "capture": {
+          "description": "Which stream becomes the task's output · `stdout` (default) · `stderr` · `combined` · `structured` = `{ stdout, stderr, exit_code }`. This is the SOURCE; `decode:` is how that string becomes a value.",
           "type": "string",
           "enum": [
             "stdout",
@@ -822,6 +835,7 @@
           ]
         },
         "args": {
+          "description": "Arguments passed to the tool · an object whose shape is the TOOL's own schema, not the language's. Each builtin and each MCP tool declares its own (spec/02-verbs.md §invoke) · `${{ }}` may appear in any leaf value.",
           "type": "object"
         },
         "workflow": {
@@ -863,6 +877,7 @@
           "type": "string"
         },
         "system": {
+          "description": "System prompt · the standing instruction, sent ahead of `prompt:` and unchanged by any turn of the loop.",
           "type": "string"
         },
         "model": {
@@ -889,6 +904,7 @@
           ]
         },
         "max_tokens_total": {
+          "description": "Cumulative token budget across every turn of the loop · the SPEND ceiling, where `max_turns` is the step ceiling. Default is engine-configurable (spec/02-verbs.md §agent).",
           "type": [
             "integer",
             "string"
@@ -914,13 +930,16 @@
       "additionalProperties": false,
       "properties": {
         "max_attempts": {
+          "description": "Total attempts, counting the first try · integer ≥ 1 · the one required field of a `retry:` block. Engines honor it strictly and surface the LAST error if every attempt fails (spec/05-errors.md §Retry policy).",
           "type": "integer",
           "minimum": 1
         },
         "backoff_ms": {
+          "description": "Initial delay between attempts, in milliseconds · default 1000. `backoff_strategy` decides how it grows from there.",
           "type": "integer"
         },
         "backoff_strategy": {
+          "description": "Which curve the delay follows between attempts · `fixed` · `linear` · `exponential` · default `exponential`. Each attempt waits `backoff_ms` flat, `backoff_ms × attempt`, or `backoff_ms × 2^(attempt-1)` capped at `backoff_max_ms`.",
           "type": "string",
           "enum": [
             "fixed",
@@ -929,12 +948,15 @@
           ]
         },
         "backoff_max_ms": {
+          "description": "Ceiling on the computed delay, in milliseconds · default 60000, one minute. Exponential growth stops climbing here.",
           "type": "integer"
         },
         "jitter": {
+          "description": "Randomize the computed delay so tasks retrying the same upstream do not synchronize · default TRUE. Engines SHOULD use a full-jitter or equal-jitter family — the anti-thundering-herd default (spec/05-errors.md §Retry policy).",
           "type": "boolean"
         },
         "on_codes": {
+          "description": "Retry ONLY on these canonical `NIKA-<NS>-<NNN>` codes · absent, the engine retries anything transient. Codes, never HTTP status numbers · the retry-side mirror of `on_error.on_codes`.",
           "type": "array",
           "items": {
             "type": "string",
@@ -952,9 +974,11 @@
           "description": "Recovery output · a `${{ }}` ref OR a literal (merges the former fallback/value per spec/05-errors.md)."
         },
         "skip": {
+          "description": "Swallow the error and let the DAG continue · the task produces no output, and the original error stays readable at `tasks.<id>.error`. Exactly one of `recover` · `skip` · `fail_workflow`.",
           "type": "boolean"
         },
         "fail_workflow": {
+          "description": "Fail the whole workflow on this error · the written-down form of the default, so a reader sees the choice instead of inferring it. Exactly one of `recover` · `skip` · `fail_workflow`.",
           "type": "boolean"
         },
         "on_codes": {
