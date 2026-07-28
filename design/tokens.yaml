@@ -157,6 +157,90 @@ builtin:
       mix: [verbs.infer.color, verbs.agent.color]
       at: 0.55                        # weight of the SECOND · agent-leaning
 
+# THE CARD'S IDENTITY — what a node card SHOWS, beyond its verb and its status.
+#
+# All of this shipped in the VS Code canvas (src/core/cardIdentity.ts) and
+# nowhere else: the website and the design bench draw a text card because the
+# vocabulary for a richer one lived in one repository. Promoted here VERBATIM —
+# every glyph, every kind, every essence below is read off that file, not
+# chosen. The rule that derives a preview is a small decision table, so it comes
+# across as data instead of a function.
+card_identity:
+  # The category's MARK — one glyph per catalogue house. Read as a set they are
+  # a little alphabet of what a builtin touches: a dot for the plumbing, a page
+  # for the disk, stacked sheets for shape, arrows for the wire, a lens for
+  # looking, a frame for what it develops.
+  category_glyph:
+    core: "◦"
+    file: "▤"
+    data: "⧉"
+    network: "⇄"
+    introspection: "⌕"
+    media: "▣"
+
+  # THE PREVIEW SLOT a card earns. Six kinds, and `none` is the honest default:
+  # most builtins have nothing to show but their words.
+  preview:
+    kinds: [image, audio, file, http, check, none]
+    # the category decides first …
+    by_category:
+      core: none
+      file: none
+      data: none
+      network: http        # a request has a response worth framing
+      introspection: none
+      media: image         # the developing frame
+    # … and these builtins differ from their house. Each is a fact about the
+    # tool, not a preference: tts_generate is the catalogue's only audio maker;
+    # write and edit are the only file builtins that leave something behind;
+    # compose statically CHECKS a drafted workflow, so its card earns a receipt.
+    overrides:
+      tts_generate: audio
+      write: file
+      edit: file
+      compose: check
+
+  # THE ESSENCE — which argument IS a builtin's soul, and how to render it.
+  # A card that shows every arg shows nothing; this names the one that answers
+  # « what does this task actually do ».
+  essence:
+    renders: [code, path, url, event, duration, condition, text]
+    by_builtin:
+      log: { arg: message, render: text }
+      emit: { arg: event_type, render: event }
+      assert: { arg: condition, render: condition }
+      prompt: { arg: message, render: text }
+      wait: { arg: duration, render: duration }
+      read: { arg: path, render: path }
+      write: { arg: path, render: path }
+      edit: { arg: path, render: path }
+      glob: { arg: pattern, render: code }
+      grep: { arg: pattern, render: code }
+      jq: { arg: expression, render: code }
+      validate: { arg: schema, render: condition }
+      convert: { arg: to, render: code }
+      uuid: { arg: version, render: text }
+      date: { arg: op, render: code }
+      hash: { arg: content, render: text }
+      decide: { arg: bundle, render: path }
+      fetch: { arg: url, render: url }
+      notify: { arg: target, render: text }
+      inspect: { arg: view, render: code }
+      compose: { arg: workflow_yaml, render: code }
+      image_generate: { arg: prompt, render: text }
+      tts_generate: { arg: text, render: text }
+
+  # THE PORT — the patch-bay jack a wire plugs into. The canvas draws it as an
+  # SVG circle with a dark bore and a machined collar; what matters here is the
+  # TYPING, and it reuses the category hues rather than inventing a palette:
+  # a media wire wears the media house, a data wire the data house.
+  port:
+    directions: [in, out]
+    flows: [data, media, plain]
+    flow_hue:
+      data: builtin.category.data
+      media: builtin.category.media
+
 # The per-FEATURE icon bindings — vscode codicon ids, drawn on the
 # rules.icon_grid contract. Unlike the 4 verbs this set is OPEN: a feature
 # lands here the day a surface pins its icon. Keys stay TS-identifier-safe
