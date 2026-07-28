@@ -13,7 +13,9 @@ permits:
 tasks:
   csv_data:
     exec:
-      command: ["printf", "'name,role,score\\nAlice,writer,9\\nBob,editor,7\\nCarol,reviewer,8\\n'"]
+      # No surrounding quotes: argv is execve, so a leading/trailing ' is DATA,
+      # not shell quoting — it emitted a 1-field 4th record and CSV refused it.
+      command: ["printf", "name,role,score\\nAlice,writer,9\\nBob,editor,7\\nCarol,reviewer,8\\n"]
       capture: stdout
 
   to_json:

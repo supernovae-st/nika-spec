@@ -6,6 +6,12 @@ workflow:
 # exec exit1 = NIKA-EXEC-001. on_codes lists NIKA-EXEC-001 → SHOULD retry max_attempts times
 # EVEN THOUGH transient:false (on_codes present overrides the transient-only rule).
 # Marker: count lines in 02_attempts.log == max_attempts (4) if on_codes forces retry.
+# The shell-string exec form cannot be pinned to a program allowlist (a list
+# applies to the array form only), so the boundary is `exec: true` — the block
+# `nika check --infer-permits` prints, verbatim.
+permits:
+  exec: true
+
 tasks:
   flaky:
     exec:

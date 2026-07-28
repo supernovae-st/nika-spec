@@ -12,6 +12,12 @@ const:
   doc:
     name: "Alice"
 
+permits:
+  fs:
+    write: ["./out/data-validation/w37-validate-bad-schema.json"]
+  exec: false
+  tools: ["nika:validate", "nika:write"]
+
 tasks:
   validate_bad_schema:
     invoke:

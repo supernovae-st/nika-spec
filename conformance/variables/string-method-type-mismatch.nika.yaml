@@ -10,6 +10,12 @@ workflow:
 const:
   n: 12345
 
+permits:
+  fs:
+    write: ["./out/cel/c15-ran.json"]
+  exec: false
+  tools: ["nika:write"]
+
 tasks:
   gate:
     when: "${{ const.n.contains('23') }}"         # .contains on a number → type error

@@ -8,6 +8,12 @@ workflow:
 # join depends on BOTH → default gate unsatisfiable (fast_fail failed) → join CANCELLED.
 # Markers: 21_slow.json PRESENT (unrelated sibling drained to completion);
 #          21_join.json ABSENT (join cancelled by failed dep). Workflow exit!=0.
+permits:
+  fs:
+    write: ["./out/ctrlflow/21_join.json", "./out/ctrlflow/21_slow.json"]
+  exec: ["exit"]
+  tools: ["nika:wait", "nika:write"]
+
 tasks:
   fast_fail:
     exec:

@@ -7,6 +7,12 @@ workflow:
 # ok_task succeeds → its on_finally writes 18_finally_ok.json.
 # fail_task fails → its on_finally STILL writes 18_finally_fail.json (before error propagates).
 # Markers: BOTH 18_finally_ok.json AND 18_finally_fail.json present. Workflow exit!=0 (fail_task).
+permits:
+  fs:
+    write: ["./out/ctrlflow/18_finally_fail.json", "./out/ctrlflow/18_finally_ok.json", "./out/ctrlflow/18_ok.json"]
+  exec: ["exit"]
+  tools: ["nika:write"]
+
 tasks:
   ok_task:
     invoke:

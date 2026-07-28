@@ -6,6 +6,12 @@ workflow:
 # → the code falls through → NO retry (only listed codes retry when on_codes set).
 # exec exit1 = NIKA-EXEC-001; on_codes lists a DIFFERENT code → 1 attempt only.
 # Marker: 03_attempts.log has exactly 1 line.
+# The shell-string exec form cannot be pinned to a program allowlist (a list
+# applies to the array form only), so the boundary is `exec: true` — the block
+# `nika check --infer-permits` prints, verbatim.
+permits:
+  exec: true
+
 tasks:
   flaky:
     exec:

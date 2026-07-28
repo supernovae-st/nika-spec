@@ -7,6 +7,12 @@ workflow:
 # exec exit1 = NIKA-EXEC-001. on_error filters on a DIFFERENT code (NIKA-TIMEOUT-001)
 # → recover does NOT apply → task FAILS → workflow fails, exit!=0.
 # downstream cancelled. Markers: 07_after.json ABSENT; exit!=0; code NIKA-EXEC-001.
+permits:
+  fs:
+    write: ["./out/ctrlflow/07_after.json"]
+  exec: ["exit"]
+  tools: ["nika:write"]
+
 tasks:
   fails:
     exec:

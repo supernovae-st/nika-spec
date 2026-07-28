@@ -7,6 +7,12 @@ workflow:
 # even with retry block. Expect: task fails, exit!=0, code NIKA-EXEC-001.
 # Marker assertion: the retry-counter file is appended once per ATTEMPT.
 # A non-transient error → exactly 1 attempt (no retry).
+# The shell-string exec form cannot be pinned to a program allowlist (a list
+# applies to the array form only), so the boundary is `exec: true` — the block
+# `nika check --infer-permits` prints, verbatim.
+permits:
+  exec: true
+
 tasks:
   flaky:
     exec:

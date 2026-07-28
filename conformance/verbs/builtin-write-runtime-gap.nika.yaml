@@ -11,6 +11,12 @@ const:
   data:
     value: 42
 
+permits:
+  fs:
+    write: ["./out/data-validation/w24-check-vs-runtime-gap.json"]
+  exec: false
+  tools: ["nika:jq", "nika:write"]
+
 tasks:
   bad_jq:
     invoke:

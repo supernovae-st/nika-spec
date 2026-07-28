@@ -3,13 +3,19 @@ nika: v1
 workflow:
   id: foreach-nonarray
 # SPEC 03 §for_each semantics: "A non-array collection (object · string · number · null)
-# is an evaluation error (NIKA-VAR-006)". Here for_each over a NUMBER.
+# is an evaluation error (NIKA-VAR-006)". Here for_each over a non-array const.
 # Expect: clean error NIKA-VAR-006 (or rejected at check). No iterations. exit!=0.
 # Markers: 11_iter_*.json ABSENT.
+# The body is argv-only (02 §exec · 0.103): the original string form was an
+# implicit shell and now refuses at parse with NIKA-PARSE-019, which masked the
+# for_each law this file exists to prove. The marker is written by /usr/bin/touch
+# so no shell is needed to observe "no iteration ran".
 const:
   not_a_list: { type: integer, default: 42 }
+permits:
+  exec: ["/usr/bin/touch"]
 tasks:
   mapped:
     for_each: ${{ const.not_a_list }}
     exec:
-      command: 'echo x > ./out/ctrlflow/11_iter_${{ index }}.json'
+      command: ["/usr/bin/touch", "./out/ctrlflow/11_iter_${{ index }}.json"]

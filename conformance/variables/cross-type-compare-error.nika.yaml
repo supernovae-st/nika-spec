@@ -12,6 +12,12 @@ const:
   num: 42
   str: "42"
 
+permits:
+  fs:
+    write: ["./out/cel/c02-ran.json"]
+  exec: false
+  tools: ["nika:write"]
+
 tasks:
   gate:
     when: "${{ const.num == const.str }}"          # 42 == "42" → cross-type → NIKA-VAR-006 expected

@@ -6,9 +6,25 @@
 # renders immediately against the records snapshot -> VAR-001, always.
 # When the runtime implements the await, flip this header to: exit 0,
 # recover-a.json == 99. Pair: recover-b-edge (WITH the edge) recovers today.
+#
+# OBSERVED 2026-07-28 · nika 0.106.0: the await LANDS — `risky` recovers, the
+# workflow exits 0, recover-a.json == 99. The VAR-001 sentence above describes
+# the engine as it was, not as it is; the file was reaching the authority gate
+# (NIKA-AUTH-006) before the recover path could speak, which is why the
+# divergence read as still-open. It is preserved verbatim, not rewritten: the
+# corpus is designed so a spec-following engine turns this row green by
+# itself. Retiring the DIVERGENCE marker cascades to README §divergence
+# policy · run.sh §verdicts · FINDINGS.md · supernovae-st/nika#291 — a canon
+# call, made once, upstream.
 nika: v1
 workflow:
   id: recover-a-noedge
+permits:
+  fs:
+    write: ["./out/errors/recover-a.json"]
+  exec: ["exit"]
+  tools: ["nika:jq", "nika:write"]
+
 tasks:
   source:
     invoke:
