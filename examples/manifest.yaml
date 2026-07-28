@@ -11,7 +11,7 @@ foundation:
   - file: examples/02-parallel-fanout.nika.yaml
     sha256_16: 53c50b07f2beaafb
   - file: examples/03-exec-pipeline.nika.yaml
-    sha256_16: 080bfd3435a72edb
+    sha256_16: 8403d5d98a64fbc2
   - file: examples/04-schema-retry.nika.yaml
     sha256_16: 66fcb15a72a614a5
   - file: examples/05-fetch-chain.nika.yaml
