@@ -747,6 +747,32 @@ def render_card_css(tokens: dict) -> str:
     # donc `retry` et `permits` se ressemblaient au pixel près.
     pol = tokens["card_identity"]["policy"]
     mix = int(pol["border_mix"] * 100)
+    # LE CHIP ÉDITABLE · un contrôle qui change le fichier ne peut pas
+    # ressembler à une étiquette morte.
+    ed = tokens["card_identity"]["control"]["editable"]
+    ed_sel = ", ".join(f":where(.{c})" for c in ed["classes"])
+    ed_sel_focus = ", ".join(f".{c}:focus-visible" for c in ed["classes"])
+    ed_sel_hover = ", ".join(f".{c}:hover" for c in ed["classes"])
+    editable = f"""{ed_sel} {{
+  cursor: pointer;
+  border-color: color-mix(in srgb, currentColor {int(ed["border_rest"] * 100)}%, transparent);
+}}
+{ed_sel}::after {{
+  /* « il y en a d'autres » · au repos, jamais seulement au survol */
+  content: '{ed["indicator"]}';
+  margin-left: 4px;
+  opacity: 0.66;
+  font-size: 0.85em;
+}}
+{ed_sel_hover} {{
+  border-color: color-mix(in srgb, currentColor {int(ed["border_hover"] * 100)}%, transparent);
+}}
+{ed_sel_focus} {{
+  /* jamais supprimé pour le polish — Geist le dit de chaque composant */
+  outline: {ed["ring_px"]}px solid currentColor;
+  outline-offset: {ed["ring_offset_px"]}px;
+}}"""
+
     sh = pol["shape"]
     chip_base = (
         ":where(.nc-pol) { overflow: hidden; text-overflow: ellipsis;"
@@ -900,6 +926,12 @@ def render_card_css(tokens: dict) -> str:
    Cinq n'avaient aucune peau dans le canvas — un `retry` était indiscernable
    d'un `permits`, et c'est exactement la distinction que le code voulait. */
 {chips}
+
+/* LE CHIP ÉDITABLE · le seul contrôle de la carte qui écrit dans le fichier.
+   Un indicateur au repos, une bordure qui se renforce au survol, un anneau de
+   focus qu'on ne supprime pas. Le nom accessible reste à la charge de la
+   surface : une infobulle ajoute du contexte, elle ne nomme pas l'action. */
+{editable}
 
 @media (prefers-reduced-motion: reduce) {{
   :where(.nc) {{ transition: none; }}

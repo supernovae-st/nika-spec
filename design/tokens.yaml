@@ -303,6 +303,37 @@ card_identity:
       fill: 0.05          # of the surface's ink
       truncate: true      # a chip states one fact · it never wraps
 
+  # THE EDITABLE CHIP — a value you can CHANGE, and the one control on the card
+  # that already edits the file. `nc-model` is a <button>: clicking it opens the
+  # provider picker, writes the YAML, and ⌘Z undoes it. It is also the ONLY
+  # interactive chip on the card with no skin of its own — audited, every other
+  # button-born class has one — so today it is pixel-identical to a dead label.
+  #
+  # AN EDITABLE VALUE IS NOT A LABEL. Three facts make the difference, and they
+  # are the ones Geist and shadcn both insist on:
+  #   · an INDICATOR that says « there are others » — visible at rest, not on hover
+  #   · a FOCUS RING that is never suppressed for visual polish
+  #   · an ACCESSIBLE NAME that states the ACTION; the tooltip adds context but
+  #     is not the name (the canvas carries only a title= today, and a title is
+  #     not reliably announced)
+  #
+  # The border must clear 3:1 against the chip it bounds — Geist's own floor for
+  # a custom border, and it is why `rest` is not thinner. MEASURED, not guessed:
+  # the first draft wrote 0.34 and the contract said it cleared. It did not —
+  # 1.83:1 on the worst plane (muted ink on bg_elevated). Solved across the three
+  # stored planes and both ink weights, the floor is reached at 0.61 (3.04:1),
+  # and hover takes it to 4.90:1 so the strengthening is legible and not decorative.
+  control:
+    editable:
+      # the classes that ARE editable today; a new one joins this list, it does
+      # not invent a second convention
+      classes: [nc-model]
+      indicator: "▾"        # « there are others » · at rest, never only on hover
+      border_rest: 0.61     # 3.04:1 · le pire cas mesuré, pas une estimation
+      border_hover: 0.89     # 4.90:1 · l'écart doit se voir
+      ring_px: 2
+      ring_offset_px: 1
+
   # THE PORT — the patch-bay jack a wire plugs into. The canvas draws it as an
   # SVG circle with a dark bore and a machined collar; what matters here is the
   # TYPING, and it reuses the category hues rather than inventing a palette:
