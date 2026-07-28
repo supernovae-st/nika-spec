@@ -205,6 +205,33 @@ card_identity:
   # « what does this task actually do ».
   essence:
     renders: [code, path, url, event, duration, condition, text]
+    # HOW EACH RENDER LOOKS — the first control primitive, and it was already
+    # drawn: the canvas styles all seven, and every one BORROWS a hue that
+    # already means something rather than picking one. Read them in a row and
+    # the reasoning is visible — a path wears the success green because a path
+    # is the thing that either happened or did not; a condition wears the retry
+    # amber because a condition is not settled; a duration is muted and
+    # tabular because it is a number you compare, not a word you read.
+    #
+    # `hue` is a dotted path into this file (the alias law). `shape` is a small
+    # closed set of typographic facts, so a surface binds them to its own idiom
+    # instead of receiving CSS it cannot re-skin.
+    style:
+      code:      { hue: brand.color.accent,   shape: [mono, well] }
+      url:       { hue: brand.color.accent,   shape: [underline] }
+      path:      { hue: severity.ok,          shape: [mono] }
+      condition: { hue: status.retrying,      shape: [] }
+      event:     { hue: verbs.invoke.text,    shape: [] }
+      duration:  { hue: status.muted,         shape: [tabular] }
+      # `inherit`, pas un alias : le texte brut porte l'ENCRE DE LA SURFACE.
+      # La première version l'aliasait sur accent_bright — un bleu — là où le
+      # canvas met var(--nk-fg). Une valeur en texte n'a pas de couleur propre ;
+      # elle a celle de la carte qui la contient, et c'est l'hôte qui la donne.
+      text:      { hue: inherit,              shape: [plain] }
+    # THE REST — every argument that is NOT the essence. It recedes rather than
+    # disappears: the card says « there is more here » without competing.
+    rest: { dim: 0.55, weight: 400 }
+    shapes: [mono, well, underline, tabular, plain]
     by_builtin:
       log: { arg: message, render: text }
       emit: { arg: event_type, render: event }
