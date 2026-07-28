@@ -303,6 +303,26 @@ material:
       alpha: 0.06
       fade: 0.70          # transparent by this stop
       ease_ms: 400
+    # ── LE CURSEUR ────────────────────────────────────────────────────────────
+    # The canvas ships NO drawn cursor: it has a native vocabulary where each
+    # shape says what the gesture will do (grab · pointer · crosshair · help ·
+    # zoom-in). That vocabulary stays. This adds ONE drawn mark, and only where
+    # it earns its place — over the pool itself.
+    #
+    # AND THE MARK IS THE GROUND'S OWN TICK. The floor is surveyed with crosses
+    # every 40px; the pointer is the same cross, larger and brighter. So moving
+    # the sheet reads as moving a survey grid rather than dragging a page, and
+    # the cursor is the one place the plane and the hand speak the same shape.
+    #
+    # It tightens when held: shorter arms, because a gripped plane is a smaller
+    # gesture than a plane you could grip. The halo is not decoration — a white
+    # mark on a pale node is invisible without it.
+    cursor:
+      box_px: 20          # the SVG box · the hotspot is its centre
+      arm_px: 6           # each arm from centre, at rest
+      arm_held_px: 4      # tightened while the sheet is held
+      stroke_px: 1.5
+      halo: 0.55          # dark outline alpha · survives any ground beneath
   motion:
     lift_ms: 190
     drawer_ms: 420
