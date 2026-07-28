@@ -257,6 +257,41 @@ card_identity:
       image_generate: { arg: prompt, render: text }
       tts_generate: { arg: text, render: text }
 
+  # THE POLICY CHIPS — what a card says about HOW a task behaves, beside what it
+  # does. Fourteen of them ship in the canvas; FIVE HAD NO SKIN AT ALL, so a
+  # `retry` chip was pixel-identical to a `permits` chip and the distinction the
+  # code clearly intended never reached an eye. The five silent ones are the
+  # heavy ones — the retry count, the hard cap, the failure branch, the blast
+  # radius, and what an agent may reach.
+  #
+  # NO CHIP INVENTS A HUE, exactly as `roles` says of itself. Each borrows one
+  # that is already loaded, and the five that were missing derive from either a
+  # sibling's precedent or this file's own doctrine — never from taste:
+  #
+  #   retry    the retry amber        · recover and fail-fast already wear it
+  #   skip     the skipped muted      · finally and per-item already wear it
+  #   timeout  the data blue          · a declared cap, like « ∥ max N »
+  #   permits  exec's orange          · roles.boundary IS exec's orange, stated above
+  #   tools    the agent's voice      · roles says `tools` under agent: is the verb's
+  policy:
+    chip:
+      retry:     status.retrying
+      timeout:   brand.color.accent
+      recover:   status.retrying
+      skip:      status.muted
+      fail:      severity.fail
+      think:     verbs.infer.text
+      vision:    verbs.infer.text
+      typed:     brand.color.accent
+      parallel:  brand.color.accent
+      peritem:   status.muted
+      failfast:  status.retrying
+      finally:   status.muted
+      permits:   verbs.exec.color
+      tools:     verbs.agent.text
+    # the border is the same hue, held back — the chip states, it does not shout
+    border_mix: 0.40
+
   # THE PORT — the patch-bay jack a wire plugs into. The canvas draws it as an
   # SVG circle with a dark bore and a machined collar; what matters here is the
   # TYPING, and it reuses the category hues rather than inventing a palette:
