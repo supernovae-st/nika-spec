@@ -111,7 +111,8 @@ status:
 # argument — what touches your disk wears the success green because it is the
 # thing that either happened or did not; what leaves the machine wears the
 # accent because that is the reach; what looks at the run itself wears the
-# critical red because introspection is how a run is judged.
+# amber, the same one a retry wears, because both are the colour of « not
+# settled yet ».
 #
 # Keys MUST equal the catalogue's `category` set; every value is a dotted path
 # into this file that must land on a #rrggbb.
