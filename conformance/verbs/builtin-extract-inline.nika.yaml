@@ -10,6 +10,12 @@ model: mock/echo
 const:
   article_content: "Rust 1.87 introduces async closures, improved error messages, and const generics stabilization."
 
+permits:
+  fs:
+    write: ["./out/research/r12-mock-chain.json"]
+  exec: false
+  tools: ["nika:jq", "nika:write"]
+
 tasks:
   echo_content:
     invoke:

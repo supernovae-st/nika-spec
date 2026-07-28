@@ -8,6 +8,12 @@ workflow:
 const:
   x: 42
 
+permits:
+  fs:
+    write: ["./out/data-validation/w05-assert-cel-true.json"]
+  exec: false
+  tools: ["nika:assert", "nika:write"]
+
 tasks:
   check_x:
     invoke:

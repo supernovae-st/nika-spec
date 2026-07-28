@@ -16,6 +16,12 @@ const:
     type: boolean
     default: true
 
+permits:
+  fs:
+    write: ["./out/data-validation/w18-typed-vars.json"]
+  exec: false
+  tools: ["nika:assert", "nika:write"]
+
 tasks:
   check_string:
     invoke:

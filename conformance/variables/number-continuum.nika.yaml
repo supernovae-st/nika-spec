@@ -13,6 +13,12 @@ const:
   two_int: 2
   nine_float: 9.0
 
+permits:
+  fs:
+    write: ["./out/cel/c01.json"]
+  exec: false
+  tools: ["nika:assert", "nika:write"]
+
 tasks:
   int_eq_float:
     invoke: { tool: "nika:assert", args: { condition: "${{ const.one_int == 1.0 }}", message: "1 == 1.0" } }

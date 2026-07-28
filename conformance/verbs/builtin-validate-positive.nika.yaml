@@ -10,6 +10,12 @@ const:
     name: "Alice"
     age: 30
 
+permits:
+  fs:
+    write: ["./out/data-validation/w01-validate-valid-object.json"]
+  exec: false
+  tools: ["nika:assert", "nika:validate", "nika:write"]
+
 tasks:
   validate_doc:
     invoke:

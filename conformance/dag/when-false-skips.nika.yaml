@@ -10,6 +10,12 @@ workflow:
 #          13_down.json present (the observation edge passes on skipped).
 const:
   flag: { type: boolean, default: false }
+permits:
+  fs:
+    write: ["./out/ctrlflow/13_down.json", "./out/ctrlflow/13_gated.json"]
+  exec: false
+  tools: ["nika:write"]
+
 tasks:
   gated:
     when: ${{ const.flag == true }}

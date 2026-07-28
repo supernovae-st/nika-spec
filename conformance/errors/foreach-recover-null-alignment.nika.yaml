@@ -7,6 +7,12 @@ workflow:
 # items 0..5, indices 1 and 4 fail -> null. Assert: good count 4, null count 2.
 const:
   items: [0, 1, 2, 3, 4, 5]
+permits:
+  fs:
+    write: ["./out/fanout/13_onerror_recover_null.json"]
+  exec: false
+  tools: ["nika:jq", "nika:write"]
+
 tasks:
   loop:
     for_each: ${{ const.items }}

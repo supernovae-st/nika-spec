@@ -5,6 +5,12 @@ workflow:
 # COVERS: ${{ index }} 0-based positional binding aligns exactly with input order.
 const:
   items: ["zero", "one", "two", "three", "four"]
+permits:
+  fs:
+    write: ["./out/fanout/04_foreach_index_binding.json"]
+  exec: false
+  tools: ["nika:jq", "nika:write"]
+
 tasks:
   loop:
     for_each: ${{ const.items }}

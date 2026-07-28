@@ -19,6 +19,12 @@ const:
   num: 42
   str: "42"
 
+permits:
+  fs:
+    write: ["./out/cel/c26-error.json"]
+  exec: false
+  tools: ["nika:assert", "nika:write"]
+
 tasks:
   fail_var:
     invoke:

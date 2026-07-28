@@ -68,6 +68,9 @@ const:
                                                                                                                           n63:
                                                                                                                             n64:
                                                                                                                               leaf: deep
+permits:
+  exec: ["echo"]
+
 tasks:
   t:
     exec:

@@ -4,6 +4,12 @@ workflow:
   id: c22-convert-builtin
   description: "Generate CSV-like content, use nika:convert to transform CSV→JSON"
 
+permits:
+  fs:
+    write: ["./out/content/c22-result.json"]
+  exec: ["printf"]
+  tools: ["nika:convert", "nika:write"]
+
 tasks:
   csv_data:
     exec:

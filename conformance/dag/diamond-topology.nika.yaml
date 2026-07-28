@@ -5,6 +5,12 @@ workflow:
 # COVERS: diamond DAG A -> {B, C} -> D join. B and C run in parallel after A;
 # D depends on BOTH and aggregates. Assert D's output == B+C combined over A's seed.
 # (NOTE: with: uses BLOCK style — flow-mapping `{ s: ${{...}} }` collides with the ${{}} braces.)
+permits:
+  fs:
+    write: ["./out/fanout/26_diamond_dag.json"]
+  exec: false
+  tools: ["nika:jq", "nika:write"]
+
 tasks:
   a:
     invoke:

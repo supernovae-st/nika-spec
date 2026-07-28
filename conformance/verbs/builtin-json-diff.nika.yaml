@@ -6,6 +6,12 @@ workflow:
 
 model: mock/echo
 
+permits:
+  fs:
+    write: ["./out/competitor/16-json-diff.json"]
+  exec: false
+  tools: ["nika:jq", "nika:json_diff", "nika:write"]
+
 tasks:
   previous_snapshot:
     invoke:

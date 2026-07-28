@@ -8,6 +8,12 @@ workflow:
 # {maybe: null}; the binding is a value edge (producer succeeds → admits);
 # has(with.maybe) is false per spec ("true iff resolves to a defined,
 # NON-null value") -> consumer_present SKIPS, consumer_absent RUNS.
+permits:
+  fs:
+    write: ["./out/fanout/27_absent.json", "./out/fanout/27_present.json"]
+  exec: false
+  tools: ["nika:jq", "nika:write"]
+
 tasks:
   producer:
     invoke:

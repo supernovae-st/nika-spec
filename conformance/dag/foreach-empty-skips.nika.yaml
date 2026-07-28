@@ -9,6 +9,12 @@ workflow:
 # iterations ran); 08_after.json present with the null payload visible.
 const:
   empty_list: { type: array, default: [] }
+permits:
+  fs:
+    write: ["./out/ctrlflow/08_after.json"]
+  exec: false
+  tools: ["nika:write"]
+
 tasks:
   mapped:
     for_each: ${{ const.empty_list }}

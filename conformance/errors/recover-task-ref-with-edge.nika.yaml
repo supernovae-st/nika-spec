@@ -2,6 +2,12 @@
 nika: v1
 workflow:
   id: recover-b-edge
+permits:
+  fs:
+    write: ["./out/errors/recover-b.json"]
+  exec: ["exit"]
+  tools: ["nika:jq", "nika:write"]
+
 tasks:
   source:
     invoke:

@@ -9,6 +9,12 @@ const:
   # severity is not in the schema enum + category is the wrong type → should be reported invalid
   bad_record: { category: 12345, severity: "EXPLODING" }
 
+permits:
+  fs:
+    write: ["./out/support/21-validate-invalid-report.json"]
+  exec: false
+  tools: ["nika:jq", "nika:validate", "nika:write"]
+
 tasks:
   validate:
     invoke:

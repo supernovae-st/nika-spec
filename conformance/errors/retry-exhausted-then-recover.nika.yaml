@@ -7,6 +7,12 @@ workflow:
 # retries to exhaust, THEN on_error.recover fires → task SUCCEEDS with recover value.
 # a downstream value edge on it → should RUN (recover → status success).
 # Markers: 04_attempts.log = 3 lines (retries ran); 04_after.json present (downstream ran).
+permits:
+  fs:
+    write: ["./out/ctrlflow/04_after.json"]
+  exec: true
+  tools: ["nika:write"]
+
 tasks:
   flaky:
     exec:

@@ -6,6 +6,12 @@ workflow:
 # KNOWN-NUANCED: recover WITH a value edge. failing task recovers; a task bound to it
 # should run (recovered = success → default gate satisfied).
 # Markers: 05_down.json present (downstream ran after recovery).
+permits:
+  fs:
+    write: ["./out/ctrlflow/05_down.json"]
+  exec: ["exit"]
+  tools: ["nika:write"]
+
 tasks:
   fails:
     exec:

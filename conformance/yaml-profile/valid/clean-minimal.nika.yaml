@@ -4,6 +4,9 @@
 nika: v1
 workflow:
   id: clean-minimal
+permits:
+  exec: ["echo"]
+
 tasks:
   t:
     exec:

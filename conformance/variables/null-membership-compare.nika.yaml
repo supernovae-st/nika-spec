@@ -12,6 +12,12 @@ workflow:
 const:
   present: 7
 
+permits:
+  fs:
+    write: ["./out/cel/c18.json"]
+  exec: false
+  tools: ["nika:assert", "nika:write"]
+
 tasks:
   null_eq_null:
     invoke: { tool: "nika:assert", args: { condition: "${{ null == null }}", message: "null == null is true" } }
