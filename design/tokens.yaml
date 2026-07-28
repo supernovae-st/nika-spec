@@ -351,6 +351,34 @@ material:
       dead_gate: "its when: can never be true · it will never run"
       asking: "parked on a question · WAITING, not working"
     audit_severity: [error, warning, info]
+    # THE SECOND SIGNAL — what each status owes BEYOND its hue. A colour dies
+    # under forced-colors and under a colour-blind eye, so a state carried by
+    # hue alone is a state half the readers cannot read.
+    #
+    # This block exists because converging the three surfaces surfaced a gap
+    # nobody had noticed: auditing the canvas status by status found `cancelled`
+    # carrying NOTHING but a hue — indistinguishable from `pending` to an eye
+    # that cannot separate the two greys. The bench had invented shapes for all
+    # seven, which was right for the wrong reason: it diverged instead of
+    # reporting. The finding belongs here, where all three read it.
+    #
+    # The value NAMES the signal; each surface picks its own implementation
+    # (the canvas dashes the card's border for `skipped`, the bench flattens the
+    # dot — same fact, two idioms, one contract). `none` is legal exactly once.
+    # A GLOW IS NOT A SECOND SIGNAL. The first draft of this block said `glow`
+    # for failed, and a halo is made of colour — it dies in exactly the two
+    # conditions this contract exists for. Every value below names a GEOMETRY,
+    # and the gate checks that each surface writes a non-colour property for it.
+    signal:
+      pending: small       # DELIBERATE understatement · smaller than the rest, and nothing else
+      running: ring        # hollow · something is passing through it
+      success: filled      # solid · the only state that is finished and fine
+      failed: diamond      # the disc turns a corner up · it stops the eye
+      retrying: ring_halo  # a ring with a second ring outside it · not settled, not lost
+      skipped: bar         # flattened · the disc never inflated, nothing ran
+      cancelled: bar_struck # the same bar, struck across · someone stopped it
+                            # (hue-only in the canvas until this block · the gap
+                            #  that converging the three surfaces found)
     # THE ROW ORDER PER VERB. Head, mechanism, essence, why — except invoke,
     # whose essence (the tool it calls) LEADS the mechanism, because that is
     # what a reader looks for first. The agent band rides between the ordered
@@ -399,6 +427,44 @@ material:
         why_line: nc-pol
         badge: nc-badge
         chip: nc-chip
+  # THE CARD'S GEOMETRY — read off the canvas, which was the only place it
+  # lived. Every number below is measured from `dag.css`, not chosen: the site
+  # and the bench each drew a card of their own invention because there was
+  # nothing to draw one FROM. Colour is deliberately absent — the hues already
+  # project (verb.hex · severity · status), and each surface binds them to its
+  # own host (VS Code theme variables · the site's palette). Geometry is the
+  # half that was still being re-invented three times.
+  card:
+    pad_x_px: 12
+    pad_y_px: 10
+    radius_px: 12          # --nk-radius-card
+    head_h_px: 22
+    head_gap_px: 7
+    tile_px: 22            # the verb glyph's square
+    tile_radius_px: 6      # --nk-r-tile
+    st_w_px: 18            # the status column, kept clear for the spinner
+    dot_px: 7
+    dot_rest_alpha: 0.6    # a task that has not started should not shout
+    sub_h_px: 15
+    sub_gap_px: 10
+    body_top_px: 4
+    body_line_px: 15
+    body_clamp: 3          # three lines, then it truncates — it never pushes
+    body_ink: 0.82
+    chip_pad_x_px: 7
+    chip_pad_y_px: 1
+    chip_radius_px: 4      # --nk-r-chip
+    chip_fill: 0.06
+    badge_clear_px: 12     # room for the spinner's corner
+    base_ms: 160           # --nk-dur-base
+    # the type ramp the card speaks in, smallest last
+    fs:
+      heading_px: 12.5     # the node's id
+      label_px: 11         # the tile's glyph
+      sub_px: 10.5         # the mechanism row
+      body_px: 10
+      meta_px: 9.5         # chips and the badge
+      note_px: 9
   motion:
     lift_ms: 190
     drawer_ms: 420
