@@ -34,6 +34,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+_HEX = re.compile(r"#[0-9a-fA-F]{6}")
+
 try:
     import yaml
 except ImportError:
@@ -339,6 +341,7 @@ def render_ts(tokens: dict) -> str:
     ]
     lines += _material_lines(tokens)
     lines += _node_lines(tokens)
+    lines += _category_lines(tokens)
     return "\n".join(lines)
 
 
@@ -356,6 +359,54 @@ def _ts_literal(value, indent: int = 0) -> str:
     if isinstance(value, bool):
         return "true" if value else "false"
     return str(value)
+
+
+def _dotted(tokens: dict, path: str) -> str:
+    """Resolve a dotted alias into the file and prove it lands on a hex.
+
+    An alias is the whole point of the blocks that use this: a category never
+    introduces a colour, it borrows the one its meaning already has. Resolving
+    at PROJECTION time — rather than storing a second copy of the hex — is what
+    makes that structural instead of a promise. A typo cannot survive it."""
+    cur = tokens
+    for part in path.split("."):
+        if not isinstance(cur, dict) or part not in cur:
+            raise SystemExit(f"design-projector · alias {path!r} does not resolve at {part!r}")
+        cur = cur[part]
+    if not (isinstance(cur, str) and _HEX.fullmatch(cur)):
+        raise SystemExit(f"design-projector · alias {path!r} lands on {cur!r}, not a #rrggbb")
+    return cur
+
+
+def _category_lines(tokens: dict) -> list[str]:
+    """TARGET 1+2 · THE BUILTIN'S HOUSE — one hue per catalogue category.
+
+    The canvas has painted these since its house-icon landed, resolved inside
+    its own stylesheet as --nk-cat-*. Nothing in the shared vocabulary said what
+    a category looks like, so the website painted none of them and the design
+    bench could not show a builtin at all."""
+    cat = tokens["builtin"]["category"]
+    def one(v):
+        """A path, or a stated ratio between two paths. Both are aliases: the
+        mix introduces no colour, it names a proportion of two that exist."""
+        if isinstance(v, str):
+            return _dotted(tokens, v)
+        a, b = (_dotted(tokens, p) for p in v["mix"])
+        w = float(v["at"])
+        chan = lambda h, i: int(h[1 + 2 * i:3 + 2 * i], 16)
+        return "#" + "".join(f"{round(chan(a, i) * (1 - w) + chan(b, i) * w):02x}" for i in range(3))
+
+    resolved = {k: one(v) for k, v in cat.items()}
+    return [
+        "/** THE BUILTIN'S HOUSE · one hue per catalogue category, ALIASED.",
+        " *  A category never introduces a colour — it borrows the one its",
+        " *  meaning already has: what touches your disk wears the success",
+        " *  green, what leaves the machine wears the accent, what looks at the",
+        " *  run itself wears the critical red. Resolved at projection time, so",
+        " *  a moved palette moves these too. */",
+        f"export const NIKA_CATEGORY_HUE = {_ts_literal(resolved)} as const",
+        "",
+    ]
 
 
 def _node_lines(tokens: dict) -> list[str]:
