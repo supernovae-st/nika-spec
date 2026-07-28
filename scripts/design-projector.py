@@ -338,6 +338,7 @@ def render_ts(tokens: dict) -> str:
         "",
     ]
     lines += _material_lines(tokens)
+    lines += _node_lines(tokens)
     return "\n".join(lines)
 
 
@@ -345,6 +346,8 @@ def _ts_literal(value, indent: int = 0) -> str:
     """A dict/scalar as a TS object literal — unquoted keys, single-quoted
     strings, so the emitted module reads like hand-written source and passes
     the consumers' lint without a per-file exemption."""
+    if isinstance(value, list):
+        return "[" + ", ".join(_ts_literal(v, indent) for v in value) + "]"
     if isinstance(value, dict):
         inner = ", ".join(f"{k}: {_ts_literal(v, indent + 1)}" for k, v in value.items())
         return "{ " + inner + " }"
@@ -353,6 +356,28 @@ def _ts_literal(value, indent: int = 0) -> str:
     if isinstance(value, bool):
         return "true" if value else "false"
     return str(value)
+
+
+def _node_lines(tokens: dict) -> list[str]:
+    """TARGET 1+2 · THE NODE'S STATE VOCABULARY.
+
+    Two axes, and keeping them apart is the whole point: a node holds exactly
+    one STATUS and any number of MARKS. Collapsing them — which the website's
+    bench did — produces a list where `stale` sits beside `success` as though a
+    task could not be both. It can, and most finished tasks eventually are."""
+    n = tokens["material"]["node"]
+    return [
+        "/** THE NODE · two axes, never one.",
+        " *  ONE status, ANY marks. `pending` deliberately has no resting rule",
+        " *  in the canvas — a task that has not started should not advertise",
+        " *  itself. The anatomy is what verbAnatomies.test.ts asserts: head,",
+        " *  mechanism, essence, why — except invoke, whose essence leads. */",
+        f"export const NIKA_NODE_STATUS = {_ts_literal(n['status'])} as const",
+        f"export const NIKA_NODE_MARKS = {_ts_literal(n['marks'])} as const",
+        f"export const NIKA_AUDIT_SEVERITY = {_ts_literal(n['audit_severity'])} as const",
+        f"export const NIKA_NODE_ANATOMY = {_ts_literal(n['anatomy'])} as const",
+        "",
+    ]
 
 
 def _material_lines(tokens: dict) -> list[str]:
