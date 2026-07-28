@@ -751,18 +751,27 @@ def render_card_css(tokens: dict) -> str:
     # ressembler à une étiquette morte.
     ed = tokens["card_identity"]["control"]["editable"]
     ed_sel = ", ".join(f":where(.{c})" for c in ed["classes"])
+    ind = ed["indicator"]
+    # le chevron, tracé · une flèche vectorielle reste nette à toute taille
+    _sv = (f"<svg xmlns='http://www.w3.org/2000/svg' width='{ind['w_px']}' height='{ind['h_px']}'>"
+           f"<path d='M0.6 0.6L{ind['w_px'] / 2} {ind['h_px'] - 0.6}L{ind['w_px'] - 0.6} 0.6'"
+           f" fill='none' stroke='%23ffffff' stroke-opacity='{ind['alpha']}'"
+           f" stroke-width='{ind['stroke_px']}' stroke-linecap='round' stroke-linejoin='round'/></svg>")
+    chevron = 'url("data:image/svg+xml,' + _sv.replace('<', '%3C').replace('>', '%3E').replace('"', "'") + '")'
     ed_sel_focus = ", ".join(f".{c}:focus-visible" for c in ed["classes"])
     ed_sel_hover = ", ".join(f".{c}:hover" for c in ed["classes"])
     editable = f"""{ed_sel} {{
   cursor: pointer;
   border-color: color-mix(in srgb, currentColor {int(ed["border_rest"] * 100)}%, transparent);
 }}
-{ed_sel}::after {{
-  /* « il y en a d'autres » · au repos, jamais seulement au survol */
-  content: '{ed["indicator"]}';
-  margin-left: 4px;
-  opacity: 0.66;
-  font-size: 0.85em;
+{ed_sel} {{
+  /* « il y en a d'autres » · DESSINÉ en SVG, pas posé en content: — un glyphe
+     CSS n'est ni sélectionnable, ni traduit, ni annoncé. Au repos, jamais
+     seulement au survol. */
+  background-image: {chevron};
+  background-repeat: no-repeat;
+  background-position: right {ind["gap_px"]}px center;
+  padding-right: {ind["gap_px"] * 2 + ind["w_px"]}px;
 }}
 {ed_sel_hover} {{
   border-color: color-mix(in srgb, currentColor {int(ed["border_hover"] * 100)}%, transparent);
