@@ -243,6 +243,23 @@ material:
     core: 0.26            # alpha at its centre
     falloff: 0.22         # where it starts to give up
     drift_s: 40           # one idle orbit, so the room lives without a pointer
+  # THE SECOND PRIMITIVE, found by reading the shipped canvas. Thirteen distinct
+  # selectors in nika-vscode src/webview/dag.css carry the same recipe by hand —
+  # the toolbar, the omnibar, the plan rail, the scrubber, the title, the status
+  # pill, both command palettes, the describe panel, the stale banner, the mark,
+  # and two toolbar parts. Twenty backdrop-filter declarations, nine of them
+  # blur+saturate, and not one shared name between them.
+  #
+  # A plate SITS on the page; a glass FLOATS over it. That is the whole
+  # difference and it is why they cannot be the same token: the plate takes a
+  # bevel because light lands on its top edge, the glass takes a blur because
+  # what is behind it must stay legible as depth rather than as content.
+  glass:
+    tint: 0.88            # how much of the surface colour remains · the rest is what is behind
+    blur_px: 11
+    saturate: 1.12        # the backdrop keeps its colour instead of going grey under blur
+    border: 0.09          # white alpha on the hairline
+    grain: 0.03           # the same tooth as the plate · one paper, two objects
   motion:
     lift_ms: 190
     drawer_ms: 420
