@@ -43,7 +43,11 @@ brand:
 
 # The 4 verbs — locked forever (spec/02-verbs.md). codicon + glyph are the
 # SHIPPED vscode bindings (workflowTree ThemeIcons · the ◇▷◆✦ unicode set);
-# fa is the Mintlify binding; icon is the nika.sh ontology id (icons.json).
+# fa is the Mintlify binding; icon is the nika.sh ontology id (icons.json) —
+# the FULL id including its family segment, checked against that file at
+# TARGET 1. Three of these four were wrong until 2026-07-28: two had lost the
+# `code/` family prefix and `agent` named `agent-graph`, which appears nowhere
+# in the ontology at all. Nothing consumed the field, so nothing went red.
 # text is the verb hue re-anchored for BODY COPY: it clears
 # rules.contrast_apca.body (APCA Lc >= 60) on brand.color.bg_base AND
 # bg_elevated. invoke already clears at its base hue — its ramp is the
@@ -62,21 +66,21 @@ verbs:
     codicon: "terminal"
     fa: "terminal"
     glyph: "▷"
-    icon: "console"
+    icon: "code/console"
   invoke:
     color: "#22d3ee"
     text: "#22d3ee"
     codicon: "plug"
     fa: "plug"
     glyph: "◆"
-    icon: "api-connection"
+    icon: "code/api-connection"
   agent:
     color: "#b07bff"
     text: "#c5a4ff"
     codicon: "robot"
     fa: "robot"
     glyph: "✦"
-    icon: "agent-graph"
+    icon: "code/agent"
 
 # The severity pair shared by run verdicts across surfaces (website run/morph
 # css · vscode run-state · docs). warn stays surface-local today (no cross-
@@ -85,6 +89,21 @@ severity:
   ok: "#34d399"
   fail: "#ff5d5d"
   fail_text: "#ff9791"      # fail re-anchored for body copy (APCA Lc >= 60 on both bg_* planes)
+  # THE AUDIT LADDER — which stored hue paints each `material.node.audit_severity`
+  # level. That list has named three levels since the node contract landed, but
+  # nothing here said what any of them look like: the canvas resolved the map
+  # inside its own stylesheet (dag.css · « Worst-severity hue: error red ·
+  # warning amber · info accent ») and the website could resolve none of it. The
+  # binding lived in one surface instead of in the vocabulary both read.
+  #
+  # ALIASES ONLY, by construction: a finding never introduces a colour, it
+  # borrows the one its weight already means. Keys must equal
+  # `material.node.audit_severity`, in that order; every value is a dotted path
+  # into this file that must land on a #rrggbb.
+  audit:
+    error: severity.fail          # a finding that stops the run wears the failure red
+    warning: status.retrying      # not fatal, not settled — the same amber as a retry
+    info: brand.color.accent      # a remark, in the voice the page already speaks
 
 # The LIVE run-state palette — the register every surface that animates a
 # run speaks (website run/morph/plan css · the vscode canvas NIKA skin ·
