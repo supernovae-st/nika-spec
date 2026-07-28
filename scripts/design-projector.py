@@ -731,7 +731,13 @@ def render_card_css(tokens: dict) -> str:
         """`inherit` is not an alias — it is the refusal of one. A plain text
         value has no colour of its own; it wears the card's ink, and the host
         supplies that."""
-        hue = "inherit" if v["hue"] == "inherit" else _dotted(tokens, v["hue"])
+        # HÔTE-LIABLE · le hex n'est que le REPLI. La feuille de géométrie ne
+        # peut porter aucune couleur en dur — c'est ce qui lui permet d'être
+        # portée par la plaque bleue du site ET la carte plate de l'éditeur — et
+        # un gate de ce dépôt le refuse, à juste titre. Une valeur sémantique
+        # reste donc un jeton que l'hôte branche, avec le canon derrière.
+        hue = ("inherit" if v["hue"] == "inherit"
+               else f"var(--nk-ess-{k}, {_dotted(tokens, v['hue'])})")
         shapes = "".join(" " + SHAPE[sh] for sh in v["shape"] if SHAPE[sh])
         return f":where(.nc-ess-{k}) {{ color: {hue};{shapes} }}"
 
@@ -868,7 +874,7 @@ def render_card_css(tokens: dict) -> str:
    une durée est sourde et tabulaire parce que c'est un nombre qu'on compare, pas
    un mot qu'on lit. La forme vient de la spec, la teinte est un alias. */
 {renders}
-:where(.nc-ess-rest) {{ opacity: {rest["dim"]}; font-weight: {rest["weight"]}; }}
+:where(.nc-ess-rest) {{ opacity: {rest["dim"]}; font-weight: var(--nk-fw-plain, {rest["weight"]}); }}
 
 @media (prefers-reduced-motion: reduce) {{
   :where(.nc) {{ transition: none; }}
