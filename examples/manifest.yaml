@@ -119,7 +119,7 @@ showcase:
     tier: T2
     description: ""
     constructs: [local_model, outputs, schema, secrets, with]
-    sha256_16: 5fa2d58e94dd322a
+    sha256_16: 6ec493057164f7f0
   - file: examples/showcase/t2-release-radar.nika.yaml
     workflow: {'id': 'release-radar', 'description': 'dependency release feed → diff vs last run → only the NEW ships'}
     tier: T2
@@ -179,7 +179,7 @@ showcase:
     tier: T4
     description: ""
     constructs: [local_model, on_finally, output, outputs, secrets, thinking, with]
-    sha256_16: a4095855feb68890
+    sha256_16: 81d3afa8bab1540c
   - file: examples/showcase/t4-deep-research-brief.nika.yaml
     workflow: {'id': 'deep-research-brief', 'description': 'plan → budgeted research agent → thinking synthesis → brief on disk'}
     tier: T4
@@ -191,10 +191,10 @@ showcase:
     tier: T4
     description: ""
     constructs: [capture, local_model, on_finally, outputs, retry, schema, secrets, thinking, with]
-    sha256_16: aa8a6e3cdf85bc5e
+    sha256_16: f369fbfee65c81e5
   - file: examples/showcase/t4-release-train.nika.yaml
     workflow: {'id': 'release-train', 'description': 'parallel gates → human GO → hold until the window → ship · verify · record'}
     tier: T4
     description: ""
     constructs: [capture, on_finally, outputs, retry, secrets, timeout, with]
-    sha256_16: 33f551723a7805ba
+    sha256_16: 68021eb905a88ffd

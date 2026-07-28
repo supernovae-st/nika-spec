@@ -337,7 +337,48 @@ def render_ts(tokens: dict) -> str:
         "] as const",
         "",
     ]
+    lines += _material_lines(tokens)
     return "\n".join(lines)
+
+
+def _ts_literal(value, indent: int = 0) -> str:
+    """A dict/scalar as a TS object literal — unquoted keys, single-quoted
+    strings, so the emitted module reads like hand-written source and passes
+    the consumers' lint without a per-file exemption."""
+    if isinstance(value, dict):
+        inner = ", ".join(f"{k}: {_ts_literal(v, indent + 1)}" for k, v in value.items())
+        return "{ " + inner + " }"
+    if isinstance(value, str):
+        return "'" + value.replace("'", "\\'") + "'"
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    return str(value)
+
+
+def _material_lines(tokens: dict) -> list[str]:
+    """TARGET 1+2 · the PLATE. The website and the VS Code canvas both draw the
+    same physical object; the docs target has no plates and ignores this.
+
+    Quantities, not CSS — how far the light reaches, how deep the well is cut,
+    how much the edge takes. The one exception is the easing curves: the canvas
+    is a WEBVIEW, so it and the site share a rendering engine and a damping
+    profile written once as linear() is the same curve in both."""
+    m = tokens["material"]
+    return [
+        "/** THE PLATE · one physical object, three surfaces.",
+        " *  The website, the VS Code canvas and the design bench all draw a",
+        " *  plate: a top edge that catches light, a face with a paper tooth, a",
+        " *  well cut into it where code sits, and two shadows — one where it",
+        " *  touches, one where it hangs. Before this block each surface",
+        " *  invented its own: three radii, three shadow recipes, three ideas",
+        " *  of how much an edge should glint.",
+        " *",
+        " *  THE LAMP IS THE POINT. One light in the room; every plate obeys it.",
+        " *  A plate alone cannot know where the light is, so these are",
+        " *  quantities on a SCENE — one gradient lights a hundred plates. */",
+        f"export const NIKA_MATERIAL = {_ts_literal(m)} as const",
+        "",
+    ]
 
 
 def _origin_main_text(dest: Path) -> str | None:

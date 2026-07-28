@@ -200,6 +200,52 @@ roles:
     web_mix_pct: 78
     vscode_semantic: "invalid.deprecated"
 
+# ── the MATERIAL a surface is made of ────────────────────────────────────────
+# Every surface that draws a nika node draws the same object: a PLATE. It has
+# a top edge that catches light, a face with a paper tooth, a well cut into it
+# where code sits, and two shadows — one where it touches, one where it hangs.
+# The website, the VS Code canvas and the design bench all render that object,
+# and until now each invented its own version of it: three radii, three shadow
+# recipes, three ideas of how much an edge should glint.
+#
+# WHAT IS STORED HERE ARE QUANTITIES, NOT CSS. How far the light reaches, how
+# deep the well is cut, how much the edge takes — a surface binds them in its
+# own vocabulary, the way roles: above binds a mark rather than a hue. The one
+# deliberate exception is the easing curves: the VS Code canvas is a WEBVIEW,
+# so it and the site share a rendering engine, and a damping profile written
+# once as linear() is the same physical curve in both. The docs target ignores
+# this block entirely — a Mintlify page has no plates.
+#
+# THE LAMP IS THE POINT. There is one light in the room and every plate obeys
+# it: the bevel brightens as it turns toward it, the shadow lengthens away from
+# it, the paper's tooth shifts by a pixel. That is why these are quantities on
+# a scene rather than properties on a card — one gradient lights a hundred
+# plates, and a plate alone cannot know where the light is.
+material:
+  plate:
+    radius_px: 7          # the corner · already what the shipped canvas draws
+    pad_px: 7             # the air inside a row
+    bevel: 0.06           # white alpha on the top edge, at rest
+    bevel_lit: 0.15       # …when the lamp is on it
+    grain: 0.03           # the paper's tooth · Bayer, never a smooth noise
+    lift_px: 3            # how far it rises when picked up
+    contact: { y_px: 1, blur_px: 3, alpha: 0.38 }
+    ambient: { y_px: 24, blur_px: 40, spread_px: -24, alpha: 0.55 }
+  well:                   # the code is CUT INTO the plate, not boxed on it
+    inset_alpha: 0.40     # shadow at the top lip — the exact inverse of bevel
+    glow_alpha: 0.05      # light pooling at the bottom lip
+  lamp:
+    reach_vmax: 60        # the light's radius
+    core: 0.10            # alpha at its centre
+    falloff: 0.22         # where it starts to give up
+    drift_s: 40           # one idle orbit, so the room lives without a pointer
+  motion:
+    lift_ms: 190
+    drawer_ms: 420
+    # springs in pure CSS · linear() samples the curve, values over 1 overshoot
+    ease_lift: "linear(0, 0.1 6%, 0.54 19%, 0.85 32%, 0.97 42%, 1.02 50%, 1.008 70%, 1)"
+    ease_drawer: "linear(0, 0.04 8%, 0.38 24%, 0.78 42%, 1.04 62%, 0.99 78%, 1)"
+
 rules:
   # Mermaid classDef fill = verb color + this alpha suffix. Derived at
   # projection time, never stored as a 5th value per verb.
