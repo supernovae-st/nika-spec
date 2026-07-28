@@ -396,6 +396,7 @@ def render_ts(tokens: dict) -> str:
     lines += _material_lines(tokens)
     lines += _node_lines(tokens)
     lines += _category_lines(tokens)
+    lines += _identity_lines(tokens)
     return "\n".join(lines)
 
 
@@ -430,6 +431,46 @@ def _dotted(tokens: dict, path: str) -> str:
     if not (isinstance(cur, str) and _HEX.fullmatch(cur)):
         raise SystemExit(f"design-projector · alias {path!r} lands on {cur!r}, not a #rrggbb")
     return cur
+
+
+def _identity_lines(tokens: dict) -> list[str]:
+    """TARGET 1+2 · THE CARD'S IDENTITY — what a node card shows.
+
+    All of it shipped in the canvas (src/core/cardIdentity.ts) and nowhere
+    else, so the website and the design bench drew a text card: the vocabulary
+    for a richer one lived in one repository. Promoted verbatim; the preview
+    rule crosses as a decision table rather than a function, because a table is
+    the same fact in a form every surface can read."""
+    ci = tokens["card_identity"]
+    prev, ess = ci["preview"], ci["essence"]
+    return [
+        "/** THE CARD'S IDENTITY · what a node shows beyond its verb.",
+        " *  The category's mark, the preview slot it earns, and WHICH argument",
+        " *  is a builtin's soul — a card that shows every arg shows nothing.",
+        " *  Read off the canvas, which was the only surface that had them. */",
+        f"export const NIKA_CATEGORY_GLYPH = {_ts_literal(ci['category_glyph'])} as const",
+        f"export const NIKA_PREVIEW_KINDS = {_ts_literal(prev['kinds'])} as const",
+        f"export const NIKA_PREVIEW_BY_CATEGORY = {_ts_literal(prev['by_category'])} as const",
+        f"export const NIKA_PREVIEW_OVERRIDE = {_ts_literal(prev['overrides'])} as const",
+        f"export const NIKA_ESSENCE_RENDERS = {_ts_literal(ess['renders'])} as const",
+        f"export const NIKA_ESSENCE = {_ts_literal(ess['by_builtin'])} as const",
+        f"export const NIKA_PORT = {_ts_literal(ci['port'])} as const",
+        "",
+        "/** THE PREVIEW SLOT · the category decides, four builtins differ.",
+        " *  Same answer as the canvas's previewFor(), proven over the whole",
+        " *  catalogue rather than asserted. */",
+        "export function nikaPreviewOf(",
+        "  builtin: string | undefined,",
+        "  category: string | undefined,",
+        "): (typeof NIKA_PREVIEW_KINDS)[number] {",
+        "  if (!builtin) return 'none'",
+        "  const over = (NIKA_PREVIEW_OVERRIDE as Record<string, string>)[builtin]",
+        "  if (over) return over as (typeof NIKA_PREVIEW_KINDS)[number]",
+        "  const byCat = (NIKA_PREVIEW_BY_CATEGORY as Record<string, string>)[category ?? '']",
+        "  return (byCat ?? 'none') as (typeof NIKA_PREVIEW_KINDS)[number]",
+        "}",
+        "",
+    ]
 
 
 def _category_lines(tokens: dict) -> list[str]:
