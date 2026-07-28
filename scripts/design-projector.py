@@ -341,7 +341,7 @@ def render_ts(tokens: dict) -> str:
     return "\n".join(lines)
 
 
-def _ts_literal(value, indent: int = 0) -> str:  # noqa: ARG001
+def _ts_literal(value, indent: int = 0) -> str:
     """A dict/scalar as a TS object literal — unquoted keys, single-quoted
     strings, so the emitted module reads like hand-written source and passes
     the consumers' lint without a per-file exemption."""
