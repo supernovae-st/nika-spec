@@ -487,7 +487,7 @@ Tools are `<namespace>:<path>` · `nika:*` are stdlib builtins ·
 
 ```yaml
 infer:  { prompt: "Summarize ${{ inputs.text }}" }            # call a model
-exec:   { command: "cargo test --workspace --lib" }           # run a process
+exec:   { command: ["cargo", "test", "--lib"] }               # argv · no implicit shell
 invoke: { tool: "nika:fetch", args: { url: "https://..." } }  # call a tool
 agent:                                                         # agentic loop
   prompt: "Review the diff"
@@ -588,7 +588,8 @@ Standards work · SQL · GraphQL · OpenAPI · Dockerfile · GitHub Actions YAML
 
 ```
 1.  ENVELOPE        nika: v1
-                    workflow: my-workflow-id
+                    workflow:
+                      id: my-workflow-id
 
 2.  THE 4 VERBS     infer:  exec:  invoke:  agent:
 
