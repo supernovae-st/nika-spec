@@ -236,7 +236,11 @@ material:
     glow_alpha: 0.05      # light pooling at the bottom lip
   lamp:
     reach_vmax: 60        # the light's radius
-    core: 0.10            # alpha at its centre
+    # 0.10 was a guess and it was invisible: forced to two opposite corners
+    # the rendered page moved 1 sample in 5394. 0.55 reads as a spotlight;
+    # 0.26 reads as a presence, which is the register. Measured on /language
+    # at 1280×1450, additive over the dark room.
+    core: 0.26            # alpha at its centre
     falloff: 0.22         # where it starts to give up
     drift_s: 40           # one idle orbit, so the room lives without a pointer
   motion:
