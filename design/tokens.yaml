@@ -260,6 +260,49 @@ material:
     saturate: 1.12        # the backdrop keeps its colour instead of going grey under blur
     border: 0.09          # white alpha on the hairline
     grain: 0.03           # the same tooth as the plate · one paper, two objects
+  # ── THE GROUND · the floor the graph is drawn on ────────────────────────────
+  # Read out of the shipped canvas (nika-vscode src/webview/dag.css), not
+  # designed here. The web had been drawing a flat fill where the canvas draws
+  # four stacked layers, which is why the two diverged on sight.
+  #
+  # A CROSS, NOT A GRID. The tick is a plus — two 8px arms crossing at the cell
+  # centre — repeated every 40px at 5% white. It reads as a survey mark rather
+  # than as graph paper: it says « this is a plane with coordinates » without
+  # drawing lines that compete with the wires.
+  #
+  # AND THE VIGNETTE KNOWS THE RUN. At rest the pool falls away from 55%; while
+  # tasks execute the falloff TIGHTENS to 46% and the rim darkens, pulling the
+  # eye to the lit work. That is not decoration — it is the only ambient signal
+  # that a run is in flight.
+  ground:
+    grid:
+      cell_px: 40         # the cross repeats on this pitch
+      arm_px: 4           # each arm reaches this far from the centre
+      stroke: 0.05        # white alpha
+      far_cell_px: 96     # when zoomed out, a coarser, slightly firmer mark
+      far_arm_px: 6
+      far_stroke: 0.07
+    vignette:
+      reach_x: 1.20       # of the container width
+      reach_y: 1.00
+      at_y: 0.38          # the pool's centre sits above the middle
+      clear: 0.55         # untouched out to here
+      edge: 0.38          # black alpha at the rim
+    vignette_running:     # the falloff closes while tasks execute
+      reach_x: 1.10
+      reach_y: 0.92
+      at_y: 0.40
+      clear: 0.46
+      edge: 0.50
+    # THE POINTER LAMP ALREADY EXISTED HERE, and it is BLUE. The website
+    # invented a white one for its cabinets before anyone read this; the two
+    # are the same idea at two scales, and this one is the original.
+    spot:
+      radius_px: 680
+      hue: "79 134 255"
+      alpha: 0.06
+      fade: 0.70          # transparent by this stop
+      ease_ms: 400
   motion:
     lift_ms: 190
     drawer_ms: 420
