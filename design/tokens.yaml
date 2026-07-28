@@ -291,6 +291,17 @@ card_identity:
       tools:     verbs.agent.text
     # the border is the same hue, held back — the chip states, it does not shout
     border_mix: 0.40
+    # THE CHIP'S OWN SHAPE, read off the canvas. It ships here because a hue
+    # without a shape is not a chip: the bench proved it by rendering all
+    # fourteen as its own generic pill, where the projected colours lost to a
+    # local rule and every policy looked identical again — the exact defect
+    # this block exists to end, reappearing one surface downstream.
+    shape:
+      pad_x_px: 6
+      pad_y_px: 1
+      radius_px: 4
+      fill: 0.05          # of the surface's ink
+      truncate: true      # a chip states one fact · it never wraps
 
   # THE PORT — the patch-bay jack a wire plugs into. The canvas draws it as an
   # SVG circle with a dark bore and a machined collar; what matters here is the

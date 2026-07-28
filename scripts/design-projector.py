@@ -747,7 +747,17 @@ def render_card_css(tokens: dict) -> str:
     # donc `retry` et `permits` se ressemblaient au pixel près.
     pol = tokens["card_identity"]["policy"]
     mix = int(pol["border_mix"] * 100)
-    chips = "\n".join(
+    sh = pol["shape"]
+    chip_base = (
+        ":where(.nc-pol) { overflow: hidden; text-overflow: ellipsis;"
+        " white-space: nowrap; font-variant-numeric: tabular-nums;"
+        f" padding: {sh['pad_y_px']}px {sh['pad_x_px']}px;"
+        f" border-radius: {sh['radius_px']}px;"
+        " font-family: var(--nk-mono, ui-monospace, monospace);"
+        f" font-size: var(--nk-fs-note, 9px); color: var(--nk-ink-dim, inherit);"
+        f" background: color-mix(in srgb, currentColor {int(sh['fill'] * 100)}%, transparent);"
+        " border: 1px solid color-mix(in srgb, currentColor 22%, transparent); }")
+    chips = chip_base + "\n" + "\n".join(
         f":where(.nc-pol-{k}) {{ color: var(--nk-pol-{k}, {_dotted(tokens, v)});"
         f" border-color: color-mix(in srgb, currentColor {mix}%, transparent); }}"
         for k, v in pol["chip"].items())
