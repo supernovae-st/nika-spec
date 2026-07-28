@@ -323,6 +323,18 @@ card_identity:
   # 1.83:1 on the worst plane (muted ink on bg_elevated). Solved across the three
   # stored planes and both ink weights, the floor is reached at 0.61 (3.04:1),
   # and hover takes it to 4.90:1 so the strengthening is legible and not decorative.
+  #
+  # THE GUARANTEE HAS A PRECONDITION, and the bench found it by breaking it. The
+  # border is `color-mix(currentColor 61%, transparent)`, so a TRANSLUCENT ink
+  # compounds: the bench bound a 20%-alpha white and 61% of it landed at 12.2%,
+  # taking the ratio with it. Nothing was wrong with the CSS and nothing was
+  # wrong with the number — the assumption that `currentColor` is opaque was
+  # simply never stated.
+  #
+  # It is stated now: EVERY RATIO IN THIS FILE ASSUMES AN OPAQUE INK. A surface
+  # that binds a translucent token where a contract measures contrast has voided
+  # the measurement, and no gate downstream can see it — the CSS is valid, the
+  # colour resolves, and only the eye or a probe notices.
   control:
     editable:
       # the classes that ARE editable today; a new one joins this list, it does
