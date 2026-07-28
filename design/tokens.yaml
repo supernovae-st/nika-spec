@@ -360,6 +360,45 @@ material:
       exec: [head, sub, body, why]
       invoke: [head, body, sub, why]
       agent: [head, sub, body, band, why]
+    # THE CLASS CONTRACT · how three surfaces write the SAME card.
+    #
+    # Read off the canvas's own nodeClassOf(), which was the only place it
+    # lived. Two facts a re-implementation gets wrong every time, and both did:
+    #   1. STATE RIDES THE WRAPPER, NOT THE CARD. `.dag-node.status-running`
+    #      wraps `.nc`; the card itself carries no state class. A surface that
+    #      writes `.nc--running` has invented a second grammar.
+    #   2. STATUS IS ONE, MARKS ARE MANY. A task can be success AND stale AND
+    #      cached — three facts, one state. They cannot share a slot.
+    classes:
+      wrapper: dag-node
+      card: nc
+      status_prefix: status-   # status-running · exactly one, always
+      verb_prefix: verb-       # verb-infer · exactly one, always
+      audit_prefix: audit-     # audit-error · rides with has-audit
+      mark:
+        stale: is-stale
+        stale_up: stale-up
+        cached: is-cached
+        recovered: is-recovered
+        audit: has-audit
+        dead_gate: dead-gate
+        asking: is-asking
+      # the anatomy's rows, in the canvas's own words
+      part:
+        head: nc-head
+        tile: nc-tile         # the verb glyph
+        id: nc-id
+        st: nc-st
+        dot: nc-dot
+        sub: nc-sub
+        sub_k: nc-sub-k
+        sub_v: nc-sub-v
+        body: nc-body
+        band: nc-agent-band
+        why: nc-policy        # the container; each line inside is nc-pol
+        why_line: nc-pol
+        badge: nc-badge
+        chip: nc-chip
   motion:
     lift_ms: 190
     drawer_ms: 420
