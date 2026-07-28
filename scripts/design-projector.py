@@ -548,6 +548,14 @@ def render_card_css(tokens: dict) -> str:
    it to its own host. TYPE SIZE is host-bound for the same reason and one more:
    a card sits inside a page that owns a type scale, and the page must win. The
    canvas already defines --nk-fs-* (12.5 · 11 · 10.5 · 10 · 9.5), so it keeps
+   ROW HEIGHTS ARE MINIMA, not fixed. They were `height:` — the canvas's exact
+   pixel rows, sized for the canvas's own type. The moment type became
+   host-bound, a surface with a larger ramp overflowed its row and the text sat
+   ON the dashed rule below it: the card read as if it had dotted leaders
+   running through every mechanism line. A row that must hold text the host
+   sizes cannot be a fixed height. The canvas is unchanged — its content is
+   exactly its old height, so the minimum is the height.
+
    its ramp untouched; the fallbacks below are whole pixels because a half step
    was measured three times to move nothing. The fallback ramp is COARSER than
    the bound one on purpose — six steps inside 3.5px cannot all be whole and
@@ -570,7 +578,7 @@ def render_card_css(tokens: dict) -> str:
   display: flex;
   align-items: center;
   gap: {c["head_gap_px"]}px;
-  height: {c["head_h_px"]}px;
+  min-height: {c["head_h_px"]}px;
   flex: none;
 }}
 :where(.nc-tile) {{
@@ -595,7 +603,7 @@ def render_card_css(tokens: dict) -> str:
 :where(.nc-st) {{
   flex: 0 0 {c["st_w_px"]}px;
   width: {c["st_w_px"]}px;
-  height: {c["head_h_px"]}px;
+  min-height: {c["head_h_px"]}px;
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -614,7 +622,7 @@ def render_card_css(tokens: dict) -> str:
   display: flex;
   align-items: baseline;
   gap: {c["sub_gap_px"]}px;
-  height: {c["sub_h_px"]}px;
+  min-height: {c["sub_h_px"]}px;
   font-size: var(--nk-fs-sub, {round(fs["sub_px"])}px);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
