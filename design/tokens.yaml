@@ -340,7 +340,17 @@ card_identity:
       # the classes that ARE editable today; a new one joins this list, it does
       # not invent a second convention
       classes: [nc-model]
-      indicator: "▾"        # « there are others » · at rest, never only on hover
+      # « IL Y EN A D'AUTRES » · DESSINÉ, jamais un content:. Un glyphe posé par
+      # CSS n'est ni sélectionnable, ni traduit, ni annoncé de façon fiable — et
+      # le gate de contenu CSS de nika.sh l'a refusé, à raison. Geist et shadcn
+      # dessinent leur chevron en SVG pour la même raison. Une flèche vectorielle
+      # reste nette à toute taille et disparaît proprement en forced-colors.
+      indicator:
+        w_px: 7
+        h_px: 4
+        stroke_px: 1.25
+        gap_px: 5           # entre la valeur et l'indicateur
+        alpha: 0.66
       border_rest: 0.61     # 3.04:1 · le pire cas mesuré, pas une estimation
       border_hover: 0.89     # 4.90:1 · l'écart doit se voir
       ring_px: 2
