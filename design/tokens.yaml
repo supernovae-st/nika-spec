@@ -99,6 +99,44 @@ status:
   retrying: "#e0b071"
   muted: "#5a606b"
 
+# THE BUILTIN'S HOUSE — which stored hue paints each of the six categories the
+# tool catalogue declares (core · file · data · network · introspection ·
+# media). The canvas has drawn these since the house-icon landed, resolved
+# inside its own stylesheet as --nk-cat-*; nothing in the shared vocabulary
+# said what a category looks like, so the website could paint none of them and
+# the design bench could not show a builtin at all.
+#
+# ALIASES ONLY, like severity.audit: a category never introduces a colour, it
+# borrows the one its MEANING already has. Reading them in order is the
+# argument — what touches your disk wears the success green because it is the
+# thing that either happened or did not; what leaves the machine wears the
+# accent because that is the reach; what looks at the run itself wears the
+# critical red because introspection is how a run is judged.
+#
+# Keys MUST equal the catalogue's `category` set; every value is a dotted path
+# into this file that must land on a #rrggbb.
+builtin:
+  category:
+    core: status.muted                # the plumbing · it should not shout
+    file: severity.ok                 # it touched your disk, or it did not
+    # THE CANVAS DOES NOT SEPARATE THESE TWO in its brand skin: --nk-data and
+    # --nk-accent are the same #4f86ff there. Recorded as the fact it is, not
+    # dressed up — if data ever earns its own hue, this is the line that moves.
+    data: brand.color.accent
+    network: brand.color.accent       # the only ones that leave the machine
+    # THE CANVAS HOLDS #e6b873 HERE and this file does not store it. Six units
+    # from status.retrying (#e0b071) across all three channels — indistinguishable
+    # at chip size, and one stored amber is worth more than two that differ by
+    # nothing. The canvas converges on this one; the difference is named rather
+    # than silently rounded.
+    introspection: status.retrying
+    # A MIX, because the canvas's is one: infer at 45% into agent. Computed at
+    # projection from two stored hues, so it stays an alias — it introduces no
+    # colour, it states a ratio between two that already exist.
+    media:
+      mix: [verbs.infer.color, verbs.agent.color]
+      at: 0.55                        # weight of the SECOND · agent-leaning
+
 # The per-FEATURE icon bindings — vscode codicon ids, drawn on the
 # rules.icon_grid contract. Unlike the 4 verbs this set is OPEN: a feature
 # lands here the day a surface pins its icon. Keys stay TS-identifier-safe
