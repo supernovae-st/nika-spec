@@ -545,7 +545,14 @@ def render_card_css(tokens: dict) -> str:
    file, so the site, the design bench and the VS Code canvas cannot drift.
 
    Colour is not here on purpose — it projects separately and each surface binds
-   it to its own host. Everything is :where(), specificity zero: the canvas's own
+   it to its own host. TYPE SIZE is host-bound for the same reason and one more:
+   a card sits inside a page that owns a type scale, and the page must win. The
+   canvas already defines --nk-fs-* (12.5 · 11 · 10.5 · 10 · 9.5), so it keeps
+   its ramp untouched; the fallbacks below are whole pixels because a half step
+   was measured three times to move nothing. The fallback ramp is COARSER than
+   the bound one on purpose — six steps inside 3.5px cannot all be whole and
+   distinct, so sub/body/meta collapse to one floor. It is a safety net for a
+   surface that binds nothing, not the ramp. Everything is :where(), specificity zero: the canvas's own
    139 selectors sit on top and win. */
 :where(.nc) {{
   position: relative;
@@ -573,7 +580,7 @@ def render_card_css(tokens: dict) -> str:
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: {fs["label_px"]}px;
+  font-size: var(--nk-fs-label, {round(fs["label_px"])}px);
   border-radius: {c["tile_radius_px"]}px;
 }}
 :where(.nc-id) {{
@@ -581,8 +588,8 @@ def render_card_css(tokens: dict) -> str:
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: {fs["heading_px"]}px;
-  font-weight: 600;
+  font-size: var(--nk-fs-heading, {round(fs["heading_px"])}px);
+  font-weight: var(--nk-fw-strong, 600);
   letter-spacing: 0.01em;
 }}
 :where(.nc-st) {{
@@ -608,7 +615,7 @@ def render_card_css(tokens: dict) -> str:
   align-items: baseline;
   gap: {c["sub_gap_px"]}px;
   height: {c["sub_h_px"]}px;
-  font-size: {fs["sub_px"]}px;
+  font-size: var(--nk-fs-sub, {round(fs["sub_px"])}px);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }}
@@ -616,7 +623,7 @@ def render_card_css(tokens: dict) -> str:
 :where(.nc-sub-v) {{ flex: 0 0 auto; margin-left: auto; }}
 :where(.nc-body) {{
   margin-top: {c["body_top_px"]}px;
-  font-size: {fs["body_px"]}px;
+  font-size: var(--nk-fs-body, {round(fs["body_px"])}px);
   line-height: {c["body_line_px"]}px;
   color: color-mix(in srgb, var(--nk-ink, currentColor) {int(c["body_ink"] * 100)}%, transparent);
   overflow: hidden;
@@ -631,7 +638,7 @@ def render_card_css(tokens: dict) -> str:
   text-overflow: ellipsis;
   white-space: nowrap;
   padding: {c["chip_pad_y_px"]}px {c["chip_pad_x_px"]}px;
-  font-size: {fs["meta_px"]}px;
+  font-size: var(--nk-fs-meta, {round(fs["meta_px"])}px);
   font-family: var(--nk-mono, ui-monospace, monospace);
   background: color-mix(in srgb, var(--nk-ink, currentColor) {int(c["chip_fill"] * 100)}%, transparent);
   border: 1px solid var(--nk-border, currentColor);
@@ -639,7 +646,7 @@ def render_card_css(tokens: dict) -> str:
 }}
 :where(.nc-badge) {{
   flex: 0 0 auto;
-  font-size: {fs["meta_px"]}px;
+  font-size: var(--nk-fs-meta, {round(fs["meta_px"])}px);
   padding-right: {c["badge_clear_px"]}px;
 }}
 
