@@ -59,6 +59,16 @@ jobs:
           python conformance/projection_core_selftest.py
           python conformance/values_proof.py
 
+      # The redteam leg (F-P10) · every seeded hostile fixture MUST be
+      # refused by the oracle with the law its header names (a seeded
+      # attack that passes silently is the worst verdict in the corpus),
+      # and the SAF-T coverage TSV must equal its regeneration byte-for-byte
+      # with zero in-scope tag uncovered.
+      - name: Redteam leg · execution + coverage
+        run: |
+          python conformance/redteam_core_selftest.py
+          python scripts/gen-saf-t-coverage.py --check
+
       # The committed corpus must be BYTE-exact against type_core.py (a
       # drifted corpus makes the Rust differential judge stale verdicts)
       # and every broken-judge mutation must be killed by it.

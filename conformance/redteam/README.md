@@ -1,8 +1,10 @@
 # conformance/redteam/ · the adaptive jam's seeded corpus
 
-> F-P10 (NEP-0014 à venir) · chaque fixture de ce répertoire est taguée
+> F-P10 (son NEP à venir · le ledger FEATURE_LEDGER row F-P10) · chaque fixture de ce répertoire est taguée
 > `# SAF-T<NNNN>` et prouve qu'une technique d'attaque nommée meurt
-> contre un gate DÉTERMINISTE (jamais un juge-LLM · ancre 2605.17634).
+> contre un gate DÉTERMINISTE (jamais un juge-LLM · ancre 2605.17634) ·
+> l'exécution est GATÉE (`conformance/redteam_core_selftest.py` · chaque
+> fixture doit être REFUSÉE avec le code que son header nomme).
 > La couverture est GÉNÉRÉE (`coverage-saf-t.tsv` · `scripts/gen-saf-t-coverage.py`
 > · jamais hand-éditée) · une technique in-scope sans fixture NI bench
 > NI hors-scope déclaré = FAIL du gate de couverture.
