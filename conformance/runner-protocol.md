@@ -188,6 +188,46 @@ byte-parity with the internal path):
 python3 conformance/runner.py run conformance/tests/core   --engine "python3 conformance/runner.py validate"
 ```
 
+### The reference engine's adapter · and the parity it measured
+
+[`adapters/nika-engine.py`](adapters/nika-engine.py) is that small
+adapter for the Rust reference engine (its `nika check --json` speaks a
+30-key report contract, not this wire shape). Run it:
+
+```bash
+NIKA_BIN=/path/to/nika python3 conformance/runner.py run conformance/tests/deep/composition \
+  --engine "python3 conformance/adapters/nika-engine.py"
+```
+
+**Measured 2026-07-29 · 200 of 215 fixtures agree.** Per tier: core
+124/129 · deep **37/37** · stdlib 22/32 · values 10/10 · types 4/4 ·
+gates 3/3. The composition family (`tests/deep/composition`) is **9/9**
+— two independent oracles, same fixtures, same verdicts.
+
+The fifteen divergences are not one bug; they are four classes, and
+naming them is the point of running this at all:
+
+| # | class | count | what it means |
+|---|---|---|---|
+| A | **adapter reach** | 3 | the fixture asserts a `category`-ONLY expectation; the engine's report carries `code`+`gate`+`kind` and no category, so the adapter cannot match it and fails LOUD rather than pass by accident (`stdlib/builtins/001·002·004`) |
+| B | **a codeless rung** | 4 | the fixtures expect `NIKA-PROVIDER`; the engine's MODELS rung emits findings with no spec code (`model`·`tasks`·`why`), so nothing can match by code. The engine owes that rung a code — the harness cannot invent one (`stdlib/001` · `stdlib/providers/001·002·006`) |
+| C | **layer scope** | 6 | a full engine judges MORE layers than a tier-scoped fixture binds. VERIFIED on `stdlib/builtins/005-valid-image-generate`: it declares `permits: {tools: […]}` and no `fs.write`, while its task writes `./assets/og` — so `NIKA-SEC-004` is CORRECT, and `expected.valid: true` is correct too, at the tier this stdlib fixture binds (names + shapes). The other five (`core/dag-topology/011` · `core/envelope/012` · `core/policy/001` · `stdlib/builtins/006·007`) share the shape and are listed UNVERIFIED |
+| D | **doctrine** | 2 | a real disagreement, each side reasoned in its own file. `core/variables/013-valid-output-schema-open-path` asserts « open schema levels … are never statically rejected — the check is sound »; the engine's `schema_typing.rs` answers « a structured-output `schema:` compiles strict — flagging unknown keys is the point of the check ». Both are defensible; the lock is the operator's. (`core/envelope/010` is the milder sibling: both oracles REJECT, they differ on the code family — `NIKA-PARSE` vs `NIKA-TYPE`.) |
+
+Class A is the adapter's own honest limit. Class B is an engine owe.
+Class C says the protocol lacks a **tier-scoping rule for third-party
+mode** — the engine-side suites already work around it by choosing
+narrow tiers (`core/authority` · `runtime/permits`), which is the
+workaround made visible. Class D needs a decision, not a patch.
+
+One defect was found and FIXED by this measurement: the MODELS rung
+refused a TEMPLATED `model:` — reading `${{ const.model }}` as a bare
+model id and thereby refusing the parameterization pattern
+[08 §H8](../spec/08-out-of-scope.md) recommends by name (« one
+workflow, any backend ») on this suite's own fixture
+`stdlib/providers/005-valid-parameterized-model`. A rung that cannot
+decide must not refuse.
+
 ### Native CLI (planned)
 
 ```bash
