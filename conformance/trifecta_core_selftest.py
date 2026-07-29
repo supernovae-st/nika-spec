@@ -13,6 +13,7 @@ from pathlib import Path
 import yaml
 
 sys.path.insert(0, str(Path(__file__).parent))
+import trifecta_core  # noqa: E402
 from trifecta_core import trifecta_errors  # noqa: E402
 
 CHECKS: list[tuple[str, bool]] = []
@@ -310,6 +311,59 @@ tasks:
       tool: "nika:write"
       args: { path: "./out/leak2.txt", content: "${{ with.body }}" }
 """))
+
+# ── the media-writer sinks · the hole a refuting probe opened 2026-07-29 ──
+# A hardcoded egress subset read this GREEN while the engine refused it
+# (NIKA-SEC-009 on `render`), and the corpus never completed that shape,
+# so 49/49 agreement had proven nothing about it. One law per media
+# writer: each is an fs-WRITE effect, so each is a leg-③ sink.
+for _tool, _args in [
+    ("nika:chart", '{ chart: "bar", data: "${{ with.d }}", out: "./out/c.svg" }'),
+    # A tainted PATH reaching an fs-write effect is the same threat as
+    # tainted content — an attacker-chosen filename lands attacker bytes
+    # somewhere the operator did not choose.
+    ("nika:image_fx", '{ input: "a.png", ops: ["dither"], out: "./out/${{ with.d }}.png" }'),
+    ("nika:image_generate", '{ prompt: "${{ with.d }}", output_dir: "./out" }'),
+    ("nika:tts_generate", '{ text: "${{ with.d }}", output_dir: "./out" }'),
+]:
+    _v = judge(f"""
+nika: v1
+workflow: {{ id: media }}
+model: mock/echo
+permits:
+  tools: ["nika:fetch", "{_tool}"]
+  fs: {{ read: ["./private/**"], write: ["./out/**"] }}
+  net: {{ http: ["api.example.com"] }}
+tasks:
+  pull:
+    invoke:
+      tool: "nika:fetch"
+      args: {{ url: "https://api.example.com/d" }}
+  render:
+    with: {{ d: "${{{{ tasks.pull.output }}}}" }}
+    invoke:
+      tool: "{_tool}"
+      args: {_args}
+""")
+    law(f"{_tool} is a leg-③ sink (fs write)",
+        len(_v) == 1 and _v[0]["task"] == "render" and _v[0]["source"] == "pull")
+
+# ── the COMPLETENESS ratchet (the structural half of the same repair) ──
+# Every builtin the registry classifies `external` must be explicitly
+# classified here — egress, or external-but-read-only. A 29th external
+# builtin fails THIS law instead of silently under-reporting a sink.
+_reg = yaml.safe_load(
+    (Path(__file__).parent.parent / "canon" / "builtins.yaml").read_text())
+_external = {r["id"] for r in _reg["builtins"]
+             if r["capability_classification"]["class"] == "external"}
+_classified = trifecta_core.EGRESS_BUILTINS | trifecta_core.EXTERNAL_READ_ONLY
+law("every registry `external` builtin is classified (no silent sink)",
+    _external - _classified == set())
+law("no classified builtin is unknown to the registry",
+    _classified - _external == set())
+law("the writers are the fs half of the egress set",
+    trifecta_core.FS_WRITERS == trifecta_core.EGRESS_BUILTINS
+    - {"nika:fetch", "nika:notify"})
 
 # ── the corpus pin · the ONE deliberately-red witness refuses HERE too ──
 _radar = Path(__file__).parent.parent / "examples" / "release-radar.nika.yaml"

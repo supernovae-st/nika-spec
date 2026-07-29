@@ -54,8 +54,35 @@ TASK_REF = re.compile(r"\btasks\.([a-z][a-z0-9_]*)")
 WITH_REF = re.compile(r"\bwith\.([a-z][a-z0-9_]*)")
 ITEM_REF = re.compile(r"\bitem\b")
 
-NET_BUILTINS = {"nika:fetch", "nika:notify"}
-FS_WRITE_BUILTINS = {"nika:write", "nika:edit"}
+# The egress-capable builtins — a builtin that can realize a net or
+# fs-WRITE effect (NEP-0002 leg ③'s sink side). Derived by hand from the
+# ONE effect table, and PARTITIONED against the registry: together with
+# EXTERNAL_READ_ONLY below this set must equal the `external` capability
+# class of `canon/builtins.yaml` (11 rows), which the selftest asserts —
+# a 29th external builtin FAILS the completeness law instead of silently
+# under-reporting. That ratchet exists because a hardcoded subset was
+# exactly the defect measured 2026-07-29: with the four media writers
+# missing, a chart-sink trifecta read GREEN here while the engine
+# refused it (the corpus never happened to complete that shape, so
+# 49/49 agreement had proven nothing about it).
+EGRESS_BUILTINS = {
+    "nika:fetch",           # net
+    "nika:notify",          # net (webhook) · egress-capable unconditionally
+    "nika:write",           # fs write
+    "nika:edit",            # fs write
+    "nika:chart",           # fs write · the `out:` artifact (+ vega sibling)
+    "nika:image_fx",        # fs write · the `out:` artifact
+    "nika:image_generate",  # fs write · assets land in `output_dir:` (recursive)
+    "nika:tts_generate",    # fs write · same shape as image_generate
+}
+# External but read-only — they touch the filesystem WITHOUT writing, so
+# they are ①'s domain (private data), never ③'s (egress).
+EXTERNAL_READ_ONLY = {"nika:read", "nika:grep", "nika:glob"}
+# The filesystem WRITERS among the egress set — the first half of the
+# exec-opacity channel (a tainted writer earlier in run order + a
+# declared `fs.read` taints a later `exec:`). Net-only tools cannot
+# stage a file for a subsequent exec to read.
+FS_WRITERS = EGRESS_BUILTINS - {"nika:fetch", "nika:notify"}
 INGRESS_BUILTIN = "nika:fetch"
 GATE_TOOL = "nika:prompt"
 VERBS = ("infer", "exec", "invoke", "agent")
@@ -171,7 +198,7 @@ def _classify(task: dict):
     elif verb == "agent":
         tools = action.get("tools") if isinstance(action, dict) else None
         ingress = _whitelist_admits(tools, {INGRESS_BUILTIN})
-        egress = _whitelist_admits(tools, NET_BUILTINS | FS_WRITE_BUILTINS)
+        egress = _whitelist_admits(tools, EGRESS_BUILTINS)
     elif verb == "invoke":
         tool = _invoke_tool(action)
         if tool is None:
@@ -181,8 +208,8 @@ def _classify(task: dict):
             egress = True
         else:
             ingress = tool == INGRESS_BUILTIN
-            egress = tool in NET_BUILTINS or tool in FS_WRITE_BUILTINS
-            writer = tool in FS_WRITE_BUILTINS
+            egress = tool in EGRESS_BUILTINS
+            writer = tool in FS_WRITERS
             if tool == GATE_TOOL:
                 args = action.get("args") if isinstance(action, dict) else None
                 gate = not (isinstance(args, dict) and "default" in args)
