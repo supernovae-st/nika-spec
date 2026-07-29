@@ -285,8 +285,8 @@ patterns:
   evidence: "workflow.schema.json's own $comment: 'INTERIM hand-derived schema · prose spec is the single source of truth · regenerate + diff against engine nika-schema at GA' — authored today, generated at GA; law.schema.json + registries.schema.json are the sealed R2 design-pack contracts (consumed as-is, byte-identical per PROOFS.md §P0)"
 - glob: "scripts/**"
   class: authored
-  match_count: 17
-  aggregate_sha256: ebdbb35ad7deab5f43996031d5a2a55d32bcbbe53257fee0a5cf6b5cdc39a6fc
+  match_count: 18
+  aggregate_sha256: ae74ab2a4691aa843a47c8c914059228de5e0c2e805e1e98cd65d2bd50d22674
   evidence: "the compiler + projectors humans wrote (ssot-compiler · canon/showcase/llms/starters/authoring/design projectors · gen-gate-matrix · gen-type-corpus · grammar_door + selftest · check-md-refs · codemods) — the tools that WRITE the generated surfaces; estate.py excepted in files: (the self row)"
 - glob: "timeline/**"
   class: authored
@@ -311,12 +311,12 @@ patterns:
 - glob: ".github/**"
   class: authored
   match_count: 7
-  aggregate_sha256: 30ab70e3b009a633183177106f1839becf1bbd8da6f54292c7801b7da8869fc4
+  aggregate_sha256: 678802f729a699716e207d7ed51cca06592ede177908a13aa39797207060e917
   evidence: "6 hand-written SHA-pinned workflows (conformance · timeline · board · codeql · reuse · scorecard) + dependabot config — ZERO in-repo bot lanes: board.yml writes to the org Projects board, timeline.yml verifies read-only, nothing here rewrites tracked files; requirements.txt excepted in files:"
 - glob: "*"
   class: authored
-  match_count: 17
-  aggregate_sha256: e385329feab5eead678bc07dfc4a9f5b5f91f277bc5c94a6274a192e28656f39
+  match_count: 16
+  aggregate_sha256: bcf2ff3bdaca81c3332fc5c0e655e89e64b08ec809f079aaacca8a9263403da5
   evidence: "root prose + config (README · QUICKSTART · GLOSSARY · CONTRIBUTING · CHANGELOG hand-kept per Keep a Changelog · SECURITY · CITATION.cff · CONFORMANT_IMPLEMENTATIONS · PROOFS.md the receipts ledger · LICENSE · REUSE.toml · ruff.toml · .gitignore · .pre-commit-hooks.yaml · .bestpractices.json) — no generation markers; VERSION · llms*.txt · canon.yaml · CODE_OF_CONDUCT.md excepted in files:"
   note: "README · QUICKSTART · GLOSSARY · CONTRIBUTING · CHANGELOG carry the canon-projected count markers — tool-maintained blocks inside authored prose"
 - glob: "**"
