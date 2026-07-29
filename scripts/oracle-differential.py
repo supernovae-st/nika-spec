@@ -41,16 +41,37 @@ sys.path.insert(0, str(SPEC_ROOT / "conformance"))
 import yaml  # noqa: E402
 from runner import load_canon, load_schema, validate_workflow  # noqa: E402
 
-# (filename, reason) — tolerated divergences. Keep it EMPTY unless a skew
-# has a name; a row here is a debt, not a dispensation.
-LEDGER: list[tuple[str, str]] = [
+# (filename, engine_ok, reference_ok, reason) — tolerated divergences,
+# DIRECTIONAL: a row forgives exactly ONE (engine, reference) verdict
+# pair. Any other combination stays unexplained — the portal never
+# narrows (every file still runs through BOTH oracles) and a skew that
+# changes shape must re-fail. Keep it EMPTY unless a skew has a name; a
+# row here is a debt, not a dispensation.
+_POLICY_SKEW = (
+    "the corpus rides the endorsement grammar (policy: · NEP-0014 · spec "
+    "ba2754c) which no engine build parses yet — engine main refuses it "
+    "as NIKA-PARSE-019 unknown field while the reference (schema updated "
+    "same commit) reads it GREEN. DEBT: the lot-3b engine PR lands the "
+    "grammar, these rows die at that merge."
+)
+
+LEDGER: list[tuple[str, bool, bool, str]] = [
     (
         "release-radar.nika.yaml",
-        "the deliberately-red corpus file (engine refuses NIKA-SEC-009, the "
-        "lethal trifecta over an honest boundary) reads GREEN to the "
-        "reference — the python runner does not implement SEC-009 yet. "
-        "DEBT: the trifecta rule lands in the reference, this row dies.",
+        False,  # engine · REFUSES (NIKA-SEC-009 · the lethal trifecta)
+        True,  # reference · GREEN (trifecta rule not implemented yet)
+        "the deliberately-red witness: engine refuses NIKA-SEC-009 (lethal "
+        "trifecta over an honest boundary) while the python reference reads "
+        "it GREEN — SEC-009 is not implemented reference-side yet. DEBT: "
+        "the trifecta rule lands in the reference, this row dies. Any OTHER "
+        "verdict pair on this file is a NEW skew and fails.",
     ),
+    ("ceo-monday-brief.nika.yaml", False, True, _POLICY_SKEW),
+    ("incident-war-room.nika.yaml", False, True, _POLICY_SKEW),
+    ("invoice-chaser.nika.yaml", False, True, _POLICY_SKEW),
+    ("release-train.nika.yaml", False, True, _POLICY_SKEW),
+    ("etl-state.nika.yaml", False, True, _POLICY_SKEW),
+    ("human-gated-ship.nika.yaml", False, True, _POLICY_SKEW),
 ]
 
 
@@ -98,7 +119,7 @@ def main() -> int:
         list((SPEC_ROOT / "examples").glob("*.nika.yaml"))
         + list((SPEC_ROOT / "templates").glob("*.nika.yaml"))
     )
-    ledger = {name: why for name, why in LEDGER}
+    ledger = {name: (e, r, why) for name, e, r, why in LEDGER}
     agree = 0
     unexplained: list[str] = []
     for f in files:
@@ -107,8 +128,10 @@ def main() -> int:
         if e_ok == r_ok:
             agree += 1
             continue
-        if f.name in ledger:
-            print(f"LEDGER {f.name} · {ledger[f.name]}")
+        row = ledger.get(f.name)
+        if row is not None and (e_ok, r_ok) == (row[0], row[1]):
+            print(f"LEDGER {f.name} · engine={'pass' if e_ok else 'fail'} · "
+                  f"reference={'pass' if r_ok else 'fail'} · {row[2]}")
             continue
         unexplained.append(f.name)
         print(f"DIVERGE {f.name} · engine={'pass' if e_ok else 'fail'} "

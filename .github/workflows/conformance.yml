@@ -59,6 +59,17 @@ jobs:
           python conformance/projection_core_selftest.py
           python conformance/values_proof.py
 
+      # The second-key gate — a duplicate YAML key silently loses to its
+      # twin (three real bites: a swallowed CI step · a doubled permits
+      # block · an indent-eaten dependabot groups). *.nika.yaml is exempt
+      # (the engine parser refuses duplicates itself · NIKA-PARSE-017) and
+      # conformance/tests/ is the harness's torture corpus, not this
+      # gate's law. Selftest first: the teeth are proven before they bite.
+      - name: YAML duplicate-key gate (selftest + sweep)
+        run: |
+          python scripts/check-yaml-dup-keys.py --selftest
+          python scripts/check-yaml-dup-keys.py
+
       # The redteam leg (F-P10) · every seeded hostile fixture MUST be
       # refused by the oracle with the law its header names (a seeded
       # attack that passes silently is the worst verdict in the corpus),
