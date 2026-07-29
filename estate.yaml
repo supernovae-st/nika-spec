@@ -320,7 +320,7 @@ patterns:
 - glob: ".github/**"
   class: authored
   match_count: 7
-  aggregate_sha256: c1c8630349d2b60bb7ebfc34b7922f7a43e7fa9689b2499b92f4875254e27acb
+  aggregate_sha256: 549d36862a3c6524340edddb553fe2aaad1df79a6f2dc56546bb083abf2461a3
   evidence: "6 hand-written SHA-pinned workflows (conformance · timeline · board · codeql · reuse · scorecard) + dependabot config — ZERO in-repo bot lanes: board.yml writes to the org Projects board, timeline.yml verifies read-only, nothing here rewrites tracked files; requirements.txt excepted in files:"
 - glob: "*"
   class: authored
