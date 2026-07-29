@@ -47,14 +47,6 @@ from runner import load_canon, load_schema, validate_workflow  # noqa: E402
 # narrows (every file still runs through BOTH oracles) and a skew that
 # changes shape must re-fail. Keep it EMPTY unless a skew has a name; a
 # row here is a debt, not a dispensation.
-_POLICY_SKEW = (
-    "the corpus rides the endorsement grammar (policy: · NEP-0014 · spec "
-    "ba2754c) which no engine build parses yet — engine main refuses it "
-    "as NIKA-PARSE-019 unknown field while the reference (schema updated "
-    "same commit) reads it GREEN. DEBT: the lot-3b engine PR lands the "
-    "grammar, these rows die at that merge."
-)
-
 LEDGER: list[tuple[str, bool, bool, str]] = [
     (
         "release-radar.nika.yaml",
@@ -66,12 +58,10 @@ LEDGER: list[tuple[str, bool, bool, str]] = [
         "the trifecta rule lands in the reference, this row dies. Any OTHER "
         "verdict pair on this file is a NEW skew and fails.",
     ),
-    ("ceo-monday-brief.nika.yaml", False, True, _POLICY_SKEW),
-    ("incident-war-room.nika.yaml", False, True, _POLICY_SKEW),
-    ("invoice-chaser.nika.yaml", False, True, _POLICY_SKEW),
-    ("release-train.nika.yaml", False, True, _POLICY_SKEW),
-    ("etl-state.nika.yaml", False, True, _POLICY_SKEW),
-    ("human-gated-ship.nika.yaml", False, True, _POLICY_SKEW),
+    # The six policy-skew rows (corpus ahead of the engine grammar ·
+    # NEP-0014) died 2026-07-29 night exactly as written: the lot-3b PR
+    # (#753) merged, an engine built from main parses `policy:`, and the
+    # re-run read 48/49 agree with zero unexplained.
 ]
 
 
