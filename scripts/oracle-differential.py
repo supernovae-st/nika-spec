@@ -48,20 +48,16 @@ from runner import load_canon, load_schema, validate_workflow  # noqa: E402
 # changes shape must re-fail. Keep it EMPTY unless a skew has a name; a
 # row here is a debt, not a dispensation.
 LEDGER: list[tuple[str, bool, bool, str]] = [
-    (
-        "release-radar.nika.yaml",
-        False,  # engine · REFUSES (NIKA-SEC-009 · the lethal trifecta)
-        True,  # reference · GREEN (trifecta rule not implemented yet)
-        "the deliberately-red witness: engine refuses NIKA-SEC-009 (lethal "
-        "trifecta over an honest boundary) while the python reference reads "
-        "it GREEN — SEC-009 is not implemented reference-side yet. DEBT: "
-        "the trifecta rule lands in the reference, this row dies. Any OTHER "
-        "verdict pair on this file is a NEW skew and fails.",
-    ),
     # The six policy-skew rows (corpus ahead of the engine grammar ·
     # NEP-0014) died 2026-07-29 night exactly as written: the lot-3b PR
     # (#753) merged, an engine built from main parses `policy:`, and the
     # re-run read 48/49 agree with zero unexplained.
+    #
+    # The release-radar row (SEC-009 unimplemented reference-side) died
+    # 2026-07-29 evening the same way: the trifecta lane landed in the
+    # reference (conformance/trifecta_core.py · NEP-0002 v2.0) and both
+    # oracles now refuse the deliberately-red witness for the same
+    # reason. The ledger is EMPTY — the healthy state.
 ]
 
 

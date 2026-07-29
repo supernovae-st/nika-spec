@@ -61,6 +61,7 @@ from jsonschema import Draft202012Validator
 
 from deep_static import deep_static_errors, policy_errors
 from composition_core import composition_errors
+from trifecta_core import trifecta_errors
 from type_core import type_core_errors
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "reference"))
@@ -937,6 +938,7 @@ def validate_workflow(doc: dict, validator: Draft202012Validator,
     errs.extend(type_core_errors(doc))
     errs.extend(values_core_errors(doc))
     errs.extend(policy_errors(doc))
+    errs.extend(trifecta_errors(doc))
     errs.extend(composition_errors(doc, base_dir))
     if canon is not None:
         errs.extend(stdlib_surface_errors(doc, canon))
@@ -1033,13 +1035,32 @@ def run_fixtures(fixtures_dir: pathlib.Path, validator: Draft202012Validator,
     return 1 if failed else 0
 
 
+# The corpus's ONE deliberate red — the SEC-009 witness (NEP-0002): the
+# engine keeps release-radar red on purpose, and the reference agrees for
+# the SAME reason. Inverted assertion, never a skip: the file MUST fail
+# with exactly this code — a green here means the trifecta lane broke, any
+# OTHER code means a new defect is hiding behind the expected one.
+DELIBERATE_RED = {"release-radar.nika.yaml": "NIKA-SEC-009"}
+
+
 def run_examples(examples_dir: pathlib.Path, validator: Draft202012Validator,
                  canon: dict | None = None) -> int:
     """Every example IS a conformance input · asserted valid at the full
-    static level (Core cross-refs + Stdlib surface) · the moat-proof gate."""
+    static level (Core cross-refs + Stdlib surface) · the moat-proof gate.
+    The named deliberate-red witnesses invert the assertion (they must
+    fail with exactly their expected code)."""
     bad = 0
     for f in sorted(examples_dir.glob("*.nika.yaml")):
         v = validate_text(f.read_text(), validator, canon)
+        expected_red = DELIBERATE_RED.get(f.name)
+        if expected_red:
+            codes = {e.get("code") or e.get("namespace") for e in v["errors"]}
+            ok = not v["valid"] and codes == {expected_red}
+            print(f"{'PASS' if ok else 'FAIL'}  {f.name} · deliberate red ({expected_red})")
+            if not ok:
+                print(f"      expected exactly {expected_red} · got valid={v['valid']} {sorted(codes) or 'no errors'}")
+                bad += 1
+            continue
         print(f"{'PASS' if v['valid'] else 'FAIL'}  {f.name}")
         if not v["valid"]:
             for e in v["errors"]:
