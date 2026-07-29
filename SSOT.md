@@ -105,21 +105,22 @@ engine/crates/nika-catalog/src/data/builtins.rs   ★ ALL_BUILTINS · 28, sorted
        ├──▶ what `nika check` accepts
        ├──▶ what the agent kit teaches   gate: the_kit_never_teaches_a_form_the_engine_refuses
        ├──▶ canon.yaml `builtins:`       (kept in step by hand today)
-       └──▶ ⚠️ NOTHING checks that a builtin has an EXAMPLE
+       └──▶ a builtin has an EXAMPLE     gate: every_builtin_is_shown_or_carries_a_named_debt
 ```
 
-**The open hole, measured 2026-07-29**: 24 of 28 builtins appear in the corpus.
-Four are invisible to any agent that learns from examples:
+**The hole is gated now** (2026-07-29 · engine
+`nika-cli/src/verbs/examples.rs` tests, same shape as the kit gate pointed the
+other way): 24 of 28 builtins appear in the corpus, and the four that do not
+ride the test's `OWED` list — each with its reason and the showcase it owes.
+The 29th builtin cannot ship silently, and a debt paid by a new lesson must be
+struck from `OWED` in the same arc or the test refuses.
 
-| missing | cost of the gap |
+| owed | cost of the gap while it lasts |
 |---|---|
 | `nika:decide` | the DETERMINISTIC decision kernel (spec 11 · W-DEC). An agent that never sees it spends a model call on an `if`. **This one costs money on every generated workflow.** |
 | `nika:inspect` | cost · records · dag_info · threads, merged into one door (ADR-088). An agent cannot introspect its own run. |
 | `nika:compose` | the agent loop's self-verification intrinsic (ADR-096) — the pattern for a model that WRITES Nika. |
 | `nika:tts_generate` | the audio graduate. A showcase gap, not a logic gap. |
-
-Ratchet owed: a test comparing `ALL_BUILTINS` against the corpus, so the 29th
-builtin cannot ship without a showcase.
 
 ---
 
@@ -183,14 +184,12 @@ Extending the dead-forms scanner past the kit is owed work.
    canon.yaml → 3 targets            canon-projectors.py --check
    spec → pack                       sync-pack.sh + nika-pack integrity tests
    the agent kit                     check-dead-forms.py + 62/62 nika-onboard
-   the 43 corpus files               nika check --native-strict, all of them
+   the corpus files                  nika check --native-strict, all of them
+   a builtin without an example      every_builtin_is_shown_or_carries_a_named_debt
+   a construct without a showcase    every_construct_has_a_showcase · 16/16 held
 
 ⚠️ UNGATED · discipline only
    taught YAML outside the kit       ~3400 files across six repos
-   a builtin without an example      4 today
-   a language construct without      never measured: the 4 verbs, edge
-     a showcase                        predicates, for_each, on_error, retry,
-                                       composition
 ```
 
 ---
@@ -234,13 +233,17 @@ through a taint, so an author who meets that wall has no visible door and will
 either widen a boundary or abandon the workflow. And composition is how anything
 non-trivial is built at all.
 
-### Owed
+### Owed — settled 2026-07-29 PM
 
 ```
-1  showcase the four zero-coverage constructs · composition and declassify first
-2  a second example for on_finally and the failure predicate
-3  the coverage ratchet, extended: a construct in the spec with no example is
-   a build warning, the same way a builtin without one should be
+1  ✔ the four zero-coverage constructs have their lessons (08-config ·
+     09-returns · 10-compose ×2 · 11-declassify · 12-failure-routing) —
+     the path covers 16/16, and the claims in those files were RUN, not
+     written (the door map, the config refusal, the ⊘ gate line)
+2  still open · a second example for on_finally and the failure predicate
+3  ✔ the ratchet holds both axes in the engine's lib battery:
+     every_construct_has_a_showcase refuses the 17th uncovered key,
+     every_builtin_is_shown_or_carries_a_named_debt refuses the silent 29th
 ```
 
 
