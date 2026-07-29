@@ -1876,3 +1876,55 @@ laws:
     closure_gates:
       - symlink-regate-dispatch-refusal
       - platform-parity-symlink-pair
+  - id: LAW-AUTH-0331
+    slug: authority/approval-ticket
+    status: active
+    owner: spec
+    domain: AUTH
+    title: "L'approbation humaine est un ticket borné · montré = signé (hash du rendu canonique) · scopé (run × step × hash) · TTL · rate-limité (N=5 · HALT typé au N+1ᵉ) · attesté (approval_decided chaîné) · révocable avant exécution seulement"
+    prose_projection:
+      chapters: ["10-authority"]
+      text: "NEP-0013 (lane F-P4 · 2026-07-24 · ratifiée op 2026-07-22 · 6e invariant) · l'approbation n'est pas une réponse nue : c'est un TICKET · content-bound (le hash du rendu canonique du montré · message + identité de l'action + classes d'effet · JAMAIS un résumé LLM · mismatch = HALT approval.content_mismatch au receipt) · scopé (ce run × ce step × ce hash · nonce run · cross-run = refus) · TTL (constante engine · 15 min défaut · expiré = re-prompt) · rate-limité (N=5 par run · dédup des prompts identiques = même ticket attesté dedup · batch hétérogène = refus au check (un prompt = une action d'une classe) · le N+1ᵉ = HALT typé security_error, jamais une file) · attesté (event approval_decided hash-chaîné · digest · shown-hash · décision · TTL · scope · les digests montent au receipt) · révocable AVANT exécution seulement (jamais de réécriture rétroactive)."
+    inputs:
+      - registry: ir
+        id: approval_decision
+        role: required
+    premises:
+      - operator: member_of
+        operands:
+          - registry: ir
+            id: approval_ticket
+          - registry: ir
+            id: scoped_ticket_set
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["jcs"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: approval_ticket
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["DeclaredPermits", "EffectiveAuthority"]
+      relation: subset
+      pipeline_stage: permits_check
+    diagnostics: ["NIKA-POLICY-001"]
+    fixtures: []
+    negative_fixtures: []
+    projections: ["prose:10-authority", "cli:check"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - cli:nika-check
+    introduced_in: C1
+    proof_obligations:
+      - "NEP-0013 lois 1-2 · la fixture content-mismatch prouve le HALT (un --answer dont le hash du contenu résolu ≠ hash montré · finding approval.content_mismatch au receipt) · la fixture TTL prouve le re-prompt à expiration et le refus cross-run (le nonce ne matche pas)."
+      - "NEP-0013 loi 3 · la fixture rafale prouve le HALT typé security_error au 6ᵉ prompt (N=5 · jamais une file) · la fixture dédup prouve UN ticket pour deux prompts de même hash (le 2ᵉ attesté dedup · l'humain non re-questionné) · la fixture batch hétérogène prouve le refus au check."
+      - "NEP-0013 loi 4 · le gate honnête passe bout à bout · l'event approval_decided est chaîné dans le journal et ses digests montent au receipt (le receipt jure QUI a approuvé QUOI · jamais « un humain a cliqué »)."
+    closure_gates:
+      - approval-ticket-content-bound
+      - approval-burst-typed-halt
+      - approval-decided-attested
