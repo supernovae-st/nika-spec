@@ -838,20 +838,25 @@ def _code_bearing_class(url: str):
     import urllib.parse
     import posixpath
     path = urllib.parse.urlparse(url).path
-    # O7-A · the encoded-extension bypass (red team 2026-07-23): classify
-    # the DECODED final segment exactly once (the origin decodes once too
-    # · RFC 3986 §2.3) · `%2e` ≡ `.` and double-encoded `%252e` stays inert.
-    path = urllib.parse.unquote(path)
+    # O7-A + O7-C · the order IS the law (mirrors nika-cap sink.rs · the
+    # final review 2026-07-23): trailing slashes are a path-structure
+    # artifact (trimmed first), then the segment decodes exactly once
+    # (RFC 3986 §2.3 · the origin decodes once too · `%2e` ≡ `.` and
+    # double-encoded `%252e` stays inert), then the trailing dot is
+    # trimmed AFTER decode — `legacy%2epkl%2e` and the literal
+    # `legacy.pkl.` are the SAME artifact and take the SAME verdict.
+    segment = path.rstrip("/").rsplit("/", 1)[-1]
+    segment = urllib.parse.unquote(segment).rstrip(".")
     # O7-B · the versioned native form (`lib.so.1.2` IS what dlopen loads)
     # · strip trailing `.N` groups before the native-class match.
-    native_base = path.rstrip("0123456789.")
-    ext = posixpath.splitext(path)[1].lower()
+    native_base = segment.rstrip("0123456789.")
+    ext = posixpath.splitext(segment)[1].lower()
     if not ext:
         return None
     for cls, exts in _CODE_BEARING_CLASSES.items():
         if ext in exts:
             return cls, ext
-    if native_base != path:
+    if native_base != segment:
         native_ext = posixpath.splitext(native_base)[1].lower()
         if native_ext in _CODE_BEARING_CLASSES.get("executable binary/module", ()):
             return "executable binary/module", native_ext
