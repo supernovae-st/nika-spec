@@ -243,3 +243,97 @@ non-trivial is built at all.
    a build warning, the same way a builtin without one should be
 ```
 
+
+---
+
+## §11 · The next cut · lessons and templates teach the SAME shapes
+
+Found while measuring the learning path with the construct index, 2026-07-29.
+Not acted on — recorded because it is the largest remaining duplication and it
+needs a decision, not a reflex.
+
+### The measurement that surfaced it
+
+Turning the index on the path itself gave a clean result and one anomaly:
+
+```
+01-hello                infer:
+02-parallel-fanout      ⚠ nothing new
+03-exec-pipeline        exec: · when: · after: · on_finally:
+04-schema-retry         retry: · schema: · inputs:
+05-fetch-chain          invoke: · on_error:
+06-code-review          agent:
+07-for-each-locales     for_each:
+08-config-values        config:
+09-returns-typed-door   returns:
+10-compose-child        ⚠ nothing new      (the callee half of lesson 10)
+10-compose-pipeline     workflow:
+11-declassify-the-door  declassify:
+12-failure-routing      ⚠ nothing new
+
+⟹ 16/16 constructs covered · none missing
+```
+
+**The path now covers the whole language.** The three ⚠ rows are not bad
+lessons — they are the index's blind spot. `02` teaches fan-out-and-merge, `12`
+teaches how failures route, and neither introduces a KEY. They teach a SHAPE:
+a combination of keys that forms a recognisable pattern.
+
+So there are two axes, and the index sees one:
+
+```
+KEYS     what syntax exists            for_each: · declassify:
+SHAPES   how keys COMBINE              fan-out+merge · failure routing · composition
+```
+
+### The duplication
+
+Templates are named by shape. Lessons, it turns out, teach the same shapes:
+
+```
+TEMPLATE (fillable)      LESSON (readable)        same shape
+agent-loop               06-code-review               ✓
+fanout                   02-parallel-fanout           ✓
+                         07-for-each-locales          ✓
+chain                    05-fetch-chain               ✓
+gate-and-act             03-exec-pipeline             ~
+```
+
+13 lessons + 10 templates = 23 files, with five pairs teaching one thing twice
+under two names in two directories.
+
+### The question, unanswered on purpose
+
+A lesson is MINIMAL — it introduces one idea with nothing else in the way. A
+template is COMPLETE — it is a working shape with the holes marked. Those are
+genuinely different artifacts for genuinely different moments.
+
+**But is that difference worth two directories and two names for one shape?**
+
+Since the corpus rebuild all ten templates run green offline, so a template is
+no longer "the broken one until you fill it". The distinction weakened, which is
+exactly when a merge becomes thinkable and exactly when it should be examined
+rather than assumed.
+
+Three ways to go:
+
+```
+1  MERGE ON SHAPE   one file per shape, SLOT-marked, readable AND fillable
+                    23 files → ~18 · one name per idea
+                    cost: loses the minimal-teaching version
+
+2  KEEP BOTH, name the relationship
+                    05-fetch-chain says « the fillable form is templates/chain »
+                    zero files moved · the duplication becomes navigable
+
+3  KEEP AS IS       the two artifacts serve two moments and the cost is 5 files
+```
+
+### What is owed either way
+
+**The index must learn the SHAPES axis.** Today `nika examples teaches` answers
+« which file shows `for_each:` » and cannot answer « which file shows fan-out
+and merge », which is the question an author with an intent actually has. The
+routing table in the authoring skill already carries the shape vocabulary
+(chain · gate-and-act · fanout · etl-state · agent-loop · human-gated-ship) and
+it is not derived from anything — a hand-maintained list beside a derived one.
