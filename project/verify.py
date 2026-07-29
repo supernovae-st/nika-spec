@@ -14,14 +14,14 @@ import yaml
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from project_os.github import (  # noqa: E402
+from project.github import (  # noqa: E402
     GitHub,
     GitHubError,
     load_project,
     project_fields,
     views_snapshot,
 )
-from project_os.model import ITEM_GATE, timeline_items  # noqa: E402
+from project.model import ITEM_GATE, timeline_items  # noqa: E402
 
 
 VALID_WRITERS = {"projector", "timeline", "github", "human"}

@@ -10,8 +10,8 @@ from unittest.mock import MagicMock, patch
 
 import yaml
 
-from project_os.github import ActualItem, GitHub, reconcile
-from project_os.model import (
+from project.github import ActualItem, GitHub, reconcile
+from project.model import (
     BLOCK_BLOCKED,
     BLOCK_BLOCKING,
     BLOCK_BOTH,
@@ -208,7 +208,7 @@ class ReconcileTests(unittest.TestCase):
             managed_content=True,
             legacy_titles=("Diamond genesis",),
         )
-        with patch("project_os.github.snapshot_items", return_value=[actual]):
+        with patch("project.github.snapshot_items", return_value=[actual]):
             actions = reconcile(
                 object(),
                 "PROJECT",
@@ -242,7 +242,7 @@ class ReconcileTests(unittest.TestCase):
                 fields={},
             ),
         ]
-        with patch("project_os.github.snapshot_items", return_value=actual):
+        with patch("project.github.snapshot_items", return_value=actual):
             actions = reconcile(
                 object(),
                 "PROJECT",
@@ -285,7 +285,7 @@ class ReconcileTests(unittest.TestCase):
             content_id="ISSUE",
             content_kind="PullRequest",
         )
-        with patch("project_os.github.snapshot_items", return_value=[actual]):
+        with patch("project.github.snapshot_items", return_value=[actual]):
             actions = reconcile(
                 object(),
                 "PROJECT",
@@ -318,7 +318,7 @@ class GitHubClientTests(unittest.TestCase):
         sleeps: list[float] = []
         client = GitHub("token", sleep=sleeps.append)
         with patch(
-            "project_os.github.urllib.request.urlopen",
+            "project.github.urllib.request.urlopen",
             side_effect=[throttled, response],
         ):
             result = client.graphql("query { viewer { login } }")
@@ -337,7 +337,7 @@ class GitHubClientTests(unittest.TestCase):
             mutation_interval=0.25,
         )
         with patch(
-            "project_os.github.urllib.request.urlopen",
+            "project.github.urllib.request.urlopen",
             return_value=response,
         ):
             client.graphql("mutation { one two three four }", mutation_cost=4)

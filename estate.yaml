@@ -18,11 +18,11 @@ classes:
   testimonial: "captured evidence — run outputs, traces, receipts: proves behavior; neither shipped law nor regenerable output"
   foreign: "pointer to a third-party sovereign source"
 summary:
-  classified_files: 1261
+  classified_files: 1260
   file_rows: 14
   pattern_rows: 29
   by_class:
-    authored: 935
+    authored: 934
     authored-pin: 0
     generated: 130
     pinned-copy: 3
@@ -50,7 +50,7 @@ files:
     - "https://www.contributor-covenant.org/version/2/1/code_of_conduct.html (CC-BY-4.0)"
 - path: "SSOT.md"
   class: authored
-  sha256: c9f13b3c2df581c101b3df35edca1ed44b911a3f0298b80459993fe42d73f609
+  sha256: 30ffa362a444c5c7b4eb51def9d560e8c6d0ed0281a493a52a3e9bad178bd3de
   evidence: "the map of where every fact lives — prose and judgments are authored, but it carries ONE generated island (the estate:map markers · §9): scripts/ssot-map-projector.py --write derives the gated-surfaces table from THIS manifest, and --check (exit 5 · conformance.yml 'Projection gates') refuses a hand edit inside the markers — the canon.yaml hybrid, inverted"
 - path: "VERSION"
   class: authored
@@ -162,7 +162,7 @@ patterns:
 - glob: "canon/**"
   class: authored
   match_count: 14
-  aggregate_sha256: bdae0d88b487717d5a90519fbe00a06b333eafe62b0f37b1c1505caef465ca82
+  aggregate_sha256: 8ae9dff489789b17b58ce6ca172ff544b824ba25832c0b228f56ab18c18ae224
   evidence: "the registries humans edit (surface · builtins · features · conformance · grammar · types · providers · migrations · projections · tombstones · snippets · templates · diagnostics) + canon/EXCEPTIONS.md (the §18 exception ledger) — the SOURCES the compiler seals; ssot.lock + sidecar excepted in files:"
 - glob: "conformance/tests/runtime/gates/**"
   class: generated
@@ -286,12 +286,12 @@ patterns:
 - glob: "scripts/**"
   class: authored
   match_count: 19
-  aggregate_sha256: fd0751952e3e0e56a30d104a1096dd58c83ebe4a3d968c9614f5d668a519455f
+  aggregate_sha256: 79401e1ac679ef7bbc4df0b9c8dd4bf16877d7507e7b9bc1dcea0775becdb295
   evidence: "the compiler + projectors humans wrote (ssot-compiler · canon/showcase/llms/starters/authoring/design projectors · gen-gate-matrix · gen-type-corpus · grammar_door + selftest · check-md-refs · codemods) — the tools that WRITE the generated surfaces; estate.py excepted in files: (the self row)"
 - glob: "timeline/**"
   class: authored
-  match_count: 3
-  aggregate_sha256: e26b1c06bc20311da6cb0f6243480bd542372cf7b14c56152f4877b1eb9527fb
+  match_count: 2
+  aggregate_sha256: 0c13ab64b684d2b62a7770cdafd366b59f92bc131702f80d505a947ef0b2fab0
   evidence: "timeline.yaml (the SSOT — 'every provable claim … re-proven against its source of truth' per timeline.yml) + verify.py + project-board.py (writes OUTWARD to the org Projects board, never into this tree)"
 - glob: "registry/**"
   class: authored
@@ -322,20 +322,20 @@ patterns:
 - glob: "**"
   class: authored
   match_count: 13
-  aggregate_sha256: d952b182dd56444fbfc1dbe8dd1b2c5872406933b2adef8d1d52e69011480606
+  aggregate_sha256: f68188f1589e0b0b9ed6c2dea866212c55d2af98e0420ed651fa91b751de2862
   evidence: "no evidence gathered — honesty over completeness (the catchall; anything landing here is reported under unverified:)"
   note: "unverified-default"
 unverified:
 - "project/README.md"
+- "project/__init__.py"
+- "project/cli.py"
+- "project/github.py"
+- "project/model.py"
 - "project/project-os-audit.nika.yaml"
 - "project/project-os.yaml"
 - "project/skills/nika-project-os-ui/SKILL.md"
 - "project/skills/nika-project-os-ui/agents/openai.yaml"
+- "project/sources.py"
+- "project/test_project_os.py"
+- "project/test_ui_guardian.py"
 - "project/verify.py"
-- "project_os/__init__.py"
-- "project_os/cli.py"
-- "project_os/github.py"
-- "project_os/model.py"
-- "project_os/sources.py"
-- "project_os/test_project_os.py"
-- "project_os/test_ui_guardian.py"

@@ -37,13 +37,13 @@ python3 project/verify.py --offline
 Preview a live reconciliation without writing:
 
 ```bash
-BOARD_PROJECT_TOKEN=... python3 timeline/project-board.py --check
+BOARD_PROJECT_TOKEN=... python3 -m project.cli --check
 ```
 
 Apply the live reconciliation:
 
 ```bash
-BOARD_PROJECT_TOKEN=... python3 timeline/project-board.py --apply
+BOARD_PROJECT_TOKEN=... python3 -m project.cli --apply
 ```
 
 GitHub does not expose view and Insights creation through its public
