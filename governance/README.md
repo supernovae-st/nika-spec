@@ -25,6 +25,7 @@ directly, the maintainers included.
 | [0014](nep-0014-thin-laws.md) | The thin-laws (lot 3a): observable independence · input origins · the readable receipt · cross-version resume | Standards Track | Draft |
 | [0015](nep-0015-preview-commit.md) | Preview-commit: the effect request is hashed at judgment and recomputed at the sink | Standards Track | Draft |
 | [0016](nep-0016-provenance-tiers.md) | Provenance tiers: a closed ladder admitted by evidence, an operator-owned floor, the tier attested | Standards Track | Draft |
+| [0017](nep-0017-thin-laws-3b.md) | The thin-laws (lot 3b): the pricing pin · the end obligation · the third blame · the named solo | Standards Track | Draft |
 | [0010](nep-0010-run-entropy-clock.md) | Every source of randomness and time is declared at the envelope's `run:` block | Standards Track | Draft |
 | [0011](nep-0011-run-lifecycle-attestation.md) | The run's lifecycle is attested: boot manifest, teardown seal, verifier-borne incomplete | Standards Track | Draft |
 | [0012](nep-0012-receipt-untrusted-input.md) | The receipt is untrusted input: bounds as constants, terminal hygiene, recognize-don't-sanitize, the differential twin | Standards Track | Draft |
