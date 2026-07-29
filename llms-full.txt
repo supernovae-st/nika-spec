@@ -111,6 +111,33 @@ See [spec/](./spec/) for the full specification.
 
 ---
 
+<!-- city:map -->
+## The city · where this repo sits
+
+```
+📜 nika-spec ──── the civil code · the law tables, the corpus, the exam   ◀── you are here
+    │ sync-pack: byte-gated mirror        │ projectors: drift-gated
+    ▼                                     ▼
+⚙️ nika ───────── the engine + the catalog (the yellow pages)
+    │ the release train                  🖥️ nika.sh · 📖 nika-docs
+    ▼                                     the showroom · the manual
+📦 homebrew-tap · npm · Docker ── the docks
+🔌 nika-client · 🎨 nika-vscode · 🤖 nika-agents ── the doors
+🏪 nika-registry ── the market · 🔍 nika-site-audit ── the witness
+```
+
+**This building** · THE CIVIL CODE · the language's laws (the law tables under `canon/`), the teaching corpus (`examples/`), the conformance exam (`conformance/`).
+
+**Consumes** · nothing · this repo is the root of the truth chain.
+
+**Serves** · the engine (corpus vendored by sync-pack, byte-gated) · the site and the docs (canon + showcase projectors, `--check` gates) · agents (`llms.txt`).
+
+**Truth lives** · edit the law tables in `canon/` · `canon.yaml` is a GENERATED hub · [`SSOT.md`](SSOT.md) is the map (its gated table is machine-projected) · `estate.yaml` is the cadastre (every file: authored, or derived with proof).
+
+Every fact has one home · everything else is a gated projection.
+The living map: [nika.sh/map](https://nika.sh/map).
+<!-- /city:map -->
+
 ## Repository layout
 
 ```
