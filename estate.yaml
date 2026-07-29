@@ -18,11 +18,11 @@ classes:
   testimonial: "captured evidence — run outputs, traces, receipts: proves behavior; neither shipped law nor regenerable output"
   foreign: "pointer to a third-party sovereign source"
 summary:
-  classified_files: 1255
+  classified_files: 1261
   file_rows: 14
   pattern_rows: 29
   by_class:
-    authored: 929
+    authored: 935
     authored-pin: 0
     generated: 130
     pinned-copy: 3
@@ -50,7 +50,7 @@ files:
     - "https://www.contributor-covenant.org/version/2/1/code_of_conduct.html (CC-BY-4.0)"
 - path: "SSOT.md"
   class: authored
-  sha256: e9f793de71215afcb9a915f3dac9f4babbe52fc132735545815af3fc2f8e61e6
+  sha256: c9f13b3c2df581c101b3df35edca1ed44b911a3f0298b80459993fe42d73f609
   evidence: "the map of where every fact lives — prose and judgments are authored, but it carries ONE generated island (the estate:map markers · §9): scripts/ssot-map-projector.py --write derives the gated-surfaces table from THIS manifest, and --check (exit 5 · conformance.yml 'Projection gates') refuses a hand edit inside the markers — the canon.yaml hybrid, inverted"
 - path: "VERSION"
   class: authored
@@ -72,9 +72,20 @@ files:
     - "schemas/registries.schema.json (the sealed outcome_class enum)"
     - "canon/EXCEPTIONS.md (the §18 exception ledger — the declared-skips mirror)"
   note: "hybrid by design: the 15 ledger sections (canon/EXCEPTIONS.md · SSOT-1 §18) stay AUTHORED and are carried verbatim through the regeneration — editing those sections is legal, editing an imported section is rc=5"
+- path: "canon/laws-index.json"
+  class: generated
+  sha256: be3f3c7a197ed06fb8937f3558f86095bb047281cc35c7832d07b0e61f80fe60
+  evidence: "carries the generator identity block ('ssot-compiler' + source_sha256) · scripts/ssot-compiler.py header: 'emits ONE deterministic projection (canon/laws-index.json, stable sort by law id, canonical JSON, NFC, LF)'"
+  derivation:
+    tool: "python3 scripts/ssot-compiler.py (write mode)"
+    gate: ".github/workflows/conformance.yml step 'SSOT gate' → scripts/ssot-compiler.py --check"
+    inputs:
+    - "canon/laws/*.yaml (the 13 law registries · 147 laws)"
+    - "schemas/law.schema.json"
+    - "schemas/registries.schema.json"
 - path: "canon/ssot.lock"
   class: generated
-  sha256: 2d293661e956e1287e5d261240cf1c1ae6b4a41e1771db6139ed789a603fac4e
+  sha256: 8507afb22834ef8023c210591685ea5ed11205d87061ea48da486acb29018fd3
   evidence: "single-line canonical JSON carrying generator identity ('ssot-compiler' 0.2.0-sandbox + its own source_sha256), the 27 leaf digests and law_count — no human writes a lock"
   derivation:
     tool: "python3 scripts/ssot-compiler.py (write mode · leaf digests only, digest-dag layer 1, own digest DETACHED per PAA-006)"
@@ -82,10 +93,10 @@ files:
     inputs:
     - "canon/laws/*.yaml"
     - "canon/*.yaml registries + canon/{diagnostics,snippets,templates}/registry.yaml"
-    - "projections/laws-index.json (leaf-hashed)"
+    - "canon/laws-index.json (leaf-hashed)"
 - path: "canon/ssot.lock.sha256"
   class: generated
-  sha256: 965cc1c262de4676d6e7d2899b6169e75f227922580281f2e30d37b5d3b40a63
+  sha256: 2bb906152d65ea9a5fa6a4501847b79d7db8e89409ed2a0c654832988ab2a32c
   evidence: "the lock's own digest, DETACHED into a sidecar per PAA-006 (a file cannot contain its own hash) — written by the compiler alongside the lock"
   derivation:
     tool: "python3 scripts/ssot-compiler.py (write mode · the detached-sidecar emission)"
@@ -138,20 +149,9 @@ files:
     - "canon.yaml (the counts)"
     - "README.md + spec/ + stdlib/ + registry/ (the linked reading path)"
   note: "carries NO in-file generation marker (llms-full.txt does) — a generated surface that does not self-declare; only the --check gate reveals its provenance"
-- path: "projections/laws-index.json"
-  class: generated
-  sha256: 6d2b4dc7a11c779baf3ddad89049faa4655755dc407393f35294685475c5a83b
-  evidence: "carries the generator identity block ('ssot-compiler' + source_sha256) · scripts/ssot-compiler.py header: 'emits ONE deterministic projection (projections/laws-index.json, stable sort by law id, canonical JSON, NFC, LF)'"
-  derivation:
-    tool: "python3 scripts/ssot-compiler.py (write mode)"
-    gate: ".github/workflows/conformance.yml step 'SSOT gate' → scripts/ssot-compiler.py --check"
-    inputs:
-    - "canon/laws/*.yaml (the 13 law registries · 147 laws)"
-    - "schemas/law.schema.json"
-    - "schemas/registries.schema.json"
 - path: "scripts/estate.py"
   class: authored
-  sha256: bd3801884994a042d2a96e554256b66311aecd3efbcfe1b65e6057d43a793e18
+  sha256: 19d26c66183416f11959a5268868a8a5ed548d57fd47712cfc45bf3a96ec5c15
   evidence: "hand-written estate projector (this manifest's generator)"
 patterns:
 - glob: "canon/laws/**"
@@ -198,8 +198,8 @@ patterns:
     - "the VOCAB_FIXTURE constant in scripts/gen-gate-matrix.py"
 - glob: "conformance/tests/**"
   class: authored
-  match_count: 497
-  aggregate_sha256: 29e50201a8022a6f18c4964e7ef31ef2454b002cd4293ae2263a1d671984ac07
+  match_count: 503
+  aggregate_sha256: 2f0f73c12a0026115104cf4c7f51f40b3d32659ace2b037e1071fee7992833f3
   evidence: "the executable law — the 5-tier fixture corpus (core · deep 001-022 · lints · runtime · stdlib): input + expected pairs written at spec-authoring time, consumed by conformance/runner.py; no generation markers"
 - glob: "conformance/.nika/**"
   class: testimonial
@@ -214,7 +214,7 @@ patterns:
 - glob: "conformance/**"
   class: authored
   match_count: 197
-  aggregate_sha256: b60c5a971b61a9ea5f49f794e3b50dd3885c6dff09370da5da5d29b870316303
+  aggregate_sha256: 60ba314781d9ab69a6cb2e7401373b3e0cb64aef339ce4571bfc344f4127ac46
   evidence: "the 95-workflow corpus (envelope · variables · verbs · errors · dag · gates · types · yaml-profile · values · composition · decision-goldens frozen at authoring time and consumed by decision_core_selftest.py) + the Python cores/selftests/runner + README/FINDINGS/runner-protocol; type-corpus + coverage-matrix excepted in files:"
 - glob: "proofs/**"
   class: testimonial

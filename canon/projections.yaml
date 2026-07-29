@@ -13,7 +13,7 @@ projections:
     identity: ssot-compiler
     version: 0.1.0-sandbox
   outputs:
-  - projections/laws-index.json
+  - canon/laws-index.json
   check_command: python3 scripts/ssot-compiler.py --check
   digest_home: canon/ssot.lock
   channel_sensitivity: stable-only
@@ -36,7 +36,7 @@ projections:
     identity: ssot-compiler
     version: 0.1.0
   outputs:
-  - projections/laws-index.json
+  - canon/laws-index.json
   check_command: python3 scripts/ssot-compiler.py --check
   digest_home: canon/ssot.lock
   channel_sensitivity: nightly-ok

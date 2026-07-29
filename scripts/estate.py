@@ -101,7 +101,7 @@ FILES = [
         "derivation": {
             "tool": "python3 scripts/ssot-compiler.py (write mode · leaf digests only, digest-dag layer 1, own digest DETACHED per PAA-006)",
             "gate": ".github/workflows/conformance.yml step 'SSOT gate' → scripts/ssot-compiler.py --check (regenerate in memory · byte-compare)",
-            "inputs": ["canon/laws/*.yaml", "canon/*.yaml registries + canon/{diagnostics,snippets,templates}/registry.yaml", "projections/laws-index.json (leaf-hashed)"],
+            "inputs": ["canon/laws/*.yaml", "canon/*.yaml registries + canon/{diagnostics,snippets,templates}/registry.yaml", "canon/laws-index.json (leaf-hashed)"],
         },
     },
     {
@@ -115,9 +115,9 @@ FILES = [
         },
     },
     {
-        "path": "projections/laws-index.json",
+        "path": "canon/laws-index.json",
         "class": "generated",
-        "evidence": "carries the generator identity block ('ssot-compiler' + source_sha256) · scripts/ssot-compiler.py header: 'emits ONE deterministic projection (projections/laws-index.json, stable sort by law id, canonical JSON, NFC, LF)'",
+        "evidence": "carries the generator identity block ('ssot-compiler' + source_sha256) · scripts/ssot-compiler.py header: 'emits ONE deterministic projection (canon/laws-index.json, stable sort by law id, canonical JSON, NFC, LF)'",
         "derivation": {
             "tool": "python3 scripts/ssot-compiler.py (write mode)",
             "gate": ".github/workflows/conformance.yml step 'SSOT gate' → scripts/ssot-compiler.py --check",

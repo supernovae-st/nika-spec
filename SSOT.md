@@ -210,15 +210,15 @@ refused by `--check` (exit 5), the same contract every projection has.
 |---|---|---|
 | `.github/requirements.txt` | `uv pip compile --generate-hashes` | `pip install --require-hashes` |
 | `canon.yaml` | `python3 scripts/ssot-compiler.py --emit-canon` | `scripts/ssot-compiler.py --check-canon` |
+| `canon/laws-index.json` | `python3 scripts/ssot-compiler.py` | `scripts/ssot-compiler.py --check` |
 | `canon/ssot.lock` | `python3 scripts/ssot-compiler.py` | `scripts/ssot-compiler.py --check` |
 | `canon/ssot.lock.sha256` | `python3 scripts/ssot-compiler.py` | `scripts/ssot-compiler.py --check` |
 | `conformance/type-corpus/corpus.jsonl` | `python3 scripts/gen-type-corpus.py --write` | `gen-type-corpus.py --check` |
 | `examples/manifest.yaml` | `python3 scripts/showcase-projector.py --write` | `scripts/showcase-projector.py --check` |
 | `llms-full.txt` | `python3 scripts/llms-projector.py --write` | `scripts/llms-projector.py --check` |
 | `llms.txt` | `python3 scripts/llms-projector.py --write` | `scripts/llms-projector.py --check` |
-| `projections/laws-index.json` | `python3 scripts/ssot-compiler.py` | `scripts/ssot-compiler.py --check` |
 
-Provenance floor: 1255 tracked files classified · authored 929 · generated 130 · pinned-copy 3 · testimonial 193 (estate schema 2 · mode observation).
+Provenance floor: 1261 tracked files classified · authored 935 · generated 130 · pinned-copy 3 · testimonial 193 (estate schema 2 · mode observation).
 
 <!-- /estate:map -->
 
