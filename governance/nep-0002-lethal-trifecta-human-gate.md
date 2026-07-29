@@ -7,7 +7,8 @@
 - **Type**: Standards Track
 - **Created**: 2026-07-19
 - **Amended**: v2.0 · 2026-07-20 (realized-flow judgment · agent whitelist
-  refinement · the infer/agent integrity inversion)
+  refinement · the infer/agent integrity inversion) · v2.1 · 2026-07-29
+  (over-approximation posture written · the finding names its disjunct)
 
 ## Abstract
 
@@ -76,6 +77,51 @@ the human gate task · never a suppression flag · so the enforced invariant is
 structural. The check reads only the static `permits:` block and the DAG: no
 model call, no runtime state, fully reproducible (consistent with the rest of
 the check ladder).
+
+### Over-approximation posture (v2.1 · the gate is honest about its coarseness)
+
+The check over-approximates, on purpose, and its finding says so. The v2.0
+realized-flow refinement narrowed leg ② to flows the DAG actually realizes;
+the leg predicates themselves stay boundary-coarse. The known false-positive
+classes, on the record:
+
+- **③ · literal-url fetch** — `net.http` non-empty arms leg ③ even when
+  every realized fetch carries a LITERAL url and no tainted value reaches
+  url, body or headers. A literal-url GET cannot carry data OUT, so
+  "`net.http` non-empty" is a coarse proxy for *can-send*. Witnessed
+  2026-07-29: two independent reviewers hit the gate on an honest boundary
+  and recommended narrowing (engine `ace795ae9` — verified, the semantics
+  kept).
+- **③ · static exec** — `permits.exec` arms leg ③ even for a fully static
+  argv that writes nowhere external (the sandbox-refinement rejection below
+  explains why this stays: a host-dependent verdict is a horoscope).
+- **③ · unrealized write-escape** — an `fs.write` glob escaping the
+  workspace arms leg ③ even when no tainted flow ever reaches a write task.
+
+**The semantics stand; the message narrows.** Narrowing a security gate on
+one afternoon's probe is the shape of the mistake that produced the
+`literal_root` fail-open (fixed in engine `0e73adc28` · guarded since by the
+differential proptest). The shipped posture is therefore:
+
+1. **Fail-closed, no known false negative** — whenever the static analysis
+   cannot decide (a templated url · an `mcp:*` tool without effect hints ·
+   an opaque exec), the leg HOLDS. Within the declared+realized model, no
+   real trifecta — untrusted content reaching an ungated egress-capable
+   sink — passes the gate.
+2. **The finding names the approximation** — since engine `ace795ae9` the
+   SEC-009 message names WHICH disjunct satisfied each leg and the witness
+   task, so an author sees the coarse proxy instead of meeting unexplained
+   ceremony.
+3. **Narrowing is an amendment, never a hotfix** — each class above
+   graduates only through its own amendment carrying conformance fixtures
+   that prove the narrowed gate still refuses every fixture of this NEP's
+   suite (the false positive dies · no false negative is born). First in
+   line: per-sink realized egress, the same move v2.0 made for leg ② —
+   trigger: field data showing the literal-url class bites adopters.
+
+The cheap fix stays better than any narrowing: a workflow flagged on an
+unused grant drops the grant (`net.http` emptied is a better boundary than
+a smarter checker) — and the finding teaches exactly that move.
 
 ## Conformance test
 
