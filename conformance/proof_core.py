@@ -142,3 +142,113 @@ def build_receipt(certificate: dict, trace_verdict: dict, assertions: list,
     receipt["digest"] = hashlib.sha256(
         preimage("receipt", RECEIPT_FORMAT, receipt).encode("utf-8")).hexdigest()
     return receipt
+
+
+# ── the untrusted-decode fortress (NEP-0012 laws 1+4 · the twin) ────────
+#
+# The reference mirror of the engine's `decode_untrusted_json`
+# (nika-dap bounded.rs) · SAME constants · SAME order (size → depth
+# scan → parse → structural scan) · SAME refusal classes — the law 4
+# differential runs the corpus through both and any verdict divergence
+# is a spec bug by definition.
+
+MAX_ARTIFACT_BYTES = 1024 * 1024
+MAX_JOURNAL_BYTES = 256 * 1024 * 1024
+MAX_JSON_DEPTH = 32
+MAX_PROOF_NODES = 64
+MAX_ID_BYTES = 256
+
+_PROOF_FIELDS = ("assertions", "proof", "covers")
+_ID_FIELDS = ("proves", "digest", "lock_digest", "workflow_semantic")
+
+
+class DecodeRefusal(Exception):
+    """NEP-0012 law 1 — a typed decode refusal: the class the engine
+    names (Oversized · TooDeep · Malformed · ProofFlood · IdOverflow)."""
+
+    def __init__(self, cls: str, detail: str = ""):
+        super().__init__(f"{cls}({detail})" if detail else cls)
+        self.cls = cls
+        self.detail = detail
+
+
+def _depth_scan(raw: str) -> None:
+    """String-aware depth scan — counts `{`/`[` nesting OUTSIDE string
+    literals, byte-for-byte the engine's scan (escape honored inside
+    strings · closes saturate)."""
+    depth = 0
+    in_string = False
+    escaped = False
+    for ch in raw:
+        if in_string:
+            if escaped:
+                escaped = False
+            elif ch == "\\":
+                escaped = True
+            elif ch == '"':
+                in_string = False
+            continue
+        if ch == '"':
+            in_string = True
+        elif ch in "{[":
+            depth += 1
+            if depth > MAX_JSON_DEPTH:
+                raise DecodeRefusal("TooDeep", f"{depth} > {MAX_JSON_DEPTH}")
+        elif ch in "}]":
+            depth = max(0, depth - 1)
+
+
+def _structural_scan(value) -> None:
+    """Total structural bounds on the DECODED value — proof-bearing
+    arrays and identifier-class strings wherever they sit (a nested
+    flood cannot hide). Identifier length is measured in BYTES, as the
+    engine does."""
+    stack = [value]
+    while stack:
+        node = stack.pop()
+        if isinstance(node, dict):
+            for key, child in node.items():
+                if (key in _PROOF_FIELDS and isinstance(child, list)
+                        and len(child) > MAX_PROOF_NODES):
+                    raise DecodeRefusal(
+                        "ProofFlood", f"{key} · {len(child)} > {MAX_PROOF_NODES}")
+                if (key in _ID_FIELDS and isinstance(child, str)
+                        and len(child.encode("utf-8")) > MAX_ID_BYTES):
+                    raise DecodeRefusal(
+                        "IdOverflow", f"{key} · {len(child.encode('utf-8'))} > {MAX_ID_BYTES}")
+                stack.append(child)
+        elif isinstance(node, list):
+            stack.extend(node)
+
+
+def decode_untrusted(raw: str):
+    """Decode ONE untrusted JSON artifact under the fortress bounds —
+    the Python twin of `decode_untrusted_json`. Total: the whole
+    document, or a typed DecodeRefusal, never a partial."""
+    if len(raw.encode("utf-8")) > MAX_ARTIFACT_BYTES:
+        raise DecodeRefusal(
+            "Oversized", f"{len(raw.encode('utf-8'))} > {MAX_ARTIFACT_BYTES}")
+    _depth_scan(raw)
+    try:
+        value = json.loads(raw)
+    except json.JSONDecodeError as e:
+        raise DecodeRefusal("Malformed", str(e)) from e
+    _structural_scan(value)
+    return value
+
+
+if __name__ == "__main__":
+    # The differential driver calls this: decode a file, print the
+    # verdict CLASS on stdout (`admit` or the refusal class).
+    import pathlib
+    import sys
+
+    if len(sys.argv) != 3 or sys.argv[1] != "decode":
+        print("usage: proof_core.py decode <path>", file=sys.stderr)
+        sys.exit(2)
+    try:
+        decode_untrusted(pathlib.Path(sys.argv[2]).read_text(encoding="utf-8"))
+    except DecodeRefusal as refusal:
+        print(refusal.cls)
+    else:
+        print("admit")
