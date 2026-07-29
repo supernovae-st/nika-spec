@@ -2,9 +2,9 @@
 
 Prove an engine implements **`nika: v1`** without reading the reference
 implementation: run every workflow here through YOUR engine and match each
-file's **declared intent**. 95 files across the 5 pillars —
-`envelope/` (28) · `variables/` (19) · `verbs/` (17) · `errors/` (17) ·
-`dag/` (14) — all runnable offline (`mock/*` models only · no keys · no
+file's **declared intent**. Five pillars — `envelope/` · `variables/` ·
+`verbs/` · `errors/` · `dag/` (the tree is the count: `ls <pillar>/*.nika.yaml`
+— hand-typed totals rotted twice) — all runnable offline (`mock/*` models only · no keys · no
 network · deterministic).
 
 ```sh

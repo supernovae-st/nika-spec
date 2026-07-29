@@ -121,7 +121,7 @@ FILES = [
         "derivation": {
             "tool": "python3 scripts/ssot-compiler.py (write mode)",
             "gate": ".github/workflows/conformance.yml step 'SSOT gate' → scripts/ssot-compiler.py --check",
-            "inputs": ["canon/laws/*.yaml (the 13 law registries · 147 laws)", "schemas/law.schema.json", "schemas/registries.schema.json"],
+            "inputs": ["canon/laws/*.yaml (the law registries — law_count lives in the lock, never in prose)", "schemas/law.schema.json", "schemas/registries.schema.json"],
         },
     },
     {
@@ -152,7 +152,7 @@ FILES = [
         "derivation": {
             "tool": "python3 scripts/showcase-projector.py --write",
             "gate": ".github/workflows/conformance.yml step 'Projection gates' → scripts/showcase-projector.py --check",
-            "inputs": ["VERSION", "examples/*.nika.yaml", "examples/showcase/*.nika.yaml"],
+            "inputs": ["VERSION", "examples/*.nika.yaml"],
         },
         "note": "the engine vendors this manifest into its pack (crates/nika-pack) — downstream it is pinned-copy, here it is the generated original",
     },
@@ -204,7 +204,7 @@ PATTERNS = [
     {
         "glob": "canon/laws/**",
         "class": "authored",
-        "evidence": "the 13 law registries humans edit (147 laws) — every entry schema-validated against schemas/law.schema.json, leaf-hashed into canon/ssot.lock by the ssot-compiler; the compiler CONSUMES these, nothing writes them",
+        "evidence": "the law registries humans edit — every entry schema-validated against schemas/law.schema.json, leaf-hashed into canon/ssot.lock by the ssot-compiler (law_count lives in the lock, never typed here); the compiler CONSUMES these, nothing writes them",
     },
     {
         "glob": "canon/**",

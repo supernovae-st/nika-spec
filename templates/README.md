@@ -110,7 +110,7 @@ When a hint tells you to remove something, run the file before you believe it.
   offline and version-locked.
 - The [12 patterns](https://docs.nika.sh/guides/patterns) are the WHY
   behind every locked choice here; the
-  [showcase](../examples/showcase/) shows each at full scale.
+  [the jobs](../examples/README-jobs.md) show each at full scale.
 - The contract every file in this corpus honours:
   [`../examples/CONVENTIONS.md`](../examples/CONVENTIONS.md).
 

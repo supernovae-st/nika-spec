@@ -1,17 +1,18 @@
 # Examples · canonical Nika workflows
 
-> The teaching corpus. **`01`–`07` is the path**: seven files, read in order,
-> each introducing one theme and using nothing a later file introduces.
+> The teaching corpus. **The numbered files are the path** — read in order,
+> each introduces constructs the previous ones don't, and
+> `nika examples teaches` prints the live coverage, gaps included.
 > An author who reads two of them writes their next workflow green.
-> Real jobs live in [`showcase/`](showcase/) (T1→T4); instantiable
-> skeletons live in [`../templates/`](../templates/).
+> Real jobs live beside them ([`README-jobs.md`](README-jobs.md));
+> instantiable skeletons live in [`../templates/`](../templates/).
 >
 > The contract every file here honours is written down in
 > [`CONVENTIONS.md`](CONVENTIONS.md). Read that before you add or edit one.
 
 ---
 
-## The path · 01 → 07
+## The path
 
 | File | Theme | Introduces |
 |---|---|---|
@@ -22,19 +23,26 @@
 | [`05-fetch-chain`](05-fetch-chain.nika.yaml) | reaching outside | `invoke:` · `nika:fetch` · `permits.tools` + `permits.net.http` · `output:` jq bindings · `on_error: recover:` |
 | [`06-code-review`](06-code-review.nika.yaml) | the agent loop | `agent:` · default-deny `tools:` · `max_turns:` + `max_tokens_total:` · `nika:done` · `permits.fs` inside the loop |
 | [`07-for-each-locales`](07-for-each-locales.nika.yaml) | mapping | `for_each:` · `${{ item }}` / `${{ index }}` · `max_parallel:` · `fail_fast:` · array-preserving recovery |
+| [`08-config-values`](08-config-values.nika.yaml) | the value authorities | `config:` — typed, defaulted, and unreachable from the caller (measured: `--var region=…` refuses) |
+| [`09-returns-typed-door`](09-returns-typed-door.nika.yaml) | typed task outputs | `returns:` — the declared shape deep references are proven against |
+| [`10-compose-pipeline`](10-compose-pipeline.nika.yaml) | composition · the caller | `workflow:` under `invoke:` — one workflow calls another, statically resolved |
+| [`10-compose-child`](10-compose-child.nika.yaml) | composition · the callee | the child's contract — typed `inputs:` in, typed `outputs:` out |
+| [`11-declassify-the-door`](11-declassify-the-door.nika.yaml) | the taint's one door | `declassify:` (`from:` · `to: trusted` · `because:`) — defers the check to the run, never lifts the boundary |
+| [`12-failure-routing`](12-failure-routing.nika.yaml) | routing failure | the `failure` edge predicate — a strictly-failure arm that settles `⊘` on green runs |
 
-All **4 verbs** appear: `infer` (01 · 02 · 04 · 05 · 07) · `exec` (03) ·
-`invoke` (05) · `agent` (06). Everything callable is a tool under `invoke:`.
+All **4 verbs** appear across the path; everything callable is a tool under
+`invoke:`. The per-construct index is derived from the files, never
+hand-listed — `nika examples teaches` speaks it from the binary.
 
 ### What the path deliberately leaves out
 
-Of the [6 value namespaces](../spec/04-variables.md) the path covers four —
-`inputs` · `const` · `with` · `tasks`, plus the `item`/`index` loop locals.
+Of the [value namespaces](../spec/04-variables.md) the path covers every one
+but `secrets:`, plus the `item`/`index` loop locals.
 
 `secrets:` and its `egress:` sanctions are **not** here on purpose: a secret
 needs a real credential and a real host, which would cost every file in this
 directory its zero-setup run. That subject belongs to a job with stakes —
-see [`showcase/t2-support-triage`](showcase/t2-support-triage.nika.yaml) for
+see [`support-triage`](support-triage.nika.yaml) for
 the reference shape (a secret that carries a webhook URL, an `egress:` that
 sanctions the one send, and the `permits.net.http` that grants the reach —
 you need both, and `CONVENTIONS.md` §3 explains why).
@@ -44,10 +52,10 @@ you need both, and `CONVENTIONS.md` §3 explains why).
 - **`ollama/qwen3.5:4b`** where the model IS the lesson — 01 (a real local
   call) and 06 (the loop needs a tool-calling model). Both say so on a
   `Needs ·` line.
-- **`mock/echo`** where the SHAPE is the lesson — 02 · 04 · 05 · 07. The twin
-  echoes each prompt back, which makes the graph visible in the output: you
-  can read the three fan-out answers arriving inside the merge. Zero setup,
-  deterministic, and `--model ollama/qwen3.5:4b` swaps a real model in
+- **`mock/echo`** where the SHAPE is the lesson — the rest of the path. The
+  twin echoes each prompt back, which makes the graph visible in the output:
+  you can read the three fan-out answers arriving inside the merge. Zero
+  setup, deterministic, and `--model ollama/qwen3.5:4b` swaps a real model in
   without touching the file.
 
 Cloud providers appear only as swap hints, never as a default.
@@ -77,4 +85,4 @@ working directory, not the file's location. `06` reads a fixture from
 
 ---
 
-🦋 *The 7-step path is canonical for v0.1.0 GA · real jobs → `showcase/` · skeletons → `../templates/`.*
+🦋 *The numbered path is canonical · real jobs → [`README-jobs.md`](README-jobs.md) · skeletons → `../templates/`.*
