@@ -18,14 +18,14 @@ classes:
   testimonial: "captured evidence — fixtures, corpora, traces, receipts: proves behavior; neither shipped source nor regenerable output"
   foreign: "pointer to a third-party sovereign source"
 summary:
-  classified_files: 1259
-  file_rows: 14
+  classified_files: 1260
+  file_rows: 15
   pattern_rows: 29
   by_class:
-    authored: 933
-    authored-pin: 0
+    authored: 932
+    authored-pin: 1
     generated: 130
-    pinned-copy: 3
+    pinned-copy: 4
     testimonial: 193
     foreign: 0
   unverified-default: 13
@@ -48,6 +48,10 @@ files:
     gate: ".github/workflows/reuse.yml (reuse lint · REUSE 3.3 compliance · the override annotation keeps the license truthful)"
     inputs:
     - "https://www.contributor-covenant.org/version/2/1/code_of_conduct.html (CC-BY-4.0)"
+- path: "ESTATE_PIN"
+  class: authored-pin
+  sha256: e51cd1e4b2fb74b8ffea6df4ec25d00a1aafbc4278cd07e7ebc0a2cde1f2460c
+  evidence: "its own header: 'Bump deliberately: edit this' · the rev the shared estate tool is mirrored from, and the INPUT the mirror gate compares against"
 - path: "SSOT.md"
   class: authored
   sha256: 7c5f800c2ff720b0fe28f0aa3ec4437d61a78148a2db99b6b492e8327fbaf280
@@ -149,9 +153,15 @@ files:
     - "README.md + spec/ + stdlib/ + registry/ (the linked reading path)"
   note: "carries NO in-file generation marker (llms-full.txt does) — a generated surface that does not self-declare; only the --check gate reveals its provenance"
 - path: "scripts/estate.py"
-  class: authored
-  sha256: e969a7fcbcb573fcd06e4aae41e8b4faa88f19415a20ec42e0ceb464ca964a27
-  evidence: "hand-written estate projector (this manifest's generator)"
+  class: pinned-copy
+  sha256: a77b3331d08ab86531f86a1bc33e9e5f0bf1fbe378803b39b2e73a42c83d93fa
+  evidence: "the shared estate tool, mirrored byte-for-byte from supernovae-st/nika-estate · editing it here is a lost gesture: change it upstream, bump ESTATE_PIN, re-mirror"
+  derivation:
+    tool: "curl the tool from nika-estate at the rev named in ESTATE_PIN"
+    gate: "the `mirror` job byte-compares scripts/estate.py against nika-estate@ESTATE_PIN and fails the run on any difference"
+    inputs:
+    - "ESTATE_PIN"
+    - "supernovae-st/nika-estate@<ESTATE_PIN>:scripts/estate.py"
 patterns:
 - glob: "canon/laws/**"
   class: authored
@@ -285,7 +295,7 @@ patterns:
 - glob: "scripts/**"
   class: authored
   match_count: 18
-  aggregate_sha256: 087f6f7f5791c8caae4e7aa0e2756fb6665b599b5849f7f668077fb863bca52e
+  aggregate_sha256: 1d79fbabe630e90f1f48e01b1e9f7648e98168f330d4e4c4b222b00923b9c6c2
   evidence: "the compiler + projectors humans wrote (ssot-compiler · canon/showcase/llms/starters/authoring/design projectors · gen-gate-matrix · gen-type-corpus · grammar_door + selftest · check-md-refs) — the tools that WRITE the generated surfaces; estate.py excepted in files: (the self row)"
 - glob: "timeline/**"
   class: authored
