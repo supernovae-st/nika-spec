@@ -570,19 +570,64 @@ def _taint_canonical_host(url: str):
     return host
 
 
-def _taint_globbed(value: str, globs) -> bool:
-    """Match against the LITERAL bounds only — an interpolated bound is law
-    1's refusal (NIKA-AUTH-007), never something to match against. BOTH
-    sides compare in canonical form: the value arrives normalized, so a
-    bound authored `./examples/x.csv` must normalize too, or an in-bound
-    dotted default reads as an escape (the false AUTH-008 that turned the
-    corpus red on main 2026-07-29 — engine green, reference red, on
-    `ceo-monday-brief`'s `sheet`; the engine canonicalizes both sides)."""
+def _seg_match(vsegs: list, gsegs: list) -> bool:
+    """Segment-wise glob: `*`/`?` stop at `/` (fnmatch per segment), `**`
+    spans any depth — the engine's matcher, mirrored. A flat fnmatch let
+    `datasets/*.csv` admit `datasets/sub/deeper/x.csv` (the exact class
+    the engine's fail-open fix killed), refuter-proven live."""
     import fnmatch
+    if not gsegs:
+        return not vsegs
+    g, rest = gsegs[0], gsegs[1:]
+    if g == "**":
+        return any(_seg_match(vsegs[i:], rest) for i in range(len(vsegs) + 1))
+    if not vsegs:
+        return False
+    return fnmatch.fnmatchcase(vsegs[0], g) and _seg_match(vsegs[1:], rest)
+
+
+def _taint_globbed(value: str, globs) -> bool:
+    """Match a canonical PATH against the LITERAL bounds only — an
+    interpolated bound is law 1's refusal (NIKA-AUTH-007), never something
+    to match against. BOTH sides compare in canonical form (the false
+    AUTH-008 that turned the corpus red on main 2026-07-29), and the
+    normalization must not GRANT what the author never wrote: a lexical
+    escape (leading `..`) can never re-enter a rooted bound even when the
+    normalized glob is `**` — without that guard, normalizing `./**` to
+    `**` turned an inert bound all-admitting (refuter counterexample
+    CX1: `../../etc/passwd` under `./**` read VALID)."""
     import posixpath
-    return any(isinstance(g, str) and not EXPR_BODY.search(g)
-               and fnmatch.fnmatchcase(value, posixpath.normpath(g))
-               for g in globs or [])
+    vsegs = value.split("/")
+    for g in globs or []:
+        if not isinstance(g, str) or EXPR_BODY.search(g):
+            continue
+        ng = posixpath.normpath(g)
+        if value.startswith("..") and not ng.startswith(".."):
+            continue
+        if _seg_match(vsegs, ng.split("/")):
+            return True
+    return False
+
+
+def _taint_host_globbed(host: str, globs) -> bool:
+    """The NET seam is its own matcher — hosts are case-insensitive and a
+    `*.x` bound covers the subdomains (mirror of the engine's
+    host_glob_matches). Routing hosts through the path matcher normalized
+    a hostname and compared case-sensitively: a bound authored
+    `API.Example.com` refused its own lowercase canonical host while the
+    engine admitted it (refuter counterexample CX4)."""
+    h = host.lower()
+    for g in globs or []:
+        if not isinstance(g, str) or EXPR_BODY.search(g):
+            continue
+        lg = g.lower()
+        if lg.startswith("*."):
+            apex = lg[2:]
+            if h == apex or h.endswith("." + apex):
+                return True
+        elif h == lg:
+            return True
+    return False
 
 
 def permit_taint_errors(doc: dict, tasks: list) -> list[dict]:
@@ -658,7 +703,7 @@ def permit_taint_errors(doc: dict, tasks: list) -> list[dict]:
                         host = _taint_canonical_host(resolved)
                         if host is not None:
                             regate(tid, paths, f"args.url ({tool})", resolved, host,
-                                   _taint_globbed(host, host_globs),
+                                   _taint_host_globbed(host, host_globs),
                                    f"net.http {host_globs}")
         if "exec" in t and isinstance(exec_rule, list):
             body = t.get("exec")

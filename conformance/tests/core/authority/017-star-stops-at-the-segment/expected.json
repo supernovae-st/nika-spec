@@ -1,0 +1,5 @@
+{
+  "valid": false,
+  "errors": [ { "code": "NIKA-AUTH-008", "category": "security_error" } ],
+  "note": "`*` never crosses `/` — a bound naming CSV files in ONE directory must not admit a path three directories down (the engine killed exactly this class in its own boundary matcher; a flat fnmatch reintroduced it reference-side · refuter CX2 · 2026-07-29)."
+}

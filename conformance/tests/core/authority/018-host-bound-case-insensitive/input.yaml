@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: t-host-bound-case-insensitive
+permits:
+  net: { http: ["API.Example.com"] }
+  tools: ["nika:fetch"]
+inputs:
+  u: { type: string, default: "https://api.example.com/v1/things" }
+tasks:
+  pull:
+    invoke:
+      tool: nika:fetch
+      args: { url: "${{ inputs.u }}" }
