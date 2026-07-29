@@ -1,4 +1,5 @@
 {
+  "tier": "t0",
   "valid": false,
   "errors": [
     {
@@ -6,5 +7,5 @@
       "category": "validation_error"
     }
   ],
-  "note": "03-dag.md \u00a7timeout \u00b7 \u00abNo d/w (use compound \u00b7 48h instead of 2d)\u00bb \u00b7 complements errors/001 ('5w' \u00b7 the w unit) \u00b7 this one pins the d unit."
+  "note": "03-dag.md §timeout · «No d/w (use compound · 48h instead of 2d)» · complements errors/001 ('5w' · the w unit) · this one pins the d unit."
 }

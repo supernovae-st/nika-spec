@@ -1002,13 +1002,21 @@ def validate_via_engine(engine_cmd: list[str], path: pathlib.Path) -> dict:
 
 def run_fixtures(fixtures_dir: pathlib.Path, validator: Draft202012Validator,
                  canon: dict | None = None,
-                 engine_cmd: list[str] | None = None) -> int:
+                 engine_cmd: list[str] | None = None,
+                 tier: str | None = None) -> int:
     inputs = sorted(fixtures_dir.rglob("input.yaml"))
+    if tier is not None:
+        # Mechanical tier selection (the T0 dry-run contract): only fixtures
+        # whose expected.json declares the tier run. Unlabeled fixtures are
+        # skipped, never failed.
+        inputs = [inp for inp in inputs
+                  if json.loads((inp.parent / "expected.json").read_text()).get("tier") == tier]
     if not inputs:
         # A tier that finds zero fixtures must NOT report "0/0 passed · exit 0":
         # a renamed or emptied directory would sail through the CI gate having
         # proven nothing. An absent tier fails loudly.
-        print(f"FAIL  {fixtures_dir} · no fixtures found (0 inputs)")
+        print(f"FAIL  {fixtures_dir} · no fixtures found (0 inputs"
+              + (f" · tier={tier})" if tier is not None else ")"))
         return 1
     passed = failed = 0
     for inp in inputs:
@@ -1057,6 +1065,14 @@ def main(argv: list[str]) -> int:
             return 2
         engine_cmd = shlex.split(argv[i + 1])
         argv = argv[:i] + argv[i + 2:]
+    tier = None
+    if "--tier" in argv:
+        i = argv.index("--tier")
+        if i + 1 >= len(argv):
+            print("--tier requires a value (e.g. t0)", file=sys.stderr)
+            return 2
+        tier = argv[i + 1]
+        argv = argv[:i] + argv[i + 2:]
     validator = load_schema()
     canon = load_canon()
     if len(argv) >= 2 and argv[1] == "validate" and len(argv) == 3:
@@ -1065,7 +1081,7 @@ def main(argv: list[str]) -> int:
         return 0 if v["valid"] else 1
     if len(argv) >= 2 and argv[1] == "run":
         d = pathlib.Path(argv[2]) if len(argv) == 3 else HERE / "tests" / "core"
-        return run_fixtures(d, validator, canon, engine_cmd=engine_cmd)
+        return run_fixtures(d, validator, canon, engine_cmd=engine_cmd, tier=tier)
     if len(argv) == 3 and argv[1] == "examples":
         return run_examples(pathlib.Path(argv[2]), validator, canon)
     if len(argv) == 2 and argv[1] == "all":

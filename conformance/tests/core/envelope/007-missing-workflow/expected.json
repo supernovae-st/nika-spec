@@ -1,4 +1,5 @@
 {
+  "tier": "t0",
   "valid": false,
   "errors": [
     {
@@ -6,5 +7,5 @@
       "category": "validation_error"
     }
   ],
-  "note": "01-envelope.md \u00a7Conformance \u00b7 \u00abReject any workflow missing nika: or workflow: with a clear error\u00bb \u00b7 not covered by envelope/001-005 (003 = bad nika value \u00b7 004 = bad workflow id format)."
+  "note": "01-envelope.md §Conformance · «Reject any workflow missing nika: or workflow: with a clear error» · not covered by envelope/001-005 (003 = bad nika value · 004 = bad workflow id format)."
 }
