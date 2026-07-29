@@ -55,33 +55,58 @@ la fait-il ?**
 
 ---
 
-## §2 · TÂCHE 0 · DÉBLOQUER LE BUILD
+## §2 · TÂCHE 0 · L'ARBRE PARTAGÉ · à lire AVANT le premier `cargo`
 
-`cargo test -p nika-check --lib` échoue sur une **dépendance** :
+**rust-analyzer tourne en continu sur le MÊME `target/`.** Diagnostiqué à la fin
+de la session, après deux échecs de build qui ressemblaient à tout sauf à ça :
 
 ```
-jiff-0.2.35 · associated type `Primitive` not found · util/parse.rs:47
+cargo test -p nika-check   →  jiff-0.2.35 · associated type `Primitive` not found
+cargo build -p nika-cli    →  extern location for rustc_demangle does not exist
+                              .../target/debug/deps/librustc_demangle-*.rmeta
 ```
 
-Le même test rendait 538/539 verts une heure plus tôt. La source cachée est
-INTACTE (377 lignes, module déclaré, fin propre) — ce n'est ni de la corruption
-ni un changement de code.
+Deux erreurs différentes, dans deux dépendances tierces, sur du code qui rendait
+538/539 verts une heure plus tôt. La source cachée de `jiff` est INTACTE (377
+lignes, module déclaré, fin propre) — ni corruption, ni features, ni mon code.
 
-**Hypothèse à confirmer** : la résolution de features diffère entre la portée
-PAQUET (`-p nika-check`) et la portée WORKSPACE. Un diagnostic comparant les
-deux tournait à la fin de la session — relance-le.
+La cause, trouvée par `pgrep` :
+
+```
+PID 22630  cargo check --workspace --message-format=json --keep-going --all-targets
+```
+
+C'est le check de fond de l'éditeur. Il **supprime et réécrit des artefacts
+pendant que ton build les lit**. Le symptôme change à chaque fois selon quel
+`.rmeta` disparaît, ce qui le rend très facile à attribuer au mauvais coupable —
+j'ai perdu trois tours à soupçonner une corruption de registre, puis une
+résolution de features.
+
+**Le remède, à utiliser systématiquement dans ce dépôt :**
 
 ```bash
-cargo test -p nika-check --lib      # échoue ?
-cargo test --workspace --lib        # 55 suites vertes la dernière fois
+export CARGO_TARGET_DIR=/tmp/nika-isolated     # un arbre à toi
 ```
 
-**Si c'est la portée** : c'est important au-delà du déblocage. Ça veut dire que
-tout `cargo test -p <crate>` dans ce dépôt est faillible, et c'est le geste le
-plus fréquent de la session. Écris-le dans `AGENTS.md`.
+Le premier build est complet, ensuite c'est incrémental et **plus jamais de
+course**. **L'hypothèse est PROUVÉE**, mesurée en fin de session :
 
-**Si c'est le cache** : `cargo clean -p jiff` puis re-résolution. Ne fais pas de
-`rm -rf` sur `~/.cargo` sans demander.
+```
+target/ partagé      cargo build -p nika-cli   rc=101 · rustc_demangle .rmeta absent
+/tmp/nika-isolated   cargo check -p nika-check rc=0   · 12.15s
+```
+
+Le même code, à la même seconde. Rien à réparer dans l'arbre — il fallait
+seulement cesser de le partager.
+
+**Ce que ça explique rétrospectivement** : une grande partie de la fragilité de
+cette session. Des builds qui « timeout », des tests qui passent puis échouent
+sans changement, un binaire qui disparaît en plein milieu d'une mesure. Chaque
+fois j'ai cherché la cause dans mon code. Elle était dans l'éditeur.
+
+**Et une leçon de méthode**, la même que le reste de l'arc : un symptôme qui
+CHANGE à chaque exécution ne vient presque jamais du code qu'on vient d'écrire.
+Le premier réflexe est `pgrep -fl cargo`, pas la relecture du diff.
 
 ---
 
