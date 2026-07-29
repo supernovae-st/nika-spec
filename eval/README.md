@@ -7,8 +7,9 @@
 
 ## What it does
 
-[`intents.yaml`](intents.yaml) holds 12 plain-language jobs (two per
-template family, no Nika vocabulary in the wording). For each intent ×
+[`intents.yaml`](intents.yaml) holds the plain-language jobs (that file
+is the count — a hand-typed « 12 » rotted the day a 13th landed; no Nika
+vocabulary in the wording). For each intent ×
 condition, [`run-eval.py`](run-eval.py):
 
 1. asks the model to author the workflow —
