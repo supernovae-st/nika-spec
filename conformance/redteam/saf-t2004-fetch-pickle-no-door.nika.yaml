@@ -1,0 +1,20 @@
+# SAF-T2004 · data-as-code smuggling through a permitted fetch
+#
+# The gate under test: F-O7 (NEP-0006 · the data-as-code sink) — a
+# permitted network read must never silently admit a code-bearing
+# artifact (a pickled payload, a script) without the declared `inert:`
+# door.
+#
+# Expected: NIKA-SEC-008 at CHECK (the serialized-executable class is
+# refused · the door stays declared, never ambient).
+nika: v1
+workflow:
+  id: saf-t2004-fetch-pickle-no-door
+permits:
+  net: { http: ["files.example.com"] }
+  tools: ["nika:fetch"]
+tasks:
+  grab:
+    invoke:
+      tool: nika:fetch
+      args: { url: "https://files.example.com/model.pkl" }

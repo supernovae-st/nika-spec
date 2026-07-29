@@ -1,0 +1,22 @@
+# SAF-T1001 · task/prompt injection into a workflow-bound tool argument
+#
+# The gate under test: F-O1 (NEP-0004 · the permit-parameterization
+# taint) — a value resolved from UNTRUSTED origin (an input an attacker
+# can steer) must be re-gated on its canonical form before it reaches a
+# permitted argument.
+#
+# Expected: NIKA-AUTH-008 at CHECK (the resolved `inputs.host` escapes
+# the declared host set · the re-gate refuses it).
+nika: v1
+workflow:
+  id: saf-t1001-untrusted-host-escape
+permits:
+  net: { http: ["api.github.com"] }
+  tools: ["nika:fetch"]
+inputs:
+  host: { type: string, default: "evil.example.com" }
+tasks:
+  grab:
+    invoke:
+      tool: nika:fetch
+      args: { url: "https://${{ inputs.host }}/data" }
