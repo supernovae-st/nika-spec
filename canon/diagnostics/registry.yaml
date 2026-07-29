@@ -1908,6 +1908,23 @@ diagnostics:
       the F-O7 spec lane · the slot the F-O1 analysis confirmed free (001-007 + 009 taken) · the engine emission
       lands with the classifier flip (F-O7 engine lane) · the run-time twin stays NIKA-SEC-004 (one runtime
       refusal voice · defense in depth).'
+  - id: NIKA-SEC-010
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0331
+    introduced_in: C1
+    namespace: SEC
+    plane: unclassified
+    condition: 'the approval-capability law is violated · a rate-limited approval burst (the N+1th distinct mint of a run) · an approval whose resolved content hash differs from the shown hash (content_mismatch) · a ticket replayed across runs or steps (scope_mismatch) · or the static heterogeneous-batch refusal (one prompt unleashing two or more effect classes) — the 6th invariant (NEP-0013 · F-P4)'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: false
+    teaching: 'approval is a bounded capability, never ambient · slow the burst down and declare the batched gate at the contract (never a queue) · answer only what was shown (the hash binds the rendered content) · a ticket lives for its run, its step, its hash — nothing else.'
+    notes: 'nep-0013 (2026-07-24 · lane 2026-07-29) · category: security_error · transient: false (canon.yaml verbatim) · minted by the F-P4 follow-up · the runtime refusals (rate_limited · content_mismatch · scope_mismatch) and the static batch refusal speak it (engine #744) · law 3 of the approval ticket.'
   - id: NIKA-SEC-009
     status: reserved
     owner: spec

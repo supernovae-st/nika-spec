@@ -1912,7 +1912,7 @@ laws:
       sets: ["DeclaredPermits", "EffectiveAuthority"]
       relation: subset
       pipeline_stage: permits_check
-    diagnostics: ["NIKA-POLICY-001"]
+    diagnostics: ["NIKA-POLICY-001", "NIKA-SEC-010"]
     fixtures: []
     negative_fixtures: []
     projections: ["prose:10-authority", "cli:check"]

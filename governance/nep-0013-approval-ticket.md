@@ -46,7 +46,7 @@ The law (MUST):
    canonical rendering of what is shown: the message, the gated
    action's identity, and the effect classes in play — JCS-canonical,
    never an LLM-generated summary. An answer whose resolved content
-   hash differs from the shown hash halts with an
+   hash differs from the shown hash halts (`NIKA-SEC-010`) with an
    `approval.content_mismatch` finding at the receipt.
 2. **Scope and TTL.** A ticket lives for this run (the run nonce) ×
    this step × this content hash, with a bounded TTL (engine-named
@@ -58,8 +58,8 @@ The law (MUST):
    the same ticket — attested `dedup`, the human is not re-asked). A
    heterogeneous batch (different actions folded into one approval) is
    refused at check: one prompt gates one action of one class. The
-   N+1th prompt of a run is a typed HALT (`security_error`) — never a
-   queue.
+   N+1th prompt of a run is a typed HALT (`NIKA-SEC-010` ·
+   `security_error`) — never a queue.
 4. **Attestation.** Every decision emits a hash-chained
    `approval_decided` event carrying the ticket digest, the shown
    hash, the decision (allow · deny · dedup), the remaining TTL, and
