@@ -86,9 +86,32 @@ def main() -> int:
         print("ssot-map-projector · mode --write | --check", file=sys.stderr)
         return 2
     estate = yaml.safe_load(ESTATE.read_text())
+    # Shape floor — a projector that tracebacks teaches nothing (exit 2 =
+    # broken input, exit 5 = drift; the refuter earned each of these).
+    if not isinstance(estate, dict) or not isinstance(estate.get("files"), list):
+        print("ssot-map-projector · estate.yaml has no files list", file=sys.stderr)
+        return 2
+    if not all(
+        isinstance(f, dict) and isinstance(f.get("path"), str)
+        for f in estate["files"]
+    ):
+        print("ssot-map-projector · a files row has no path", file=sys.stderr)
+        return 2
+    if not all(
+        isinstance(f.get("derivation"), dict)
+        for f in estate["files"]
+        if f.get("class") == "generated" and "derivation" in f
+    ):
+        print("ssot-map-projector · a derivation is not a mapping", file=sys.stderr)
+        return 2
     text = SSOT_MD.read_text()
-    if OPEN not in text or CLOSE not in text:
-        print(f"ssot-map-projector · markers missing in {SSOT_MD.name}", file=sys.stderr)
+    # Exactly ONE island, opened before it closes — a second marker pair
+    # would ride unchecked (the duplicate-island bypass, refuter-proven).
+    if text.count(OPEN) != 1 or text.count(CLOSE) != 1:
+        print(f"ssot-map-projector · exactly one {OPEN} island required", file=sys.stderr)
+        return 2
+    if text.index(OPEN) > text.index(CLOSE):
+        print("ssot-map-projector · island markers are inverted", file=sys.stderr)
         return 2
     head, rest = text.split(OPEN, 1)
     _, tail = rest.split(CLOSE, 1)
