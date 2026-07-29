@@ -42,13 +42,25 @@ reported anyway, `detail` only: an `invalid` verdict with no reason
 attached is the worst output a harness can print, and was this
 adapter's first draft.
 
-Two more deliberate absences:
+`category` ← the diagnostics registry, by code — ONE truth, never a
+guess. The report itself carries `code` + `gate` + `kind`, never the
+spec's error CATEGORY; the registry
+(`canon/diagnostics/registry.yaml`) records each imported code's
+category as the greppable `category: <c>` fragment of its `notes:`
+(the C0 canon-flip audit trail), and a value is admitted only when
+`canon.yaml`'s closed `error_categories` set knows it. The registry's
+`cause:` field is deliberately NOT read — it carries the category
+verbatim only until the table-13 runtime cause mapping mints (registry
+`$comment`), then diverges. A code the registry does not cover stays
+category-less (today: the 11 kernel-born NIKA-YAML rows + the 2
+NIKA-AGENT seeds carry no fragment) — absent, loud on a category-only
+fixture, never invented. Codeless rungs get no category either. An
+unreadable registry degrades the same way, with a warning on stderr:
+categories vanish, verdicts and codes stay — fail-closed, since a
+missing category can only turn a match into a LOUD mismatch.
 
-- **no `category`**. The report carries `code` + `gate` + `kind`, never
-  the spec's error CATEGORY, and the matching rule makes category
-  advisory whenever a `code` is present. A fixture asserting a
-  category-ONLY expectation is therefore out of reach by construction —
-  loud, never a silent pass.
+One more deliberate absence:
+
 - **no derived `namespace`**. The matching rule already accepts an
   expected namespace when an emitted `code` starts with it, so deriving
   one would add a second, guessable spelling of the same fact
@@ -61,15 +73,43 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
+from pathlib import Path
+
+_REPO = Path(__file__).resolve().parents[2]
+_REGISTRY = _REPO / "canon" / "diagnostics" / "registry.yaml"
+_CANON = _REPO / "canon.yaml"
 
 
 # Every array the engine's `clean` is composed from (see the docstring
 # table). The last two are codeless by construction, and are reported
 # with a `detail` only — an invalid verdict must never arrive reasonless.
 VIOLATION_SOURCES = ("conformance", "findings", "model_findings", "skill_findings")
+
+
+def load_categories() -> dict[str, str]:
+    """code → spec category, from the diagnostics registry (see docstring).
+
+    The greppable `category: <c>` fragment of each row's `notes:` is the
+    carrier; `canon.yaml`'s closed `error_categories` set is the gate. A
+    row without the fragment contributes nothing — absent stays absent.
+    """
+    import yaml  # the suite's own dependency (conformance/requirements.txt)
+
+    loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+    closed = set(
+        yaml.load(_CANON.read_text(), Loader=loader)["error_categories"]["items"]
+    )
+    registry = yaml.load(_REGISTRY.read_text(), Loader=loader)
+    categories: dict[str, str] = {}
+    for row in registry.get("diagnostics") or []:
+        m = re.search(r"category:\s*([a-z_]+)", row.get("notes") or "")
+        if m and m.group(1) in closed:
+            categories[row["id"]] = m.group(1)
+    return categories
 
 
 def _detail(f: dict) -> str:
@@ -80,7 +120,7 @@ def _detail(f: dict) -> str:
     return json.dumps(f, sort_keys=True)
 
 
-def verdict(report: dict) -> dict:
+def verdict(report: dict, categories: dict[str, str] | None = None) -> dict:
     """The report contract → the wire shape (see the module docstring)."""
     errors: list[dict] = []
     for key in VIOLATION_SOURCES:
@@ -90,6 +130,9 @@ def verdict(report: dict) -> dict:
             e: dict = {"detail": _detail(f)}
             if f.get("code"):
                 e["code"] = f["code"]
+                category = (categories or {}).get(f["code"])
+                if category:
+                    e["category"] = category
             errors.append(e)
     return {"valid": bool(report.get("clean")), "errors": errors}
 
@@ -122,7 +165,12 @@ def main(argv: list[str]) -> int:
     except json.JSONDecodeError as e:
         print(f"nika-engine adapter: report is not JSON · {e}", file=sys.stderr)
         return 3
-    print(json.dumps(verdict(report)))
+    try:
+        categories = load_categories()
+    except Exception as e:  # degrade, never crash: absence is fail-closed
+        print(f"nika-engine adapter: registry unreadable · {e}", file=sys.stderr)
+        categories = {}
+    print(json.dumps(verdict(report, categories)))
     return 0
 
 
