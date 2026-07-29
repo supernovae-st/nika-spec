@@ -22,6 +22,7 @@ directly, the maintainers included.
 | [0008](nep-0008-egress-permit-bound.md) | The sandboxed egress proxy is the permit's exact projection | Standards Track | Draft |
 | [0009](nep-0009-effective-path-identity.md) | A path grant names an effective path identity, re-judged at dispatch | Standards Track | Draft |
 | [0013](nep-0013-approval-ticket.md) | Human approval is a bounded, content-bound, attested ticket | Standards Track | Draft |
+| [0014](nep-0014-thin-laws.md) | The thin-laws (lot 3a): observable independence · input origins · the readable receipt · cross-version resume | Standards Track | Draft |
 | [0010](nep-0010-run-entropy-clock.md) | Every source of randomness and time is declared at the envelope's `run:` block | Standards Track | Draft |
 | [0011](nep-0011-run-lifecycle-attestation.md) | The run's lifecycle is attested: boot manifest, teardown seal, verifier-borne incomplete | Standards Track | Draft |
 | [0012](nep-0012-receipt-untrusted-input.md) | The receipt is untrusted input: bounds as constants, terminal hygiene, recognize-don't-sanitize, the differential twin | Standards Track | Draft |
