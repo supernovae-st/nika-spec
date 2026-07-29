@@ -233,7 +233,7 @@ patterns:
 - glob: "eval/**"
   class: authored
   match_count: 8
-  aggregate_sha256: 8c5ed151045e0afd7c21b7f1737772ae97490c6cb68a5b50007afaadc04817e7
+  aggregate_sha256: b38197f44bd318c821f4d38d353c2b3c4645d6215e98ee1a9e3e03cef930097a
   evidence: "the eval harness humans wrote — run-eval.py · intents.yaml · authorability/{eval.yaml,generate.py,tasks.jsonl} · READMEs; results excepted above"
 - glob: "examples/**"
   class: authored

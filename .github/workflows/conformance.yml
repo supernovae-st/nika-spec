@@ -114,3 +114,10 @@ jobs:
       # never leave the claim standing. Fixed command · repo files only.
       - name: Governance refs · every relative md link resolves
         run: python3 scripts/check-md-refs.py
+
+      # A workflow header's `Run ·` line is a promise the README makes on
+      # its behalf — 26 of them taught a dead directory for a day after
+      # the flatten (found by a re-proof, not a gate). Fixed command ·
+      # repo files only.
+      - name: Run-line refs · every header command names a real path
+        run: python3 scripts/check-run-lines.py
