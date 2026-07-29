@@ -80,9 +80,10 @@ tasks:
   rollback:
     # Strictly the failure arm. On the green run this task settles
     # `cancelled` — its producer never entered the pass-set, so the path is
-    # eliminated as a value, not reported as an error. On the drill run it
-    # does real work: the incident record IS the reason this is a task and
-    # not a `recover:`.
+    # eliminated as a value, not reported as an error; the render says so
+    # in one line: `⊘ rollback  gate: an edge did not admit`. On the drill
+    # run it does real work: the incident record IS the reason this is a
+    # task and not a `recover:`.
     after: { deploy: failure }
     invoke:
       tool: "nika:write"

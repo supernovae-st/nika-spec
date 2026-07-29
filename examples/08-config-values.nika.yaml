@@ -40,9 +40,11 @@ inputs:
 
 config:
   # The deployment's knobs. `type:` is required; `default:` is what makes
-  # this file runnable everywhere. Never a credential here: config values
-  # appear in logs and traces (spec/01-envelope.md §config-vs-secrets) — a
-  # value that must stay masked belongs to `secrets:`.
+  # this file runnable everywhere. The caller cannot reach these — measured:
+  # `--var region=us` refuses with `unknown input — the workflow declares:
+  # team`. Never a credential here: config values appear in logs and traces
+  # (spec/01-envelope.md §config-vs-secrets) — a value that must stay
+  # masked belongs to `secrets:`.
   region:
     type: string
     default: "eu"
