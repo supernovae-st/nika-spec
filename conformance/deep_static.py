@@ -572,10 +572,17 @@ def _taint_canonical_host(url: str):
 
 def _taint_globbed(value: str, globs) -> bool:
     """Match against the LITERAL bounds only — an interpolated bound is law
-    1's refusal (NIKA-AUTH-007), never something to match against."""
+    1's refusal (NIKA-AUTH-007), never something to match against. BOTH
+    sides compare in canonical form: the value arrives normalized, so a
+    bound authored `./examples/x.csv` must normalize too, or an in-bound
+    dotted default reads as an escape (the false AUTH-008 that turned the
+    corpus red on main 2026-07-29 — engine green, reference red, on
+    `ceo-monday-brief`'s `sheet`; the engine canonicalizes both sides)."""
     import fnmatch
+    import posixpath
     return any(isinstance(g, str) and not EXPR_BODY.search(g)
-               and fnmatch.fnmatchcase(value, g) for g in globs or [])
+               and fnmatch.fnmatchcase(value, posixpath.normpath(g))
+               for g in globs or [])
 
 
 def permit_taint_errors(doc: dict, tasks: list) -> list[dict]:
