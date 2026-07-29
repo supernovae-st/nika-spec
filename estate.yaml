@@ -18,11 +18,11 @@ classes:
   testimonial: "captured evidence — run outputs, traces, receipts: proves behavior; neither shipped law nor regenerable output"
   foreign: "pointer to a third-party sovereign source"
 summary:
-  classified_files: 1252
+  classified_files: 1254
   file_rows: 14
   pattern_rows: 29
   by_class:
-    authored: 926
+    authored: 928
     authored-pin: 0
     generated: 130
     pinned-copy: 3
@@ -50,7 +50,7 @@ files:
     - "https://www.contributor-covenant.org/version/2/1/code_of_conduct.html (CC-BY-4.0)"
 - path: "SSOT.md"
   class: authored
-  sha256: b5d5987cbf7917bd03c52f1afd4dbd7fee20bc957af4a82ef1fb7c4127d9149b
+  sha256: 2027f57c00b1e81f42cea4fd846c1ff8873e044c702740d11ed633797948b2af
   evidence: "the map of where every fact lives — prose and judgments are authored, but it carries ONE generated island (the estate:map markers · §9): scripts/ssot-map-projector.py --write derives the gated-surfaces table from THIS manifest, and --check (exit 5 · conformance.yml 'Projection gates') refuses a hand edit inside the markers — the canon.yaml hybrid, inverted"
 - path: "VERSION"
   class: authored
@@ -198,8 +198,8 @@ patterns:
     - "the VOCAB_FIXTURE constant in scripts/gen-gate-matrix.py"
 - glob: "conformance/tests/**"
   class: authored
-  match_count: 495
-  aggregate_sha256: 21e59f1de4a6bf1f258945a8d0de08c9152e0606aa8de95940733fc82ee3e2c1
+  match_count: 497
+  aggregate_sha256: 29e50201a8022a6f18c4964e7ef31ef2454b002cd4293ae2263a1d671984ac07
   evidence: "the executable law — the 5-tier fixture corpus (core · deep 001-022 · lints · runtime · stdlib): input + expected pairs written at spec-authoring time, consumed by conformance/runner.py; no generation markers"
 - glob: "conformance/.nika/**"
   class: testimonial
@@ -214,7 +214,7 @@ patterns:
 - glob: "conformance/**"
   class: authored
   match_count: 197
-  aggregate_sha256: e675beeaf8de6107bc81e5e5bbe393b5c77e0b8abc32939fc0bda4609ba502b8
+  aggregate_sha256: b60c5a971b61a9ea5f49f794e3b50dd3885c6dff09370da5da5d29b870316303
   evidence: "the 95-workflow corpus (envelope · variables · verbs · errors · dag · gates · types · yaml-profile · values · composition · decision-goldens frozen at authoring time and consumed by decision_core_selftest.py) + the Python cores/selftests/runner + README/FINDINGS/runner-protocol; type-corpus + coverage-matrix excepted in files:"
 - glob: "proofs/**"
   class: testimonial

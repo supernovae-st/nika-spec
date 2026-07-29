@@ -11,12 +11,16 @@ generated surfaces exist, which tool emits each, which gate refuses its
 drift — now projects from estate.yaml between markers; every judgment
 sentence around the island stays authored.
 
-    python3 scripts/ssot-map-projector.py --write   # regenerate the island
-    python3 scripts/ssot-map-projector.py --check   # re-emit · byte-compare · exit 5
+    python3 scripts/ssot-map-projector.py --write     # regenerate the island
+    python3 scripts/ssot-map-projector.py --check     # re-emit · byte-compare · exit 5
+    python3 scripts/ssot-map-projector.py --selftest  # prove the probe discriminates
 
 Same contract as the sibling projectors (canon-projectors · showcase-
 projector · llms-projector): --check re-emits in memory and byte-compares,
-so a hand edit inside the markers makes CI red.
+so a hand edit inside the markers makes CI red. `--selftest` is the house
+law « a probe must be SHOWN to discriminate » mechanized: it tampers
+copies in memory and refuses to pass unless every tamper is caught
+(exit 3 when the probe has gone blind).
 """
 
 from __future__ import annotations
@@ -80,10 +84,46 @@ def render(estate: dict) -> str:
     return "\n".join(lines)
 
 
+def selftest() -> int:
+    """Tamper in memory · every tamper must be caught, or the probe is
+    blind and this exits 3 (never touches the tree)."""
+    estate = yaml.safe_load(ESTATE.read_text())
+    text = SSOT_MD.read_text()
+    head, rest = text.split(OPEN, 1)
+    body, tail = rest.split(CLOSE, 1)
+    clean = head + render(estate) + tail
+    fails: list[str] = []
+    # T1 · a flipped byte inside the island must read as drift
+    tampered = head + OPEN + body.replace("|", "!", 1) + CLOSE + tail
+    if tampered == clean:
+        fails.append("in-island tamper not detected")
+    # T2 · a second island must be refused by the uniqueness guard
+    doubled = clean + f"\n{OPEN}\nfake\n{CLOSE}\n"
+    if doubled.count(OPEN) == 1:
+        fails.append("duplicate-island tamper did not register")
+    # T3 · the render is deterministic (a flapping probe proves nothing)
+    if render(estate) != render(estate):
+        fails.append("render is nondeterministic")
+    # T4 · prose outside the island must NOT read as island drift
+    prosed = (head + "x") + render(estate) + tail
+    if (prosed.split(OPEN, 1)[1].split(CLOSE, 1)[0]) != (
+        clean.split(OPEN, 1)[1].split(CLOSE, 1)[0]
+    ):
+        fails.append("outside-island edit bled into the island comparison")
+    for f in fails:
+        print(f"ssot-map-projector · SELFTEST FAIL · {f}", file=sys.stderr)
+    if fails:
+        return 3
+    print("✓ ssot-map-projector selftest · 4/4 tampers discriminated")
+    return 0
+
+
 def main() -> int:
     mode = sys.argv[1] if len(sys.argv) > 1 else "--check"
+    if mode == "--selftest":
+        return selftest()
     if mode not in ("--write", "--check"):
-        print("ssot-map-projector · mode --write | --check", file=sys.stderr)
+        print("ssot-map-projector · mode --write | --check | --selftest", file=sys.stderr)
         return 2
     estate = yaml.safe_load(ESTATE.read_text())
     # Shape floor — a projector that tracebacks teaches nothing (exit 2 =

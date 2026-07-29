@@ -94,6 +94,7 @@ jobs:
           python scripts/showcase-projector.py --check
           python scripts/llms-projector.py --check
           python scripts/ssot-map-projector.py --check
+          python scripts/ssot-map-projector.py --selftest
           python scripts/starters-projector.py --check
           python scripts/authoring-projector.py --check
           python scripts/design-projector.py --check
