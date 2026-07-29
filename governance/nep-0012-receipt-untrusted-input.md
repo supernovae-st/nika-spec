@@ -42,8 +42,12 @@ The law (MUST):
 1. **Bounds are constants.** The verifier refuses, with a typed
    finding, any artifact exceeding the spec's decode bounds — input
    size, journal line length, JSON nesting depth, proof-node count,
-   identifier length. The bounds live in the spec as named constants
-   (the values are the lane's, frozen with the law); refusal is total —
+   identifier length. The bounds are named here, normatively (input
+   1 MiB · journal line 1 MiB · journal total 256 MiB · JSON nesting
+   depth 32 · proof-node count 64 · identifier 256 bytes), and the
+   reference engine carries exactly these values as public, semver-
+   pinned constants (`nika-dap` · one source, no duplication); refusal
+   is total —
    no partial decode, no truncation-and-continue. Bounds are enforced
    by code on every build profile, never by debug assertions.
 2. **Terminal hygiene.** Every artifact-derived string rendered to a
@@ -54,8 +58,9 @@ The law (MUST):
 3. **Recognize, don't sanitize.** A malicious artifact is classified
    and refused; the verifier never repairs input into acceptability.
    The golden corpus (`receipts/malicious/` · the lane's classes:
-   oversized · deep · flood · escape-bearing · truncated · duplicated
-   · confused) lives WITH the engine's tests and is born with this law
+   deep · truncated · trailing · proof-flood · id-overflow ·
+   duplicate-keys · escape-bearing · plus the golden) lives WITH the
+   engine's tests and is born with this law
    (ratchet NEP-0000). A crash, hang or overflow on the corpus is a P0
    engine bug by definition.
 4. **The differential twin.** The reference decoder (`proof_core` ·
@@ -88,10 +93,14 @@ refusal — naming behavior that was never a promise.
 ## Reference Implementation
 
 - The engine lane (F-P1): bounds before `serde_json::from_str` on the
-  receipt read, a line cap on the journal walk, the promoted
-  `sanitize()` law on the verify render, the golden corpus under the
-  forensics crate's tests, the 5th fuzz target, and the Rust-vs-Python
-  differential over the corpus.
+  receipt read, a line cap on the journal walk, the golden corpus
+  under the forensics crate's tests — and, landed with the lot-1
+  review fixpack: the promoted terminal-escape law at the render
+  sites (the OSC52 class, `escape_tty` born at birth), the 5th fuzz
+  target in the nightly matrix with its seed corpus, and the
+  journal's whole-file bound (256 MiB). The Rust-vs-Python
+  differential over the corpus (law 4) is the named remainder — the
+  claim lands with its delivery, never before.
 
 ## Deferred (P2)
 

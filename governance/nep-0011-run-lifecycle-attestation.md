@@ -66,10 +66,13 @@ The law (MUST):
    fields; a manifest claims only what exists (absent is honest).
 2. **The teardown seal.** The seal's `covers` object gains
    `receipt_digest` (the digest of the run receipt folded from this
-   seal's OWN pre-seal chain facts — a verifier MUST recompute it from
-   `covers.head` / `covers.events`; the folded receipt fixes
-   `chain: intact` and `sealed: true` at the seal instant, so its
-   digest is deliberately NOT the later evidence-pack receipt's),
+   seal's OWN pre-seal chain facts — bound under the seal's signature,
+   tamper-evident without any verifier-side recompute: the full
+   re-fold needs the receipt body, which lives in the evidence pack,
+   not in `covers`; the folded receipt fixes `chain: intact` and
+   `sealed: true` at the seal instant, so its digest is deliberately
+   NOT the later evidence-pack receipt's — a pack↔seal cross-check is
+   the named follow-on),
    `budgets` (the consumed ρ — `spent_usd` only when metered, never a
    fabricated zero), and `effects` (the exercised ε at the
    effect-task attempt grain, beside the declared bound). The
