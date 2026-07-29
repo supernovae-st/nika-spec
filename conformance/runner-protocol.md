@@ -110,6 +110,34 @@ exit non-zero on any failure).
 
 The engine MUST exit non-zero if any fixture in the claimed level fails.
 
+## The tier-scoping rule · a `valid: true` fixture is whole-spec legal
+
+A conformant engine MAY judge more layers than the tier a fixture lives
+in binds — authority (`permits` · NIKA-SEC-004), confidentiality
+(`egress:` sanctions · NIKA-SEC-006), policy (`endorsement:` ·
+NIKA-SEC-013) — and a refusal on ANY spec law is a correct refusal.
+Tier-scoping therefore lives in the FIXTURE, never in the runner:
+
+- **`valid: true` asserts the whole spec.** The input MUST be a fully
+  legal workflow under every law of the spec, not merely at the tier
+  that motivated it: every effect its body names is declared
+  (`permits.fs.write` for a literal output path · `permits.net.http`
+  for a literal webhook host) · every secret reach is sanctioned
+  (`egress:`) · every human gate runs under a declared `endorsement:`
+  mode. The reference oracle judges fewer layers than a full engine; a
+  fixture that leans on that gap asserts an accident, not a law.
+- **`valid: false` fixtures need no scoping.** The matching rule asserts
+  the expected entries against the emitted set; an engine that piles
+  further out-of-tier refusals on top changes nothing — extra errors
+  never un-match, and the verdict is already a refusal.
+
+No runner mechanism carries this rule (no `binds:` field, no namespace
+filter): a filter that ignored out-of-tier refusals on valid fixtures
+would let a broken engine pass them — fail-open, the one thing this
+suite exists to refuse. Applied 2026-07-30 to the six class-C fixtures
+(below); the engine-side workaround (choosing narrow tiers) is
+superseded.
+
 ## The stdlib STATIC-surface layer (`tests/stdlib/`)
 
 Stdlib v0.1 fixtures split the level in two halves ·
@@ -212,6 +240,13 @@ construction: the matching rule consults an emitted `category` ONLY on
 the category-only path, so a derived value can open a match, never
 close one.
 
+**Re-measured 2026-07-30 (later) · 209 of 215**: the six class-C
+fixtures were made whole-spec legal (§the tier-scoping rule) — core
+124/129 → **127/129** · stdlib 25/32 → **28/32** · deep/values/types/
+gates byte-identical. The six survivors are exactly the four class-B
+fixtures (the codeless MODELS rung · an engine owe) and the two
+class-D doctrine rows below.
+
 The fifteen divergences were not one bug; they are four classes, and
 naming them is the point of running this at all:
 
@@ -219,15 +254,14 @@ naming them is the point of running this at all:
 |---|---|---|---|
 | A | **adapter reach** · CLOSED 2026-07-30 | ~~3~~ 0 | the fixture asserts a `category`-ONLY expectation; the engine's report carries `code`+`gate`+`kind` and no category. Closed by derivation, not invention: [`canon/diagnostics/registry.yaml`](../canon/diagnostics/registry.yaml) records each imported code's category as the greppable `category: <c>` note (the C0 canon-flip audit trail) and the adapter maps code → category through it, gated by `canon.yaml`'s closed `error_categories` set — ONE truth. Codes the registry does not cover stay category-less and loud (`stdlib/builtins/001·002·004` now agree) |
 | B | **a codeless rung** | 4 | the fixtures expect `NIKA-PROVIDER`; the engine's MODELS rung emits findings with no spec code (`model`·`tasks`·`why`), so nothing can match by code. The engine owes that rung a code — the harness cannot invent one (`stdlib/001` · `stdlib/providers/001·002·006`) |
-| C | **layer scope** | 6 | a full engine judges MORE layers than a tier-scoped fixture binds. VERIFIED on `stdlib/builtins/005-valid-image-generate`: it declares `permits: {tools: […]}` and no `fs.write`, while its task writes `./assets/og` — so `NIKA-SEC-004` is CORRECT, and `expected.valid: true` is correct too, at the tier this stdlib fixture binds (names + shapes). The other five (`core/dag-topology/011` · `core/envelope/012` · `core/policy/001` · `stdlib/builtins/006·007`) share the shape and are listed UNVERIFIED |
+| C | **layer scope** · CLOSED 2026-07-30 | ~~6~~ 0 | a full engine judges MORE layers than a tier-scoped fixture binds — and verifying the five UNVERIFIED members one by one showed the six were never one class: 3× under-granted authority (`stdlib/builtins/005·006·007` wrote literal paths with no `permits.fs.write` · NIKA-SEC-004) · 1× unsanctioned secret reach (`core/envelope/012` · secrets→exec env with no `egress:` · NIKA-SEC-006 · the law is [01-envelope §egress](../spec/01-envelope.md)'s own default-deny) · 1× undeclared endorsement mode (`core/policy/001` · a human gate under no `endorsement:` · NIKA-SEC-013 · [10 §policy](../spec/10-authority.md)) · 1× not layer-scope at all (`core/dag-topology/011` · `nika:notify` under the canonical arg shape wants `channel`+`target`+`message`, and a literal webhook host wants `permits.net.http`). All six inputs made whole-spec legal (§the tier-scoping rule) · both oracles now accept each. Named honestly: the reference oracle implements neither NIKA-SEC-006 nor NIKA-SEC-013 today — exactly how illegal inputs sat green in this suite |
 | D | **doctrine** | 2 | a real disagreement, each side reasoned in its own file. `core/variables/013-valid-output-schema-open-path` asserts « open schema levels … are never statically rejected — the check is sound »; the engine's `schema_typing.rs` answers « a structured-output `schema:` compiles strict — flagging unknown keys is the point of the check ». Both are defensible; the lock is the operator's. (`core/envelope/010` is the milder sibling: both oracles REJECT, they differ on the code family — `NIKA-PARSE` vs `NIKA-TYPE`.) |
 
 Class A was the adapter's own honest limit — closed 2026-07-30 by
 deriving the category from the registry (one truth, never a guess).
-Class B is an engine owe. Class C says the protocol lacks a
-**tier-scoping rule for third-party mode** — the engine-side suites
-already work around it by choosing narrow tiers (`core/authority` ·
-`runtime/permits`), which is the workaround made visible. Class D
+Class B is an engine owe. Class C exposed a missing law, not a missing
+mechanism — closed 2026-07-30 by §the tier-scoping rule (a `valid:
+true` fixture is whole-spec legal) applied to all six inputs. Class D
 needs a decision, not a patch.
 
 One defect was found and FIXED by this measurement: the MODELS rung

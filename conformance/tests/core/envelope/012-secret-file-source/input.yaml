@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 nika: v1
 workflow:
   id: core-secret-file
@@ -5,6 +6,7 @@ secrets:
   signing_pem:
     source: file
     path: ~/.keys/signing.pem
+    egress: [{ to: "exec" }]
 permits:
   exec: ["./sign.sh"]
 tasks:

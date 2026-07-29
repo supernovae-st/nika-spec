@@ -3,6 +3,7 @@ nika: v1
 workflow:
   id: t
 policy:
+  endorsement: solo
   require:
     human_gate_before: [exec]
 permits:
