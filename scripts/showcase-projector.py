@@ -61,11 +61,14 @@ IS_LESSON = re.compile(r"^\d{2}-")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from grammar_door import downcast_w2, downcast_w105  # noqa: E402
 
-# The default = the grammar the LATEST RELEASED binary speaks (w105 since
-# v0.105.0 · 2026-07-20). Override per bake: w2 (0.104 era) · wnew (identity ·
-# the post-train flip). The release-heal ratchet derives this from the
-# release itself (R2) — until then the default moves WITH the train.
-SERVED_GRAMMAR = os.environ.get("NIKA_SERVED_GRAMMAR", "w105")
+# The default = the grammar the LATEST RELEASED binary speaks — the
+# IDENTITY door since the 0.106 train (v0.106.1 · 2026-07-28 refuses
+# `vars:`, so the w105 downcast now bakes fences the released judge
+# kills: 33/57 died on guides/templates.mdx before this flip). The era
+# doors remain per-bake overrides: w2 (0.104) · w105 (0.105). The
+# release-heal ratchet derives this from the release itself (R2) —
+# until then the default moves WITH the train, and it just did.
+SERVED_GRAMMAR = os.environ.get("NIKA_SERVED_GRAMMAR", "wnew")
 
 
 def served(yaml_text: str, fname: str) -> str:
@@ -371,8 +374,11 @@ def render_coverage(workflows: dict[str, str]) -> str:
         users = sorted(n for n, cs in per_file.items() if key in cs)
         if not users:
             continue
+        # The slug IS the link — post-flatten there is no tier prefix to
+        # strip, and the old `.split('-', 1)[1]` turned `support-triage`
+        # into `/examples/triage` (144 dead docs links reborn per --write).
         links = " · ".join(
-            f"[{n.removesuffix('.nika.yaml').split('-', 1)[1]}](/examples/{n.removesuffix('.nika.yaml').split('-', 1)[1]})"
+            f"[{n.removesuffix('.nika.yaml')}](/examples/{n.removesuffix('.nika.yaml')})"
             for n in users)
         lines.append(f"| [{label}]({href}) | {links} |")
     lines.append("")
