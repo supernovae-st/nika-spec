@@ -1925,6 +1925,22 @@ diagnostics:
     span_required: false
     teaching: 'approval is a bounded capability, never ambient · slow the burst down and declare the batched gate at the contract (never a queue) · answer only what was shown (the hash binds the rendered content) · a ticket lives for its run, its step, its hash — nothing else.'
     notes: 'nep-0013 (2026-07-24 · lane 2026-07-29) · category: security_error · transient: false (canon.yaml verbatim) · minted by the F-P4 follow-up · the runtime refusals (rate_limited · content_mismatch · scope_mismatch) and the static batch refusal speak it (engine #744) · law 3 of the approval ticket.'
+  - id: NIKA-SEC-011
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: SEC
+    plane: run
+    condition: 'preview-commit divergence — the commit digest recomputed at the sink over the exact bytes about to fire differs from the preview digest computed at resolution (one bit of rendered argv · a permuted context field · a mutated tool argument) · the step refuses fail-closed and the receipt carries divergence:{preview, commit} — judged = executed at the action scale (NEP-0015 · F-P6)'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: true
+    teaching: 'the request changed between judgment and execution — re-run from a fresh resolution · if a hook or a test mutated the scope, the mutation is the bug · the bytes the executor fires are the bytes the preview judged, never a neighbor.'
+    notes: 'nep-0015 (2026-07-29) · category: security_error · transient: false (canon.yaml verbatim) · minted by the F-P6 spec lane · the engine emission lands with the preview-commit lane (feat/f-p6-preview-commit) · law_ids empty until the freeze batch names the canon law · SecureClaw arXiv:2606.09549 transposed.'
   - id: NIKA-SEC-009
     status: reserved
     owner: spec
