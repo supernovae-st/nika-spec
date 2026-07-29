@@ -59,22 +59,28 @@ IS_LESSON = re.compile(r"^\d{2}-")
 # (the website applies the same law at serve time via src/lib/w1-to-w2.ts).
 # Flips to identity at the release train: NIKA_SERVED_GRAMMAR=wnew.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from grammar_door import downcast_w2, downcast_w105  # noqa: E402
+from grammar_door import downcast_w2, downcast_w105, downcast_w106  # noqa: E402
 
-# The default = the grammar the LATEST RELEASED binary speaks — the
-# IDENTITY door since the 0.106 train (v0.106.1 · 2026-07-28 refuses
-# `vars:`, so the w105 downcast now bakes fences the released judge
-# kills: 33/57 died on guides/templates.mdx before this flip). The era
-# doors remain per-bake overrides: w2 (0.104) · w105 (0.105). The
-# release-heal ratchet derives this from the release itself (R2) —
-# until then the default moves WITH the train, and it just did.
-SERVED_GRAMMAR = os.environ.get("NIKA_SERVED_GRAMMAR", "wnew")
+# The default = the grammar the LATEST RELEASED binary speaks — w106
+# since the NEP-0014 mints (2026-07-29): the v0.106.1 ASSET (the binary
+# a visitor installs · published 07-28) predates `policy.endorsement`
+# and refuses it PARSE-019 (the rule set is closed per minor), so the
+# door drops that one family from baked fences. The identity flip
+# (`wnew`) returns when the released asset parses endorsement — the
+# release-heal ratchet derives this from the release itself (R2); until
+# then the default tracks the PUBLISHED asset, never a local rebuild
+# (empirical 2026-07-29: a same-version brew rebake accepted what the
+# asset refuses — the asset is the judge). Era doors stay per-bake
+# overrides: w2 (0.104) · w105 (0.105 · v0.106.1 refuses its `vars:`).
+SERVED_GRAMMAR = os.environ.get("NIKA_SERVED_GRAMMAR", "w106")
 
 
 def served(yaml_text: str, fname: str) -> str:
     """The grammar a docs reader copies · the released dialect via the door."""
     if SERVED_GRAMMAR == "wnew":
         return yaml_text
+    if SERVED_GRAMMAR == "w106":
+        return downcast_w106(yaml_text, fname)
     if SERVED_GRAMMAR == "w105":
         return downcast_w105(yaml_text, fname)
     return downcast_w2(yaml_text, fname)
