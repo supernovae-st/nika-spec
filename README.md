@@ -118,8 +118,9 @@ See [spec/](./spec/) for the full specification.
     │ the release train                  🖥️ nika.sh · 📖 nika-docs
     ▼                                     the showroom · the manual
 📦 homebrew-tap · npm · Docker ── the docks
-🔌 nika-client · 🎨 nika-vscode · 🤖 nika-agents ── the doors
-🏪 nika-registry ── the market · 🔍 nika-site-audit ── the witness
+🔌 nika-client · 🎨 nika-vscode · 🤖 nika-agents · ⚡ gh-nika ── the doors
+🏭 nika-action · 🧪 nika-actions-starter ── the CI district
+🏪 nika-registry ── the market · 🏛 nika-estate ── the land registry
 ```
 
 **This building** · THE CIVIL CODE · the language's laws (the law tables under `canon/`), the teaching corpus (`examples/`), the conformance exam (`conformance/`).
@@ -132,7 +133,7 @@ See [spec/](./spec/) for the full specification.
 
 **Truth lives** · edit the law tables in `canon/` · `canon.yaml` is a GENERATED hub · [`SSOT.md`](SSOT.md) is the map (its gated table is machine-projected) · `estate.yaml` is the cadastre (every file: authored, or derived with proof).
 
-All the buildings: [nika-spec](https://github.com/supernovae-st/nika-spec) · [nika](https://github.com/supernovae-st/nika) · [nika.sh](https://github.com/supernovae-st/nika.sh) · [nika-docs](https://github.com/supernovae-st/nika-docs) · [nika-client](https://github.com/supernovae-st/nika-client) · [nika-vscode](https://github.com/supernovae-st/nika-vscode) · [nika-agents](https://github.com/supernovae-st/nika-agents) · [homebrew-tap](https://github.com/supernovae-st/homebrew-tap) · [nika-registry](https://github.com/supernovae-st/nika-registry) · [nika-site-audit](https://github.com/supernovae-st/nika-site-audit)
+All the buildings: [nika-spec](https://github.com/supernovae-st/nika-spec) · [nika](https://github.com/supernovae-st/nika) · [nika.sh](https://github.com/supernovae-st/nika.sh) · [nika-docs](https://github.com/supernovae-st/nika-docs) · [nika-client](https://github.com/supernovae-st/nika-client) · [nika-vscode](https://github.com/supernovae-st/nika-vscode) · [nika-agents](https://github.com/supernovae-st/nika-agents) · [gh-nika](https://github.com/supernovae-st/gh-nika) · [homebrew-tap](https://github.com/supernovae-st/homebrew-tap) · [nika-action](https://github.com/supernovae-st/nika-action) · [nika-actions-starter](https://github.com/supernovae-st/nika-actions-starter) · [nika-registry](https://github.com/supernovae-st/nika-registry) · [nika-estate](https://github.com/supernovae-st/nika-estate)
 
 Every fact has one home · everything else is a gated projection.
 The living map: [nika.sh/map](https://nika.sh/map).
@@ -335,5 +336,5 @@ The reference implementation (separate repo) is AGPL-3.0-or-later.
 ---
 
 <p align="center">
-  <sub>Docs: <a href="https://docs.nika.sh">docs.nika.sh</a> · Engine (AGPL-3.0): <a href="https://github.com/supernovae-st/nika">nika</a> · Templates: <a href="https://github.com/supernovae-st/nika-starter">nika-starter</a> · <a href="https://github.com/supernovae-st/nika-actions-starter">nika-actions-starter</a> · Registry: <a href="https://github.com/supernovae-st/nika-registry">nika-registry</a></sub>
+  <sub>Docs: <a href="https://docs.nika.sh">docs.nika.sh</a> · Engine (AGPL-3.0): <a href="https://github.com/supernovae-st/nika">nika</a> · Template: <a href="https://github.com/supernovae-st/nika-actions-starter">nika-actions-starter</a> · Registry: <a href="https://github.com/supernovae-st/nika-registry">nika-registry</a></sub>
 </p>
