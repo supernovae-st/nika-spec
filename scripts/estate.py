@@ -316,7 +316,7 @@ PATTERNS = [
     {
         "glob": "design/**",
         "class": "authored",
-        "evidence": "the design SSOTs (tokens.yaml · motion.yaml — design-projector.py projects them OUTWARD to consumers, nothing writes them here) + ssot-map.md + v1-constitution.md",
+        "evidence": "the design SSOTs (tokens.yaml · motion.yaml — design-projector.py projects them OUTWARD to consumers, nothing writes them here) + v1-constitution.md",
     },
     {
         "glob": "reference/**",
@@ -331,7 +331,7 @@ PATTERNS = [
     {
         "glob": "scripts/**",
         "class": "authored",
-        "evidence": "the compiler + projectors humans wrote (ssot-compiler · canon/showcase/llms/starters/authoring/design projectors · gen-gate-matrix · gen-type-corpus · grammar_door + selftest · check-md-refs · codemods) — the tools that WRITE the generated surfaces; estate.py excepted in files: (the self row)",
+        "evidence": "the compiler + projectors humans wrote (ssot-compiler · canon/showcase/llms/starters/authoring/design projectors · gen-gate-matrix · gen-type-corpus · grammar_door + selftest · check-md-refs) — the tools that WRITE the generated surfaces; estate.py excepted in files: (the self row)",
     },
     {
         "glob": "timeline/**",

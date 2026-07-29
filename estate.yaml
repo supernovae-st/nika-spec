@@ -18,11 +18,11 @@ classes:
   testimonial: "captured evidence — run outputs, traces, receipts: proves behavior; neither shipped law nor regenerable output"
   foreign: "pointer to a third-party sovereign source"
 summary:
-  classified_files: 1260
+  classified_files: 1255
   file_rows: 14
   pattern_rows: 29
   by_class:
-    authored: 934
+    authored: 929
     authored-pin: 0
     generated: 130
     pinned-copy: 3
@@ -50,7 +50,7 @@ files:
     - "https://www.contributor-covenant.org/version/2/1/code_of_conduct.html (CC-BY-4.0)"
 - path: "SSOT.md"
   class: authored
-  sha256: 30ffa362a444c5c7b4eb51def9d560e8c6d0ed0281a493a52a3e9bad178bd3de
+  sha256: d00cd49ca657dd88a1b7d55da2d5177cc5d12151469b84e887153ee95e372969
   evidence: "the map of where every fact lives — prose and judgments are authored, but it carries ONE generated island (the estate:map markers · §9): scripts/ssot-map-projector.py --write derives the gated-surfaces table from THIS manifest, and --check (exit 5 · conformance.yml 'Projection gates') refuses a hand edit inside the markers — the canon.yaml hybrid, inverted"
 - path: "VERSION"
   class: authored
@@ -150,7 +150,7 @@ files:
   note: "carries NO in-file generation marker (llms-full.txt does) — a generated surface that does not self-declare; only the --check gate reveals its provenance"
 - path: "scripts/estate.py"
   class: authored
-  sha256: 7936efe7632e20eb8b3d444232b2c4fe2ab35d468bb9de993f68da4df82ecd3b
+  sha256: e877908de54c4ca7e0eb996fdc97715e69c8dbfe99f347314ba9ffdc66dfa475
   evidence: "hand-written estate projector (this manifest's generator)"
 patterns:
 - glob: "canon/laws/**"
@@ -269,9 +269,9 @@ patterns:
   evidence: "per-decision records authored at decision time (adr-099 · 100 · 104 · 105) — no generation markers"
 - glob: "design/**"
   class: authored
-  match_count: 4
-  aggregate_sha256: 86ccfbdc3dfaa393fdc50822312557318deb9f8d12f0db5e8f527d48a7d678b0
-  evidence: "the design SSOTs (tokens.yaml · motion.yaml — design-projector.py projects them OUTWARD to consumers, nothing writes them here) + ssot-map.md + v1-constitution.md"
+  match_count: 3
+  aggregate_sha256: 4f5fce5a1fb19ed62b2ad0821f856d14c2eb078c15d5701c0d72c65f06824a0d
+  evidence: "the design SSOTs (tokens.yaml · motion.yaml — design-projector.py projects them OUTWARD to consumers, nothing writes them here) + v1-constitution.md"
 - glob: "reference/**"
   class: authored
   match_count: 6
@@ -284,9 +284,9 @@ patterns:
   evidence: "workflow.schema.json's own $comment: 'INTERIM hand-derived schema · prose spec is the single source of truth · regenerate + diff against engine nika-schema at GA' — authored today, generated at GA; law.schema.json + registries.schema.json are the sealed R2 design-pack contracts (consumed as-is, byte-identical per PROOFS.md §P0)"
 - glob: "scripts/**"
   class: authored
-  match_count: 19
-  aggregate_sha256: 08bec0539ddaa5b66ba13232c6b15d7ebf9a8126abc4df29bdb3489a03cfceaa
-  evidence: "the compiler + projectors humans wrote (ssot-compiler · canon/showcase/llms/starters/authoring/design projectors · gen-gate-matrix · gen-type-corpus · grammar_door + selftest · check-md-refs · codemods) — the tools that WRITE the generated surfaces; estate.py excepted in files: (the self row)"
+  match_count: 15
+  aggregate_sha256: 2d3fbc57923dd59b3beddc005ccb9962a0418c71591be1ea08cf3f732481dfc6
+  evidence: "the compiler + projectors humans wrote (ssot-compiler · canon/showcase/llms/starters/authoring/design projectors · gen-gate-matrix · gen-type-corpus · grammar_door + selftest · check-md-refs) — the tools that WRITE the generated surfaces; estate.py excepted in files: (the self row)"
 - glob: "timeline/**"
   class: authored
   match_count: 2
