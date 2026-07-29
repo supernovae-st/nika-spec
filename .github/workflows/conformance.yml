@@ -93,6 +93,14 @@ jobs:
           python scripts/canon-projectors.py --check
           python scripts/showcase-projector.py --check
           python scripts/llms-projector.py --check
+          python scripts/ssot-map-projector.py --check
+
+      # Estate observation (E0) · the provenance manifest declares what IS.
+      # Advisory while mode is observation — drift warns, never blocks
+      # (the website wires the same rung non-blocking · promotion is E2's
+      # SEAL move, an operator decision). Fixed command · repo files only.
+      - name: Estate observation · provenance manifest (non-blocking)
+        run: python scripts/estate.py --check || echo "::warning::estate drift — run scripts/estate.py --write"
           python scripts/starters-projector.py --check
           python scripts/authoring-projector.py --check
           python scripts/design-projector.py --check

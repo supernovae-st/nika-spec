@@ -71,6 +71,11 @@ FILES = [
         "evidence": "hand-written estate projector (this manifest's generator)",
     },
     {
+        "path": "SSOT.md",
+        "class": "authored",
+        "evidence": "the map of where every fact lives — prose and judgments are authored, but it carries ONE generated island (the estate:map markers · §9): scripts/ssot-map-projector.py --write derives the gated-surfaces table from THIS manifest, and --check (exit 5 · conformance.yml 'Projection gates') refuses a hand edit inside the markers — the canon.yaml hybrid, inverted",
+    },
+    {
         "path": "canon.yaml",
         "class": "generated",
         "evidence": "its own header: 'GENERATED · canon.yaml is a generated projection since the C0 flip — manual edits of a generated surface make CI red (ssot-compiler --check-canon · rc=5)' + a detached body-sha256 self-hash per PAA-006",

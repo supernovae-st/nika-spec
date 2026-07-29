@@ -18,10 +18,11 @@ rule, and knowing which is which is the point of the document.
 
 ```
 ① THE LANGUAGE FACTS                    ② THE ENGINE FACTS
-   spec/canon.yaml                         the binary itself
-   Apache-2.0                              AGPL-3.0
-   "4 verbs · 28 builtins · 17 providers"  "N crates · N tests · N vectors"
-   changes when the LANGUAGE changes       changes when the CODE changes
+   spec/canon/ registries                  the binary itself
+   (hub projection: canon.yaml)            AGPL-3.0
+   Apache-2.0                              "N crates · N tests · N vectors"
+   "4 verbs · 28 builtins · 17 providers"  changes when the CODE changes
+   changes when the LANGUAGE changes
 ```
 
 They are orthogonal on purpose, and the licence split mirrors it. A number that
@@ -31,27 +32,37 @@ a language guarantee that is really an implementation detail.
 
 ---
 
-## §2 · Language facts · `canon.yaml` → three targets
+## §2 · Language facts · `canon/` → canon.yaml → three targets
 
 ```
-canon.yaml                      ★ THE SOURCE · 21 keys
-   │                              counts · verbs · builtins · providers
-   │                              error_codes · templates · extract_modes …
+canon/ registries               ★ THE SOURCE · EDIT HERE
+   surface.yaml · builtins.yaml · laws/*.yaml · templates/registry.yaml
+   diagnostics/registry.yaml · features.yaml
    │
-   └── scripts/canon-projectors.py
+   │  scripts/ssot-compiler.py --emit-canon    gate: --check-canon · rc=5
+   ▼                                           (re-emits · byte-compares)
+canon.yaml                      GENERATED HUB · + canon/ssot.lock
+   │                              hybrid by design: the §18 EXCEPTIONS
+   │                              ledger sections stay AUTHORED inside it
+   └── scripts/canon-projectors.py             gate: --check
          ├──▶ THIS repo    *.md          <!-- canon:KEY -->N<!-- /canon -->
          ├──▶ nika-docs    snippets/_canon.mdx        import { CANON }
          └──▶ nika.sh      src/canon.generated.ts     import { CANON }
 ```
 
 **The law**: a page interpolates `{CANON.x}`. It never hand-types a volatile
-language fact.
+language fact. And the hub itself is a projection — a hand edit of
+`canon.yaml` outside the ledger sections is refused by CI (the C0 flip),
+so « edit here » means the `canon/` registries, nothing downstream.
 
 **Why this exists, measured**: the website said *"13 providers"* in three source
 sites while `llms.txt` said 14. Nobody was careless — the number simply lived in
-four places and only one of them moved.
+four places and only one of them moved. (And this file inverted the root for
+eleven days — it taught `canon.yaml ★ EDIT HERE` while the file's own header
+said GENERATED. The map is a projection now; see §9.)
 
-**Verify**: `python3 scripts/canon-projectors.py --check`
+**Verify**: `python3 scripts/ssot-compiler.py --check-canon` ·
+`python3 scripts/canon-projectors.py --check`
 
 ---
 
@@ -63,6 +74,8 @@ the engine  ── scripts/mintlify-snapshot.sh ──▶ nika-docs _status-snap
 
 Crate counts, test counts, hygiene vectors. **Never quote these from memory** —
 they drift weekly. If you are about to type one, run the refresh instead.
+Honest status: this edge is discipline today — no CI refuses a stale
+snapshot (gate owed; the cross-repo rung the estate federation will carry).
 
 ---
 
@@ -104,7 +117,9 @@ engine/crates/nika-catalog/src/data/builtins.rs   ★ ALL_BUILTINS · 28, sorted
        │
        ├──▶ what `nika check` accepts
        ├──▶ what the agent kit teaches   gate: the_kit_never_teaches_a_form_the_engine_refuses
-       ├──▶ canon.yaml `builtins:`       (kept in step by hand today)
+       ├──▶ canon/builtins.yaml seam     gate: the_two_builtin_roots_agree_at_the_seam
+       │      (two sovereign roots — the language list and the engine list —
+       │       joined at the CONSUMER: the engine test reads the vendored canon)
        └──▶ a builtin has an EXAMPLE     gate: every_builtin_is_shown_or_carries_a_named_debt
 ```
 
@@ -127,11 +142,17 @@ struck from `OWED` in the same arc or the test refuses.
 ## §6 · Taught code OUTSIDE the corpus · the largest unguarded surface
 
 Every fenced YAML block in a doc, a README, a test fixture or a source comment
-teaches something. Measured, files carrying `nika: v1` outside `.nika.yaml`:
+teaches something. The count is a MEASUREMENT — run it, never quote it:
 
 ```
-engine    2869      spec  323      website  83      docs  57      vscode  55
+git grep -l 'nika: v1' -- ':!*.nika.yaml' | wc -l        # per repo, tracked files
 ```
+
+Last run 2026-07-29: engine 742 · spec 320 · agents 7 (an earlier pass
+reported engine 2869 by counting untracked run traces — the command above
+is the reproducible form). Inside THIS repo, 112 of the 213 fenced ```yaml
+blocks in tracked *.md carry `nika:` — the surface a dead-forms scanner
+should cover and does not yet.
 
 **Guarded**: the agent kit, by `agents/scripts/check-dead-forms.py` — it
 extracts every fenced block and refuses a form the engine no longer accepts.
@@ -179,17 +200,41 @@ Extending the dead-forms scanner past the kit is owed work.
 
 ## §9 · Honest state of enforcement
 
+<!-- estate:map -->
+
+The rows below are DERIVED from `estate.yaml` — regenerate with
+`python3 scripts/ssot-map-projector.py --write`; a hand edit here is
+refused by `--check` (exit 5), the same contract every projection has.
+
+| generated surface | emitted by | drift refused by |
+|---|---|---|
+| `.github/requirements.txt` | `uv pip compile --generate-hashes` | `pip install --require-hashes` |
+| `canon.yaml` | `python3 scripts/ssot-compiler.py --emit-canon` | `scripts/ssot-compiler.py --check-canon` |
+| `canon/ssot.lock` | `python3 scripts/ssot-compiler.py` | `scripts/ssot-compiler.py --check` |
+| `canon/ssot.lock.sha256` | `python3 scripts/ssot-compiler.py` | `scripts/ssot-compiler.py --check` |
+| `conformance/type-corpus/corpus.jsonl` | `python3 scripts/gen-type-corpus.py --write` | `gen-type-corpus.py --check` |
+| `examples/manifest.yaml` | `python3 scripts/showcase-projector.py --write` | `scripts/showcase-projector.py --check` |
+| `llms-full.txt` | `python3 scripts/llms-projector.py --write` | `scripts/llms-projector.py --check` |
+| `llms.txt` | `python3 scripts/llms-projector.py --write` | `scripts/llms-projector.py --check` |
+| `projections/laws-index.json` | `python3 scripts/ssot-compiler.py` | `scripts/ssot-compiler.py --check` |
+
+Provenance floor: 1252 tracked files classified · authored 926 · generated 130 · pinned-copy 3 · testimonial 193 (estate schema 2 · mode observation).
+
+<!-- /estate:map -->
+
+Beyond the derived rows above, gates that live OUTSIDE this repo's estate:
+
 ```
-✅ GATED · a machine refuses the drift
-   canon.yaml → 3 targets            canon-projectors.py --check
-   spec → pack                       sync-pack.sh + nika-pack integrity tests
-   the agent kit                     check-dead-forms.py + 62/62 nika-onboard
+✅ GATED elsewhere
    the corpus files                  nika check --native-strict, all of them
-   a builtin without an example      every_builtin_is_shown_or_carries_a_named_debt
-   a construct without a showcase    every_construct_has_a_showcase · 16/16 held
+   the agent kit                     check-dead-forms.py + 62/62 nika-onboard
+   canon ↔ engine builtin roots      the_two_builtin_roots_agree_at_the_seam (engine lib)
+   a builtin without an example      every_builtin_is_shown_or_carries_a_named_debt (engine lib)
+   a construct without a showcase    every_construct_has_a_showcase (engine lib)
 
 ⚠️ UNGATED · discipline only
-   taught YAML outside the kit       ~3400 files across six repos
+   taught YAML outside the kit       §6 — run the measurement, then extend the scanner
+   engine facts → docs snapshot      §3 — no CI refuses a stale snapshot
 ```
 
 ---
