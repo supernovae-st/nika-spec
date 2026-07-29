@@ -4,7 +4,7 @@
 # Consumers · the reference engine embeds this pack (nika examples ·
 # nika spec) · docs + website render projections of the same files.
 pack_version: 0.1.0-draft
-workflow_count: 33
+workflow_count: 39
 foundation:
   - file: examples/01-hello.nika.yaml
     sha256_16: a3746ebe75be7a2e
@@ -20,6 +20,18 @@ foundation:
     sha256_16: 99bd4736eebd11cc
   - file: examples/07-for-each-locales.nika.yaml
     sha256_16: 396c1cc81c62d259
+  - file: examples/08-config-values.nika.yaml
+    sha256_16: 552f45823a8cdae6
+  - file: examples/09-returns-typed-door.nika.yaml
+    sha256_16: 29ddda394f9b8250
+  - file: examples/10-compose-child.nika.yaml
+    sha256_16: d18e4cbcc1e696f3
+  - file: examples/10-compose-pipeline.nika.yaml
+    sha256_16: 3b71fca164b18dad
+  - file: examples/11-declassify-the-door.nika.yaml
+    sha256_16: 1f8bf7fe26a01c9b
+  - file: examples/12-failure-routing.nika.yaml
+    sha256_16: 362581f1ec7c44c4
 templates:
   - file: templates/agent-loop.nika.yaml
     sha256_16: fba1d9e2c3c6c05d
