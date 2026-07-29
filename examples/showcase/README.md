@@ -28,19 +28,19 @@ T4 EPIC        multi-stage pipelines · agents under budget · self-reporting ru
 | File | Industry | The wow | Key constructs |
 |---|---|---|---|
 | `t1-standup-digest` | engineering | the standup note writes itself from real commits | parallel start · `nika:date` · exec→infer |
-| `t1-meeting-actions` | every office | transcript → tracker-ready typed action items | `infer.schema:` · typed vars |
-| `t1-price-watch` | e-commerce / personal | a price alert with **zero** model calls | `output:` jq · CEL `when:` · secrets |
+| `t1-meeting-actions` | every office | transcript → tracker-ready typed action items | `infer.schema:` · input `default:` vs literal permit |
+| `t1-price-watch` | e-commerce / personal | a price alert with **zero** model calls | `output:` jq · CEL `when:` · `egress:` **and** `net.http` |
 | `t1-social-repurpose` | marketing / creators | one post → thread + LinkedIn + newsletter, in parallel | diamond DAG · `with:` aliasing |
-| `t1-og-images` | marketing / content | brief in → OG PNG + provenance manifest out, one task | `nika:image_generate` · provenance |
-| `t1-image-fx-batch` | creators / media | a folder of photos → deterministic art, byte-identical forever | `nika:glob` · `for_each` · `nika:image_fx` ops chain |
-| `t2-release-notes` | engineering / devrel | git log → typed notes → CHANGELOG edited in place | `nika:edit` · schema · notify |
-| `t2-seo-content-brief` | SEO / content | a brief that beats the competitor's best page | chained fetch modes · CEL indexing |
+| `t1-og-images` | marketing / content | brief in → OG PNG + provenance manifest out, one task | `nika:image_generate` · dir-writing permit |
+| `t1-image-fx-batch` | creators / media | a folder of photos → deterministic art, byte-identical forever | `nika:glob` · jq-derived paths · `nika:image_fx` ops chain |
+| `t2-release-notes` | engineering / devrel | git log → typed notes → a CHANGELOG copy edited in place | `exec` `recover:` · `nika:edit` · gated notify |
+| `t2-seo-content-brief` | SEO / content | a brief that beats the competitor's best page | chained fetch modes · `recover:` · CEL indexing |
 | `t2-invoice-chaser` | finance / freelance | overdue reminders drafted · NOTHING sent without a yes | `nika:convert` · `nika:prompt` gate · `size()` |
 | `t2-support-triage` | customer support | the overnight queue triaged before coffee | schema-over-list · jq post-filter · `nika:uuid` |
 | `t2-contract-guard` | legal / compliance | the contract **never leaves the machine** (local model) | `ollama/…` · `nika:validate` + `nika:assert` |
 | `t2-etl-quarantine` | data engineering | bad batches degrade to quarantine · the pipeline lives | `on_error: recover:` · `nika:validate` · jq group_by |
 | `t2-model-bench` | engineering / model selection | the same question, three local models, one MEASURED table | per-task `infer.model:` · `duration_ms` as data · jq fan-in |
-| `t2-release-radar` | devops / dependencies | only the NEW ships reach you | `mode: feed` · state-file diff · RFC 6902 |
+| `t2-release-radar` | devops / dependencies | only the NEW ships reach you — **the one deliberate red**, see below | `mode: feed` · state-file diff · RFC 6902 |
 | `t2-csv-chart-report` | data → picture | paste the spreadsheet, get the slide — offline, deterministic | `nika:convert` · jq group_by · `nika:chart` |
 | `t2-transcript-shownotes` | podcasts / meetings | raw transcript → typed show-notes, ONE bounded infer | `infer.schema:` strict · typed→markdown |
 | `t2-bookmark-triage` | personal / research | the bookmark pile triaged — dead links survive the batch | `mode: metadata` · resilient `for_each` · recover |
@@ -53,6 +53,44 @@ T4 EPIC        multi-stage pipelines · agents under budget · self-reporting ru
 | `t4-incident-war-room` | SRE / on-call | the postmortem drafts itself — after recovery is PROVEN | `nika:wait` settle · assert · `on_finally:` |
 | `t4-ceo-monday-brief` | founders / execs | the brief that reports its own LLM bill | 3-branch gather · `nika:inspect` cost |
 | `t4-release-train` | devops / release | gates → human GO → hold until the window → ship · verify | `nika:wait until:` · `nika:date diff` · `nika:prompt` |
+
+## Clone and run
+
+Every T1 and T2 file runs from the repo root with **no arguments and no
+setup**. Run them exactly as their `Run ·` header line says — paths resolve
+from your working directory, not from the file's, so the repo root is the
+contract:
+
+```bash
+nika check examples/showcase/t2-csv-chart-report.nika.yaml --native-strict   # 0 findings, 0 hints
+nika run   examples/showcase/t2-csv-chart-report.nika.yaml                   # artifacts land in out/
+rm -rf out                                                                    # back to clean
+```
+
+- **Fixtures are committed.** `fixtures/` holds the sample data these files
+  read — a sales CSV, a dirty orders batch, a meeting transcript, two PNGs, a
+  contract, a ticket queue, a changelog. A header with **no `Needs ·` line
+  needs nothing**: clone, run, watch it work. A `Needs ·` line names the one
+  effect that is genuinely external (a git repo, a network host, ollama seats).
+- **Every write lands under `out/`.** Nothing in this corpus writes into your
+  source tree, so `rm -rf out` always restores a clean checkout. Reads point
+  at `fixtures/`; repoint the `const:` at your own data and move the matching
+  `permits.fs.read` literal with it — `permits:` cannot interpolate
+  (`NIKA-AUTH-007`), and that is the point: a boundary you can read is a
+  boundary a reviewer can check.
+- **Offline by default.** Any `infer:` file rehearses with `--model mock/echo`
+  — deterministic, zero keys. Files that reach the network carry an
+  `on_error: recover:` sample so the run stays green with no network at all;
+  a recovery stands in for the RAW response, so the `output:` jq bindings run
+  over it unchanged.
+- **One deliberate red · `t2-release-radar`.** `nika check` exits 2 there with
+  `NIKA-SEC-009`, and the run refuses to start with it. The finding
+  over-approximates (the "egress" it names is a local state-file write); the
+  decision to leave it red rather than bolt on a `nika:prompt` to silence it
+  is recorded in the engine repo at
+  `docs/plans/2026-07-28-verdict-coverage.md` (§DECIDED · SEC-009). A red gate
+  reporting something true is the honest state, and the file says so in its
+  own header.
 
 ## Conventions (same gate as the foundation set)
 
@@ -67,11 +105,11 @@ T4 EPIC        multi-stage pipelines · agents under budget · self-reporting ru
   feature, show it
 - the offline story, honestly: `nika check` needs zero network on every
   file, and any `infer:` showcase dry-runs with `--model mock/echo`
-  (deterministic, zero model). The `agent:` showcases
-  (`t3-pr-review-fanout` · `t4-deep-research-brief`) are the exception —
-  mock echoes text and never *calls* a tool, so the ReAct loop does zero
-  rounds under it: exercising the agent needs a real tool-calling model
-  (the pinned local `qwen3.5` qualifies)
+  (deterministic, zero model) — see **Clone and run** above. The `agent:`
+  showcases (`t3-pr-review-fanout` · `t4-deep-research-brief`) are the
+  exception — mock echoes text and never *calls* a tool, so the ReAct loop
+  does zero rounds under it: exercising the agent needs a real tool-calling
+  model (the pinned local `qwen3.5` qualifies)
 - every file is a conformance input · `python conformance/runner.py all`
   MUST stay green · one verb per task · snake_case ids · every
   `${{ tasks.X }}` reference at the `with:` boundary (the binding IS the edge)
