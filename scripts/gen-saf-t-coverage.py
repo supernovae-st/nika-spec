@@ -8,6 +8,12 @@ Each `saf-tNNNN-*.nika.yaml` fixture declares its tag by name; this
 walks the directory and emits one row per tag: tag · gate · fixture.
 The gate exits 1 when an in-scope tag (the registry the file itself
 carries) has zero rows.
+
+Modes
+  write (default)   regenerate the TSV, print it
+  --check           regenerate in memory, byte-compare against disk,
+                    never write (the drift gate — same discipline as
+                    ssot-compiler --check)
 """
 from __future__ import annotations
 
@@ -28,7 +34,8 @@ IN_SCOPE: list[tuple[str, str]] = [
 ]
 
 
-def main() -> int:
+def render() -> tuple[str, int]:
+    """The regenerated TSV body + the count of in-scope tags without a row."""
     rows: dict[str, str] = {}
     for fixture in sorted(REDTEAM.glob("saf-t*-*.nika.yaml")):
         m = re.match(r"(saf-t\d+)", fixture.name, re.IGNORECASE)
@@ -42,8 +49,20 @@ def main() -> int:
         if fixture.startswith("MISSING"):
             missing += 1
         lines.append(f"{tag}\t{gate}\t{fixture}")
-    OUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    print(OUT.read_text(encoding="utf-8"), end="")
+    return "\n".join(lines) + "\n", missing
+
+
+def main(argv: list[str]) -> int:
+    body, missing = render()
+    if "--check" in argv:
+        on_disk = OUT.read_text(encoding="utf-8") if OUT.exists() else ""
+        if on_disk != body:
+            print(f"coverage DRIFT · {OUT} differs from its regeneration — run scripts/gen-saf-t-coverage.py", file=sys.stderr)
+            return 1
+        print(body, end="")
+    else:
+        OUT.write_text(body, encoding="utf-8")
+        print(body, end="")
     if missing:
         print(f"coverage FAIL · {missing} in-scope tag(s) without a row", file=sys.stderr)
         return 1
@@ -52,4 +71,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(sys.argv))
