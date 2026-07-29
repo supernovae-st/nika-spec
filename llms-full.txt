@@ -250,7 +250,7 @@ sha256 over the exact text every surface renders. The contract:
 |---|---|
 | [`canon.yaml`](canon.yaml) | THE source for every language count (verbs · namespaces · builtins · providers · modes · error namespaces) |
 | [`scripts/canon-projectors.py`](scripts/canon-projectors.py) | projects canon counts → docs snippet + website module (`--write` / `--check`) |
-| [`scripts/showcase-projector.py`](scripts/showcase-projector.py) | projects [`examples/showcase/`](examples/showcase/) → docs example pages + website explorer (yaml · diagrams · run-sim model · coverage matrix) |
+| [`scripts/showcase-projector.py`](scripts/showcase-projector.py) | projects the [`examples/`](examples/) jobs → docs example pages + website explorer (yaml · diagrams · run-sim model · coverage matrix) |
 | [`conformance/runner.py`](conformance/runner.py) | the static oracle · core + stdlib fixtures + every example as a conformance input (the CI gate) |
 | [`.pre-commit-hooks.yaml`](.pre-commit-hooks.yaml) | pre-commit hook ids for downstream engines consuming this spec |
 
