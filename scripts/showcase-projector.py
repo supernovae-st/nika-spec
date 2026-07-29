@@ -45,7 +45,13 @@ except ImportError:
     sys.exit(2)
 
 SPEC_ROOT = Path(__file__).resolve().parent.parent
-SHOWCASE = SPEC_ROOT / "examples" / "showcase"
+# The JOBS — every example that is a whole realistic workflow, as opposed to
+# the numbered teaching sequence (`01-`…`07-`) a reader walks in order. One
+# directory since the showcase/ split was nuked: it carried no information the
+# filename did not already give, and cost a word ("showcase") that meant
+# nothing "example" did not.
+JOBS_DIR = SPEC_ROOT / "examples"
+IS_LESSON = re.compile(r"^\d{2}-")
 
 # ── the served-grammar door (docs targets only) ──────────────────────
 # The pack is authored in the RATIFIED grammar; docs are a BAKED visitor
@@ -105,12 +111,14 @@ def lean(yaml_text: str) -> str:
 
 
 def load_showcase() -> dict[str, str]:
-    if not SHOWCASE.is_dir():
-        print(f"showcase-projector · {SHOWCASE} missing", file=sys.stderr)
+    if not JOBS_DIR.is_dir():
+        print(f"showcase-projector · {JOBS_DIR} missing", file=sys.stderr)
         sys.exit(2)
-    files = sorted(SHOWCASE.glob("*.nika.yaml"))
+    # The numbered lesson files are excluded: they teach ONE construct each and
+    # are read in order, which is a different job from a projected use-case.
+    files = sorted(f for f in JOBS_DIR.glob("*.nika.yaml") if not IS_LESSON.match(f.name))
     if not files:
-        print("showcase-projector · no showcase files", file=sys.stderr)
+        print("showcase-projector · no job examples", file=sys.stderr)
         sys.exit(2)
     return {f.name: lean(f.read_text()) for f in files}
 
