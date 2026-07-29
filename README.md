@@ -124,6 +124,8 @@ See [spec/](./spec/) for the full specification.
 
 **This building** · THE CIVIL CODE · the language's laws (the law tables under `canon/`), the teaching corpus (`examples/`), the conformance exam (`conformance/`).
 
+**Root** · LANGUAGE facts, Apache-2.0 · the verbs, the builtins, the providers, the laws. Engine facts (crates, tests, hygiene vectors) never enter here · the two roots never mix.
+
 **Consumes** · nothing · this repo is the root of the truth chain.
 
 **Serves** · the engine (corpus vendored by sync-pack, byte-gated) · the site and the docs (canon + showcase projectors, `--check` gates) · agents (`llms.txt`).
