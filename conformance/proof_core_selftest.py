@@ -9,9 +9,19 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 from proof_core import (  # noqa: E402
-    ProofError, assert_level, build_receipt, canonical, canonical_is_idempotent,
-    check_assert_claim, preimage, semantic_hash, validate_lock,
+    DecodeRefusal, ProofError, assert_level, build_receipt, canonical,
+    canonical_is_idempotent, check_assert_claim, decode_untrusted, preimage,
+    semantic_hash, validate_lock,
 )
+
+
+def refuses_cls(fn, cls, *a) -> bool:
+    try:
+        fn(*a)
+        return False
+    except DecodeRefusal as refusal:
+        return refusal.cls == cls
+
 
 CHECKS: list[tuple[str, bool]] = []
 
@@ -93,6 +103,35 @@ law("the receipt proves its semantic hash",
     r["proves"] == semantic_hash(IR_A) and r["receipt_format"] == 1)
 law("the receipt is self-digesting (domain-separated)",
     isinstance(r["digest"], str) and len(r["digest"]) == 64)
+
+# ── the untrusted-decode fortress (NEP-0012 law 1 · the twin pins) ──────
+
+law("a golden-shaped document admits",
+    decode_untrusted('{"receipt_format": 1, "proves": "ab", "assertions": []}')["receipt_format"] == 1)
+law("oversized refuses Oversized",
+    refuses_cls(decode_untrusted, "Oversized", '{"a": "' + "x" * (1024 * 1024) + '"}'))
+law("deep nesting refuses TooDeep (string-aware · brackets in strings do not count)",
+    refuses_cls(decode_untrusted, "TooDeep", "[" * 40 + "]" * 40))
+law("brackets inside a string are NOT depth",
+    decode_untrusted('{"s": "[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[["}')["s"].startswith("["))
+law("truncated refuses Malformed",
+    refuses_cls(decode_untrusted, "Malformed", '{"a": 1'))
+law("trailing garbage refuses Malformed",
+    refuses_cls(decode_untrusted, "Malformed", '{"a": 1} trailing'))
+law("a proof flood refuses ProofFlood",
+    refuses_cls(decode_untrusted, "ProofFlood",
+                '{"assertions": [' + ",".join(["1"] * 70) + "]}"))
+law("a nested flood cannot hide (the scan is total)",
+    refuses_cls(decode_untrusted, "ProofFlood",
+                '{"outer": {"inner": {"covers": [' + ",".join(["1"] * 70) + "]}}}"))
+law("an identifier overflow refuses IdOverflow",
+    refuses_cls(decode_untrusted, "IdOverflow", '{"digest": "' + "a" * 300 + '"}'))
+law("identifier length is measured in BYTES (multibyte counts per byte)",
+    refuses_cls(decode_untrusted, "IdOverflow", '{"digest": "' + "é" * 200 + '"}'))
+law("duplicate keys admit last-wins (both evaluators read the same doc)",
+    decode_untrusted('{"a": 1, "a": 2}')["a"] == 2)
+law("escape-bearing strings admit at decode (the render law owns the tty)",
+    decode_untrusted('{"s": "a\\u001b]52;;x"}')["s"] == "a\x1b]52;;x")
 
 bad = [n for n, ok in CHECKS if not ok]
 print(f"proof-core selftest · {len(CHECKS) - len(bad)}/{len(CHECKS)} laws hold")
