@@ -96,6 +96,21 @@ PROBES = [
      ("replace",
       '    except DupKey as e:\n        return "dup", str(e)\n',
       '    except DupKey:\n        return "ok", None\n')),
+    # The differential judges (self-executing files · replace mode): a
+    # lints extractor whose kind filter melts harvests non-lint
+    # advisories — the clock-tamper case must catch it.
+    (("scripts/lints-differential.py", "--selftest"),
+     "scripts/lints-differential.py",
+     ("replace",
+      '        if not isinstance(h, dict) or h.get("kind") != "native-first":\n',
+      '        if not isinstance(h, dict):\n')),
+    # A runtime judge that never diffs reads every tamper as agreement —
+    # the flipped-status and typed-value cases must die.
+    (("scripts/runtime-differential.py", "--selftest"),
+     "scripts/runtime-differential.py",
+     ("replace",
+      '    diffs: list[str] = []\n    want_state = expected.get("workflow_state")\n',
+      '    diffs: list[str] = []\n    return diffs\n    want_state = expected.get("workflow_state")\n')),
 ]
 
 

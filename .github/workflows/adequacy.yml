@@ -6,7 +6,8 @@
 # worktree and its selftest must DIE — a survivor exits non-zero, named
 # (scripts/mutation-adequacy.py · same family as the type-corpus --mutate
 # step, generalized to the *_core selftests + the redteam leg + the
-# grammar door + the values proof + the dup-keys gate · 13 probes).
+# grammar door + the values proof + the dup-keys gate + the two
+# differential judges · 15 probes).
 # Weekly, not per-push: adequacy rots with EDITS to selftests, not with
 # time — the cron is a backstop, workflow_dispatch the on-demand door.
 #
