@@ -3763,12 +3763,16 @@ authoring contract ·
 - An engine **SHOULD** validate `tasks.X.output.<path>` references against
   the declared schema at parse time (the misspelled-key class is caught
   before any model is called).
-- An engine **MUST reject only provably-invalid paths** ·
-  `NIKA-VAR-003` · `variable_error`. A path step is *provably invalid*
-  when ·
-  1. a **member step** lands on a schema level that declares
-     `additionalProperties: false` and does NOT list the key in
-     `properties`;
+- An engine **MUST reject invalid paths** · `NIKA-VAR-003` ·
+  `variable_error`. A path step is *invalid* when ·
+  1. a **member step** lands on a schema level that **declares
+     `properties:`** and does NOT list the key — declaring properties
+     CLOSES the level for binding (operator lock 2026-07-30 · strict by
+     default, one voice with the `returns:` walk below). The level opens
+     back up ONLY explicitly: `additionalProperties: true` (or a schema
+     object for extras) makes undeclared siblings legal again.
+     (`additionalProperties: false` on a level with no `properties:`
+     also closes it — the declared empty object.)
   2. a **member step** lands on a level whose `type` excludes `object`;
   3. an **index step** lands on a level whose `type` excludes `array`.
 - The static walk covers the v0.1 subset **`properties` · `items` ·
@@ -3776,15 +3780,26 @@ authoring contract ·
   (`$ref` · `oneOf` / `anyOf` / `allOf` · `patternProperties` · a missing
   `type` · …) makes that level **open**: the walk stops and the engine
   **MUST NOT** reject anything beneath it.
+- A level that declares **no `properties:` at all** (a bare
+  `type: object`) is **open**: nothing is declared, so nothing can be
+  contradicted — paths beneath it are never statically rejected.
 - Tasks with NO declared schema (every `exec:` / `invoke:` task · an
   `infer:` without `schema:`) are dynamic: paths into their output are
   never statically rejected (a wrong path surfaces at run time as
   `NIKA-VAR-001`).
 
-This keeps the check **sound** (zero false rejections · a valid workflow
-is never refused) while making the declared-schema path the
-better-tooling path (one more reason structured output is the default
-authoring style).
+The balance is deliberate (2026-07-30 · supersedes the earlier
+"only `additionalProperties: false` closes" reading): where the author
+declared NOTHING, the check stays **sound** — open levels and dynamic
+producers are never refused. Where the author DECLARED the shape, the
+declaration is a contract — reading an undeclared sibling of declared
+keys is the misspelled-key class and refuses loudly, with a one-line
+fix either way (declare the key, or open the level with
+`additionalProperties: true`). Note the runtime nuance this owns: JSON
+Schema itself treats an absent `additionalProperties` as permissive at
+run time, and that runtime semantic is unchanged — the static BINDING
+law is stricter than the runtime validator on purpose (catching typos
+before any model is called is the point of declaring a schema).
 
 **`returns:` sharpens the walk (normative · [09-types.md](./09-types.md)).**
 When the producer declares a `returns:` type instead of a raw `schema:`,
@@ -4193,6 +4208,7 @@ these from this file alone.
 | `NIKA-INFER-001` | provider call failed (HTTP error · provider refusal) | `provider_error` | engine-assessed |
 | `NIKA-INFER-003` | the provider reported no token usage for a priced model — the ledger cannot bill the call honestly (fail-closed · the usage-absence gate, R3-F1) | `validation_error` | false |
 | `NIKA-INFER-002` | structured output failed `schema:` validation (after any engine-internal retries) | `validation_error` | false |
+| `NIKA-INFER-003` | the provider reported no token usage for a priced model — the ledger cannot bill the call honestly, so the call fails closed (the usage-absence gate · R3-F1) | `validation_error` | false |
 | `NIKA-EXEC-001` | non-zero exit code (default capture modes · see [02 §exec](./02-verbs.md#exec--shell-command)) | `process_error` | false |
 | `NIKA-EXEC-002` | spawn failure (command not found · permission) | `process_error` | false |
 | `NIKA-INVOKE-001` | unknown tool (unresolvable `nika:`/`mcp:` id) | `validation_error` | false |
@@ -7500,22 +7516,39 @@ gates byte-identical. The six survivors are exactly the four class-B
 fixtures (the codeless MODELS rung · an engine owe) and the two
 class-D doctrine rows below.
 
+**Re-measured 2026-07-30 (operator locks) · 213 of 217**: the two
+class-D rows closed by decision — the TYPE family owns the type-fit
+(`core/envelope/010` pins the exact `NIKA-TYPE-001` both oracles
+emit), and static binding went **strict by default** (04 §Static
+binding validation rewritten: declaring `properties:` closes a level
+for binding · `additionalProperties: true` reopens it explicitly ·
+bare `type: object` and schema-less producers stay open and sound).
+The universe grew 215 → **217**: the undeclared-sibling read moved out
+of `core/variables/013` into its own violation/boundary pair
+(`014-undeclared-sibling-read-rejected` ·
+`015-valid-additional-properties-opens-binding`). Core is FULL —
+**131/131** — and every remaining divergence is the one class-B owe:
+stdlib 28/32.
+
 The fifteen divergences were not one bug; they are four classes, and
 naming them is the point of running this at all:
 
 | # | class | count | what it means |
 |---|---|---|---|
 | A | **adapter reach** · CLOSED 2026-07-30 | ~~3~~ 0 | the fixture asserts a `category`-ONLY expectation; the engine's report carries `code`+`gate`+`kind` and no category. Closed by derivation, not invention: [`canon/diagnostics/registry.yaml`](../canon/diagnostics/registry.yaml) records each imported code's category as the greppable `category: <c>` note (the C0 canon-flip audit trail) and the adapter maps code → category through it, gated by `canon.yaml`'s closed `error_categories` set — ONE truth. Codes the registry does not cover stay category-less and loud (`stdlib/builtins/001·002·004` now agree) |
-| B | **a codeless rung** | 4 | the fixtures expect `NIKA-PROVIDER`; the engine's MODELS rung emits findings with no spec code (`model`·`tasks`·`why`), so nothing can match by code. The engine owes that rung a code — the harness cannot invent one (`stdlib/001` · `stdlib/providers/001·002·006`) |
+| B | **a codeless rung** | 4 | the fixtures expect `NIKA-PROVIDER`; the engine's MODELS rung emits findings with no spec code (`model`·`tasks`·`why`), so nothing can match by code. The engine owes that rung a code — the harness cannot invent one (`stdlib/001` · `stdlib/providers/001·002·006`). Same owe family, second member found 2026-07-30: the engine's strict-binding rung ("`maybe_extra` is not in the declared schema — did you mean …?") also refuses codeless, while its coded `NIKA-VAR-003` twin still speaks only the pre-lock `additionalProperties: false` law — which is why `core/variables/014` asserts the refusal with an empty pin until that rung gains its code |
 | C | **layer scope** · CLOSED 2026-07-30 | ~~6~~ 0 | a full engine judges MORE layers than a tier-scoped fixture binds — and verifying the five UNVERIFIED members one by one showed the six were never one class: 3× under-granted authority (`stdlib/builtins/005·006·007` wrote literal paths with no `permits.fs.write` · NIKA-SEC-004) · 1× unsanctioned secret reach (`core/envelope/012` · secrets→exec env with no `egress:` · NIKA-SEC-006 · the law is [01-envelope §egress](../spec/01-envelope.md)'s own default-deny) · 1× undeclared endorsement mode (`core/policy/001` · a human gate under no `endorsement:` · NIKA-SEC-013 · [10 §policy](../spec/10-authority.md)) · 1× not layer-scope at all (`core/dag-topology/011` · `nika:notify` under the canonical arg shape wants `channel`+`target`+`message`, and a literal webhook host wants `permits.net.http`). All six inputs made whole-spec legal (§the tier-scoping rule) · both oracles now accept each. Named honestly: the reference oracle implements neither NIKA-SEC-006 nor NIKA-SEC-013 today — exactly how illegal inputs sat green in this suite |
-| D | **doctrine** | 2 | a real disagreement, each side reasoned in its own file. `core/variables/013-valid-output-schema-open-path` asserts « open schema levels … are never statically rejected — the check is sound »; the engine's `schema_typing.rs` answers « a structured-output `schema:` compiles strict — flagging unknown keys is the point of the check ». Both are defensible; the lock is the operator's. (`core/envelope/010` is the milder sibling: both oracles REJECT, they differ on the code family — `NIKA-PARSE` vs `NIKA-TYPE`.) |
+| D | **doctrine** · CLOSED 2026-07-30 (operator locks) | ~~2~~ 0 | a real disagreement, each side reasoned in its own file. `core/variables/013-valid-output-schema-open-path` asserted « open schema levels … are never statically rejected — the check is sound »; the engine's `schema_typing.rs` answered « a structured-output `schema:` compiles strict — flagging unknown keys is the point of the check ». **Locked strict-by-default**: declaring `properties:` closes a level for binding, `additionalProperties: true` reopens it explicitly, genuinely-open surfaces stay sound — one voice with the `returns:` walk, which was already closed-by-default ([04 §Static binding validation](../spec/04-variables.md) rewritten · 013 keeps the sound half · the sibling read became the 014/015 pair). `core/envelope/010` (both oracles reject · code family PARSE vs TYPE) **locked TYPE**: the type system owns the type-fit, and both oracles already emit the exact `NIKA-TYPE-001`, so the fixture pins it |
 
 Class A was the adapter's own honest limit — closed 2026-07-30 by
 deriving the category from the registry (one truth, never a guess).
-Class B is an engine owe. Class C exposed a missing law, not a missing
-mechanism — closed 2026-07-30 by §the tier-scoping rule (a `valid:
-true` fixture is whole-spec legal) applied to all six inputs. Class D
-needs a decision, not a patch.
+Class C exposed a missing law, not a missing mechanism — closed
+2026-07-30 by §the tier-scoping rule (a `valid: true` fixture is
+whole-spec legal) applied to all six inputs. Class D needed a decision,
+not a patch — both locked by the operator 2026-07-30 (TYPE owns the
+fit · strict binding by default). Class B — the codeless rungs
+(MODELS · strict-binding) — is the ONE remaining owe, and it is the
+engine's.
 
 One defect was found and FIXED by this measurement: the MODELS rung
 refused a TEMPLATED `model:` — reading `${{ const.model }}` as a bare
