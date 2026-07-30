@@ -7354,9 +7354,12 @@ see [tests/runtime/README.md](tests/runtime/README.md). They use
 them by construction. **First measured by command 2026-07-30 — and
 fully green**:
 [`scripts/runtime-differential.py`](../scripts/runtime-differential.py)
-drives all 54 fixtures through the public doors (`nika run --json`
-event-stream projection · `nika trace verify` for the trace area) —
-**54/54 agree**. The measurement earned its keep on the way: two regate
+drives every behavioral fixture through the public doors (`nika run
+--json` event-stream projection · `nika trace verify` for the trace
+area) — **54/54 agree at first measure**, and the universe has grown
+green since (the promised-contract pair · the stdlib behavioral
+batches, refusals included — the differential's own summary is the
+live count, never this prose). The measurement earned its keep on the way: two regate
 fixtures owed their divergence to the HARNESS (the run.json `inputs`
 key never threaded — the engine's SEC-004 regate was right all along) ·
 one fixture asserted a string where the engine's typed value is a

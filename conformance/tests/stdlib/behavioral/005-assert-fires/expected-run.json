@@ -1,0 +1,5 @@
+{
+ "workflow_state": "failure",
+ "tasks": { "guard": { "status": "failure", "error_code": "NIKA-BUILTIN-ASSERT-001" } },
+ "note": "the failing condition is the wire code NIKA-BUILTIN-ASSERT-001 and the workflow fails — the behavioral tier's first refusal fixture. Firing twin of 004. Measured at the door 2026-07-30."
+}

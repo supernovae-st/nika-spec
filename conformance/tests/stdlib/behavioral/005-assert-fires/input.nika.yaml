@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: Apache-2.0
+# Stdlib BEHAVIORAL · the assert pair, firing half — the behavioral
+# tier's first REFUSAL fixture (negative-first: the refusal is the
+# product): a failing condition is NIKA-BUILTIN-ASSERT-001 and the
+# workflow FAILS. The arg is `condition:` (the ARGS gate teaches its
+# own contract: declared = condition · message — probed).
+nika: v1
+workflow:
+  id: rt-stdlib-assert-fires
+permits: { tools: ["nika:assert"] }
+const:
+  n: 3
+tasks:
+  guard:
+    invoke:
+      tool: "nika:assert"
+      args: { condition: "${{ const.n == 4 }}", message: "n must be 4" }

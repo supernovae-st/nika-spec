@@ -1,0 +1,5 @@
+{
+ "workflow_state": "success",
+ "tasks": { "guard": { "status": "success", "output": true } },
+ "note": "the holding condition settles success · .output is the TYPED boolean true, never 'True' (exact value means type included). Boundary twin of 005. Measured at the door 2026-07-30."
+}
