@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+# Stdlib BEHAVIORAL · nika:jq executes its expression over the input and
+# the typed result lands in .output (builtins-v0.1.md §nika:jq) — the
+# no-network half of the behavioral tier, first batch 2026-07-30.
+nika: v1
+workflow:
+  id: rt-stdlib-jq
+permits: { tools: ["nika:jq"] }
+const:
+  doc: { "items": [ {"n": 1}, {"n": 2}, {"n": 3} ] }
+tasks:
+  total:
+    invoke:
+      tool: "nika:jq"
+      args: { input: "${{ const.doc }}", expression: "[.items[].n] | add" }

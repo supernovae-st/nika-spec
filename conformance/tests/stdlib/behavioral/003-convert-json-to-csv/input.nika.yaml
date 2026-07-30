@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0
+# Stdlib BEHAVIORAL · nika:convert is the canonical multi-format builtin
+# (ADR-086 · it absorbed csv_to_json) — from: and to: are both REQUIRED
+# (check refuses a missing from: at the ARGS gate) and the conversion
+# runs for real: two JSON rows become a csv with its header line.
+nika: v1
+workflow:
+  id: rt-stdlib-convert
+permits: { tools: ["nika:convert"] }
+const:
+  rows: [ {"a": 1, "b": "x"}, {"a": 2, "b": "y"} ]
+tasks:
+  csv:
+    invoke:
+      tool: "nika:convert"
+      args: { input: "${{ const.rows }}", from: json, to: csv }

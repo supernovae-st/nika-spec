@@ -40,7 +40,11 @@ import sys
 import tempfile
 
 SPEC_ROOT = pathlib.Path(__file__).resolve().parent.parent
-RUNTIME = SPEC_ROOT / "conformance" / "tests" / "runtime"
+# The behavioral universe is discovered by FILE SHAPE anywhere under
+# tests/ (expected-run.json / expected-verify.json triples) — that is
+# how tests/stdlib/behavioral/ joins the same sweep as tests/runtime/
+# while the static tiers (expected.json) stay invisible to it.
+RUNTIME = SPEC_ROOT / "conformance" / "tests"
 
 TERMINAL_TASK_KINDS = {
     "task_completed", "task_failed", "task_skipped", "task_cancelled",

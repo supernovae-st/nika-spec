@@ -1,0 +1,8 @@
+{
+ "workflow_state": "success",
+ "tasks": {
+  "put": { "status": "success", "output": "./out/note.txt" },
+  "get": { "status": "success", "output": "the roundtrip value" }
+ },
+ "note": "write answers with the path, read answers with the content — the pair proves the write LANDED (assets on disk, never base64). The with: edge orders the pair. Measured at the door 2026-07-30."
+}

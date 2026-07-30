@@ -1,0 +1,5 @@
+{
+ "workflow_state": "success",
+ "tasks": { "csv": { "status": "success", "output": "a,b\n1,x\n2,y\n" } },
+ "note": "json rows -> csv with the header row and a trailing newline, exactly as measured · from: is required (the ARGS gate refuses its absence). Measured at the door 2026-07-30."
+}

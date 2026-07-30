@@ -9,7 +9,7 @@
 
 | Implementation | Language | Core | Runtime | Stdlib | Spec commit | Verified |
 |---|---|---|---|---|---|---|
-| [nika](https://github.com/supernovae-st/nika) (reference engine) | Rust | ✅ 57/57 core fixtures (`cargo test -p nika-schema --test conformance_core` · the 2026-06-11 hardening gaps closed in [nika#121](https://github.com/supernovae-st/nika/pull/121)) | — (no runtime crates yet) | — | `6c18927` lineage | 2026-06-11 |
+| [nika](https://github.com/supernovae-st/nika) (reference engine · 0.106.1) | Rust | ✅ **131/131** core fixtures — BY COMMAND, never linkage (the Bowtie adapter · `NIKA_BIN=… sh scripts/parity-sweep.sh` · full static sweep 213/217, every remaining divergence a NAMED engine owe: the codeless rungs [nika#761](https://github.com/supernovae-st/nika/issues/761)) | ✅ **56/56** behavioral fixtures by command (`NIKA_BIN=… python3 scripts/runtime-differential.py` · the run + trace doors) | ✅ static surface 28/32 (the 4 reds are the [#761](https://github.com/supernovae-st/nika/issues/761) codeless MODELS rung) · lints 4/4 at the only door + 25 NO-DOOR ([#763](https://github.com/supernovae-st/nika/issues/763)) · behavioral half pending | `63a6295` | 2026-07-30 |
 
 ## How to be listed
 

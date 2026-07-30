@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: Apache-2.0
+# Stdlib BEHAVIORAL · the fs pair roundtrips under a declared boundary:
+# nika:write returns the PATH it wrote · nika:read returns the CONTENT
+# (builtins-v0.1.md) · permits.fs grants exactly ./out/**.
+nika: v1
+workflow:
+  id: rt-stdlib-write-read
+permits:
+  tools: ["nika:write", "nika:read"]
+  fs: { write: ["./out/**"], read: ["./out/**"] }
+tasks:
+  put:
+    invoke:
+      tool: "nika:write"
+      args: { path: "./out/note.txt", content: "the roundtrip value" }
+  get:
+    with:
+      done: ${{ tasks.put.output }}
+    invoke:
+      tool: "nika:read"
+      args: { path: "./out/note.txt" }

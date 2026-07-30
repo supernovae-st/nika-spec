@@ -1,0 +1,5 @@
+{
+ "workflow_state": "success",
+ "tasks": { "total": { "status": "success", "output": 6 } },
+ "note": "the jq expression runs for real and the TYPED result (a number · never the string '6') becomes .output. Measured at the door 2026-07-30."
+}
