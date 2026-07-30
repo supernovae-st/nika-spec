@@ -18,17 +18,17 @@ classes:
   testimonial: "captured evidence — fixtures, corpora, traces, receipts: proves behavior; neither shipped source nor regenerable output"
   foreign: "pointer to a third-party sovereign source"
 summary:
-  classified_files: 1298
+  classified_files: 1301
   file_rows: 15
   pattern_rows: 29
   by_class:
-    authored: 970
+    authored: 973
     authored-pin: 1
     generated: 130
     pinned-copy: 4
     testimonial: 193
     foreign: 0
-  unverified-default: 13
+  unverified-default: 14
 files:
 - path: ".github/requirements.txt"
   class: generated
@@ -294,8 +294,8 @@ patterns:
   evidence: "workflow.schema.json's own $comment: 'INTERIM hand-derived schema · prose spec is the single source of truth · regenerate + diff against engine nika-schema at GA' — authored today, generated at GA; law.schema.json + registries.schema.json are the sealed R2 design-pack contracts (consumed as-is, byte-identical per PROOFS.md §P0)"
 - glob: "scripts/**"
   class: authored
-  match_count: 22
-  aggregate_sha256: 5c8793dec2db5ee3b12e6c6c5293dda0a300822ac0695ef4b099fe4b912ea3dc
+  match_count: 24
+  aggregate_sha256: f373ab839bc1d6f488c83a8b0d70621ed59307e0564c3c2af31189ee34457cad
   evidence: "the compiler + projectors humans wrote (ssot-compiler · canon/showcase/llms/starters/authoring/design projectors · gen-gate-matrix · gen-type-corpus · grammar_door + selftest · check-md-refs) — the tools that WRITE the generated surfaces; estate.py excepted in files: (the self row)"
 - glob: "timeline/**"
   class: authored
@@ -325,16 +325,17 @@ patterns:
 - glob: "*"
   class: authored
   match_count: 16
-  aggregate_sha256: 2977c415546c33a950ca0e43fb2515471b5b5589a0ecf6b75eed1a50caeecef9
+  aggregate_sha256: 853d7e9d0ce67276997e0df90d79b60c42d676a0acb6a7b90059e0e87011f1c1
   evidence: "root prose + config (README · QUICKSTART · GLOSSARY · CONTRIBUTING · CHANGELOG hand-kept per Keep a Changelog · SECURITY · CITATION.cff · CONFORMANT_IMPLEMENTATIONS · PROOFS.md the receipts ledger · LICENSE · REUSE.toml · ruff.toml · .gitignore · .pre-commit-hooks.yaml · .bestpractices.json) — no generation markers; VERSION · llms*.txt · canon.yaml · CODE_OF_CONDUCT.md excepted in files:"
   note: "README · QUICKSTART · GLOSSARY · CONTRIBUTING · CHANGELOG carry the canon-projected count markers — tool-maintained blocks inside authored prose"
 - glob: "**"
   class: authored
-  match_count: 13
-  aggregate_sha256: 2309bc4253baa37cb053eb4928adb1128abf5de57922de4de0b833f9e8f472fd
+  match_count: 14
+  aggregate_sha256: 34267d001cb5c9445ffb242a22f664b684c6ce7ba179aa0bec0a04ff304f05fd
   evidence: "no evidence gathered — honesty over completeness (the catchall; anything landing here is reported under unverified:)"
   note: "unverified-default"
 unverified:
+- "media/law-in-action.gif"
 - "project/README.md"
 - "project/__init__.py"
 - "project/cli.py"
