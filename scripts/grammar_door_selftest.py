@@ -134,7 +134,7 @@ def main() -> int:
     # refuser (a template gaining `config:`) moves the count and refuses
     # here until the ratchet is deliberately retuned. (Before the train
     # this leg demanded zero refusals and contradicted leg 3.)
-    stopped_w2 = 0
+    stopped_w2: list[str] = []
     for f in pack:
         text = f.read_text()
         lines = text.splitlines()
@@ -146,7 +146,7 @@ def main() -> int:
             w2 = downcast_w2(text, f.name)
         except DoorRefusal as e:
             if "STOP-list" in str(e):
-                stopped_w2 += 1
+                stopped_w2.append(f.name)
                 continue
             fail(f"pack refusal · {e}")
         if re.search(r"^(inputs|const|config):", w2, re.M):
@@ -191,7 +191,7 @@ def main() -> int:
     keep = "nika: v1\nworkflow:\n  id: x\ntypes:\n  T:\n    kind: string\ntasks:\n  t:\n    exec: { shell: \"true\" }\n"
     if "types:" not in downcast_w105(keep, "keep"):
         fail("w105 must keep types:")
-    stopped_w105 = 0
+    stopped_w105: list[str] = []
     for f in pack:
         text = f.read_text()
         lines = text.splitlines()
@@ -203,7 +203,7 @@ def main() -> int:
             w105 = downcast_w105(text, f.name)
         except DoorRefusal as e:
             if "STOP-list" in str(e):
-                stopped_w105 += 1
+                stopped_w105.append(f.name)
                 continue
             fail(f"w105 pack refusal · {e}")
         if re.search(r"^(inputs|const):", w105, re.M):
@@ -213,16 +213,32 @@ def main() -> int:
         if downcast_w105(w105, f.name + "@2") != w105:
             fail(f"{f.name} · w105 not idempotent")
 
-    if stopped_w2 != 2 or stopped_w105 != 1:
+    # The ratchet names its MEMBERS, never just a count — a rotation
+    # (one refuser leaves, another enters) would ride a bare number
+    # unseen. Retuned 2026-07-30: NEP-0014 spread `policy:` through the
+    # pack, and `policy:` has no W2 twin (it downcasts at w105, where
+    # only `config:` still refuses).
+    want_w2 = [
+        "08-config-values.nika.yaml",       # config: · no W2 twin
+        "09-returns-typed-door.nika.yaml",  # types: · no W2 twin
+        "ceo-monday-brief.nika.yaml",       # policy: (NEP-0014)
+        "etl-state.nika.yaml",              # policy: (NEP-0014)
+        "human-gated-ship.nika.yaml",       # policy: (NEP-0014)
+        "incident-war-room.nika.yaml",      # policy: (NEP-0014)
+        "invoice-chaser.nika.yaml",         # policy: (NEP-0014)
+        "release-train.nika.yaml",          # policy: (NEP-0014)
+    ]
+    want_w105 = ["08-config-values.nika.yaml"]
+    if sorted(stopped_w2) != want_w2 or sorted(stopped_w105) != want_w105:
         fail(
-            f"STOP-refusal ratchet moved · w2 {stopped_w2} (want 2: 08 config: "
-            f"· 09 types:) · w105 {stopped_w105} (want 1: 08 config:) — a new "
-            f"wnew-only construct entered the pack, retune deliberately"
+            f"STOP-refusal ratchet moved · w2 {sorted(stopped_w2)} want "
+            f"{want_w2} · w105 {sorted(stopped_w105)} want {want_w105} — a "
+            f"new wnew-only construct entered the pack, retune deliberately"
         )
     print(
         f"grammar-door selftest ✓ golden + stop-list + {len(pack)} pack files "
-        f"(w2: {stopped_w2} typed STOP refusals · w105: {stopped_w105} — "
-        f"exactly the named wnew-only files)"
+        f"(w2: {len(stopped_w2)} typed STOP refusals · w105: "
+        f"{len(stopped_w105)} — exactly the named wnew-only files)"
     )
     return 0
 

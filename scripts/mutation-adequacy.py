@@ -115,6 +115,19 @@ def probe_all(worktree: Path) -> int:
         if missing:
             raise FileNotFoundError(f"probe table stale: {missing[0]}")
         _git("-C", str(worktree), "checkout", "--", judged)
+        # Baseline gate: a selftest RED before any mutation makes its
+        # death meaningless — the probe would report DIES on a corpse.
+        # (Found live: grammar_door_selftest sat red-on-clean — it is in
+        # no CI gate — and its first DIES proved nothing.)
+        clean = subprocess.run(
+            [sys.executable, str(worktree / cmd[0]), *cmd[1:]],
+            capture_output=True, text=True, timeout=300,
+        )
+        if clean.returncode != 0:
+            tail = (clean.stdout.strip().splitlines() or ["(no output)"])[-1]
+            raise RuntimeError(
+                f"{label} is RED before mutation (rc={clean.returncode}) — "
+                f"fix the selftest first · {tail[:110]}")
         target = worktree / judged
         if isinstance(shadow, tuple):
             # ("replace", old, new) · for judges that EXECUTE on import or
