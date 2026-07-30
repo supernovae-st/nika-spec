@@ -54,6 +54,16 @@ the tooling ships with tests in the same PR.
 - Workflow files are named `<name>.nika.yaml`
   ([01 §File naming](./spec/01-envelope.md#file-naming-normative)).
 
+## Developer Certificate of Origin
+
+Every PR commit carries a `Signed-off-by` trailer matching the commit
+author ([DCO 1.1](https://developercertificate.org) — the lightweight
+alternative to a CLA: you certify you have the right to submit the
+change under this repository's license). `git commit -s` appends it;
+repair an existing branch with `git rebase --signoff origin/main` and
+force-push. CI enforces it (`.github/workflows/dco.yml`); merge commits
+and bot authors are exempt.
+
 ## License
 
 The spec is Apache-2.0 with patent grant. By contributing you agree your
