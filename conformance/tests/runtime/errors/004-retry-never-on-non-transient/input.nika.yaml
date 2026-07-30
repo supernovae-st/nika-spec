@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0
+# Retry honors transient-only (the README's promised contract · the
+# stageable half): a NON-transient error under a declared retry is never
+# replayed — attempts stays 1 (the outcome payload counts) and the task
+# fails with the tool's own code. The transient half needs a
+# deterministic transient error and parks behind the HTTP mock.
+nika: v1
+workflow:
+  id: rt-retry-transient-only
+permits: { tools: ["nika:assert"] }
+tasks:
+  flaky:
+    retry: { max_attempts: 3 }
+    invoke:
+      tool: "nika:assert"
+      args: { condition: "${{ 1 == 2 }}", message: "always fails, never transiently" }

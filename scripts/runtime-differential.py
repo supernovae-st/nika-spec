@@ -95,6 +95,7 @@ def project(events: list[dict]) -> dict:
                 "status": out.get("class") or kind.removeprefix("task_"),
                 "output": payload.get("value"),
                 "error_code": (payload.get("error") or {}).get("code"),
+                "attempts": payload.get("attempts"),
             }
     return {"workflow_state": state, "tasks": tasks, "events": seen}
 
@@ -157,6 +158,9 @@ def diff_run(expected: dict, got: dict) -> list[str]:
         if "error_code" in want and have["error_code"] != want["error_code"]:
             diffs.append(f"task {tid}.error_code: want {want['error_code']} · "
                          f"got {have['error_code']}")
+        if "attempts" in want and have["attempts"] != want["attempts"]:
+            diffs.append(f"task {tid}.attempts: want {want['attempts']} · "
+                         f"got {have['attempts']}")
     for ev in expected.get("events_include") or []:
         if ev not in got["events"]:
             diffs.append(f"events_include missing {ev}")
@@ -200,7 +204,7 @@ def selftest() -> int:
         _ev("workflow_started", workflow="w"),
         _ev("task_completed", task="a",
             outcome=json.dumps({"cause": "normal", "class": "success",
-                                "payload": {"value": 2}})),
+                                "payload": {"value": 2, "attempts": 1}})),
         _ev("task_skipped", task="b",
             outcome=json.dumps({"cause": "error_skip", "class": "skipped",
                                 "payload": {"error": {"code": "NIKA-X-001"}}})),
@@ -227,6 +231,9 @@ def selftest() -> int:
     checks.append(("a missing expected event is named",
                    any("events_include" in d for d in diff_run(
                        {"events_include": ["task.started:zzz"]}, got))))
+    checks.append(("a wrong attempts count is named (retry observability)",
+                   any("a.attempts" in d for d in diff_run(
+                       {"tasks": {"a": {"attempts": 3}}}, got))))
     checks.append(("a task with no terminal event is named",
                    any("no terminal event" in d for d in diff_run(
                        {"tasks": {"ghost": {"status": "success"}}}, got))))

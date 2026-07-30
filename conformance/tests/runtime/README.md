@@ -30,7 +30,8 @@ tests/runtime/<area>/<NNN-name>/
       "status": "success | failure | skipped | cancelled",
       "output": "<exact value>",          // optional · exact match
       "output_contains": "<substring>",   // optional · weaker assert
-      "error_code": "NIKA-…"              // optional · when status=failure
+      "error_code": "NIKA-…",             // optional · when status=failure
+      "attempts": 1                       // optional · the outcome payload's retry count (task_completed/failed carry it · task_skipped does not)
     }
   },
   "events_include": ["task.started:<id>", "task.skipped:<id>"]   // optional · order-free
@@ -53,6 +54,6 @@ reported · never asserted).
 |---|---|
 | `gates/` | default gate cancels on upstream failure · explicit `when:` evaluates over terminal deps · `when: true` runs in a failing workflow (the always-pattern) |
 | `for-each/` | per-iteration timeout · null placeholder at a failed index (zip alignment) · empty collection → skipped |
-| `errors/` | retry honors transient-only + on_codes · on_error.skip preserves the error · recover substitutes BEFORE bindings · DAG-004-class await never deadlocks — **parked**: the engine's check refuses the await shape itself (the corpus's one divergent-by-design row, `errors/recover-task-ref-no-edge` · nika#291), so the runtime contract is unstageable by command until that lands |
+| `errors/` | retry honors transient-only (the non-transient half is `004-retry-never-on-non-transient` — attempts stays 1 under a declared retry · the TRANSIENT half needs a deterministic transient error and parks behind the HTTP mock, post-announce) + on_codes · on_error.skip preserves the error · recover substitutes BEFORE bindings · DAG-004-class await never deadlocks — **parked**: the engine's check refuses the await shape itself (the corpus's one divergent-by-design row, `errors/recover-task-ref-no-edge` · nika#291), so the runtime contract is unstageable by command until that lands |
 | `agent/` | budget exhaustion = NIKA-AGENT-001/002 with partial in error.details · tool errors feed back EXCEPT security_error (the feed-back half is `003-tool-error-feeds-back` — the final AGENT-001 IS the proof the loop survived the tool error · the security half — a refusal that must END the loop — stays unstageable with mock/echo, which cannot be steered to synthesize an out-of-boundary argument deterministically) · nika:done result: becomes .output |
 | `permits/` | NIKA-SEC-004 at the first out-of-boundary effect · permits:{} = pure compute |

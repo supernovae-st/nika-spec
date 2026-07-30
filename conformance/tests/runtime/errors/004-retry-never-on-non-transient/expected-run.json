@@ -1,0 +1,5 @@
+{
+ "workflow_state": "failure",
+ "tasks": { "flaky": { "status": "failure", "error_code": "NIKA-BUILTIN-ASSERT-001", "attempts": 1 } },
+ "note": "retry: {max_attempts: 3} is declared and IGNORED for a non-transient error — attempts stays 1 (transient-only is the law, not a default). Measured at the door 2026-07-30."
+}

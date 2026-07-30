@@ -99,6 +99,12 @@ jobs:
           python scripts/lints-differential.py --selftest
           python scripts/runtime-differential.py --selftest
 
+      # The 36 gate-matrix fixtures are GENERATED (edit the generator,
+      # never the cells) — an ungated lane rots, so the drift gate joins
+      # the wall. Fixed command · repo files only.
+      - name: Gate matrix · generated cells match their generator
+        run: python scripts/gen-gate-matrix.py --check
+
       # SSOT gate (SSOT-1 §21-23) · the laws-index/lock projections must equal
       # their regeneration byte-for-byte, and canon.yaml — a GENERATED projection
       # since the C0 flip — must carry its header and equal its own --emit-canon
