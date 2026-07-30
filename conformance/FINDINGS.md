@@ -19,6 +19,16 @@ header class; an engine that additionally prints the wire code is equally
 conformant. Upstream question: should check-time gate refusals surface the
 canonical wire code (one-voice)?
 
+> **Re-measured 2026-07-30 · nika 0.106.1 — EVOLVED, and the question
+> sharpened.** The surface now emits a CODE (`NIKA-BUILTIN-001` in
+> `check --json`, probed on the same unknown-`nika:*` shape) — the
+> codeless half of this finding is closed. What remains is a family
+> question: BUILTIN-001's registered condition is the *statically-checkable
+> arg contract*, while 05 assigns *unknown tool* to `NIKA-INVOKE-001` —
+> the engine speaks a neighbouring code. Same one-voice genre as the
+> codeless-rungs owe (supernovae-st/nika#761); parked with it rather than
+> filed separately.
+
 ## F-2 · Out-of-range index / missing map key → VAR-001 "unresolved reference" (whole expression as ref name)
 
 Probed (lab `cel/c12-index-out-of-range`, `cel/c14-missing-map-key` — NOT in corpus):
@@ -32,3 +42,9 @@ message-quality issue. Because the normative code is ambiguous, c12 was swapped 
 of the corpus for `cel/c15-string-method-type-mismatch` (spec 03 side-constraint 1
 is explicit, engine fires exactly `NIKA-VAR-006`); index-out-of-range sits in the
 v0.2 backlog pending the spec call.
+
+> **Re-measured 2026-07-30 · nika 0.106.1 — STANDS unchanged.** The same
+> probe (a `when:` indexing past a 3-element list) still fails at run as
+> `NIKA-VAR-001 · unresolved template reference` with the whole
+> expression as the reference name. Both halves of the finding hold; the
+> v0.2 spec call stays owed.
