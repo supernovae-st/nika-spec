@@ -1,8 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
-# Static binding validation soundness · OPEN levels are never rejected ·
-# (a) `meta` has no additionalProperties:false → unknown keys below stay
-# legal · (b) a schema-less producer (exec) is fully dynamic · (c) a
-# declared property path is of course valid. The engine MUST accept.
+# Static binding validation soundness · genuinely OPEN surfaces are never
+# rejected · (a) `meta` declares NO properties (bare type: object) → nothing
+# declared, nothing to contradict — unknown keys below stay legal · (b) a
+# schema-less producer (exec) is fully dynamic · (c) a declared property
+# path is of course valid. The engine MUST accept. (The undeclared-SIBLING
+# read that used to ride here moved to its own pair — 014 violation ·
+# 015 boundary — per the 2026-07-30 strict-binding lock.)
 nika: v1
 workflow:
   id: schema-path-open
@@ -27,7 +30,6 @@ tasks:
     with:
       extract_entities: ${{ tasks.extract.output.entities }}
       extract_meta_anything: ${{ tasks.extract.output.meta.anything }}
-      extract_maybe_extra: ${{ tasks.extract.output.maybe_extra }}
       fetch_raw_whatever: ${{ tasks.fetch_raw.output.whatever }}
     exec:
-      command: ["report", "${{ with.extract_entities }}", "${{ with.extract_meta_anything }}", "${{ with.extract_maybe_extra }}", "${{ with.fetch_raw_whatever }}"]
+      command: ["report", "${{ with.extract_entities }}", "${{ with.extract_meta_anything }}", "${{ with.fetch_raw_whatever }}"]

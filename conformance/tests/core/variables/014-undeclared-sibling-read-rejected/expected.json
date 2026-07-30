@@ -1,0 +1,5 @@
+{
+  "valid": false,
+  "errors": [],
+  "note": "Both oracles refuse; the code pin is owed. The reference emits NIKA-VAR-003 (variable_error); the engine's strict-binding rung refuses codeless today ('maybe_extra is not in the declared schema'), so pinning NIKA-VAR-003 here would fail the fuller oracle for speaking without the article number — the pin lands when that rung gains its code (the codeless-rungs engine owe, tracked with the MODELS rung)."
+}

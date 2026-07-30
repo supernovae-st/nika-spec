@@ -433,7 +433,12 @@ def _resolution_errors(value, scopes: dict, where: str) -> list[dict]:
 def _provably_invalid(schema, steps):
     """04 §Static binding validation · walk the v0.1 subset (properties ·
     items · type · additionalProperties) · return a reason string when a
-    step is PROVABLY invalid · None when the path is valid-or-open."""
+    step is invalid · None when the path is valid-or-open. Declaring
+    `properties:` CLOSES a level for binding (operator lock 2026-07-30 ·
+    one voice with the returns: walk); only an explicit
+    `additionalProperties: true` (or a schema object for extras) reopens
+    it. A level with no properties at all stays open — nothing declared,
+    nothing to contradict."""
     level = schema
     for kind, val in steps:
         if not isinstance(level, dict):
@@ -456,10 +461,17 @@ def _provably_invalid(schema, steps):
             if isinstance(props, dict) and val in props:
                 level = props[val]
                 continue
-            if level.get("additionalProperties") is False:
+            extras = level.get("additionalProperties")
+            if extras is False:
                 return (f"key '{val}' absent from a closed level "
                         "(additionalProperties: false)")
-            return None  # open level
+            if isinstance(props, dict) and props and not (
+                    extras is True or isinstance(extras, dict)):
+                return (f"key '{val}' is not among the declared properties "
+                        f"{sorted(props)} — declaring properties closes the "
+                        "level for binding · declare the key, or open the "
+                        "level with additionalProperties: true")
+            return None  # open level: nothing declared, or explicitly opened
         # index step
         if type_excludes("array"):
             return f"index step '[{val}]' on a level whose type excludes array"

@@ -1,4 +1,4 @@
 {
   "valid": true,
-  "note": "Open schema levels (no additionalProperties: false) and schema-less producers are never statically rejected — the check is sound (04 §Static binding validation)."
+  "note": "Genuinely open surfaces are never statically rejected — a level declaring NO properties (bare type: object) and a schema-less producer stay sound (04 §Static binding validation · strict-binding lock 2026-07-30: the undeclared-sibling read lives in the 014/015 pair now)."
 }
