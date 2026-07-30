@@ -290,6 +290,10 @@ gates byte-identical. The six survivors are exactly the four class-B
 fixtures (the codeless MODELS rung · an engine owe) and the two
 class-D doctrine rows below.
 
+(One-command replay of the whole static sweep:
+`NIKA_BIN=<engine> sh scripts/parity-sweep.sh` — per-tier lines + the
+total · exit 0 iff full parity.)
+
 **Re-measured 2026-07-30 (operator locks) · 213 of 217**: the two
 class-D rows closed by decision — the TYPE family owns the type-fit
 (`core/envelope/010` pins the exact `NIKA-TYPE-001` both oracles
