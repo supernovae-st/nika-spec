@@ -37,29 +37,21 @@ import os
 import pathlib
 import shutil
 import subprocess
+import sys
 
 SPEC_ROOT = pathlib.Path(__file__).resolve().parent.parent
 LINTS = SPEC_ROOT / "conformance" / "tests" / "lints"
 
 
-def engine_hints(engine: str, workflow: pathlib.Path) -> list[tuple[str, str]]:
-    """(rule, task) pairs from the check surface, report order kept.
+def hints_pairs(report: dict) -> list[tuple[str, str]]:
+    """(rule, task) pairs from a check report, report order kept.
 
     Only `kind: "native-first"` hints are lints — the surface also carries
     non-lint advisories (the F-P3 clock hint, cost/energy notes) that
     expected-lints.json never speaks, so harvesting every hint would fake
-    divergences on clean fixtures (found live on first run).
+    divergences on clean fixtures (found live on first run · pinned by
+    the selftest's clock-advisory tamper case).
     """
-    proc = subprocess.run(
-        [engine, "check", "--json", str(workflow)],
-        capture_output=True, text=True, timeout=120,
-    )
-    out = proc.stdout
-    start = out.find("{")
-    if start < 0:
-        raise RuntimeError(f"no JSON from the engine on {workflow.name} · "
-                           f"stderr: {proc.stderr.strip()[:160]!r}")
-    report = json.loads(out[start:])
     pairs: list[tuple[str, str]] = []
     for h in report.get("hints") or []:
         if not isinstance(h, dict) or h.get("kind") != "native-first":
@@ -69,7 +61,64 @@ def engine_hints(engine: str, workflow: pathlib.Path) -> list[tuple[str, str]]:
     return pairs
 
 
+def engine_hints(engine: str, workflow: pathlib.Path) -> list[tuple[str, str]]:
+    proc = subprocess.run(
+        [engine, "check", "--json", str(workflow)],
+        capture_output=True, text=True, timeout=120,
+    )
+    out = proc.stdout
+    start = out.find("{")
+    if start < 0:
+        raise RuntimeError(f"no JSON from the engine on {workflow.name} · "
+                           f"stderr: {proc.stderr.strip()[:160]!r}")
+    return hints_pairs(json.loads(out[start:]))
+
+
+def selftest() -> int:
+    """The judge's own laws, offline — no engine, CI-runnable.
+
+    A differential whose extraction lies reads as agreement forever, so
+    the extraction is pinned: the kind filter (a non-lint advisory must
+    contribute NOTHING · the fake-divergence class found live), the
+    advice-prefix rule id, report order, and the empty surface.
+    """
+    checks: list[tuple[str, bool]] = []
+    fire = {"hints": [
+        {"kind": "native-first",
+         "advice": "native-first/001 · `curl` is an HTTP fetch — …",
+         "task": "crawl"},
+    ]}
+    checks.append(("a firing native-first hint extracts (rule, task)",
+                   hints_pairs(fire) == [("native-first/001", "crawl")]))
+    clock = {"hints": [
+        {"kind": "clock",
+         "advice": "1 task(s) declare `timeout:` against an undeclared clock …",
+         "task": "-"},
+    ]}
+    checks.append(("a non-lint advisory (the F-P3 clock hint) contributes NOTHING",
+                   hints_pairs(clock) == []))
+    mixed = {"hints": [
+        clock["hints"][0],
+        {"kind": "native-first", "advice": "native-first/005 · `node` runs …",
+         "task": "upload"},
+        fire["hints"][0],
+    ]}
+    checks.append(("mixed surface keeps report order, lints only",
+                   hints_pairs(mixed) == [("native-first/005", "upload"),
+                                          ("native-first/001", "crawl")]))
+    checks.append(("an empty surface is silence", hints_pairs({}) == []))
+    checks.append(("a malformed hint entry is skipped, never a crash",
+                   hints_pairs({"hints": ["garbage", None]}) == []))
+    bad = [name for name, ok in checks if not ok]
+    for name, ok in checks:
+        print(f"{'ok  ' if ok else 'FAIL'}  {name}")
+    print(f"lints-differential selftest · {len(checks) - len(bad)}/{len(checks)}")
+    return 1 if bad else 0
+
+
 def main() -> int:
+    if len(sys.argv) > 1 and sys.argv[1] == "--selftest":
+        return selftest()
     engine = os.environ.get("NIKA_BIN") or shutil.which("nika") or "nika"
     dirs = sorted(p for p in LINTS.iterdir() if (p / "expected-lints.json").exists())
     if not dirs:

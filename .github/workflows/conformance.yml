@@ -89,6 +89,16 @@ jobs:
           python scripts/gen-type-corpus.py --check
           python scripts/gen-type-corpus.py --mutate
 
+      # The engine differentials cannot run here (no NIKA_BIN in this
+      # gate) but their JUDGE LOGIC can: extraction, projection and
+      # diffing are proven offline — a differential whose extraction
+      # lies reads as agreement forever, so the selftests pin it.
+      # Fixed commands · repo files only.
+      - name: Differential judges · offline selftests
+        run: |
+          python scripts/lints-differential.py --selftest
+          python scripts/runtime-differential.py --selftest
+
       # SSOT gate (SSOT-1 §21-23) · the laws-index/lock projections must equal
       # their regeneration byte-for-byte, and canon.yaml — a GENERATED projection
       # since the C0 flip — must carry its header and equal its own --emit-canon

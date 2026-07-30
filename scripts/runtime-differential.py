@@ -133,7 +133,11 @@ def judge_run(engine: str, d: pathlib.Path) -> list[str]:
                     "the embedded static gate fired before any runtime event"]
         raise RuntimeError(f"no events on stdout (rc={proc.returncode} · "
                            f"stderr: {proc.stderr.strip()[:140]!r})")
-    got = project(events)
+    return diff_run(expected, project(events))
+
+
+def diff_run(expected: dict, got: dict) -> list[str]:
+    """The judge, pure: every difference named (selftest-pinned)."""
     diffs: list[str] = []
     want_state = expected.get("workflow_state")
     if want_state is not None and got["workflow_state"] != want_state:
@@ -159,6 +163,17 @@ def judge_run(engine: str, d: pathlib.Path) -> list[str]:
     return diffs
 
 
+def trace_verdict(rc: int, out: str) -> str:
+    """The verify exit-map, pure — MEASURED, never assumed: forged rides
+    rc 2 · finding exits 0 like clean and only the `FINDING — ` marker
+    discriminates (selftest-pinned)."""
+    if rc == 2:
+        return "forged"
+    if rc == 0:
+        return "finding" if "FINDING — " in out else "clean"
+    return f"rc={rc}"
+
+
 def judge_trace(engine: str, d: pathlib.Path) -> list[str]:
     """Differences between the verify verdict and expected-verify.json."""
     want = json.loads((d / "expected-verify.json").read_text())["verdict"]
@@ -166,17 +181,72 @@ def judge_trace(engine: str, d: pathlib.Path) -> list[str]:
         [engine, "trace", "verify", str(d / "trace.ndjson"), "--color", "never"],
         capture_output=True, text=True, timeout=120,
     )
-    out = proc.stdout + proc.stderr
-    if proc.returncode == 2:
-        got = "forged"
-    elif proc.returncode == 0:
-        got = "finding" if "FINDING — " in out else "clean"
-    else:
-        got = f"rc={proc.returncode}"
+    got = trace_verdict(proc.returncode, proc.stdout + proc.stderr)
     return [] if got == want else [f"verdict: want {want} · got {got}"]
 
 
+def _ev(kind: str, **fields: object) -> str:
+    return json.dumps({"kind": kind,
+                       "fields": [{"key": k, "value": v} for k, v in fields.items()]})
+
+
+def selftest() -> int:
+    """The judge's own laws, offline — no engine, CI-runnable. The day's
+    live lessons pinned as permanent tampers: exact value means TYPE
+    included ('2' is not 2) · a pretty-printed check report is not an
+    event stream · finding exits 0 like clean."""
+    checks: list[tuple[str, bool]] = []
+    stream = "\n".join([
+        _ev("workflow_started", workflow="w"),
+        _ev("task_completed", task="a",
+            outcome=json.dumps({"cause": "normal", "class": "success",
+                                "payload": {"value": 2}})),
+        _ev("task_skipped", task="b",
+            outcome=json.dumps({"cause": "error_skip", "class": "skipped",
+                                "payload": {"error": {"code": "NIKA-X-001"}}})),
+        _ev("workflow_completed", workflow="w"),
+    ])
+    got = project(parse_events(stream))
+    checks.append(("projection · state + typed value + error code",
+                   got["workflow_state"] == "success"
+                   and got["tasks"]["a"]["output"] == 2
+                   and got["tasks"]["b"]["error_code"] == "NIKA-X-001"))
+    checks.append(("projection · events normalize dot-for-underscore",
+                   "task.completed:a" in got["events"]))
+    agree = {"workflow_state": "success",
+             "tasks": {"a": {"status": "success", "output": 2},
+                       "b": {"status": "skipped", "error_code": "NIKA-X-001"}},
+             "events_include": ["task.completed:a"]}
+    checks.append(("agreement yields zero diffs", diff_run(agree, got) == []))
+    checks.append(("a flipped status is named",
+                   any("a.status" in d for d in diff_run(
+                       {"tasks": {"a": {"status": "failure"}}}, got))))
+    checks.append(("exact value means TYPE included ('2' is not 2)",
+                   any("a.output" in d for d in diff_run(
+                       {"tasks": {"a": {"output": "2"}}}, got))))
+    checks.append(("a missing expected event is named",
+                   any("events_include" in d for d in diff_run(
+                       {"events_include": ["task.started:zzz"]}, got))))
+    checks.append(("a task with no terminal event is named",
+                   any("no terminal event" in d for d in diff_run(
+                       {"tasks": {"ghost": {"status": "success"}}}, got))))
+    checks.append(("a pretty-printed check report is NOT an event stream",
+                   parse_events('{\n  "analysis": {}\n}') == []))
+    checks.append(("trace exit-map · clean / finding / forged / other",
+                   trace_verdict(0, "OK — chain intact") == "clean"
+                   and trace_verdict(0, "FINDING — witness absent") == "finding"
+                   and trace_verdict(2, "") == "forged"
+                   and trace_verdict(3, "") == "rc=3"))
+    bad = [name for name, ok in checks if not ok]
+    for name, ok in checks:
+        print(f"{'ok  ' if ok else 'FAIL'}  {name}")
+    print(f"runtime-differential selftest · {len(checks) - len(bad)}/{len(checks)}")
+    return 1 if bad else 0
+
+
 def main(argv: list[str]) -> int:
+    if len(argv) > 1 and argv[1] == "--selftest":
+        return selftest()
     engine = os.environ.get("NIKA_BIN") or shutil.which("nika") or "nika"
     root = RUNTIME
     if len(argv) > 1:
