@@ -1,0 +1,13 @@
+{
+ "workflow_state": "failure",
+ "tasks": {
+  "pick": {
+   "status": "success"
+  },
+  "fetcher": {
+   "status": "failure",
+   "error_code": "NIKA-SEC-004"
+  }
+ },
+ "note": "NEP-0003 law 3 · permits DECLARED and bounded (net.http: one host) · the fetch url resolves DYNAMICALLY outside the boundary — the static judge defers (01 §permits · host unknown), the run boundary refuses the effect NIKA-SEC-004 (defense in depth) · nika:jq is pure internal, so pick succeeds (law 4). Reworked 2026-07-30: the previous ABSENT-permits premise was unexercisable at run — absent + an effect refuses AT CHECK (F-O8), the gate fires before any event boots."
+}

@@ -13,7 +13,10 @@ ignores them).
 ```
 tests/runtime/<area>/<NNN-name>/
 ├── input.nika.yaml     the workflow · model: mock/echo (deterministic)
-├── run.json            invocation · {"vars": {...}, "env": {...}}
+├── run.json            invocation · {"vars": {...}, "inputs": {...}, "env": {...}}
+│                       (vars + inputs both thread through `--var` — the
+│                        flag sets a workflow `inputs:` value · env
+│                        overlays the engine's process environment)
 └── expected-run.json   the assertion · see below
 ```
 
@@ -34,10 +37,15 @@ tests/runtime/<area>/<NNN-name>/
 }
 ```
 
-Determinism rules · `mock/echo` only (prompt-verbatim output · schema →
-shaped defaults) · no network (fetch fixtures use the engine's HTTP mock ·
-post-announce) · no wall-clock asserts (durations are reported · never
-asserted).
+Determinism rules · `mock/echo` only — its output is
+`mock(echo) · <prompt>` (the marker is PART of the contract: synthetic
+output never masquerades as real content, and the spec's own examples
+teach the same format — retuned 2026-07-30 from the aspirational
+"prompt-verbatim" this parenthetical used to claim; the `nika:done`
+`result:` path stays unprefixed, it carries an authored value) ·
+schema → shaped defaults · no network (fetch fixtures use the engine's
+HTTP mock · post-announce) · no wall-clock asserts (durations are
+reported · never asserted).
 
 ## The five areas (one per execution contract)
 

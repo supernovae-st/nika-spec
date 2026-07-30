@@ -75,13 +75,23 @@ conformance/tests/stdlib/    stdlib static surface · provider prefixes · extra
                              modes · builtin names (canon.yaml-derived)
 ```
 
-(`tests/runtime/` carries the behavioral CONTRACT today — fixture shape ·
+(`tests/runtime/` carries the behavioral contract — fixture shape ·
 run.json invocation · expected-run.json assertions · determinism rules ·
-see [tests/runtime/README.md](tests/runtime/README.md) — the fixtures
-execute when the reference engine's vertical slice lands ·
-[07](../spec/07-conformance.md#suite-status--v01-honest). They use
+see [tests/runtime/README.md](tests/runtime/README.md). They use
 `input.nika.yaml`, NOT `input.yaml`, so the static `all` gate ignores
-them by construction.)
+them by construction. **First measured by command 2026-07-30 — and
+fully green**:
+[`scripts/runtime-differential.py`](../scripts/runtime-differential.py)
+drives all 54 fixtures through the public doors (`nika run --json`
+event-stream projection · `nika trace verify` for the trace area) —
+**54/54 agree**. The measurement earned its keep on the way: two regate
+fixtures owed their divergence to the HARNESS (the run.json `inputs`
+key never threaded — the engine's SEC-004 regate was right all along) ·
+one fixture asserted a string where the engine's typed value is a
+number · one premise was unexercisable (ABSENT permits defer to run —
+F-O8 refuses at check first · reworked as the dynamic-host refusal,
+proven at the door) · and six adopted the `mock(echo) · ` output marker
+the spec's own examples already teach.)
 
 `conformance/tests/lints/` is the **linter-conformance corpus** (the
 03-dag one-obvious-way table is « normative for linters ») · per case

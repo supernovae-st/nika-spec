@@ -6,8 +6,8 @@
   },
   "survivors": {
    "status": "success",
-   "output": "2"
+   "output": 2
   }
  },
- "note": "a failed iteration recovers to null AT ITS INDEX (order preserved) · the fan-in filters · 03 §for_each"
+ "note": "a failed iteration recovers to null AT ITS INDEX (order preserved) · the fan-in filters · 03 §for_each · output is the TYPED count (a number · the engine's payload.value is typed, and <exact value> means type included — retuned 2026-07-30 from the string '2')"
 }

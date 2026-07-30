@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: Apache-2.0
+# NEP-0003 law 3 · the RUNTIME boundary refusal · permits are DECLARED and
+# bounded (net.http: one host) · the fetch url resolves DYNAMICALLY to a
+# host OUTSIDE the boundary — the static judge cannot see the resolved
+# host (01 §permits · it defers), the run boundary canonicalizes the
+# resolved value and refuses the effect NIKA-SEC-004 (defense in depth).
+# nika:jq is pure internal, so pick succeeds (law 4).
+# (Reworked 2026-07-30: the previous premise — ABSENT permits deferring to
+# run — is unexercisable: absent + an effect refuses AT CHECK per F-O8.)
+nika: v1
+workflow:
+  id: rt-permits-dynamic-host-refusal
+model: mock/echo
+permits:
+  net: { http: ["allowed.example.com"] }
+  tools: ["nika:fetch", "nika:jq"]
+const:
+  hosts: ["https://evil.example.net/payload"]
+tasks:
+  pick:
+    invoke:
+      tool: "nika:jq"
+      args: { input: "${{ const.hosts }}", expression: ".[0]" }
+  fetcher:
+    with:
+      pick: ${{ tasks.pick.output }}
+    invoke:
+      tool: "nika:fetch"
+      args:
+        url: "${{ with.pick }}"
+        mode: text

@@ -1,8 +1,16 @@
 {
-  "workflow_state": "failure",
-  "tasks": {
-    "work": { "status": "failure", "error_code": "NIKA-BUILTIN-ASSERT-001" },
-    "dependent": { "status": "cancelled" },
-    "record": { "status": "success", "output": "the record lands" }
+ "workflow_state": "failure",
+ "tasks": {
+  "work": {
+   "status": "failure",
+   "error_code": "NIKA-BUILTIN-ASSERT-001"
+  },
+  "dependent": {
+   "status": "cancelled"
+  },
+  "record": {
+   "status": "success",
+   "output": "mock(echo) · the record lands"
   }
+ }
 }
