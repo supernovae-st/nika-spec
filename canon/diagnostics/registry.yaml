@@ -2047,7 +2047,7 @@ diagnostics:
       fail-closed (endorsement.undeclared_mode · F-F5 · zero implicit escape),
       and endorsement: solo carried by a workflow with more than one gate
       refuses as the declaration lying (endorsement.solo_count · exactly one
-      endorser) (NEP-0014 · F-P23)'
+      endorser) (NEP-0017 · F-P23)'
     outcome_class: failure
     cause: security_error
     retryable: false
@@ -2059,9 +2059,9 @@ diagnostics:
       fresh authorization bound to the action and logged as such · an
       undeclared mode refuses fail-closed · solo with a second gate is the
       declaration lying: drop a gate or declare a mode that admits it
-      (NEP-0014 · F-P23 · 10-authority §endorsement).'
-    notes: 'nep-0014 (2026-07-29) · category: security_error · transient: false
-      (canon.yaml verbatim) · minted by the lot-3 thin-laws lane (F-P23) ·
+      (NEP-0017 · F-P23 · 10-authority §endorsement).'
+    notes: 'nep-0017 (2026-07-29) · category: security_error · transient: false
+      (canon.yaml verbatim) · minted by the lot-3b thin-laws lane (F-P23) ·
       law_ids empty until the freeze batch names the canon law · sister row of
       NIKA-SEC-012 — same half-shipped lane (ba2754c edited the generated
       projection), same restoration (SSOT-1 §12).'
@@ -2395,3 +2395,179 @@ diagnostics:
     span_required: false
     teaching: 'the P0 soundness hole — a value that passed check and failed at run — is closed at check · same code covers const, no second mint.'
     notes: 'r3b · category: validation_error · transient: false (canon.yaml verbatim) · registered from the engine vendored canon (downstream drift closed).'
+  - id: NIKA-MCP-003
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: MCP
+    plane: run
+    condition: 'the pinned MCP tool''s description drifted from the lockfile (the rug-pull refusal · fail closed)'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: true
+    teaching: 'the tool you pinned is not the tool answering — re-pin deliberately (the lockfile is the contract) or refuse the server · never update the lock by accident.'
+    notes: 'r3-registry (2026-07-30) · category: security_error · transient: false · minted engine-side first (nika-mcp/src/pin.rs) and hoisted to the SSOT · law_ids empty until the freeze batch.'
+  - id: NIKA-MCP-004
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: MCP
+    plane: run
+    condition: 'the MCP pin lockfile exists but cannot be trusted (malformed · never treated as empty)'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: true
+    teaching: 'a lockfile that does not parse is not an empty lockfile — restore it from the journal or regenerate it with the pins you actually granted.'
+    notes: 'r3-registry (2026-07-30) · category: security_error · transient: false · minted engine-side first (nika-mcp/src/pin.rs) and hoisted to the SSOT.'
+  - id: NIKA-MCP-005
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: MCP
+    plane: run
+    condition: 'the OS sandbox refused the MCP server spawn (fail closed)'
+    outcome_class: failure
+    cause: process_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/process_error.schema.json
+    span_required: true
+    teaching: 'the sandbox is doing its job — declare the boundary the server needs (permits) or run it outside the confined lane deliberately.'
+    notes: 'r3-registry (2026-07-30) · category: process_error · transient: false · minted engine-side first (nika-mcp/src/pin.rs) and hoisted to the SSOT.'
+  - id: NIKA-REG-001
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: REG
+    plane: run
+    condition: 'the name has no entry in the registry index'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'the name is the index''s claim — check the spelling, then the registry''s own listing before assuming an outage.'
+    notes: 'r3-registry (2026-07-30) · category: validation_error · transient: false · minted engine-side first (nika-registry-client) and hoisted to the SSOT.'
+  - id: NIKA-REG-002
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: REG
+    plane: run
+    condition: 'the registry''s advisory metadata refuses the resolution'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: true
+    teaching: 'an advisory is the registry speaking — read it before overriding; a yanked or disputed name stays refused in strict mode.'
+    notes: 'r3-registry (2026-07-30) · category: security_error · transient: false · minted engine-side first and hoisted to the SSOT.'
+  - id: NIKA-REG-003
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: REG
+    plane: run
+    condition: 'the artifact''s sha256 differs from the registry entry''s pin'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: true
+    teaching: 'the bytes are not the bytes the entry attests — a mirror race, a poisoned artifact, or a stale pin · name which before retrying anything.'
+    notes: 'r3-registry (2026-07-30) · category: security_error · transient: false · minted engine-side first and hoisted to the SSOT.'
+  - id: NIKA-REG-004
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: REG
+    plane: run
+    condition: 'the local cache''s bytes or tier diverge from the registry entry''s attested state'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: true
+    teaching: 'the cache is a cache — delete it and re-fetch; a tampered cache never upgrades into trust by sitting on disk.'
+    notes: 'r3-registry (2026-07-30) · category: security_error · transient: false · minted engine-side first and hoisted to the SSOT.'
+  - id: NIKA-REG-005
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: REG
+    plane: run
+    condition: 'the registry index document is not a well-formed index'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'a malformed index is a registry-side event — do not parse around it; report it and pin to the last good index if your policy allows.'
+    notes: 'r3-registry (2026-07-30) · category: validation_error · transient: false · minted engine-side first and hoisted to the SSOT.'
+  - id: NIKA-REG-006
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: REG
+    plane: run
+    condition: 'the entry''s minisign signature does not verify'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: true
+    teaching: 'a signature that does not verify is not a network error — the entry is refused, full stop; the journal of trust decisions is yours to inspect.'
+    notes: 'r3-registry (2026-07-30) · category: security_error · transient: false · minted engine-side first and hoisted to the SSOT.'
+  - id: NIKA-REG-007
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: REG
+    plane: run
+    condition: 'the signing key changed between releases (TOFU · the operator ceremony)'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: true
+    teaching: 'a key change is a path jump, never a routine rotate — accept it only through the deliberate trust ceremony, with the old and new fingerprints in front of you.'
+    notes: 'r3-registry (2026-07-30) · category: security_error · transient: false · minted engine-side first and hoisted to the SSOT.'
+  - id: NIKA-REG-008
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: REG
+    plane: run
+    condition: 'the entry''s provenance tier sits below the operator''s admission floor (NEP-0016 · F-P27)'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: true
+    teaching: 'the floor is yours — lower it deliberately in ~/.nika/registry/policy.toml, or ask the publisher for evidence that reaches it (unprovenanced < provenanced < stage-clear < verified).'
+    notes: 'r3-registry (2026-07-30) · category: security_error · transient: false · minted engine-side first (F-P27 · NEP-0016 · #751) and hoisted to the SSOT.'
