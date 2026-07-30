@@ -5,16 +5,23 @@ Three legs, read off the DECLARED boundary and the task graph
 (NEP-0002 §Specification · v2.0 realized-flow):
 
 - ① private-data · `permits.fs.read` is non-empty.
-- ② untrusted ingress · the `tools:` grant admits an ingress-capable tool
-  (`nika:fetch` covered by a glob · any `mcp:*` server) AND the graph
-  REALIZES a source: a fetch invoked · an `mcp:*` invoked (server content
-  is untrusted by construction · fail-closed) · an `agent:` whose
-  whitelist admits ingress. Content propagates through `with:` bindings,
+- ② untrusted ingress · the grant admits an ingress channel — the
+  `tools:` grant covers an ingress-capable tool (`nika:fetch` by name or
+  glob · any `mcp:*` server) OR `permits.exec` is enabled (v2.2 · F2
+  2026-07-30: a subprocess is a trust boundary — it imports content the
+  workflow did not author, so the exec permit arms leg ② exactly like a
+  fetch grant) — AND the graph REALIZES a source: a fetch invoked · an
+  `mcp:*` invoked (server content is untrusted by construction ·
+  fail-closed) · an `agent:` whose whitelist admits ingress · an `exec:`
+  (v2.2 — its stdout is untrusted by construction, judged like
+  `nika:fetch`; until then the SAME flow drew `NIKA-SEC-009` over the
+  native fetch and a ✔ over `exec curl`, a perverse incentive to leave
+  the native path). Content propagates through `with:` bindings,
   `for_each` items, `tasks.*.output` reads and `on_error.recover` reads;
   `infer:`/`agent:` outputs CARRY it when their prompt sees it (the
   integrity direction — the verbatim-echo carve-out is confidentiality-
-  only and does not apply); an `exec:` is tainted when a tainted data
-  ancestor feeds it OR a tainted WRITER ran earlier under a declared
+  only and does not apply); an `exec:` is ALSO tainted when a tainted
+  data ancestor feeds it OR a tainted WRITER ran earlier under a declared
   `fs.read` (the file-mediated channel a static argv scan cannot see).
 - ③ external egress · `permits.net.http` non-empty, OR a declared
   `fs.write` glob escapes the workspace (absolute · `~` · a preserved
@@ -193,6 +200,10 @@ def _classify(task: dict):
     verb, action = _verb_of(task)
     ingress = egress = gate = writer = False
     if verb == "exec":
+        # v2.2 (F2 · 2026-07-30): the subprocess's stdout is untrusted by
+        # construction — born-ingress like `nika:fetch`, plus egress and
+        # the writer half of the file channel as before.
+        ingress = True
         egress = True
         writer = True
     elif verb == "agent":
@@ -280,14 +291,18 @@ def trifecta_errors(doc) -> list[dict]:
     read = fs.get("read") if isinstance(fs.get("read"), list) else []
     leg1 = bool(read)
     tools_grant = permits.get("tools")
-    grant_ok = (isinstance(tools_grant, list)
-                and any(_grant_admits_ingress(g) for g in tools_grant))
+    allows_exec = bool(permits.get("exec"))
+    # v2.2 (F2): the exec permit is an ingress CHANNEL — a subprocess
+    # imports content the workflow did not author (the grant twin of the
+    # `_classify` exec arm), so it arms leg ② like a fetch grant.
+    grant_ok = (allows_exec
+                or (isinstance(tools_grant, list)
+                    and any(_grant_admits_ingress(g) for g in tools_grant)))
     leg2 = grant_ok and any(ingress)
     net = permits.get("net") if isinstance(permits.get("net"), dict) else {}
     http = net.get("http") if isinstance(net.get("http"), list) else []
     writes = fs.get("write") if isinstance(fs.get("write"), list) else []
     escapes = any(_write_glob_escapes(g) for g in writes if isinstance(g, str))
-    allows_exec = bool(permits.get("exec"))
     leg3 = bool(http) or escapes or allows_exec
     if not (leg1 and leg2 and leg3):
         return []
@@ -317,9 +332,12 @@ def trifecta_errors(doc) -> list[dict]:
     for wave in waves:
         for i in wave:
             tid, task = order[i]
-            item_src = next(
-                (out_origin[idx[r]] for r in _refs(task.get("for_each"))
-                 if out_origin[idx[r]] is not None), None)
+            # The with map first (it ACCUMULATES — a later key may read an
+            # earlier one, exactly like the engine's content_flow), then
+            # the for_each item (its source may ride a `with:` alias — the
+            # with-indirection is an edge since W2 « the flow »), then the
+            # effect. Reading the item's tasks-only refs lost every
+            # aliased collection (the pr-review-fanout divergence, v2.2).
             with_map = (task.get("with")
                         if isinstance(task.get("with"), dict) else {})
             with_src: dict[str, str] = {}
@@ -327,10 +345,14 @@ def trifecta_errors(doc) -> list[dict]:
                 if not isinstance(key, str):
                     continue
                 for kind, name in _typed_refs(val):
-                    origin = _origin_of(kind, name, {}, item_src)
+                    origin = _origin_of(kind, name, with_src, None)
                     if origin is not None:
                         with_src[key] = origin
                         break
+            item_src = next(
+                (o for kind, name in _typed_refs(task.get("for_each"))
+                 if (o := _origin_of(kind, name, with_src, None))
+                 is not None), None)
             eff = next(
                 (o for kind, name in _typed_refs(actions[i])
                  if (o := _origin_of(kind, name, with_src, item_src))

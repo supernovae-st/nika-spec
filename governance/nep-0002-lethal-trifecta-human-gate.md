@@ -8,7 +8,9 @@
 - **Created**: 2026-07-19
 - **Amended**: v2.0 · 2026-07-20 (realized-flow judgment · agent whitelist
   refinement · the infer/agent integrity inversion) · v2.1 · 2026-07-29
-  (over-approximation posture written · the finding names its disjunct)
+  (over-approximation posture written · the finding names its disjunct) ·
+  v2.2 · 2026-07-30 (the `exec:` verb is born-ingress — the subprocess
+  trust boundary · leg ② counts the exec permit as an ingress channel)
 
 ## Abstract
 
@@ -37,26 +39,34 @@ Legs, read off the declared boundary:
 
 - **① private-data**: `permits.fs.read` is non-empty. (v2 refinement: a
   sensitivity classification over read paths; v1 treats any declared read as ①.)
-- **② untrusted ingress (amended v2.0)**: the boundary grants an ingress-capable
-  tool AND the task graph **realizes** untrusted content — a `nika:fetch`
+- **② untrusted ingress (amended v2.0 · v2.2)**: the boundary grants an ingress
+  channel AND the task graph **realizes** untrusted content — a `nika:fetch`
   builtin **invoked** (a glob like `nika:*` covers the grant), an `mcp:*` tool
   invoked (server-provided content is untrusted by construction; the catalog
-  `content_trust` mark is the follow-on refinement, absent = untrusted), or an
+  `content_trust` mark is the follow-on refinement, absent = untrusted), an
   `agent:` whose `tools:` whitelist admits an ingress-capable tool (a browsing
   agent's final message is attacker-influenced even with a statically clean
-  prompt). First-party LOCAL builtins (`nika:read` · `nika:write` · …) are NOT
-  ingress: a private read is ①'s domain, a write ③'s. Untrusted content
-  **propagates** through `with:` bindings, `for_each` items, `tasks.*.output`
-  reads, and `on_error.recover` reads; **`infer:`/`agent:` outputs carry it when
-  their prompt sees it** — the integrity direction, where the "model output is
-  not a verbatim echo" carve-out (confidentiality-only) does not apply: a
-  summary of an attacker's page carries the attacker's payload. An `exec:` task
-  is content-tainted when it has a tainted data ancestor OR (`fs.read` non-empty
-  ∧ a tainted task **capable of writing** — an fs-write builtin or another exec —
-  ran earlier in the run order): the filesystem-mediated flow a static argv scan
-  cannot see. (v1.1 note: the coarse any-grant reading flagged the spec's own
-  permits-fit fixture `deep/014-permits-fit-valid` — `tools: [nika:read,
-  nika:write]` declares no ingress.)
+  prompt), or — **v2.2** — an `exec:` task, with `permits.exec` itself
+  counting as the ingress grant. A subprocess is a trust boundary: its
+  stdout is content the workflow did not author (a curled page · a `git
+  log` with hostile subjects · a compromised binary), exactly the class
+  `nika:fetch` is judged for. Until v2.2 the SAME flow drew `NIKA-SEC-009`
+  over the native fetch and a ✔ over `exec curl` — a measured perverse
+  incentive to leave the native, defensible path (audit run 5 · F2 ·
+  2026-07-30). First-party LOCAL builtins (`nika:read` · `nika:write` · …)
+  are NOT ingress: a private read is ①'s domain, a write ③'s. Untrusted
+  content **propagates** through `with:` bindings, `for_each` items,
+  `tasks.*.output` reads, and `on_error.recover` reads; **`infer:`/`agent:`
+  outputs carry it when their prompt sees it** — the integrity direction,
+  where the "model output is not a verbatim echo" carve-out
+  (confidentiality-only) does not apply: a summary of an attacker's page
+  carries the attacker's payload. An `exec:` task is ALSO content-tainted
+  when it has a tainted data ancestor OR (`fs.read` non-empty ∧ a tainted
+  task **capable of writing** — an fs-write builtin or another exec — ran
+  earlier in the run order): the filesystem-mediated flow a static argv
+  scan cannot see. (v1.1 note: the coarse any-grant reading flagged the
+  spec's own permits-fit fixture `deep/014-permits-fit-valid` —
+  `tools: [nika:read, nika:write]` declares no ingress.)
 - **③ external egress**: `permits.net.http` is non-empty, OR a `permits.fs.write`
   glob escapes the declared workspace, OR `permits.exec` is enabled.
 
@@ -152,6 +162,16 @@ needs changes; workflows flagged under v1.1 solely by granted-but-never-invoked
 ingress (or by egress tasks no untrusted content reaches) become clean.
 Previously-passing workflows are unaffected in both directions (a gate that
 dominated still dominates; a narrowed permit still drops a leg).
+
+**v2.2**: v2.2 findings are a SUPERSET of v2.0 findings on exactly one axis —
+an `exec:` task is now a born source, so a workflow whose untrusted content
+entered ONLY through a subprocess (the `exec curl` rewrite of a judged
+`nika:fetch` flow) is flagged like its native twin. The migration is the
+NEP's own: one dominating `invoke: nika:prompt` gate, or narrow a leg. The
+spec's showcase `examples/pr-review-fanout.nika.yaml` took the gate (it
+descends every task from the prompt — dominance is structural, a sibling
+branch bypass re-opens the finding). A workflow whose exec tasks never feed
+an egress-capable task is unaffected.
 
 ## Migration plan
 
