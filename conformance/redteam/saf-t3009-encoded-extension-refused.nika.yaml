@@ -1,0 +1,20 @@
+# SAF-T3009 · the encoded-extension composition (percent-decode then trim)
+#
+# The gate under test: F-O7 + the composition class the final review
+# caught — the sink classifier must decode percent-encoding BEFORE the
+# trailing-dot trim, so the encoded and the literal form of the same
+# artifact take the SAME verdict.
+#
+# Expected: NIKA-SEC-008 at CHECK (`legacy%2epkl%2e` ≡ `legacy.pkl.` ·
+# both refused — never one inert, one dead).
+nika: v1
+workflow:
+  id: saf-t3009-encoded-extension-refused
+permits:
+  net: { http: ["files.example.com"] }
+  tools: ["nika:fetch"]
+tasks:
+  grab:
+    invoke:
+      tool: nika:fetch
+      args: { url: "https://files.example.com/legacy%2epkl%2e" }

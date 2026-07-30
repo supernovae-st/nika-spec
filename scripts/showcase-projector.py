@@ -45,7 +45,13 @@ except ImportError:
     sys.exit(2)
 
 SPEC_ROOT = Path(__file__).resolve().parent.parent
-SHOWCASE = SPEC_ROOT / "examples" / "showcase"
+# The JOBS — every example that is a whole realistic workflow, as opposed to
+# the numbered teaching sequence (`01-`…`07-`) a reader walks in order. One
+# directory since the showcase/ split was nuked: it carried no information the
+# filename did not already give, and cost a word ("showcase") that meant
+# nothing "example" did not.
+JOBS_DIR = SPEC_ROOT / "examples"
+IS_LESSON = re.compile(r"^\d{2}-")
 
 # ── the served-grammar door (docs targets only) ──────────────────────
 # The pack is authored in the RATIFIED grammar; docs are a BAKED visitor
@@ -53,19 +59,28 @@ SHOWCASE = SPEC_ROOT / "examples" / "showcase"
 # (the website applies the same law at serve time via src/lib/w1-to-w2.ts).
 # Flips to identity at the release train: NIKA_SERVED_GRAMMAR=wnew.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from grammar_door import downcast_w2, downcast_w105  # noqa: E402
+from grammar_door import downcast_w2, downcast_w105, downcast_w106  # noqa: E402
 
-# The default = the grammar the LATEST RELEASED binary speaks (w105 since
-# v0.105.0 · 2026-07-20). Override per bake: w2 (0.104 era) · wnew (identity ·
-# the post-train flip). The release-heal ratchet derives this from the
-# release itself (R2) — until then the default moves WITH the train.
-SERVED_GRAMMAR = os.environ.get("NIKA_SERVED_GRAMMAR", "w105")
+# The default = the grammar the LATEST RELEASED binary speaks — w106
+# since the NEP-0014 mints (2026-07-29): the v0.106.1 ASSET (the binary
+# a visitor installs · published 07-28) predates `policy.endorsement`
+# and refuses it PARSE-019 (the rule set is closed per minor), so the
+# door drops that one family from baked fences. The identity flip
+# (`wnew`) returns when the released asset parses endorsement — the
+# release-heal ratchet derives this from the release itself (R2); until
+# then the default tracks the PUBLISHED asset, never a local rebuild
+# (empirical 2026-07-29: a same-version brew rebake accepted what the
+# asset refuses — the asset is the judge). Era doors stay per-bake
+# overrides: w2 (0.104) · w105 (0.105 · v0.106.1 refuses its `vars:`).
+SERVED_GRAMMAR = os.environ.get("NIKA_SERVED_GRAMMAR", "w106")
 
 
 def served(yaml_text: str, fname: str) -> str:
     """The grammar a docs reader copies · the released dialect via the door."""
     if SERVED_GRAMMAR == "wnew":
         return yaml_text
+    if SERVED_GRAMMAR == "w106":
+        return downcast_w106(yaml_text, fname)
     if SERVED_GRAMMAR == "w105":
         return downcast_w105(yaml_text, fname)
     return downcast_w2(yaml_text, fname)
@@ -105,12 +120,14 @@ def lean(yaml_text: str) -> str:
 
 
 def load_showcase() -> dict[str, str]:
-    if not SHOWCASE.is_dir():
-        print(f"showcase-projector · {SHOWCASE} missing", file=sys.stderr)
+    if not JOBS_DIR.is_dir():
+        print(f"showcase-projector · {JOBS_DIR} missing", file=sys.stderr)
         sys.exit(2)
-    files = sorted(SHOWCASE.glob("*.nika.yaml"))
+    # The numbered lesson files are excluded: they teach ONE construct each and
+    # are read in order, which is a different job from a projected use-case.
+    files = sorted(f for f in JOBS_DIR.glob("*.nika.yaml") if not IS_LESSON.match(f.name))
     if not files:
-        print("showcase-projector · no showcase files", file=sys.stderr)
+        print("showcase-projector · no job examples", file=sys.stderr)
         sys.exit(2)
     return {f.name: lean(f.read_text()) for f in files}
 
@@ -363,8 +380,11 @@ def render_coverage(workflows: dict[str, str]) -> str:
         users = sorted(n for n, cs in per_file.items() if key in cs)
         if not users:
             continue
+        # The slug IS the link — post-flatten there is no tier prefix to
+        # strip, and the old `.split('-', 1)[1]` turned `support-triage`
+        # into `/examples/triage` (144 dead docs links reborn per --write).
         links = " · ".join(
-            f"[{n.removesuffix('.nika.yaml').split('-', 1)[1]}](/examples/{n.removesuffix('.nika.yaml').split('-', 1)[1]})"
+            f"[{n.removesuffix('.nika.yaml')}](/examples/{n.removesuffix('.nika.yaml')})"
             for n in users)
         lines.append(f"| [{label}]({href}) | {links} |")
     lines.append("")
@@ -561,11 +581,17 @@ def render_manifest(workflows: dict[str, str]) -> str:
     (what every surface renders) makes the pack verifiable end-to-end.
     """
     version = (SPEC_ROOT / "VERSION").read_text().strip()
+    # Foundation = the numbered lessons ONLY. Post-flatten (1f15601) the jobs
+    # live in the same directory, so the bare glob double-counted all 26 of
+    # them here while the showcase section still pointed at dead
+    # examples/showcase/ paths — 69 entries for 43 files, and --check stayed
+    # green because both sides of the comparison carried the same bug.
     foundation = sorted(
-        f.name for f in (SPEC_ROOT / "examples").glob("*.nika.yaml"))
+        f.name for f in (SPEC_ROOT / "examples").glob("*.nika.yaml")
+        if IS_LESSON.match(f.name))
     lines = [
         "# examples/manifest.yaml — AUTO-GENERATED by scripts/showcase-projector.py",
-        "# from VERSION + examples/ + examples/showcase/ — the versioned pack",
+        "# from VERSION + examples/ + templates/ — the versioned pack",
         "# contract. DO NOT EDIT · regenerate: python3 scripts/showcase-projector.py --write",
         "# Consumers · the reference engine embeds this pack (nika examples ·",
         "# nika spec) · docs + website render projections of the same files.",
@@ -591,9 +617,10 @@ def render_manifest(workflows: dict[str, str]) -> str:
         doc = yaml.safe_load(body)
         digest = hashlib.sha256(body.encode()).hexdigest()[:16]
         constructs = sorted(_constructs_of(body))
-        lines.append(f"  - file: examples/showcase/{name}")
+        # Flat path — showcase/ died at 1f15601. The tier line died with the
+        # prefix it was sliced from: rank is metadata, not identity.
+        lines.append(f"  - file: examples/{name}")
         lines.append(f"    workflow: {doc.get('workflow')}")
-        lines.append(f"    tier: {name[:2].upper()}")
         lines.append(f"    description: {json.dumps(doc.get('description', ''))}")
         lines.append(f"    constructs: [{', '.join(constructs)}]")
         lines.append(f"    sha256_16: {digest}")

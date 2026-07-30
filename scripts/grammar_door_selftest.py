@@ -122,11 +122,19 @@ def main() -> int:
 
     pack = (
         sorted((SPEC_ROOT / "examples").glob("*.nika.yaml"))
-        + sorted((SPEC_ROOT / "examples" / "showcase").glob("*.nika.yaml"))
         + sorted((SPEC_ROOT / "templates").glob("*.nika.yaml"))
     )
     if len(pack) < 30:
         fail(f"pack sweep found only {len(pack)} files — layout moved?")
+    # The pack law, post-0.106: a file either downcasts cleanly, or it
+    # refuses TYPED on a STOP-listed wnew-only construct. The refusers are
+    # NAMED below and ratcheted exactly — the top-level door sees `config:`
+    # (08) and `types:` (09); composition and `declassify:` are task-level
+    # and pass through it. Any other refusal is still red, and a NEW
+    # refuser (a template gaining `config:`) moves the count and refuses
+    # here until the ratchet is deliberately retuned. (Before the train
+    # this leg demanded zero refusals and contradicted leg 3.)
+    stopped_w2 = 0
     for f in pack:
         text = f.read_text()
         lines = text.splitlines()
@@ -137,6 +145,9 @@ def main() -> int:
         try:
             w2 = downcast_w2(text, f.name)
         except DoorRefusal as e:
+            if "STOP-list" in str(e):
+                stopped_w2 += 1
+                continue
             fail(f"pack refusal · {e}")
         if re.search(r"^(inputs|const|config):", w2, re.M):
             fail(f"{f.name} · wnew value block survived the door")
@@ -180,6 +191,7 @@ def main() -> int:
     keep = "nika: v1\nworkflow:\n  id: x\ntypes:\n  T:\n    kind: string\ntasks:\n  t:\n    exec: { shell: \"true\" }\n"
     if "types:" not in downcast_w105(keep, "keep"):
         fail("w105 must keep types:")
+    stopped_w105 = 0
     for f in pack:
         text = f.read_text()
         lines = text.splitlines()
@@ -190,6 +202,9 @@ def main() -> int:
         try:
             w105 = downcast_w105(text, f.name)
         except DoorRefusal as e:
+            if "STOP-list" in str(e):
+                stopped_w105 += 1
+                continue
             fail(f"w105 pack refusal · {e}")
         if re.search(r"^(inputs|const):", w105, re.M):
             fail(f"{f.name} · value block survived the w105 door")
@@ -198,7 +213,17 @@ def main() -> int:
         if downcast_w105(w105, f.name + "@2") != w105:
             fail(f"{f.name} · w105 not idempotent")
 
-    print(f"grammar-door selftest ✓ golden + stop-list + {len(pack)} pack files (w2 + w105 targets)")
+    if stopped_w2 != 2 or stopped_w105 != 1:
+        fail(
+            f"STOP-refusal ratchet moved · w2 {stopped_w2} (want 2: 08 config: "
+            f"· 09 types:) · w105 {stopped_w105} (want 1: 08 config:) — a new "
+            f"wnew-only construct entered the pack, retune deliberately"
+        )
+    print(
+        f"grammar-door selftest ✓ golden + stop-list + {len(pack)} pack files "
+        f"(w2: {stopped_w2} typed STOP refusals · w105: {stopped_w105} — "
+        f"exactly the named wnew-only files)"
+    )
     return 0
 
 

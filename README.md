@@ -105,6 +105,40 @@ See [spec/](./spec/) for the full specification.
 
 ---
 
+![nika check audits the workflow (plan, permits, cost, secrets, types, the lethal-trifecta gate), then nika run executes it locally and seals the hash-chained trace — the audit-then-run story](https://raw.githubusercontent.com/supernovae-st/nika/main/media/nika-hero.gif)
+
+<!-- city:map -->
+## The city · where this repo sits
+
+```
+📜 nika-spec ──── the civil code · the law tables, the corpus, the exam   ◀── you are here
+    │ sync-pack: byte-gated mirror        │ projectors: drift-gated
+    ▼                                     ▼
+⚙️ nika ───────── the engine + the catalog (the yellow pages)
+    │ the release train                  🖥️ nika.sh · 📖 nika-docs
+    ▼                                     the showroom · the manual
+📦 homebrew-tap · npm · Docker ── the docks
+🔌 nika-client · 🎨 nika-vscode · 🤖 nika-agents · ⚡ gh-nika ── the doors
+🏭 nika-action · 🧪 nika-actions-starter ── the CI district
+🏪 nika-registry ── the market · 🏛 nika-estate ── the land registry
+```
+
+**This building** · THE CIVIL CODE · the language's laws (the law tables under `canon/`), the teaching corpus (`examples/`), the conformance exam (`conformance/`).
+
+**Root** · LANGUAGE facts, Apache-2.0 · the verbs, the builtins, the providers, the laws. Engine facts (crates, tests, hygiene vectors) never enter here · the two roots never mix.
+
+**Consumes** · nothing · this repo is the root of the truth chain.
+
+**Serves** · the engine (corpus vendored by sync-pack, byte-gated) · the site and the docs (canon + showcase projectors, `--check` gates) · agents (`llms.txt`).
+
+**Truth lives** · edit the law tables in `canon/` · `canon.yaml` is a GENERATED hub · [`SSOT.md`](SSOT.md) is the map (its gated table is machine-projected) · `estate.yaml` is the cadastre (every file: authored, or derived with proof).
+
+All the buildings: [nika-spec](https://github.com/supernovae-st/nika-spec) · [nika](https://github.com/supernovae-st/nika) · [nika.sh](https://github.com/supernovae-st/nika.sh) · [nika-docs](https://github.com/supernovae-st/nika-docs) · [nika-client](https://github.com/supernovae-st/nika-client) · [nika-vscode](https://github.com/supernovae-st/nika-vscode) · [nika-agents](https://github.com/supernovae-st/nika-agents) · [gh-nika](https://github.com/supernovae-st/gh-nika) · [homebrew-tap](https://github.com/supernovae-st/homebrew-tap) · [nika-action](https://github.com/supernovae-st/nika-action) · [nika-actions-starter](https://github.com/supernovae-st/nika-actions-starter) · [nika-registry](https://github.com/supernovae-st/nika-registry) · [nika-estate](https://github.com/supernovae-st/nika-estate)
+
+Every fact has one home · everything else is a gated projection.
+The living map: [nika.sh/map](https://nika.sh/map).
+<!-- /city:map -->
+
 ## Repository layout
 
 ```
@@ -244,7 +278,7 @@ sha256 over the exact text every surface renders. The contract:
 |---|---|
 | [`canon.yaml`](canon.yaml) | THE source for every language count (verbs · namespaces · builtins · providers · modes · error namespaces) |
 | [`scripts/canon-projectors.py`](scripts/canon-projectors.py) | projects canon counts → docs snippet + website module (`--write` / `--check`) |
-| [`scripts/showcase-projector.py`](scripts/showcase-projector.py) | projects [`examples/showcase/`](examples/showcase/) → docs example pages + website explorer (yaml · diagrams · run-sim model · coverage matrix) |
+| [`scripts/showcase-projector.py`](scripts/showcase-projector.py) | projects the [`examples/`](examples/) jobs → docs example pages + website explorer (yaml · diagrams · run-sim model · coverage matrix) |
 | [`conformance/runner.py`](conformance/runner.py) | the static oracle · core + stdlib fixtures + every example as a conformance input (the CI gate) |
 | [`.pre-commit-hooks.yaml`](.pre-commit-hooks.yaml) | pre-commit hook ids for downstream engines consuming this spec |
 
@@ -254,7 +288,7 @@ CI failure, not a maybe).
 
 ## Status
 
-- v0.1.0-draft · spec drafted · 7 foundation + 26 showcase examples + 10 templates · workflow.schema.json · 185 static conformance fixtures (core · deep · stdlib surface · the value-authority lanes `values`/`types`/`gates`; `python3 conformance/runner.py all` is the live count), every example gated in CI · runtime/behavioral conformance pending
+- v0.1.0-draft · spec drafted · the numbered path + the jobs + the templates (counts live in [examples/manifest.yaml](examples/manifest.yaml)) · workflow.schema.json · 185 static conformance fixtures (core · deep · stdlib surface · the value-authority lanes `values`/`types`/`gates`; `python3 conformance/runner.py all` is the live count), every example gated in CI · runtime/behavioral conformance pending
 - v0.1.0 GA · target August 2026 (after spec review + examples +
   conformance suite + schemas)
 
@@ -302,5 +336,5 @@ The reference implementation (separate repo) is AGPL-3.0-or-later.
 ---
 
 <p align="center">
-  <sub>Docs: <a href="https://docs.nika.sh">docs.nika.sh</a> · Engine (AGPL-3.0): <a href="https://github.com/supernovae-st/nika">nika</a> · Templates: <a href="https://github.com/supernovae-st/nika-starter">nika-starter</a> · <a href="https://github.com/supernovae-st/nika-actions-starter">nika-actions-starter</a> · Registry: <a href="https://github.com/supernovae-st/nika-registry">nika-registry</a></sub>
+  <sub>Docs: <a href="https://docs.nika.sh">docs.nika.sh</a> · Engine (AGPL-3.0): <a href="https://github.com/supernovae-st/nika">nika</a> · Template: <a href="https://github.com/supernovae-st/nika-actions-starter">nika-actions-starter</a> · Registry: <a href="https://github.com/supernovae-st/nika-registry">nika-registry</a></sub>
 </p>

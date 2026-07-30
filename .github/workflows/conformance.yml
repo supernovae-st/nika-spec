@@ -54,10 +54,32 @@ jobs:
           python conformance/gateway_core_selftest.py
           python conformance/outcome_core_selftest.py
           python conformance/composition_core_selftest.py
+          python conformance/trifecta_core_selftest.py
           python conformance/yaml_profile_core_selftest.py
           python conformance/proof_core_selftest.py
           python conformance/projection_core_selftest.py
           python conformance/values_proof.py
+
+      # The second-key gate — a duplicate YAML key silently loses to its
+      # twin (three real bites: a swallowed CI step · a doubled permits
+      # block · an indent-eaten dependabot groups). *.nika.yaml is exempt
+      # (the engine parser refuses duplicates itself · NIKA-PARSE-017) and
+      # conformance/tests/ is the harness's torture corpus, not this
+      # gate's law. Selftest first: the teeth are proven before they bite.
+      - name: YAML duplicate-key gate (selftest + sweep)
+        run: |
+          python scripts/check-yaml-dup-keys.py --selftest
+          python scripts/check-yaml-dup-keys.py
+
+      # The redteam leg (F-P10) · every seeded hostile fixture MUST be
+      # refused by the oracle with the law its header names (a seeded
+      # attack that passes silently is the worst verdict in the corpus),
+      # and the SAF-T coverage TSV must equal its regeneration byte-for-byte
+      # with zero in-scope tag uncovered.
+      - name: Redteam leg · execution + coverage
+        run: |
+          python conformance/redteam_core_selftest.py
+          python scripts/gen-saf-t-coverage.py --check
 
       # The committed corpus must be BYTE-exact against type_core.py (a
       # drifted corpus makes the Rust differential judge stale verdicts)
@@ -83,12 +105,53 @@ jobs:
           python scripts/canon-projectors.py --check
           python scripts/showcase-projector.py --check
           python scripts/llms-projector.py --check
+          python scripts/ssot-map-projector.py --check
+          python scripts/ssot-map-projector.py --selftest
           python scripts/starters-projector.py --check
           python scripts/authoring-projector.py --check
           python scripts/design-projector.py --check
+
+      # Estate observation (E0) · the provenance manifest declares what IS.
+      # Advisory while mode is observation — drift warns, never blocks
+      # (the website wires the same rung non-blocking · promotion is E2's
+      # SEAL move, an operator decision). Fixed command · repo files only.
+      # A SEPARATE step on purpose: a line appended under a plain-scalar
+      # run: is swallowed as echo text — that exact YAML class disarmed
+      # three projector gates here for one push (caught by the refuter).
+      - name: Estate observation · provenance manifest (non-blocking)
+        run: python scripts/estate.py --check || echo "::warning::estate drift — run scripts/estate.py --write"
 
       # Governance surfaces cite files by relative link (the certifications
       # matrix · GLOSSARY · CONTRIBUTING) · a deleted target must fail here,
       # never leave the claim standing. Fixed command · repo files only.
       - name: Governance refs · every relative md link resolves
         run: python3 scripts/check-md-refs.py
+
+      # A workflow header's `Run ·` line is a promise the README makes on
+      # its behalf — 26 of them taught a dead directory for a day after
+      # the flatten (found by a re-proof, not a gate). Fixed command ·
+      # repo files only.
+      - name: Run-line refs · every header command names a real path
+        run: python3 scripts/check-run-lines.py
+
+  mirror:
+    name: The estate tool is the shared one
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: scripts/estate.py is byte-identical to nika-estate at the pinned rev
+        run: |
+          pin="$(grep -v '^#' ESTATE_PIN | head -1 | tr -d '[:space:]')"
+          url="https://raw.githubusercontent.com/supernovae-st/nika-estate/${pin}/scripts/estate.py"
+          curl -fsSL "$url" -o /tmp/estate-canonical.py
+          if ! cmp -s /tmp/estate-canonical.py scripts/estate.py; then
+            echo "::error file=scripts/estate.py::diverges from nika-estate@${pin} — the tool is shared: change it upstream, bump ESTATE_PIN, re-mirror"
+            diff -u /tmp/estate-canonical.py scripts/estate.py | head -60
+            exit 1
+          fi
+          if [ ! -x scripts/estate.py ]; then
+            echo "::error file=scripts/estate.py::has a shebang but is not executable · cmp compares content and raw.githubusercontent serves no modes, so the mirror carries the bit itself"
+            exit 1
+          fi
+          echo "✓ scripts/estate.py is byte-identical to nika-estate@${pin} and executable"

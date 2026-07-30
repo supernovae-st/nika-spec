@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: Apache-2.0
+# Strict binding (04 §Static binding validation · operator lock 2026-07-30) ·
+# the producer declares properties [entities, meta] with no explicit
+# additionalProperties · declaring properties CLOSES the level for binding ·
+# reading the undeclared sibling `maybe_extra` is the misspelled-key class →
+# refused at parse time. Fix is one line either way: declare the key, or
+# open the level with additionalProperties: true (the 015 boundary twin).
+nika: v1
+workflow:
+  id: schema-sibling-undeclared
+permits:
+  exec: ["report"]
+tasks:
+  extract:
+    infer:
+      prompt: "Extract entities"
+      schema:
+        type: object
+        required: [entities]
+        properties:
+          entities:
+            type: array
+            items: { type: string }
+          meta:
+            type: object
+  report:
+    with:
+      extract_maybe_extra: ${{ tasks.extract.output.maybe_extra }}
+    exec:
+      command: ["report", "${{ with.extract_maybe_extra }}"]

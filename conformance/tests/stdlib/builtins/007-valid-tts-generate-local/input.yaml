@@ -4,6 +4,7 @@ workflow:
   id: narrate-sovereign
 permits:
   tools: ["nika:tts_generate"]
+  fs: { write: ["./assets/audio"] }
 tasks:
   narrate:
     invoke:

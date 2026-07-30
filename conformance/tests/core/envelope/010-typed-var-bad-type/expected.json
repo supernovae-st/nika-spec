@@ -1,10 +1,5 @@
 {
   "valid": false,
-  "errors": [
-    {
-      "namespace": "NIKA-PARSE",
-      "category": "validation_error"
-    }
-  ],
-  "note": "09-types.md \u00b7 an inputs declaration type speaks the full TypeExpr (R3b \u00b7 LAW-GRAMMAR-0211 \u00b7 the flat 6-enum is dead \u00b7 LAW-SURFACE-0211) \u00b7 'text' is neither a primitive nor a PascalCase type reference \u00b7 rejected."
+  "errors": [{ "code": "NIKA-TYPE-001" }],
+  "note": "09-types.md · an inputs declaration type speaks the full TypeExpr (R3b · LAW-GRAMMAR-0211 · the flat 6-enum is dead · LAW-SURFACE-0211) · 'text' is neither a primitive nor a PascalCase type reference · rejected. The TYPE family owns the type-fit (operator lock 2026-07-30): both oracles emit the exact code NIKA-TYPE-001, so the expectation pins it — the reference's additional NIKA-PARSE schema-layer emission is a legal extra, never the pin."
 }

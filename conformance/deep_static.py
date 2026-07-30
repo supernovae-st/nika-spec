@@ -570,12 +570,64 @@ def _taint_canonical_host(url: str):
     return host
 
 
-def _taint_globbed(value: str, globs) -> bool:
-    """Match against the LITERAL bounds only — an interpolated bound is law
-    1's refusal (NIKA-AUTH-007), never something to match against."""
+def _seg_match(vsegs: list, gsegs: list) -> bool:
+    """Segment-wise glob: `*`/`?` stop at `/` (fnmatch per segment), `**`
+    spans any depth — the engine's matcher, mirrored. A flat fnmatch let
+    `datasets/*.csv` admit `datasets/sub/deeper/x.csv` (the exact class
+    the engine's fail-open fix killed), refuter-proven live."""
     import fnmatch
-    return any(isinstance(g, str) and not EXPR_BODY.search(g)
-               and fnmatch.fnmatchcase(value, g) for g in globs or [])
+    if not gsegs:
+        return not vsegs
+    g, rest = gsegs[0], gsegs[1:]
+    if g == "**":
+        return any(_seg_match(vsegs[i:], rest) for i in range(len(vsegs) + 1))
+    if not vsegs:
+        return False
+    return fnmatch.fnmatchcase(vsegs[0], g) and _seg_match(vsegs[1:], rest)
+
+
+def _taint_globbed(value: str, globs) -> bool:
+    """Match a canonical PATH against the LITERAL bounds only — an
+    interpolated bound is law 1's refusal (NIKA-AUTH-007), never something
+    to match against. BOTH sides compare in canonical form (the false
+    AUTH-008 that turned the corpus red on main 2026-07-29), and the
+    normalization must not GRANT what the author never wrote: a lexical
+    escape (leading `..`) can never re-enter a rooted bound even when the
+    normalized glob is `**` — without that guard, normalizing `./**` to
+    `**` turned an inert bound all-admitting (refuter counterexample
+    CX1: `../../etc/passwd` under `./**` read VALID)."""
+    import posixpath
+    vsegs = value.split("/")
+    for g in globs or []:
+        if not isinstance(g, str) or EXPR_BODY.search(g):
+            continue
+        ng = posixpath.normpath(g)
+        if value.startswith("..") and not ng.startswith(".."):
+            continue
+        if _seg_match(vsegs, ng.split("/")):
+            return True
+    return False
+
+
+def _taint_host_globbed(host: str, globs) -> bool:
+    """The NET seam is its own matcher — hosts are case-insensitive and a
+    `*.x` bound covers the subdomains (mirror of the engine's
+    host_glob_matches). Routing hosts through the path matcher normalized
+    a hostname and compared case-sensitively: a bound authored
+    `API.Example.com` refused its own lowercase canonical host while the
+    engine admitted it (refuter counterexample CX4)."""
+    h = host.lower()
+    for g in globs or []:
+        if not isinstance(g, str) or EXPR_BODY.search(g):
+            continue
+        lg = g.lower()
+        if lg.startswith("*."):
+            apex = lg[2:]
+            if h == apex or h.endswith("." + apex):
+                return True
+        elif h == lg:
+            return True
+    return False
 
 
 def permit_taint_errors(doc: dict, tasks: list) -> list[dict]:
@@ -651,7 +703,7 @@ def permit_taint_errors(doc: dict, tasks: list) -> list[dict]:
                         host = _taint_canonical_host(resolved)
                         if host is not None:
                             regate(tid, paths, f"args.url ({tool})", resolved, host,
-                                   _taint_globbed(host, host_globs),
+                                   _taint_host_globbed(host, host_globs),
                                    f"net.http {host_globs}")
         if "exec" in t and isinstance(exec_rule, list):
             body = t.get("exec")
@@ -838,20 +890,25 @@ def _code_bearing_class(url: str):
     import urllib.parse
     import posixpath
     path = urllib.parse.urlparse(url).path
-    # O7-A · the encoded-extension bypass (red team 2026-07-23): classify
-    # the DECODED final segment exactly once (the origin decodes once too
-    # · RFC 3986 §2.3) · `%2e` ≡ `.` and double-encoded `%252e` stays inert.
-    path = urllib.parse.unquote(path)
+    # O7-A + O7-C · the order IS the law (mirrors nika-cap sink.rs · the
+    # final review 2026-07-23): trailing slashes are a path-structure
+    # artifact (trimmed first), then the segment decodes exactly once
+    # (RFC 3986 §2.3 · the origin decodes once too · `%2e` ≡ `.` and
+    # double-encoded `%252e` stays inert), then the trailing dot is
+    # trimmed AFTER decode — `legacy%2epkl%2e` and the literal
+    # `legacy.pkl.` are the SAME artifact and take the SAME verdict.
+    segment = path.rstrip("/").rsplit("/", 1)[-1]
+    segment = urllib.parse.unquote(segment).rstrip(".")
     # O7-B · the versioned native form (`lib.so.1.2` IS what dlopen loads)
     # · strip trailing `.N` groups before the native-class match.
-    native_base = path.rstrip("0123456789.")
-    ext = posixpath.splitext(path)[1].lower()
+    native_base = segment.rstrip("0123456789.")
+    ext = posixpath.splitext(segment)[1].lower()
     if not ext:
         return None
     for cls, exts in _CODE_BEARING_CLASSES.items():
         if ext in exts:
             return cls, ext
-    if native_base != path:
+    if native_base != segment:
         native_ext = posixpath.splitext(native_base)[1].lower()
         if native_ext in _CODE_BEARING_CLASSES.get("executable binary/module", ()):
             return "executable binary/module", native_ext

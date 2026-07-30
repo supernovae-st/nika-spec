@@ -5,7 +5,7 @@ Contract source: design-pack-pre1/01_STRUCTURED_LAW_SCHEMA.md §6 + PRE1_C0_SCOP
 + PRE1_C0_FIRST_72H_PLAN.md T+24h. Sandbox instance: parses canon/laws/*.yaml, validates
 every law entry against schemas/law.schema.json (SEALED, consumed as-is), validates the
 13 registry documents against schemas/registries.schema.json, resolves law refs into the
-seeded registries, emits ONE deterministic projection (projections/laws-index.json,
+seeded registries, emits ONE deterministic projection (canon/laws-index.json,
 stable sort by law id, canonical JSON, NFC, LF) plus canon/ssot.lock (leaf digests only,
 digest-dag layer 1, own digest DETACHED in canon/ssot.lock.sha256 per PAA-006).
 
@@ -101,7 +101,7 @@ REGISTRY_COMPONENTS = {
     "providers": "canon/providers.yaml",  # C1 registry home (closed the providers ledger exception)
 }
 LAWS_DIR = "canon/laws"
-PROJECTION_PATH = "projections/laws-index.json"
+PROJECTION_PATH = "canon/laws-index.json"
 LOCK_PATH = "canon/ssot.lock"
 LOCK_SIDECAR_PATH = "canon/ssot.lock.sha256"
 

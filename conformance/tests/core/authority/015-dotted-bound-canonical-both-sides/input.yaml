@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: t-dotted-bound-canonical-both-sides
+permits:
+  fs: { read: ["./examples/fixtures/kpis.csv"] }
+  tools: ["nika:read"]
+inputs:
+  sheet: { type: string, default: "./examples/fixtures/kpis.csv" }
+tasks:
+  load:
+    invoke:
+      tool: nika:read
+      args: { path: "${{ inputs.sheet }}" }

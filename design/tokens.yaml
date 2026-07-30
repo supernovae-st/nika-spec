@@ -223,10 +223,10 @@ card_identity:
       condition: { hue: status.retrying,      shape: [] }
       event:     { hue: verbs.invoke.text,    shape: [] }
       duration:  { hue: status.muted,         shape: [tabular] }
-      # `inherit`, pas un alias : le texte brut porte l'ENCRE DE LA SURFACE.
-      # La première version l'aliasait sur accent_bright — un bleu — là où le
-      # canvas met var(--nk-fg). Une valeur en texte n'a pas de couleur propre ;
-      # elle a celle de la carte qui la contient, et c'est l'hôte qui la donne.
+      # `inherit`, not an alias: the plain text carries the SURFACE INK.
+      # The first version aliased it to accent_bright — a blue — where the
+      # canvas sets var(--nk-fg). A text value owns no colour of its own;
+      # it takes the card's, and the host provides it.
       text:      { hue: inherit,              shape: [plain] }
     # THE REST — every argument that is NOT the essence. It recedes rather than
     # disappears: the card says « there is more here » without competing.
@@ -341,10 +341,10 @@ card_identity:
       # not invent a second convention
       classes: [nc-model]
       # « IL Y EN A D'AUTRES » · DESSINÉ, jamais un content:. Un glyphe posé par
-      # CSS n'est ni sélectionnable, ni traduit, ni annoncé de façon fiable — et
-      # le gate de contenu CSS de nika.sh l'a refusé, à raison. Geist et shadcn
-      # dessinent leur chevron en SVG pour la même raison. Une flèche vectorielle
-      # reste nette à toute taille et disparaît proprement en forced-colors.
+      # CSS content is neither selectable, nor translated, nor reliably
+      # announced — and nika.sh's CSS-content gate refused it, rightly. Geist
+      # and shadcn draw their chevron in SVG for the same reason. A vector
+      # arrow stays sharp at any size and disappears cleanly in forced-colors.
       indicator:
         w_px: 7
         h_px: 4

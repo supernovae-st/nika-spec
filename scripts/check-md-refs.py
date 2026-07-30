@@ -28,6 +28,11 @@ SURFACES = sorted(
     [
         *HERE.glob("*.md"),
         *(HERE / "governance").glob("*.md"),
+        # The corpus prose teaches paths too — eleven dead `showcase/`
+        # links survived the flatten because nothing governed these
+        # (census 2026-07-29 · the gate follows the fix, same push).
+        *(HERE / "examples").glob("*.md"),
+        *(HERE / "templates").glob("*.md"),
     ]
 )
 

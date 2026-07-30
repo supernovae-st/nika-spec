@@ -120,3 +120,26 @@ The **envelope** is the header contract (`nika: v1` + `workflow:` ·
 · extract modes · builtins) versions independently. The **pack** is the
 versioned examples+templates bundle every engine embeds
 (`examples/manifest.yaml` · hash-pinned).
+
+## catalog · registry · the law tables
+
+Three storage words, three objects — never interchangeable:
+
+- **the catalog** — the engine's built-in capability pages
+  (`nika catalog` · the `nika-catalog` crate): providers · models ·
+  pricing · MCP servers · builtins. Vendored upstream DATA, every table
+  pinned with provenance (`source` · `as_of` · sha256) and refreshed at
+  maintenance time, never at runtime.
+- **the registry** — the public artifact market (`nika-registry`): what
+  people publish and install, every entry re-proven in CI (hash ·
+  oracle · engine cert). The bare word « registry » names THIS and
+  nothing else.
+- **the law tables** — this repo's `canon/` roots (laws · builtins ·
+  templates · diagnostics · tombstones), the authored sources
+  `ssot-compiler` compiles into `canon.yaml`. In prose call them « the
+  law tables » — never « registers » or « registries », which would
+  collide with the market above.
+
+Direction of travel (ruled 2026-07-29): catalog rows become first-party
+registry artifacts — the in-binary catalog is a vendored projection of
+the market's shelf, one certificate model for both.

@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "additionalProperties: true explicitly reopens a declared-properties level for binding — the undeclared sibling read that 014 refuses is legal here (04 §Static binding validation · strict-binding lock 2026-07-30)."
+}

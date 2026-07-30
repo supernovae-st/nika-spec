@@ -36,7 +36,7 @@ from day 1 so anyone can reproduce or extend it.
 |---|---|---|
 | `id` | string | stable slug |
 | `intent` | string | the natural-language ask (what a real user types) |
-| `difficulty` | t1-t4 | mirrors the showcase tiers |
+| `difficulty` | t1-t4 | legacy rank labels (the tier taxonomy died with the flatten — kept as ordinal difficulty only) |
 | `expect.verbs` | string[] | verbs the solution must use |
 | `expect.min_tasks` / `max_tasks` | int | DAG size bounds |
 | `expect.constructs` | string[] | required constructs (schema · for_each · with · after · retry · permits …) |

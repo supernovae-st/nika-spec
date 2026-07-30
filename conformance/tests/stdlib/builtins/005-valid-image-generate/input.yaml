@@ -4,6 +4,7 @@ workflow:
   id: og-hero
 permits:
   tools: ["nika:image_generate"]
+  fs: { write: ["./assets/og"] }
 tasks:
   hero:
     invoke:

@@ -1,0 +1,4 @@
+tag	gate	fixture_or_out_of_scope
+SAF-T1001	F-O1 (NEP-0004 · the permit-parameterization taint)	saf-t1001-untrusted-host-escape
+SAF-T2004	F-O7 (NEP-0006 · the data-as-code sink)	saf-t2004-fetch-pickle-no-door
+SAF-T3009	F-O7 composition (decode-then-trim)	saf-t3009-encoded-extension-refused

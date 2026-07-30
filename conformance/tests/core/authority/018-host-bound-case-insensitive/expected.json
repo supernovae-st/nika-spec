@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "Hosts are case-insensitive: a bound authored `API.Example.com` covers its canonical lowercase host, exactly as the engine's host matcher reads it (refuter CX4 · 2026-07-29 — routing hosts through the path matcher refused the author's own bound)."
+}

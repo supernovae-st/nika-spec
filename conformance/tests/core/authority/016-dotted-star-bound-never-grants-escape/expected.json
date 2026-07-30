@@ -1,0 +1,5 @@
+{
+  "valid": false,
+  "errors": [ { "code": "NIKA-AUTH-008", "category": "security_error" } ],
+  "note": "Normalizing the bound must never GRANT what the author did not write: `./**` normalizes to `**`, and without the escape guard a leading-`..` canonical value read as in-bound (refuter CX1 · 2026-07-29). A lexical escape can never re-enter a rooted bound."
+}

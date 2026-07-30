@@ -38,7 +38,7 @@ tasks:
   unit:
     timeout: "1m"
     exec:
-      command: ["python3", "-m", "unittest", "discover", "-s", "project_os", "-p", "test_*.py"]
+      command: ["python3", "-m", "unittest", "discover", "-s", "project", "-t", ".", "-p", "test_*.py"]
       cwd: "."
       capture: structured
 

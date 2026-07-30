@@ -5,10 +5,13 @@ workflow:
 permits:
   tools: ["nika:notify"]
   exec: ["./build.sh"]
+  net: { http: ["hooks.example.com"] }
 tasks:
   build:
     exec: { command: ["./build.sh"] }
   notify:
     after: { build: terminal }
     when: true
-    invoke: { tool: "nika:notify", args: { message: "done either way" } }
+    invoke:
+      tool: "nika:notify"
+      args: { channel: webhook, target: "https://hooks.example.com/build", message: "done either way" }

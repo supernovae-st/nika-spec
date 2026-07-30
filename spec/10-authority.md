@@ -68,10 +68,11 @@ policy:
   prefer:                              # SOFT · recorded, never judged (v1)
     providers: [ollama]
   optimize: cost                       # SOFT · recorded, never judged (v1)
+  endorsement: solo                    # HARD · the named solo mode (NEP-0014)
 ```
 
 **Grammar (normative · closed at every level).** `policy:` is a mapping
-of up to six **families**. Unknown families and unknown rule names are
+of up to seven **families**. Unknown families and unknown rule names are
 refusals (`NIKA-PARSE`-class): the rule set is closed per minor —
 patterns are named after the incidents they prevent, raw temporal logic
 is never exposed.
@@ -82,6 +83,7 @@ is never exposed.
 | `forbid:` | **hard** · judged at check | `exec_after: [<effect-class>…]` |
 | `allow:` | **hard** · judged at check | `providers: [<provider>…]` |
 | `limits:` | **hard** · judged at check | `max_tasks: <positive integer>` |
+| `endorsement:` | **hard** · judged at check | `solo` — the NAMED solo mode: exactly one endorser (one human gate), its fresh authorization bound to the action and logged as such · a gate under no declared mode refuses (`NIKA-SEC-013` · fail-closed) · a declared solo with more than one gate refuses as the declaration lying (NEP-0014 · F-P23) |
 | `prefer:` | **soft** · parsed, recorded, NOT judged | `providers: [<provider>…]` (ordered) |
 | `optimize:` | **soft** · parsed, recorded, NOT judged | `cost` \| `latency` \| `quality` |
 
@@ -111,9 +113,26 @@ graph — the same derived graph every judge reads, [03](./03-dag.md))** ·
   as the permits argv rule: judge the shape you can actually verify).
 - `limits.max_tasks: N` — the workflow declares at most N tasks.
 
+**The approval is a bounded ticket (normative · NEP-0013)** · the
+consent the pause collects is not a bare answer: it is a **ticket**
+· (1) **content-bound** — the ticket binds the hash of the canonical
+rendering of what is shown (the message · the gated action's identity ·
+the effect classes in play · never an LLM summary); an answer whose
+resolved content hash differs halts (`approval.content_mismatch` at the
+receipt) · (2) **scoped and TTL'd** — this run × this step × this
+content hash, with a bounded TTL; an expired ticket re-prompts, a
+cross-run replay is refused · (3) **rate-limited** — at most N=5
+approvals per run; identical prompts dedup (the same content hash rides
+one ticket, attested `dedup`); a heterogeneous batch is refused at
+check (one prompt gates one action of one class); the N+1th prompt is a
+typed HALT (`NIKA-SEC-010` · `security_error`), never a queue · (4) **attested** — every
+decision emits a hash-chained `approval_decided` event (ticket digest ·
+shown hash · decision · remaining TTL · scope), and the digests rise to
+the receipt · (5) **revocable before execution only** — never after:
+the receipt shows what executed under which authority.
+
 **A violation is `NIKA-POLICY-001`** (`security_error` · check-time ·
-before any token). The diagnostic names the rule, the offending task,
-and the witness — for order rules, the path (`fetch_page → summarize →
+before any token). The diagnostic names the rule, the offending task,and the witness — for order rules, the path (`fetch_page → summarize →
 deploy`); for gate rules, the missing ancestor; for provider rules, the
 offending literal. Policy violations are never fed back to an `agent:`
 model: organizational law is not negotiation material.

@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: Apache-2.0
+# The boundary twin of 014 (04 §Static binding validation · operator lock
+# 2026-07-30) · same workflow, same undeclared-sibling read — but the level
+# EXPLICITLY opens extras with additionalProperties: true, so the read is
+# legal again. Proves the strict refusal is precise, never blanket.
+nika: v1
+workflow:
+  id: schema-sibling-opted-open
+permits:
+  exec: ["report"]
+tasks:
+  extract:
+    infer:
+      prompt: "Extract entities"
+      schema:
+        type: object
+        required: [entities]
+        additionalProperties: true
+        properties:
+          entities:
+            type: array
+            items: { type: string }
+          meta:
+            type: object
+  report:
+    with:
+      extract_maybe_extra: ${{ tasks.extract.output.maybe_extra }}
+    exec:
+      command: ["report", "${{ with.extract_maybe_extra }}"]

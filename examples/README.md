@@ -1,51 +1,88 @@
 # Examples · canonical Nika workflows
 
-> The teaching corpus. **`01`–`07` is the path**: seven files, in order,
-> covering the complete v0.1 construct space — an LLM (or a human)
-> few-shot-prompted on these has seen every load-bearing pattern.
-> Real jobs live in [`showcase/`](showcase/) (T1→T4); instantiable
-> skeletons live in [`../templates/`](../templates/).
+> The teaching corpus. **The numbered files are the path** — read in order,
+> each introduces constructs the previous ones don't, and
+> `nika examples teaches` prints the live coverage, gaps included.
+> An author who reads two of them writes their next workflow green.
+> Real jobs live beside them ([`README-jobs.md`](README-jobs.md));
+> instantiable skeletons live in [`../templates/`](../templates/).
+>
+> The contract every file here honours is written down in
+> [`CONVENTIONS.md`](CONVENTIONS.md). Read that before you add or edit one.
 
 ---
 
-## The path · 01 → 07
+## The path
 
-```
-examples/
-├── 01-hello.nika.yaml             envelope · 1 infer task · local model (mock twin)
-├── 02-parallel-fanout.nika.yaml   DAG fan-out + merge · with value edges
-├── 03-exec-pipeline.nika.yaml     exec · capture:structured · timeout · when · on_finally
-├── 04-schema-retry.nika.yaml      infer schema (JSON Schema) · retry · typed vars
-├── 05-fetch-chain.nika.yaml       invoke nika:fetch · output: jq · on_error recover
-├── 06-code-review.nika.yaml       agent loop · default-deny tools · max_turns · nika:done
-└── 07-for-each-locales.nika.yaml  for_each · max_parallel · fail_fast · item/index
-```
+| File | Theme | Introduces |
+|---|---|---|
+| [`01-hello`](01-hello.nika.yaml) | the complete minimum | `nika: v1` · `workflow.id` · `model:` · `permits: {}` · `infer:` · `max_tokens:` · `outputs:` |
+| [`02-parallel-fanout`](02-parallel-fanout.nika.yaml) | the DAG | implicit parallelism · `const:` · `with:` value edges · `${{ tasks.<id>.output }}` |
+| [`03-exec-pipeline`](03-exec-pipeline.nika.yaml) | shells and gates | `exec:` (`shell:` + `command:`) · `capture: structured` · `timeout:` · `run.clock` · `when:` · `after:` control edges · `on_finally:` |
+| [`04-schema-retry`](04-schema-retry.nika.yaml) | typed calls | typed `inputs:` + `default:` · `infer.schema:` · `additionalProperties: false` · `retry:` · the long `outputs:` form |
+| [`05-fetch-chain`](05-fetch-chain.nika.yaml) | reaching outside | `invoke:` · `nika:fetch` · `permits.tools` + `permits.net.http` · `output:` jq bindings · `on_error: recover:` |
+| [`06-code-review`](06-code-review.nika.yaml) | the agent loop | `agent:` · default-deny `tools:` · `max_turns:` + `max_tokens_total:` · `nika:done` · `permits.fs` inside the loop |
+| [`07-for-each-locales`](07-for-each-locales.nika.yaml) | mapping | `for_each:` · `${{ item }}` / `${{ index }}` · `max_parallel:` · `fail_fast:` · array-preserving recovery |
+| [`08-config-values`](08-config-values.nika.yaml) | the value authorities | `config:` — typed, defaulted, and unreachable from the caller (measured: `--var region=…` refuses) |
+| [`09-returns-typed-door`](09-returns-typed-door.nika.yaml) | typed task outputs | `returns:` — the declared shape deep references are proven against |
+| [`10-compose-pipeline`](10-compose-pipeline.nika.yaml) | composition · the caller | `workflow:` under `invoke:` — one workflow calls another, statically resolved |
+| [`10-compose-child`](10-compose-child.nika.yaml) | composition · the callee | the child's contract — typed `inputs:` in, typed `outputs:` out |
+| [`11-declassify-the-door`](11-declassify-the-door.nika.yaml) | the taint's one door | `declassify:` (`from:` · `to: trusted` · `because:`) — defers the check to the run, never lifts the boundary |
+| [`12-failure-routing`](12-failure-routing.nika.yaml) | routing failure | the `failure` edge predicate — a strictly-failure arm that settles `⊘` on green runs |
 
-Together: all 4 verbs · `with:`/`after:` edges · `when` · `for_each` (+
-`max_parallel` + `fail_fast`) · `retry` · `on_error` · `on_finally` ·
-`with` · `output:` jq bindings · `schema:` structured output · the 5
-namespaces · `${{ item }}`/`${{ index }}` loop locals · tool refs.
-The path is **complete** — new workflows join `showcase/` (real jobs)
-or `../templates/` (skeletons), never this list.
+All **4 verbs** appear across the path; everything callable is a tool under
+`invoke:`. The per-construct index is derived from the files, never
+hand-listed — `nika examples teaches` speaks it from the binary.
+
+### What the path deliberately leaves out
+
+Of the [value namespaces](../spec/04-variables.md) the path covers every one
+but `secrets:`, plus the `item`/`index` loop locals.
+
+`secrets:` and its `egress:` sanctions are **not** here on purpose: a secret
+needs a real credential and a real host, which would cost every file in this
+directory its zero-setup run. That subject belongs to a job with stakes —
+see [`support-triage`](support-triage.nika.yaml) for
+the reference shape (a secret that carries a webhook URL, an `egress:` that
+sanctions the one send, and the `permits.net.http` that grants the reach —
+you need both, and `CONVENTIONS.md` §3 explains why).
+
+## Why some files name a real model and others do not
+
+- **`ollama/qwen3.5:4b`** where the model IS the lesson — 01 (a real local
+  call) and 06 (the loop needs a tool-calling model). Both say so on a
+  `Needs ·` line.
+- **`mock/echo`** where the SHAPE is the lesson — the rest of the path. The
+  twin echoes each prompt back, which makes the graph visible in the output:
+  you can read the three fan-out answers arriving inside the merge. Zero
+  setup, deterministic, and `--model ollama/qwen3.5:4b` swaps a real model in
+  without touching the file.
+
+Cloud providers appear only as swap hints, never as a default.
 
 ## Every file promises
 
-- `# SPDX-License-Identifier: Apache-2.0` header
-- a top comment teaching WHAT it demonstrates and WHY it is shaped so
-- a true `# Run ·` line — and a `# Needs ·` line whenever the file
-  expects something from YOUR world (a file, a key, a live endpoint)
-- v0.1 envelope (`nika: v1`) · stdlib v0.1 only · conformance-clean
-  (one verb per task · snake_case ids · resolvable deps · no phantom tools)
-- local-first models (`ollama/…` · `mock/echo` for the dry twin) — cloud
-  providers appear as per-job swap hints, never as the default
+- `# SPDX-License-Identifier: Apache-2.0` + the `yaml-language-server` schema line
+- a header that states the job, then `Demonstrates ·`, then `Needs ·`
+  (**absent means: needs nothing**), then the exact `Run ·` command
+- `nika check <file> --native-strict` → rc=0, **zero findings and zero hints**
+- it has actually been RUN, and its `outputs:` parsed
+- the tightest `permits:` block that covers the body — never widened to
+  silence a message
+- every comment true: measured, or citing a spec line
 
 ## Run them
 
 ```bash
-nika run examples/01-hello.nika.yaml                  # with the reference engine
-nika run examples/01-hello.nika.yaml --model mock/echo  # zero-setup dry twin
+nika run examples/01-hello.nika.yaml                     # as written
+nika run examples/01-hello.nika.yaml --model mock/echo   # zero-setup dry twin
+nika run examples/01-hello.nika.yaml --output json       # the typed outputs, as one JSON object
 ```
+
+Run from the **repo root**: paths inside a workflow resolve against your
+working directory, not the file's location. `06` reads a fixture from
+[`fixtures/`](fixtures/) and expects exactly that.
 
 ---
 
-🦋 *The 7-step path is complete and canonical for v0.1.0 GA · real jobs → `showcase/` · skeletons → `../templates/`.*
+🦋 *The numbered path is canonical · real jobs → [`README-jobs.md`](README-jobs.md) · skeletons → `../templates/`.*

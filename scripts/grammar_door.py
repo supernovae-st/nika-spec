@@ -277,6 +277,41 @@ def _fold_predicates(lines: list[str]) -> list[str]:
     return out
 
 
+def downcast_w106(text: str, name: str = "<inline>") -> str:
+    """ratified → the RELEASED 0.106 dialect. ONE transform: the policy
+    rule set is closed per minor (spec 10 §policy) and v0.106.1 predates
+    the NEP-0014 endorsement family, so `policy.endorsement` is dropped
+    from the baked fence — the prose may announce the mode, but the yaml
+    a reader copies must run on the binary they installed. Everything
+    else the ratified grammar ships already parses on v0.106.1. If the
+    drop empties the policy block, the `policy:` header goes with it."""
+    lines = text.splitlines()
+    drop: set[int] = set()
+    for key, _rest, start, end in _block_ranges(lines):
+        if key != "policy":
+            continue
+        i = start + 1
+        while i < end:
+            if re.match(r"^ {2}endorsement\s*:", lines[i]):
+                drop.add(i)
+                j = i + 1
+                while j < end and lines[j].strip() \
+                        and (len(lines[j]) - len(lines[j].lstrip())) > 2:
+                    drop.add(j)
+                    j += 1
+                i = j
+            else:
+                i += 1
+        children = {i for i in range(start + 1, end) if lines[i].strip()
+                    and not lines[i].lstrip().startswith("#")}
+        if children and children <= drop:
+            for i in range(start, end):
+                drop.add(i)
+    if not drop:
+        return text
+    return "\n".join(l for i, l in enumerate(lines) if i not in drop).rstrip() + "\n"
+
+
 def downcast_w105(text: str, name: str = "<inline>") -> str:
     """ratified → the RELEASED 0.105 dialect. Two transforms + STOP-list."""
     lines = text.splitlines()

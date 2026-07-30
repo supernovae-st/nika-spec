@@ -24,7 +24,7 @@ SPDX-FileCopyrightText = "2026 SuperNovae Studio <nika@supernovae.studio>"
 SPDX-License-Identifier = "Apache-2.0"
 
 [[annotations]]
-path = ["examples/README.md", "examples/showcase/README.md"]
+path = ["examples/README.md", "examples/README-jobs.md"]
 precedence = "override"
 SPDX-FileCopyrightText = "2026 SuperNovae Studio <nika@supernovae.studio>"
 SPDX-License-Identifier = "Apache-2.0"

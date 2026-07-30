@@ -1437,6 +1437,22 @@ diagnostics:
       mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
       is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
       span obligation not stated by the source → span_required false.'
+  - id: NIKA-INFER-003
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: INFER
+    plane: run
+    condition: 'the provider reported no token usage for a priced model — the ledger cannot bill the call honestly (fail-closed · R3-F1)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: true
+    teaching: 'the call happened and the meter is blind — do not retry into a doubled bill: name the provider path that dropped the usage report (a priced model MUST report its tokens, or the run reads free what cost real money).'
+    notes: 'r3-f1 (2026-07-29 · the adversarial audit''s usage-absence gate) · category: validation_error · transient: false (canon.yaml verbatim) · minted engine-side first (nika aa669fd2e) and hoisted to the SSOT · law_ids empty until the freeze batch.'
   - id: NIKA-EXEC-001
     status: reserved
     owner: spec
@@ -1562,6 +1578,22 @@ diagnostics:
       mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
       is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
       span obligation not stated by the source → span_required false.'
+  - id: NIKA-AGENT-005
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: AGENT
+    plane: run
+    condition: 'the provider reported no token usage for a priced model — every budget and ledger reads the turn as free, so the loop fails closed (R3-F1 · the usage-absence gate)'
+    outcome_class: failure
+    cause: budget_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/budget_error.schema.json
+    span_required: true
+    teaching: 'NIKA-INFER-003 one scale up: the agent loop''s turn reads free what the budget must count — fix the provider''s usage report, never stretch the budget to absorb the unmetered turn.'
+    notes: 'r3-f1 (2026-07-29 · the adversarial audit''s usage-absence gate) · category: budget_error · transient: false (canon.yaml verbatim) · minted engine-side first (nika aa669fd2e) and hoisted to the SSOT · law_ids empty until the freeze batch.'
   - id: NIKA-MCP-001
     status: reserved
     owner: spec
@@ -1908,6 +1940,39 @@ diagnostics:
       the F-O7 spec lane · the slot the F-O1 analysis confirmed free (001-007 + 009 taken) · the engine emission
       lands with the classifier flip (F-O7 engine lane) · the run-time twin stays NIKA-SEC-004 (one runtime
       refusal voice · defense in depth).'
+  - id: NIKA-SEC-010
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0331
+    introduced_in: C1
+    namespace: SEC
+    plane: unclassified
+    condition: 'the approval-capability law is violated · a rate-limited approval burst (the N+1th distinct mint of a run) · an approval whose resolved content hash differs from the shown hash (content_mismatch) · a ticket replayed across runs or steps (scope_mismatch) · or the static heterogeneous-batch refusal (one prompt unleashing two or more effect classes) — the 6th invariant (NEP-0013 · F-P4)'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: false
+    teaching: 'approval is a bounded capability, never ambient · slow the burst down and declare the batched gate at the contract (never a queue) · answer only what was shown (the hash binds the rendered content) · a ticket lives for its run, its step, its hash — nothing else.'
+    notes: 'nep-0013 (2026-07-24 · lane 2026-07-29) · category: security_error · transient: false (canon.yaml verbatim) · minted by the F-P4 follow-up · the runtime refusals (rate_limited · content_mismatch · scope_mismatch) and the static batch refusal speak it (engine #744) · law 3 of the approval ticket.'
+  - id: NIKA-SEC-011
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: SEC
+    plane: run
+    condition: 'preview-commit divergence — the commit digest recomputed at the sink over the exact bytes about to fire differs from the preview digest computed at resolution (one bit of rendered argv · a permuted context field · a mutated tool argument) · the step refuses fail-closed and the receipt carries divergence:{preview, commit} — judged = executed at the action scale (NEP-0015 · F-P6)'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: true
+    teaching: 'the request changed between judgment and execution — re-run from a fresh resolution · if a hook or a test mutated the scope, the mutation is the bug · the bytes the executor fires are the bytes the preview judged, never a neighbor.'
+    notes: 'nep-0015 (2026-07-29) · category: security_error · transient: false (canon.yaml verbatim) · minted by the F-P6 spec lane · the engine emission lands with the preview-commit lane (feat/f-p6-preview-commit) · law_ids empty until the freeze batch names the canon law · SecureClaw arXiv:2606.09549 transposed.'
   - id: NIKA-SEC-009
     status: reserved
     owner: spec
@@ -1943,6 +2008,63 @@ diagnostics:
       reserved, not active: the executable LAW row lands when the canon mints
       the SEC law family · the engine projection names the witness task and
       anchors its span → span_required true.'
+  - id: NIKA-SEC-012
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: SEC
+    plane: check
+    condition: 'unordered shared writes — two tasks incomparable in the DAG closure
+      whose literal nika:write/nika:edit paths collide with no ordering edge
+      (after: · with:) to serialize them, or a for_each fan writing one constant
+      path · parallelism is safe exactly where the writes are provably disjoint
+      (NEP-0014 law 1 · F-P15)'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: true
+    teaching: 'parallelism is safe exactly where the writes are provably disjoint ·
+      serialize the colliding writers with an ordering edge (after: · with:) or
+      make the literal paths disjoint · a for_each fan writing one constant path
+      derives the path from the item instead (NEP-0014 law 1).'
+    notes: 'nep-0014 (2026-07-29) · category: security_error · transient: false
+      (canon.yaml verbatim) · minted by the lot-3 thin-laws lane (F-P15) ·
+      law_ids empty until the freeze batch names the canon law · the lane
+      edited the generated canon.yaml directly (ba2754c) — this row restores
+      the source so the projection regenerates (SSOT-1 §12).'
+  - id: NIKA-SEC-013
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: SEC
+    plane: check
+    condition: 'the endorsement mode law — a human gate (invoke: nika:prompt)
+      declared under a policy: block that names no endorsement mode refuses
+      fail-closed (endorsement.undeclared_mode · F-F5 · zero implicit escape),
+      and endorsement: solo carried by a workflow with more than one gate
+      refuses as the declaration lying (endorsement.solo_count · exactly one
+      endorser) (NEP-0014 · F-P23)'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: true
+    teaching: 'name the endorsement mode on the policy: block that carries a
+      human gate — endorsement: solo means exactly one endorser: one gate, its
+      fresh authorization bound to the action and logged as such · an
+      undeclared mode refuses fail-closed · solo with a second gate is the
+      declaration lying: drop a gate or declare a mode that admits it
+      (NEP-0014 · F-P23 · 10-authority §endorsement).'
+    notes: 'nep-0014 (2026-07-29) · category: security_error · transient: false
+      (canon.yaml verbatim) · minted by the lot-3 thin-laws lane (F-P23) ·
+      law_ids empty until the freeze batch names the canon law · sister row of
+      NIKA-SEC-012 — same half-shipped lane (ba2754c edited the generated
+      projection), same restoration (SSOT-1 §12).'
   - id: NIKA-TIMEOUT-001
     status: reserved
     owner: spec

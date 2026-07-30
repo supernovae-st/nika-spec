@@ -1,0 +1,48 @@
+# Adequacy by mutation · the selftests must be able to LOSE.
+#
+# The conformance gate proves fixtures against the oracle on every push;
+# THIS proves the oracle's own selftests are not decorative: each judge
+# module goes permissive (one minimal shadow) in a throwaway detached
+# worktree and its selftest must DIE — a survivor exits non-zero, named
+# (scripts/mutation-adequacy.py · same family as the type-corpus --mutate
+# step, generalized to all ten *_core selftests + the redteam leg).
+# Weekly, not per-push: adequacy rots with EDITS to selftests, not with
+# time — the cron is a backstop, workflow_dispatch the on-demand door.
+#
+# Security note: schedule/dispatch triggers only · fixed commands · zero
+# event-data interpolation anywhere · the prover reads repo files and
+# mutates a throwaway git worktree of HEAD exclusively · no
+# user-controlled strings reach the shell.
+
+name: Adequacy
+
+on:
+  schedule:
+    - cron: '43 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mutation-adequacy:
+    name: mutation adequacy · every selftest dies with its judge
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Install runner deps
+        run: pip install --require-hashes -r .github/requirements.txt
+
+      # jq mirrors the conformance gate: the redteam probe drives the full
+      # reference pipeline, whose jq-expression compile check leans on it.
+      - name: Ensure jq (workflow jq-expression compile check)
+        run: jq --version || sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Every selftest dies when its judge goes permissive
+        run: python scripts/mutation-adequacy.py
