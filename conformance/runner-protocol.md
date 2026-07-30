@@ -206,6 +206,24 @@ on **stdout** — `{"valid": bool, "errors": [{"code"|"namespace",
 "category", "detail"}]}` (the shape above). The process exit code is
 free — the JSON is the verdict. An engine whose native output differs
 wraps itself in a small adapter script (the Bowtie harness pattern).
+
+### Tier selection (the T0 dry-run contract · `--tier`)
+
+A fixture's `expected.json` MAY declare `"tier": "<name>"`; the runner
+flag `--tier <name>` runs exactly that labeled subset (unlabeled
+fixtures are skipped, never failed):
+
+```bash
+python3 conformance/runner.py run conformance/tests/core --tier t0
+```
+
+The `t0` tier is the dry-run subset of the **weekend re-implementation
+rule** (the golden rule a third party must hold before any freeze:
+re-implement the checker's core from the spec and the fixtures alone,
+in one weekend). The subset is mechanical by construction — parse +
+envelope (core/envelope 001-008) · the absent-permits law
+(core/authority 001-006) · the error taxonomy for that scope
+(core/errors 001-006) · the verb shape gates (verbs-shape 005-006).
 A missing command, a timeout, or a non-JSON reply fails LOUD as a
 `harness_error` — never a silent pass.
 

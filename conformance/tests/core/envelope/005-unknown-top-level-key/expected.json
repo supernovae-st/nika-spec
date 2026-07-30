@@ -1,4 +1,5 @@
 {
+  "tier": "t0",
   "valid": false,
   "mode": "strict",
   "errors": [

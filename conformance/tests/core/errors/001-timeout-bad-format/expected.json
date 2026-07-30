@@ -1,4 +1,5 @@
 {
+  "tier": "t0",
   "valid": false,
   "errors": [
     {
@@ -6,5 +7,5 @@
       "category": "validation_error"
     }
   ],
-  "note": "timeout is a Go-duration string \u00b7 'w' is not a valid unit (use 'h'/compound)."
+  "note": "timeout is a Go-duration string · 'w' is not a valid unit (use 'h'/compound)."
 }
