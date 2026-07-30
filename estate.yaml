@@ -62,7 +62,7 @@ files:
   evidence: "hand-set at the v0.1.0-draft spec commit — no lane advances it; the derivations' INPUT (showcase-projector.py reads it as pack_version)"
 - path: "canon.yaml"
   class: generated
-  sha256: 16b5bcb76de75ecb31018f836349c9fa9cb3ec10558a368e3b9ccbdccd786283
+  sha256: fdaaea3c4846f26bdc46d09bee0042185d56c169426edea8600858587d19e34d
   evidence: "its own header: 'GENERATED · canon.yaml is a generated projection since the C0 flip — manual edits of a generated surface make CI red (ssot-compiler --check-canon · rc=5)' + a detached body-sha256 self-hash per PAA-006"
   derivation:
     tool: "python3 scripts/ssot-compiler.py --emit-canon (ssot-compiler 0.2.0-sandbox · SSOT-1 §21-23, the canon flip)"
@@ -171,7 +171,7 @@ patterns:
 - glob: "canon/**"
   class: authored
   match_count: 14
-  aggregate_sha256: 523b339c43536a08dd1d223ca3cf71fc768f580fae449e1871abf17f4350e9a9
+  aggregate_sha256: 99f7e3adfab9aec31fa1806a0d7573e860ead66047bc55477d091fd30b03a746
   evidence: "the registries humans edit (surface · builtins · features · conformance · grammar · types · providers · migrations · projections · tombstones · snippets · templates · diagnostics) + canon/EXCEPTIONS.md (the §18 exception ledger) — the SOURCES the compiler seals; ssot.lock + sidecar excepted in files:"
 - glob: "conformance/tests/runtime/gates/**"
   class: generated
@@ -258,7 +258,7 @@ patterns:
 - glob: "spec/**"
   class: authored
   match_count: 18
-  aggregate_sha256: d3297d11b642aa01909651df75f69934b728cac5d7b5bccabc7f68630085fbea
+  aggregate_sha256: ed7ec5f65779c6ea6178360253ea70e3ccb2c36de79353fa0592a65e376904d3
   evidence: "the normative prose law (00-overview → 16-projections) — THE spec; no generation markers"
   note: "spec/00-04 · 06-08 carry tool-maintained '<!-- canon:KEY -->N<!-- /canon -->' count markers inside the authored prose (canon-projectors.py TARGET 0 · --check gated) — the class stays authored"
 - glob: "stdlib/**"
@@ -290,7 +290,7 @@ patterns:
 - glob: "schemas/**"
   class: authored
   match_count: 4
-  aggregate_sha256: 1bf03ea3de90888bcadc296300f6a23587c6445c3e4ad77e54a2aaf100014977
+  aggregate_sha256: a035999c9148e33768a0535180aec30e466d03547353d6ce83a5338c95bde27a
   evidence: "workflow.schema.json's own $comment: 'INTERIM hand-derived schema · prose spec is the single source of truth · regenerate + diff against engine nika-schema at GA' — authored today, generated at GA; law.schema.json + registries.schema.json are the sealed R2 design-pack contracts (consumed as-is, byte-identical per PROOFS.md §P0)"
 - glob: "scripts/**"
   class: authored
