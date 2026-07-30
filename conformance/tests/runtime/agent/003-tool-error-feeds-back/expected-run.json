@@ -1,0 +1,15 @@
+{
+ "workflow_state": "success",
+ "tasks": {
+  "loop": {
+   "status": "skipped",
+   "error_code": "NIKA-AGENT-001"
+  },
+  "reader": {
+   "status": "success",
+   "output": "mock(echo) · NIKA-AGENT-001"
+  }
+ },
+ "events_include": ["tool.invoked:loop"],
+ "note": "the failing nika:assert feeds back and the loop runs on to budget exhaustion — NIKA-AGENT-001, never the assert code, is the feed-back proof · tool.invoked:loop witnesses the failing call happened · on_error.skip preserves the error for the reader (05 §Fields). Measured at the door 2026-07-30."
+}

@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: Apache-2.0
+# Tool errors FEED BACK into the agent loop (the README's promised
+# contract, fixture landed 2026-07-30): nika:assert fails NON-securely on
+# turn 1 · the error feeds back, the loop CONTINUES and exhausts
+# max_turns — so the task's error is NIKA-AGENT-001 (budget), NEVER the
+# assert's own code. That final code IS the feed-back proof: a loop that
+# did not feed the error back would have died on turn 1 with the tool's
+# error. (The security_error half of the contract — a refusal that must
+# END the loop — stays unstageable with mock/echo: the mock cannot be
+# steered to synthesize an out-of-boundary argument deterministically ·
+# noted in the README.)
+nika: v1
+workflow:
+  id: rt-agent-tool-error-feeds-back
+model: mock/echo
+permits: { tools: ["nika:assert"] }
+tasks:
+  loop:
+    on_error: { skip: true }
+    agent:
+      prompt: "call nika:assert"
+      tools: ["nika:assert"]
+      max_turns: 2
+  reader:
+    with:
+      err: ${{ tasks.loop.error }}
+    when: ${{ with.err != null }}
+    infer: { prompt: "${{ with.err.code }}" }

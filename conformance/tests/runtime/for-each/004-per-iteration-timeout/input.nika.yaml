@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: Apache-2.0
+# The per-iteration timeout (03 §for_each · the README's promised
+# contract, fixture landed 2026-07-30): `timeout:` binds EACH iteration ·
+# iteration 1 (sleep 0) settles inside it, iteration 2 (sleep 3) hits the
+# 1s ceiling and fails · on_error.skip keeps the workflow green and the
+# failed index becomes the NULL PLACEHOLDER in the zip-aligned output.
+nika: v1
+workflow:
+  id: rt-foreach-iter-timeout
+permits: { exec: ["sleep"] }
+const:
+  waits: ["0", "3"]
+tasks:
+  work:
+    for_each: ${{ const.waits }}
+    on_error: { skip: true }
+    timeout: 1s
+    exec: { command: ["sleep", "${{ item }}"] }

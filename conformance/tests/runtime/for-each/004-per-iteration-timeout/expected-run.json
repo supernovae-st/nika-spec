@@ -1,0 +1,10 @@
+{
+ "workflow_state": "success",
+ "tasks": {
+  "work": {
+   "status": "success",
+   "output": ["", null]
+  }
+ },
+ "note": "timeout: binds each ITERATION, not the collection · sleep 0 lands ('' · exec stdout), sleep 3 dies at the 1s ceiling and its index is the null placeholder (zip alignment) · on_error.skip keeps the workflow green. Measured at the door 2026-07-30."
+}
