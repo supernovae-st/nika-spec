@@ -295,7 +295,7 @@ patterns:
 - glob: "scripts/**"
   class: authored
   match_count: 22
-  aggregate_sha256: e567cf4dc6e37875523e390807fec5f30e90e70e0f662e51c917c33756f53512
+  aggregate_sha256: 395f2e0099eae5c1236ae8d410322682453b1071ae4496c631d3b0dfa57a153e
   evidence: "the compiler + projectors humans wrote (ssot-compiler · canon/showcase/llms/starters/authoring/design projectors · gen-gate-matrix · gen-type-corpus · grammar_door + selftest · check-md-refs) — the tools that WRITE the generated surfaces; estate.py excepted in files: (the self row)"
 - glob: "timeline/**"
   class: authored
@@ -320,7 +320,7 @@ patterns:
 - glob: ".github/**"
   class: authored
   match_count: 9
-  aggregate_sha256: 77b3314032b2eb70784490e9d84a4ddfa4eba53038f2a639d173de9447b4c9bb
+  aggregate_sha256: 873d03640e4ffb64c8937211f2f9a6167a9e6f8319bbd6346d30ff56458b7c40
   evidence: "6 hand-written SHA-pinned workflows (conformance · timeline · board · codeql · reuse · scorecard) + dependabot config — ZERO in-repo bot lanes: board.yml writes to the org Projects board, timeline.yml verifies read-only, nothing here rewrites tracked files; requirements.txt excepted in files:"
 - glob: "*"
   class: authored
