@@ -208,7 +208,7 @@ patterns:
 - glob: "conformance/tests/**"
   class: authored
   match_count: 531
-  aggregate_sha256: f9a03b24d263937d6222832b8937849aea0922f01118df237481f2f359f0cdd3
+  aggregate_sha256: 3cc2dd6fd69aa369be33385077ed5369f964c2e6e0f1413a72ac2c6efec71f1c
   evidence: "the executable law — the 5-tier fixture corpus (core · deep 001-022 · lints · runtime · stdlib): input + expected pairs written at spec-authoring time, consumed by conformance/runner.py; no generation markers"
 - glob: "conformance/.nika/**"
   class: testimonial
@@ -223,7 +223,7 @@ patterns:
 - glob: "conformance/**"
   class: authored
   match_count: 200
-  aggregate_sha256: b01385aee7485f7318919d7c09cb5e0b7459f01d8b5bac1367b269e88f41c054
+  aggregate_sha256: 23912c48434e62d1692497bc16406942fc355c3b513269aec39e84b175f74745
   evidence: "the 95-workflow corpus (envelope · variables · verbs · errors · dag · gates · types · yaml-profile · values · composition · decision-goldens frozen at authoring time and consumed by decision_core_selftest.py) + the Python cores/selftests/runner + README/FINDINGS/runner-protocol; type-corpus + coverage-matrix excepted in files:"
 - glob: "proofs/**"
   class: testimonial
@@ -248,7 +248,7 @@ patterns:
 - glob: "examples/**"
   class: authored
   match_count: 63
-  aggregate_sha256: 92c6d5aa7e262d1dde5595cb0b62f859099da6dc96518fac0de8c45dfe081d89
+  aggregate_sha256: f5b7eeea639ded2d5b223d3a33ae7f78e50d001eafd9a4187aa442f2489a7cf7
   evidence: "the ORIGINALS everything downstream copies (engine pack vendoring · docs/website projections) — 7 foundation + 26 showcase workflows, every one executed by the conformance gate ('examples/ — every shipped example executed as a conformance input'); manifest.yaml excepted in files:"
 - glob: "templates/**"
   class: authored
@@ -270,7 +270,7 @@ patterns:
 - glob: "governance/**"
   class: authored
   match_count: 21
-  aggregate_sha256: 12089aa4e7ab4d17e256de810e2d9a4be8b80f84821992e591442d8cd55367b3
+  aggregate_sha256: 738f2b1647b1f113bd6c32da313eada3eb35f980a872ec73197b8502f459c1fa
   evidence: "the NEP process + NEPs + certifications matrix — hand-written governance prose, link-integrity gated by scripts/check-md-refs.py"
 - glob: "adr/**"
   class: authored

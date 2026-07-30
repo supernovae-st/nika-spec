@@ -1,5 +1,10 @@
 {
   "valid": false,
-  "errors": [],
-  "note": "Both oracles refuse; the code pin is owed. The reference emits NIKA-VAR-003 (variable_error); the engine's strict-binding rung refuses codeless today ('maybe_extra is not in the declared schema'), so pinning NIKA-VAR-003 here would fail the fuller oracle for speaking without the article number — the pin lands when that rung gains its code (the codeless-rungs engine owe, tracked with the MODELS rung)."
+  "errors": [
+    {
+      "code": "NIKA-VAR-003",
+      "category": "variable_error"
+    }
+  ],
+  "note": "The producer declares properties [entities, meta] and never opens the level, so reading the undeclared sibling 'maybe_extra' is provably invalid (04 §Static binding validation rule 1 · the operator lock of 2026-07-30). The pin was empty while the engine's strict-binding rung refused CODELESS beside a coded NIKA-VAR-003 twin that still spoke the pre-lock 'additionalProperties: false' law — class B of runner-protocol.md. Closed 2026-07-30: the coded walk in analyze() adopted the locked law and carries the did-you-mean, and the check-side rung no longer repeats a reference it already refused — one law, one voice. Same code as its closed-level twin 012."
 }
