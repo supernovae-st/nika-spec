@@ -1437,6 +1437,22 @@ diagnostics:
       mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
       is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
       span obligation not stated by the source → span_required false.'
+  - id: NIKA-INFER-003
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: INFER
+    plane: run
+    condition: 'the provider reported no token usage for a priced model — the ledger cannot bill the call honestly (fail-closed · R3-F1)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: true
+    teaching: 'the call happened and the meter is blind — do not retry into a doubled bill: name the provider path that dropped the usage report (a priced model MUST report its tokens, or the run reads free what cost real money).'
+    notes: 'r3-f1 (2026-07-29 · the adversarial audit''s usage-absence gate) · category: validation_error · transient: false (canon.yaml verbatim) · minted engine-side first (nika aa669fd2e) and hoisted to the SSOT · law_ids empty until the freeze batch.'
   - id: NIKA-EXEC-001
     status: reserved
     owner: spec
@@ -1562,6 +1578,22 @@ diagnostics:
       mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
       is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
       span obligation not stated by the source → span_required false.'
+  - id: NIKA-AGENT-005
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: AGENT
+    plane: run
+    condition: 'the provider reported no token usage for a priced model — every budget and ledger reads the turn as free, so the loop fails closed (R3-F1 · the usage-absence gate)'
+    outcome_class: failure
+    cause: budget_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/budget_error.schema.json
+    span_required: true
+    teaching: 'NIKA-INFER-003 one scale up: the agent loop''s turn reads free what the budget must count — fix the provider''s usage report, never stretch the budget to absorb the unmetered turn.'
+    notes: 'r3-f1 (2026-07-29 · the adversarial audit''s usage-absence gate) · category: budget_error · transient: false (canon.yaml verbatim) · minted engine-side first (nika aa669fd2e) and hoisted to the SSOT · law_ids empty until the freeze batch.'
   - id: NIKA-MCP-001
     status: reserved
     owner: spec
