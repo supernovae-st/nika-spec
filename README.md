@@ -22,6 +22,8 @@ Sovereign · multi-provider · local-first.</strong></p>
 
 ---
 
+![The law in action: a conformance fixture declares Expected NIKA-SEC-009 in its header, nika check refuses the ungated lethal trifecta with the exact finding, and the human-gated twin passes clean · every verdict is the released engine's own](media/law-in-action.gif)
+
 ## What is Nika?
 
 Nika is a **language**. Not a framework, not a runtime, not a SaaS.
