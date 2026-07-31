@@ -31,9 +31,12 @@ How each one holds that promise:
   shells out, a literal recovery value stands in until you wire the real
   thing. Every one of those blocks says, in place, to delete it once the
   source is real — a rehearsal value left in production hides failures.
-- **the two gated skeletons pause, they do not fail.** `etl-state` and
-  `human-gated-ship` stop at a human decision (exit 4 · durable, not an
-  error) and print their own resume command.
+- **the two gated skeletons hold a real human decision.** `etl-state`
+  blocks (no `default:`): headless it PAUSES (exit 4 · durable, not an
+  error) and prints its own resume command. `human-gated-ship` fails
+  CLOSED instead — its `default: false` answers NO for an unattended run
+  (measured: rc=0, the act settles skipped) · delete that line and it
+  pauses like etl-state.
 
 ## Intent → template routing (deterministic)
 
@@ -88,16 +91,16 @@ nika new --from "watch a price and ping me" p.nika.yaml   # routes to the closes
 
 ## Two hints that are meant to stay
 
-Most hints are defects. Two, in these files, are the checker
-over-approximating, and the templates say so in place:
+Most hints are defects. Two, both in `etl-state`, are the checker
+over-approximating, and the template says so in place:
 
 - **`etl-state`** carries `[headless-prompt]` and `[inputs]`. The blocking
   gate is deliberate — adding the `default:` the hint suggests completes
   the lethal trifecta and lights `NIKA-SEC-009`.
-- **`fanout`** and **`api-upload-and-create`** carry `[NIKA-DRIFT-001]` on
-  an `fs.read` entry. The drift detector does not model a `nika:glob` walk
-  or a `multipart:` file part as a read; the runtime does. **Following that
-  hint deletes the entry and kills the run.**
+- **`fanout`** and **`api-upload-and-create`** used to carry
+  `[NIKA-DRIFT-001]` on an `fs.read` entry the detector could not model
+  (a `nika:glob` walk · a `multipart:` file part). The detector learned
+  both — measured on `nika-cli 0.107`, neither file prints a hint today.
 
 When a hint tells you to remove something, run the file before you believe it.
 
