@@ -62,7 +62,9 @@ Cloud providers appear only as swap hints, never as a default.
 
 ## Every file promises
 
+<!-- REUSE-IgnoreStart · prose QUOTING the header, not carrying one -->
 - `# SPDX-License-Identifier: Apache-2.0` + the `yaml-language-server` schema line
+<!-- REUSE-IgnoreEnd -->
 - a header that states the job, then `Demonstrates ·`, then `Needs ·`
   (**absent means: needs nothing**), then the exact `Run ·` command
 - `nika check <file> --native-strict` → rc=0, **zero findings and zero hints**
