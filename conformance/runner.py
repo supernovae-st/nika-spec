@@ -1067,6 +1067,59 @@ DELIBERATE_RED: dict[str, str] = {}
 WITNESS_RED = ("conformance/envelope/trifecta-realized-flow-ungated.nika.yaml",
                "NIKA-SEC-009")
 
+# The corpus contract — the MECHANICAL slice of examples/CONVENTIONS.md
+# §1-§2 plus the drift classes the 2026-07-31 oracle-intelligence audit
+# measured recurring (49 files · 7 auditors · adversarial verify). A prose
+# rule is obeyed or ignored; these five are structure:
+#   C1  the two verbatim header lines lead the file (SPDX · schema)
+#   C2  a `# Run ·` line exists — the header hands the exact command
+#   C3  jobs and skeletons carry workflow.description — the words
+#       `nika new "<intent>"` matches (numbered lessons are exempt by
+#       corpus convention · README.md §The path)
+#   C4  no `# SLOT` comment rides the WORKFLOW description line (the
+#       2-space-indented one under workflow:) — a trailing slot marker
+#       leaks into every catalog/router display (measured: the fanout row
+#       rendered `…merge"   # SLOT` in closest-matches). Deeper
+#       `description:` lines (inputs/outputs) keep their SLOT markers —
+#       they are the skeleton's own teaching device.
+#   C5  permits: top-level categories hold §2 order (exec · tools · net · fs)
+_NUMBERED_LESSON = re.compile(r"^\d{2}-")
+
+
+def corpus_contract_errors(path: pathlib.Path, text: str) -> list[str]:
+    errs: list[str] = []
+    lines = text.splitlines()
+    if len(lines) < 2 or lines[0] != "# SPDX-License-Identifier: Apache-2.0" \
+            or not lines[1].startswith("# yaml-language-server: $schema="):
+        errs.append("C1 · the two verbatim header lines must lead the file")
+    if not any(line.startswith("# Run ·") for line in lines):
+        errs.append("C2 · no `# Run ·` line — the header must hand the exact command")
+    for line in lines:
+        if line.startswith("  description:") and not line.startswith("   ") \
+                and "# SLOT" in line:
+            errs.append("C4 · `# SLOT` rides the workflow description line — it "
+                        "leaks into the catalog display · move it to its own line above")
+            break
+    try:
+        doc = yaml.safe_load(text) or {}
+    except yaml.YAMLError:
+        return errs  # the schema stage owns parse failures
+    if not isinstance(doc, dict):
+        return errs
+    if not _NUMBERED_LESSON.match(path.name):
+        desc = (doc.get("workflow") or {}).get("description")
+        if not (isinstance(desc, str) and desc.strip()):
+            errs.append("C3 · workflow.description missing — jobs and skeletons "
+                        "are found by their words")
+    permits = doc.get("permits")
+    if isinstance(permits, dict):
+        order = {"exec": 0, "tools": 1, "net": 2, "fs": 3}
+        seen = [k for k in permits if k in order]
+        if seen != sorted(seen, key=lambda k: order[k]):
+            errs.append("C5 · permits categories out of §2 order "
+                        f"(exec · tools · net · fs) — got ({' · '.join(seen)})")
+    return errs
+
 
 def run_examples(examples_dir: pathlib.Path, validator: Draft202012Validator,
                  canon: dict | None = None) -> int:
@@ -1086,10 +1139,15 @@ def run_examples(examples_dir: pathlib.Path, validator: Draft202012Validator,
                 print(f"      expected exactly {expected_red} · got valid={v['valid']} {sorted(codes) or 'no errors'}")
                 bad += 1
             continue
-        print(f"{'PASS' if v['valid'] else 'FAIL'}  {f.name}")
+        corpus = corpus_contract_errors(f, f.read_text())
+        ok = v["valid"] and not corpus
+        print(f"{'PASS' if ok else 'FAIL'}  {f.name}")
         if not v["valid"]:
             for e in v["errors"]:
                 print(f"      {e.get('code') or e.get('namespace')} · {e.get('detail', '')[:100]}")
+        for c in corpus:
+            print(f"      corpus-contract {c}")
+        if not ok:
             bad += 1
     # The always-red witness (WITNESS_RED) rides the same lane: it MUST
     # refuse with exactly its code — the trifecta lane's negative proof.
