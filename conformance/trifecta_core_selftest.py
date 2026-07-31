@@ -3,7 +3,7 @@
 """Self-test of the trifecta lane (NEP-0002 · NIKA-SEC-009) — the engine
 checker's fourteen law cases transcribed as inline docs (same law · zero
 shared code · the two-oracle doctrine), plus the corpus pin: the ONE
-deliberately-red witness (`examples/release-radar.nika.yaml`) must refuse
+deliberately-red witness (`conformance/envelope/trifecta-realized-flow-ungated.nika.yaml`) must refuse
 here for the same reason it refuses at `nika check`."""
 from __future__ import annotations
 
@@ -366,13 +366,17 @@ law("the writers are the fs half of the egress set",
     - {"nika:fetch", "nika:notify"})
 
 # ── the corpus pin · the ONE deliberately-red witness refuses HERE too ──
-_radar = Path(__file__).parent.parent / "examples" / "release-radar.nika.yaml"
-v = trifecta_errors(yaml.safe_load(_radar.read_text()))
-law("release-radar: exactly one finding", len(v) == 1)
-law("release-radar: the sink is save_state (the in-workspace write)",
-    bool(v) and v[0]["task"] == "save_state")
-law("release-radar: the source is the feed fetch",
-    bool(v) and v[0]["source"] == "feed")
+# (moved out of examples/ 2026-07-31: every SHIPPED example checks green —
+# the teaching surface law — so the always-red witness lives beside the
+# other conformance inputs, same inverted assertion.)
+_witness = (Path(__file__).parent / "envelope"
+            / "trifecta-realized-flow-ungated.nika.yaml")
+v = trifecta_errors(yaml.safe_load(_witness.read_text()))
+law("witness: exactly one finding", len(v) == 1)
+law("witness: the sink is exfil (the notify egress)",
+    bool(v) and v[0]["task"] == "exfil")
+law("witness: the source is the ingest fetch",
+    bool(v) and v[0]["source"] == "ingest")
 
 bad = [n for n, ok in CHECKS if not ok]
 print(f"trifecta-core selftest · {len(CHECKS) - len(bad)}/{len(CHECKS)} laws hold")

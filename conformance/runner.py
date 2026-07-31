@@ -1056,12 +1056,16 @@ def run_fixtures(fixtures_dir: pathlib.Path, validator: Draft202012Validator,
     return 1 if failed else 0
 
 
-# The corpus's ONE deliberate red — the SEC-009 witness (NEP-0002): the
-# engine keeps release-radar red on purpose, and the reference agrees for
-# the SAME reason. Inverted assertion, never a skip: the file MUST fail
-# with exactly this code — a green here means the trifecta lane broke, any
-# OTHER code means a new defect is hiding behind the expected one.
-DELIBERATE_RED = {"release-radar.nika.yaml": "NIKA-SEC-009"}
+# The corpus's ONE deliberate red — the SEC-009 witness (NEP-0002). It
+# lives in conformance/envelope/, NOT examples/: every SHIPPED example
+# checks green (the teaching surface law · release-radar took its human
+# gate at 699ebb0), so the always-red witness sits beside the other
+# conformance inputs. Inverted assertion, never a skip: the file MUST
+# fail with exactly this code — a green here means the trifecta lane
+# broke, any OTHER code means a new defect hides behind the expected one.
+DELIBERATE_RED: dict[str, str] = {}
+WITNESS_RED = ("conformance/envelope/trifecta-realized-flow-ungated.nika.yaml",
+               "NIKA-SEC-009")
 
 
 def run_examples(examples_dir: pathlib.Path, validator: Draft202012Validator,
@@ -1087,6 +1091,21 @@ def run_examples(examples_dir: pathlib.Path, validator: Draft202012Validator,
             for e in v["errors"]:
                 print(f"      {e.get('code') or e.get('namespace')} · {e.get('detail', '')[:100]}")
             bad += 1
+    # The always-red witness (WITNESS_RED) rides the same lane: it MUST
+    # refuse with exactly its code — the trifecta lane's negative proof.
+    rel_path, expected_red = WITNESS_RED
+    witness = examples_dir.parent / rel_path
+    if witness.exists():
+        v = validate_text(witness.read_text(), validator, canon)
+        codes = {e.get("code") or e.get("namespace") for e in v["errors"]}
+        ok = not v["valid"] and codes == {expected_red}
+        print(f"{'PASS' if ok else 'FAIL'}  {rel_path} · deliberate red ({expected_red})")
+        if not ok:
+            print(f"      expected exactly {expected_red} · got valid={v['valid']} {sorted(codes) or 'no errors'}")
+            bad += 1
+    else:
+        print(f"FAIL  {rel_path} · the always-red witness is MISSING")
+        bad += 1
     return 1 if bad else 0
 
 

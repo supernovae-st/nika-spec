@@ -13,7 +13,7 @@ on the cross-file laws · type on `open ⋢ closed rides assignable` · decision
 on bucket-edge ordering · gateway on the on_absent closed set · outcome on
 the unknown-class refusal · proof on `semantically-different IRs → different
 semantic hash` · projection on the env_value leak · yaml-profile on the
-fixture-parity sweep · trifecta on the release-radar witness · redteam on
+fixture-parity sweep · trifecta on the realized-flow witness (conformance/envelope) · redteam on
 `0/3 fixtures die as named`).
 
 Extended 2026-07-30 (wave 2) beyond the conformance cores to every
