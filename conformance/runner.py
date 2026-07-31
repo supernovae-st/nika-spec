@@ -1089,8 +1089,11 @@ _NUMBERED_LESSON = re.compile(r"^\d{2}-")
 def corpus_contract_errors(path: pathlib.Path, text: str) -> list[str]:
     errs: list[str] = []
     lines = text.splitlines()
+    # REUSE-IgnoreStart — the STRING below teaches the header; the linter
+    # must not parse this code line as a license tag.
     if len(lines) < 2 or lines[0] != "# SPDX-License-Identifier: Apache-2.0" \
             or not lines[1].startswith("# yaml-language-server: $schema="):
+    # REUSE-IgnoreEnd
         errs.append("C1 · the two verbatim header lines must lead the file")
     if not any(line.startswith("# Run ·") for line in lines):
         errs.append("C2 · no `# Run ·` line — the header must hand the exact command")

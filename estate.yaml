@@ -248,7 +248,7 @@ patterns:
 - glob: "examples/**"
   class: authored
   match_count: 63
-  aggregate_sha256: 42457543d4e9c87fdb69242941ffbec219b132320997e491c62cff8094ec2719
+  aggregate_sha256: efa9a942d4e4497cfc5dd05172a743e668697a3c4b9142d229de66f223d997c4
   evidence: "the ORIGINALS everything downstream copies (engine pack vendoring · docs/website projections) — 7 foundation + 26 showcase workflows, every one executed by the conformance gate ('examples/ — every shipped example executed as a conformance input'); manifest.yaml excepted in files:"
 - glob: "templates/**"
   class: authored

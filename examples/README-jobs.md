@@ -85,9 +85,7 @@ rm -rf out                                                                    # 
 
 ## Conventions (same gate as the foundation set)
 
-<!-- REUSE-IgnoreStart · prose QUOTING the header, not carrying one -->
 - `# SPDX-License-Identifier: Apache-2.0` header + schema hint line
-<!-- REUSE-IgnoreEnd -->
 - `ollama/qwen3.5:4b` is the showcase model: every file leads local,
   with one deliberate exception class — strict-schema showcases pick a
   NON-thinking model (`ollama/llama3.2:3b`): a thinking model can burn

@@ -22,7 +22,9 @@ from runner import corpus_contract_errors  # noqa: E402
 SPEC_ROOT = Path(__file__).resolve().parent.parent
 
 HEAD = (
+    # REUSE-IgnoreStart — the string teaches the header, not the file
     "# SPDX-License-Identifier: Apache-2.0\n"
+    # REUSE-IgnoreEnd
     "# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json\n"
 )
 
