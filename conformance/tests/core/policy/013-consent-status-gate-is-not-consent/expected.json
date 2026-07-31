@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-SEC-014", "category": "security_error" }
+  ],
+  "note": "NEP-0020 · a when: reading the gate's STATUS is not consent: the refusal settles success, so `with.st == 'success'` is provably TRUE under the substitution — nothing of the answer is consumed and the route stands."
+}

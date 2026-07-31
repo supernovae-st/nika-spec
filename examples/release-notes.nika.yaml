@@ -81,8 +81,11 @@ tasks:
   # it with a private `fs.read` and a webhook: the lethal trifecta, unless a
   # human dominates the path. The gate comes FIRST and BOTH roots hang off it
   # (`history` carries the untrusted content, `existing` carries the private
-  # read); a gate on a sibling branch dominates nothing. Non-interactive runs
-  # answer it in one pass with `--answer approve=true`.
+  # read); a gate on a sibling branch dominates nothing. And each root
+  # CONSUMES the answer affirmatively (NEP-0020 — a bare `after:` admits the
+  # refusal: it settles success with value false), the downstream null-guards
+  # passing the « no » along the value edges. Non-interactive runs answer it
+  # in one pass with `--answer approve=true`.
   approve:
     invoke:
       tool: "nika:prompt"
@@ -92,6 +95,9 @@ tasks:
 
   history:
     after: { approve: success }
+    with:
+      go: ${{ tasks.approve.output }}
+    when: ${{ with.go == true }}       # « no » at the gate → no history read at all
     exec:
       command: ["git", "log", "${{ const.since_tag }}..HEAD", "--oneline", "--no-merges"]
     on_error:
@@ -105,6 +111,7 @@ tasks:
   notes:
     with:
       history: ${{ tasks.history.output }}
+    when: ${{ with.history != null }}  # a refused gate skips history → nothing to draft
     infer:
       max_tokens: 1000
       prompt: |
@@ -125,6 +132,9 @@ tasks:
   # carry the anchor. Read yours, write the working copy, edit THAT.
   existing:
     after: { approve: success }
+    with:
+      go: ${{ tasks.approve.output }}
+    when: ${{ with.go == true }}       # the same « no » closes the private-read branch
     invoke:
       tool: "nika:read"
       args: { path: "${{ const.changelog_src }}" }
@@ -132,6 +142,7 @@ tasks:
   copy:
     with:
       existing: ${{ tasks.existing.output }}
+    when: ${{ with.existing != null }}  # a refused gate skips the read → nothing to copy
     invoke:
       tool: "nika:write"
       args:

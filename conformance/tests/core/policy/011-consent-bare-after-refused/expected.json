@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-SEC-014", "category": "security_error" }
+  ],
+  "note": "NEP-0020 · the affirmative-consent law: a REFUSED confirm settles success with value false, so the bare `after: { ask: success }` edge carries the refusal straight into the irreversible exec — the witness names gate + sink."
+}

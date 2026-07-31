@@ -14,6 +14,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **The affirmative-consent law** (10 §the affirmative-consent law ·
+  NEP-0020 · normative) — a REFUSED confirm-mode `nika:prompt` settles
+  success with value `false`, so every route from the gate to an
+  egress-capable task must be closed (an affirmative `when:` proving
+  false under the refusal substitution · `when: false` · a closer
+  confirm gate): a bare `after:` route to an effect is
+  **`NIKA-SEC-014`** (`security_error` · check-time). Undecidable gates
+  stay advisory (sound — no false red). Conformance:
+  `core/policy/011-013` · the reference oracle implements the same
+  walk. The 2026-07-30 hint escalates to the refusal it was measuring.
 - **File naming law** (01 §File naming · normative · #124) —
   `<name>.nika.yaml` is the canonical filename and the only form tools
   emit · `.nika.yml` is accepted by matchers and taught against (never

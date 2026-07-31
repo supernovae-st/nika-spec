@@ -59,7 +59,7 @@ import sys, json, re, pathlib
 import yaml
 from jsonschema import Draft202012Validator
 
-from deep_static import deep_static_errors, policy_errors
+from deep_static import deep_static_errors, policy_errors, consent_errors
 from composition_core import composition_errors
 from trifecta_core import trifecta_errors
 from type_core import type_core_errors
@@ -950,6 +950,7 @@ def validate_workflow(doc: dict, validator: Draft202012Validator,
     errs.extend(type_core_errors(doc))
     errs.extend(values_core_errors(doc))
     errs.extend(policy_errors(doc))
+    errs.extend(consent_errors(doc))
     errs.extend(trifecta_errors(doc))
     errs.extend(composition_errors(doc, base_dir))
     if canon is not None:

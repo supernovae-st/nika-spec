@@ -2065,6 +2065,41 @@ diagnostics:
       law_ids empty until the freeze batch names the canon law · sister row of
       NIKA-SEC-012 — same half-shipped lane (ba2754c edited the generated
       projection), same restoration (SSOT-1 §12).'
+  - id: NIKA-SEC-014
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: SEC
+    plane: check
+    condition: 'the affirmative-consent law — a confirm-mode human gate
+      (invoke: nika:prompt · mode absent or confirm) reaches an egress-capable
+      task over a route no affirmative gate closes: a REFUSED confirm settles
+      success with value false, so a bare after: { gate: success } edge, a
+      when: that never reads the answer, and a when: provably true on the
+      refusal all let the effect through · the gate is credited only when
+      every route consumes the answer and proves false on it (the
+      Kleene-falsifiable when: · when: false · a closer confirm gate owns its
+      closure) · an undecidable gate (a nested binding · a non-fragment
+      expression) defers to the advisory hint, never a refusal (NEP-0020 ·
+      P0-2 of the 2026-07-30 audit)'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: true
+    teaching: 'bind the answer and gate on it: with: { go: "${{ tasks.<gate>.output
+      }}" } + when: ${{ with.go == true }} (the human-gated-ship pattern) —
+      the refusal then proves the route closed · when: false closes a route
+      by construction · a closer confirm gate owns its own closure (NEP-0020
+      · 10-authority §the affirmative-consent law).'
+    notes: 'nep-0020 (2026-07-31) · category: security_error · transient: false
+      (canon.yaml verbatim) · minted by the affirmative-consent lane (P0-2 of
+      the 2026-07-30 UX audit — the hint-only lane of 2026-07-30 escalates to
+      the refusal it was measuring) · law_ids empty until the freeze batch
+      names the canon law · the engine emission lands with the same PR
+      (nika-check consent.rs).'
   - id: NIKA-TIMEOUT-001
     status: reserved
     owner: spec

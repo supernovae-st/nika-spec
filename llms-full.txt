@@ -28,6 +28,8 @@ Sovereign · multi-provider · local-first.</strong></p>
 
 ---
 
+![The law in action: a conformance fixture declares Expected NIKA-SEC-009 in its header, nika check refuses the ungated lethal trifecta with the exact finding, and the human-gated twin passes clean · every verdict is the released engine's own](media/law-in-action.gif)
+
 ## What is Nika?
 
 Nika is a **language**. Not a framework, not a runtime, not a SaaS.
@@ -4233,6 +4235,7 @@ these from this file alone.
 | `NIKA-SEC-011` | preview-commit divergence — the commit digest recomputed at the sink over the exact bytes about to fire differs from the preview digest judged at resolution (one bit of rendered argv · a permuted context field · a mutated tool argument) · the step refuses fail-closed and the receipt carries `divergence: {preview, commit}` — judged = executed at the action scale ([NEP-0015](../governance/nep-0015-preview-commit.md) · F-P6) | `security_error` | false |
 | `NIKA-SEC-012` | unordered shared writes — two tasks incomparable in the DAG closure whose literal `nika:write`/`nika:edit` paths collide with no ordering edge (`after:` · `with:`) to serialize them, or a `for_each` fan writing one constant path · parallelism is safe exactly where the writes are provably disjoint (NEP-0014 law 1 · F-P15) | `security_error` | false |
 | `NIKA-SEC-013` | the endorsement mode law — a human gate (`invoke: nika:prompt`) declared under a `policy:` block that names no endorsement mode refuses fail-closed (`endorsement.undeclared_mode` · F-F5 · zero implicit escape), and `endorsement: solo` carried by a workflow with more than one gate refuses as the declaration lying (`endorsement.solo_count` · exactly one endorser) ([10 §policy](./10-authority.md) · NEP-0017 · F-P23) | `security_error` | false |
+| `NIKA-SEC-014` | the affirmative-consent law — a confirm-mode human gate (`invoke: nika:prompt` · mode absent or `confirm`) reaches an egress-capable task over a route no affirmative gate closes: a REFUSED confirm settles success with value `false`, so a bare `after: { gate: success }` edge, a `when:` that never reads the answer, and a `when:` provably true on the refusal all let the effect through · the gate is credited only when every route consumes the answer and proves false on it (the Kleene-falsifiable `when:` · `when: false` · a closer confirm gate owns its closure) · an undecidable gate defers to the advisory hint, never a refusal ([10 §the affirmative-consent law](./10-authority.md#the-affirmative-consent-law--normative--nep-0020) · [NEP-0020](../governance/nep-0020-affirmative-consent.md) · P0-2) | `security_error` | false |
 | `NIKA-AUTH-006` | an absent `permits:` block — DeclaredPermits is empty, so every effect the body requires is refused before any token; the diagnostic carries the inferred block, ready to paste ([10 §authority](./10-authority.md)) | `security_error` | false |
 | `NIKA-AUTH-007` | an interpolation reaches a permit BOUND (a host · glob · program · env name inside `permits:`) — a bound must be a literal, or the boundary is self-serve ([10 §authority](./10-authority.md)) | `security_error` | false |
 | `NIKA-AUTH-008` | an untrusted value reaches a permitted verb's ARGUMENT and its canonical resolved form escapes the step's permit — the diagnostic carries the taint path ([10 §authority](./10-authority.md)) | `security_error` | false |
@@ -6049,6 +6052,48 @@ satisfy **both**. (`allow.providers` deliberately covers the one
 authority `permits:` does not — the provider surface; capability stays
 permits' ground, and no policy rule re-spells a permits grant.)
 
+## The affirmative-consent law · *normative · NEP-0020*
+
+A REFUSED confirm-mode `nika:prompt` settles the task **success with
+value `false`** — the Deny lives in the approval attestation
+(NEP-0013), never in the task status. So a gate that nothing consumes
+is a rubber stamp: a bare `after: { ask: success }` edge admits the
+refusal, a `when:` that never reads the answer lets it through, and a
+`when:` provably true on `false`
+(`with.go == true || with.go == false`) blocks nothing. The law: for
+every confirm-mode gate (`mode:` absent or the literal `confirm`) and
+every egress-capable task (`exec:` · a net or fs-**write** builtin ·
+`mcp:*` · an `agent:` whose whitelist admits an egress tool), judged on
+the derived graph, **every route from the gate to the task must be
+closed** — by an affirmative gate, by `when: false`, or by a closer
+confirm gate (the nearest gate owns its closure). **`false` triggers
+exactly zero effects.**
+
+**The affirmative gate (normative · the decidable fragment).** A `when:`
+is affirmative when it evaluates to FALSE under the **refusal
+substitution**: `tasks.<gate>.output` → `false` · `tasks.<gate>.status`
+→ `"success"` (a refusal settles success — a status read is NOT
+consent, and it is decidable exactly), the exact single-island `with:`
+binding carrying its target's value, Kleene-3 over the fragment
+(boolean literals · `==`/`!=`/`in` on resolved literals · `!`/`&&`/`||`
+/ternary). Three verdicts, three fates —
+
+- **FALSE** — the route is closed (the human-gated-ship pattern:
+  `with: { go: "${{ tasks.ask.output }}" }` + `when: ${{ with.go == true }}`).
+- **TRUE** — the gate is PROVEN open under the refusal; the route stands.
+- **Unknown** — the gate cannot be decided statically (a nested template
+  binding · an expression beyond the fragment): the defect is unproven,
+  and an unproven defect is the advisory hint's ground, **never** a
+  refusal (sound — no false red).
+
+A violation is **`NIKA-SEC-014`** (`security_error` · check-time ·
+before any token) — the diagnostic names the gate AND the sink and
+teaches the affirmative pattern. The law binds with or without a
+`policy:` block (it is not a declared-rule violation, so it does not
+speak `NIKA-POLICY-001`), and `mode: choice` is out of scope — its
+answer is a string and the lane claims nothing there (silence, never
+wrong).
+
 ## Secret flow refusals carry their codes (normative)
 
 The flow rules themselves live in
@@ -6175,7 +6220,9 @@ projection: the judge is the check ladder, never the JSON.
 
 `NIKA-SEC-006` / `NIKA-SEC-007` join the existing `NIKA-SEC` namespace
 ([05](./05-errors.md)); `NIKA-AUTH-007` / `NIKA-AUTH-008` join the
-`NIKA-AUTH` namespace opened by NEP-0003's `NIKA-AUTH-006`.
+`NIKA-AUTH` namespace opened by NEP-0003's `NIKA-AUTH-006`;
+`NIKA-SEC-013` (the endorsement mode) and `NIKA-SEC-014` (the
+affirmative-consent law) join the same `NIKA-SEC` namespace.
 
 ## One obvious way (normative for linters)
 

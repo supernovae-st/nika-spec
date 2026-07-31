@@ -82,7 +82,9 @@ tasks:
   # lethal trifecta, unless a human dominates the path. The gate comes
   # FIRST so every task the diff output reaches descends from it (a gate
   # on a sibling branch dominates nothing — the data edge would bypass
-  # it). Under `--answer approve=true` the CI one-pass answers it here.
+  # it), and each root CONSUMES the answer affirmatively (NEP-0020 — a
+  # bare `after:` admits the refusal: it settles success with value
+  # false). Under `--answer approve=true` the CI one-pass answers it here.
   approve:
     invoke:
       tool: "nika:prompt"
@@ -94,12 +96,16 @@ tasks:
   # reviewed, and asking an agent to read it just burns a turn on an error.
   changed:
     after: { approve: success }
+    with:
+      go: ${{ tasks.approve.output }}
+    when: ${{ with.go == true }}     # « no » at the gate → no diff, no swarm
     exec:
       command: ["git", "diff", "--name-only", "--diff-filter=d", "${{ const.base_ref }}...HEAD"]
 
   files:
     with:
       changed: ${{ tasks.changed.output }}
+    when: ${{ with.changed != null }}  # a refused gate skips the diff → nothing to split
     invoke:
       tool: "nika:jq"
       args:
@@ -115,6 +121,9 @@ tasks:
   # would re-open the trifecta no matter how clean its own content is.
   todo_sweep:
     after: { approve: success }
+    with:
+      go: ${{ tasks.approve.output }}
+    when: ${{ with.go == true }}     # the same « no » closes this branch too
     invoke:
       tool: "nika:grep"
       args:
@@ -186,6 +195,7 @@ tasks:
     with:
       merged: ${{ tasks.merged.output }}
       todo_sweep: ${{ tasks.todo_sweep.output }}
+    when: ${{ with.todo_sweep != null }}  # a refused gate skips the sweep → no page to write
     infer:
       max_tokens: 2500                 # a review page · not the whole diff back
       prompt: |
@@ -198,6 +208,7 @@ tasks:
   save:
     with:
       summary: ${{ tasks.summary.output }}
+    when: ${{ with.summary != null }}   # a refused gate skips the summary → no REVIEW.md
     invoke:
       tool: "nika:write"
       args:

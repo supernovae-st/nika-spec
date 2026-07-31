@@ -1388,3 +1388,393 @@ def policy_errors(doc: dict) -> list[dict]:
                   f"{len(tasks)} tasks (10 §policy)")
 
     return errs
+
+
+# ── CONSENT · the affirmative-consent law (spec 10 · NEP-0020 · NIKA-SEC-014)
+#
+# A REFUSED confirm-mode nika:prompt settles the task SUCCESS with value
+# false (the Deny lives in the approval attestation, NEP-0013), so every
+# route that does not consume the answer passes the effect through. The
+# law: every route from a confirm gate to an egress-capable task must be
+# CLOSED — an affirmative when: (proven FALSE under the refusal
+# substitution) · when: false · a closer confirm gate. Only the PROVEN
+# non-affirmative route refuses (sound — an undecidable gate defers to
+# the engine's advisory hint, never to this code).
+
+_CONSENT_UNKNOWN = object()  # the Kleene third value (never equal to data)
+
+
+class _ConsentParser:
+    """The when:-body parser for the consent evaluator — same tokens as the
+    CEL grammar above, but it KEEPS the tree (the shape parser discards it).
+    Unknown constructs parse fine and evaluate to UNKNOWN."""
+
+    def __init__(self, tokens):
+        self.toks = tokens
+        self.i = 0
+
+    def peek(self):
+        return self.toks[self.i]
+
+    def take(self, value=None, kind=None):
+        k, v = self.toks[self.i]
+        if (value is not None and v != value) or (kind is not None and k != kind):
+            raise CelError(f"expected {value or kind} · got {v!r}")
+        self.i += 1
+        return v
+
+    def parse(self):
+        tree = self.expr()
+        if self.peek()[0] != "eof":
+            raise CelError(f"trailing input from {self.peek()[1]!r}")
+        return tree
+
+    def expr(self):
+        return self.ternary()
+
+    def ternary(self):
+        cond = self.or_()
+        if self.peek()[1] == "?":
+            self.take("?")
+            then = self.expr()
+            self.take(":")
+            else_ = self.ternary()
+            return ("tern", cond, then, else_)
+        return cond
+
+    def or_(self):
+        left = self.and_()
+        while self.peek()[1] == "||":
+            self.take("||")
+            left = ("or", left, self.and_())
+        return left
+
+    def and_(self):
+        left = self.rel()
+        while self.peek()[1] == "&&":
+            self.take("&&")
+            left = ("and", left, self.rel())
+        return left
+
+    def rel(self):
+        left = self.unary()
+        k, v = self.peek()
+        if v in ("==", "!=", "<", "<=", ">", ">=") or (k == "ident" and v == "in"):
+            self.take(v)
+            right = self.unary()
+            k2, v2 = self.peek()
+            if v2 in ("==", "!=", "<", "<=", ">", ">=") or (k2 == "ident" and v2 == "in"):
+                raise CelError("relations do not chain (a == b == c) · parenthesize")
+            return ("rel", v, left, right)
+        return left
+
+    def unary(self):
+        if self.peek()[1] == "!":
+            self.take("!")
+            return ("not", self.unary())
+        return self.postfix()
+
+    def postfix(self):
+        base = self.primary()
+        while True:
+            k, v = self.peek()
+            if v == ".":
+                self.take(".")
+                name = self.take(kind="ident")
+                if self.peek()[1] == "(":
+                    self.take("(")
+                    args = []
+                    if self.peek()[1] != ")":
+                        args.append(self.expr())
+                    self.take(")")
+                    base = ("call", name, base, args)
+                else:
+                    base = ("member", base, name)
+            elif v == "[":
+                self.take("[")
+                base = ("index", base, self.expr())
+                self.take("]")
+            else:
+                return base
+
+    def primary(self):
+        k, v = self.peek()
+        if k == "int":
+            self.take(kind=k)
+            return ("lit", int(v))
+        if k == "float":
+            self.take(kind=k)
+            return ("lit", float(v))
+        if k == "string":
+            self.take(kind=k)
+            return ("lit", v[1:-1])
+        if v == "(":
+            self.take("(")
+            inner = self.expr()
+            self.take(")")
+            return inner
+        if v == "[":
+            self.take("[")
+            items = []
+            if self.peek()[1] != "]":
+                items.append(self.expr())
+                while self.peek()[1] == ",":
+                    self.take(",")
+                    items.append(self.expr())
+            self.take("]")
+            return ("list", items)
+        if k == "ident":
+            if v in ("true", "false"):
+                self.take(v)
+                return ("lit", v == "true")
+            if v == "null":
+                self.take(v)
+                return ("lit", None)
+            if v == "in":
+                raise CelError("reserved word 'in' as identifier")
+            self.take(kind="ident")
+            if self.peek()[1] == "(":
+                self.take("(")
+                args = []
+                if self.peek()[1] != ")":
+                    args.append(self.expr())
+                self.take(")")
+                return ("call", v, None, args)
+            return ("ref", v)
+        raise CelError(f"unexpected token {v!r}")
+
+
+def _consent_ref_path(tree):
+    """('ref'/'member'/'index'-chain → the dotted path) or None — the
+    binding/resolution reads only plain paths; anything richer is UNKNOWN."""
+    if tree[0] == "ref":
+        return [tree[1]]
+    if tree[0] == "member":
+        base = _consent_ref_path(tree[1])
+        if base is not None:
+            return base + [tree[2]]
+    if tree[0] == "index" and tree[2][0] == "lit":
+        base = _consent_ref_path(tree[1])
+        if base is not None:
+            return base + [str(tree[2][1])]
+    return None
+
+
+def _consent_eval(tree, gate, env):
+    """Kleene-3 over the consent fragment — the gate's settled facts under
+    the refusal are substituted (output → False · status → 'success' · the
+    exact with: binding carries its target's value); everything else is
+    UNKNOWN. Only a proven FALSE closes the route (NEP-0020)."""
+    tag = tree[0]
+    if tag == "lit":
+        return tree[1]
+    if tag in ("ref", "member", "index"):
+        path = _consent_ref_path(tree)
+        if path is None:
+            return _CONSENT_UNKNOWN
+        if path[0] == "with" and len(path) == 2:
+            return env.get(path[1], _CONSENT_UNKNOWN)
+        if path[0] == "tasks" and len(path) == 3 and path[1] == gate:
+            if path[2] == "output":
+                return False
+            if path[2] == "status":
+                return "success"
+        return _CONSENT_UNKNOWN
+    if tag == "not":
+        v = _consent_eval(tree[1], gate, env)
+        if v is _CONSENT_UNKNOWN or not isinstance(v, bool):
+            return _CONSENT_UNKNOWN
+        return not v
+    if tag == "and":
+        left = _consent_eval(tree[1], gate, env)
+        if left is False:
+            return False
+        right = _consent_eval(tree[2], gate, env)
+        if left is True:
+            return right
+        return False if right is False else _CONSENT_UNKNOWN
+    if tag == "or":
+        left = _consent_eval(tree[1], gate, env)
+        if left is True:
+            return True
+        right = _consent_eval(tree[2], gate, env)
+        if left is False:
+            return right
+        return True if right is True else _CONSENT_UNKNOWN
+    if tag == "tern":
+        cond = _consent_eval(tree[1], gate, env)
+        if cond is _CONSENT_UNKNOWN:
+            return _CONSENT_UNKNOWN
+        return _consent_eval(tree[2] if cond else tree[3], gate, env)
+    if tag == "rel":
+        op, left_t, right_t = tree[1], tree[2], tree[3]
+        left = _consent_eval(left_t, gate, env)
+        right = _consent_eval(right_t, gate, env)
+        if left is _CONSENT_UNKNOWN or right is _CONSENT_UNKNOWN:
+            return _CONSENT_UNKNOWN
+        if op == "==":
+            return left == right
+        if op == "!=":
+            return left != right
+        if op == "in":
+            if right_t[0] == "list" and isinstance(right, list):
+                return left in right
+            return _CONSENT_UNKNOWN
+        return _CONSENT_UNKNOWN  # < <= > >= — outside the fragment
+    if tag == "list":
+        items = [_consent_eval(i, gate, env) for i in tree[1]]
+        if any(i is _CONSENT_UNKNOWN for i in items):
+            return _CONSENT_UNKNOWN
+        return items
+    return _CONSENT_UNKNOWN  # calls · methods — outside the fragment
+
+
+def _consent_bindings(task, gate):
+    """The task's with: env for the substitution — an EXACT single-island
+    `${{ tasks.<gate>.output }}` binding carries False (status: 'success');
+    any other template carrying the gate's value is UNPROVEN (unknown)."""
+    env = {}
+    w = task.get("with")
+    if not isinstance(w, dict):
+        return env
+    for key, value in w.items():
+        if not isinstance(value, str):
+            continue
+        bodies = EXPR_BODY.findall(value)
+        carries = any(re.search(rf"tasks\.{re.escape(gate)}\b", b) for b in bodies)
+        m = re.fullmatch(r"\s*\$\{\{\s*(.*?)\s*\}\}\s*", value, re.DOTALL)
+        if m and len(bodies) == 1:
+            body = bodies[0].strip()
+            if re.fullmatch(rf"tasks\.{re.escape(gate)}\.output", body):
+                env[key] = False
+                continue
+            if re.fullmatch(rf"tasks\.{re.escape(gate)}\.status", body):
+                env[key] = "success"
+                continue
+        if carries:
+            env[key] = _CONSENT_UNKNOWN  # a nested carrier — unproven
+    return env
+
+
+def _consent_gate(task, gate):
+    """The task's when: under the refusal — 'closed' (proven FALSE · the
+    affirmative gate) · 'open' (no when: · proven TRUE) · 'unclear' (the
+    fragment cannot decide — the advisory hint's ground, never a refusal)."""
+    when = task.get("when")
+    if when is None:
+        return "open"
+    if isinstance(when, bool):
+        return "open" if when else "closed"
+    if not isinstance(when, str):
+        return "unclear"
+    m = EXPR_BODY.search(when)
+    if not m:
+        return "unclear"
+    try:
+        tree = _ConsentParser(_tokenize(m.group(1).strip())).parse()
+    except CelError:
+        return "unclear"
+    verdict = _consent_eval(tree, gate, _consent_bindings(task, gate))
+    if verdict is False:
+        return "closed"
+    if verdict is True:
+        return "open"
+    return "unclear"
+
+
+def _is_confirm_prompt(task):
+    """A confirm-mode invoke: nika:prompt — mode ABSENT is confirm (the
+    runtime default); another literal mode is a different contract, a
+    templated mode is not judged (silence, never wrong)."""
+    inv = task.get("invoke")
+    if not isinstance(inv, dict) or inv.get("tool") != _HUMAN_GATE_TOOL:
+        return False
+    args = inv.get("args")
+    mode = args.get("mode") if isinstance(args, dict) else None
+    if mode is None:
+        return True
+    return isinstance(mode, str) and mode == "confirm" and "${{" not in mode
+
+
+def _consent_egress(task):
+    """The egress-capable table (the coarse projection of the ONE effect
+    table · engine trifecta::egress_capable): exec · a net or fs-write
+    builtin · mcp:* · an agent whose whitelist admits an egress glob."""
+    if "exec" in task:
+        return True
+    tool = _task_tool(task)
+    if tool is not None:
+        return (tool.startswith("mcp:") or tool in _POLICY_NET_TOOLS
+                or tool in _POLICY_WRITE_TOOLS)
+    ag = task.get("agent")
+    if isinstance(ag, dict):
+        for g in (ag.get("tools") or []):
+            if (isinstance(g, str) and not g.startswith("!")
+                    and (g.startswith("mcp:") or g in ("*", "nika:*")
+                         or g in _POLICY_NET_TOOLS or g in _POLICY_WRITE_TOOLS)):
+                return True
+    return False
+
+
+def _consent_children(tasks):
+    """tid → direct child tids ADMITTING the refusal (it settles SUCCESS):
+    every with: edge, plus the after: entries whose predicate admits
+    success (success · terminal) — a failure/skipped edge cannot carry it."""
+    import json as _json
+    ids = {tid for tid, _ in tasks}
+    down: dict[str, set[str]] = {tid: set() for tid, _ in tasks}
+    for tid, t in tasks:
+        refs: set[str] = set()
+        w = t.get("with")
+        if w is not None:
+            for body in EXPR_BODY.findall(_json.dumps(w)):
+                for m in re.finditer(r"tasks\.([a-z][a-z0-9_]*)", body):
+                    refs.add(m.group(1))
+        after = t.get("after")
+        if isinstance(after, dict):
+            for k, pred in after.items():
+                if isinstance(k, str) and pred in (None, "success", "terminal"):
+                    refs.add(k)
+        for r in refs & ids:
+            down[r].add(tid)
+    return down
+
+
+def consent_errors(doc: dict) -> list[dict]:
+    """The affirmative-consent law (spec 10 · NEP-0020): an egress-capable
+    task reached from a confirm gate over a route no affirmative gate
+    closes is NIKA-SEC-014. Only the PROVEN route refuses — an unclear
+    gate cuts the walk (no claim, never wrong)."""
+    tasks = iter_tasks(doc)
+    down = _consent_children(tasks)
+    by_id = dict(tasks)
+    errs: list[dict] = []
+    for tid, t in tasks:
+        if not _is_confirm_prompt(t):
+            continue
+        seen = {tid}
+        queue = sorted(down[tid])
+        while queue:
+            n = queue.pop(0)
+            if n in seen:
+                continue
+            seen.add(n)
+            task = by_id[n]
+            # A closer confirm gate owns its closure; a closed gate (the
+            # affirmative when: · when: false) cuts the route; an UNCLEAR
+            # gate is unproven — the walk claims nothing past it.
+            if _is_confirm_prompt(task) or _consent_gate(task, gate=tid) != "open":
+                continue
+            if _consent_egress(task):
+                errs.append({
+                    "code": "NIKA-SEC-014", "namespace": "NIKA-SEC",
+                    "category": "security_error",
+                    "detail": f"task '{n}' runs on a route from confirm gate "
+                              f"'{tid}' that never consumes the answer — a REFUSED "
+                              "confirm settles success with value false, so the "
+                              f"effect fires on 'no' · fix: with: {{ go: "
+                              f'"${{{{ tasks.{tid}.output }}}}" }} + '
+                              f"when: ${{{{ with.go == true }}}} (NEP-0020 · "
+                              "10 §the affirmative-consent law)"})
+            queue.extend(sorted(down[n]))
+    return errs
