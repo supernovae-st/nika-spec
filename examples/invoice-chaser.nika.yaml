@@ -82,7 +82,7 @@ tasks:
   approve:
     with:
       drafts: ${{ tasks.drafts.output }}
-    when: ${{ with.drafts != null }}   # nothing drafted · nothing to approve
+    when: ${{ with.drafts != null && size(with.drafts) > 0 }}   # nothing drafted — OR an empty answer (a thinking seat can spend the budget in its think block) · nothing to approve
     invoke:
       tool: "nika:prompt"
       args:
@@ -93,7 +93,7 @@ tasks:
     with:
       drafts: ${{ tasks.drafts.output }}
       approved: ${{ tasks.approve.output }}
-    when: ${{ with.drafts != null && with.approved == true }}   # zero overdue → drafts skipped (null) · don't write nothing
+    when: ${{ with.drafts != null && size(with.drafts) > 0 && with.approved == true }}   # skipped (null) OR empty drafts → never write a 0-byte deliverable under a green run
     invoke:
       tool: "nika:write"
       args:
