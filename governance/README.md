@@ -1,8 +1,16 @@
 # governance/ · how the Nika standard evolves
 
 Every evolution of the standard is a **NEP** (Nika Enhancement Proposal):
-a numbered, public, git-versioned document. Nobody amends the standard
-directly, the maintainers included.
+a numbered, public, git-versioned document.
+
+> **Pre-ratification clause (until 1.0).** The language is not ratified
+> yet: the spec on `main` is the DRAFT, and the draft evolves directly.
+> Until `1.0.0` ratifies, the documents below are **design records of
+> the draft** — they carry the reasoning the draft folds in, and their
+> numbers are already load-bearing (engine code and traces cite
+> `NEP-0012`, `NEP-0019`, …). At 1.0 the process becomes **binding**:
+> from ratification on, nobody amends the standard directly, the
+> maintainers included — every change walks through this door.
 
 - Start here: [NEP-0000 · The NEP Process](nep-0000-the-nep-process.md)
 - Propose: copy [nep-template.md](nep-template.md) to

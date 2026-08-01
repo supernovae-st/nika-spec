@@ -11,9 +11,15 @@
 
 A NEP (Nika Enhancement Proposal) is the public, numbered document through
 which every evolution of the Nika standard is proposed, discussed and
-decided. Nobody amends the standard directly, the maintainers included.
-This document defines the process itself: the lifecycle, the template, who
-decides, and how the process evolves.
+decided. This document defines the process itself: the lifecycle, the
+template, who decides, and how the process evolves.
+
+**Pre-ratification clause.** Until `1.0.0` ratifies the language, the
+spec on `main` is the draft and the draft evolves directly — the NEPs of
+this era are **design records of the draft** (all Standards-Track NEPs
+carry `Status: Draft` accordingly), their numbers already load-bearing
+in engine code and traces. **From 1.0 on, this process is binding**:
+nobody amends the standard directly, the maintainers included.
 
 The lineage is deliberate: [PEP 1](https://peps.python.org/pep-0001/)
 governs Python this way, the
