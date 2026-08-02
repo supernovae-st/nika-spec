@@ -70,6 +70,7 @@ Run it: install to first output in under a minute ·
 
 ```bash
 brew install supernovae-st/tap/nika     # single static binary (Rust · no runtime deps)
+nika try 01-hello                       # see it work first · offline · zero keys (embedded pack, mock rehearsal)
 ollama pull qwen3.5:4b                 # the local model above (once · or swap for a cloud provider)
 nika run hello.nika.yaml
 ```
@@ -225,7 +226,7 @@ The reference engine is installable and runs workflows end-to-end today ·
 `brew install supernovae-st/tap/nika` · then `nika check` + `nika run` ·
 - Targets full v0.1 spec conformance (Stdlib level)
 - Self-contained single binary (embeds this spec + schema + examples ·
-  `nika spec` / `nika schema` / `nika examples` work offline;
+  `nika spec --canon` / `nika spec --schema` / `nika try` work offline;
   `cargo install nika` joins brew + curl as an install path at 1.0)
 - Exposes the engine's static oracle via MCP server (`nika mcp`) for harness
   integration (Claude Code · Cursor · Hermes · etc.). The MCP surface is
@@ -274,9 +275,9 @@ canonical workflow (foundation + showcase) with tier, constructs and a
 sha256 over the exact text every surface renders. The contract:
 
 - the **docs** and the **website** render projections of these files (never copies)
-- the **reference engine embeds the pack of its version**: `nika examples`
-  / `nika spec` / `nika schema` work offline, and an installed binary always
-  carries the canonical examples *of the language version it speaks*
+- the **reference engine embeds the pack of its version**: `nika try` /
+  `nika spec --canon` / `nika spec --schema` work offline, and an installed
+  binary always carries the canonical examples *of the language version it speaks*
 - the manifest hashes make the pack **verifiable end-to-end**: a tampered or
   drifted example fails the check, anywhere it travels
 
@@ -296,7 +297,7 @@ CI failure, not a maybe).
 
 ## Status
 
-- v0.1.0-draft · spec drafted · the numbered path + the jobs + the templates (counts live in [examples/manifest.yaml](examples/manifest.yaml)) · workflow.schema.json · 185 static conformance fixtures (core · deep · stdlib surface · the value-authority lanes `values`/`types`/`gates`; `python3 conformance/runner.py all` is the live count), every example gated in CI · runtime/behavioral conformance pending
+- v0.1.0-draft · spec drafted · the numbered path + the jobs + the templates (counts live in [examples/manifest.yaml](examples/manifest.yaml)) · workflow.schema.json · the static conformance fixtures (core · deep · stdlib surface · the value-authority lanes `values`/`types`/`gates` — `python3 conformance/runner.py all` speaks the live count), every example gated in CI · runtime/behavioral conformance pending
 - v0.1.0 GA · target August 2026 (after spec review + examples +
   conformance suite + schemas)
 
@@ -7738,9 +7739,15 @@ conformance · open a PR on `supernovae-st/nika-spec` to be listed in
 
 A NEP (Nika Enhancement Proposal) is the public, numbered document through
 which every evolution of the Nika standard is proposed, discussed and
-decided. Nobody amends the standard directly, the maintainers included.
-This document defines the process itself: the lifecycle, the template, who
-decides, and how the process evolves.
+decided. This document defines the process itself: the lifecycle, the
+template, who decides, and how the process evolves.
+
+**Pre-ratification clause.** Until `1.0.0` ratifies the language, the
+spec on `main` is the draft and the draft evolves directly — the NEPs of
+this era are **design records of the draft** (all Standards-Track NEPs
+carry `Status: Draft` accordingly), their numbers already load-bearing
+in engine code and traces. **From 1.0 on, this process is binding**:
+nobody amends the standard directly, the maintainers included.
 
 The lineage is deliberate: [PEP 1](https://peps.python.org/pep-0001/)
 governs Python this way, the
@@ -8267,7 +8274,7 @@ invoke: { tool: "nika:write", args: { path: "./out.md", content: "...", create_d
 ```
 Write a file · returns the path. A binary `content` value (an opaque bytes output from an upstream tool · e.g. MCP image content) is written as-is · no `output_format` declaration needed (the value carries its own type).
 
-`overwrite:` defaults **true** · `create_dirs:` defaults **false** — and a false `create_dirs:` is ENFORCED, not ignored: a missing parent directory is refused loudly (a typo'd path surfaces rather than silently materializing a directory tree), so pass `create_dirs: true` to create the parent. Throws · `NIKA-BUILTIN-WRITE-001` (IO failure, or a missing parent while `create_dirs: false`) · `-002` (`overwrite: false` and the path exists). Both `tool_error` · `transient: false`.
+`overwrite:` defaults **true** · `create_dirs:` defaults **false** — and a false `create_dirs:` is ENFORCED, not ignored: a missing parent directory is refused loudly (a typo'd path surfaces rather than silently materializing a directory tree), so pass `create_dirs: true` to create the parent. **One carve-out, by decision (engine #433 option C): a declared `permits.fs.write` entry covering the target path IS the intent** — the boundary creates the parent tree before the builtin's gate, and the write lands without `create_dirs:` (measured on the reference engine: a literal grant `deep/dir/new.txt` and a glob grant `out/**` both materialize their tree · run green). The refusal keeps its teeth where no declared grant covers the path — and there the boundary itself speaks first: an uncovered write is `NIKA-SEC-004` before the parent gate can. A typo'd path under a *narrow* grant still surfaces (it falls outside the grant → SEC-004); the tree-scatter the enforcement exists to catch cannot hide inside a boundary the author drew. Throws · `NIKA-BUILTIN-WRITE-001` (IO failure, or a missing parent while `create_dirs: false` outside a covering grant) · `-002` (`overwrite: false` and the path exists). Both `tool_error` · `transient: false`.
 
 ### `nika:edit`
 ```yaml
