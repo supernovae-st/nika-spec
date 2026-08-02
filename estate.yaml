@@ -325,7 +325,7 @@ patterns:
 - glob: "*"
   class: authored
   match_count: 16
-  aggregate_sha256: b477bff4a186e50e43425ad78ae75427a8cba9878126c8ec48001b60c043720c
+  aggregate_sha256: 10069b948b313cc01f6c5f66e35975d17ec0178639dbb2c4eca4512cf5fbcb91
   evidence: "root prose + config (README · QUICKSTART · GLOSSARY · CONTRIBUTING · CHANGELOG hand-kept per Keep a Changelog · SECURITY · CITATION.cff · CONFORMANT_IMPLEMENTATIONS · PROOFS.md the receipts ledger · LICENSE · REUSE.toml · ruff.toml · .gitignore · .pre-commit-hooks.yaml · .bestpractices.json) — no generation markers; VERSION · llms*.txt · canon.yaml · CODE_OF_CONDUCT.md excepted in files:"
   note: "README · QUICKSTART · GLOSSARY · CONTRIBUTING · CHANGELOG carry the canon-projected count markers — tool-maintained blocks inside authored prose"
 - glob: "**"

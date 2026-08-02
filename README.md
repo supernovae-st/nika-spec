@@ -64,6 +64,7 @@ Run it: install to first output in under a minute ·
 
 ```bash
 brew install supernovae-st/tap/nika     # single static binary (Rust · no runtime deps)
+nika try 01-hello                       # see it work first · offline · zero keys (embedded pack, mock rehearsal)
 ollama pull qwen3.5:4b                 # the local model above (once · or swap for a cloud provider)
 nika run hello.nika.yaml
 ```
@@ -290,7 +291,7 @@ CI failure, not a maybe).
 
 ## Status
 
-- v0.1.0-draft · spec drafted · the numbered path + the jobs + the templates (counts live in [examples/manifest.yaml](examples/manifest.yaml)) · workflow.schema.json · 185 static conformance fixtures (core · deep · stdlib surface · the value-authority lanes `values`/`types`/`gates`; `python3 conformance/runner.py all` is the live count), every example gated in CI · runtime/behavioral conformance pending
+- v0.1.0-draft · spec drafted · the numbered path + the jobs + the templates (counts live in [examples/manifest.yaml](examples/manifest.yaml)) · workflow.schema.json · the static conformance fixtures (core · deep · stdlib surface · the value-authority lanes `values`/`types`/`gates` — `python3 conformance/runner.py all` speaks the live count), every example gated in CI · runtime/behavioral conformance pending
 - v0.1.0 GA · target August 2026 (after spec review + examples +
   conformance suite + schemas)
 
