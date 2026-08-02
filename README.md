@@ -219,7 +219,7 @@ The reference engine is installable and runs workflows end-to-end today ·
 `brew install supernovae-st/tap/nika` · then `nika check` + `nika run` ·
 - Targets full v0.1 spec conformance (Stdlib level)
 - Self-contained single binary (embeds this spec + schema + examples ·
-  `nika spec` / `nika schema` / `nika examples` work offline;
+  `nika spec --canon` / `nika spec --schema` / `nika try` work offline;
   `cargo install nika` joins brew + curl as an install path at 1.0)
 - Exposes the engine's static oracle via MCP server (`nika mcp`) for harness
   integration (Claude Code · Cursor · Hermes · etc.). The MCP surface is
@@ -268,9 +268,9 @@ canonical workflow (foundation + showcase) with tier, constructs and a
 sha256 over the exact text every surface renders. The contract:
 
 - the **docs** and the **website** render projections of these files (never copies)
-- the **reference engine embeds the pack of its version**: `nika examples`
-  / `nika spec` / `nika schema` work offline, and an installed binary always
-  carries the canonical examples *of the language version it speaks*
+- the **reference engine embeds the pack of its version**: `nika try` /
+  `nika spec --canon` / `nika spec --schema` work offline, and an installed
+  binary always carries the canonical examples *of the language version it speaks*
 - the manifest hashes make the pack **verifiable end-to-end**: a tampered or
   drifted example fails the check, anywhere it travels
 

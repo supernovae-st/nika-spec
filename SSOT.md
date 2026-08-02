@@ -89,8 +89,8 @@ spec/templates/         ★ EDIT HERE
        ▼
 engine/crates/nika-pack/pack/     ⚠️ MIRROR · edits here are overwritten
        │
-       ├──▶ `nika new --from <t>`     what a BEGINNER receives
-       ├──▶ `nika examples show <s>`  what an AGENT reads
+       ├──▶ `nika new <t>`            what a BEGINNER receives
+       ├──▶ `nika_examples <s>` (MCP) what an AGENT reads
        └──▶ nika-onboard 62/62        the gate that refuses a broken scaffold
 ```
 
@@ -379,7 +379,8 @@ Three ways to go:
 
 ### What is owed either way
 
-**The index must learn the SHAPES axis.** Today `nika examples teaches` answers
+**The index must learn the SHAPES axis.** Today the per-construct index (the
+`constructs:` rows of [`examples/manifest.yaml`](examples/manifest.yaml)) answers
 « which file shows `for_each:` » and cannot answer « which file shows fan-out
 and merge », which is the question an author with an intent actually has. The
 routing table in the authoring skill already carries the shape vocabulary
