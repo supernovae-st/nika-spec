@@ -54,7 +54,7 @@ files:
   evidence: "its own header: 'Bump deliberately: edit this' · the rev the shared estate tool is mirrored from, and the INPUT the mirror gate compares against"
 - path: "SSOT.md"
   class: authored
-  sha256: 1d5c6617ddbf6ebf8b39efa3f659c596adb663828f7e236ab8a4d2d09352bea6
+  sha256: 6fa8c559c950f19fd6a7e280c62db7d7fc84ef901783beed9b000a2960a54521
   evidence: "the map of where every fact lives — prose and judgments are authored, but it carries ONE generated island (the estate:map markers · §9): scripts/ssot-map-projector.py --write derives the gated-surfaces table from THIS manifest, and --check (exit 5 · conformance.yml 'Projection gates') refuses a hand edit inside the markers — the canon.yaml hybrid, inverted"
 - path: "VERSION"
   class: authored
@@ -62,7 +62,7 @@ files:
   evidence: "hand-set at the v0.1.0-draft spec commit — no lane advances it; the derivations' INPUT (showcase-projector.py reads it as pack_version)"
 - path: "canon.yaml"
   class: generated
-  sha256: 33e5e1e9d6e03d75db7a4183baaae679babfe3295dddaf58995b870f36b39e2d
+  sha256: 5c5e6f40c59cebf5cc9f4e555c1bfe57b2b7c48d56cfdc008c1a69f3c9718cb9
   evidence: "its own header: 'GENERATED · canon.yaml is a generated projection since the C0 flip — manual edits of a generated surface make CI red (ssot-compiler --check-canon · rc=5)' + a detached body-sha256 self-hash per PAA-006"
   derivation:
     tool: "python3 scripts/ssot-compiler.py --emit-canon (ssot-compiler 0.2.0-sandbox · SSOT-1 §21-23, the canon flip)"
@@ -223,7 +223,7 @@ patterns:
 - glob: "conformance/**"
   class: authored
   match_count: 201
-  aggregate_sha256: fb0e2fbc792d5b88e6c4428edca8361c777a9ef250584fd7af9d1f1ba90f67ff
+  aggregate_sha256: f3e694c679731dd871dbccb9637ff760574cd52ec3c15ad3832198f1791bb265
   evidence: "the 95-workflow corpus (envelope · variables · verbs · errors · dag · gates · types · yaml-profile · values · composition · decision-goldens frozen at authoring time and consumed by decision_core_selftest.py) + the Python cores/selftests/runner + README/FINDINGS/runner-protocol; type-corpus + coverage-matrix excepted in files:"
 - glob: "proofs/**"
   class: testimonial
@@ -248,7 +248,7 @@ patterns:
 - glob: "examples/**"
   class: authored
   match_count: 63
-  aggregate_sha256: efa9a942d4e4497cfc5dd05172a743e668697a3c4b9142d229de66f223d997c4
+  aggregate_sha256: 77b95d14911b27aa724376760ce066a85e2a323eba93178bd0b308e33d8ead1f
   evidence: "the ORIGINALS everything downstream copies (engine pack vendoring · docs/website projections) — 7 foundation + 26 showcase workflows, every one executed by the conformance gate ('examples/ — every shipped example executed as a conformance input'); manifest.yaml excepted in files:"
 - glob: "templates/**"
   class: authored
@@ -270,7 +270,7 @@ patterns:
 - glob: "governance/**"
   class: authored
   match_count: 23
-  aggregate_sha256: 7106e1184eeeaeaadf2cb47e28ff464b86e48c3971a5a310492ef0767d721028
+  aggregate_sha256: dd03b493ab5726a386d6a8bc2fc9c15d18dc898fbe676614f879349780ce22cf
   evidence: "the NEP process + NEPs + certifications matrix — hand-written governance prose, link-integrity gated by scripts/check-md-refs.py"
 - glob: "adr/**"
   class: authored
