@@ -1766,7 +1766,7 @@ diagnostics:
     introduced_in: C0
     namespace: SEC
     plane: unclassified
-    condition: 'exec: blocklist hit'
+    condition: 'exec refused before the child spawns — either the shell floor (a destructive/privilege pattern · always-on · independent of permits:) or the mock plane under `nika test`, which refuses EVERY command by design (it simulates the model, not effects) · under test the exit is `nika run` for real effects, or an `on_error: recover` rehearsal on the task'
     outcome_class: failure
     cause: security_error
     retryable: false
