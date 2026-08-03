@@ -218,7 +218,7 @@ refused by `--check` (exit 5), the same contract every projection has.
 | `llms-full.txt` | `python3 scripts/llms-projector.py --write` | `scripts/llms-projector.py --check` |
 | `llms.txt` | `python3 scripts/llms-projector.py --write` | `scripts/llms-projector.py --check` |
 
-Provenance floor: 1309 tracked files classified · authored 981 · generated 130 · pinned-copy 4 · testimonial 193 (estate schema 2 · mode observation).
+Provenance floor: 1319 tracked files classified · authored 991 · generated 130 · pinned-copy 4 · testimonial 193 (estate schema 2 · mode observation).
 
 <!-- /estate:map -->
 

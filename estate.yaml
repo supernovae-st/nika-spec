@@ -54,7 +54,7 @@ files:
   evidence: "its own header: 'Bump deliberately: edit this' · the rev the shared estate tool is mirrored from, and the INPUT the mirror gate compares against"
 - path: "SSOT.md"
   class: authored
-  sha256: af4e64dd92d88f37465e925b7f64f0da2a7583827606480b16b00efcfc036f20
+  sha256: bd80ec54fa1dc7287da56d980f0345860738003dae540adcb0cde9e30d4a379b
   evidence: "the map of where every fact lives — prose and judgments are authored, but it carries ONE generated island (the estate:map markers · §9): scripts/ssot-map-projector.py --write derives the gated-surfaces table from THIS manifest, and --check (exit 5 · conformance.yml 'Projection gates') refuses a hand edit inside the markers — the canon.yaml hybrid, inverted"
 - path: "VERSION"
   class: authored
