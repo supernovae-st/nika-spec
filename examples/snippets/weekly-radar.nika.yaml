@@ -50,7 +50,7 @@ permits:
 tasks:
   approve:
     invoke:
-      # blocking · no `default:` · a gate with a default is not a gate — the
+      # blocking · no `default:` · a gate with a default is not a gate · the
       # checker enforces both directions: `default: false` here turns this
       # file RED with NIKA-SEC-009, because a defaulted prompt dominates
       # nothing. Blocking costs one [headless-prompt] hint instead · that
