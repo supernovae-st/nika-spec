@@ -1131,7 +1131,14 @@ def run_examples(examples_dir: pathlib.Path, validator: Draft202012Validator,
     The named deliberate-red witnesses invert the assertion (they must
     fail with exactly their expected code)."""
     bad = 0
-    for f in sorted(examples_dir.glob("*.nika.yaml")):
+    corpus = sorted(examples_dir.glob("*.nika.yaml"))
+    # An empty harvest asserts nothing and reads as clean — a moved or
+    # renamed corpus directory would retire this gate silently while it
+    # kept reporting green. Blind is RED, not a pass.
+    if not corpus:
+        print(f"FAIL  {examples_dir} · no *.nika.yaml found — the corpus moved, this gate is blind")
+        return 1
+    for f in corpus:
         v = validate_text(f.read_text(), validator, canon)
         expected_red = DELIBERATE_RED.get(f.name)
         if expected_red:
@@ -1154,8 +1161,12 @@ def run_examples(examples_dir: pathlib.Path, validator: Draft202012Validator,
             bad += 1
     # The always-red witness (WITNESS_RED) rides the same lane: it MUST
     # refuse with exactly its code — the trifecta lane's negative proof.
+    # Resolved from SPEC_ROOT, never from examples_dir: the witness lives
+    # beside the runner, and the mode must hold for ANY corpus directory
+    # (examples/snippets joined 2026-08-03 · `examples_dir.parent` was an
+    # accident of the one historical caller and read MISSING on a subdir).
     rel_path, expected_red = WITNESS_RED
-    witness = examples_dir.parent / rel_path
+    witness = SPEC_ROOT / rel_path
     if witness.exists():
         v = validate_text(witness.read_text(), validator, canon)
         codes = {e.get("code") or e.get("namespace") for e in v["errors"]}
@@ -1224,6 +1235,12 @@ def main(argv: list[str]) -> int:
         if showcase.is_dir():
             print("\n== examples/showcase (industry workflows · same gate) ==")
             rc |= run_examples(showcase, validator, canon)
+        # UNCONDITIONAL — the register the website's yamls trace to. A
+        # rename must turn this red (the empty-corpus floor inside
+        # run_examples), never silently retire the gate the way a
+        # conditional would.
+        print("\n== examples/snippets (the website's registered yamls · same gate) ==")
+        rc |= run_examples(SPEC_ROOT / "examples" / "snippets", validator, canon)
         templates = SPEC_ROOT / "templates"
         if templates.is_dir():
             print("\n== templates (instantiable skeletons · must stay valid) ==")

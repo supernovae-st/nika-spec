@@ -18,11 +18,11 @@ classes:
   testimonial: "captured evidence — fixtures, corpora, traces, receipts: proves behavior; neither shipped source nor regenerable output"
   foreign: "pointer to a third-party sovereign source"
 summary:
-  classified_files: 1309
+  classified_files: 1319
   file_rows: 15
   pattern_rows: 29
   by_class:
-    authored: 981
+    authored: 991
     authored-pin: 1
     generated: 130
     pinned-copy: 4
@@ -223,7 +223,7 @@ patterns:
 - glob: "conformance/**"
   class: authored
   match_count: 201
-  aggregate_sha256: f3e694c679731dd871dbccb9637ff760574cd52ec3c15ad3832198f1791bb265
+  aggregate_sha256: 5d475c29618ef6971af8db5edf38f049a3ef019efc50c5fc972239389ec393af
   evidence: "the 95-workflow corpus (envelope · variables · verbs · errors · dag · gates · types · yaml-profile · values · composition · decision-goldens frozen at authoring time and consumed by decision_core_selftest.py) + the Python cores/selftests/runner + README/FINDINGS/runner-protocol; type-corpus + coverage-matrix excepted in files:"
 - glob: "proofs/**"
   class: testimonial
@@ -247,8 +247,8 @@ patterns:
   evidence: "the eval harness humans wrote — run-eval.py · intents.yaml · authorability/{eval.yaml,generate.py,tasks.jsonl} · READMEs; results excepted above"
 - glob: "examples/**"
   class: authored
-  match_count: 63
-  aggregate_sha256: 6ba88c1fb2b5e64ab671bfbb4d69628002b8ca2cc9577a69759fe554e4c4915c
+  match_count: 73
+  aggregate_sha256: 5630ac4361a3a1c395cef9194bb93992ff85bbeae7db446e7b311472ae27bd00
   evidence: "the ORIGINALS everything downstream copies (engine pack vendoring · docs/website projections) — 7 foundation + 26 showcase workflows, every one executed by the conformance gate ('examples/ — every shipped example executed as a conformance input'); manifest.yaml excepted in files:"
 - glob: "templates/**"
   class: authored
