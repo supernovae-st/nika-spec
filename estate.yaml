@@ -18,11 +18,11 @@ classes:
   testimonial: "captured evidence — fixtures, corpora, traces, receipts: proves behavior; neither shipped source nor regenerable output"
   foreign: "pointer to a third-party sovereign source"
 summary:
-  classified_files: 1319
+  classified_files: 1321
   file_rows: 15
   pattern_rows: 29
   by_class:
-    authored: 991
+    authored: 993
     authored-pin: 1
     generated: 130
     pinned-copy: 4
@@ -54,7 +54,7 @@ files:
   evidence: "its own header: 'Bump deliberately: edit this' · the rev the shared estate tool is mirrored from, and the INPUT the mirror gate compares against"
 - path: "SSOT.md"
   class: authored
-  sha256: bd80ec54fa1dc7287da56d980f0345860738003dae540adcb0cde9e30d4a379b
+  sha256: 346876d8c2b98f013c3dcb7430f876cf1067dd12881d3de3f3b9aac2479d8bf4
   evidence: "the map of where every fact lives — prose and judgments are authored, but it carries ONE generated island (the estate:map markers · §9): scripts/ssot-map-projector.py --write derives the gated-surfaces table from THIS manifest, and --check (exit 5 · conformance.yml 'Projection gates') refuses a hand edit inside the markers — the canon.yaml hybrid, inverted"
 - path: "VERSION"
   class: authored
@@ -207,8 +207,8 @@ patterns:
     - "the VOCAB_FIXTURE constant in scripts/gen-gate-matrix.py"
 - glob: "conformance/tests/**"
   class: authored
-  match_count: 537
-  aggregate_sha256: 2c19552fcc063a2fb6a094f6b93b6d38494a3de86fd6eaa0813270efb1b67c7b
+  match_count: 539
+  aggregate_sha256: 970195191b1b8e80cb426275c63609b0a60451f6ad1d39662ea30f5fa9da9985
   evidence: "the executable law — the 5-tier fixture corpus (core · deep 001-022 · lints · runtime · stdlib): input + expected pairs written at spec-authoring time, consumed by conformance/runner.py; no generation markers"
 - glob: "conformance/.nika/**"
   class: testimonial
@@ -290,7 +290,7 @@ patterns:
 - glob: "schemas/**"
   class: authored
   match_count: 4
-  aggregate_sha256: 4127acc7ff0c755489fcb49a92d1a2d7cce9e7f7fd38f026d591a9e1453f5297
+  aggregate_sha256: 738d4896677233042f40616200528f01267f683379d5a8f1763f16eb9347b4e7
   evidence: "workflow.schema.json's own $comment: 'INTERIM hand-derived schema · prose spec is the single source of truth · regenerate + diff against engine nika-schema at GA' — authored today, generated at GA; law.schema.json + registries.schema.json are the sealed R2 design-pack contracts (consumed as-is, byte-identical per PROOFS.md §P0)"
 - glob: "scripts/**"
   class: authored
