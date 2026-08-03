@@ -62,7 +62,7 @@ files:
   evidence: "hand-set at the v0.1.0-draft spec commit — no lane advances it; the derivations' INPUT (showcase-projector.py reads it as pack_version)"
 - path: "canon.yaml"
   class: generated
-  sha256: 5c5e6f40c59cebf5cc9f4e555c1bfe57b2b7c48d56cfdc008c1a69f3c9718cb9
+  sha256: be1dde99e7a1d2069b8771790c49b19a54ac0a1c221c0525eeb6ba423b5c2d76
   evidence: "its own header: 'GENERATED · canon.yaml is a generated projection since the C0 flip — manual edits of a generated surface make CI red (ssot-compiler --check-canon · rc=5)' + a detached body-sha256 self-hash per PAA-006"
   derivation:
     tool: "python3 scripts/ssot-compiler.py --emit-canon (ssot-compiler 0.2.0-sandbox · SSOT-1 §21-23, the canon flip)"
