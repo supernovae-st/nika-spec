@@ -55,7 +55,7 @@ tasks:
       # file RED with NIKA-SEC-009, because a defaulted prompt dominates
       # nothing. Blocking costs one [headless-prompt] hint instead · that
       # hint is the price of a real gate, not a defect to paper over.
-      # Unattended the run pauses (exit 4) — answer and resume with
+      # Unattended the run pauses (exit 4) · answer and resume with
       #   nika run <file> --resume <trace> --answer approve=true
       tool: "nika:prompt"
       args:
