@@ -1,0 +1,11 @@
+{
+  "tier": "t0",
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-AUTH-006",
+      "category": "security_error"
+    }
+  ],
+  "note": "NEP-0003 law 1 · the exec capability is Required whatever the command form — the shell string defers its VALUE to the runtime (law 3), never its category · twin of 003 (argv) · probed live 2026-08-04: the shell spelling passed green while argv refused."
+}
