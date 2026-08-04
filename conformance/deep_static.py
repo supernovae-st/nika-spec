@@ -353,10 +353,15 @@ def _task_required_absent(t: dict) -> set[str]:
     refusal (law 3). Pure/internal builtins and pure agents require nothing."""
     req: set[str] = set()
     if "exec" in t:
-        cmd = _as_dict(t.get("exec")).get("command")
-        prog = cmd[0] if isinstance(cmd, list) and cmd else None
-        if _static_str(prog) is not None:
-            req.add("exec")
+        # NEP-0003 law 1 · the exec CAPABILITY is Required the moment an
+        # exec task sits in the body, whatever the command form (argv
+        # literal · computed argv · shell string). Law 3's runtime
+        # deferral owns the dynamic VALUE cases (which program · which
+        # host), never the category question, which ∅ decides.
+        # (2026-08-04 probe: the shell spelling passed green while the
+        # argv twin refused — the same hole as the engine's permits_fit,
+        # closed in the same arc.)
+        req.add("exec")
     inv = t.get("invoke")
     if isinstance(inv, dict):
         tool = _static_str(inv.get("tool"))
@@ -389,6 +394,7 @@ def _infer_permits_block(tasks: list) -> dict:
     hosts: list[str] = []
     reads: list[str] = []
     writes: list[str] = []
+    exec_any = False
 
     def keep(lst: list, v: str | None) -> None:
         if v is not None and v not in lst:
@@ -398,7 +404,15 @@ def _infer_permits_block(tasks: list) -> dict:
         if "exec" in t:
             cmd = _as_dict(t.get("exec")).get("command")
             prog = cmd[0] if isinstance(cmd, list) and cmd else None
-            keep(programs, _static_str(prog))
+            if _static_str(prog) is not None:
+                keep(programs, prog)
+            else:
+                # Shell string or computed argv: no program allowlist can
+                # verify the form (the runtime refuses that pairing
+                # wholesale) — widen to the whole-exec grant, mirroring
+                # the engine's own inference note, so the block the
+                # diagnostic carries actually re-checks clean.
+                exec_any = True
         inv = t.get("invoke")
         if isinstance(inv, dict):
             tool = _static_str(inv.get("tool"))
@@ -422,7 +436,9 @@ def _infer_permits_block(tasks: list) -> dict:
     block: dict = {}
     if tools:
         block["tools"] = sorted(tools)
-    if programs:
+    if exec_any:
+        block["exec"] = True
+    elif programs:
         block["exec"] = sorted(programs)
     if hosts:
         block["net"] = {"http": sorted(hosts)}

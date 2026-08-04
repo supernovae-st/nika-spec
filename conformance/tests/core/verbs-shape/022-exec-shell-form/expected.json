@@ -1,5 +1,5 @@
 {
   "valid": true,
   "errors": [],
-  "note": "02-verbs.md · shell: is the explicit shell door · valid at the structural layer (the blocklist is a policy layer)."
+  "note": "02-verbs.md · shell: is the explicit shell door · valid at the structural layer (the blocklist is a policy layer) · the exec authority is declared (NEP-0003 · F-O8) so the judgment this fixture exercises is the SHAPE one — the authority refusal of the same form without a block lives in core/authority/027."
 }
