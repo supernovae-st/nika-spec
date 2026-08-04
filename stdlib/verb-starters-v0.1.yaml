@@ -65,6 +65,7 @@ verbs:
     - id: exec-shell
       label: "shell · the explicit door"
       hint: "One /bin/sh line — pipes · redirects · globs. The blocklist applies here; own your interpolations."
+      permits: "{exec: true}"   # NEP-0003 · the starter declares its boundary (the shell form earns the whole grant — no program allowlist verifies a string)
       body: |
         exec:
           shell: "git log --oneline | head -20"   # SLOT: the shell line (pipes/redirects live HERE)
