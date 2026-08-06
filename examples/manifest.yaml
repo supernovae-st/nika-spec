@@ -82,8 +82,8 @@ showcase:
   - file: examples/corpus-digest.nika.yaml
     workflow: {'id': 'corpus-digest', 'description': 'glob a corpus → plan a focus per file → card each doc in a fresh window → jq ranks the deck → one sourced brief'}
     description: ""
-    constructs: [fail_fast, for_each, local_model, max_parallel, on_error, outputs, schema, thinking, with]
-    sha256_16: d99bda4975ae6461
+    constructs: [fail_fast, for_each, local_model, max_parallel, on_error, outputs, schema, thinking, timeout, when, with]
+    sha256_16: fea55d518286fc59
   - file: examples/csv-chart-report.nika.yaml
     workflow: {'id': 'csv-chart-report', 'description': 'CSV / spreadsheet → aggregate → rendered bar chart + markdown report · offline · deterministic'}
     description: ""

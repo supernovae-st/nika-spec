@@ -23,8 +23,10 @@
 #     a model cannot misfile its own card
 #   - the synthesis reads CARDS, never documents · handles, not payloads
 #
-# Needs · nothing — runs on the committed fixture tree
-#         (./examples/fixtures/docs). To digest YOUR folder, edit
+# Needs · nothing to rehearse — the fixture tree is committed
+#         (./examples/fixtures/docs). The real run wants ollama serving
+#         llama3.2:3b (one small resident seat · see `model:`). To
+#         digest YOUR folder, edit
 #         `const.corpus_root` AND the matching `permits.fs.read` entry
 #         TOGETHER: a permit is a literal, it cannot interpolate a const
 #         (`NIKA-AUTH-007`).
@@ -38,7 +40,18 @@ workflow:
   id: corpus-digest
   description: "glob a corpus → plan a focus per file → card each doc in a fresh window → jq ranks the deck → one sourced brief"
 
-model: ollama/qwen3.5:4b   # local · zero key · `--model mock/echo` rehearses the whole file
+run:
+  clock: system   # the `timeout:` deadlines below ride the wall clock · said out loud (see 03)
+
+# A small NON-thinking seat, on purpose: two of the four model stages are
+# forms to fill, and a thinking seat DELIBERATES on forms (measured: the
+# corpus default qwen3.5:4b burned caps of 600, 2000 and 3000 tokens
+# reasoning before the JSON and never closed it · NIKA-INFER-002). One
+# resident seat also spares the model-swap thrash of per-task overrides
+# on a single GPU (measured: alternating two seats sent every stage cold
+# and timed the synthesis out). Upgrade path: point `brief` at a
+# thinking seat via its own `model:` when your machine holds both.
+model: ollama/llama3.2:3b   # local · zero key · `--model mock/echo` rehearses the whole file
 
 inputs:
   question:
@@ -79,13 +92,14 @@ tasks:
     with:
       question: ${{ inputs.question }}
       files: ${{ tasks.files.output }}
+    timeout: "8m"                # a local seat may be slow · bounded, not instant
     infer:
-      max_tokens: 600            # planning is short · cap it and the cost report is a ceiling
+      max_tokens: 3000           # the form is short · the cap is margin, not hope
       prompt: |
-        Question · ${{ with.question }}
-        Files · ${{ with.files }}
-        For each file path, write ONE focus: what this file should be read
-        for, given the question. Do not guess contents — assign an angle.
+        Assign one focus of 3 to 8 words to each file path. The focuses
+        serve this question: ${{ with.question }}
+        Paths · ${{ with.files }}
+        Return the assignments only.
       schema:
         # `additionalProperties: false` on every object node — the plan is
         # read by jq below, so its shape is a promise, not a hope.
@@ -145,12 +159,15 @@ tasks:
     for_each: ${{ with.slices }}
     max_parallel: 3              # rate-limit the provider, not the disk
     fail_fast: false             # finish the batch · one bad doc is not a batch failure
+    timeout: "8m"                # per ITERATION · same reasoning as `plan`
     on_error:
       recover: null              # null holds the index open so the zip below stays aligned
     infer:
-      max_tokens: 800            # a card, not an essay
+      max_tokens: 3000           # a card, not an essay
       prompt: |
-        Read ONE document and return its card.
+        Fill the card for ONE document. Claims are one sentence each,
+        quotes are verbatim and short, relevance is 0 to 5 for the focus.
+        Return the card only.
         Focus · ${{ item.focus }}
         Document (${{ item.path }}) ·
         ${{ item.text }}
@@ -194,6 +211,13 @@ tasks:
     with:
       question: ${{ inputs.question }}
       deck: ${{ tasks.deck.output }}
+    # The synthesis only runs on a NON-EMPTY deck. `recover: null` above
+    # keeps a failed card from aborting the batch — but if EVERY card
+    # died, an ungated brief would synthesize from nothing and sound
+    # confident doing it. The gate turns that silent hazard into a
+    # visible skip.
+    when: ${{ size(with.deck) > 0 }}
+    timeout: "12m"               # judgment gets patience · still bounded
     infer:
       max_tokens: 2000
       prompt: |
