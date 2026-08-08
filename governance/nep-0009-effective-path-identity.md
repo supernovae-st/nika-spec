@@ -33,6 +33,18 @@ the reference fix is refusal of the symlinked bind source, completed by
 an fd-pinned mount; the silent canonical-rewrite alternative (the
 firejail practice) would mount a path the judgment never named.
 
+The third arm fell first, and it is the arm suspected least. Measured
+2026-08-08 on the 0.108.0 binary: an exact grant (`fs.read:
+["./allowed.txt"]`) swapped for a symlink to an out-of-tree secret
+BETWEEN `nika check` (green) and `nika run` was served in full through
+`nika:read` — the in-process builtin re-judged the path the task NAMED,
+and the resolved-vs-resolved comparison followed the planted symlink on
+both sides, so judged equaled executed and neither noticed. The kernel
+path-walk arm (seatbelt) refuses that open; a builtin answers to no
+kernel. The boundary's judgment must therefore hold the grant's FINAL
+component lexical — the identity a planted pivot cannot redirect — on
+every arm that enforces the grant, sandboxed or not.
+
 The contract system calls this invariant 4 — judged = executed =
 attested. A mount that follows a symlink breaks the equation three ways
 at once: the executed path is not the judged one, the journal records
@@ -43,12 +55,16 @@ author declared must be the boundary the kernel enforces, on every arm.
 
 The law (MUST):
 
-1. **Re-judgment at dispatch.** Before any sandbox projection of an
-   `fs.read` / `fs.write` grant, the engine resolves the grant's literal
-   prefix to its effective form — the longest existing ancestor
+1. **Re-judgment at dispatch.** Before any enforcement of an `fs.read` /
+   `fs.write` grant — the sandbox projection of a jailed `exec` AND the
+   in-process builtin boundary (`nika:read` · `nika:write` · `nika:glob`
+   · `nika:grep` · `nika:edit`) alike — the engine resolves the grant's
+   literal prefix to its effective form — the longest existing ancestor
    canonicalized, the not-yet-existing tail carried lexically — and
    tests the identity against the declared set (descendancy, both sides
-   canonical).
+   canonical). The builtin arm is named explicitly because no sandbox
+   covers it: an in-process read answers to no mount projection and no
+   kernel path-walk, so the boundary itself is the only wall.
 2. **Escape = refusal, never rewrite.** An identity that escapes the
    declared set is refused before spawn (`NIKA-SEC-004` class). The
    engine MUST NOT mount the resolved target under the judged name, and
@@ -58,10 +74,11 @@ The law (MUST):
    `fs.path_mismatch`, carrying the judged prefix and the resolved
    target.
 4. **Platform parity.** The same verdict holds on every enforcement arm
-   (kernel path-walk and mount-projection alike); the conformance pair
-   asserts both. A static lint SHOULD name a literal grant that
-   traverses a symlink at check time, but the lint is never the wall —
-   the planted symlink is a run-time fact.
+   — the kernel path-walk arm, the mount-projection arm, AND the
+   in-process builtin boundary; the conformance pair asserts it, so
+   `check ≡ run ≡ jail` descends to symlinks. A static lint SHOULD name
+   a literal grant that traverses a symlink at check time, but the lint
+   is never the wall — the planted symlink is a run-time fact.
 5. **Not-yet-existing writes stay legal.** A write grant whose target
    does not exist is judged on its longest existing ancestor; creation
    under a healthy ancestor is admitted.
@@ -108,6 +125,17 @@ not-yet-existing write targets stay legal by law 5.
   fixtures — the planted-pivot PoC refused before spawn (zero bytes
   read, zero exec event), the not-yet-existing write admitted, the
   platform-parity pair in the CI matrix.
+- The builtin lane (2026-08-08): the same identity judgment on the
+  in-process boundary (`nika-builtin` `FsBoundary` — every `nika:read` /
+  `nika:write` / `nika:glob` / `nika:grep` / `nika:edit` op), refusing
+  the swapped exact grant AND the swapped glob root as
+  `fs.path_mismatch` (`NIKA-SEC-004`), naming the judged prefix and the
+  resolved target. On this plane the refusal is attested as the task's
+  coded failure (the builtin per-op witness frame is the declared v1
+  residual); the verdict class and the carried pair are the exec arm's
+  own. Proven red-first at the unit plane (the swapped grant, the
+  inside-pointing symlink, the swapped root) and at the binary plane
+  (the check-to-run swap refused, zero secret bytes emitted).
 - The residual window and the fd-pin follow-on are carried in the
   engine's inline documentation next to the re-gate.
 
