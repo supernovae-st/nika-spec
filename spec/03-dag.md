@@ -742,7 +742,7 @@ declaration surface — nothing else creates an edge ·
 | **E_d** · data | `with:` bindings referencing `tasks.*` | `value` · `terminal-observation` · `failure-observation` (per field shape · §with) | yes |
 | **E_c** · control | `after:` entries | `control` (with its predicate) | yes |
 | **E_r** · recovery | `on_error.recover:` references | `recovery` — a parking read at recovery time, NOT an execution-order edge (`NIKA-DAG-004` guards the deadlock) | no |
-| **E_f** · finally | `on_finally:` attachment (parent → its cleanup units) | `finally` — cleanup ordering after the parent settles | no (cleanup units are not tasks) |
+| **E_f** · finally | `on_finally:` attachment (parent → its cleanup units · then unit → next unit) | `finally` — cleanup ordering after the parent settles | no · cleanup units are not tasks and never enter `G_p` — but they ARE **nodes** in the projection (`kind: "finally"` · format 3), because a judge that cannot see an effect carrier cannot govern it |
 
 **The precedence graph is `G_p = E_d ∪ E_c`** · it MUST be acyclic
 (`NIKA-DAG-001` · including self-edges) · Kahn wave scheduling runs over
@@ -1211,7 +1211,7 @@ the author records it in the **exec ledger** (task · command · why no
 native path · the unlock that would remove it) — the workflow header
 comment is the conventional home.
 
-## Graph projection (`graph_format: 2`)
+## Graph projection (`graph_format: 3`)
 
 The DAG has ONE canonical machine-readable view: the **graph document**
 a conforming implementation emits for a *checked* workflow (the
@@ -1223,43 +1223,90 @@ workflow whose conformance report is clean.
 
 ```json
 {
-  "graph_format": 2,
+  "graph_format": 3,
   "workflow": "release-notes",
   "nodes": [
     {
-      "id": "gather", "verb": "invoke", "tool": "nika:read",
+      "id": "gather", "kind": "task", "verb": "invoke", "tool": "nika:read",
       "when": null, "fan_out": null,
       "permits": ["fs.read:README.md"], "cost_interval": null
     },
     {
-      "id": "think", "verb": "infer", "model": "mistral/mistral-small",
+      "id": "think", "kind": "task", "verb": "infer", "model": "mistral/mistral-small",
       "when": null, "fan_out": null, "permits": [],
       "cost_interval": [0.0002, 0.0031],
       "timeout_ms": 60000, "outputs": ["summary"]
     },
     {
-      "id": "publish", "verb": "exec",
+      "id": "publish", "kind": "task", "verb": "exec",
       "when": null, "fan_out": null, "permits": ["exec: ./publish.sh"],
       "cost_interval": null, "on_error": "recover"
+    },
+    {
+      "id": "publish::finally:0", "kind": "finally", "parent": "publish", "ordinal": 0,
+      "verb": "exec", "when": null, "fan_out": null,
+      "permits": ["exec: /bin/rm"], "cost_interval": null, "timeout_ms": 30000
     }
   ],
   "edges": [
     { "from": "gather", "to": "think", "kind": "value", "binding": "readme" },
     { "from": "think", "to": "publish", "kind": "control", "predicate": "success" },
-    { "from": "gather", "to": "publish", "kind": "recovery" }
+    { "from": "gather", "to": "publish", "kind": "recovery" },
+    { "from": "publish", "to": "publish::finally:0", "kind": "finally" }
   ]
 }
 ```
 
-**The envelope.** `graph_format: 2` is the W2 reshape (typed edges — a
-breaking change of MEANING, not just of fields: a v1 reader assuming every
-edge is an ordering dependency would mis-read an observation edge, so the
-format number moved). Format 1 is **dead**: no producer, no consumer, no
-compat fallback survives W2 — a reader MUST refuse a format it does not
-speak rather than guess. Within format 2, evolution is **additive only**:
-new fields and new edge `kind` values may appear in the SAME format number;
-readers MUST ignore fields and edge kinds they do not know
-(fold-tolerance — the same law the run stream follows).
+**The envelope.** The number moves only for a change of MEANING, never
+for new fields. Two such moves have happened ·
+
+- **format 2** was the W2 reshape (typed edges): a format-1 reader
+  assuming every edge is an ordering dependency would mis-read an
+  observation edge.
+- **format 3** admits **cleanup units as nodes**. A format-2 reader
+  assumes every node is a task and every node belongs to `G_p` — it
+  would schedule cleanup, or count it in a wave. The `kind` field is
+  what makes the two populations distinguishable, and a reader that does
+  not know `kind` cannot be trusted to keep them apart.
+
+Formats 1 and 2 are **dead**: no producer, no consumer, no compat
+fallback. **A reader MUST refuse a format it does not speak rather than
+guess** — this is the whole point of moving the number, and it is the
+protection format 2 could not offer, because a silently-ignored node is
+a verdict rendered on a graph the judge did not fully see.
+
+Within a format, evolution is **additive only**: new fields and new edge
+`kind` values may appear in the SAME format number; readers MUST ignore
+fields and edge kinds they do not know (fold-tolerance — the same law
+the run stream follows). Node `kind` is the exception that forced the
+bump: it is not additive, because its absence has a meaning
+(*everything is a task*) that is now false.
+
+### Cleanup units are nodes (normative · new in format 3)
+
+Every `on_finally:` unit is projected as a node. Before format 3 they
+were executed, they checked permits, and they emitted trace events — but
+they had **no place in the derived graph**, so every graph-shaped judge
+(order · consent · flow) was blind to them while the runtime ran them.
+A judge that cannot see an effect carrier cannot govern it, and a green
+from such a judge is a claim about a subset.
+
+| Field | Rule |
+|---|---|
+| `id` | `<parent>::finally:<ordinal>` · ordinal is the 0-based declaration index. Not an author-visible name: `tasks.*` never resolves it, and `after:`/`with:` can never reference it. |
+| `kind` | `"finally"` |
+| `parent` | the task id this unit cleans up after |
+| `ordinal` | 0-based position in the declared `on_finally:` list |
+| `verb` · `permits` · `timeout_ms` | as for any node — `permits` is the reason this projection exists · `timeout_ms` defaults to 30000 (§on_finally) |
+| `when` · `fan_out` · `cost_interval` | present-as-null · a cleanup unit takes no gate and no fan-out |
+
+**They are NOT in `G_p`.** `finally` edges never schedule (the `E_f` row
+above) and never participate in cycle detection or wave assignment. A
+reader that adds them to a precedence graph is wrong. The edges are ·
+
+- parent → `::finally:0` · `kind: "finally"`
+- `::finally:<n>` → `::finally:<n+1>` · `kind: "finally"` (units run
+  sequentially in declared order)
 
 **Nodes are topologically sorted** in wave order (over G_p), and the order
 is stable across runs of the projector — stable input, stable layout.
@@ -1270,7 +1317,7 @@ wire contract:
 
 | Presence | Fields | Rule |
 |---|---|---|
-| always | `id` · `verb` · `permits` | `permits` may be empty — per-task capability attribution (`exec:` · `fs.read:` · `fs.write:` · `net.http:` · `tool:` families, deterministic order), the un-aggregated voice of the same effect walk `infer_permits` folds into the workflow boundary |
+| always | `id` · `kind` · `verb` · `permits` | `kind` is `"task"` or `"finally"` (format 3 · a reader MUST branch on it before assuming a node schedules) · `permits` may be empty — per-task capability attribution (`exec:` · `fs.read:` · `fs.write:` · `net.http:` · `tool:` families, deterministic order), the un-aggregated voice of the same effect walk `infer_permits` folds into the workflow boundary |
 | present-as-null when undeclared | `when` · `fan_out` · `cost_interval` | `when` carries the business-condition source (`"true"`/`"false"` literal or the CEL island — POST-gate, never the gate itself) · `fan_out` is `{ "kind": "list" \| "expression" }` with `count` only for the literal-list form · `cost_interval` is `[min_path, worst_case]` USD for **priced inference tasks only** (no price, no interval — never a fabricated 0) |
 | absent when undeclared | `tool` · `model` · `retry_max_attempts` · `timeout_ms` · `on_error` · `outputs` | declared POLICY, projected so clients read it here instead of re-parsing YAML: `tool` for `invoke` tasks · `model` as resolved `provider/name` (task override else workflow default) · `retry.max_attempts` (05) · `timeout:` as parsed milliseconds (unambiguous where the source string is not) · `on_error:` action (`recover` · `skip`) · declared `output:` binding names in source order (04) |
 

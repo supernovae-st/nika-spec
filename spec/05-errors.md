@@ -367,7 +367,7 @@ slow_fetch:
 A `recover: ${{ tasks.X.output }}` reference is **NOT an execution-order
 edge** — it is the *recovery* surface of the reference boundary
 ([04 §boundary](./04-variables.md#the-reference-boundary--where-tasks-may-appear) ·
-projected as a `recovery` edge in `graph_format: 2`, which never schedules).
+projected as a `recovery` edge in `graph_format: 3`, which never schedules).
 Resolution happens at **recovery time** ·
 
 1. The failing task exhausts `retry:` · `on_error.recover` fires.
