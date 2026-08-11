@@ -647,21 +647,49 @@ indistinguishable from a language whose keywords were drawn *at random*
 better names exist: `map:` (states the semantics) and `fan_out:` (states
 the execution).
 
-**It keeps the name anyway, and the reason is stated so nobody has to
-re-derive it.** Parallel-by-default is pillar 3, locked; renaming would
-not change the semantics, only the first-read expectation. What the
-mismatch actually costs is one wrong guess per new author, once,
-recoverable by reading this paragraph. What a rename costs is every
-existing workflow, every doc, every example, and the loss of the one
-word every neighbouring system already uses for this shape (`scatter` in
-WDL/CWL, `Map` in ASL, `withItems` in Argo, `matrix` in GHA — four
-spellings, and `for_each` is the one a reader of any of them guesses).
+**It keeps the name — but three of the arguments usually offered for
+keeping it do not survive contact, and they are struck here rather than
+left for a reviewer to strike.**
 
-**Nobody has measured this specific case** — the studies above cover
-general-purpose languages, not workflow DSLs. So this is a judgement
-recorded with its evidence and its cost, not a result. `max_parallel:`
-is the honest mitigation: it is the field that makes the concurrency
-visible at the call site.
+❌ *« every neighbour uses this word, so a reader guesses it »* —
+**self-refuting.** The neighbours spell it `scatter` (WDL/CWL), `Map`
+(ASL), `withItems` (Argo), `matrix` (GHA). `for_each` is a **fifth**
+spelling, not one of the four, so « a reader of those four guesses ours »
+has no support whatsoever. (The precedent that *would* support it is
+Terraform's `for_each`, whose applies are also concurrent by default —
+that is the citation to check before anyone leans on this argument.)
+
+❌ *« parallel-by-default is pillar 3, locked »* — **a category error.**
+Pillar 3 constrains the **semantics**, not the **spelling**. `map:` with
+parallel-by-default satisfies pillar 3 identically. A semantic lock
+cannot defend a naming choice, and using it that way is precisely the
+after-the-fact justification this spec tries not to commit.
+
+❌ *« renaming changes only the first-read expectation »* — **the word
+« only » is doing illegitimate work.** The studies cited above exist
+*because* first-read expectation is measurable. Their real limit is
+scope: they measure novice accuracy on general-purpose languages, and
+whether that transfers to one field name in a workflow DSL is
+**unknown**. That is the honest caveat, not a dismissal.
+
+**What actually survives** is a migration cost against a bounded and
+partly-measured confusion cost ·
+
+- A rename touches every existing workflow, doc and example, for zero
+  semantic gain.
+- **42% of `for_each` tasks in the corpus also set `max_parallel:`**
+  (45 of 106, derived). Setting a concurrency cap *proves* the author
+  saw the concurrency. The remaining 58% prove nothing either way — so
+  42% is a **floor on informed authorship**, not a comprehension rate.
+- `max_parallel:` is therefore the load-bearing mitigation: it is the
+  field that makes concurrency visible at the call site, and it is
+  already reached for by a large minority unprompted.
+
+**Nobody has measured this specific case.** This is a judgement recorded
+with its evidence, its cost, and its three dead arguments — not a
+result. If someone runs the experiment (`for_each` vs `map:` vs
+`fan_out:`, first-read expectation of ordering) the finding wins over
+this paragraph.
 
 ### `timeout` · *optional · task-level timeout (Go duration string)*
 
