@@ -1211,7 +1211,7 @@ wire contract:
 | `failure-observation` | `binding` | an `.error` reference in `with:` |
 | `control` | `predicate` (`success` · `failure` · `skipped` · `terminal`) | an `after:` entry |
 | `recovery` | — | an `on_error.recover:` reference (source task → declaring task · a parking read, not an ordering edge) |
-| `finally` | — | **reserved** · cleanup units have no runtime identity yet (no events · no trace rows), so W2 emits no `finally` edges — the kind is named so the enum is complete when the trace contract (W5) gives cleanup units identity |
+| `finally` | — | **reserved for the GRAPH** · W2 emits no `finally` edges. ⚠️ The reason given here was *"no runtime identity yet · no events · no trace rows"* and that is **measured FALSE** (2026-08-11): a cleanup unit emits `permit_checked` carrying `plane: on_finally · gate: cleanup #N · decision: attempt`. It HAS runtime identity; what it lacks is a place in the derived graph. **The two are different, and conflating them is how a cleanup unit became invisible to every graph-shaped judge while the runtime executed it** — the defect behind D-2026-08-11-N19 (complete mediation). The edge kind stays unemitted until cleanup units enter the graph; the trace contract already sees them |
 
 One `with:` binding whose expression references N tasks yields N edges
 (each carrying the same `binding` name). The `kind` enum is CLOSED at six —

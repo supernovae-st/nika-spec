@@ -641,6 +641,30 @@ refused in both parse modes, like `permits:`).
   per task — a run has exactly one entropy source and one clock, so the
   composition stays auditable.
 
+### `policy` · *optional · the workflow's declared law*
+
+```yaml
+policy:
+  allow:   { providers: ["mistral", "ollama"] }   # HARD · judged at check
+  limits:  { max_tasks: 20 }                      # HARD · judged at check
+  endorsement: solo                               # HARD · the named solo mode
+  prefer:  { providers: ["ollama", "mistral"] }   # SOFT · recorded, NOT judged
+```
+
+Where `permits:` declares **what the workflow may touch**, `policy:` declares
+**the law it runs under** — which brains it may reach, how many tasks it may
+open, and whether a human gate is required. The families, their hard/soft
+split and their refusals are normative in
+[10 §policy](./10-authority.md) · this section exists so the envelope's own
+inventory is complete.
+
+> ⚰️ **This key was an envelope key with no section here** (added 2026-08-11).
+> Measured: the published schema carries **13** top-level keys and this chapter
+> documented **12** — `policy:` was the one missing, while carrying hard
+> refusals. **An inventory that is one short is worse than no inventory**: it
+> reads complete, and it is exactly the document against which someone writes a
+> migration, an editor plugin, or a second engine.
+
 ### `tasks` · **required · a non-empty MAP · the key IS the identity**
 
 ```yaml
