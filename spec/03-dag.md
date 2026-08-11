@@ -96,6 +96,14 @@ it is a resource name, never referenced inside an expression.)
 
 ### `with` · *optional · the DATA boundary — bindings that ARE edges*
 
+> **A name collision worth knowing about.** In Nix, `with` is the
+> canonical *hidden-dependency* construct: `with pkgs;` pulls an
+> unknown set of names into scope, and a reader cannot tell where an
+> identifier came from without evaluating the set. nika's `with:` is the
+> **exact opposite** — every binding is named at the boundary, and each
+> one *creates a visible edge*. Same token, inverted property. If you
+> arrive from Nix, read this block as `let … in`, not as `with`.
+
 ```yaml
 summarize:
     with:
@@ -627,6 +635,33 @@ everything in [§static liveness](#static-liveness-check-time--normative).
 
 **So the refusal of `while:` is not conservatism.** It is the same line,
 named twice.
+
+#### The name, examined rather than left alone
+
+`for_each` reads sequential and runs **parallel**. That is a real
+mismatch, and the empirical literature on keyword choice is not on its
+side: Stefik & Siebert (ACM TOCE 13(4), 2013) showed novice accuracy
+varies measurably with keyword choice — Perl's was statistically
+indistinguishable from a language whose keywords were drawn *at random*
+— and Lappi et al. (Software Quality Journal, 2023) replicated it. Two
+better names exist: `map:` (states the semantics) and `fan_out:` (states
+the execution).
+
+**It keeps the name anyway, and the reason is stated so nobody has to
+re-derive it.** Parallel-by-default is pillar 3, locked; renaming would
+not change the semantics, only the first-read expectation. What the
+mismatch actually costs is one wrong guess per new author, once,
+recoverable by reading this paragraph. What a rename costs is every
+existing workflow, every doc, every example, and the loss of the one
+word every neighbouring system already uses for this shape (`scatter` in
+WDL/CWL, `Map` in ASL, `withItems` in Argo, `matrix` in GHA — four
+spellings, and `for_each` is the one a reader of any of them guesses).
+
+**Nobody has measured this specific case** — the studies above cover
+general-purpose languages, not workflow DSLs. So this is a judgement
+recorded with its evidence and its cost, not a result. `max_parallel:`
+is the honest mitigation: it is the field that makes the concurrency
+visible at the call site.
 
 ### `timeout` · *optional · task-level timeout (Go duration string)*
 
