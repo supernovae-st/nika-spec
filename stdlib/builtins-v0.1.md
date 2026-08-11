@@ -61,7 +61,21 @@ Returns `null` · best-effort (no failure codes · a log that cannot land never 
 ```yaml
 invoke: { tool: "nika:emit", args: { event_type: custom.event, payload: { ... } } }
 ```
-Emit a custom machine event (consumed by subscribers · journal). Distinct from `log` · `log` = human diagnostic · `emit` = machine event.
+Emit a custom machine event (consumed by subscribers · journal).
+
+> **Why this is not `log` with a different word (normative rationale · 2026-08-11).**
+> The separation was stated as *"`log` = human diagnostic · `emit` = machine
+> event"* — a claim about the intended READER, and a reader is a property of the
+> consumer, not of the write. That reasoning would not have survived the
+> collapse sweep that merged `sleep`+`wait_until` and four introspection
+> builtins. **The load-bearing difference is the FAILURE MODE**, and it is
+> structural: `nika:log` has **no failure codes at all** — a log that cannot
+> land never fails its task — while `emit` **validates the event shape** and
+> refuses `NIKA-BUILTIN-EMIT-001`. Collapsing them forces one of two
+> regressions: either every diagnostic becomes failable (73 files in the
+> measured corpus rely on it not being), or machine events lose their shape
+> gate. Two builtins, two contracts, one event stream — **kept for what they
+> promise on failure, not for who reads them.**
 
 `event_type:` matches `^[a-z][a-z0-9_.-]*$` · `payload:` any JSON value. Returns `null`. Delivery is engine-side (journal · subscribers) · best-effort once shape-valid. Throws · `NIKA-BUILTIN-EMIT-001` (invalid event shape · `validation_error`).
 
