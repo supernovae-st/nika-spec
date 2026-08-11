@@ -496,8 +496,54 @@ v0.1 jq conformance subset (every engine MUST support) ·
 ```
 
 The subset above is the portability floor every engine MUST support. Full jq
-(the `jaq` Rust impl · « full stdlib ») MAY be used: it is the single data
-extraction-and-transform language (`output:` bindings + the `nika:jq` builtin).
+(the `jaq` Rust impl · « full stdlib ») MAY be used **minus what the next
+section refuses** (D-2026-08-11-N26 · ambient reads and the wall clock): it is
+the single data extraction-and-transform language (`output:` bindings + the
+`nika:jq` builtin). ⚠️ *Full-minus-a-prose-list is a floor, not a ceiling.* The
+ceiling is a named, versioned grammar — `jq-subset/0.1`, the sibling of
+[`cel-subset/0.1`](./03-dag.md) — which **does not exist yet**
+(D-2026-08-11-N31 creates it). Until it does, this sentence is the boundary,
+and a boundary written in prose is weaker than one written in EBNF.
+
+#### An expression sees only its input (normative · D-2026-08-11-N26)
+
+> **The world of a data expression is the value it is given, and nothing
+> else.** Not the process, not the clock, not the disk, not the environment.
+> The control expressions of [03 §CEL](./03-dag.md) obey the same law: their
+> world is the bindings they are given.
+
+This is what makes the surrounding closure real. A data expression cannot name
+a host, a path, a program or a tool — those are literal in `permits:`. It
+cannot decide whether a task runs — that is CEL, and CEL is non-Turing. It
+carries no effect of its own. **What remains is a transformation from a value
+to a value, and that is the whole of its power.** The language is not closed
+because it forbids expression; it is closed because an expression cannot
+*reach* anything.
+
+Two consequences, both normative:
+
+- **Ambient reads are refused.** A program that reads the process environment
+  (`env`, `$ENV`), the input filename, or the standard input reaches outside
+  its value. ⚠️ **Measured 2026-08-11 on a shipped engine: `env.NAME` returned
+  the ambient value under an absent `permits:` block and again under an
+  explicit empty `permits.env`, while the static check reported the body as
+  pure compute from which nothing escapes.** The reach is bounded — such a
+  program is a literal in the reviewed file and cannot be interpolated from a
+  model's output (`NIKA-VAR-005`) — but a computation that reads the ambient
+  environment is not pure, and the certificate said it was.
+- **The clock is an input, never an ambient** (D-2026-08-11-N27). `now` and
+  its relatives MUST resolve to the run's start instant, which is already in
+  the trace, so that a replay yields the same value forever. Reading the wall
+  clock would make the same file pass on a fast machine and fail on a slow
+  one — the property a replay exists to deny. A long task therefore sees the
+  START instant, not its own; that is the price of determinism and it is the
+  correct one.
+
+**Why the layer is not simply removed.** The need to reshape a value does not
+disappear with it: an author denied this layer reaches for `exec:` and a real
+subprocess, which is strictly worse. The bounded expression layer is what
+*prevents* the escape to the shell. Subtracting without replacing moves the
+hole; it does not close it.
 
 #### Binding rules (single-value · pure-jq)
 
