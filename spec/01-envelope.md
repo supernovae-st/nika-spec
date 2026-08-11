@@ -560,10 +560,25 @@ subprocess's environment reads are opaque) · the undeclared-read failure
 mode is the child tool's own missing-variable error, and the repair is
 one declared line (`env: [NAME]`).
 
-So `permits: {}` is a workflow provably limited to pure compute (`infer:` +
-CEL + `nika:jq`): zero fs, zero net, zero shell, zero tools, zero env
+So `permits: {}` is a workflow limited to compute (`infer:` + CEL +
+`nika:jq`): zero fs, zero net, zero shell, zero tools, zero env
 passthrough (its children see the runner env floor plus their task `env:`
 maps, nothing else). That property is checkable BEFORE the run.
+
+> ⚠️ **The word `provably` was here and it was measured FALSE on 2026-08-11.**
+> The passthrough claim above holds — it is about what a CHILD PROCESS
+> inherits. What did not hold is the stronger reading a reader takes away:
+> under `permits: {}` a `nika:jq` binding reads the engine's *own* ambient
+> environment (measured: a canary variable reaching a downstream prompt, under
+> an absent block and again under an explicit empty `permits.env`), while the
+> static check reports the body as pure compute from which nothing escapes.
+> **A computation that reads the ambient environment is not pure.** The repair
+> is D-2026-08-11-N26 (*an expression sees only its input*); until it ships,
+> this paragraph says `limited to compute`, not `provably limited to pure
+> compute`. The reach is bounded: such an expression is a literal in the
+> reviewed file and cannot be interpolated from a model's output
+> (`NIKA-VAR-005`), so this is authority an author takes, not authority an
+> injection steals.
 
 **The engine MUST enforce `permits:` on BOTH surfaces** ·
 1. **Statically** (`nika check`) · a `nika:write ./etc/x` outside `fs.write`,

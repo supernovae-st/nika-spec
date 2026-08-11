@@ -21,7 +21,7 @@
 An **effect** is a class of interaction with the world outside the run.
 The v1 vocabulary is exactly the capability surface of
 [01 §permits](./01-envelope.md#permits--optional--the-declared-capability-boundary)
-— **four categories** (this table is the one vocabulary the checker, the
+— **five categories** (this table is the one vocabulary the checker, the
 inference, the certificate, and `policy:` rules all speak — one voice,
 never a parallel list):
 
@@ -31,6 +31,18 @@ never a parallel list):
 | `net` | `nika:fetch` · `nika:notify` (webhook) · any URL-reaching builtin | `permits.net.http` (host allowlist · SSRF floor beneath) |
 | `exec` | the `exec:` verb | `permits.exec` (`false` · `true` · program allowlist) |
 | `tools` | the `invoke:` verb surface | `permits.tools` (id globs) |
+| `env` | the names a child process inherits — composed, never inherited (see [01 §permits](./01-envelope.md#permits--optional--the-declared-capability-boundary)) | `permits.env` (exact names · **never inferred**: a subprocess's environment reads are opaque) |
+
+> **Why this table said `four` until 2026-08-11 (D-2026-08-11-N22).** `permits.env`
+> has shipped in the envelope since the block existed, `NIKA-AUTH-007` counts its
+> entries among the bounds (NEP-0005), and [02 §exec](./02-verbs.md) reaches a
+> child's environment *only through a declared `permits.env:` name*. The table
+> that calls itself **one voice, never a parallel list** did not know the key —
+> so the spec carried exactly the parallel list it forbids. Admitting `env` is
+> **not adding a category, it is documenting one that ships**: a category with no
+> key would change the language; a key with no category made four downstream
+> surfaces (inference · certificate · `policy:` `<effect-class>` · `NIKA-SEC-004`)
+> unable to name it.
 
 Two derived facts the engine computes and no author writes:
 
@@ -89,7 +101,14 @@ is never exposed.
 
 `<effect-class>` is the closed set `exec · write · net · tools` — the
 effect vocabulary above with `fs` split at its grain of harm (`write`;
-reads are not gateable in v1). Soft families are **inert by design** in
+reads are not gateable in v1) **and `env` deliberately absent: a policy
+rule over environment names is a separate decision this spec has not
+taken, and naming it here without the semantics would be a rule that
+cannot be judged** (see the soft-family law in the next sentence, which
+this set must not violate). The gap is stated rather than closed
+silently, because the table above is the one vocabulary and a reader is
+owed the reason a member of it is missing from this derived set.
+Soft families are **inert by design** in
 v1: the solver that would satisfy them is research surface, and a
 constraint that cannot be judged must never look judged — the check
 records them (a hint names them as recorded-not-judged) and nothing
