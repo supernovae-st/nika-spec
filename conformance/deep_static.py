@@ -513,21 +513,24 @@ class _DeferRegate(Exception):
     trusted root) → NEP-0004 law 4 DEFERs to the run-time re-gate."""
 
 
-def _taint_declassified(t: dict) -> set[str]:
-    """The bindings a task-level declassify: raises to trusted (law 5 · the
-    only door). Shape enforcement is the schema's; the oracle reads the
-    `from` set tolerantly (a malformed entry is the schema's finding)."""
+def _taint_lifted(t: dict) -> set[str]:
+    """The bindings a task-level `lift:` entry naming the TAINT law raises to
+    trusted (law 5 · the only door · 10 §the authored doors). Shape
+    enforcement is the schema's; the oracle reads the `from` set tolerantly
+    (a malformed entry is the schema's finding) and ignores every entry
+    naming another law — a data-as-code lift moves no binding."""
     out: set[str] = set()
-    entries = t.get("declassify")
+    entries = t.get("lift")
     if isinstance(entries, list):
         for e in entries:
-            if isinstance(e, dict) and isinstance(e.get("from"), str):
+            if (isinstance(e, dict) and e.get("law") == "taint"
+                    and isinstance(e.get("from"), str)):
                 out.add(e["from"])
     return out
 
 
 def _resolve_untrusted(s: str, inputs: dict, config: dict,
-                       declassified: set) -> tuple:
+                       lifted: set) -> tuple:
     """Resolve the UNTRUSTED ${{ }} references of a verb-argument string at
     check. Returns (resolved, taint_paths) when ≥1 untrusted ref resolves
     and no reference stays dynamic · (None, []) when nothing untrusted
@@ -544,8 +547,8 @@ def _resolve_untrusted(s: str, inputs: dict, config: dict,
         if root not in _TAINT_UNTRUSTED_ROOTS or not name:
             raise _DeferRegate  # trusted root (const · secrets) or dynamic
         binding = f"{root}.{name}"
-        if binding in declassified:
-            raise _DeferRegate  # the declassify: door · trusted here
+        if binding in lifted:
+            raise _DeferRegate  # the lift: taint door · trusted here
         decl = (inputs if root == "inputs" else config).get(name)
         default = decl.get("default") if isinstance(decl, dict) else None
         if not isinstance(default, str):
@@ -692,10 +695,11 @@ def permit_taint_errors(doc: dict, tasks: list) -> list[dict]:
                                f"{' , '.join(paths)} -> {argname} · resolved (default): "
                                f"{resolved!r} -> canonical {canonical!r} ∉ {bound_desc} · "
                                "fix: keep the value inside the boundary · or declare "
-                               "declassify: on the task (the only door)"})
+                               "lift: [{law: taint, from: <binding>, because: \"<why>\"}] "
+                               "on the task (the only door)"})
 
     for tid, t in tasks:
-        declassified = _taint_declassified(t)
+        lifted = _taint_lifted(t)
         inv = t.get("invoke")
         if isinstance(inv, dict):
             tool = inv.get("tool")
@@ -705,7 +709,7 @@ def permit_taint_errors(doc: dict, tasks: list) -> list[dict]:
                 globs = read_globs if is_read else write_globs
                 v = args.get("path")
                 if isinstance(v, str) and EXPR_BODY.search(v):
-                    resolved, paths = _resolve_untrusted(v, inputs, config, declassified)
+                    resolved, paths = _resolve_untrusted(v, inputs, config, lifted)
                     if resolved is not None:
                         canon = _taint_canonical_path(resolved)
                         regate(tid, paths, f"args.path ({tool})", resolved, canon,
@@ -714,7 +718,7 @@ def permit_taint_errors(doc: dict, tasks: list) -> list[dict]:
             elif tool in _TAINT_NET_TOOLS:
                 v = args.get("url")
                 if isinstance(v, str) and EXPR_BODY.search(v):
-                    resolved, paths = _resolve_untrusted(v, inputs, config, declassified)
+                    resolved, paths = _resolve_untrusted(v, inputs, config, lifted)
                     if resolved is not None:
                         host = _taint_canonical_host(resolved)
                         if host is not None:
@@ -728,7 +732,7 @@ def permit_taint_errors(doc: dict, tasks: list) -> list[dict]:
                 for i, el in enumerate(cmd):
                     if not isinstance(el, str) or not EXPR_BODY.search(el):
                         continue
-                    resolved, paths = _resolve_untrusted(el, inputs, config, declassified)
+                    resolved, paths = _resolve_untrusted(el, inputs, config, lifted)
                     if resolved is None:
                         continue
                     if i == 0:
@@ -744,7 +748,8 @@ def permit_taint_errors(doc: dict, tasks: list) -> list[dict]:
                                                f"· resolved (default): {resolved!r} is the re-entry "
                                                f"class, never covered unless listed ∉ exec "
                                                f"{exec_rule} · fix: drop the token · or declare "
-                                               "declassify: on the task (the only door)"})
+                                               "lift: [{law: taint, from: <binding>, "
+                                               "because: \"<why>\"}] on the task (the only door)"})
     return errs
 
 
@@ -977,15 +982,19 @@ def _resolve_static_url(v: str, doc: dict):
 def data_as_code_errors(doc: dict, tasks: list) -> list[dict]:
     """NEP-0006 / LAW-AUTH-0327 · a nika:fetch whose resolved URL path
     names a code-bearing class is refused (NIKA-SEC-008) unless the task
-    declares the inert: door (non-empty · the shape gate is the schema's).
-    The unresolvable defers to the run twin (NIKA-SEC-004 · law 3)."""
+    declares the door — a `lift:` entry naming the DATA-AS-CODE law, with a
+    non-empty `because:` (the shape gate is the schema's · 10 §the authored
+    doors). The unresolvable defers to the run twin (NIKA-SEC-004 · law 3)."""
     errs: list[dict] = []
     for tid, t in tasks:
         inv = t.get("invoke")
         if not isinstance(inv, dict) or inv.get("tool") != "nika:fetch":
             continue
-        door = t.get("inert")
-        if isinstance(door, str) and door:
+        entries = t.get("lift")
+        if isinstance(entries, list) and any(
+                isinstance(e, dict) and e.get("law") == "data-as-code"
+                and isinstance(e.get("because"), str) and e["because"]
+                for e in entries):
             continue  # the declared door · law 2 (empty = the schema's refusal)
         args = _as_dict(inv.get("args"))
         v = args.get("url")
@@ -1004,7 +1013,8 @@ def data_as_code_errors(doc: dict, tasks: list) -> list[dict]:
                                f"· `{ext}`) · {resolved} is a program, not data: the read "
                                "hides an execution sink (NEP-0006 law 1) · fix: model the "
                                "acquisition as the exec it feeds (exec: + a program permit) "
-                               "· or declare the read inert on the task (inert: \"<because>\")"})
+                               "· or declare the read inert on the task "
+                               "(lift: [{law: data-as-code, because: \"<why>\"}])"})
     return errs
 
 
@@ -1198,7 +1208,7 @@ def deep_static_errors(doc: dict) -> list[dict]:
     errs.extend(net_egress_boundary_errors(doc))
 
     # DATA-AS-CODE · NEP-0006 (LAW-AUTH-0327) · a code-bearing fetch is
-    # refused unless the task declares the inert: door (NIKA-SEC-008)
+    # refused unless the task lifts the law (NIKA-SEC-008)
     errs.extend(data_as_code_errors(doc, tasks))
 
     # PERMITS-FIT · the declared boundary must contain the body (01 §permits)

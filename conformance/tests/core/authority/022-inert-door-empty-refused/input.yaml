@@ -10,4 +10,6 @@ tasks:
     invoke:
       tool: nika:fetch
       args: { url: "https://data.example.com/models/legacy.pkl" }
-    inert: ""
+    lift:
+      - law: data-as-code
+        because: ""

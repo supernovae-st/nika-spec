@@ -27,7 +27,7 @@
 | [`09-returns-typed-door`](09-returns-typed-door.nika.yaml) | typed task outputs | `returns:` — the declared shape deep references are proven against |
 | [`10-compose-pipeline`](10-compose-pipeline.nika.yaml) | composition · the caller | `workflow:` under `invoke:` — one workflow calls another, statically resolved |
 | [`10-compose-child`](10-compose-child.nika.yaml) | composition · the callee | the child's contract — typed `inputs:` in, typed `outputs:` out |
-| [`11-declassify-the-door`](11-declassify-the-door.nika.yaml) | the taint's one door | `declassify:` (`from:` · `to: trusted` · `because:`) — defers the check to the run, never lifts the boundary |
+| [`11-declassify-the-door`](11-declassify-the-door.nika.yaml) | the taint's one door | `lift:` (`law: taint` · `from:` · `because:`) — defers the check to the run, never lifts the boundary |
 | [`12-failure-routing`](12-failure-routing.nika.yaml) | routing failure | the `failure` edge predicate — a strictly-failure arm that settles `⊘` on green runs |
 
 All **4 verbs** appear across the path; everything callable is a tool under

@@ -2,8 +2,8 @@
 #
 # The gate under test: F-O7 (NEP-0006 · the data-as-code sink) — a
 # permitted network read must never silently admit a code-bearing
-# artifact (a pickled payload, a script) without the declared `inert:`
-# door.
+# artifact (a pickled payload, a script) without the declared door — a
+# `lift:` entry naming the `data-as-code` law.
 #
 # Expected: NIKA-SEC-008 at CHECK (the serialized-executable class is
 # refused · the door stays declared, never ambient).

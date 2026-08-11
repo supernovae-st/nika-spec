@@ -754,7 +754,7 @@ outputs:                              # what the workflow returns · symmetric t
 | [13 outcomes](./13-outcomes.md) | The Outcome IR · TerminalClass × Cause × Payload · the normative transition table (one source: canon) · `trace_format: 2` |
 | [14 composition](./14-composition.md) | Workflow calling workflow · `invoke: workflow:` (tagged union) · the CallableContract · the ten composition laws · the trace forest |
 | [15 proof](./15-proof.md) | The proof layer · the semantic hash (H = H(domain ‖ version ‖ JCS(IR))) · `nika.lock` (pin by default) · `assert:` (StaticProof · TraceVerified · Unknown) · the one receipt |
-| [16 projections](./16-projections.md) | The oracle surface · one canonical projection (graph_format:2) served byte-identical across CLI · LSP · MCP · the LSP semantic document (`semantic_document_format: 1`) wraps it with spans + one-word `reason` · the additive arc (holes · actions · capabilities over the frozen IR) |
+| [16 projections](./16-projections.md) | The oracle surface · one canonical projection (graph_format:3) served byte-identical across CLI · LSP · MCP · the LSP semantic document (`semantic_document_format: 1`) wraps it with spans + one-word `reason` · the additive arc (holes · actions · capabilities over the frozen IR) |
 | [17 trace](./17-trace.md) | The run journal · NDJSON frames chained by sha256 (`trace_format: 2` · the prologue manifest · the closed kind vocabulary) · the REQUIRED permit-decision witness (NEP-0007 · granted and refused alike) · the differential check ⇔ run equivalence law · graved from an observed run |
 
 **Stdlib** (versioned independently · not a spec section) · [stdlib/](../stdlib/): **<!-- canon:providers -->17<!-- /canon --> providers · <!-- canon:extract_modes -->9<!-- /canon --> extract modes · <!-- canon:builtins -->28<!-- /canon --> builtins** (6 core · 5 file · 8 data · 2 network · 2 introspection · 4 media).
@@ -921,12 +921,40 @@ version, independent of any engine version.)
 **Anti-pattern** · do not write `nika: v1.0` · `nika: "1"` · or
 `nika: 1.0`. The value is exactly `v1`.
 
+> **What this field actually is, stated honestly (2026-08-11).** By the two
+> sentences above — one legal value, no `v2` ever — **`nika: v1` carries zero
+> bits as a version.** It is not a version marker; it is a **magic number**, in
+> the family of `#!/bin/sh`, `%PDF-`, `\x7fELF`: the thing that says *this
+> byte-stream is a Nika workflow*. That is a real and sufficient function, and
+> it is the one to defend it by — *"specifications have versions"* does not
+> survive its own normative text.
+>
+> **Why the file extension is not enough.** On disk, `.nika.yaml` discriminates.
+> A workflow does not always arrive on disk: it arrives as a registry blob, an
+> HTTP body, a stdin pipe (`nika check -`), a chat paste. In all of those the
+> extension is gone and the first line is the only discriminator. **The magic
+> number earns its slot on the transports the registry creates**, not on the
+> filesystem.
+>
+> ⚠️ And the choice is **coupled** to [07 §unknown key](./07-conformance.md):
+> Docker Compose could demote its marker precisely because it chose
+> accept-and-warn — an old runtime meeting a new file just warns. Under our
+> strict refusal an old engine must say *why* it refuses, and the marker is
+> what lets it say *"I do not speak this contract"* rather than *"unknown key"*.
+> The two decisions are one decision, and citing Compose approvingly on the
+> first while going the other way on the second needs this sentence to stay
+> honest.
+
 > **Why one field, not `apiVersion` + `schema`?** Earlier drafts used a
 > Kubernetes-style `apiVersion: nika.sh/v1` (the superseded ADR-021 form)
 > plus a separate `schema: nika/workflow@v1` (superseded too). That is two version-ish fields and
 > ceremony a workflow file does not need. Modern specs converge on a
 > single version marker: OpenAPI writes `openapi: 3.1.0`, Docker
-> Compose dropped its `version:` field entirely. Nika takes the
+> Compose **deprecated its `version:` field to informative-only** (it is
+> still defined by the Compose Specification for backward compatibility,
+> still parsed, and emits an obsolescence warning — the earlier wording here,
+> *"dropped it entirely"*, was a hand-typed claim and is **factually wrong**;
+> corrected 2026-08-11 against the live Compose reference). Nika takes the
 > middle, proven path: **one field, the language name as the key, the
 > contract version as the value.** The engine's internal canonical URI
 > stays `https://nika.sh/spec/v1` for RDF / conformance tooling, but
@@ -1351,10 +1379,25 @@ subprocess's environment reads are opaque) · the undeclared-read failure
 mode is the child tool's own missing-variable error, and the repair is
 one declared line (`env: [NAME]`).
 
-So `permits: {}` is a workflow provably limited to pure compute (`infer:` +
-CEL + `nika:jq`): zero fs, zero net, zero shell, zero tools, zero env
+So `permits: {}` is a workflow limited to compute (`infer:` + CEL +
+`nika:jq`): zero fs, zero net, zero shell, zero tools, zero env
 passthrough (its children see the runner env floor plus their task `env:`
 maps, nothing else). That property is checkable BEFORE the run.
+
+> ⚠️ **The word `provably` was here and it was measured FALSE on 2026-08-11.**
+> The passthrough claim above holds — it is about what a CHILD PROCESS
+> inherits. What did not hold is the stronger reading a reader takes away:
+> under `permits: {}` a `nika:jq` binding reads the engine's *own* ambient
+> environment (measured: a canary variable reaching a downstream prompt, under
+> an absent block and again under an explicit empty `permits.env`), while the
+> static check reports the body as pure compute from which nothing escapes.
+> **A computation that reads the ambient environment is not pure.** The repair
+> is D-2026-08-11-N26 (*an expression sees only its input*); until it ships,
+> this paragraph says `limited to compute`, not `provably limited to pure
+> compute`. The reach is bounded: such an expression is a literal in the
+> reviewed file and cannot be interpolated from a model's output
+> (`NIKA-VAR-005`), so this is authority an author takes, not authority an
+> injection steals.
 
 **The engine MUST enforce `permits:` on BOTH surfaces** ·
 1. **Statically** (`nika check`) · a `nika:write ./etc/x` outside `fs.write`,
@@ -1416,6 +1459,30 @@ refused in both parse modes, like `permits:`).
 - **One run, one clock**: the declaration lives at the envelope, never
   per task — a run has exactly one entropy source and one clock, so the
   composition stays auditable.
+
+### `policy` · *optional · the workflow's declared law*
+
+```yaml
+policy:
+  allow:   { providers: ["mistral", "ollama"] }   # HARD · judged at check
+  limits:  { max_tasks: 20 }                      # HARD · judged at check
+  endorsement: solo                               # HARD · the named solo mode
+  prefer:  { providers: ["ollama", "mistral"] }   # SOFT · recorded, NOT judged
+```
+
+Where `permits:` declares **what the workflow may touch**, `policy:` declares
+**the law it runs under** — which brains it may reach, how many tasks it may
+open, and whether a human gate is required. The families, their hard/soft
+split and their refusals are normative in
+[10 §policy](./10-authority.md) · this section exists so the envelope's own
+inventory is complete.
+
+> ⚰️ **This key was an envelope key with no section here** (added 2026-08-11).
+> Measured: the published schema carries **13** top-level keys and this chapter
+> documented **12** — `policy:` was the one missing, while carrying hard
+> refusals. **An inventory that is one short is worse than no inventory**: it
+> reads complete, and it is exactly the document against which someone writes a
+> migration, an editor plugin, or a second engine.
 
 ### `tasks` · **required · a non-empty MAP · the key IS the identity**
 
@@ -1783,7 +1850,7 @@ A v0.1-compliant engine MUST ·
 - Call the configured provider with the given prompt + system + parameters
 - Return the model's response as the task output
 - Validate the response against `schema` if present · MAY auto-retry validation failures internally before surfacing `NIKA-INFER-002` (engine-configurable · the same rule as [05 §structured output](./05-errors.md#structured-output-validation))
-- Reject any unknown field with a clear error (forward-compat) · or accept + warn (engine choice)
+- **Reject** any unknown field with a clear error (`NIKA-PARSE-005`) — the choice this line used to leave open is closed by [07 §unknown key](./07-conformance.md#an-unknown-key-is-an-error-at-every-level-normative--d-2026-08-11-n20): a key can REMOVE authority, so accept-and-warn fails open
 
 ---
 
@@ -2793,6 +2860,43 @@ This is the one construct that lets a v1 workflow process a
 runtime-computed number of items (N files · N search hits · N pages)
 without statically enumerating tasks.
 
+#### Where this sits · deliberately between two named dataflow models
+
+`for_each` is not a loop that got restricted. It is a specific point on a
+line the dataflow literature drew in the 1980s and 90s, and the position is
+the whole reason the language stays checkable ·
+
+```
+   SDF · synchronous dataflow          Lee & Messerschmitt 1987
+     token rates FIXED at compile time
+     ⇒ static schedule · bounded memory · deadlock-freedom · ALL DECIDABLE
+     ⇒ but a data-dependent count cannot be expressed AT ALL
+
+          ▼   nika `for_each` sits HERE   ▼
+     · cardinality N is DATA-DEPENDENT (not SDF)
+     · the collection is a PRE-FAN-OUT surface, evaluated EXACTLY ONCE
+     · NO feedback from the iterations back into the graph
+     · a task cannot fan out over its own output
+     ⇒ N is unknown at check time · the PROGRAM stays finite and analysable
+
+   BDF · Boolean dataflow              Buck & Lee 1993 · Lee & Parks,
+     data-dependent switch/select      Proc. IEEE 83(5), 1995
+     ⇒ TURING-COMPLETE
+     ⇒ bounded-memory scheduling and deadlock-freedom become UNDECIDABLE
+```
+
+In the vendor-neutral workflow-pattern vocabulary (Russell, ter Hofstede,
+van der Aalst, Mulyar, *Workflow Control-Flow Patterns: A Revised View*,
+BPM-06-22, 2006) this is exactly **WCP-14 supported** (multiple instances
+with run-time knowledge of N) and **WCP-15 structurally refused** (multiple
+instances *without* a priori run-time knowledge — new iterations added while
+the fan-out is already running). WCP-15 is a switch whose decision re-enters
+the graph. That is the BDF line, and crossing it costs the decidability of
+everything in [§static liveness](#static-liveness-check-time--normative).
+
+**So the refusal of `while:` is not conservatism.** It is the same line,
+named twice.
+
 ### `timeout` · *optional · task-level timeout (Go duration string)*
 
 ```yaml
@@ -2908,7 +3012,7 @@ declaration surface — nothing else creates an edge ·
 | **E_d** · data | `with:` bindings referencing `tasks.*` | `value` · `terminal-observation` · `failure-observation` (per field shape · §with) | yes |
 | **E_c** · control | `after:` entries | `control` (with its predicate) | yes |
 | **E_r** · recovery | `on_error.recover:` references | `recovery` — a parking read at recovery time, NOT an execution-order edge (`NIKA-DAG-004` guards the deadlock) | no |
-| **E_f** · finally | `on_finally:` attachment (parent → its cleanup units) | `finally` — cleanup ordering after the parent settles | no (cleanup units are not tasks) |
+| **E_f** · finally | `on_finally:` attachment (parent → its cleanup units · then unit → next unit) | `finally` — cleanup ordering after the parent settles | no · cleanup units are not tasks and never enter `G_p` — but they ARE **nodes** in the projection (`kind: "finally"` · format 3), because a judge that cannot see an effect carrier cannot govern it |
 
 **The precedence graph is `G_p = E_d ∪ E_c`** · it MUST be acyclic
 (`NIKA-DAG-001` · including self-edges) · Kahn wave scheduling runs over
@@ -2993,6 +3097,75 @@ along G_p ·
 A literal `when: false` alone is **not** a finding — it is the documented
 never-pattern (feature-flag). The task settles `skipped` by explicit
 intent, and downstream edges judge that state like any other.
+
+### What that liveness check IS · soundness, and what it costs elsewhere
+
+`NIKA-DAG-006` is not a nika invention. It is a **sound but incomplete
+approximation** of condition (iii) of **soundness**, the workflow-net
+correctness property defined by van der Aalst (1997/1998) and surveyed
+in *Soundness of workflow nets: classification, decidability, and
+analysis* (Formal Aspects of Computing 23(3):333–363, 2011). The three
+conditions are ·
+
+| Soundness condition | Where nika earns it |
+|---|---|
+| (i) **option to complete** — the final state is reachable from every reachable state | structural · `G_p` is finite and acyclic, so a topological order exists and the wave scheduler drains it in at most \|V\| waves. A task that cannot start still *settles* (`cancelled` propagates along every edge whose pass-set excludes its producer) — there is no wait state that no edge can leave. |
+| (ii) **proper completion** — nothing is left running when the workflow ends | structural · **every task settles exactly once**, into exactly one of four terminal states. There is no construct that puts a second thread of control on a node, so there is no residual token to leave behind. |
+| (iii) **no dead transitions** — every activity fires in at least one execution | **approximated · sound, not complete** · `NIKA-DAG-006` / `NIKA-DAG-007`, above, refused before any run. See the limit below. |
+
+> **The limit, stated honestly (measured on 0.108.0).** The reachability
+> pass folds a per-task possible-status set and tests **each edge
+> separately** against it — an *independent product*, which
+> over-approximates the reachable joint assignments. It therefore never
+> sees a death that depends on a **correlation between two producers of
+> a common ancestor**. A worked counterexample that `check` accepts
+> today ·
+>
+> ```yaml
+> tasks:
+>   upstream:       { exec: { command: ["true"] } }
+>   branch_success: { after: { upstream: success }, exec: { command: ["true"] } }
+>   branch_failure: { after: { upstream: failure }, exec: { command: ["true"] } }
+>   dead:
+>     after: { branch_success: success, branch_failure: success }
+>     exec: { command: ["true"] }
+> ```
+>
+> `upstream` settles into exactly ONE state, so `branch_success` and
+> `branch_failure` can never both be `success` in the same run — `dead`
+> is cancelled on every possible execution. `check` reports
+> `✔ GATES no task proven dead`.
+>
+> The direction of the error is the part that matters: the pass is
+> **sound** (a refused task is genuinely dead — no false positives) and
+> **incomplete** (a dead task can slip through — false negatives). It
+> never refuses a live program. Tightening it to the true joint set is a
+> known, bounded piece of work; claiming it already decides condition
+> (iii) would not be.
+
+The reason this is worth stating: **soundness is EXPSPACE-complete in
+general** (Blondin, Mazowiecki, Offtermatt, LICS 2022 · arXiv:2201.05588 ·
+generalised soundness PSPACE-complete), and PTIME only for the free-choice
+subclass. In nika, (i) and (ii) hold **by shape** and (iii) is
+approximated in polynomial time over `G_p` — because the shape was
+chosen to make the question tractable, not because the check is clever.
+The honest scoreboard: two conditions structural, one condition sound
+but not yet complete, and a general problem that is EXPSPACE-complete.
+Argo, GitHub Actions, Airflow and Step Functions accept a branch that
+can never fire at all.
+
+> **The permanent rule this buys.** A construct that cancels an **arbitrary
+> region** — rather than propagating along declared edges — is a *reset arc*,
+> and reset arcs make **every** variant of soundness **undecidable** (Blondin,
+> Finkel, Hofman, Mazowiecki, Offtermatt, LICS 2024 · DOI
+> 10.1145/3661814.3662086). YAWL cancellation regions and BPMN
+> cancel/compensate/error events are exactly this. nika's cancellation is
+> monotone propagation along edges that already exist, computed from
+> context-free pass-sets — it never leaves the decidable class. **This is a
+> permanent refusal, not a defer.**
+>
+> The same cliff closes the general OR-join: its accepted formalization is a
+> reset net. See [08 §antivalues](./08-out-of-scope.md).
 
 ---
 
@@ -3342,7 +3515,7 @@ the author records it in the **exec ledger** (task · command · why no
 native path · the unlock that would remove it) — the workflow header
 comment is the conventional home.
 
-## Graph projection (`graph_format: 2`)
+## Graph projection (`graph_format: 3`)
 
 The DAG has ONE canonical machine-readable view: the **graph document**
 a conforming implementation emits for a *checked* workflow (the
@@ -3354,43 +3527,90 @@ workflow whose conformance report is clean.
 
 ```json
 {
-  "graph_format": 2,
+  "graph_format": 3,
   "workflow": "release-notes",
   "nodes": [
     {
-      "id": "gather", "verb": "invoke", "tool": "nika:read",
+      "id": "gather", "kind": "task", "verb": "invoke", "tool": "nika:read",
       "when": null, "fan_out": null,
       "permits": ["fs.read:README.md"], "cost_interval": null
     },
     {
-      "id": "think", "verb": "infer", "model": "mistral/mistral-small",
+      "id": "think", "kind": "task", "verb": "infer", "model": "mistral/mistral-small",
       "when": null, "fan_out": null, "permits": [],
       "cost_interval": [0.0002, 0.0031],
       "timeout_ms": 60000, "outputs": ["summary"]
     },
     {
-      "id": "publish", "verb": "exec",
+      "id": "publish", "kind": "task", "verb": "exec",
       "when": null, "fan_out": null, "permits": ["exec: ./publish.sh"],
       "cost_interval": null, "on_error": "recover"
+    },
+    {
+      "id": "publish::finally:0", "kind": "finally", "parent": "publish", "ordinal": 0,
+      "verb": "exec", "when": null, "fan_out": null,
+      "permits": ["exec: /bin/rm"], "cost_interval": null, "timeout_ms": 30000
     }
   ],
   "edges": [
     { "from": "gather", "to": "think", "kind": "value", "binding": "readme" },
     { "from": "think", "to": "publish", "kind": "control", "predicate": "success" },
-    { "from": "gather", "to": "publish", "kind": "recovery" }
+    { "from": "gather", "to": "publish", "kind": "recovery" },
+    { "from": "publish", "to": "publish::finally:0", "kind": "finally" }
   ]
 }
 ```
 
-**The envelope.** `graph_format: 2` is the W2 reshape (typed edges — a
-breaking change of MEANING, not just of fields: a v1 reader assuming every
-edge is an ordering dependency would mis-read an observation edge, so the
-format number moved). Format 1 is **dead**: no producer, no consumer, no
-compat fallback survives W2 — a reader MUST refuse a format it does not
-speak rather than guess. Within format 2, evolution is **additive only**:
-new fields and new edge `kind` values may appear in the SAME format number;
-readers MUST ignore fields and edge kinds they do not know
-(fold-tolerance — the same law the run stream follows).
+**The envelope.** The number moves only for a change of MEANING, never
+for new fields. Two such moves have happened ·
+
+- **format 2** was the W2 reshape (typed edges): a format-1 reader
+  assuming every edge is an ordering dependency would mis-read an
+  observation edge.
+- **format 3** admits **cleanup units as nodes**. A format-2 reader
+  assumes every node is a task and every node belongs to `G_p` — it
+  would schedule cleanup, or count it in a wave. The `kind` field is
+  what makes the two populations distinguishable, and a reader that does
+  not know `kind` cannot be trusted to keep them apart.
+
+Formats 1 and 2 are **dead**: no producer, no consumer, no compat
+fallback. **A reader MUST refuse a format it does not speak rather than
+guess** — this is the whole point of moving the number, and it is the
+protection format 2 could not offer, because a silently-ignored node is
+a verdict rendered on a graph the judge did not fully see.
+
+Within a format, evolution is **additive only**: new fields and new edge
+`kind` values may appear in the SAME format number; readers MUST ignore
+fields and edge kinds they do not know (fold-tolerance — the same law
+the run stream follows). Node `kind` is the exception that forced the
+bump: it is not additive, because its absence has a meaning
+(*everything is a task*) that is now false.
+
+### Cleanup units are nodes (normative · new in format 3)
+
+Every `on_finally:` unit is projected as a node. Before format 3 they
+were executed, they checked permits, and they emitted trace events — but
+they had **no place in the derived graph**, so every graph-shaped judge
+(order · consent · flow) was blind to them while the runtime ran them.
+A judge that cannot see an effect carrier cannot govern it, and a green
+from such a judge is a claim about a subset.
+
+| Field | Rule |
+|---|---|
+| `id` | `<parent>::finally:<ordinal>` · ordinal is the 0-based declaration index. Not an author-visible name: `tasks.*` never resolves it, and `after:`/`with:` can never reference it. |
+| `kind` | `"finally"` |
+| `parent` | the task id this unit cleans up after |
+| `ordinal` | 0-based position in the declared `on_finally:` list |
+| `verb` · `permits` · `timeout_ms` | as for any node — `permits` is the reason this projection exists · `timeout_ms` defaults to 30000 (§on_finally) |
+| `when` · `fan_out` · `cost_interval` | present-as-null · a cleanup unit takes no gate and no fan-out |
+
+**They are NOT in `G_p`.** `finally` edges never schedule (the `E_f` row
+above) and never participate in cycle detection or wave assignment. A
+reader that adds them to a precedence graph is wrong. The edges are ·
+
+- parent → `::finally:0` · `kind: "finally"`
+- `::finally:<n>` → `::finally:<n+1>` · `kind: "finally"` (units run
+  sequentially in declared order)
 
 **Nodes are topologically sorted** in wave order (over G_p), and the order
 is stable across runs of the projector — stable input, stable layout.
@@ -3401,9 +3621,9 @@ wire contract:
 
 | Presence | Fields | Rule |
 |---|---|---|
-| always | `id` · `verb` · `permits` | `permits` may be empty — per-task capability attribution (`exec:` · `fs.read:` · `fs.write:` · `net.http:` · `tool:` families, deterministic order), the un-aggregated voice of the same effect walk `infer_permits` folds into the workflow boundary |
+| always | `id` · `kind` · `verb` · `permits` | `kind` is `"task"` or `"finally"` (format 3 · a reader MUST branch on it before assuming a node schedules) · `permits` may be empty — per-task capability attribution (`exec:` · `fs.read:` · `fs.write:` · `net.http:` · `tool:` families, deterministic order), the un-aggregated voice of the same effect walk `infer_permits` folds into the workflow boundary |
 | present-as-null when undeclared | `when` · `fan_out` · `cost_interval` | `when` carries the business-condition source (`"true"`/`"false"` literal or the CEL island — POST-gate, never the gate itself) · `fan_out` is `{ "kind": "list" \| "expression" }` with `count` only for the literal-list form · `cost_interval` is `[min_path, worst_case]` USD for **priced inference tasks only** (no price, no interval — never a fabricated 0) |
-| absent when undeclared | `tool` · `model` · `retry_max_attempts` · `timeout_ms` · `on_error` · `outputs` | declared POLICY, projected so clients read it here instead of re-parsing YAML: `tool` for `invoke` tasks · `model` as resolved `provider/name` (task override else workflow default) · `retry.max_attempts` (05) · `timeout:` as parsed milliseconds (unambiguous where the source string is not) · `on_error:` action (`recover` · `skip` · `fail_workflow`) · declared `output:` binding names in source order (04) |
+| absent when undeclared | `tool` · `model` · `retry_max_attempts` · `timeout_ms` · `on_error` · `outputs` | declared POLICY, projected so clients read it here instead of re-parsing YAML: `tool` for `invoke` tasks · `model` as resolved `provider/name` (task override else workflow default) · `retry.max_attempts` (05) · `timeout:` as parsed milliseconds (unambiguous where the source string is not) · `on_error:` action (`recover` · `skip`) · declared `output:` binding names in source order (04) |
 
 **Edges** carry `from` · `to` · `kind` — and per kind ·
 
@@ -3414,7 +3634,7 @@ wire contract:
 | `failure-observation` | `binding` | an `.error` reference in `with:` |
 | `control` | `predicate` (`success` · `failure` · `skipped` · `terminal`) | an `after:` entry |
 | `recovery` | — | an `on_error.recover:` reference (source task → declaring task · a parking read, not an ordering edge) |
-| `finally` | — | **reserved** · cleanup units have no runtime identity yet (no events · no trace rows), so W2 emits no `finally` edges — the kind is named so the enum is complete when the trace contract (W5) gives cleanup units identity |
+| `finally` | — | **reserved for the GRAPH** · W2 emits no `finally` edges. ⚠️ The reason given here was *"no runtime identity yet · no events · no trace rows"* and that is **measured FALSE** (2026-08-11): a cleanup unit emits `permit_checked` carrying `plane: on_finally · gate: cleanup #N · decision: attempt`. It HAS runtime identity; what it lacks is a place in the derived graph. **The two are different, and conflating them is how a cleanup unit became invisible to every graph-shaped judge while the runtime executed it** — the defect behind D-2026-08-11-N19 (complete mediation). The edge kind stays unemitted until cleanup units enter the graph; the trace contract already sees them |
 
 One `with:` binding whose expression references N tasks yields N edges
 (each carrying the same `binding` name). The `kind` enum is CLOSED at six —
@@ -3942,8 +4162,143 @@ v0.1 jq conformance subset (every engine MUST support) ·
 ```
 
 The subset above is the portability floor every engine MUST support. Full jq
-(the `jaq` Rust impl · « full stdlib ») MAY be used: it is the single data
-extraction-and-transform language (`output:` bindings + the `nika:jq` builtin).
+(the `jaq` Rust impl · « full stdlib ») MAY be used **minus what the next
+section refuses** (D-2026-08-11-N26 · ambient reads and the wall clock): it is
+the single data extraction-and-transform language (`output:` bindings + the
+`nika:jq` builtin). ⚠️ *Full-minus-a-prose-list is a floor, not a ceiling.* The
+ceiling is a named, versioned grammar — `jq-subset/0.1`, the sibling of
+[`cel-subset/0.1`](./03-dag.md) — which **does not exist yet**
+(D-2026-08-11-N31 creates it). Until it does, this sentence is the boundary,
+and a boundary written in prose is weaker than one written in EBNF.
+
+##### Formal grammar · jq v0.1 subset (normative · grammar version `jq-subset/0.1`)
+
+Prose + examples are not re-implementable; this EBNF is. A conformant engine
+parses exactly this grammar in an `output:` binding and in `nika:jq` (it is a
+strict subset of jq: **any full jq parser accepts every expression below**) ·
+
+```ebnf
+program  = pipeline ;
+pipeline = alt , { "|" , alt } ;
+alt      = cmp , { "//" , cmp } ;             (* alternative · the // operator *)
+cmp      = sum , [ cmpop , sum ] ;            (* at most ONE comparison · non-associative *)
+cmpop    = "==" | "!=" | "<" | "<=" | ">" | ">=" ;
+sum      = term , { ( "+" | "-" ) , term } ;
+term     = unary , { ( "*" | "/" ) , unary } ;
+unary    = [ "-" ] , postfix ;
+postfix  = primary , { suffix } ;
+suffix   = "." , IDENT
+         | "[" , [ pipeline ] , "]"           (* index · [] iterates · NO slice in 0.1 *)
+         | "?" ;                              (* optional · swallows the type error *)
+reduce   = "reduce" , postfix , "as" , "$" , IDENT ,
+           "(" , pipeline , ";" , pipeline , ")" ;   (* bounded fold · the stream IS the bound *)
+format   = "@" , ( "base64" | "base64d" | "text" | "json" | "csv" | "tsv" | "uri" ) ;
+primary  = "."                                (* identity *)
+         | "." , IDENT
+         | call | literal | object | array
+         | reduce | format
+         | "$" , IDENT
+         | "(" , pipeline , ")" ;
+call     = FUNC , [ "(" , pipeline , { ";" , pipeline } , ")" ] ;
+object   = "{" , [ pair , { "," , pair } ] , "}" ;
+pair     = ( IDENT | STRING ) , [ ":" , pipeline ] ;
+array    = "[" , [ pipeline ] , "]" ;
+literal  = NUMBER | STRING | "true" | "false" | "null" ;
+```
+
+`FUNC` is the **closed** set ·
+
+```
+length · keys · values · has · type · not · empty · error
+map · map_values · select · add · join · split · flatten · range
+sort · sort_by · group_by · unique · unique_by · reverse
+first · last · min · max · min_by · max_by · any · all
+to_entries · from_entries · with_entries · del · paths
+tostring · tonumber · tojson · fromjson · getpath · setpath · leaf_paths
+ascii_downcase · ascii_upcase · ltrimstr · rtrimstr · startswith · endswith
+floor · ceil · fabs
+```
+
+**The set is deliberately small, and small is the safe direction**: a minor
+version may only ADD (same law as `cel-subset/0.1`), so a name omitted here
+costs one amendment while a name admitted early can never be withdrawn.
+
+> ⚠️ **The first cut of this grammar refused four of THIS SPEC'S OWN canonical
+> recipes** (2026-08-11 · corrected the same day). It had been verified against
+> the 41 programs the corpus *uses* and never against the recipes
+> [stdlib §what jq subsumes](../stdlib/builtins-v0.1.md) *recommends* —
+> `reduce`, the `@base64` formats, and the `getpath`/`setpath`/`leaf_paths`
+> family, which the cut-builtin table publishes as the supported way to do
+> the work those builtins used to do. **A corpus of USE and a corpus of
+> RECOMMENDATION are two different subjects**, and a grammar that refuses its
+> own documentation would have made the spec self-contradictory the day it
+> shipped. `reduce` is admitted with its stream as the bound — it folds over
+> a finite stream and cannot recurse, so it terminates by construction and
+> does not reopen what the table below refuses. Both corpora now pass: 40/40
+> programs, 9/9 recipes.
+Derived from the corpus, not invented: over **41 programs** in the shipped and
+internal corpora, the functions actually used are `map · sort · last ·
+fromjson · join · length`, plus paths, the pipe, object/array construction and
+arithmetic. Everything above is that set plus its obvious companions.
+
+**What the grammar refuses BY CONSTRUCTION, and why ·**
+
+| Absent | Why |
+|---|---|
+| `recurse` · `..` · `while` · `until` · `repeat` | non-termination · a binding must be decidable at check |
+| `def` | user-defined recursion re-introduces the same |
+| `env` · `$ENV` · `input` · `inputs` · `input_filename` | ambient reads · the law above |
+| `debug` · `stderr` | writes outside the value |
+| `now` · `localtime` · `gmtime` · `mktime` · `strftime` | the clock · an input, never an ambient (N27) |
+| `halt` · `halt_error` | process control · a data expression does not end a run |
+| `test` · `match` · `sub` · `gsub` · `splits` · `scan` | regex · data-dependent blowup · deferred to a minor that pairs them with a bounded engine, not banned on principle |
+| slices `.[a:b]` | omitted for 0.1 only · a minor may add |
+
+⚠️ **A grammar bounds the SHAPE, never the MAGNITUDE.** `[range(1e9)]`
+parses clean and still materialises a billion elements. That is the runtime
+step budget's job (D-2026-08-11-N32), and the two ceilings are not
+interchangeable: the static one buys **termination**, the runtime one buys
+**size**. Neither alone is enough.
+
+#### An expression sees only its input (normative · D-2026-08-11-N26)
+
+> **The world of a data expression is the value it is given, and nothing
+> else.** Not the process, not the clock, not the disk, not the environment.
+> The control expressions of [03 §CEL](./03-dag.md) obey the same law: their
+> world is the bindings they are given.
+
+This is what makes the surrounding closure real. A data expression cannot name
+a host, a path, a program or a tool — those are literal in `permits:`. It
+cannot decide whether a task runs — that is CEL, and CEL is non-Turing. It
+carries no effect of its own. **What remains is a transformation from a value
+to a value, and that is the whole of its power.** The language is not closed
+because it forbids expression; it is closed because an expression cannot
+*reach* anything.
+
+Two consequences, both normative:
+
+- **Ambient reads are refused.** A program that reads the process environment
+  (`env`, `$ENV`), the input filename, or the standard input reaches outside
+  its value. ⚠️ **Measured 2026-08-11 on a shipped engine: `env.NAME` returned
+  the ambient value under an absent `permits:` block and again under an
+  explicit empty `permits.env`, while the static check reported the body as
+  pure compute from which nothing escapes.** The reach is bounded — such a
+  program is a literal in the reviewed file and cannot be interpolated from a
+  model's output (`NIKA-VAR-005`) — but a computation that reads the ambient
+  environment is not pure, and the certificate said it was.
+- **The clock is an input, never an ambient** (D-2026-08-11-N27). `now` and
+  its relatives MUST resolve to the run's start instant, which is already in
+  the trace, so that a replay yields the same value forever. Reading the wall
+  clock would make the same file pass on a fast machine and fail on a slow
+  one — the property a replay exists to deny. A long task therefore sees the
+  START instant, not its own; that is the price of determinism and it is the
+  correct one.
+
+**Why the layer is not simply removed.** The need to reshape a value does not
+disappear with it: an author denied this layer reaches for `exec:` and a real
+subprocess, which is strictly worse. The bounded expression layer is what
+*prevents* the escape to the shell. Subtracting without replacing moves the
+hole; it does not close it.
 
 #### Binding rules (single-value · pure-jq)
 
@@ -3958,6 +4313,29 @@ extraction-and-transform language (`output:` bindings + the `nika:jq` builtin).
   `NIKA-VAR-004`. Collect a stream with `[ … ]` (`[.users[].email]` → array)
   · take one with an index (`.users[0]`) or `first(…)`. One obvious way · no
   silent first-match, no implicit array-wrap.
+
+#### `output:` or `nika:jq` · the choice, decided (normative for linters · 2026-08-11)
+
+| Rule | Instead of | Write |
+|---|---|---|
+| `one-obvious-way/013` | `invoke: {tool: nika:jq}` reshaping **one** producer's output | an `output:` binding on that producer |
+
+**They are the same jq over the same value, and until now nothing said which
+to reach for** — the only genuine unguarded overlap left in the language. The
+rule follows from what each one IS, not from taste ·
+
+- An `output:` binding is **boundary work**: it costs no task, no wave and no
+  node in the graph, it runs per iteration inside a `for_each`, and it carries
+  a normative cardinality law (exactly one value · `NIKA-VAR-002`).
+- `nika:jq` is **a task**: it has an id, a place in the DAG, its own gate and
+  its own timeout — and it can read **several** producers through `with:`,
+  which a binding structurally cannot, since a binding sees only the output it
+  hangs from.
+
+⇒ **One producer, reshaped: a binding. Two or more, joined: the builtin.** The
+builtin stays because the many-input case is real and inexpressible otherwise;
+the binding wins the single-input case because a whole task node to rename a
+field is a node the graph did not need.
 - **An `output:` jq expression is pure jq over the task's raw output**: it does
   NOT contain `${{ }}` (the two expression layers never nest in one string ·
   CEL reads the namespaces · jq reads the task output). To parametrize an
@@ -4133,7 +4511,7 @@ Error codes follow the format `NIKA-<NAMESPACE>-<NNN>` where namespace is 2-9 up
 | `NIKA-DECIDE` | Decision bundles + evidence (`nika:decide` · [11-decision](./11-decision.md)) | 001-099 |
 | `NIKA-PORT` | Gateway artifacts (deployment bundle · lowering · fidelity · [12-gateway](./12-gateway.md)) | 001-099 |
 | `NIKA-POLICY` | `policy:` hard-rule violations ([10-authority](./10-authority.md)) | 001-099 |
-| `NIKA-ASSERT` | `assert:` obligations ([15-proof](./15-proof.md)) | 001-099 |
+| `NIKA-ASSERT` | assertion obligations ([15-proof](./15-proof.md)) · ⚰️ the `assert:` ENVELOPE KEY was removed 2026-08-11 · the range stays RESERVED, unemitted, for the day a property returns as an addition | 001-099 |
 | `NIKA-LOCK` | `nika.lock` pin violations ([15-proof](./15-proof.md)) | 001-099 |
 | `NIKA-REG` | Registry client refusals (resolve · digest · advisory · [registry-v0.1](../registry/registry-v0.1.md) · allocated for the reference engine's `registry:` resolver — engine ADR-106) | 001-099 |
 
@@ -4211,6 +4589,7 @@ these from this file alone.
 | `NIKA-INFER-001` | provider call failed (HTTP error · provider refusal) | `provider_error` | engine-assessed |
 | `NIKA-INFER-003` | the provider reported no token usage for a priced model — the ledger cannot bill the call honestly (fail-closed · the usage-absence gate, R3-F1) | `validation_error` | false |
 | `NIKA-INFER-002` | structured output failed `schema:` validation (after any engine-internal retries) | `validation_error` | false |
+| `NIKA-INFER-004` | the provider spent tokens yet the visible answer is empty — a thinking model ate the budget on its reasoning trace (fail-closed · raise `max_tokens` or use a no-think variant) | `validation_error` | false |
 | `NIKA-INFER-003` | the provider reported no token usage for a priced model — the ledger cannot bill the call honestly, so the call fails closed (the usage-absence gate · R3-F1) | `validation_error` | false |
 | `NIKA-EXEC-001` | non-zero exit code (default capture modes · see [02 §exec](./02-verbs.md#exec--shell-command)) | `process_error` | false |
 | `NIKA-EXEC-002` | spawn failure (command not found · permission) | `process_error` | false |
@@ -4226,7 +4605,7 @@ these from this file alone.
 | `NIKA-SEC-001` | `exec:` blocklist hit | `security_error` | false |
 | `NIKA-SEC-002` | agent tool call outside the `tools:` whitelist | `security_error` | false |
 | `NIKA-SEC-003` | run-recursion bound — nested-run depth exceeded OR self-launching workflow | `security_error` | false |
-| `NIKA-SEC-004` | effect outside the declared `permits:` capability boundary (fs/net/exec/tool · [01 §permits](./01-envelope.md#permits--optional--the-declared-capability-boundary)) | `security_error` | false |
+| `NIKA-SEC-004` | effect outside the declared `permits:` capability boundary (fs/net/exec/tool · [01 §permits](./01-envelope.md#permits--optional--the-declared-capability-boundary)) · ⚠️ **`env` is the fifth category since D-2026-08-11-N22 and this code does NOT yet cover it** — measured 2026-08-11 on the shipped binary: an in-process expression reads the ambient environment under an absent `permits:` block and under an explicit empty `permits.env`, and the static check reports the body as pure compute. Stated as an obligation, not a guarantee: a spec that listed `env` here before the engine enforced it would be the parallel-list defect this vocabulary exists to prevent | `security_error` | false |
 | `NIKA-SEC-005` | SSRF block — a `nika:fetch`/`nika:notify` URL resolves to a loopback/private/link-local/metadata target (the always-on engine floor · independent of `permits:`, with ONE carve-out: an exact loopback literal in `permits.net.http` declassifies the floor for that host only · [01 §permits](./01-envelope.md#permits--optional--the-declared-capability-boundary)) | `security_error` | false |
 | `NIKA-SEC-006` | secret flow — a `secrets.<name>` value reaches an unsanctioned sink (an `exec:` argument · an `invoke:` payload · an `infer:`/`agent:` prompt) · the diagnostic carries the **taint path** + the exact `egress:` clause that would sanction it ([10 §secret flow](./10-authority.md#secret-flow-refusals-carry-their-codes-normative) · rules in [01 §egress](./01-envelope.md#egress--optional--sanctioned-destinations-declassification)) | `security_error` | false |
 | `NIKA-SEC-007` | secret egress — a tainted value reaches the workflow boundary (`outputs:` · where a result leaves the run) · the diagnostic carries the taint path ([10 §secret flow](./10-authority.md#secret-flow-refusals-carry-their-codes-normative)) | `security_error` | false |
@@ -4249,7 +4628,7 @@ these from this file alone.
 | `NIKA-POLICY-001` | a hard `policy:` rule is violated (`require.human_gate_before` · `forbid.exec_after` · `allow.providers` · `limits.max_tasks`) — the diagnostic names rule + task + witness · check-time, before any token ([10 §policy](./10-authority.md#the-policy-block--optional--named-workflow-law)) | `security_error` | false |
 | `NIKA-TIMEOUT-001` | task (or for_each iteration) exceeded `timeout:` | `timeout_error` | false |
 | `NIKA-CANCEL-001` | task cancelled (workflow failure gate · user cancellation) | `cancelled` | false |
-| `NIKA-ASSERT-001` | an `assert:` claims a level the evidence does not support (a `StaticProof` the IR cannot decide · a mis-leveled obligation · [15 §assert](./15-proof.md#assert--the-authors-obligations-normative)) | `validation_error` | false |
+| `NIKA-ASSERT-001` | ⚰️ RESERVED, not emitted in v0.1 (the envelope key it judged was removed 2026-08-11) · an assertion claims a level the evidence does not support (a `StaticProof` the IR cannot decide · a mis-leveled obligation · [15 §assert](./15-proof.md#assert--the-authors-obligations-normative)) | `validation_error` | false |
 | `NIKA-LOCK-001` | a dependency resolved that `nika.lock` does not pin, or a hand-edited lock digest does not match ([15 §lock](./15-proof.md#nikalock--the-single-lock-normative--f7)) | `validation_error` | false |
 | `NIKA-BUILTIN-001` | builtin `invoke:` violates its statically-checkable arg contract (e.g. `nika:fetch` without `url:` · `nika:jq` arg shape) | `validation_error` | false |
 | `NIKA-BUILTIN-DONE-001` | `nika:done` invoked outside an `agent:` loop | `validation_error` | false |
@@ -4390,8 +4769,6 @@ api_call:
       recover: ${{ tasks.cached_data.output }}    # recovery output · a ${{ }} ref OR a literal
       # OR
       # skip: true                          # skip · downstream sees status = skipped
-      # OR
-      # fail_workflow: true                 # explicit · same as no on_error
 ```
 
 ### Fields · exactly ONE action + an optional code filter
@@ -4400,11 +4777,23 @@ api_call:
 |---|---|---|
 | `recover: <value>` | Use a recovery output: a `${{ }}` ref (e.g. another task's output) OR a literal | `status: success` · output = recover value |
 | `skip: true` | Skip this task on error · **the original error stays readable** at `tasks.X.error` (status is `skipped` · error populated · the one state where both coexist · enables downstream per-code routing) | `status: skipped` · `error` = the original typed error |
-| `fail_workflow: true` | Fail the whole workflow (default behavior) | n/a (workflow fails) |
 | `on_codes: [<NIKA-…>]` | **Optional filter** (combinable with exactly one action above) · the action applies ONLY when the final error's `code` is listed · an unlisted code falls through to the default (fail) · the catch-side mirror of `retry.on_codes` (same regex) | per the action |
 
 `recover:` merges the former `fallback:` (ref) + `value:` (literal) into one field
 (`${{ }}` resolves to values either way · 4 modes → 3 · one way).
+
+> ⚰️ **`fail_workflow: true` is REMOVED (2026-08-11) · 3 modes → 2.** It was a
+> keyword whose entire meaning was *"do the default"* — this spec said so in its
+> own three voices: the commented example read *"explicit · same as no
+> `on_error`"*, the table entry read *"(default behavior)"*, and combined with
+> `on_codes:` **both branches fail**, since an unlisted code *"falls through to
+> the default (fail)"*. A no-op in every combination is a comment wearing a
+> keyword's syntax; write a YAML comment. **The consolidation above had already
+> been run once and stopped one short** — three ways to spell one action is
+> still two too many when one of them does nothing. An author who wants the
+> default omits `on_error:`; an author who wants to SAY they chose it writes
+> `# fails the workflow · deliberate`. Measured cost before removal: 2 files in
+> the whole corpus, zero of them a real workflow.
 
 ```yaml
 # Catch-side routing · recover ONLY on timeout · any other code still fails
@@ -4421,7 +4810,7 @@ slow_fetch:
 A `recover: ${{ tasks.X.output }}` reference is **NOT an execution-order
 edge** — it is the *recovery* surface of the reference boundary
 ([04 §boundary](./04-variables.md#the-reference-boundary--where-tasks-may-appear) ·
-projected as a `recovery` edge in `graph_format: 2`, which never schedules).
+projected as a `recovery` edge in `graph_format: 3`, which never schedules).
 Resolution happens at **recovery time** ·
 
 1. The failing task exhausts `retry:` · `on_error.recover` fires.
@@ -4810,7 +5199,7 @@ An engine claims « Core v0.1-compliant » if it ·
    - Validates the `workflow` identifier kebab-case
    - Validates typed `inputs` (type + required) · validates `config` / `const` / `secrets` shape
    - Recognizes the 4 verbs (`infer` · `exec` · `invoke` · `agent`)
-   - Rejects unknown top-level fields with a clear error OR ignores with warning (engine's choice · documented behavior)
+   - **Rejects** unknown fields with a clear error (`NIKA-PARSE-005` · strict) — at every level, not only the top (D-2026-08-11-N20)
 
 2. **Computes DAG topology** correctly
    - Derives E_d from `with:` bindings (role per referenced field) and E_c from `after:` entries · G_p = E_d ∪ E_c ([03 §four graphs](./03-dag.md#the-four-graphs-normative))
@@ -4882,8 +5271,38 @@ GitHub Actions and Docker Compose. A working modeline today:
 nika: v1
 ```
 
-(The short `https://nika.sh/spec/v1/workflow.schema.json` form goes live
-with the site launch · both will resolve to the same schema.) This is also what makes a Nika file
+#### The address MUST become versioned and immutable (normative · D-2026-08-11-N24)
+
+⚠️ **The modeline above points at a moving branch, and that is a defect with
+two independent causes.**
+
+*The first is ours.* Since [§unknown key](#an-unknown-key-is-an-error-at-every-level-normative--d-2026-08-11-n20)
+an unknown key is an error, so this schema's `additionalProperties: false` is
+no longer a lint preference — it is the accepted surface of the language. Served
+from `main`, that surface moves under every editor in the world **while no file
+has changed**. A workflow that validated on Monday shows red on Tuesday because
+a schema it never named was edited. This is precisely the drift the strict rule
+exists to prevent, arriving through the back door.
+
+*The second is the host's.* `raw.githubusercontent.com` fronts a cache that
+serves stale bytes: a schema can be correct at the commit and wrong at the
+reader for an unspecified window. **Immutable upstream is not immutable at the
+point of use** — measured in this workspace, 2026-08-07.
+
+**The shape.** One address per minor, frozen forever ·
+
+```yaml
+# yaml-language-server: $schema=https://nika.sh/schema/v0.1/workflow.schema.json
+nika: v1
+```
+
+This is what JSON Schema, OpenAPI, Kubernetes and CWL all do, and it composes
+with the `nika: v1` marker the envelope already carries. A file written in 2027
+still reads in 2030 against **its own** schema. Until the address ships, the
+modeline above is the pragmatic form and this paragraph is the standing debt —
+stated, not hidden.
+
+This is also what makes a Nika file
 pleasant (and trap-free) for an AI to author: the schema constrains the shape
 before the engine ever runs. CEL expressions and jq expressions inside string
 fields are validated by the engine (Core level), not the JSON Schema.
@@ -5044,6 +5463,44 @@ The reference implementation [supernovae-st/nika](https://github.com/supernovae-
 
 A conformance claim is **specific to a spec version**. As the stdlib evolves to v0.2 · engines re-claim conformance against the new suite. The Core conformance level is stable forever within v1 of the language.
 
+### An unknown key is an error, at every level (normative · D-2026-08-11-N20)
+
+An engine MUST refuse a key it does not know (`NIKA-PARSE-005`). It MUST NOT
+accept-and-warn. **This clause used to leave the choice to the engine, and a
+choice here is not a detail: it is the whole growth model.** Two conformant
+engines were entitled to disagree on every future key — one refusing a file
+the other ran — which is the definition of a language that has not decided
+what it is.
+
+**Why refusal is the safe direction, and acceptance is not.** The instinct
+runs the other way: accept-and-warn looks forward-compatible, since a file
+written for a later minor would still run on an older engine. It is the wrong
+instinct here, because **a key in this language can REMOVE authority.** A
+future rule that forbids something would be silently dropped by an older
+engine, and the file would run with **more** authority than its author
+granted — failing open, in the one language whose premise is that an absent
+grant means zero. Refusal fails closed: the file does not run at all, and the
+author learns why.
+
+**What it buys, and it is not small.** Every key this spec reserves for a later
+minor lands **additively and for free** under refusal: no valid file uses one
+today, so admitting it later breaks nothing. Adding to a closed space is always
+compatible; the closure is what makes the growth safe. It also
+catches the misspelling — `permit:` written for `permits:` — which today is
+accepted in silence and yields *zero authority* without saying so, the most
+expensive typo the language can carry.
+
+**Precedent, and it is not ours.** CWL treats an unrecognised field as *a
+fatal error*; the field its readers may ignore is the advisory one, not the
+structural one. A serious specification refuses.
+
+⚠️ **A corollary that is not optional.** Under strict refusal, the published
+JSON Schema (`additionalProperties: false`) can no longer be served from a
+moving branch: it needs a **versioned, immutable address** (one per minor).
+Otherwise the editors of the world watch the accepted surface move under them
+while no file has changed — the drift the refusal exists to prevent, arriving
+by the back door.
+
 ---
 
 🦋 *Next · [08 · Out of scope](./08-out-of-scope.md)*
@@ -5070,6 +5527,115 @@ This document is the canonical defer list. If you find yourself missing
 a feature here · it is intentional · not a forgotten gap. Most of these
 items are tracked in design discussions and may land in `nika.sh/v2` or
 in stdlib v0.x extensions.
+
+---
+
+## Antivalues · what this language is AGAINST, permanently
+
+A defer list is not enough. « Later OR never » is itself accretion
+pressure — every deferred item reads as a promise to someone. The list
+below is the other kind: **things nika will not do, at any version.** If
+you need one of them, nika is the wrong tool and the honest answer is to
+say so. (Prior art for publishing this at all: WDL's `Antivalues` section
+— the only workflow language that names what it refuses.)
+
+**A1 · Flexibility at all costs.** nika expresses the majority of
+workflows, not all of them. Arbitrary execution patterns are out. If you
+want them, use a language embedded in a general-purpose host — Nextflow
+or Snakemake are good, and they say so themselves.
+
+**A2 · A second way to spell one intent.** Every construct has one
+spelling. Argo ships `steps:` and `dag:` for the same thing, and inside
+`dag:` ships both `dependencies:` and `depends:` — three ways to say one
+thing. The `one-obvious-way/*` lint set exists so that never happens
+here. *(Design bet, stated as one: PEP 20's slogan has no empirical
+support anywhere we could find.)*
+
+**A3 · Ambient state.** A body reads its declared imports and nothing
+else. No implicit environment, no global task namespace, no inherited
+scope. This is the [hidden dependencies](https://www.cl.cam.ac.uk/~afb21/CognitiveDimensions/)
+dimension of Green's Cognitive Dimensions of Notations (1989/1996) —
+« is every dependency overtly indicated *in both directions*? » — and it
+is why the graph document lists every edge with `from` and `to`.
+
+**A4 · An unversioned expression layer.** Both expression sublanguages
+carry a normative, versioned grammar with a closed callable set
+(`cel-subset/0.1` · `jq-subset/0.1`). CWL feature-gates its JavaScript
+hatch but does not bound it — and portability breaks exactly there.
+GitHub Actions documents its `${{ }}`-into-shell hazard and ships the
+canonical injection class anyway. Nextflow is amputating Groovy right
+now (strict parser default in 26.04, `for`/`while`/`switch`/`import`
+removed) at the cost of a multi-year migration. A hatch you cannot
+version is a hatch you cannot keep.
+
+**A5 · Orchestration.** No scheduler, no queue, no cluster. `nika.yaml`
+arms a cadence; it does not become a control plane.
+
+**A6 · More than one thread of control per node.** A task settles
+exactly once. This permanently refuses the discriminator family
+(WCP-9, WCP-28–31), Multi-Merge (WCP-8), and N-of-M joins. It is not a
+gap to patch — it is the property that makes
+[soundness conditions (i) and (ii)](./03-dag.md#what-that-liveness-check-is--soundness-and-what-it-costs-elsewhere)
+structural rather than checked.
+
+**A7 · Cancellation of an arbitrary region.** Reset arcs make every
+variant of soundness undecidable (LICS 2024). This closes YAWL-style
+cancellation regions, BPMN cancel/compensate events, and the general
+OR-join — whose accepted formalization *is* a reset net.
+
+### The counter-arguments, stated before a reviewer states them
+
+Honesty costs less than being caught. The strongest published positions
+against this design ·
+
+- **The configuration complexity clock** (Hadlow, 2012): config grows a
+  rules engine, grows a DSL, and you have rebuilt a bad programming
+  language. Folklore, zero data — but it is *the* objection.
+- **Snakemake** (Mölder et al., F1000Research 10:33) states it from
+  inside the field: purely declarative systems get « concision and
+  clarity … [but] can be **more restrictive in the processes that can be
+  expressed** ». Their `checkpoint` — re-plan the DAG mid-run — is the
+  strongest existing counter to A6/A7.
+- **Closedness does not buy comprehensibility**, only analysability. A
+  large Starlark codebase is still hard to read.
+- **Oozie's rigid XML lost to Airflow's Python.** Being closed is not
+  sufficient.
+
+**The rebuttal, in one line:** nika's escape hatches are *declared floors,
+not ambient capability* — `exec:` (lint-discouraged, `native-first/*`),
+`agent:` (budget-bounded, cap in the file), `invoke: workflow:`
+(authority intersected). And the measurement now runs the other way: in
+260K workflows over six years, custom shell commands carry **4.12× the
+odds of failure**, ambient environment variables 1.84×, and **each
+additional language feature used adds ~19% to the odds of failure**
+(Bardsiri, Decan, Mens, arXiv:2605.26825, 2026 — usage Gini 0.84, with
+74.6% of constructs accounting for 7.1% of use).
+
+### The same metric, turned on ourselves
+
+A citation that can only ever agree with us is decoration. So the
+authors' own metric was run against **this** language, over 669 files
+and 2071 authored tasks ·
+
+| | GitHub Actions | nika |
+|---|---|---|
+| constructs measured | 197 | **41** |
+| usage Gini | 0.840 | **0.700** |
+| constructs under 1% of use | 147 (74.6%) | **16** |
+| never written | — | **2** |
+
+Read it honestly. Our distribution is **less** concentrated (0.700 vs
+0.840), but **we have a long tail too** — 16 constructs sit under 1% of
+use, and 2 have never been written. The argument that survives is
+therefore **not** « nika has no long tail ». It is the surface size:
+**41 constructs against 197.** With ~19% added odds of failure per
+feature *used*, the ceiling on what an author CAN reach is the
+protection — and that ceiling is what this document defends.
+
+Two limits of that measurement, stated rather than hidden: the corpus is
+our own (a first-party corpus is not a population sample), and the
+envelope-key count picks up keys from files still written in an older
+dialect, so the tail is if anything **understated**.
 
 ---
 
@@ -5167,11 +5733,23 @@ poll_until:
       command: ["./check.sh"]
 ```
 
-**Why deferred** · unbounded loops break the « acyclic » guarantee of the DAG
-and the static-analyzability that makes Core conformance possible (you cannot
-bound the work statically). Workaround in v1 · use the `agent:` verb with a
-tool + `max_turns` budget (bounded), OR `for_each:` over a known collection
-(bounded fan-out).
+**Not deferred — REFUSED, permanently.** This section previously said
+« why deferred », which contradicted two other places in this spec that
+call the same construct a structural refusal. One statement, one home:
+**the status of `while:` is decided in
+[03 §where this sits](./03-dag.md#where-this-sits--deliberately-between-two-named-dataflow-models),
+and it is `A1` + `A6` here.** Everywhere else points at those.
+
+The reason is not that loops are hard to analyse. It is that a
+data-dependent branch whose decision **re-enters the graph** is exactly
+the SDF→BDF line: Boolean dataflow is Turing-complete, and bounded-memory
+scheduling plus deadlock-freedom become **undecidable** (Buck & Lee 1993 ·
+Lee & Parks, Proc. IEEE 83(5), 1995). Nothing about a future version
+changes that; a `while:` that stayed decidable would not be a `while:`.
+
+Bounded iteration already exists and is not a workaround: `for_each:`
+over a runtime-computed collection (WCP-14), or `agent:` with a
+`max_turns` budget written in the file.
 
 ### Goto / jumps
 
@@ -5930,7 +6508,7 @@ value MUST conform to its declared type — checked, never warnings
 An **effect** is a class of interaction with the world outside the run.
 The v1 vocabulary is exactly the capability surface of
 [01 §permits](./01-envelope.md#permits--optional--the-declared-capability-boundary)
-— **four categories** (this table is the one vocabulary the checker, the
+— **five categories** (this table is the one vocabulary the checker, the
 inference, the certificate, and `policy:` rules all speak — one voice,
 never a parallel list):
 
@@ -5940,6 +6518,18 @@ never a parallel list):
 | `net` | `nika:fetch` · `nika:notify` (webhook) · any URL-reaching builtin | `permits.net.http` (host allowlist · SSRF floor beneath) |
 | `exec` | the `exec:` verb | `permits.exec` (`false` · `true` · program allowlist) |
 | `tools` | the `invoke:` verb surface | `permits.tools` (id globs) |
+| `env` | the names a child process inherits — composed, never inherited (see [01 §permits](./01-envelope.md#permits--optional--the-declared-capability-boundary)) | `permits.env` (exact names · **never inferred**: a subprocess's environment reads are opaque) |
+
+> **Why this table said `four` until 2026-08-11 (D-2026-08-11-N22).** `permits.env`
+> has shipped in the envelope since the block existed, `NIKA-AUTH-007` counts its
+> entries among the bounds (NEP-0005), and [02 §exec](./02-verbs.md) reaches a
+> child's environment *only through a declared `permits.env:` name*. The table
+> that calls itself **one voice, never a parallel list** did not know the key —
+> so the spec carried exactly the parallel list it forbids. Admitting `env` is
+> **not adding a category, it is documenting one that ships**: a category with no
+> key would change the language; a key with no category made four downstream
+> surfaces (inference · certificate · `policy:` `<effect-class>` · `NIKA-SEC-004`)
+> unable to name it.
 
 Two derived facts the engine computes and no author writes:
 
@@ -5994,11 +6584,32 @@ is never exposed.
 | `limits:` | **hard** · judged at check | `max_tasks: <positive integer>` |
 | `endorsement:` | **hard** · judged at check | `solo` — the NAMED solo mode: exactly one endorser (one human gate), its fresh authorization bound to the action and logged as such · a gate under no declared mode refuses (`NIKA-SEC-013` · fail-closed) · a declared solo with more than one gate refuses as the declaration lying (NEP-0014 · F-P23) |
 | `prefer:` | **soft** · parsed, recorded, NOT judged | `providers: [<provider>…]` (ordered) |
+
+> ⚠️ **`endorsement:` names a family and has one member, and the gap is a
+> capability gap, not a naming one** (stated 2026-08-11). A workflow that wants
+> **two** human gates on one action is **inexpressible** — not because two
+> endorsers are unsafe, but because the enum has a single value. The honest
+> reading is that the language today can say *one human authorised this* and
+> cannot say *two did*, and a reader deserves to know which of the two it is.
+> **The single member is not the defect and MUST NOT be removed**: `solo`
+> carries two live refusals (a gate under no declared mode · a declared `solo`
+> wearing more than one gate). Deleting a working refusal to make a table
+> shorter is subtraction, not simplification. The member that is missing is
+> the one to add — and since [07 §unknown key](./07-conformance.md) an unknown
+> value is an error, a second member lands additively, for free, the day its
+> semantics are decided.
 | `optimize:` | **soft** · parsed, recorded, NOT judged | `cost` \| `latency` \| `quality` |
 
 `<effect-class>` is the closed set `exec · write · net · tools` — the
 effect vocabulary above with `fs` split at its grain of harm (`write`;
-reads are not gateable in v1). Soft families are **inert by design** in
+reads are not gateable in v1) **and `env` deliberately absent: a policy
+rule over environment names is a separate decision this spec has not
+taken, and naming it here without the semantics would be a rule that
+cannot be judged** (see the soft-family law in the next sentence, which
+this set must not violate). The gap is stated rather than closed
+silently, because the table above is the one vocabulary and a reader is
+owed the reason a member of it is missing from this derived set.
+Soft families are **inert by design** in
 v1: the solver that would satisfy them is research surface, and a
 constraint that cannot be judged must never look judged — the check
 records them (a hint names them as recorded-not-judged) and nothing
@@ -6146,7 +6757,9 @@ task `NIKA-SEC-004` — the defense-in-depth twin of NEP-0003 law 3), and
 the check report SHOULD list the deferred re-gates informationally so CI
 sees the attack surface before launch.
 
-The only door is the authored one — a task-level `declassify:` entry:
+The only door is the authored one — a `lift:` entry naming the **taint**
+law (see [§the authored doors](#the-authored-doors-normative) for the
+construct):
 
 ```yaml
 tasks:
@@ -6154,18 +6767,17 @@ tasks:
     invoke:
       tool: nika:read
       args: { path: "${{ inputs.p }}" }
-    declassify:
-      - from: inputs.p            # one binding
-        to: trusted
+    lift:
+      - law: taint
+        from: inputs.p            # one binding
         because: "vendor inventory path, deployment-controlled, reviewed at release time"
 ```
 
-`declassify:` MUST name `from:` (one binding), `to: trusted`, and a
-non-empty `because:`; the receipt records it (taint path · because ·
-value digest). It lifts the TAINT law only — the value is then matched
-like a literal and must still sit inside the declared boundary.
-Declassify is never a permit bypass, and there is no implicit
-declassification in v1.
+A `law: taint` entry MUST name `from:` (one binding) and a non-empty
+`because:`; the receipt records it (taint path · because · value
+digest). It lifts the TAINT law only — the value is then matched like a
+literal and must still sit inside the declared boundary. It is never a
+permit bypass, and there is no implicit declassification in v1.
 
 ## The data-as-code sink (normative · NEP-0006 · LAW-AUTH-0327)
 
@@ -6184,11 +6796,58 @@ security_error · the diagnostic names the class and both repairs) when
 the URL is literal or resolvable through the taint rules above; the
 unresolvable DEFERS to the run-time twin (`NIKA-SEC-004` · the same
 class refused on the resolved URL · defense in depth). The honest door
-is the task-level `inert: "<because>"` declaration (non-empty ·
-greppable): it lifts THIS law only · never the `net.http` boundary,
+is a `lift:` entry naming the **data-as-code** law (non-empty `because:`
+· greppable): it lifts THIS law only · never the `net.http` boundary,
 never the SSRF floor, never the taint re-gate. The repair in the other
 direction is to model the acquisition as the `exec` it feeds, under a
 program permit review can see.
+
+```yaml
+    lift:
+      - law: data-as-code
+        because: "vendor checkpoint archived to cold storage, never loaded"
+```
+
+## The authored doors (normative)
+
+`lift:` is the **single** construct through which an author opens a
+named law. There is no second spelling, and there will not be one when a
+third law earns a door.
+
+```yaml
+lift:
+  - law: taint                    # REQUIRES from:
+    from: inputs.p
+    because: "<why this is safe, in words a reviewer can judge>"
+  - law: data-as-code             # from: is FORBIDDEN here
+    because: "<why this artifact is never loaded>"
+```
+
+The contract, for every entry ·
+
+1. **`law:` is a closed enum.** v1 knows `taint` and `data-as-code`. A
+   law that has no door cannot be lifted at all — that is the default,
+   and it is the common case: **24 error-bearing laws exist; 2 have a
+   door.**
+2. **`because:` is mandatory and non-empty.** A lift with no reason is a
+   parse error, not a warning. The reason is what review reads.
+3. **A lift moves exactly ONE law.** It never widens `permits:`, never
+   touches the `net.http` boundary, never lowers the SSRF floor.
+4. **Every lift is recorded** in the run receipt and projected in the
+   check certificate. A lift that review cannot see would defeat its own
+   purpose.
+5. **`from:` is law-specific** — required by `taint`, forbidden
+   elsewhere. The schema enforces the discrimination; a `from:` on the
+   wrong law is a parse error.
+
+**Why one construct and not one field per law.** A door per law grows
+the language linearly in laws, and each language feature an author uses
+carries a measured **+18.9% odds of workflow failure** across 260K
+workflows (see [08 §antivalues](./08-out-of-scope.md)). The provider is
+a parameter of `infer:`, not a verb; the law is a parameter of `lift:`,
+not a field. The predecessors — a task-level `declassify:` list and a
+task-level `inert: "<because>"` string — are **dead**: same job, two
+spellings, and the third law would have made three.
 
 ## The certificate names its effects (normative)
 
@@ -6250,6 +6909,15 @@ affirmative-consent law) join the same `NIKA-SEC` namespace.
 - **No policy inheritance.** A file's law is the file's — composition
   across `invoke: workflow:` calls stays the callee's own policy (the
   ceiling algebra is reserved, unwired).
+- **No memory category.** Recall is a **tool**, reached through `invoke:`
+  like every other callable ([08 §H9](./08-out-of-scope.md) · today
+  `mcp:memory-server/recall`, tomorrow the reserved `nika:connectome/*`
+  group — same verb, zero workflow-shape change). It is therefore
+  governed by `permits.tools`, and **never by an ambient implicit
+  memory**: a recall a reader cannot see in the file does not exist.
+  Whether a store-scoped grant deserves its own effect category — the
+  `net` precedent, where `nika:fetch` is a tool and yet hosts need
+  bounding — is an open question for a future proposal, not a v1 gap.
 
 ## Related
 
@@ -6913,11 +7581,20 @@ A composition is well-formed iff **all ten** hold:
 
 ## Agent capability closure (normative · G25)
 
-An `agent:` task's reachable surface has TWO public fields, kept
-separate: `tools:` and `workflows:`. Internally they are one tagged
-`CapabilitySet`; a glob resolves to an EXACT set in the lockfile
-(hashed and shown). An agent can never reach a path-shaped or dynamic
-target — the closure is static, the same law as the top-level form.
+An `agent:` task's reachable surface is **one public field**: `tools:`. A glob
+resolves to an EXACT set in the lockfile (hashed and shown). An agent can never
+reach a path-shaped or dynamic target — the closure is static, the same law as
+the top-level form.
+
+> ⚰️ **This paragraph promised a second field, `workflows:`, and it does not
+> exist** (removed 2026-08-11 · verified against the published schema, whose
+> `agent` object carries `max_tokens_total · max_turns · model · prompt ·
+> schema · skills · system · temperature · tools`, and against the engine,
+> which refuses any other name with `NIKA-PARSE-005`). A normative sentence
+> describing a field nobody can write is worse than silence: a reader builds
+> on it, and an implementer ships it. **The subtraction is the fix** — if
+> workflow-reachability becomes a real capability it comes back as an addition,
+> which a closed vocabulary always permits.
 
 ## Errors (the `NIKA-COMP` namespace · new in this chapter)
 
@@ -7051,12 +7728,40 @@ policy:                         # the resolved policy decisions (10)
   file — the local boundary of the same supply chain the gateway (12)
   and the distribution work extend.
 
-## `assert:` · *the author's obligations (normative)*
+## `assert:` · ⚰️ *NOT in the envelope of v0.1 (removed 2026-08-11)*
 
-A task or workflow declares assertions the engine judges — distinct
-from `nika:assert` (the single-condition fail-fast builtin): `assert:`
-is a **closed vocabulary of properties**, each judged at an honest
-level:
+> **The envelope key is gone. `nika:assert`, the single-condition fail-fast
+> builtin, stays and is untouched** — that half works and is what an author
+> actually reaches for today.
+>
+> **Three measurements forced the subtraction, and any one of them would have.**
+> ① The published JSON Schema carries **13 envelope keys and `assert` is not
+> among them** — so a feature the engine accepted *failed the validator the
+> project ships*, and since [07 §unknown key](./07-conformance.md) made refusal
+> strict, that contradiction became fatal rather than untidy. ② It judged
+> **nothing**: an assertion naming an ordering over two tasks that do not exist
+> was accepted with a `clean · risk low` verdict, where the same mistake one
+> field away (`after:`) is `NIKA-DAG-002`. ③ Across **661 workflow files**,
+> exactly **one** carried the block — and that file is the probe written to
+> demonstrate this very defect. *The only user of the field was the witness of
+> its flaw.*
+>
+> **Why removal rather than repair.** A vocabulary of obligations that accepts
+> anything and checks nothing is worse than its absence: absence sends an
+> author looking for a real mechanism, silence tells them a guarantee is held.
+> Making it merely *refuse* would have kept an envelope key that expresses
+> nothing an engine can act on. **The subtraction is the fix, and it costs one
+> reserved slot back.**
+>
+> **It returns as an ADDITION, not as a rescue.** The vocabulary and the three
+> honesty levels below are kept in this chapter as the design of record. The
+> day `nika trace verify` can judge a property, that property comes back —
+> one at a time, each moving from *absent* to *judged*, never from *silent* to
+> *judged*. A closed language always permits an addition; that is the whole
+> point of closing it.
+
+The design of record — a **closed vocabulary of properties**, each judged at an
+honest level — is preserved below and is **not implementable surface today**:
 
 ```yaml
 assert:
@@ -7091,6 +7796,44 @@ assertion with its achieved level, and a `StaticProof` claim that the
 IR cannot actually decide is itself a refusal (`NIKA-ASSERT-001` — an
 assertion mis-leveled). Bounded/statistical assertions stay LAB
 (calibrated research · never presented as a guarantee).
+
+### An assertion the engine cannot judge is REFUSED (normative · D-2026-08-11-N34)
+
+⚰️ **Superseded the same day by the removal above.** This clause hardened an
+envelope key into refusing what it could not judge; the key is now absent, so
+there is nothing to harden. The clause is kept because its *reason* survives
+the key and generalises — it is the law any future property must satisfy
+before it re-enters ·
+
+An engine MUST refuse (`NIKA-ASSERT-001`) any property it does not judge. It
+MUST NOT parse it, accept it, and stay silent.
+
+**This is written because the opposite was measured on a shipped engine,
+2026-08-11.** An `assert:` naming a `before:` ordering over **two tasks that do
+not exist** was accepted and the audit reported `clean · risk low` — no lane,
+no finding, nothing. Compare `after:` pointing at an undeclared task, which is
+`NIKA-DAG-002`. The same mistake, one field apart, once fatal and once
+invisible.
+
+That silence contradicts [10 §policy](./10-authority.md) in its own words —
+*a constraint that cannot be judged must never look judged* — and this block
+is where an author states an **obligation**, the one place in the language
+where a human writes what the file is supposed to guarantee. A vocabulary of
+obligations that accepts anything and checks nothing is worse than its
+absence: absence teaches the author to look elsewhere, silence teaches them
+that a guarantee is held.
+
+**The properties land one at a time**, each moving from *refused* to *judged*,
+never from *silent* to *judged*. An author is never surprised in the direction
+that matters: a file that checked clean does not later reveal it was carrying
+an unjudged claim.
+
+⚠️ **The cost was measured before this was written.** Across 661 workflow
+files in the shipped and internal corpora, exactly **one** carries an
+`assert:` block — and that file is the probe written to demonstrate this very
+defect. **The only user of the field is the witness of the flaw it has.** It
+uses `before:`, the most decidable of the five, so starting there breaks
+nothing real.
 
 ## `receipt_format: 1` · *the one receipt (normative)*
 
@@ -7177,7 +7920,7 @@ never safety ([12](./12-gateway.md) separation laws).
 ## The one projection (normative)
 
 There is **one canonical projection** of a workflow — the graph of
-[03](./03-dag.md) (`graph_format: 2`) — and every surface serves *that same
+[03](./03-dag.md) (`graph_format: 3`) — and every surface serves *that same
 projection*. `nika inspect --format json` (CLI), `nika/semanticDocument`
 (LSP), and the `nika_inspect` MCP tool all carry the **byte-identical**
 canonical projection; the surfaces differ only in what presentation they
@@ -7194,7 +7937,7 @@ which is why it carries its own version.
 ```
 semantic_document = (
   semantic_document_format   # the surface's OWN version (this chapter)
-  graph?                     # the canonical projection (03 · graph_format: 2) · absent when unbuildable
+  graph?                     # the canonical projection (03 · graph_format: 3) · absent when unbuildable
   reason?                    # WHY graph is absent · one word · closed vocabulary · omitted when graph is present
   spans                      # task id → the range of its declaring `id` token
 )
@@ -7207,7 +7950,7 @@ semantic_document = (
   capabilities · §the additive arc) needs a version of its own so a
   consumer can reason about the *surface* without unwrapping the graph.
 - **`graph`** is the canonical projection of [03](./03-dag.md) *verbatim*
-  (`graph_format: 2` · the derived edges · the reference identity). The
+  (`graph_format: 3` · the derived edges · the reference identity). The
   semantic document never re-derives it — it carries it.
 - **`spans`** map each task id to the LSP range of its declaring `id`
   token, so a canvas or a lens links a node back to source without
@@ -7235,7 +7978,7 @@ The **canonical projection** has **exactly one producer** and is served,
 byte-identical, by three surfaces:
 
 ```
-nika inspect --format json     ┐  the canonical projection (graph_format: 2)
+nika inspect --format json     ┐  the canonical projection (graph_format: 3)
 nika/semanticDocument (LSP)     ├─ byte-identical · one projection, three lenses
 nika_inspect (MCP)              ┘  (the LSP additionally wraps editor spans)
 ```
@@ -7273,7 +8016,7 @@ piece of the language:
 - **Additive-field discipline.** A new optional field (holes · actions ·
   capabilities) bumps `semantic_document_format` and is `skip`-omitted when
   empty. A consumer that ignores an additive field still reads the whole
-  older surface correctly — the same forward-compat the `graph_format: 2`
+  older surface correctly — the same forward-compat the `graph_format: 3`
   envelope already keeps (03). A consumer MUST ignore fields it does not
   know, never fail on them.
 - **Capabilities are negotiated, not assumed.** A client announces which
@@ -7317,7 +8060,7 @@ them is a reservation, never a promise they exist.
 
 ## Related
 
-- [03 · DAG](./03-dag.md) — the `graph_format: 2` projection this carries
+- [03 · DAG](./03-dag.md) — the `graph_format: 3` projection this carries
 - [05 · Errors](./05-errors.md) — the diagnostics lane (judgment lives there, not here)
 - [10 · Authority](./10-authority.md) — the flow laws the projection also obeys (structure only)
 - [15 · Proof](./15-proof.md) — the semantic identity the projected graph commits to
@@ -8193,7 +8936,21 @@ Returns `null` · best-effort (no failure codes · a log that cannot land never 
 ```yaml
 invoke: { tool: "nika:emit", args: { event_type: custom.event, payload: { ... } } }
 ```
-Emit a custom machine event (consumed by subscribers · journal). Distinct from `log` · `log` = human diagnostic · `emit` = machine event.
+Emit a custom machine event (consumed by subscribers · journal).
+
+> **Why this is not `log` with a different word (normative rationale · 2026-08-11).**
+> The separation was stated as *"`log` = human diagnostic · `emit` = machine
+> event"* — a claim about the intended READER, and a reader is a property of the
+> consumer, not of the write. That reasoning would not have survived the
+> collapse sweep that merged `sleep`+`wait_until` and four introspection
+> builtins. **The load-bearing difference is the FAILURE MODE**, and it is
+> structural: `nika:log` has **no failure codes at all** — a log that cannot
+> land never fails its task — while `emit` **validates the event shape** and
+> refuses `NIKA-BUILTIN-EMIT-001`. Collapsing them forces one of two
+> regressions: either every diagnostic becomes failable (73 files in the
+> measured corpus rely on it not being), or machine events lose their shape
+> gate. Two builtins, two contracts, one event stream — **kept for what they
+> promise on failure, not for who reads them.**
 
 `event_type:` matches `^[a-z][a-z0-9_.-]*$` · `payload:` any JSON value. Returns `null`. Delivery is engine-side (journal · subscribers) · best-effort once shape-valid. Throws · `NIKA-BUILTIN-EMIT-001` (invalid event shape · `validation_error`).
 
@@ -8435,8 +9192,8 @@ resolved URL path names a code-bearing class (serialized-executable ·
 script/interpreter · executable binary/module · the closed list in
 `10-authority.md` §the data-as-code sink) is refused at check
 (`NIKA-SEC-008`) and at run (`NIKA-SEC-004`) unless the task declares the
-read inert (`inert: "<because>"` · the honest door · it never lifts the
-host boundary or the SSRF floor).
+read inert (`lift: [{law: data-as-code, because: "…"}]` · the honest
+door · it never lifts the host boundary or the SSRF floor).
 
 **`traverse` semantics (normative)** · same-origin BFS from `url` ·
 fragment-stripped dedup · per-page output is the fixed page digest

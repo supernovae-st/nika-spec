@@ -1940,8 +1940,8 @@ diagnostics:
     namespace: SEC
     plane: check
     condition: 'data-as-code sink · a nika:fetch resolved URL path names a code-bearing class (serialized-executable
-      · script/interpreter · executable binary/module · the closed NEP-0006 list) and the task declares no inert:
-      door · the read hides an execution sink (F-O7 · NEP-0006)'
+      · script/interpreter · executable binary/module · the closed NEP-0006 list) and the task declares no door
+      — no lift: entry naming the data-as-code law · the read hides an execution sink (F-O7 · NEP-0006)'
     outcome_class: failure
     cause: security_error
     retryable: false
@@ -1949,8 +1949,8 @@ diagnostics:
     payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
     span_required: true
     teaching: 'a code-bearing artifact is a program, not data · model the acquisition as the exec it feeds (exec:
-      + a program permit · reviewable authority) · or declare the read inert on the task (inert: "<because>" ·
-      non-empty · it lifts the sink law only, never the host boundary or the SSRF floor) · the unresolvable URL
+      + a program permit · reviewable authority) · or declare the read inert on the task (lift: [{law: data-as-code,
+      because: "<why>"}] · non-empty · it lifts the sink law only, never the host boundary or the SSRF floor) · the unresolvable URL
       defers to the run twin (NIKA-SEC-004 on the resolved URL).'
     notes: 'nep-0006 (2026-07-23) · category: security_error · transient: false (canon.yaml verbatim) · minted by
       the F-O7 spec lane · the slot the F-O1 analysis confirmed free (001-007 + 009 taken) · the engine emission
@@ -2342,7 +2342,7 @@ diagnostics:
     terminal: true
     payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
     span_required: false
-    teaching: 'the category grant says nothing about the resolved value · keep the value inside the boundary (the diagnostic carries the taint path source-first + the canonical form + the escaped bound), or declare declassify: on the task — the only door, and never a permit bypass.'
+    teaching: 'the category grant says nothing about the resolved value · keep the value inside the boundary (the diagnostic carries the taint path source-first + the canonical form + the escaped bound), or declare lift: [{law: taint, from: <binding>, because: "<why>"}] on the task — the only door, and never a permit bypass.'
     notes: 'nep-0004 (2026-07-22) · category: security_error · transient: false (canon.yaml verbatim) · minted by the F-O1 spec lane · the run-time twin of this refusal is NIKA-SEC-004 (defense in depth, NEP-0003 law 3 provenance) · the engine emission lands with the re-gate flip (F-O1 PR-2/3).'
   - id: NIKA-AUTH-009
     status: reserved

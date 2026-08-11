@@ -245,6 +245,16 @@ Measured 2026-07-29 over the 43 corpus files. Builtins came back 24/28. The
 language's CONSTRUCTS are the same question with a bigger blast radius, and
 they came back worse.
 
+> **Reading note (the measurement is not rewritten).** §10 and §11 below name
+> two constructs that have since been merged: the task-level `declassify:`
+> list and the task-level `inert:` string are **dead**, replaced by the single
+> `lift:` construct (`law:` a closed enum · `from:` required by `taint` and
+> forbidden elsewhere · `because:` non-empty · `to: trusted` deleted outright).
+> See [`spec/10-authority.md` §the authored doors](spec/10-authority.md). The
+> rows keep their original spelling because they record what was measured on
+> 2026-07-29 — the count columns belong to that spelling and re-labelling them
+> would put a new name on an old number.
+
 **Four core constructs have ZERO examples**, while the spec discusses each of
 them at length:
 

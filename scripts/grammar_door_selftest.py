@@ -129,7 +129,7 @@ def main() -> int:
     # The pack law, post-0.106: a file either downcasts cleanly, or it
     # refuses TYPED on a STOP-listed wnew-only construct. The refusers are
     # NAMED below and ratcheted exactly — the top-level door sees `config:`
-    # (08) and `types:` (09); composition and `declassify:` are task-level
+    # (08) and `types:` (09); composition and `lift:` are task-level
     # and pass through it. Any other refusal is still red, and a NEW
     # refuser (a template gaining `config:`) moves the count and refuses
     # here until the ratchet is deliberately retuned. (Before the train

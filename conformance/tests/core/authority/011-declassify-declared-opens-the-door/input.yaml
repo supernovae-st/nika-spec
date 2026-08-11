@@ -12,7 +12,7 @@ tasks:
     invoke:
       tool: nika:read
       args: { path: "${{ inputs.p }}" }
-    declassify:
-      - from: inputs.p
-        to: trusted
+    lift:
+      - law: taint
+        from: inputs.p
         because: "vendor inventory path, deployment-controlled, reviewed at release time"

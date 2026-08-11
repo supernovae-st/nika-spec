@@ -29,7 +29,7 @@ foundation:
   - file: examples/10-compose-pipeline.nika.yaml
     sha256_16: 3b71fca164b18dad
   - file: examples/11-declassify-the-door.nika.yaml
-    sha256_16: 1f8bf7fe26a01c9b
+    sha256_16: 86dd084e327ad9b0
   - file: examples/12-failure-routing.nika.yaml
     sha256_16: 9049c1132ab0c545
 templates:
@@ -168,7 +168,7 @@ showcase:
     workflow: {'id': 'seo-content-brief', 'description': 'Competitor sitemap → top page → gap analysis → typed brief'}
     description: ""
     constructs: [local_model, on_error, output, outputs, schema, with]
-    sha256_16: af89cab80ab3dbfc
+    sha256_16: dc196db38776ebba
   - file: examples/social-repurpose.nika.yaml
     workflow: {'id': 'social-repurpose', 'description': 'One post → thread + LinkedIn + newsletter, in parallel'}
     description: ""
