@@ -505,6 +505,77 @@ ceiling is a named, versioned grammar — `jq-subset/0.1`, the sibling of
 (D-2026-08-11-N31 creates it). Until it does, this sentence is the boundary,
 and a boundary written in prose is weaker than one written in EBNF.
 
+##### Formal grammar · jq v0.1 subset (normative · grammar version `jq-subset/0.1`)
+
+Prose + examples are not re-implementable; this EBNF is. A conformant engine
+parses exactly this grammar in an `output:` binding and in `nika:jq` (it is a
+strict subset of jq: **any full jq parser accepts every expression below**) ·
+
+```ebnf
+program  = pipeline ;
+pipeline = alt , { "|" , alt } ;
+alt      = cmp , { "//" , cmp } ;             (* alternative · the // operator *)
+cmp      = sum , [ cmpop , sum ] ;            (* at most ONE comparison · non-associative *)
+cmpop    = "==" | "!=" | "<" | "<=" | ">" | ">=" ;
+sum      = term , { ( "+" | "-" ) , term } ;
+term     = unary , { ( "*" | "/" ) , unary } ;
+unary    = [ "-" ] , postfix ;
+postfix  = primary , { suffix } ;
+suffix   = "." , IDENT
+         | "[" , [ pipeline ] , "]"           (* index · [] iterates · NO slice in 0.1 *)
+         | "?" ;                              (* optional · swallows the type error *)
+primary  = "."                                (* identity *)
+         | "." , IDENT
+         | call | literal | object | array
+         | "$" , IDENT
+         | "(" , pipeline , ")" ;
+call     = FUNC , [ "(" , pipeline , { ";" , pipeline } , ")" ] ;
+object   = "{" , [ pair , { "," , pair } ] , "}" ;
+pair     = ( IDENT | STRING ) , [ ":" , pipeline ] ;
+array    = "[" , [ pipeline ] , "]" ;
+literal  = NUMBER | STRING | "true" | "false" | "null" ;
+```
+
+`FUNC` is the **closed** set ·
+
+```
+length · keys · values · has · type · not · empty · error
+map · map_values · select · add · join · split · flatten · range
+sort · sort_by · group_by · unique · unique_by · reverse
+first · last · min · max · min_by · max_by · any · all
+to_entries · from_entries · with_entries · del · paths
+tostring · tonumber · tojson · fromjson
+ascii_downcase · ascii_upcase · ltrimstr · rtrimstr · startswith · endswith
+floor · ceil · fabs
+```
+
+**The set is deliberately small, and small is the safe direction**: a minor
+version may only ADD (same law as `cel-subset/0.1`), so a name omitted here
+costs one amendment while a name admitted early can never be withdrawn.
+Derived from the corpus, not invented: over **41 programs** in the shipped and
+internal corpora, the functions actually used are `map · sort · last ·
+fromjson · join · length`, plus paths, the pipe, object/array construction and
+arithmetic. Everything above is that set plus its obvious companions.
+
+**What the grammar refuses BY CONSTRUCTION, and why ·**
+
+| Absent | Why |
+|---|---|
+| `recurse` · `..` · `while` · `until` · `repeat` | non-termination · a binding must be decidable at check |
+| `def` | user-defined recursion re-introduces the same |
+| `env` · `$ENV` · `input` · `inputs` · `input_filename` | ambient reads · the law above |
+| `debug` · `stderr` | writes outside the value |
+| `now` · `localtime` · `gmtime` · `mktime` · `strftime` | the clock · an input, never an ambient (N27) |
+| `halt` · `halt_error` | process control · a data expression does not end a run |
+| `test` · `match` · `sub` · `gsub` · `splits` · `scan` | regex · data-dependent blowup · deferred to a minor that pairs them with a bounded engine, not banned on principle |
+| slices `.[a:b]` | omitted for 0.1 only · a minor may add |
+
+⚠️ **A grammar bounds the SHAPE, never the MAGNITUDE.** `[range(1e9)]`
+parses clean and still materialises a billion elements. That is the runtime
+step budget's job (D-2026-08-11-N32), and the two ceilings are not
+interchangeable: the static one buys **termination**, the runtime one buys
+**size**. Neither alone is enough.
+
 #### An expression sees only its input (normative · D-2026-08-11-N26)
 
 > **The world of a data expression is the value it is given, and nothing
