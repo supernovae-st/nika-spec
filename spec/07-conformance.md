@@ -111,8 +111,38 @@ GitHub Actions and Docker Compose. A working modeline today:
 nika: v1
 ```
 
-(The short `https://nika.sh/spec/v1/workflow.schema.json` form goes live
-with the site launch · both will resolve to the same schema.) This is also what makes a Nika file
+#### The address MUST become versioned and immutable (normative · D-2026-08-11-N24)
+
+⚠️ **The modeline above points at a moving branch, and that is a defect with
+two independent causes.**
+
+*The first is ours.* Since [§unknown key](#an-unknown-key-is-an-error-at-every-level-normative--d-2026-08-11-n20)
+an unknown key is an error, so this schema's `additionalProperties: false` is
+no longer a lint preference — it is the accepted surface of the language. Served
+from `main`, that surface moves under every editor in the world **while no file
+has changed**. A workflow that validated on Monday shows red on Tuesday because
+a schema it never named was edited. This is precisely the drift the strict rule
+exists to prevent, arriving through the back door.
+
+*The second is the host's.* `raw.githubusercontent.com` fronts a cache that
+serves stale bytes: a schema can be correct at the commit and wrong at the
+reader for an unspecified window. **Immutable upstream is not immutable at the
+point of use** — measured in this workspace, 2026-08-07.
+
+**The shape.** One address per minor, frozen forever ·
+
+```yaml
+# yaml-language-server: $schema=https://nika.sh/schema/v0.1/workflow.schema.json
+nika: v1
+```
+
+This is what JSON Schema, OpenAPI, Kubernetes and CWL all do, and it composes
+with the `nika: v1` marker the envelope already carries. A file written in 2027
+still reads in 2030 against **its own** schema. Until the address ships, the
+modeline above is the pragmatic form and this paragraph is the standing debt —
+stated, not hidden.
+
+This is also what makes a Nika file
 pleasant (and trap-free) for an AI to author: the schema constrains the shape
 before the engine ever runs. CEL expressions and jq expressions inside string
 fields are validated by the engine (Core level), not the JSON Schema.
