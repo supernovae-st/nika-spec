@@ -1453,6 +1453,22 @@ diagnostics:
     span_required: true
     teaching: 'the call happened and the meter is blind — do not retry into a doubled bill: name the provider path that dropped the usage report (a priced model MUST report its tokens, or the run reads free what cost real money).'
     notes: 'r3-f1 (2026-07-29 · the adversarial audit''s usage-absence gate) · category: validation_error · transient: false (canon.yaml verbatim) · minted engine-side first (nika aa669fd2e) and hoisted to the SSOT · law_ids empty until the freeze batch.'
+  - id: NIKA-INFER-004
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: INFER
+    plane: run
+    condition: 'the provider spent tokens yet the visible answer is empty — a thinking model ate the budget on its reasoning trace (fail-closed · #651 · raise max_tokens or use a no-think variant)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: true
+    teaching: 'the reasoning share lives inside max_tokens: raise it, set an explicit thinking.budget_tokens, or pick a no-think variant — a paid blank answer never settles green.'
+    notes: 'nika#651 (2026-08-11 · the paid repro: 7/7 done · exit 0 · an empty brief.md) · category: validation_error · transient: false (canon.yaml verbatim) · minted engine-side first (nika fix/651-empty-answer-typed) and hoisted to the SSOT, the INFER-003 precedent · law_ids empty until the freeze batch.'
   - id: NIKA-EXEC-001
     status: reserved
     owner: spec
