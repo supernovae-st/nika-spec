@@ -99,7 +99,7 @@ re-meant:
 `task_retrying` · `task_recovered` · `task_cancelled` ·
 `task_cache_hit` · `verb_invoked` · `tool_invoked` ·
 `checkpoint_written` · `cost_incurred` · `infer_chunk` ·
-`permit_checked` · `declassify` · `run_sealed` ·
+`permit_checked` · `lift` · `run_sealed` ·
 `agent_tools_selected` · `agent_nudge` · `agent_stalled` ·
 `agent_compose_checked` · `agent_budget_checkpoint`
 

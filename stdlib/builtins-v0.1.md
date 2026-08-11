@@ -317,8 +317,8 @@ resolved URL path names a code-bearing class (serialized-executable ·
 script/interpreter · executable binary/module · the closed list in
 `10-authority.md` §the data-as-code sink) is refused at check
 (`NIKA-SEC-008`) and at run (`NIKA-SEC-004`) unless the task declares the
-read inert (`inert: "<because>"` · the honest door · it never lifts the
-host boundary or the SSRF floor).
+read inert (`lift: [{law: data-as-code, because: "…"}]` · the honest
+door · it never lifts the host boundary or the SSRF floor).
 
 **`traverse` semantics (normative)** · same-origin BFS from `url` ·
 fragment-stripped dedup · per-page output is the fixed page digest

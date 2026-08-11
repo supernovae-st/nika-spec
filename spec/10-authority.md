@@ -270,7 +270,9 @@ task `NIKA-SEC-004` — the defense-in-depth twin of NEP-0003 law 3), and
 the check report SHOULD list the deferred re-gates informationally so CI
 sees the attack surface before launch.
 
-The only door is the authored one — a task-level `declassify:` entry:
+The only door is the authored one — a `lift:` entry naming the **taint**
+law (see [§the authored doors](#the-authored-doors-normative) for the
+construct):
 
 ```yaml
 tasks:
@@ -278,18 +280,17 @@ tasks:
     invoke:
       tool: nika:read
       args: { path: "${{ inputs.p }}" }
-    declassify:
-      - from: inputs.p            # one binding
-        to: trusted
+    lift:
+      - law: taint
+        from: inputs.p            # one binding
         because: "vendor inventory path, deployment-controlled, reviewed at release time"
 ```
 
-`declassify:` MUST name `from:` (one binding), `to: trusted`, and a
-non-empty `because:`; the receipt records it (taint path · because ·
-value digest). It lifts the TAINT law only — the value is then matched
-like a literal and must still sit inside the declared boundary.
-Declassify is never a permit bypass, and there is no implicit
-declassification in v1.
+A `law: taint` entry MUST name `from:` (one binding) and a non-empty
+`because:`; the receipt records it (taint path · because · value
+digest). It lifts the TAINT law only — the value is then matched like a
+literal and must still sit inside the declared boundary. It is never a
+permit bypass, and there is no implicit declassification in v1.
 
 ## The data-as-code sink (normative · NEP-0006 · LAW-AUTH-0327)
 
@@ -308,11 +309,58 @@ security_error · the diagnostic names the class and both repairs) when
 the URL is literal or resolvable through the taint rules above; the
 unresolvable DEFERS to the run-time twin (`NIKA-SEC-004` · the same
 class refused on the resolved URL · defense in depth). The honest door
-is the task-level `inert: "<because>"` declaration (non-empty ·
-greppable): it lifts THIS law only · never the `net.http` boundary,
+is a `lift:` entry naming the **data-as-code** law (non-empty `because:`
+· greppable): it lifts THIS law only · never the `net.http` boundary,
 never the SSRF floor, never the taint re-gate. The repair in the other
 direction is to model the acquisition as the `exec` it feeds, under a
 program permit review can see.
+
+```yaml
+    lift:
+      - law: data-as-code
+        because: "vendor checkpoint archived to cold storage, never loaded"
+```
+
+## The authored doors (normative)
+
+`lift:` is the **single** construct through which an author opens a
+named law. There is no second spelling, and there will not be one when a
+third law earns a door.
+
+```yaml
+lift:
+  - law: taint                    # REQUIRES from:
+    from: inputs.p
+    because: "<why this is safe, in words a reviewer can judge>"
+  - law: data-as-code             # from: is FORBIDDEN here
+    because: "<why this artifact is never loaded>"
+```
+
+The contract, for every entry ·
+
+1. **`law:` is a closed enum.** v1 knows `taint` and `data-as-code`. A
+   law that has no door cannot be lifted at all — that is the default,
+   and it is the common case: **24 error-bearing laws exist; 2 have a
+   door.**
+2. **`because:` is mandatory and non-empty.** A lift with no reason is a
+   parse error, not a warning. The reason is what review reads.
+3. **A lift moves exactly ONE law.** It never widens `permits:`, never
+   touches the `net.http` boundary, never lowers the SSRF floor.
+4. **Every lift is recorded** in the run receipt and projected in the
+   check certificate. A lift that review cannot see would defeat its own
+   purpose.
+5. **`from:` is law-specific** — required by `taint`, forbidden
+   elsewhere. The schema enforces the discrimination; a `from:` on the
+   wrong law is a parse error.
+
+**Why one construct and not one field per law.** A door per law grows
+the language linearly in laws, and each language feature an author uses
+carries a measured **+18.9% odds of workflow failure** across 260K
+workflows (see [08 §antivalues](./08-out-of-scope.md)). The provider is
+a parameter of `infer:`, not a verb; the law is a parameter of `lift:`,
+not a field. The predecessors — a task-level `declassify:` list and a
+task-level `inert: "<because>"` string — are **dead**: same job, two
+spellings, and the third law would have made three.
 
 ## The certificate names its effects (normative)
 

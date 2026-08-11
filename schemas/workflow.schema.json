@@ -599,42 +599,60 @@
             "format": "jq"
           }
         },
-        "inert": {
-          "type": "string",
-          "minLength": 1,
-          "description": "The honest door of the data-as-code sink · declares this task's fetch a code-bearing artifact it will never load or run. The non-empty string IS the justification · it lifts the sink law only, never the net boundary and never the SSRF floor (spec/10-authority.md · NEP-0006 · LAW-AUTH-0327)."
-        },
-        "declassify": {
+        "lift": {
           "type": "array",
-          "description": "The ONLY door through the permit-parameterization taint (spec/10-authority.md §the permit-parameterization taint · NEP-0004 · LAW-AUTH-0325) · each entry raises ONE binding from untrusted to trusted, check-visible and receipt-recorded. Lifts the taint law only — the value is still matched against the declared boundary (never a permit bypass).",
+          "description": "The authored doors · each entry lifts exactly ONE named law, with a mandatory reason, check-visible and receipt-recorded. A lift is NEVER a permit bypass — the value still sits inside the declared boundary, and no law but the named one moves. The law set is CLOSED and normative (a NEP amends it): this is why a new law costs zero language fields (spec/10-authority.md §the authored doors).",
           "minItems": 1,
           "items": {
             "type": "object",
             "additionalProperties": false,
             "required": [
-              "from",
-              "to",
+              "law",
               "because"
             ],
             "properties": {
+              "law": {
+                "type": "string",
+                "enum": [
+                  "taint",
+                  "data-as-code"
+                ],
+                "description": "WHICH law this entry lifts · 'taint' raises ONE binding from untrusted to trusted (NEP-0004 · LAW-AUTH-0325) · 'data-as-code' declares this task's fetch a code-bearing artifact it will never load or run (NEP-0006 · LAW-AUTH-0327). Neither ever lifts the net boundary or the SSRF floor."
+              },
               "from": {
                 "type": "string",
                 "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)+$",
-                "description": "The ONE binding this entry raises (e.g. inputs.p · config.region · tasks.fetch.output) · a dotted value-binding path."
-              },
-              "to": {
-                "type": "string",
-                "enum": [
-                  "trusted"
-                ],
-                "description": "The target integrity label · v1 knows exactly one raise: untrusted -> trusted."
+                "description": "REQUIRED for law 'taint', forbidden otherwise · the ONE binding this entry raises (e.g. inputs.p · config.region · tasks.fetch.output) · a dotted value-binding path."
               },
               "because": {
                 "type": "string",
                 "minLength": 1,
                 "description": "The non-empty justification · recorded in the run receipt with the taint path and the value digest."
               }
-            }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "law": {
+                      "const": "taint"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "from"
+                  ]
+                },
+                "else": {
+                  "not": {
+                    "required": [
+                      "from"
+                    ]
+                  }
+                }
+              }
+            ]
           }
         },
         "infer": {
