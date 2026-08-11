@@ -975,17 +975,13 @@
     "onError": {
       "type": "object",
       "additionalProperties": false,
-      "description": "Error recovery · exactly ONE action (recover / skip / fail_workflow · the oneOf enforces it) + optional on_codes filter (spec/05-errors.md §Fields · catch-side mirror of retry.on_codes · skip preserves the original error at tasks.X.error).",
+      "description": "Error recovery · exactly ONE action (recover / skip · the oneOf enforces it) + optional on_codes filter (spec/05-errors.md §Fields · catch-side mirror of retry.on_codes · skip preserves the original error at tasks.X.error).",
       "properties": {
         "recover": {
           "description": "Recovery output · a `${{ }}` ref OR a literal (merges the former fallback/value per spec/05-errors.md)."
         },
         "skip": {
-          "description": "Swallow the error and let the DAG continue · the task produces no output, and the original error stays readable at `tasks.<id>.error`. Exactly one of `recover` · `skip` · `fail_workflow`.",
-          "type": "boolean"
-        },
-        "fail_workflow": {
-          "description": "Fail the whole workflow on this error · the written-down form of the default, so a reader sees the choice instead of inferring it. Exactly one of `recover` · `skip` · `fail_workflow`.",
+          "description": "Swallow the error and let the DAG continue · the task produces no output, and the original error stays readable at `tasks.<id>.error`. Exactly one of `recover` · `skip`.",
           "type": "boolean"
         },
         "on_codes": {
@@ -1007,11 +1003,6 @@
         {
           "required": [
             "skip"
-          ]
-        },
-        {
-          "required": [
-            "fail_workflow"
           ]
         }
       ]

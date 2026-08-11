@@ -326,8 +326,6 @@ api_call:
       recover: ${{ tasks.cached_data.output }}    # recovery output · a ${{ }} ref OR a literal
       # OR
       # skip: true                          # skip · downstream sees status = skipped
-      # OR
-      # fail_workflow: true                 # explicit · same as no on_error
 ```
 
 ### Fields · exactly ONE action + an optional code filter
@@ -336,11 +334,23 @@ api_call:
 |---|---|---|
 | `recover: <value>` | Use a recovery output: a `${{ }}` ref (e.g. another task's output) OR a literal | `status: success` · output = recover value |
 | `skip: true` | Skip this task on error · **the original error stays readable** at `tasks.X.error` (status is `skipped` · error populated · the one state where both coexist · enables downstream per-code routing) | `status: skipped` · `error` = the original typed error |
-| `fail_workflow: true` | Fail the whole workflow (default behavior) | n/a (workflow fails) |
 | `on_codes: [<NIKA-…>]` | **Optional filter** (combinable with exactly one action above) · the action applies ONLY when the final error's `code` is listed · an unlisted code falls through to the default (fail) · the catch-side mirror of `retry.on_codes` (same regex) | per the action |
 
 `recover:` merges the former `fallback:` (ref) + `value:` (literal) into one field
 (`${{ }}` resolves to values either way · 4 modes → 3 · one way).
+
+> ⚰️ **`fail_workflow: true` is REMOVED (2026-08-11) · 3 modes → 2.** It was a
+> keyword whose entire meaning was *"do the default"* — this spec said so in its
+> own three voices: the commented example read *"explicit · same as no
+> `on_error`"*, the table entry read *"(default behavior)"*, and combined with
+> `on_codes:` **both branches fail**, since an unlisted code *"falls through to
+> the default (fail)"*. A no-op in every combination is a comment wearing a
+> keyword's syntax; write a YAML comment. **The consolidation above had already
+> been run once and stopped one short** — three ways to spell one action is
+> still two too many when one of them does nothing. An author who wants the
+> default omits `on_error:`; an author who wants to SAY they chose it writes
+> `# fails the workflow · deliberate`. Measured cost before removal: 2 files in
+> the whole corpus, zero of them a real workflow.
 
 ```yaml
 # Catch-side routing · recover ONLY on timeout · any other code still fails
