@@ -1354,6 +1354,31 @@ the run stream follows). Node `kind` is the exception that forced the
 bump: it is not additive, because its absence has a meaning
 (*everything is a task*) that is now false.
 
+**What a bump costs downstream, stated rather than discovered.** A
+format-pinned reader stops reading the day the producer moves. That is
+the *intended* behaviour — refusing beats guessing — but it is a real
+migration, not a free one, and the producer owes consumers three things ·
+
+1. **The bump is announced before it ships.** A consumer pinned to
+   format 2 (`graph_format === 2`) is not broken by the spec; it is
+   broken by the day the engine starts emitting 3. Those are different
+   dates and the gap is the migration window.
+2. **The engine SHOULD be able to emit the older format on request** for
+   the length of that window. The precedent worth copying is
+   Kubernetes' split CEL environments: a **narrow, version-pinned gate
+   on what may be written**, and a **permissive runtime that still reads
+   everything already persisted**. Write-time strict, read-time
+   tolerant — that is what makes a rollback safe by construction.
+3. **The marker must not reach the interop boundary.** Rust editions are
+   the clean form: crates of different editions link, because the
+   edition changes the parser and never the artifact. A projection
+   format that splits its own consumer ecosystem has bought the split it
+   was meant to avoid.
+
+The v1 position: format 3 is the wire, format 2 is dead, and any
+consumer pinned to 2 MUST be migrated rather than served a downgrade
+forever. The window is a courtesy with an end, not a second format.
+
 ### Cleanup units are nodes (normative · new in format 3)
 
 Every `on_finally:` unit is projected as a node. Before format 3 they
