@@ -878,6 +878,34 @@ three. The three conditions of classical soundness are ·
 > known, bounded piece of work; claiming it already decides condition
 > (iii) would not be.
 
+#### The two declared back-offs (normative · conformance)
+
+Per-gate, the analysis is **exact**: it enumerates the referenced
+upstream status sets in Kleene three-valued logic (a non-status atom
+evaluates *Unknown*, and an Unknown gate is never declared dead). The
+approximation above is at the **joint** level only.
+
+That exactness is bought with two bounds, and a conformant engine MUST
+declare them because they change the verdict ·
+
+| Bound | Reference engine | Behaviour past it |
+|---|---|---|
+| distinct tasks referenced by one gate | **6** (4⁶ = 4096 leaf evaluations per gate) | the gate is treated **satisfiable** — it widens, never narrows |
+| items in one gate's `in [...]` list | **256** | same widening. A status list has ≤4 meaningful values, so a longer one is adversarial padding (a 3.6 MiB gate costs ≈0.9 s to enumerate) |
+
+Both back-offs move in the **sound** direction: past the bound the
+checker gives up on proving death, never on admitting life. The
+observable consequence is that **the same contradiction is refused at 6
+gate references and accepted at 7** — that is the contract, not a bug,
+and it is stated here because a conformance suite cannot test a
+threshold it was never told about.
+
+This is the shape the surrounding literature converges on: an exact
+analysis is purchasable only against a **declared bound** on the input,
+and where the bound is absent the static gate is abandoned rather than
+faked (cf. Kubernetes KEP-3488, which drops static CEL cost estimation
+exactly where `maxItems`/`maxLength` are unavailable).
+
 The reason this is worth stating: **soundness is EXPSPACE-complete in
 general** (Blondin, Mazowiecki, Offtermatt, LICS 2022 · arXiv:2201.05588 ·
 generalised soundness PSPACE-complete), and PTIME only for the free-choice
