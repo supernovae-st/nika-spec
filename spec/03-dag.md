@@ -830,25 +830,59 @@ intent, and downstream edges judge that state like any other.
 
 ### What that liveness check IS · soundness, and what it costs elsewhere
 
-`NIKA-DAG-006` is not a nika invention. It is condition (iii) of
-**soundness**, the workflow-net correctness property defined by van der
-Aalst (1997/1998) and surveyed in *Soundness of workflow nets:
-classification, decidability, and analysis* (Formal Aspects of Computing
-23(3):333–363, 2011). The three conditions are ·
+`NIKA-DAG-006` is not a nika invention. It is a **sound but incomplete
+approximation** of condition (iii) of **soundness**, the workflow-net
+correctness property defined by van der Aalst (1997/1998) and surveyed
+in *Soundness of workflow nets: classification, decidability, and
+analysis* (Formal Aspects of Computing 23(3):333–363, 2011). The three
+conditions are ·
 
 | Soundness condition | Where nika earns it |
 |---|---|
 | (i) **option to complete** — the final state is reachable from every reachable state | structural · `G_p` is finite and acyclic, so a topological order exists and the wave scheduler drains it in at most \|V\| waves. A task that cannot start still *settles* (`cancelled` propagates along every edge whose pass-set excludes its producer) — there is no wait state that no edge can leave. |
 | (ii) **proper completion** — nothing is left running when the workflow ends | structural · **every task settles exactly once**, into exactly one of four terminal states. There is no construct that puts a second thread of control on a node, so there is no residual token to leave behind. |
-| (iii) **no dead transitions** — every activity fires in at least one execution | **checked** · `NIKA-DAG-006` / `NIKA-DAG-007`, above, refused before any run. |
+| (iii) **no dead transitions** — every activity fires in at least one execution | **approximated · sound, not complete** · `NIKA-DAG-006` / `NIKA-DAG-007`, above, refused before any run. See the limit below. |
+
+> **The limit, stated honestly (measured on 0.108.0).** The reachability
+> pass folds a per-task possible-status set and tests **each edge
+> separately** against it — an *independent product*, which
+> over-approximates the reachable joint assignments. It therefore never
+> sees a death that depends on a **correlation between two producers of
+> a common ancestor**. A worked counterexample that `check` accepts
+> today ·
+>
+> ```yaml
+> tasks:
+>   upstream:       { exec: { command: ["true"] } }
+>   branch_success: { after: { upstream: success }, exec: { command: ["true"] } }
+>   branch_failure: { after: { upstream: failure }, exec: { command: ["true"] } }
+>   dead:
+>     after: { branch_success: success, branch_failure: success }
+>     exec: { command: ["true"] }
+> ```
+>
+> `upstream` settles into exactly ONE state, so `branch_success` and
+> `branch_failure` can never both be `success` in the same run — `dead`
+> is cancelled on every possible execution. `check` reports
+> `✔ GATES no task proven dead`.
+>
+> The direction of the error is the part that matters: the pass is
+> **sound** (a refused task is genuinely dead — no false positives) and
+> **incomplete** (a dead task can slip through — false negatives). It
+> never refuses a live program. Tightening it to the true joint set is a
+> known, bounded piece of work; claiming it already decides condition
+> (iii) would not be.
 
 The reason this is worth stating: **soundness is EXPSPACE-complete in
 general** (Blondin, Mazowiecki, Offtermatt, LICS 2022 · arXiv:2201.05588 ·
 generalised soundness PSPACE-complete), and PTIME only for the free-choice
-subclass. nika decides it in polynomial time over `G_p` because the shape
-was chosen to make it decidable, not because the check is clever. Argo,
-GitHub Actions, Airflow and Step Functions all accept a branch that can
-never fire.
+subclass. In nika, (i) and (ii) hold **by shape** and (iii) is
+approximated in polynomial time over `G_p` — because the shape was
+chosen to make the question tractable, not because the check is clever.
+The honest scoreboard: two conditions structural, one condition sound
+but not yet complete, and a general problem that is EXPSPACE-complete.
+Argo, GitHub Actions, Airflow and Step Functions accept a branch that
+can never fire at all.
 
 > **The permanent rule this buys.** A construct that cancels an **arbitrary
 > region** — rather than propagating along declared edges — is a *reset arc*,
