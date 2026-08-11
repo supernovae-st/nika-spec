@@ -524,9 +524,13 @@ postfix  = primary , { suffix } ;
 suffix   = "." , IDENT
          | "[" , [ pipeline ] , "]"           (* index · [] iterates · NO slice in 0.1 *)
          | "?" ;                              (* optional · swallows the type error *)
+reduce   = "reduce" , postfix , "as" , "$" , IDENT ,
+           "(" , pipeline , ";" , pipeline , ")" ;   (* bounded fold · the stream IS the bound *)
+format   = "@" , ( "base64" | "base64d" | "text" | "json" | "csv" | "tsv" | "uri" ) ;
 primary  = "."                                (* identity *)
          | "." , IDENT
          | call | literal | object | array
+         | reduce | format
          | "$" , IDENT
          | "(" , pipeline , ")" ;
 call     = FUNC , [ "(" , pipeline , { ";" , pipeline } , ")" ] ;
@@ -544,7 +548,7 @@ map · map_values · select · add · join · split · flatten · range
 sort · sort_by · group_by · unique · unique_by · reverse
 first · last · min · max · min_by · max_by · any · all
 to_entries · from_entries · with_entries · del · paths
-tostring · tonumber · tojson · fromjson
+tostring · tonumber · tojson · fromjson · getpath · setpath · leaf_paths
 ascii_downcase · ascii_upcase · ltrimstr · rtrimstr · startswith · endswith
 floor · ceil · fabs
 ```
@@ -552,6 +556,20 @@ floor · ceil · fabs
 **The set is deliberately small, and small is the safe direction**: a minor
 version may only ADD (same law as `cel-subset/0.1`), so a name omitted here
 costs one amendment while a name admitted early can never be withdrawn.
+
+> ⚠️ **The first cut of this grammar refused four of THIS SPEC'S OWN canonical
+> recipes** (2026-08-11 · corrected the same day). It had been verified against
+> the 41 programs the corpus *uses* and never against the recipes
+> [stdlib §what jq subsumes](../stdlib/builtins-v0.1.md) *recommends* —
+> `reduce`, the `@base64` formats, and the `getpath`/`setpath`/`leaf_paths`
+> family, which the cut-builtin table publishes as the supported way to do
+> the work those builtins used to do. **A corpus of USE and a corpus of
+> RECOMMENDATION are two different subjects**, and a grammar that refuses its
+> own documentation would have made the spec self-contradictory the day it
+> shipped. `reduce` is admitted with its stream as the bound — it folds over
+> a finite stream and cannot recurse, so it terminates by construction and
+> does not reopen what the table below refuses. Both corpora now pass: 40/40
+> programs, 9/9 recipes.
 Derived from the corpus, not invented: over **41 programs** in the shipped and
 internal corpora, the functions actually used are `map · sort · last ·
 fromjson · join · length`, plus paths, the pipe, object/array construction and
