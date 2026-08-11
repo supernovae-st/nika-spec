@@ -120,6 +120,38 @@ IR cannot actually decide is itself a refusal (`NIKA-ASSERT-001` — an
 assertion mis-leveled). Bounded/statistical assertions stay LAB
 (calibrated research · never presented as a guarantee).
 
+### An assertion the engine cannot judge is REFUSED (normative · D-2026-08-11-N34)
+
+An engine MUST refuse (`NIKA-ASSERT-001`) any property in this block that it
+does not judge. It MUST NOT parse it, accept it, and stay silent.
+
+**This is written because the opposite was measured on a shipped engine,
+2026-08-11.** An `assert:` naming a `before:` ordering over **two tasks that do
+not exist** was accepted and the audit reported `clean · risk low` — no lane,
+no finding, nothing. Compare `after:` pointing at an undeclared task, which is
+`NIKA-DAG-002`. The same mistake, one field apart, once fatal and once
+invisible.
+
+That silence contradicts [10 §policy](./10-authority.md) in its own words —
+*a constraint that cannot be judged must never look judged* — and this block
+is where an author states an **obligation**, the one place in the language
+where a human writes what the file is supposed to guarantee. A vocabulary of
+obligations that accepts anything and checks nothing is worse than its
+absence: absence teaches the author to look elsewhere, silence teaches them
+that a guarantee is held.
+
+**The properties land one at a time**, each moving from *refused* to *judged*,
+never from *silent* to *judged*. An author is never surprised in the direction
+that matters: a file that checked clean does not later reveal it was carrying
+an unjudged claim.
+
+⚠️ **The cost was measured before this was written.** Across 661 workflow
+files in the shipped and internal corpora, exactly **one** carries an
+`assert:` block — and that file is the probe written to demonstrate this very
+defect. **The only user of the field is the witness of the flaw it has.** It
+uses `before:`, the most decidable of the five, so starting there breaks
+nothing real.
+
 ## `receipt_format: 1` · *the one receipt (normative)*
 
 A run's receipt folds four things into one shape:

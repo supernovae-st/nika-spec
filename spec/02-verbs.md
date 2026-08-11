@@ -102,7 +102,7 @@ A v0.1-compliant engine MUST ·
 - Call the configured provider with the given prompt + system + parameters
 - Return the model's response as the task output
 - Validate the response against `schema` if present · MAY auto-retry validation failures internally before surfacing `NIKA-INFER-002` (engine-configurable · the same rule as [05 §structured output](./05-errors.md#structured-output-validation))
-- Reject any unknown field with a clear error (forward-compat) · or accept + warn (engine choice)
+- **Reject** any unknown field with a clear error (`NIKA-PARSE-005`) — the choice this line used to leave open is closed by [07 §unknown key](./07-conformance.md#an-unknown-key-is-an-error-at-every-level-normative--d-2026-08-11-n20): a key can REMOVE authority, so accept-and-warn fails open
 
 ---
 

@@ -39,7 +39,7 @@ An engine claims « Core v0.1-compliant » if it ·
    - Validates the `workflow` identifier kebab-case
    - Validates typed `inputs` (type + required) · validates `config` / `const` / `secrets` shape
    - Recognizes the 4 verbs (`infer` · `exec` · `invoke` · `agent`)
-   - Rejects unknown top-level fields with a clear error OR ignores with warning (engine's choice · documented behavior)
+   - **Rejects** unknown fields with a clear error (`NIKA-PARSE-005` · strict) — at every level, not only the top (D-2026-08-11-N20)
 
 2. **Computes DAG topology** correctly
    - Derives E_d from `with:` bindings (role per referenced field) and E_c from `after:` entries · G_p = E_d ∪ E_c ([03 §four graphs](./03-dag.md#the-four-graphs-normative))
@@ -272,6 +272,44 @@ The reference implementation [supernovae-st/nika](https://github.com/supernovae-
 ## Versioning
 
 A conformance claim is **specific to a spec version**. As the stdlib evolves to v0.2 · engines re-claim conformance against the new suite. The Core conformance level is stable forever within v1 of the language.
+
+### An unknown key is an error, at every level (normative · D-2026-08-11-N20)
+
+An engine MUST refuse a key it does not know (`NIKA-PARSE-005`). It MUST NOT
+accept-and-warn. **This clause used to leave the choice to the engine, and a
+choice here is not a detail: it is the whole growth model.** Two conformant
+engines were entitled to disagree on every future key — one refusing a file
+the other ran — which is the definition of a language that has not decided
+what it is.
+
+**Why refusal is the safe direction, and acceptance is not.** The instinct
+runs the other way: accept-and-warn looks forward-compatible, since a file
+written for a later minor would still run on an older engine. It is the wrong
+instinct here, because **a key in this language can REMOVE authority.** A
+future rule that forbids something would be silently dropped by an older
+engine, and the file would run with **more** authority than its author
+granted — failing open, in the one language whose premise is that an absent
+grant means zero. Refusal fails closed: the file does not run at all, and the
+author learns why.
+
+**What it buys, and it is not small.** Every key this spec reserves for a later
+minor lands **additively and for free** under refusal: no valid file uses one
+today, so admitting it later breaks nothing. Adding to a closed space is always
+compatible; the closure is what makes the growth safe. It also
+catches the misspelling — `permit:` written for `permits:` — which today is
+accepted in silence and yields *zero authority* without saying so, the most
+expensive typo the language can carry.
+
+**Precedent, and it is not ours.** CWL treats an unrecognised field as *a
+fatal error*; the field its readers may ignore is the advisory one, not the
+structural one. A serious specification refuses.
+
+⚠️ **A corollary that is not optional.** Under strict refusal, the published
+JSON Schema (`additionalProperties: false`) can no longer be served from a
+moving branch: it needs a **versioned, immutable address** (one per minor).
+Otherwise the editors of the world watch the accepted surface move under them
+while no file has changed — the drift the refusal exists to prevent, arriving
+by the back door.
 
 ---
 
