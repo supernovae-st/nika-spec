@@ -130,12 +130,40 @@ version, independent of any engine version.)
 **Anti-pattern** · do not write `nika: v1.0` · `nika: "1"` · or
 `nika: 1.0`. The value is exactly `v1`.
 
+> **What this field actually is, stated honestly (2026-08-11).** By the two
+> sentences above — one legal value, no `v2` ever — **`nika: v1` carries zero
+> bits as a version.** It is not a version marker; it is a **magic number**, in
+> the family of `#!/bin/sh`, `%PDF-`, `\x7fELF`: the thing that says *this
+> byte-stream is a Nika workflow*. That is a real and sufficient function, and
+> it is the one to defend it by — *"specifications have versions"* does not
+> survive its own normative text.
+>
+> **Why the file extension is not enough.** On disk, `.nika.yaml` discriminates.
+> A workflow does not always arrive on disk: it arrives as a registry blob, an
+> HTTP body, a stdin pipe (`nika check -`), a chat paste. In all of those the
+> extension is gone and the first line is the only discriminator. **The magic
+> number earns its slot on the transports the registry creates**, not on the
+> filesystem.
+>
+> ⚠️ And the choice is **coupled** to [07 §unknown key](./07-conformance.md):
+> Docker Compose could demote its marker precisely because it chose
+> accept-and-warn — an old runtime meeting a new file just warns. Under our
+> strict refusal an old engine must say *why* it refuses, and the marker is
+> what lets it say *"I do not speak this contract"* rather than *"unknown key"*.
+> The two decisions are one decision, and citing Compose approvingly on the
+> first while going the other way on the second needs this sentence to stay
+> honest.
+
 > **Why one field, not `apiVersion` + `schema`?** Earlier drafts used a
 > Kubernetes-style `apiVersion: nika.sh/v1` (the superseded ADR-021 form)
 > plus a separate `schema: nika/workflow@v1` (superseded too). That is two version-ish fields and
 > ceremony a workflow file does not need. Modern specs converge on a
 > single version marker: OpenAPI writes `openapi: 3.1.0`, Docker
-> Compose dropped its `version:` field entirely. Nika takes the
+> Compose **deprecated its `version:` field to informative-only** (it is
+> still defined by the Compose Specification for backward compatibility,
+> still parsed, and emits an obsolescence warning — the earlier wording here,
+> *"dropped it entirely"*, was a hand-typed claim and is **factually wrong**;
+> corrected 2026-08-11 against the live Compose reference). Nika takes the
 > middle, proven path: **one field, the language name as the key, the
 > contract version as the value.** The engine's internal canonical URI
 > stays `https://nika.sh/spec/v1` for RDF / conformance tooling, but
