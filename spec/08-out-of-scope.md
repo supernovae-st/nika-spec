@@ -64,7 +64,8 @@ arms a cadence; it does not become a control plane.
 
 **A6 · More than one thread of control per node.** A task settles
 exactly once. This permanently refuses the discriminator family
-(WCP-9, WCP-28–31), Multi-Merge (WCP-8), and N-of-M joins. It is not a
+(WCP-9, WCP-28–32 — six members), Multi-Merge (WCP-8), and N-of-M
+joins. It is not a
 gap to patch — it is the property that makes
 [soundness conditions (i) and (ii)](./03-dag.md#what-that-liveness-check-is--soundness-and-what-it-costs-elsewhere)
 structural rather than checked.
@@ -95,12 +96,16 @@ against this design ·
 **The rebuttal, in one line:** nika's escape hatches are *declared floors,
 not ambient capability* — `exec:` (lint-discouraged, `native-first/*`),
 `agent:` (budget-bounded, cap in the file), `invoke: workflow:`
-(authority intersected). And the measurement now runs the other way: in
-260K workflows over six years, custom shell commands carry **4.12× the
-odds of failure**, ambient environment variables 1.84×, and **each
-additional language feature used adds ~19% to the odds of failure**
-(Bardsiri, Decan, Mens, arXiv:2605.26825, 2026 — usage Gini 0.84, with
-74.6% of constructs accounting for 7.1% of use).
+(authority intersected). And the measurement now runs the other way:
+custom shell commands carry **4.12× the odds of failure**, environment
+variables 1.84×, and **each additional language feature used adds ~19%
+to the odds of failure** (Bardsiri, Decan, Mens, arXiv:2605.26825,
+2026). Attribution matters and the first version of this paragraph got
+it wrong: those odds ratios are regressed over **13,915 workflows across
+six months**, not over the paper's larger 260K/six-year usage corpus —
+the Gini 0.84 and the 74.6%-of-constructs-at-7.1%-of-use figures come
+from the usage study, the odds ratios from the reliability study. Two
+populations, one paper.
 
 ### The same metric, turned on ourselves
 

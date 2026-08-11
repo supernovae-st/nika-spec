@@ -355,8 +355,9 @@ The contract, for every entry ·
 
 **Why one construct and not one field per law.** A door per law grows
 the language linearly in laws, and each language feature an author uses
-carries a measured **+18.9% odds of workflow failure** across 260K
-workflows (see [08 §antivalues](./08-out-of-scope.md)). The provider is
+carries a measured **+18.9% odds of workflow failure** (regressed over
+13,915 workflows · see [08 §antivalues](./08-out-of-scope.md) for the
+population and its limits). The provider is
 a parameter of `infer:`, not a verb; the law is a parameter of `lift:`,
 not a field. The predecessors — a task-level `declassify:` list and a
 task-level `inert: "<because>"` string — are **dead**: same job, two

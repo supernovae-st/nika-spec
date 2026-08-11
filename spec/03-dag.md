@@ -612,7 +612,8 @@ the whole reason the language stays checkable ·
    BDF · Boolean dataflow              Buck & Lee 1993 · Lee & Parks,
      data-dependent switch/select      Proc. IEEE 83(5), 1995
      ⇒ TURING-COMPLETE
-     ⇒ bounded-memory scheduling and deadlock-freedom become UNDECIDABLE
+     ⇒ bounded-memory scheduling and strong consistency become UNDECIDABLE
+       (Buck 1993 · deadlock-freedom specifically is NOT what is proved)
 ```
 
 In the vendor-neutral workflow-pattern vocabulary (Russell, ter Hofstede,
@@ -834,8 +835,12 @@ intent, and downstream edges judge that state like any other.
 approximation** of condition (iii) of **soundness**, the workflow-net
 correctness property defined by van der Aalst (1997/1998) and surveyed
 in *Soundness of workflow nets: classification, decidability, and
-analysis* (Formal Aspects of Computing 23(3):333–363, 2011). The three
-conditions are ·
+analysis* (Formal Aspects of Computing 23(3):333–363, 2011). Two
+attributions worth keeping straight: the condition **names** below are
+the 2011 survey's, not the 1997 paper's, and that survey classifies
+**eight** soundness notions — « structural soundness » in the complexity
+results cited further down is one of those eight, not one of these
+three. The three conditions of classical soundness are ·
 
 | Soundness condition | Where nika earns it |
 |---|---|
@@ -876,7 +881,9 @@ conditions are ·
 The reason this is worth stating: **soundness is EXPSPACE-complete in
 general** (Blondin, Mazowiecki, Offtermatt, LICS 2022 · arXiv:2201.05588 ·
 generalised soundness PSPACE-complete), and PTIME only for the free-choice
-subclass. In nika, (i) and (ii) hold **by shape** and (iii) is
+subclass (van der Aalst 1998, Corollary 1 — **not** Esparza et al.
+arXiv:1704.04190, which cites that result as background rather than
+establishing it). In nika, (i) and (ii) hold **by shape** and (iii) is
 approximated in polynomial time over `G_p` — because the shape was
 chosen to make the question tractable, not because the check is clever.
 The honest scoreboard: two conditions structural, one condition sound
@@ -886,9 +893,12 @@ can never fire at all.
 
 > **The permanent rule this buys.** A construct that cancels an **arbitrary
 > region** — rather than propagating along declared edges — is a *reset arc*,
-> and reset arcs make **every** variant of soundness **undecidable** (Blondin,
-> Finkel, Hofman, Mazowiecki, Offtermatt, LICS 2024 · DOI
-> 10.1145/3661814.3662086). YAWL cancellation regions and BPMN
+> and reset arcs make soundness **undecidable** — classical, structural and
+> generalised alike (the last of those closed by Blondin, Finkel, Hofman,
+> Mazowiecki, Offtermatt, LICS 2024 · DOI 10.1145/3661814.3662086; the others
+> were already known). That paper also exhibits a variant that *stays*
+> decidable (1-in-between soundness), so « every variant » would be too
+> strong. YAWL cancellation regions and BPMN
 > cancel/compensate/error events are exactly this. nika's cancellation is
 > monotone propagation along edges that already exist, computed from
 > context-free pass-sets — it never leaves the decidable class. **This is a
