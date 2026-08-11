@@ -100,9 +100,33 @@ not ambient capability* — `exec:` (lint-discouraged, `native-first/*`),
 odds of failure**, ambient environment variables 1.84×, and **each
 additional language feature used adds ~19% to the odds of failure**
 (Bardsiri, Decan, Mens, arXiv:2605.26825, 2026 — usage Gini 0.84, with
-74.6% of constructs accounting for 7.1% of use). The long tail of a
-workflow language is both unused and measurably harmful. This document is
-the mechanism against it.
+74.6% of constructs accounting for 7.1% of use).
+
+### The same metric, turned on ourselves
+
+A citation that can only ever agree with us is decoration. So the
+authors' own metric was run against **this** language, over 669 files
+and 2071 authored tasks ·
+
+| | GitHub Actions | nika |
+|---|---|---|
+| constructs measured | 197 | **41** |
+| usage Gini | 0.840 | **0.700** |
+| constructs under 1% of use | 147 (74.6%) | **16** |
+| never written | — | **2** |
+
+Read it honestly. Our distribution is **less** concentrated (0.700 vs
+0.840), but **we have a long tail too** — 16 constructs sit under 1% of
+use, and 2 have never been written. The argument that survives is
+therefore **not** « nika has no long tail ». It is the surface size:
+**41 constructs against 197.** With ~19% added odds of failure per
+feature *used*, the ceiling on what an author CAN reach is the
+protection — and that ceiling is what this document defends.
+
+Two limits of that measurement, stated rather than hidden: the corpus is
+our own (a first-party corpus is not a population sample), and the
+envelope-key count picks up keys from files still written in an older
+dialect, so the tail is if anything **understated**.
 
 ---
 
@@ -200,11 +224,23 @@ poll_until:
       command: ["./check.sh"]
 ```
 
-**Why deferred** · unbounded loops break the « acyclic » guarantee of the DAG
-and the static-analyzability that makes Core conformance possible (you cannot
-bound the work statically). Workaround in v1 · use the `agent:` verb with a
-tool + `max_turns` budget (bounded), OR `for_each:` over a known collection
-(bounded fan-out).
+**Not deferred — REFUSED, permanently.** This section previously said
+« why deferred », which contradicted two other places in this spec that
+call the same construct a structural refusal. One statement, one home:
+**the status of `while:` is decided in
+[03 §where this sits](./03-dag.md#where-this-sits--deliberately-between-two-named-dataflow-models),
+and it is `A1` + `A6` here.** Everywhere else points at those.
+
+The reason is not that loops are hard to analyse. It is that a
+data-dependent branch whose decision **re-enters the graph** is exactly
+the SDF→BDF line: Boolean dataflow is Turing-complete, and bounded-memory
+scheduling plus deadlock-freedom become **undecidable** (Buck & Lee 1993 ·
+Lee & Parks, Proc. IEEE 83(5), 1995). Nothing about a future version
+changes that; a `while:` that stayed decidable would not be a `while:`.
+
+Bounded iteration already exists and is not a workaround: `for_each:`
+over a runtime-computed collection (WCP-14), or `agent:` with a
+`max_turns` budget written in the file.
 
 ### Goto / jumps
 
