@@ -590,6 +590,43 @@ This is the one construct that lets a v1 workflow process a
 runtime-computed number of items (N files · N search hits · N pages)
 without statically enumerating tasks.
 
+#### Where this sits · deliberately between two named dataflow models
+
+`for_each` is not a loop that got restricted. It is a specific point on a
+line the dataflow literature drew in the 1980s and 90s, and the position is
+the whole reason the language stays checkable ·
+
+```
+   SDF · synchronous dataflow          Lee & Messerschmitt 1987
+     token rates FIXED at compile time
+     ⇒ static schedule · bounded memory · deadlock-freedom · ALL DECIDABLE
+     ⇒ but a data-dependent count cannot be expressed AT ALL
+
+          ▼   nika `for_each` sits HERE   ▼
+     · cardinality N is DATA-DEPENDENT (not SDF)
+     · the collection is a PRE-FAN-OUT surface, evaluated EXACTLY ONCE
+     · NO feedback from the iterations back into the graph
+     · a task cannot fan out over its own output
+     ⇒ N is unknown at check time · the PROGRAM stays finite and analysable
+
+   BDF · Boolean dataflow              Buck & Lee 1993 · Lee & Parks,
+     data-dependent switch/select      Proc. IEEE 83(5), 1995
+     ⇒ TURING-COMPLETE
+     ⇒ bounded-memory scheduling and deadlock-freedom become UNDECIDABLE
+```
+
+In the vendor-neutral workflow-pattern vocabulary (Russell, ter Hofstede,
+van der Aalst, Mulyar, *Workflow Control-Flow Patterns: A Revised View*,
+BPM-06-22, 2006) this is exactly **WCP-14 supported** (multiple instances
+with run-time knowledge of N) and **WCP-15 structurally refused** (multiple
+instances *without* a priori run-time knowledge — new iterations added while
+the fan-out is already running). WCP-15 is a switch whose decision re-enters
+the graph. That is the BDF line, and crossing it costs the decidability of
+everything in [§static liveness](#static-liveness-check-time--normative).
+
+**So the refusal of `while:` is not conservatism.** It is the same line,
+named twice.
+
 ### `timeout` · *optional · task-level timeout (Go duration string)*
 
 ```yaml
@@ -790,6 +827,41 @@ along G_p ·
 A literal `when: false` alone is **not** a finding — it is the documented
 never-pattern (feature-flag). The task settles `skipped` by explicit
 intent, and downstream edges judge that state like any other.
+
+### What that liveness check IS · soundness, and what it costs elsewhere
+
+`NIKA-DAG-006` is not a nika invention. It is condition (iii) of
+**soundness**, the workflow-net correctness property defined by van der
+Aalst (1997/1998) and surveyed in *Soundness of workflow nets:
+classification, decidability, and analysis* (Formal Aspects of Computing
+23(3):333–363, 2011). The three conditions are ·
+
+| Soundness condition | Where nika earns it |
+|---|---|
+| (i) **option to complete** — the final state is reachable from every reachable state | structural · `G_p` is finite and acyclic, so a topological order exists and the wave scheduler drains it in at most \|V\| waves. A task that cannot start still *settles* (`cancelled` propagates along every edge whose pass-set excludes its producer) — there is no wait state that no edge can leave. |
+| (ii) **proper completion** — nothing is left running when the workflow ends | structural · **every task settles exactly once**, into exactly one of four terminal states. There is no construct that puts a second thread of control on a node, so there is no residual token to leave behind. |
+| (iii) **no dead transitions** — every activity fires in at least one execution | **checked** · `NIKA-DAG-006` / `NIKA-DAG-007`, above, refused before any run. |
+
+The reason this is worth stating: **soundness is EXPSPACE-complete in
+general** (Blondin, Mazowiecki, Offtermatt, LICS 2022 · arXiv:2201.05588 ·
+generalised soundness PSPACE-complete), and PTIME only for the free-choice
+subclass. nika decides it in polynomial time over `G_p` because the shape
+was chosen to make it decidable, not because the check is clever. Argo,
+GitHub Actions, Airflow and Step Functions all accept a branch that can
+never fire.
+
+> **The permanent rule this buys.** A construct that cancels an **arbitrary
+> region** — rather than propagating along declared edges — is a *reset arc*,
+> and reset arcs make **every** variant of soundness **undecidable** (Blondin,
+> Finkel, Hofman, Mazowiecki, Offtermatt, LICS 2024 · DOI
+> 10.1145/3661814.3662086). YAWL cancellation regions and BPMN
+> cancel/compensate/error events are exactly this. nika's cancellation is
+> monotone propagation along edges that already exist, computed from
+> context-free pass-sets — it never leaves the decidable class. **This is a
+> permanent refusal, not a defer.**
+>
+> The same cliff closes the general OR-join: its accepted formalization is a
+> reset net. See [08 §antivalues](./08-out-of-scope.md).
 
 ---
 

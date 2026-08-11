@@ -21,6 +21,91 @@ in stdlib v0.x extensions.
 
 ---
 
+## Antivalues · what this language is AGAINST, permanently
+
+A defer list is not enough. « Later OR never » is itself accretion
+pressure — every deferred item reads as a promise to someone. The list
+below is the other kind: **things nika will not do, at any version.** If
+you need one of them, nika is the wrong tool and the honest answer is to
+say so. (Prior art for publishing this at all: WDL's `Antivalues` section
+— the only workflow language that names what it refuses.)
+
+**A1 · Flexibility at all costs.** nika expresses the majority of
+workflows, not all of them. Arbitrary execution patterns are out. If you
+want them, use a language embedded in a general-purpose host — Nextflow
+or Snakemake are good, and they say so themselves.
+
+**A2 · A second way to spell one intent.** Every construct has one
+spelling. Argo ships `steps:` and `dag:` for the same thing, and inside
+`dag:` ships both `dependencies:` and `depends:` — three ways to say one
+thing. The `one-obvious-way/*` lint set exists so that never happens
+here. *(Design bet, stated as one: PEP 20's slogan has no empirical
+support anywhere we could find.)*
+
+**A3 · Ambient state.** A body reads its declared imports and nothing
+else. No implicit environment, no global task namespace, no inherited
+scope. This is the [hidden dependencies](https://www.cl.cam.ac.uk/~afb21/CognitiveDimensions/)
+dimension of Green's Cognitive Dimensions of Notations (1989/1996) —
+« is every dependency overtly indicated *in both directions*? » — and it
+is why the graph document lists every edge with `from` and `to`.
+
+**A4 · An unversioned expression layer.** Both expression sublanguages
+carry a normative, versioned grammar with a closed callable set
+(`cel-subset/0.1` · `jq-subset/0.1`). CWL feature-gates its JavaScript
+hatch but does not bound it — and portability breaks exactly there.
+GitHub Actions documents its `${{ }}`-into-shell hazard and ships the
+canonical injection class anyway. Nextflow is amputating Groovy right
+now (strict parser default in 26.04, `for`/`while`/`switch`/`import`
+removed) at the cost of a multi-year migration. A hatch you cannot
+version is a hatch you cannot keep.
+
+**A5 · Orchestration.** No scheduler, no queue, no cluster. `nika.yaml`
+arms a cadence; it does not become a control plane.
+
+**A6 · More than one thread of control per node.** A task settles
+exactly once. This permanently refuses the discriminator family
+(WCP-9, WCP-28–31), Multi-Merge (WCP-8), and N-of-M joins. It is not a
+gap to patch — it is the property that makes
+[soundness conditions (i) and (ii)](./03-dag.md#what-that-liveness-check-is--soundness-and-what-it-costs-elsewhere)
+structural rather than checked.
+
+**A7 · Cancellation of an arbitrary region.** Reset arcs make every
+variant of soundness undecidable (LICS 2024). This closes YAWL-style
+cancellation regions, BPMN cancel/compensate events, and the general
+OR-join — whose accepted formalization *is* a reset net.
+
+### The counter-arguments, stated before a reviewer states them
+
+Honesty costs less than being caught. The strongest published positions
+against this design ·
+
+- **The configuration complexity clock** (Hadlow, 2012): config grows a
+  rules engine, grows a DSL, and you have rebuilt a bad programming
+  language. Folklore, zero data — but it is *the* objection.
+- **Snakemake** (Mölder et al., F1000Research 10:33) states it from
+  inside the field: purely declarative systems get « concision and
+  clarity … [but] can be **more restrictive in the processes that can be
+  expressed** ». Their `checkpoint` — re-plan the DAG mid-run — is the
+  strongest existing counter to A6/A7.
+- **Closedness does not buy comprehensibility**, only analysability. A
+  large Starlark codebase is still hard to read.
+- **Oozie's rigid XML lost to Airflow's Python.** Being closed is not
+  sufficient.
+
+**The rebuttal, in one line:** nika's escape hatches are *declared floors,
+not ambient capability* — `exec:` (lint-discouraged, `native-first/*`),
+`agent:` (budget-bounded, cap in the file), `invoke: workflow:`
+(authority intersected). And the measurement now runs the other way: in
+260K workflows over six years, custom shell commands carry **4.12× the
+odds of failure**, ambient environment variables 1.84×, and **each
+additional language feature used adds ~19% to the odds of failure**
+(Bardsiri, Decan, Mens, arXiv:2605.26825, 2026 — usage Gini 0.84, with
+74.6% of constructs accounting for 7.1% of use). The long tail of a
+workflow language is both unused and measurably harmful. This document is
+the mechanism against it.
+
+---
+
 ## Workflow composition · the CALL half SHIPPED ([14](./14-composition.md)) · the TEXTUAL half deferred
 
 ### Multi-file workflows (`include:` · `import:`)
