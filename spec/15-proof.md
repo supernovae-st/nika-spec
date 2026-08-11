@@ -79,12 +79,40 @@ policy:                         # the resolved policy decisions (10)
   file — the local boundary of the same supply chain the gateway (12)
   and the distribution work extend.
 
-## `assert:` · *the author's obligations (normative)*
+## `assert:` · ⚰️ *NOT in the envelope of v0.1 (removed 2026-08-11)*
 
-A task or workflow declares assertions the engine judges — distinct
-from `nika:assert` (the single-condition fail-fast builtin): `assert:`
-is a **closed vocabulary of properties**, each judged at an honest
-level:
+> **The envelope key is gone. `nika:assert`, the single-condition fail-fast
+> builtin, stays and is untouched** — that half works and is what an author
+> actually reaches for today.
+>
+> **Three measurements forced the subtraction, and any one of them would have.**
+> ① The published JSON Schema carries **13 envelope keys and `assert` is not
+> among them** — so a feature the engine accepted *failed the validator the
+> project ships*, and since [07 §unknown key](./07-conformance.md) made refusal
+> strict, that contradiction became fatal rather than untidy. ② It judged
+> **nothing**: an assertion naming an ordering over two tasks that do not exist
+> was accepted with a `clean · risk low` verdict, where the same mistake one
+> field away (`after:`) is `NIKA-DAG-002`. ③ Across **661 workflow files**,
+> exactly **one** carried the block — and that file is the probe written to
+> demonstrate this very defect. *The only user of the field was the witness of
+> its flaw.*
+>
+> **Why removal rather than repair.** A vocabulary of obligations that accepts
+> anything and checks nothing is worse than its absence: absence sends an
+> author looking for a real mechanism, silence tells them a guarantee is held.
+> Making it merely *refuse* would have kept an envelope key that expresses
+> nothing an engine can act on. **The subtraction is the fix, and it costs one
+> reserved slot back.**
+>
+> **It returns as an ADDITION, not as a rescue.** The vocabulary and the three
+> honesty levels below are kept in this chapter as the design of record. The
+> day `nika trace verify` can judge a property, that property comes back —
+> one at a time, each moving from *absent* to *judged*, never from *silent* to
+> *judged*. A closed language always permits an addition; that is the whole
+> point of closing it.
+
+The design of record — a **closed vocabulary of properties**, each judged at an
+honest level — is preserved below and is **not implementable surface today**:
 
 ```yaml
 assert:
@@ -122,8 +150,14 @@ assertion mis-leveled). Bounded/statistical assertions stay LAB
 
 ### An assertion the engine cannot judge is REFUSED (normative · D-2026-08-11-N34)
 
-An engine MUST refuse (`NIKA-ASSERT-001`) any property in this block that it
-does not judge. It MUST NOT parse it, accept it, and stay silent.
+⚰️ **Superseded the same day by the removal above.** This clause hardened an
+envelope key into refusing what it could not judge; the key is now absent, so
+there is nothing to harden. The clause is kept because its *reason* survives
+the key and generalises — it is the law any future property must satisfy
+before it re-enters ·
+
+An engine MUST refuse (`NIKA-ASSERT-001`) any property it does not judge. It
+MUST NOT parse it, accept it, and stay silent.
 
 **This is written because the opposite was measured on a shipped engine,
 2026-08-11.** An `assert:` naming a `before:` ordering over **two tasks that do

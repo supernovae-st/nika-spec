@@ -97,6 +97,20 @@ is never exposed.
 | `limits:` | **hard** · judged at check | `max_tasks: <positive integer>` |
 | `endorsement:` | **hard** · judged at check | `solo` — the NAMED solo mode: exactly one endorser (one human gate), its fresh authorization bound to the action and logged as such · a gate under no declared mode refuses (`NIKA-SEC-013` · fail-closed) · a declared solo with more than one gate refuses as the declaration lying (NEP-0014 · F-P23) |
 | `prefer:` | **soft** · parsed, recorded, NOT judged | `providers: [<provider>…]` (ordered) |
+
+> ⚠️ **`endorsement:` names a family and has one member, and the gap is a
+> capability gap, not a naming one** (stated 2026-08-11). A workflow that wants
+> **two** human gates on one action is **inexpressible** — not because two
+> endorsers are unsafe, but because the enum has a single value. The honest
+> reading is that the language today can say *one human authorised this* and
+> cannot say *two did*, and a reader deserves to know which of the two it is.
+> **The single member is not the defect and MUST NOT be removed**: `solo`
+> carries two live refusals (a gate under no declared mode · a declared `solo`
+> wearing more than one gate). Deleting a working refusal to make a table
+> shorter is subtraction, not simplification. The member that is missing is
+> the one to add — and since [07 §unknown key](./07-conformance.md) an unknown
+> value is an error, a second member lands additively, for free, the day its
+> semantics are decided.
 | `optimize:` | **soft** · parsed, recorded, NOT judged | `cost` \| `latency` \| `quality` |
 
 `<effect-class>` is the closed set `exec · write · net · tools` — the
