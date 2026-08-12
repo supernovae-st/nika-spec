@@ -97,6 +97,7 @@ is never exposed.
 | `limits:` | **hard** · judged at check | `max_tasks: <positive integer>` |
 | `endorsement:` | **hard** · judged at check | `solo` — the NAMED solo mode: exactly one endorser (one human gate), its fresh authorization bound to the action and logged as such · a gate under no declared mode refuses (`NIKA-SEC-013` · fail-closed) · a declared solo with more than one gate refuses as the declaration lying (NEP-0014 · F-P23) |
 | `prefer:` | **soft** · parsed, recorded, NOT judged | `providers: [<provider>…]` (ordered) |
+| `optimize:` | **soft** · parsed, recorded, NOT judged | `cost` \| `latency` \| `quality` |
 
 > ⚠️ **`endorsement:` names a family and has one member, and the gap is a
 > capability gap, not a naming one** (stated 2026-08-11). A workflow that wants
@@ -111,7 +112,11 @@ is never exposed.
 > the one to add — and since [07 §unknown key](./07-conformance.md) an unknown
 > value is an error, a second member lands additively, for free, the day its
 > semantics are decided.
-| `optimize:` | **soft** · parsed, recorded, NOT judged | `cost` \| `latency` \| `quality` |
+>
+> ⚠️ **Cette note vit SOUS la table, jamais au milieu** — une note insérée
+> entre deux rangées casse la lecture mécanique de la table (mesuré
+> 2026-08-12 · le générateur de la page autorité lisait une famille soft de
+> moins, et le gate GA-b l'a attrapé).
 
 `<effect-class>` is the closed set `exec · write · net · tools` — the
 effect vocabulary above with `fs` split at its grain of harm (`write`;
