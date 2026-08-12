@@ -819,9 +819,26 @@ left for a reviewer to strike.**
 **self-refuting.** The neighbours spell it `scatter` (WDL/CWL), `Map`
 (ASL), `withItems` (Argo), `matrix` (GHA). `for_each` is a **fifth**
 spelling, not one of the four, so « a reader of those four guesses ours »
-has no support whatsoever. (The precedent that *would* support it is
-Terraform's `for_each`, whose applies are also concurrent by default —
-that is the citation to check before anyone leans on this argument.)
+has no support whatsoever.
+
+**The precedent that DOES support it — checked, 2026-08-12.** Terraform's
+`for_each` is the fifth-spelling ancestor, and its applies are indeed
+concurrent by default: *« Graph walking is done in parallel: a node is
+walked as soon as all of its dependencies are walked »*, bounded by a
+semaphore whose `-parallelism` *« Defaults to 10 »* (`internals/graph.mdx`
+· `plan.mdx`). So the word does arrive with a concurrent connotation from
+the largest infrastructure-as-code ecosystem — **bounded, not unbounded**,
+which is exactly what `for_each.max_parallel:` expresses here.
+
+⭐ **And the same page hands us a stronger law than the naming one.**
+Terraform requires `for_each` keys to be known before any remote call, and
+refuses them outright when they are not: *« Keys in the `for_each` argument
+cannot be the result of or rely on the result of impure functions,
+including `uuid`, `bcrypt`, or `timestamp` »*. **Unknowns travel in the
+VALUES, never in the STRUCTURE.** That is the same line this section draws
+between SDF and BDF, reached independently by a declarative system with no
+dataflow vocabulary — and it is why a fan-out cardinality that depended on
+its own iterations would not be a feature but a different language.
 
 ❌ *« parallel-by-default is pillar 3, locked »* — **a category error.**
 Pillar 3 constrains the **semantics**, not the **spelling**. `map:` with
