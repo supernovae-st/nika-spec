@@ -5596,7 +5596,7 @@ An engine claims « Core v0.1-compliant » if it ·
    - `${{ inputs.x }}` · `${{ const.x }}` resolve to declared envelope `inputs:` / `const:` entries
    - `${{ with.x }}` resolves to a declared task `with:` key
    - `${{ tasks.X.field }}` resolves to a declared upstream task + a valid field name
-   - `${{ config.X }}` · `${{ secrets.X }}` resolve to declared namespaces
+   - `${{ secrets.X }}` resolves to a declared `secrets:` entry
    - `when:` and `for_each:` expressions are valid **CEL** (the v0.1 subset · see 03-dag) and their references **resolve to known namespaces**: Core parses but does NOT *evaluate* them (no execution = no `tasks.X.status` to compare against · that is Runtime's job)
    - `output:` bindings are valid **jq** expressions (the one data language · see 04-variables) · `${{ }}` never appears inside a binding
    - Reports undefined references with `NIKA-VAR-001` · static expression violations with `NIKA-VAR-005` (the deep-static layer · CEL subset parse · jq compile · `when:` boolean shape)
@@ -7372,10 +7372,9 @@ The secret-flow and permit-taint codes join the existing `NIKA-SEC` and
 > Bundle** owned by the consuming organization — Nika is a *reference
 > implementation* of the contract, never its prison.
 >
-> Three algebras, never fused:
+> Two algebras, never fused:
 > [`permits:`](./10-authority.md) is *authority* (required ⊆ permitted)
-> · [`policy:`](./10-authority.md) is *law* (the shape of allowed
-> action) · a **decision** is *judgment* —
+> · a **decision** is *judgment* —
 > `D = Evaluate(Bundle, EvidenceSnapshot)` — deterministic, explained,
 > appealable. **The model never decides** — the law is this chapter's:
 > `infer:`/`agent:` may produce closed, cited semantic *facts*; the
@@ -7592,8 +7591,8 @@ never fakes it.
 
 ## Related
 
-- [10 · Authority](./10-authority.md) — permits (authority) · policy
-  (law) — the two algebras this one completes
+- [10 · Authority](./10-authority.md) — permits (authority) — the other
+  algebra this one completes
 - [09 · Types](./09-types.md) — evidence value types · `returns:` on
   the decide task
 - [05 · Errors](./05-errors.md) — the registry (DECIDE rows)
@@ -7646,7 +7645,7 @@ its author proved it.
 |---|---|
 | `manifest` | id · version · owner · the semantic hashes of every workflow it ships |
 | `lock` | every dependency **pinned by digest** (spec pin · tool versions · provider catalog snapshot · schemas) — nothing resolves at run time |
-| `authority` | the DECLARED boundary: the `permits:`/`policy:` blocks verbatim + the inferred needed-effects projection (10 §certificate) |
+| `authority` | the DECLARED boundary: the `permits:` block verbatim + the inferred needed-effects projection (10 §certificate) |
 | `contracts` | the callable contracts (types · returns · inputs/outputs) of every entry workflow |
 | `backend_requirements` | the MINIMUM capability set a backend must attest before this bundle runs (see below) — with per-requirement `on_absent: refuse \| degrade_declared` |
 | `attestations` | reserved (W6 — signatures · provenance · SBOM refs) |
@@ -8093,7 +8092,7 @@ adds: wherever the target is static, a linter recommends the native form.
 > *instances* of one shape, never three.
 >
 > This is the last pre-1.0 chapter. It closes the loop the language
-> opened: `nika: v1` in, a signed honest proof out.
+> opened: a `nika:` file in, a signed honest proof out.
 
 ---
 
@@ -8174,7 +8173,7 @@ registry:                       # every registry: ref pinned owner/name@version 
 > actually reaches for today.
 >
 > **Three measurements forced the subtraction, and any one of them would have.**
-> ① The published JSON Schema carries **13 envelope keys and `assert` is not
+> ① The published JSON Schema carries **9 envelope keys and `assert` is not
 > among them** — so a feature the engine accepted *failed the validator the
 > project ships*, and since [07 §unknown key](./07-conformance.md) made refusal
 > strict, that contradiction became fatal rather than untidy. ② It judged
@@ -8254,7 +8253,7 @@ no finding, nothing. Compare `after:` pointing at an undeclared task, which is
 `NIKA-DAG-002`. The same mistake, one field apart, once fatal and once
 invisible.
 
-That silence contradicts [10 §policy](./10-authority.md) in its own words —
+That silence contradicts [10 · Authority](./10-authority.md) in its own words —
 *a constraint that cannot be judged must never look judged* — and this block
 is where an author states an **obligation**, the one place in the language
 where a human writes what the file is supposed to guarantee. A vocabulary of
@@ -8350,7 +8349,7 @@ never safety ([12](./12-gateway.md) separation laws).
 > for byte the same**. One truth, many lenses.
 >
 > This is the first chapter of the post-1.0, additive arc. Everything it
-> adds is a **projection over the frozen `nika: v1` IR** — never a change
+> adds is a **projection over the frozen v1 IR** — never a change
 > to the language. A projection is a *view*; the thing viewed does not
 > move.
 
@@ -8438,8 +8437,8 @@ nika_inspect (MCP)              ┘  (the LSP additionally wraps editor spans)
   a `reason` and whatever spans it could recover — never an error. Judgment
   lives in `nika check` (05), never in the projection.
 - **Structure only.** The projection carries names, shapes, spans, and
-  derived structure — **never** a `config` value, a secret, or resolved
-  material ([10](./10-authority.md) flow laws hold here too). A projection
+  derived structure — **never** a resolved `inputs:` value, a secret, or any
+  other resolved material ([10](./10-authority.md) flow laws hold here too). A projection
   that leaked a secret would be a sink; it is not one, by construction.
 - **A projection is a view over the frozen IR.** It never mutates, never
   re-orders, never re-interprets the workflow. Given the same source it is
