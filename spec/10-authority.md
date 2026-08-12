@@ -412,6 +412,54 @@ The secret-flow and permit-taint codes join the existing `NIKA-SEC` and
   out of by saying nothing is not a rule (measured: 26 gates spared, 8
   punished, and the 8 were the ones that had declared something else).
 
+## What `permits:` is, formally — *and what it is not*
+
+`permits:` is **not a capability system**, and this chapter says so
+plainly rather than borrowing a word it has not earned.
+
+In the capability model as Dennis and Van Horn defined it (CACM 9(3),
+1966), a reference is a pair `[i, a]` where `i` is an index **into the
+holder's own C-list**, and each C-list entry *"locates by means of a
+pointer some computing object"*. A computation cannot name an object it
+was not handed. **Authority comes from the indirection.**
+
+`permits.fs.write: ["./out/**"]` is a **name**, resolved at use against
+an ambient filesystem the engine process can already reach in full. Two
+paths therefore exist through the system: the designation, which travels
+in `args`, and the authority, which travels in `permits`. They are
+recombined at the moment of access by a reference monitor. Miller, Yee
+and Shapiro (SRL2003-02, 2003) call the absence of that split *Property
+A · No Designation Without Authority*, and state that **no ACL system
+can have it**. `permits:` does not have it.
+
+The shape is closer than the label suggests — `permits:` is per-subject
+and lists objects, which is a C-list's shape rather than an access
+list's. But a C-list of **strings** is not a C-list. The accurate name
+is **a per-subject permission manifest over a shared namespace**: the
+family of Android manifests and Deno flags, not the family of seL4
+capabilities.
+
+The known cost is stated with it. A manifest is declared once, before
+the work exists, so it must be written wide enough for every call the
+file could ever make — *"you often do not know in advance what
+authorities the program actually needs"* (Miller, 2006, §3.1). That is
+authority granted **just-in-case**, where the principle of least
+authority asks for **just-in-time**.
+
+What v1 buys instead is the thing none of those systems attempts: **the
+bound is judged before the program runs.** A capability is checked when
+it is invoked — which is to say after the tokens are spent and the
+request is already out. `nika check` reads the whole declared boundary
+against the whole graph and refuses ahead of the first effect, and
+`--infer-permits` lets the machine derive the boundary so the author is
+not the one who has to be exhaustive. That is a different guarantee, not
+a weaker version of the same one, and it is the one this file is built
+to give.
+
+> **Citation note.** The law usually quoted as *"No Ambient Authority"*
+> is Property D of SRL2003-02, **not** of Miller's 2006 dissertation:
+> the word `ambient` does not occur in the dissertation text.
+
 ## What v1 deliberately does not do
 
 - **No solver, and no soft constraints at all.** `prefer:`/`optimize:`
