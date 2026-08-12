@@ -336,6 +336,29 @@ The contract, for every entry ·
 5. **`from:` is law-specific** — required by `taint`, forbidden
    elsewhere. The schema enforces the discrimination; a `from:` on the
    wrong law is a parse error.
+6. **A lift that lifts nothing is an ERROR** (`NIKA-AUTH-011` ·
+   `validation_error`), never a silent no-op. If the named law would not
+   have fired on this task, the entry is refused and the diagnostic says
+   so.
+
+> **Rule 6 is borrowed from a regression, and the regression is the
+> argument.** Terraform's `nonsensitive()` is the same shape: an authored
+> trapdoor that lowers one label, with the responsibility transfer stated
+> in its own docs (*« you are declaring to Terraform that you have done
+> all that is necessary … that's a bug in your module and not a bug in
+> Terraform itself »*). In `v1.5.0` a redundant call was an **error**
+> — `if args[0].IsKnown() && !args[0].HasMark(marks.Sensitive) { return …
+> "this call is redundant" }`. On `main` that guard is **gone**: the mark
+> is deleted unconditionally, so a redundant declassification is a silent
+> no-op. Their own documentation page has not caught up — its prose says
+> no-op, its example still shows the error.
+>
+> **The cost is not the wasted line. It is that the trapdoor stops being
+> greppable.** A reviewer auditing « every declassification in this repo
+> carries its weight » can do that under the strict rule and cannot under
+> the lax one, because dead lifts accumulate indistinguishably from live
+> ones. A trapdoor whose whole value is being **countable and reviewable**
+> must refuse to be written when it does nothing.
 
 **Why one construct and not one field per law.** A door per law grows
 the language linearly in laws, and each language feature an author uses

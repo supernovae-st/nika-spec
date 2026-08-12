@@ -322,9 +322,33 @@ resolved secret values in logs, traces, and journal events.
 
 | `source` | `key` means | Use |
 |---|---|---|
-| `vault` (default) | path in the local `nika-vault` | the sovereign default |
 | `env` | name of an OS environment variable | 12-factor / CI secrets |
 | `file` | path to a file holding the value | Docker / k8s mounted secrets |
+| ~~`vault`~~ | — | **withdrawn from the contract · see below** |
+
+> #### 🔴 `vault` is withdrawn until it runs · corrected 2026-08-12
+>
+> This table called `vault` **« the sovereign default »**. The reference
+> engine's own hint says otherwise, verbatim ·
+>
+> > `secrets.k` uses source `vault`, **not yet runtime-resolvable — the
+> > check is green but `${{ secrets.k }}` will fail at run with
+> > NIKA-1702**; use `source: env` or `source: file` until vault
+> > resolution ships
+>
+> There is no `nika vault` verb and no `nika-vault` crate. Corpus vote,
+> derived: **`env` 19 · `vault` 0 · `file` 0.**
+>
+> This is the same class as the `config:`-without-`default:` defect fixed
+> the day before — **green at check, dead at run** — except it sat on the
+> member this table designated as THE default. A spec that names a
+> non-functioning member as the recommended one does not merely fail to
+> help: it steers every new author into the failure.
+>
+> The enum is therefore `env | file` until vault resolution ships, at
+> which point `vault` returns **additively** and reclaims the default. A
+> capability re-enters the contract when it runs, never before — and
+> nothing is lost meanwhile, because nothing was working.
 
 The `inputs` / `secrets` split is the modern secure-workflow default:
 non-sensitive values in `inputs:` (they appear in logs), masked references in
