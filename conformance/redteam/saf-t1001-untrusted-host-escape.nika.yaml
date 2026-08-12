@@ -7,9 +7,7 @@
 #
 # Expected: NIKA-AUTH-008 at CHECK (the resolved `inputs.host` escapes
 # the declared host set · the re-gate refuses it).
-nika: v1
-workflow:
-  id: saf-t1001-untrusted-host-escape
+nika: saf-t1001-untrusted-host-escape
 permits:
   net: { http: ["api.github.com"] }
   tools: ["nika:fetch"]

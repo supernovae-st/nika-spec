@@ -1,6 +1,4 @@
-nika: v1
-workflow:
-  id: twin-keys
+nika: twin-keys
 tasks:
   hello:
     exec:

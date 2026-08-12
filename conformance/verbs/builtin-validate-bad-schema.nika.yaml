@@ -4,9 +4,7 @@
 # Tests: NIKA-BUILTIN-VALIDATE-001 fires at runtime
 # nika check: might pass (schema validity is hard to check statically)
 # nika run: should fail with NIKA-BUILTIN-VALIDATE-001
-nika: v1
-workflow:
-  id: w37-validate-bad-schema
+nika: w37-validate-bad-schema
 
 const:
   doc:

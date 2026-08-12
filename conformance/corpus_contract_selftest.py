@@ -3,15 +3,17 @@
 # Copyright (C) 2024-2026 SuperNovae Studio <contact@supernovae.studio>
 #
 # corpus_contract_selftest.py — the gate that guards the corpus is itself
-# guarded. corpus_contract_errors (runner.py · C1-C5) is anchor-driven
-# (line prefixes · an indentation-scoped description match · a category
-# order table); a refactor that breaks an anchor makes the gate silently
-# blind — it would keep "covering" the corpus while flagging nothing.
-# Every law is proven BOTH ways here: the violation flags, and the
-# exemption that carries teaching weight (numbered lessons · deep SLOT
-# descriptions) stays silent. Then the live sweep: every shipped
-# examples/ + templates/ file passes the gate — the corpus and its gate
-# can never drift apart unnoticed. Exit 0 green · 1 red.
+# guarded. corpus_contract_errors (runner.py · C1 · C2 · C5) is
+# anchor-driven (line prefixes · a category order table); a refactor that
+# breaks an anchor makes the gate silently blind — it would keep
+# "covering" the corpus while flagging nothing. Every law is proven BOTH
+# ways here: the violation flags, and the clean specimen stays silent.
+# Then the live sweep: every shipped examples/ + templates/ file passes
+# the gate — the corpus and its gate can never drift apart unnoticed.
+# Exit 0 green · 1 red.
+#
+# C3/C4 retired with `workflow.description` (the envelope nuke · the
+# scalar `workflow:` carries no prose). Their ids are NOT reused.
 
 import sys
 from pathlib import Path
@@ -33,10 +35,7 @@ CLEAN_JOB = HEAD + """#
 #
 # Run · nika run specimen.nika.yaml
 
-nika: v1
-workflow:
-  id: specimen
-  description: "a clean specimen job"
+nika: specimen
 permits:
   exec: ["git"]
   tools: ["nika:write"]
@@ -62,7 +61,7 @@ def expect(name: str, text: str, *, flags: str | None, fname: str = "specimen.ni
         failures.append(f"{name}: expected a {flags} flag, got {errs or 'silence'}")
 
 
-# The clean specimen holds all five.
+# The clean specimen holds all three.
 expect("clean job", CLEAN_JOB, flags=None)
 
 # C1 · the two verbatim header lines lead the file.
@@ -70,30 +69,6 @@ expect("C1 missing SPDX", CLEAN_JOB.replace(HEAD, "# not the header\n"), flags="
 
 # C2 · a `# Run ·` line exists.
 expect("C2 no Run line", CLEAN_JOB.replace("# Run · nika run specimen.nika.yaml\n", ""), flags="C2")
-
-# C3 · jobs/skeletons carry workflow.description — numbered lessons are exempt.
-NO_DESC = CLEAN_JOB.replace('  description: "a clean specimen job"\n', "")
-expect("C3 job without description", NO_DESC, flags="C3")
-expect("C3 lesson exemption", NO_DESC, flags=None, fname="03-specimen.nika.yaml")
-
-# C4 · no SLOT on the WORKFLOW description line — deeper SLOT descriptions
-# (inputs/outputs · the skeleton teaching device) stay untouched.
-expect(
-    "C4 SLOT on workflow description",
-    CLEAN_JOB.replace(
-        '  description: "a clean specimen job"',
-        '  description: "a clean specimen job"   # SLOT',
-    ),
-    flags="C4",
-)
-expect(
-    "C4 deep-SLOT exemption",
-    CLEAN_JOB.replace(
-        "tasks:",
-        'inputs:\n  goal:\n    type: string\n    default: "x"\n    description: "What to do"   # SLOT\ntasks:',
-    ),
-    flags=None,
-)
 
 # C5 · permits categories hold the §2 order (exec · tools · net · fs).
 expect(
@@ -122,4 +97,4 @@ if failures:
     for f in failures:
         print(f"  ✗ {f}")
     sys.exit(1)
-print(f"corpus_contract_selftest PASS · 5 laws × both ways · {swept} shipped files green")
+print(f"corpus_contract_selftest PASS · 3 laws × both ways · {swept} shipped files green")

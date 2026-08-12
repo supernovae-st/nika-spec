@@ -1,6 +1,4 @@
-nika: v1
-workflow:
-  id: deep-007
+nika: deep-007
 tasks:
   check:
     exec: { command: ["./check.sh"] }

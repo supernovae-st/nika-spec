@@ -29,7 +29,7 @@ def codes(src) -> list[str]:
     return [e["code"] for e in profile_errors(src)]
 
 
-WF = "nika: v1\nworkflow: { id: p }\ntasks: { t: { exec: { command: [echo, hi] } } }\n"
+WF = "nika: p\ntasks: { t: { exec: { command: [echo, hi] } } }\n"
 
 # ── the three R11 point-1 interdictions ────────────────────────────────
 law("a clean minimal workflow admits", codes(WF) == [])

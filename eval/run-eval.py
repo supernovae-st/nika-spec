@@ -79,7 +79,7 @@ TEMPLATE:
 ```"""
 
 FREEFORM_SYSTEM = """You author Nika workflows. A Nika workflow is a YAML file that starts
-with `nika: v1` and `workflow: <kebab-case-id>`, then a `tasks:` list.
+with `nika: <kebab-case-id>` (the mark AND the name), then a `tasks:` map.
 Each task has an id and exactly one verb: infer (LLM call), exec
 (shell), invoke (tool call, e.g. nika:fetch, nika:write, nika:jq),
 or agent (tool-using loop). Values interpolate with ${{ }}.

@@ -1,7 +1,5 @@
 yaml-language-server: $schema=https://nika.sh/schema/v1/workflow.schema.json
-nika: v1
-workflow:
-  id: hello
+nika: hello
 tasks:
   a:
     exec: { command: ["true"] }

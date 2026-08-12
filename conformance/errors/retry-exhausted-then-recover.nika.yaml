@@ -1,7 +1,5 @@
 # Expected: exit 0 — NIKA-EXEC-001 fires internally (3 attempts), recovered via on_error.
-nika: v1
-workflow:
-  id: retry-then-onerror
+nika: retry-then-onerror
 # SPEC 05 §on_error: "recover from ... retried-and-still-failing transient errors".
 # Order = retry FIRST, then on_error. Here exec fails (NIKA-EXEC-001), on_codes forces
 # retries to exhaust, THEN on_error.recover fires → task SUCCEEDS with recover value.

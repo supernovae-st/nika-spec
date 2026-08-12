@@ -1,0 +1,11 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "validation_error"
+    }
+  ],
+  "note": "Dead form: `workflow:` is not an envelope key at all. It existed only to house `id:` and `description:`; the description died (one consumer across five reading surfaces \u00b7 the semantic hash was identical with it and without it) and the id moved onto `nika:`, so the object had nothing left to hold. NIKA-PARSE-020 and NIKA-PARSE-021 are RETIRED with it \u2014 neither code is ever reused.",
+  "mode": "strict"
+}

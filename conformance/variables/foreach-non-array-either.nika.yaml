@@ -1,7 +1,5 @@
 # Expected: NIKA-VAR-006 (check or run).
-nika: v1
-workflow:
-  id: foreach-nonarray
+nika: foreach-nonarray
 # SPEC 03 §for_each semantics: "A non-array collection (object · string · number · null)
 # is an evaluation error (NIKA-VAR-006)". Here for_each over a non-array const.
 # Expect: clean error NIKA-VAR-006 (or rejected at check). No iterations. exit!=0.

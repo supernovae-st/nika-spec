@@ -1,6 +1,4 @@
-nika: v1
-workflow:
-  id: core-mcp-digit-server
+nika: core-mcp-digit-server
 tasks:
   ui:
     invoke: { tool: "mcp:21st/create_component", args: { brief: "a button" } }

@@ -26,9 +26,7 @@
 #     — the deploy fails ON PURPOSE, the run exits red, and out/incident.md
 #     is the artifact that proves the failure arm ran.
 
-nika: v1
-workflow:
-  id: failure-routing
+nika: failure-routing
 
 permits:
   exec: false

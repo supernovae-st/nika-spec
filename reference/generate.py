@@ -21,7 +21,7 @@ PREDICATES = ["success", "failure", "skipped", "terminal"]
 def generate(seed: int) -> str:
     rng = random.Random(seed)
     n = rng.randint(3, 9)
-    lines = ["nika: v1", "workflow:", f"  id: gen-w2-{seed}", "tasks:"]
+    lines = [f"nika: gen-w2-{seed}", "tasks:"]
     # Statically-LIVE authorship only: the checker refuses a provably-dead
     # task (an edge whose pass-set the producer can never reach — the reach
     # analysis), so a predicate is drawn from what its producer CAN settle:

@@ -1,8 +1,7 @@
-nika: v1
-workflow:
-  id: desc-misplaced
-description: I used to live at the top level
+# SPDX-License-Identifier: Apache-2.0
+nika: t
+description: "prose the envelope never carried"
 tasks:
-  hello:
-    exec:
-      command: ["true"]
+  greet:
+    infer:
+      prompt: "hi"

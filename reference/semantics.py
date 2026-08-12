@@ -57,6 +57,11 @@ import yaml
 SUCCESS, FAILURE, SKIPPED, CANCELLED = "success", "failure", "skipped", "cancelled"
 TERMINAL = {SUCCESS, FAILURE, SKIPPED, CANCELLED}
 
+# the envelope mark · `nika:` carries the file's NAME (kebab-case), never a
+# version — the version slot died with the envelope nuke and that is lossless
+# (there is no `nika: v2`, ever · pre-1.0 breaks live INSIDE v1)
+_KEBAB = re.compile(r"^[a-z][a-z0-9-]*$")
+
 # --- edge roles (G11) -------------------------------------------------------
 VALUE, TERMINAL_OBS, FAILURE_OBS, CONTROL = (
     "value",
@@ -105,9 +110,10 @@ def parse(text: str) -> dict:
     """Parse the W2 subset the generator emits. Refuses what it does not
     model (loudly) — and refuses the W1 forms W2 kills."""
     doc = yaml.safe_load(text)
-    if not isinstance(doc, dict) or doc.get("nika") != "v1":
-        raise ModelError("envelope: nika: v1 required")
-    # E-split · the value authorities are inputs/config/const/secrets · the dead
+    if not isinstance(doc, dict) or not _KEBAB.match(str(doc.get("nika", ""))):
+        raise ModelError("envelope: `nika: <kebab-id>` required — the key carries the "
+                         "file's NAME (the version slot is gone: there is no nika: v2)")
+    # E-split · the value authorities are inputs/const/secrets · the dead
     # forms (vars/env), a foreign namespace read, and a type-violating default
     # refuse at the envelope (values_core · NIKA-VALUES-001..003 · NIKA-DEFAULT-001).
     _refusals = _value_errors(doc)

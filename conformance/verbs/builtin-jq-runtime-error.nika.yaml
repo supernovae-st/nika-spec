@@ -1,8 +1,6 @@
 # Expected: NIKA-BUILTIN-JQ-001 at RUN.
 # Indexing a string field (.a.b where .a is a string) is a jq type error.
-nika: v1
-workflow:
-  id: jq-type-err
+nika: jq-type-err
 tasks:
   t:
     invoke: { tool: nika:jq, args: { input: { a: "hello" }, expression: ".a.b" } }

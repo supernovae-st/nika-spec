@@ -3,8 +3,8 @@
 > A workflow's authority is **declared in the file and judged before a
 > token is spent** — three blocks, three questions, never conflated:
 > [`permits:`](./01-envelope.md#permits--optional--the-declared-capability-boundary)
-> says what the workflow **may touch** (capability) · `policy:` says in
-> what **order and shape** it may act (law · this chapter) ·
+> says what the workflow **may touch** (capability) · the **unconditional
+> laws** say in what **order and shape** it may act (this chapter) ·
 > [`secrets:` + `egress:`](./01-envelope.md#egress--optional--sanctioned-destinations-declassification)
 > say where a sensitive value **may go** (flow). The three compose
 > without overlap; none is negotiation material for a model.
@@ -22,7 +22,7 @@ An **effect** is a class of interaction with the world outside the run.
 The v1 vocabulary is exactly the capability surface of
 [01 §permits](./01-envelope.md#permits--optional--the-declared-capability-boundary)
 — **five categories** (this table is the one vocabulary the checker, the
-inference, the certificate, and `policy:` rules all speak — one voice,
+inference, the certificate, and the unconditional laws all speak — one voice,
 never a parallel list):
 
 | Effect category | Carried by | Granted by |
@@ -41,7 +41,7 @@ never a parallel list):
 > so the spec carried exactly the parallel list it forbids. Admitting `env` is
 > **not adding a category, it is documenting one that ships**: a category with no
 > key would change the language; a key with no category made four downstream
-> surfaces (inference · certificate · `policy:` `<effect-class>` · `NIKA-SEC-004`)
+> surfaces (inference · certificate · the `<effect-class>` vocabulary · `NIKA-SEC-004`)
 > unable to name it.
 
 Two derived facts the engine computes and no author writes:
@@ -60,99 +60,90 @@ Two derived facts the engine computes and no author writes:
 at `nika check` (an escape = refusal before any token) and at run time
 (`NIKA-SEC-004` — the dynamic cases a static check cannot see).
 
-## The `policy:` block · *optional · named workflow law*
+## The unconditional laws · *normative · the `policy:` block is dead*
 
 `permits:` bounds capability; nothing bounded **order and shape** — «
 no shell after an untrusted fetch », « a human signs before anything
-irreversible », « only these providers » were checkable only by eyeball.
-`policy:` names those laws next to the workflow:
+irreversible ». A `policy:` block used to name those laws next to the
+workflow. **It is dead (2026-08-12), and the reason is the shape of the
+enforcement, not the shape of the syntax.**
 
-```yaml
-policy:
-  require:
-    human_gate_before: [exec, write]   # these effect classes sit behind a human
-  forbid:
-    exec_after: [net]                  # order law · no shell downstream of the network
-  allow:
-    providers: [ollama, mistral]       # infer/agent provider allowlist
-  limits:
-    max_tasks: 50                      # workflow-shape bound
-  prefer:                              # SOFT · recorded, never judged (v1)
-    providers: [ollama]
-  optimize: cost                       # SOFT · recorded, never judged (v1)
-  endorsement: solo                    # HARD · the named solo mode (NEP-0014)
-```
+### Why a declared law was not a law
 
-**Grammar (normative · closed at every level).** `policy:` is a mapping
-of up to seven **families**. Unknown families and unknown rule names are
-refusals (`NIKA-PARSE`-class): the rule set is closed per minor —
-patterns are named after the incidents they prevent, raw temporal logic
-is never exposed.
+Measured on the corpus before the ruling ·
 
-| Family | Nature | v1 rules (closed) |
-|---|---|---|
-| `require:` | **hard** · judged at check | `human_gate_before: [<effect-class>…]` |
-| `forbid:` | **hard** · judged at check | `exec_after: [<effect-class>…]` |
-| `allow:` | **hard** · judged at check | `providers: [<provider>…]` |
-| `limits:` | **hard** · judged at check | `max_tasks: <positive integer>` |
-| `endorsement:` | **hard** · judged at check | `solo` — the NAMED solo mode: exactly one endorser (one human gate), its fresh authorization bound to the action and logged as such · a gate under no declared mode refuses (`NIKA-SEC-013` · fail-closed) · a declared solo with more than one gate refuses as the declaration lying (NEP-0014 · F-P23) |
-| `prefer:` | **soft** · parsed, recorded, NOT judged | `providers: [<provider>…]` (ordered) |
-| `optimize:` | **soft** · parsed, recorded, NOT judged | `cost` \| `latency` \| `quality` |
+- **Zero usage in real work.** The 12 `policy:` blocks in the corpus were
+  all exactly `policy:` + `endorsement: solo`. Six of the seven families
+  had fan-out **zero**.
+- **The soft families were never recorded.** `prefer:` and `optimize:`
+  claimed to be « parsed and recorded »; `check --json` came back
+  **byte-identical at the sha256** with opposite values in them. Nothing
+  read them.
+- **`limits.max_tasks` asserted a bound on a literal in the same file.**
+  A number checking a number it can see.
+- **And the whole block was FAIL-OPEN.** A human gate with **no**
+  `policy:` block passed. The **same** gate carrying an unrelated clause
+  refused. Corpus tally: **26 gates spared, 8 punished** — and the 8 were
+  the ones that had declared something else entirely. A law that binds
+  only the file that opts into it binds nothing.
 
-> ⚠️ **`endorsement:` names a family and has one member, and the gap is a
-> capability gap, not a naming one** (stated 2026-08-11). A workflow that wants
-> **two** human gates on one action is **inexpressible** — not because two
-> endorsers are unsafe, but because the enum has a single value. The honest
-> reading is that the language today can say *one human authorised this* and
-> cannot say *two did*, and a reader deserves to know which of the two it is.
-> **The single member is not the defect and MUST NOT be removed**: `solo`
-> carries two live refusals (a gate under no declared mode · a declared `solo`
-> wearing more than one gate). Deleting a working refusal to make a table
-> shorter is subtraction, not simplification. The member that is missing is
-> the one to add — and since [07 §unknown key](./07-conformance.md) an unknown
-> value is an error, a second member lands additively, for free, the day its
-> semantics are decided.
+The two codes that served the block are **retired**, and the whole
+`NIKA-POLICY` namespace with them. No retired code is ever reused.
+
+### What survived, and where it went
+
+Two of the families read the **transitive graph** — they say something a
+reader cannot see by looking at one task — so they did not die with the
+key. They moved to the shelf where the lethal-trifecta law and the
+affirmative-consent law already live: **laws that fire with no
+declaration at all.**
+
+**`forbid.exec_after` became the order law, unconditional.** No `exec:`
+task may sit transitively downstream of a net-effecting task
+(`nika:fetch` · `nika:notify`) over the derived graph (`with:` data edges
+∪ `after:` control edges). Content the workflow did not author must not
+reach a shell. Fixed at `[net]`, the one parameterization it was ever
+declared with. The diagnostic names the **path**, which is the witness
+(`fetch_page → act`). Its code is in [05](./05-errors.md).
+
+> **The trifecta does NOT subsume it, and this was measured.** The
+> trifecta needs leg ① — a non-empty `permits.fs.read`. A file that
+> fetches and then shells, with no private read declared, reads **GREEN**
+> under the trifecta and **RED** under this law. That file is the
+> conformance fixture `core/order/001-net-before-exec-violation`.
 >
-> ⚠️ **Cette note vit SOUS la table, jamais au milieu** — une note insérée
-> entre deux rangées casse la lecture mécanique de la table (mesuré
-> 2026-08-12 · le générateur de la page autorité lisait une famille soft de
-> moins, et le gate GA-b l'a attrapé).
+> **Cost, measured BEFORE the ruling** · 194 `exec:` tasks across the
+> shipped corpus, **1** refused — and that one
+> (`conformance/envelope/secrets-two-sinks-one-sanctioned`) is already a
+> declared `check-reject`. Zero green files paid for it.
 
-`<effect-class>` is the closed set `exec · write · net · tools` — the
-effect vocabulary above with `fs` split at its grain of harm (`write`;
-reads are not gateable in v1) **and `env` deliberately absent: a policy
-rule over environment names is a separate decision this spec has not
-taken, and naming it here without the semantics would be a rule that
-cannot be judged** (see the soft-family law in the next sentence, which
-this set must not violate). The gap is stated rather than closed
-silently, because the table above is the one vocabulary and a reader is
-owed the reason a member of it is missing from this derived set.
-Soft families are **inert by design** in
-v1: the solver that would satisfy them is research surface, and a
-constraint that cannot be judged must never look judged — the check
-records them (a hint names them as recorded-not-judged) and nothing
-else.
+**`require.human_gate_before` did NOT make the same move, and the residue
+is owed rather than guessed.** Its unconditional substance — *a human
+gate must dominate every route by which untrusted content reaches an
+egress* — is what the trifecta law and the affirmative-consent law
+already carry, with no declaration. What is **not** covered is the
+narrower claim *a human gate before `exec:`, absent any private read*.
+Turning that into an unconditional law at its one declared
+parameterization `[exec]` would refuse **187 of the 194** `exec:` tasks in
+the corpus: that is not a law, it is a ban on `exec:`. The
+parameterization a real unconditional gate rule would need has **no
+empirical signal** — no corpus file ever declared the family — so it is
+named here as **OWED**, and left undecided rather than invented.
 
-**Semantics of the hard rules (normative · statically decided on the
-graph — the same derived graph every judge reads, [03](./03-dag.md))** ·
+**`allow.providers` and `limits.max_tasks` are simply gone.** Neither
+reads the graph; both were a declared preference the file could have
+enforced by being written differently. A provider allowlist is a
+deployment concern, not a property of the workflow text.
 
-- `require.human_gate_before: [C…]` — every task carrying an effect of
-  a listed class has, among its ancestors (data ∪ control edges), a
-  **human gate**: an `invoke:` of `nika:prompt`. The pause is the
-  consent (exit 4 · resume with the answer · [02](./02-verbs.md)).
-- `forbid.exec_after: [C…]` — no `exec:` task is a descendant of a task
-  carrying an effect of a listed class. The order law reads the graph,
-  not the schedule: any path counts, `after:` edges included.
-- `allow.providers: [P…]` — every `infer:`/`agent:` task's provider
-  (the segment of `model:` before `/`, or the run's default model when
-  the task names none) is in the list. A provider that cannot be
-  determined statically (a templated `model:`) is a violation under a
-  declared allowlist — **fail-closed**, pin the literal (same doctrine
-  as the permits argv rule: judge the shape you can actually verify).
-- `limits.max_tasks: N` — the workflow declares at most N tasks.
+### The two judges that remain
+
+`permits:` and the unconditional laws are orthogonal judges over one
+body: permits answers *may this task touch X at all*, the unconditional
+laws answer *may it do so here, in this order, unattended*. A body must
+satisfy **both**, and **neither is opt-in**.
 
 **The approval is a bounded ticket (normative · NEP-0013)** · the
-consent the pause collects is not a bare answer: it is a **ticket**
+consent a pause collects is not a bare answer: it is a **ticket**
 · (1) **content-bound** — the ticket binds the hash of the canonical
 rendering of what is shown (the message · the gated action's identity ·
 the effect classes in play · never an LLM summary); an answer whose
@@ -163,24 +154,11 @@ cross-run replay is refused · (3) **rate-limited** — at most N=5
 approvals per run; identical prompts dedup (the same content hash rides
 one ticket, attested `dedup`); a heterogeneous batch is refused at
 check (one prompt gates one action of one class); the N+1th prompt is a
-typed HALT (`NIKA-SEC-010` · `security_error`), never a queue · (4) **attested** — every
+typed HALT (`security_error`), never a queue · (4) **attested** — every
 decision emits a hash-chained `approval_decided` event (ticket digest ·
 shown hash · decision · remaining TTL · scope), and the digests rise to
 the receipt · (5) **revocable before execution only** — never after:
 the receipt shows what executed under which authority.
-
-**A violation is `NIKA-POLICY-001`** (`security_error` · check-time ·
-before any token). The diagnostic names the rule, the offending task,and the witness — for order rules, the path (`fetch_page → summarize →
-deploy`); for gate rules, the missing ancestor; for provider rules, the
-offending literal. Policy violations are never fed back to an `agent:`
-model: organizational law is not negotiation material.
-
-**Composition** · `policy:` and `permits:` are orthogonal judges over
-one body: permits answers *may this task touch X at all*, policy
-answers *may it do so here, in this order, unattended*. A body must
-satisfy **both**. (`allow.providers` deliberately covers the one
-authority `permits:` does not — the provider surface; capability stays
-permits' ground, and no policy rule re-spells a permits grant.)
 
 ## The affirmative-consent law · *normative · NEP-0020*
 
@@ -218,9 +196,9 @@ binding carrying its target's value, Kleene-3 over the fragment
 
 A violation is **`NIKA-SEC-014`** (`security_error` · check-time ·
 before any token) — the diagnostic names the gate AND the sink and
-teaches the affirmative pattern. The law binds with or without a
-`policy:` block (it is not a declared-rule violation, so it does not
-speak `NIKA-POLICY-001`), and `mode: choice` is out of scope — its
+teaches the affirmative pattern. The law binds with **no declaration at
+all** — it always did, which is why it survived the death of the declared
+block untouched — and `mode: choice` is out of scope — its
 answer is a string and the lane claims nothing there (silence, never
 wrong).
 
@@ -390,45 +368,43 @@ prints) · `boundary_declared` says whether the file carries a
 `permits:` block · `escapes` is the count of required-outside-permitted
 violations (0 in any clean report — the field exists so a certificate
 consumer never has to re-derive it). The certificate stays a
-projection: the judge is the check ladder, never the JSON.
+## Errors (the order law · new in this chapter)
 
-## Errors (the `NIKA-POLICY` namespace · new in this chapter)
+The order law's code, its category and its meaning live in the one error
+catalogue ([05-errors](./05-errors.md)) — this chapter names the law, never
+its wire spelling.
 
-| Code | Category | Meaning |
-|---|---|---|
-| `NIKA-POLICY-001` | `security_error` | a hard `policy:` rule is violated (the diagnostic names rule + task + witness) |
-
-`NIKA-SEC-006` / `NIKA-SEC-007` join the existing `NIKA-SEC` namespace
-([05](./05-errors.md)); `NIKA-AUTH-007` / `NIKA-AUTH-008` join the
-`NIKA-AUTH` namespace opened by NEP-0003's `NIKA-AUTH-006`;
-`NIKA-SEC-013` (the endorsement mode) and `NIKA-SEC-014` (the
-affirmative-consent law) join the same `NIKA-SEC` namespace.
+The secret-flow and permit-taint codes join the existing `NIKA-SEC` and
+`NIKA-AUTH` namespaces, as does the affirmative-consent law. The
+`NIKA-POLICY` namespace is **retired** with the block it served.
 
 ## One obvious way (normative for linters)
 
-- A capability boundary is spelled `permits:` — `policy.allow` never
-  re-spells a permits grant (providers is the one allow rule, because
-  permits has no provider category).
+- A capability boundary is spelled `permits:` — nothing else re-spells a
+  permits grant.
 - A human gate is `invoke: { tool: "nika:prompt" }` — the pause IS the
-  consent mechanism; a `when:` on a `config` flag is not a gate.
-- Soft families record intent (`prefer` · `optimize`) — an engine that
-  cannot honor them MUST still accept them (they are never judged, so
-  they can never refuse).
+  consent mechanism; a `when:` on an input flag is not a gate.
+- A law that reads the graph is UNCONDITIONAL — there is no block to
+  declare it in, and none to disable it from. A rule an author can opt
+  out of by saying nothing is not a rule (measured: 26 gates spared, 8
+  punished, and the 8 were the ones that had declared something else).
 
 ## What v1 deliberately does not do
 
-- **No solver.** Soft constraints are recorded, not satisfied —
-  Pareto/unsat-core surfaces are research (the constraint that cannot
-  be judged must never look judged).
-- **No runtime policy.** Every v1 rule is decidable at `nika check` on
+- **No solver, and no soft constraints at all.** `prefer:`/`optimize:`
+  died with the block that held them: measured, nothing read them (the
+  `check --json` sha256 was identical with opposite values). A
+  constraint that cannot be judged must never look judged, and the
+  honest way to not judge one is to not accept it.
+- **No runtime law.** Every v1 rule is decidable at `nika check` on
   the graph; rules whose truth needs runtime data are out of scope,
   deliberately (the check stays the pre-token audit).
 - **No new verbs, no `approve:`.** The human gate rides the existing
   `nika:prompt` pause; a dedicated approval surface (delegation ·
   quorum · `via:`) is future work with its own chapter.
-- **No policy inheritance.** A file's law is the file's — composition
-  across `invoke: workflow:` calls stays the callee's own policy (the
-  ceiling algebra is reserved, unwired).
+- **No law inheritance.** A file's law is the file's — composition
+  across `invoke: workflow:` calls judges the callee by the same
+  unconditional laws (the ceiling algebra is reserved, unwired).
 - **No memory category.** Recall is a **tool**, reached through `invoke:`
   like every other callable ([08 §H9](./08-out-of-scope.md) · today
   `mcp:memory-server/recall`, tomorrow the reserved `nika:connectome/*`

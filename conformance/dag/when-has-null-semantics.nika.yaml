@@ -1,8 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Expected: exit 0 — has() is false on defined-but-null; present-consumer skips, absent-consumer runs.
-nika: v1
-workflow:
-  id: when-null-upstream
+nika: when-null-upstream
 # COVERS: a defined-but-NULL upstream value imported through with: and read
 # in when: via has() (spec 03 §when · §side constraint 1). producer emits
 # {maybe: null}; the binding is a value edge (producer succeeds → admits);

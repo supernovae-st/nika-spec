@@ -11,7 +11,7 @@
 > *instances* of one shape, never three.
 >
 > This is the last pre-1.0 chapter. It closes the loop the language
-> opened: `nika: v1` in, a signed honest proof out.
+> opened: a `nika:` file in, a signed honest proof out.
 
 ---
 
@@ -68,8 +68,14 @@ providers:                      # every model pinned by content digest
   "anthropic/claude-…": { digest: "blake3:…" }
 tools:                          # builtin + MCP surface versions
 registry:                       # every registry: ref pinned owner/name@version + digest
-policy:                         # the resolved policy decisions (10)
 ```
+
+> The `policy:` row died with the envelope block it materialized
+> (2026-08-12): the author surface and its lock materialization die
+> together — a lock field pinning « the resolved policy decisions » of a
+> block that cannot be written is a column with no source. The
+> unconditional laws ([10](./10-authority.md)) need no pin: nothing
+> declares them, so nothing about them can drift between runs.
 
 - **Pin by default**: a run resolves ONLY what the lock pins; an
   unpinned dependency is a refusal (`NIKA-LOCK-001`). Nothing floats.
@@ -86,7 +92,7 @@ policy:                         # the resolved policy decisions (10)
 > actually reaches for today.
 >
 > **Three measurements forced the subtraction, and any one of them would have.**
-> ① The published JSON Schema carries **13 envelope keys and `assert` is not
+> ① The published JSON Schema carries **9 envelope keys and `assert` is not
 > among them** — so a feature the engine accepted *failed the validator the
 > project ships*, and since [07 §unknown key](./07-conformance.md) made refusal
 > strict, that contradiction became fatal rather than untidy. ② It judged
@@ -166,7 +172,7 @@ no finding, nothing. Compare `after:` pointing at an undeclared task, which is
 `NIKA-DAG-002`. The same mistake, one field apart, once fatal and once
 invisible.
 
-That silence contradicts [10 §policy](./10-authority.md) in its own words —
+That silence contradicts [10 · Authority](./10-authority.md) in its own words —
 *a constraint that cannot be judged must never look judged* — and this block
 is where an author states an **obligation**, the one place in the language
 where a human writes what the file is supposed to guarantee. A vocabulary of

@@ -2,9 +2,7 @@
 # W33: NIKA-PARSE-013 — reserved binding name in output:
 # Tests: using a reserved name (output/status/error) in output: block → NIKA-PARSE-013 at check
 # Detail: reserved binding name rejected at parse.
-nika: v1
-workflow:
-  id: w33-reserved-binding-name
+nika: w33-reserved-binding-name
 
 const:
   data:

@@ -1,8 +1,6 @@
 # Expected: exit 0 — a scalar of exactly 65 536 bytes (64 KiB · the D-2026-07-17-N5 cap)
 # is LEGAL: the cap is an exact frontier (LAW-GRAMMAR-0110 · closes gap P5).
-nika: v1
-workflow:
-  id: scalar-at-cap
+nika: scalar-at-cap
 const:
   blob:
     type: string

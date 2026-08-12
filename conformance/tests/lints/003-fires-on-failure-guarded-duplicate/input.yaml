@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: f003
+nika: f003
 tasks:
   a:
     invoke:

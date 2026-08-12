@@ -1,6 +1,0 @@
-nika: v1
-workflow: old-scalar-form
-tasks:
-  hello:
-    exec:
-      command: ["true"]

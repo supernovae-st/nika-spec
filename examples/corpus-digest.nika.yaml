@@ -35,10 +35,7 @@
 #         --var question="what do these docs promise about deployment?"
 #       · rehearse offline with --model mock/echo (zero keys · no network)
 
-nika: v1
-workflow:
-  id: corpus-digest
-  description: "glob a corpus → plan a focus per file → card each doc in a fresh window → jq ranks the deck → one sourced brief"
+nika: corpus-digest
 
 run:
   clock: system   # the `timeout:` deadlines below ride the wall clock · said out loud (see 03)

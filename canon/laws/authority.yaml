@@ -1202,7 +1202,7 @@ laws:
       text: "R12 point 27 verbatim : « Aucun nouveau champ YAML de publication. » · R12 point 30 verbatim : « Le langage reste nika: v1. » · R9 point 20 verbatim : « Le langage reste nika: v1. » Le modèle 4-ensembles vit dans le lifecycle plane et les manifests; la grammaire publique ne gagne ni champ de publication ni marqueur de version."
     inputs:
       - registry: surface
-        id: nika_version_marker
+        id: nika_mark_and_name
         role: required
       - registry: grammar
         id: envelope_nika_field
@@ -1211,7 +1211,7 @@ laws:
       - operator: matches
         operands:
           - registry: surface
-            id: nika_version_marker
+            id: nika_mark_and_name
           - registry: grammar
             id: envelope_nika_field
         quantifier: forall
@@ -1228,7 +1228,7 @@ laws:
     judgment:
       generated_facts:
         - registry: surface
-          id: nika_version_marker
+          id: nika_mark_and_name
       independent_judgment: true
     domain_payload:
       kind: authority

@@ -5,9 +5,7 @@
 # reading the undeclared sibling `maybe_extra` is the misspelled-key class →
 # refused at parse time. Fix is one line either way: declare the key, or
 # open the level with additionalProperties: true (the 015 boundary twin).
-nika: v1
-workflow:
-  id: schema-sibling-undeclared
+nika: schema-sibling-undeclared
 permits:
   exec: ["report"]
 tasks:

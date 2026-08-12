@@ -2,10 +2,7 @@
 # Adversarial shape · an after: that is not a map (a sequence). The schema
 # layer flags it · every later layer must SURVIVE it and still produce a
 # collected verdict (oracle crash = conformance bug).
-nika: v1
-workflow:
-  id: malformed-after
-  description: "a sequence-shaped after: must not crash the oracle"
+nika: malformed-after
 
 tasks:
   gather:

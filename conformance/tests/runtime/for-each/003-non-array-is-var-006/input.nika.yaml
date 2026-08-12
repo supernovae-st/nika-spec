@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: rt-foreach-non-array
+nika: rt-foreach-non-array
 model: mock/echo
 const:
   not_a_list: "just a string"

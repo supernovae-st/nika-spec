@@ -4,9 +4,7 @@
 # string 'True'). The firing twin is 005 — negative-first reaches the
 # behavioral tier: the refusal is the product, this half proves the
 # refusal is precise.
-nika: v1
-workflow:
-  id: rt-stdlib-assert-holds
+nika: rt-stdlib-assert-holds
 permits: { tools: ["nika:assert"] }
 const:
   n: 3

@@ -17,9 +17,7 @@
 #
 # Run · nika run examples/07-for-each-locales.nika.yaml
 
-nika: v1
-workflow:
-  id: for-each-locales
+nika: for-each-locales
 
 model: mock/echo   # the dry twin · this file teaches the loop, not the translations
 

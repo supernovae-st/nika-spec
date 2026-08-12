@@ -1,9 +1,6 @@
 # Expected: NIKA-SEC-005 at CHECK (static literal — the floor-parity
 # lint · 01-envelope §permits) AND at RUN for the dynamic form.
-nika: v1
-workflow:
-  id: sec03-ssrf-aws-metadata
-  description: "ATTACK: SSRF to AWS IMDSv1 169.254.169.254 — expect BLOCKED"
+nika: sec03-ssrf-aws-metadata
 
 permits:
   net:

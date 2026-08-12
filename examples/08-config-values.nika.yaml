@@ -6,13 +6,13 @@
 # Four authorities can put a value in a workflow. The path has shown two:
 # `inputs:` (the caller, per run) and `const:` (the author, fixed in the
 # file). `config:` is the third: non-sensitive knobs that belong to the
-# DEPLOYMENT — a region, a verbosity switch — read as `${{ config.x }}`.
+# DEPLOYMENT — a region, a verbosity switch — read as `${{ inputs.x }}`.
 # The fourth, `secrets:`, needs a real credential and lives with the jobs
 # (CONVENTIONS §3).
 #
 # Demonstrates ·
 #   - `config:` · typed, `default:`-carrying deployment knobs
-#   - declared-only resolution · an undeclared `${{ config.x }}` is
+#   - declared-only resolution · an undeclared `${{ inputs.x }}` is
 #     `NIKA-VAR-001` — the engine NEVER falls back to the OS environment
 #     (spec/01-envelope.md §config)
 #   - `when:` on a config flag · a quiet run and a verbose run, one file
@@ -24,9 +24,7 @@
 #   (spec/01-envelope.md §config); the reference engine resolves `config:`
 #   from its declared `default:`.
 
-nika: v1
-workflow:
-  id: config-values
+nika: config-values
 
 permits:
   tools: ["nika:jq", "nika:log"]
@@ -37,8 +35,6 @@ inputs:
     default: "atelier"
     required: true
     description: "Whose report this is — the CALLER's value · --var team=…"
-
-config:
   # The deployment's knobs. `type:` is required; `default:` is what makes
   # this file runnable everywhere. The caller cannot reach these — measured:
   # `--var region=us` refuses with `unknown input — the workflow declares:
@@ -46,10 +42,12 @@ config:
   # (spec/01-envelope.md §config-vs-secrets) — a value that must stay
   # masked belongs to `secrets:`.
   region:
+    required: false
     type: string
     default: "eu"
     description: "Which region label the report carries"
   verbose:
+    required: false
     type: bool
     default: false
     description: "Emit the debug dump task when true"
@@ -65,7 +63,7 @@ tasks:
       args:
         input:
           team: "${{ inputs.team }}"
-          region: "${{ config.region }}"
+          region: "${{ inputs.region }}"
           window_days: "${{ const.window_days }}"
         expression: '. + {title: "\(.team) · \(.region) · last \(.window_days) days"}'
 
@@ -77,7 +75,7 @@ tasks:
     # False by default: this task settles `skipped`, and nothing downstream
     # reads it, so the quiet run stays quiet. The shape rule (cel-subset)
     # wants an explicit relation — `== true`, never the bare flag.
-    when: ${{ config.verbose == true }}
+    when: ${{ inputs.verbose == true }}
     invoke:
       tool: "nika:log"
       args:

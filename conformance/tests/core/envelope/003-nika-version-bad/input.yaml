@@ -1,8 +1,0 @@
-# SPDX-License-Identifier: Apache-2.0
-nika: v1.0
-workflow:
-  id: hello
-tasks:
-  greet:
-    infer:
-      prompt: "hi"

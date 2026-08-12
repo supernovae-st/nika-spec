@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: t-inert-door-declared
+nika: t-inert-door-declared
 permits:
   net: { http: ["data.example.com"] }
   tools: ["nika:fetch"]

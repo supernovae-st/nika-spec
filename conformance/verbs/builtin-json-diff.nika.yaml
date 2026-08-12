@@ -1,8 +1,5 @@
 # Expected: exit 0 — nika:diff over inline documents.
-nika: v1
-workflow:
-  id: competitor-json-diff
-  description: "Use nika:json_diff to detect changes in competitor feature set"
+nika: competitor-json-diff
 
 model: mock/echo
 

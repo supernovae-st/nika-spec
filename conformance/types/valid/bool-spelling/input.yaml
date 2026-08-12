@@ -1,11 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: io-bool-spelling
+nika: io-bool-spelling
 inputs:
   verbose: { type: bool, default: false }
-config:
-  dry_run: { type: bool, default: false }
+  dry_run: { type: bool, default: false, required: false }
 const:
   strict: { type: bool, value: true }
 tasks:
@@ -13,7 +10,7 @@ tasks:
     invoke:
       tool: "nika:log"
       args:
-        message: "${{ inputs.verbose }} ${{ config.dry_run }} ${{ const.strict }}"
+        message: "${{ inputs.verbose }} ${{ inputs.dry_run }} ${{ const.strict }}"
 outputs:
   ok:
     value: ${{ tasks.note.output }}

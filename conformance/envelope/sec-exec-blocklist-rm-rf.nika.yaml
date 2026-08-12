@@ -1,8 +1,5 @@
 # Expected: NIKA-SEC-001 at RUN.
-nika: v1
-workflow:
-  id: sec11-exec-blocklist-rm-rf
-  description: "ATTACK: exec blocklist — rm -rf /tmp/nonexistent-xyz (safe target) — expect NIKA-SEC-001"
+nika: sec11-exec-blocklist-rm-rf
 
 permits:
   exec: true

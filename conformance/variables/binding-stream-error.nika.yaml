@@ -1,8 +1,6 @@
 # Expected: NIKA-VAR-002 at RUN.
 # Output binding streams multiple emails; a binding needs exactly one value.
-nika: v1
-workflow:
-  id: jq-binding-stream
+nika: jq-binding-stream
 tasks:
   t:
     invoke: { tool: nika:jq, args: { input: { users: [{"email":"a@x"},{"email":"b@x"}] }, expression: "." } }

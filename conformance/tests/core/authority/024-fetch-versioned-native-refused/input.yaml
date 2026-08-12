@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: t-fetch-versioned-native
+nika: t-fetch-versioned-native
 permits:
   net: { http: ["data.example.com"] }
   tools: ["nika:fetch"]

@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: og-hero-sovereign
+nika: og-hero-sovereign
 permits:
   tools: ["nika:image_generate"]
   fs: { write: ["./assets/og"] }

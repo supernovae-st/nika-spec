@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "The whole envelope minimum: `nika: <kebab-id>` + a non-empty `tasks:`. One line carries the mark and the identity. `tasks:` present \u21d2 this document is a WORKFLOW (spec/01-envelope.md \u00a7the type discriminant)."
+}

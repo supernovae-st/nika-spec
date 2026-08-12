@@ -16,9 +16,7 @@
 # itself. Retiring the DIVERGENCE marker cascades to README §divergence
 # policy · run.sh §verdicts · FINDINGS.md · supernovae-st/nika#291 — a canon
 # call, made once, upstream.
-nika: v1
-workflow:
-  id: recover-a-noedge
+nika: recover-a-noedge
 permits:
   fs:
     write: ["./out/errors/recover-a.json"]

@@ -1,6 +1,4 @@
-nika: v1
-workflow:
-  id: comp-007-returns
+nika: comp-007-returns
 tasks:
   call:
     invoke:

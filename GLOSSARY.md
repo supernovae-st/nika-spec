@@ -79,8 +79,9 @@ only as a status.
 A workflow's declared inputs are its typed `inputs:`; the caller supplies values
 at launch (`nika run <file> --var key=value` · repeatable). « Launch
 inputs » is the collective noun. Distinct from `const:` (fixed values baked
-into the file) · from `with:` (per-task bindings) and from `config:`
-(non-sensitive runtime config supplied by the deployment).
+into the file) and from `with:` (per-task bindings). A value the **deployment**
+supplies is an `inputs:` entry carrying `required: false` and a `default:` —
+the same namespace, not a fourth authority.
 
 ## paused · human gate · nika:prompt
 
@@ -106,6 +107,22 @@ conformance claim ([07 §Claiming](./spec/07-conformance.md#claiming-conformance
 « v0.1-compliant » in normative sentences names the level *bar*, not
 the claim.
 
+## `nika:` · the mark and the name
+
+One key, one spelling, two referents resolved by the document it opens: in
+`nika.yaml` it carries the **project** name, in a `*.nika.yaml` it carries the
+**workflow** name. Kebab-case (`^[a-z][a-z0-9-]*$`) · a bad id is
+`NIKA-PARSE-003`, an absent key is `NIKA-PARSE-002`.
+
+The **document type is read from `tasks:`** — present means workflow, absent
+means project. Never from `workflow:` (the block is gone) and never from the
+filename, which does not travel in a blob, a paste or an HTTP body.
+
+The key held the literal `v1` until the envelope nuke. It carried zero bits as
+a version — there is no `nika: v2`, ever — so **nothing was lost**: the family
+is still v1, pre-1.0 breaking changes live INSIDE it, and the key now carries
+the file's most necessary field instead.
+
 ## canonical filename
 
 `<name>.nika.yaml` ([01 §File naming](./spec/01-envelope.md#file-naming-normative)).
@@ -114,8 +131,8 @@ the reserved media type is `application/vnd.nika+yaml`.
 
 ## envelope · pillar · stdlib · pack
 
-The **envelope** is the header contract (`nika: v1` + `workflow:` ·
-[01](./spec/01-envelope.md)). The **5 pillars** are the immutable core
+The **envelope** is the header contract — the 9 top-level keys, opening on
+`nika: <name>` ([01](./spec/01-envelope.md)). The **5 pillars** are the immutable core
 (envelope · verbs · DAG · variables · errors). The **stdlib** (providers
 · extract modes · builtins) versions independently. The **pack** is the
 versioned examples+templates bundle every engine embeds

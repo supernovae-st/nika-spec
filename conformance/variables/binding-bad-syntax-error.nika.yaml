@@ -1,8 +1,6 @@
 # Expected: NIKA-VAR-004 at RUN.
 # Output binding contains invalid jq ('.a |').
-nika: v1
-workflow:
-  id: jq-binding-badsyntax
+nika: jq-binding-badsyntax
 tasks:
   t:
     invoke: { tool: nika:jq, args: { input: { a: 1 }, expression: "." } }

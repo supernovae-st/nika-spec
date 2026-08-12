@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: image-fx-tool-typo
+nika: image-fx-tool-typo
 permits:
   fs:
     read: ["./out/**"]

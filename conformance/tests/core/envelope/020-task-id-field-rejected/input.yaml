@@ -1,6 +1,4 @@
-nika: v1
-workflow:
-  id: id-field-lingers
+nika: id-field-lingers
 tasks:
   hello:
     id: hello

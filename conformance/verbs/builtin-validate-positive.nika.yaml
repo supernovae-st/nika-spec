@@ -1,9 +1,7 @@
 # Expected: exit 0 — nika:validate passes a valid object.
 # W01: validate a well-formed object — PASS case
 # Tests: nika:validate with required fields + type constraints
-nika: v1
-workflow:
-  id: w01-validate-valid-object
+nika: w01-validate-valid-object
 
 const:
   doc:

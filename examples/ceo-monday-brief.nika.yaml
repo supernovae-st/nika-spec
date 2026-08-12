@@ -30,10 +30,7 @@
 #       · arm the founders ping · add --var alert=true — FOUNDERS_WEBHOOK_URL must be
 #         set or the armed run dies NIKA-VAR-001 at `alert` (see permits.net.http)
 
-nika: v1
-workflow:
-  id: ceo-monday-brief
-  description: "news + repo pulse + KPIs → one synthesis → dated brief → a ping on every outcome"
+nika: ceo-monday-brief
 
 model: ollama/qwen3.5:4b   # local · zero key · `--model mock/echo` rehearses the whole file
 
@@ -77,8 +74,6 @@ permits:
     # segment and never crosses `/`, so nothing here can steer the write into a
     # subtree — which is why this is not `./briefs/**`.
     write: ["./briefs/*-monday.md"]
-policy:                              # NEP-0014 · the gate runs under a NAMED endorsement mode
-  endorsement: solo
 
 tasks:
   # ── the human gate · FIRST, before anything untrusted enters ──

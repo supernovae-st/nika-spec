@@ -1,8 +1,5 @@
 # Expected: check-reject (gate verdict). PERMITS: fs read outside the declared read globs.
-nika: v1
-workflow:
-  id: sec09-permits-fs-read-escape
-  description: "ATTACK: fs.read /etc/passwd with only write permit — expect NIKA-SEC-004 at check"
+nika: sec09-permits-fs-read-escape
 
 permits:
   fs:

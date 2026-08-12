@@ -20,7 +20,7 @@
 #                       binding validation · closed level / type exclusion)
 #         NIKA-VAR-001  an unresolved `${{ }}` reference (04-variables.md
 #                       §Resolution order) · non-existent task · undeclared
-#                       inputs./config./const./with./secrets. entry · undefined namespace ·
+#                       inputs./const./with./secrets. entry · undefined namespace ·
 #                       loop-local item/index outside a for_each task
 #         NIKA-VAR      unclosed `${{` delimiter (validation_error · the
 #                       substitution surface is 04-variables.md's)
@@ -59,7 +59,7 @@ import sys, json, re, pathlib
 import yaml
 from jsonschema import Draft202012Validator
 
-from deep_static import deep_static_errors, policy_errors, consent_errors
+from deep_static import deep_static_errors, consent_errors, net_before_exec_errors
 from composition_core import composition_errors
 from trifecta_core import trifecta_errors
 from type_core import type_core_errors
@@ -451,7 +451,13 @@ BARE_TASK_REF = re.compile(
 def _bare_envelope_errors(value, where: str) -> list[dict]:
     """D2 (#75 - 0.103): bare `tasks.X` is the ENVELOPE, not a value - the
     projection set (.output/.status/.error/.duration_ms) is closed and
-    required. Fires when a `tasks.X` root carries no projection."""
+    required. Fires when a `tasks.X` root carries no projection.
+
+    Plus the same defect one level up: a bare `tasks` ROOT names no task at
+    all. Measured 2026-08-12 - `${{ tasks }}` was refused by the engine
+    (NIKA-DAG-002) and read VALID here, because the projection scan needs a
+    `tasks.<id>` to fire and the resolution scan skips the tasks root on
+    boundary surfaces. A namespace root is never a value."""
     errs = []
     for body in _expr_bodies(value):
         for m in BARE_TASK_REF.finditer(body):
@@ -496,7 +502,7 @@ def _resolution_errors(value, scopes: dict, where: str) -> list[dict]:
             if root in LOOP_LOCALS:
                 if not scopes["in_for_each"]:
                     var_err(f"'{root}' is a for_each loop-local · no for_each here")
-            elif root in ("inputs", "config", "const", "secrets", "with"):
+            elif root in ("inputs", "const", "secrets", "with"):
                 if seg and seg not in scopes[root]:
                     var_err(f"{root}.{seg} is not declared")
             elif root == "tasks":
@@ -980,14 +986,13 @@ def cross_ref_errors(doc: dict) -> list[dict]:
         return set(v.keys()) if isinstance(v, dict) else set()
 
     inputs_keys = _keys(doc.get("inputs"))
-    config_keys = _keys(doc.get("config"))
     const_keys = _keys(doc.get("const"))
     secrets_keys = _keys(doc.get("secrets"))
     for tid, t in tasks:
         # tasks-root existence inside a task body is judged by the boundary
         # rules (with:/after: ghosts → DAG-002 · body refs → VAR-021 · the
         # recover ghost check below) — never double-reported as VAR-001.
-        scopes = {"inputs": inputs_keys, "config": config_keys, "const": const_keys,
+        scopes = {"inputs": inputs_keys, "const": const_keys,
                   "secrets": secrets_keys,
                   "tasks": idset, "with": _keys(t.get("with")),
                   "in_for_each": "for_each" in t, "tasks_mode": "skip"}
@@ -1002,7 +1007,7 @@ def cross_ref_errors(doc: dict) -> list[dict]:
                 errs.append({"code": "NIKA-VAR-001", "category": "variable_error",
                              "detail": f"task '{tid}' on_error.recover reads "
                                        f"tasks.{r} — a non-existent task"})
-    out_scopes = {"inputs": inputs_keys, "config": config_keys, "const": const_keys,
+    out_scopes = {"inputs": inputs_keys, "const": const_keys,
                   "secrets": secrets_keys,
                   "tasks": idset, "with": set(), "in_for_each": False}
     errs.extend(_resolution_errors(doc.get("outputs"), out_scopes, "outputs:"))
@@ -1125,8 +1130,8 @@ def validate_workflow(doc: dict, validator: Draft202012Validator,
     errs.extend(deep_static_errors(doc))
     errs.extend(type_core_errors(doc))
     errs.extend(values_core_errors(doc))
-    errs.extend(policy_errors(doc))
     errs.extend(consent_errors(doc))
+    errs.extend(net_before_exec_errors(doc))
     errs.extend(trifecta_errors(doc))
     errs.extend(composition_errors(doc, base_dir))
     if canon is not None:
@@ -1246,20 +1251,18 @@ WITNESS_RED = ("conformance/envelope/trifecta-realized-flow-ungated.nika.yaml",
 # The corpus contract — the MECHANICAL slice of examples/CONVENTIONS.md
 # §1-§2 plus the drift classes the 2026-07-31 oracle-intelligence audit
 # measured recurring (49 files · 7 auditors · adversarial verify). A prose
-# rule is obeyed or ignored; these five are structure:
+# rule is obeyed or ignored; these three are structure:
 #   C1  the two verbatim header lines lead the file (SPDX · schema)
 #   C2  a `# Run ·` line exists — the header hands the exact command
-#   C3  jobs and skeletons carry workflow.description — the words
-#       `nika new "<intent>"` matches (numbered lessons are exempt by
-#       corpus convention · README.md §The path)
-#   C4  no `# SLOT` comment rides the WORKFLOW description line (the
-#       2-space-indented one under workflow:) — a trailing slot marker
-#       leaks into every catalog/router display (measured: the fanout row
-#       rendered `…merge"   # SLOT` in closest-matches). Deeper
-#       `description:` lines (inputs/outputs) keep their SLOT markers —
-#       they are the skeleton's own teaching device.
 #   C5  permits: top-level categories hold §2 order (exec · tools · net · fs)
-_NUMBERED_LESSON = re.compile(r"^\d{2}-")
+#
+# C3 (« jobs and skeletons carry workflow.description ») and C4 (« no
+# `# SLOT` rides the workflow description line ») are RETIRED with the
+# construct they policed: `workflow:` is a scalar id again and carries no
+# prose. The ids C3/C4 are never reused — a renumbered C3 would mean two
+# different rules under one name across the git history. What the two
+# rules bought (a file is found by its words) now rides the `# Run ·`
+# header line and the file NAME, the two surfaces a reader actually sees.
 
 
 def corpus_contract_errors(path: pathlib.Path, text: str) -> list[str]:
@@ -1273,23 +1276,12 @@ def corpus_contract_errors(path: pathlib.Path, text: str) -> list[str]:
         errs.append("C1 · the two verbatim header lines must lead the file")
     if not any(line.startswith("# Run ·") for line in lines):
         errs.append("C2 · no `# Run ·` line — the header must hand the exact command")
-    for line in lines:
-        if line.startswith("  description:") and not line.startswith("   ") \
-                and "# SLOT" in line:
-            errs.append("C4 · `# SLOT` rides the workflow description line — it "
-                        "leaks into the catalog display · move it to its own line above")
-            break
     try:
         doc = yaml.safe_load(text) or {}
     except yaml.YAMLError:
         return errs  # the schema stage owns parse failures
     if not isinstance(doc, dict):
         return errs
-    if not _NUMBERED_LESSON.match(path.name):
-        desc = (doc.get("workflow") or {}).get("description")
-        if not (isinstance(desc, str) and desc.strip()):
-            errs.append("C3 · workflow.description missing — jobs and skeletons "
-                        "are found by their words")
     permits = doc.get("permits")
     if isinstance(permits, dict):
         order = {"exec": 0, "tools": 1, "net": 2, "fs": 3}

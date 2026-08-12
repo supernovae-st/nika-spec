@@ -11,8 +11,9 @@
 `workflow.schema.json` is **shipped** — a complete Draft 2020-12 structural
 contract for the v1 envelope + the 4 verbs (inlined as `$defs`), **hand-derived
 from the prose spec** and proven against the example suite: all 7 foundation
-examples validate, and a negative control (`nika: v1.0` + bad id + two-verb
-task) is correctly rejected. This is the **Phase L1 authorability** lever: an
+examples validate, and a negative control (a non-kebab `nika:` id + a bad task
+id + a two-verb task) is correctly rejected. This is the **Phase L1
+authorability** lever: an
 LLM can validate its own generated Nika against this schema, and editors with
 `yaml-language-server` get autocomplete + inline errors today.
 
@@ -29,7 +30,7 @@ self-contained for editor use).
 
 ```
 schemas/
-├── workflow.schema.json         ✅ envelope + tasks + 4 verbs ($defs) · 7 examples ⊨ · negative-control verified
+├── workflow.schema.json         ✅ the 9 envelope keys + tasks + 4 verbs ($defs) · 7 examples ⊨ · negative-control verified
 ├── verb-infer.schema.json       # infer: action shape
 ├── verb-exec.schema.json        # exec: action shape
 ├── verb-invoke.schema.json      # invoke: action shape
@@ -43,9 +44,7 @@ schemas/
 
 ```yaml
 # yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
-nika: v1
-workflow:
-  id: my-workflow
+nika: my-workflow
 ...
 ```
 

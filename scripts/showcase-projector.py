@@ -59,28 +59,25 @@ IS_LESSON = re.compile(r"^\d{2}-")
 # (the website applies the same law at serve time via src/lib/w1-to-w2.ts).
 # Flips to identity at the release train: NIKA_SERVED_GRAMMAR=wnew.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from grammar_door import downcast_w2, downcast_w105, downcast_w106  # noqa: E402
+from grammar_door import downcast_w2, downcast_w105  # noqa: E402
 
-# The default = the grammar the LATEST RELEASED binary speaks — w106
-# since the NEP-0014 mints (2026-07-29): the v0.106.1 ASSET (the binary
-# a visitor installs · published 07-28) predates `policy.endorsement`
-# and refuses it PARSE-019 (the rule set is closed per minor), so the
-# door drops that one family from baked fences. The identity flip
-# (`wnew`) returns when the released asset parses endorsement — the
-# release-heal ratchet derives this from the release itself (R2); until
-# then the default tracks the PUBLISHED asset, never a local rebuild
-# (empirical 2026-07-29: a same-version brew rebake accepted what the
-# asset refuses — the asset is the judge). Era doors stay per-bake
-# overrides: w2 (0.104) · w105 (0.105 · v0.106.1 refuses its `vars:`).
-SERVED_GRAMMAR = os.environ.get("NIKA_SERVED_GRAMMAR", "w106")
+# The default = the grammar the LATEST RELEASED binary speaks. w106 died
+# with `policy:` (its one transform dropped `policy.endorsement` from baked
+# fences and the family left the language), so the default falls back to
+# w105 — the released dialect the door can still fully serve: `nika: v1` +
+# `workflow: <id>`, one `vars:` block, the released predicate names. The
+# identity flip (`wnew`) returns when the released asset parses the
+# post-nuke envelope; until then the default tracks the PUBLISHED asset,
+# never a local rebuild (empirical 2026-07-29: a same-version brew rebake
+# accepted what the asset refuses — the asset is the judge). Era door w2
+# (0.104) stays a per-bake override.
+SERVED_GRAMMAR = os.environ.get("NIKA_SERVED_GRAMMAR", "w105")
 
 
 def served(yaml_text: str, fname: str) -> str:
     """The grammar a docs reader copies · the released dialect via the door."""
     if SERVED_GRAMMAR == "wnew":
         return yaml_text
-    if SERVED_GRAMMAR == "w106":
-        return downcast_w106(yaml_text, fname)
     if SERVED_GRAMMAR == "w105":
         return downcast_w105(yaml_text, fname)
     return downcast_w2(yaml_text, fname)
@@ -638,8 +635,11 @@ def render_manifest(workflows: dict[str, str]) -> str:
         # Flat path — showcase/ died at 1f15601. The tier line died with the
         # prefix it was sliced from: rank is metadata, not identity.
         lines.append(f"  - file: examples/{name}")
-        lines.append(f"    workflow: {doc.get('workflow')}")
-        lines.append(f"    description: {json.dumps(doc.get('description', ''))}")
+        # `nika:` carries the identity since the envelope nuke — the
+        # `workflow:` key and its `description:` are gone, so the manifest
+        # names the file by its mark. A `description:` row would emit "" on
+        # every entry, which is a column that says nothing.
+        lines.append(f"    name: {doc.get('nika')}")
         lines.append(f"    constructs: [{', '.join(constructs)}]")
         lines.append(f"    sha256_16: {digest}")
     if snippets:

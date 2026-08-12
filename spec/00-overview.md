@@ -38,27 +38,27 @@ Standards work · SQL · GraphQL · OpenAPI · Dockerfile · GitHub Actions YAML
 ## The <!-- canon:pillars -->5<!-- /canon --> pillars · immutable forever
 
 ```
-1.  ENVELOPE        nika: v1
-                    workflow:
-                      id: my-workflow-id
+1.  ENVELOPE        nika: my-workflow-id        ← the mark AND the name
+                    9 keys · nika · model · inputs · const · secrets
+                              permits · run · tasks · outputs
 
 2.  THE 4 VERBS     infer:  exec:  invoke:  agent:
 
 3.  DAG SHAPE       tasks · with (data edges) · after (control) · when · for_each
 
-4.  VARIABLES       ${{ ... }} = CEL · ONE syntax · 6 namespaces
-                    inputs · config · const · secrets · with · tasks
+4.  VARIABLES       ${{ ... }} = CEL · ONE syntax · 5 namespaces
+                    inputs · const · secrets · with · tasks
 
 5.  ERROR MODEL     NIKA-<NS>-<NNN> codes · retry semantics · structured output
 ```
 
-These 5 pillars are **locked forever** at `nika: v1`. Everything else (providers · builtins · extract modes · etc.) lives in the **stdlib** and evolves independently. Minor language additions are **additive** within `v1` (feature-detected · no minor version in the file).
+These 5 pillars are **locked forever** at v1. Everything else (providers · builtins · extract modes · etc.) lives in the **stdlib** and evolves independently. Minor language additions are **additive** within `v1` (feature-detected · no version marker in the file at all).
 
 ---
 
 ## Pre-1.0 stability contract
 
-> **`nika: v1` names the first stable family of the language. Its public
+> **v1 names the first stable family of the language. Its public
 > stability begins at engine 1.0.0 — not before.**
 
 Until the reference engine ships 1.0.0, the v1 grammar is **pre-stable** ·
@@ -97,9 +97,7 @@ additive and feature-detected, exactly as the pillars section states.
 ## Hello world
 
 ```yaml
-nika: v1
-workflow:
-  id: hello
+nika: hello
 
 model: ollama/qwen3.5:4b
 tasks:
@@ -113,9 +111,7 @@ tasks:
 ## A more representative example
 
 ```yaml
-nika: v1
-workflow:
-  id: scrape-and-summarize
+nika: scrape-and-summarize
 
 model: mistral/mistral-large
 tasks:
@@ -153,16 +149,16 @@ outputs:                              # what the workflow returns · symmetric t
 
 | Section | What it covers |
 |---|---|
-| [01 envelope](./01-envelope.md) | The header · `nika: v1` · `workflow:` · typed `inputs` · `config` · `const` · `secrets` |
+| [01 envelope](./01-envelope.md) | The header · the 9 keys · `nika:` (the mark AND the name) · typed `inputs` · `const` · `secrets` |
 | [02 verbs](./02-verbs.md) | The 4 verbs · signatures · semantics |
 | [03 DAG](./03-dag.md) | Tasks · `with:` data edges · `after:` control · `when` · `for_each` · the four graphs |
-| [04 variables](./04-variables.md) | `${{ inputs · config · const · secrets · with · tasks }}` · <!-- canon:namespaces -->6<!-- /canon --> namespaces |
+| [04 variables](./04-variables.md) | `${{ inputs · const · secrets · with · tasks }}` · <!-- canon:namespaces -->5<!-- /canon --> namespaces |
 | [05 errors](./05-errors.md) | Error codes · retry · structured output schemas |
 | [06 stdlib contract](./06-stdlib-contract.md) | How the stdlib versions independently |
 | [07 conformance](./07-conformance.md) | What « v0.1-compliant » means |
 | [08 out of scope](./08-out-of-scope.md) | Explicit defer list (memory · macros · etc.) |
-| [09 types](./09-types.md) | The decidable type core · `types:` · `returns:` · `decode:` · the lattice · JSON-Schema lowering |
-| [10 authority](./10-authority.md) | The authority system · the effect vocabulary · `policy:` (named workflow law) · secret-flow codes · `certificate.effects` |
+| [09 types](./09-types.md) | The decidable type core · `returns:` (the type expression, INLINE) · `decode:` · the lattice · JSON-Schema lowering |
+| [10 authority](./10-authority.md) | The authority system · the effect vocabulary · the unconditional order law (`NIKA-SEC-015`) · secret-flow codes · `certificate.effects` |
 | [11 decision](./11-decision.md) | The decision contract · portable Decision Bundle · Evidence IR (two lattices) · Belnap logic · fixed-point Decision IR · abstention · `nika:decide` |
 | [12 gateway](./12-gateway.md) | The gateway contracts · Deployment Bundle · ExecutionBackend (capabilities · lowering · readback) · AgentRuntimeAdapter (FidelityReport · AuthorityDelta) · the separation laws |
 | [13 outcomes](./13-outcomes.md) | The Outcome IR · TerminalClass × Cause × Payload · the normative transition table (one source: canon) · `trace_format: 2` |
@@ -193,9 +189,9 @@ See [`08-out-of-scope.md`](./08-out-of-scope.md) for the explicit list.
 
 ## Frozen language envelope
 
-The **language** envelope is frozen at `nika: v1` forever. **There is no `nika: v2` — ever.** The version marker names the one language family; deep grammar changes happen INSIDE `v1` while the reference engine is pre-1.0 (per the [pre-1.0 stability contract](#pre-10-stability-contract) above), and after engine 1.0.0 changes are additive only (feature-detected · no minor version in the file). (This is the **language** version, independent of any engine version: the reference engine ships its own semver toward a 1.0 release, which does not touch `nika: v1`.)
+The **language** envelope is frozen at **v1** forever. **There is no `nika: v2` — ever.** Because that was true, the version slot carried no bits, and the envelope nuke gave it away: `nika:` now holds the file's NAME. **Nothing was lost.** v1 names the one language family; deep grammar changes happen INSIDE `v1` while the reference engine is pre-1.0 (per the [pre-1.0 stability contract](#pre-10-stability-contract) above), and after engine 1.0.0 changes are additive only (feature-detected · no version marker in the file at all). (This is the **language** family, independent of any engine version: the reference engine ships its own semver toward a 1.0 release, which does not touch v1.)
 
-In practice · we expect `nika: v1` to last 10+ years.
+In practice · we expect v1 to last 10+ years.
 
 ---
 

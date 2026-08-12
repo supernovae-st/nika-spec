@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: t-declassify-declared-opens-door
+nika: t-declassify-declared-opens-door
 permits:
   fs: { read: ["datasets/**", "vendor/**"] }
   tools: ["nika:read"]

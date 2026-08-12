@@ -1,7 +1,5 @@
 # Expected: exit 0 — diamond fan-out/fan-in topology completes.
-nika: v1
-workflow:
-  id: diamond-dag
+nika: diamond-dag
 # COVERS: diamond DAG A -> {B, C} -> D join. B and C run in parallel after A;
 # D depends on BOTH and aggregates. Assert D's output == B+C combined over A's seed.
 # (NOTE: with: uses BLOCK style — flow-mapping `{ s: ${{...}} }` collides with the ${{}} braces.)

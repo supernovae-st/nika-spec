@@ -41,7 +41,7 @@ laws:
       text: "R7 point 1 verbatim : « La source Nika conserve uniquement : `nika: v1` » · R7 point 15 verbatim : « Aucun `nika: v2`. » La détection de features ne passe JAMAIS par un bump du marqueur de langage : la source ne porte aucun autre marqueur de version, et aucun second marqueur n'existera."
     inputs:
       - registry: surface
-        id: nika_version_marker
+        id: nika_mark_and_name
         role: required
       - registry: grammar
         id: envelope_nika_field
@@ -50,7 +50,7 @@ laws:
       - operator: matches
         operands:
           - registry: surface
-            id: nika_version_marker
+            id: nika_mark_and_name
           - registry: grammar
             id: envelope_nika_field
         quantifier: forall
@@ -62,14 +62,14 @@ laws:
     judgment:
       generated_facts:
         - registry: surface
-          id: nika_version_marker
+          id: nika_mark_and_name
       independent_judgment: true
     domain_payload:
       kind: surface
       constraint: one_spelling_per_meaning
       subject:
         registry: surface
-        id: nika_version_marker
+        id: nika_mark_and_name
     diagnostics: []
     fixtures:
       - conformance/envelope/minimal-valid-workflow.nika.yaml
@@ -741,7 +741,7 @@ laws:
         id: machine_format_version_markers
         role: required
       - registry: surface
-        id: nika_version_marker
+        id: nika_mark_and_name
         role: ceiling
     premises:
       - operator: intersect_empty

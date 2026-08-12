@@ -4,9 +4,7 @@
 # (42 == "42") is an evaluation error (NIKA-VAR · variable_error) · not false."
 # This is a `when:` gate so the expr is boolean-shaped (passes parse shape check)
 # but resolves cross-type at eval → expected NIKA-VAR-006 at RUN.
-nika: v1
-workflow:
-  id: c02-string-vs-number-coercion
+nika: c02-string-vs-number-coercion
 
 const:
   num: 42

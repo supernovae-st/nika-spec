@@ -1,8 +1,5 @@
 # Expected: exit 0 — exec stdout captured, then nika:convert csv→json.
-nika: v1
-workflow:
-  id: c22-convert-builtin
-  description: "Generate CSV-like content, use nika:convert to transform CSV→JSON"
+nika: c22-convert-builtin
 
 permits:
   fs:

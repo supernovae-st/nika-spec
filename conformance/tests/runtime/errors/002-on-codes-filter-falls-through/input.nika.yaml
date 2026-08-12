@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: rt-on-codes-fall-through
+nika: rt-on-codes-fall-through
 model: mock/echo
 tasks:
   guarded:

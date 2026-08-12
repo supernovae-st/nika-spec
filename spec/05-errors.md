@@ -67,7 +67,6 @@ Error codes follow the format `NIKA-<NAMESPACE>-<NNN>` where namespace is 2-9 up
 | `NIKA-COMP` | Composition (`invoke: workflow:` · [14-composition](./14-composition.md)) | 001-099 |
 | `NIKA-DECIDE` | Decision bundles + evidence (`nika:decide` · [11-decision](./11-decision.md)) | 001-099 |
 | `NIKA-PORT` | Gateway artifacts (deployment bundle · lowering · fidelity · [12-gateway](./12-gateway.md)) | 001-099 |
-| `NIKA-POLICY` | `policy:` hard-rule violations ([10-authority](./10-authority.md)) | 001-099 |
 | `NIKA-ASSERT` | assertion obligations ([15-proof](./15-proof.md)) · ⚰️ the `assert:` ENVELOPE KEY was removed 2026-08-11 · the range stays RESERVED, unemitted, for the day a property returns as an addition | 001-099 |
 | `NIKA-LOCK` | `nika.lock` pin violations ([15-proof](./15-proof.md)) | 001-099 |
 | `NIKA-REG` | Registry client refusals (resolve · digest · advisory · [registry-v0.1](../registry/registry-v0.1.md) · allocated for the reference engine's `registry:` resolver — engine ADR-106) | 001-099 |
@@ -86,8 +85,8 @@ these from this file alone.
 | Code | Failure | Category | `transient` |
 |---|---|---|---|
 | `NIKA-PARSE-001` | the YAML itself does not parse (syntax error) | `parse_error` | false |
-| `NIKA-PARSE-002` | missing envelope field (`nika:` / `workflow:` / non-empty `tasks:`) | `validation_error` | false |
-| `NIKA-PARSE-003` | `nika:` version marker is not exactly `v1` | `parse_error` | false |
+| `NIKA-PARSE-002` | missing envelope field (`nika:` · a non-empty `tasks:`) — a file with no `nika:` key is not a nika file; `workflow:` no longer exists to be missing ([01 §envelope](./01-envelope.md)) | `validation_error` | false |
+| `NIKA-PARSE-003` | `nika:` is not a kebab-case id (`^[a-z][a-z0-9-]*$`) — the key carries the file's NAME, not a version; the version slot is gone forever and losslessly (there is no `nika: v2`, ever · [01 §nika](./01-envelope.md)) | `parse_error` | false |
 | `NIKA-PARSE-004` | `workflow:` id violates `^[a-z][a-z0-9-]*$` | `validation_error` | false |
 | `NIKA-PARSE-005` | unknown field — strict mode rejects anything outside the closed v1 set | `validation_error` | false |
 | `NIKA-PARSE-006` | task id violates `^[a-z][a-z0-9_]*$` (snake_case · CEL-safe · no hyphens) | `validation_error` | false |
@@ -102,8 +101,6 @@ these from this file alone.
 | `NIKA-PARSE-017` | duplicate mapping key — no silent last-wins | `validation_error` | false |
 | `NIKA-PARSE-018` | missing required field in a verb body (`infer.prompt` · `exec.command` · `invoke.tool`) | `validation_error` | false |
 | `NIKA-PARSE-019` | generic structural validation — wrong YAML shape for a field | `validation_error` | false |
-| `NIKA-PARSE-020` | `workflow:` is a scalar — the envelope became an object (`workflow:` then `id:`) | `validation_error` | false |
-| `NIKA-PARSE-021` | top-level `description:` — it moved into `workflow.description` | `validation_error` | false |
 | `NIKA-PARSE-022` | `tasks:` is a sequence — it became a map keyed by task id | `validation_error` | false |
 | `NIKA-PARSE-023` | a task carries an `id:` field — the map key IS the identity | `validation_error` | false |
 | `NIKA-PARSE-024` | a task carries `depends_on:` — dead since W2 (data → `with:` bindings · control → `after:` predicates · `check --fix` migrates) | `validation_error` | false |
@@ -123,16 +120,14 @@ these from this file alone.
 | `NIKA-DAG-007` | status compared against a literal outside the vocabulary (`success` · `failure` · `skipped` · `cancelled`) — `==` never matches, `!=` always holds | `validation_error` | false |
 | `NIKA-DAG-008` | a `${{ group.<name> }}` fold names a group **no task declares** — including a bare `${{ group }}`, and including the group left empty by a renamed member. Membership is declared, never matched, precisely so a rename is an error here instead of a silently smaller fold ([03 §group](./03-dag.md#declared-membership-never-a-pattern-normative)) | `validation_error` | false |
 | `NIKA-DAG-009` | an `unwind` task declares `group:` — cleanup is an `E_f` attachment that never enters `G_p`, so a `fan-in` edge from it would have no wave to schedule against ([03 §group](./03-dag.md#the-rest-of-the-contract-1)) | `validation_error` | false |
-| `NIKA-TYPE-001` | unknown type name (in `types:` · `returns:` · an `outputs:` type) — did-you-mean when close | `validation_error` | false |
-| `NIKA-TYPE-002` | recursive type reference — the `types:` graph must be acyclic | `validation_error` | false |
+| `NIKA-TYPE-001` | unknown type name (in `returns:` · an `inputs:`/`outputs:` type) — with named `types:` retired, a PascalCase name in type position resolves to nothing and the refusal teaches the inline form | `validation_error` | false |
 | `NIKA-TYPE-003` | `returns:` and `schema:` on the same task — one contract, one spelling | `validation_error` | false |
 | `NIKA-TYPE-004` | `returns:` type unreachable from the declared `decode:` (an object contract over `decode: text` · …) | `validation_error` | false |
 | `NIKA-TYPE-005` | a secret-carrying type in a lowered position (reserved with `secret<T>` · W4) | `security_error` | false |
 | `NIKA-TYPE-006` | regex pattern outside the locked dialect (backreference · lookaround · named group · inline flags · lazy/possessive · `\b` · `\p` — [09 §the regex dialect](./09-types.md#the-regex-dialect-normative--locked)) | `validation_error` | false |
 | `NIKA-TYPE-101` | run-time contract violation — the decoded value does not fit `returns:` (`exec:`/`invoke:` lane · `infer:`/`agent:` stay `NIKA-INFER-002`-class) | `validation_error` | false |
 | `NIKA-DEFAULT-001` | a `default:` that does not conform to its own `type:` — the declaration would hand a caller a value its type forbids ([09 §types](./09-types.md)) | `validation_error` | false |
-| `NIKA-DEFAULT-002` | a `config:` entry with no `default:` — nothing can supply it (`--var` reaches `inputs:` only), so the file would pass check and die at run on `NIKA-VAR-001`. Refused at CHECK so the green means something ([01 §config](./01-envelope.md)) | `validation_error` | false |
-| `NIKA-VAR-001` | unresolved reference (unknown namespace entry · undeclared `inputs`/`config`/`const`/`secrets`/`with` key) | `variable_error` | false |
+| `NIKA-VAR-001` | unresolved reference (unknown namespace entry · undeclared `inputs`/`const`/`secrets`/`with` key) | `variable_error` | false |
 | `NIKA-VAR-002` | binding cardinality — a jq binding emitted zero or multiple values (evaluation-time · data-dependent) | `variable_error` | false |
 | `NIKA-VAR-003` | provably-invalid path into a declared `schema:` (static walk · [04](./04-variables.md)) | `validation_error` | false |
 | `NIKA-VAR-004` | jq runtime error while evaluating a binding | `variable_error` | false |
@@ -144,8 +139,8 @@ these from this file alone.
 | `NIKA-VAR-021` | a `tasks.*` reference outside the boundary (`with:` · `after:` · `on_error.recover` · an `unwind` task reading its producer · workflow `outputs:`) — hoist it into `with:` (`check --fix` applies it) | `validation_error` | false |
 | `NIKA-VAR-009` | typed `outputs` value did not match its declared `type:` at run end (the output half of the callable contract · [01 §engine MUST](./01-envelope.md)) | `validation_error` | false |
 | `NIKA-VALUES-001` | the pre-flip envelope `vars:` block — dead since the E-split; classify each use into the authority its role commands ([04 §values](./04-variables.md)) | `validation_error` | false |
-| `NIKA-VALUES-002` | the pre-flip envelope `env:` block — dead since the E-split; `config:` is workflow config, `exec.env` is one subprocess's OS environment ([04 §values](./04-variables.md)) | `validation_error` | false |
-| `NIKA-VALUES-003` | a value-namespace read outside the four-authority family (`${{ params.X }}` and friends) ([04 §values](./04-variables.md)) | `validation_error` | false |
+| `NIKA-VALUES-002` | the pre-flip envelope `env:` block — dead since the E-split; a deployment knob is an `inputs:` entry with `required: false`, `exec.env` is one subprocess's OS environment ([04 §values](./04-variables.md)) | `validation_error` | false |
+| `NIKA-VALUES-003` | a value-namespace read outside the three-authority family (`inputs` · `const` · `secrets`) (`${{ params.X }}` and friends) ([04 §values](./04-variables.md)) | `validation_error` | false |
 | `NIKA-INFER-001` | provider call failed (HTTP error · provider refusal) | `provider_error` | engine-assessed |
 | `NIKA-INFER-003` | the provider reported no token usage for a priced model — the ledger cannot bill the call honestly (fail-closed · the usage-absence gate, R3-F1) | `validation_error` | false |
 | `NIKA-INFER-002` | structured output failed `schema:` validation (after any engine-internal retries) | `validation_error` | false |
@@ -174,8 +169,8 @@ these from this file alone.
 | `NIKA-SEC-010` | the approval-capability law is violated ([NEP-0013](../governance/nep-0013-approval-ticket.md) · the 6th invariant) — a rate-limited approval burst (`approval.rate_limited` · the N+1th distinct mint of a run, never a queue) · an approval whose resolved content hash differs from the shown hash (`approval.content_mismatch`) · a ticket replayed outside its run/step/hash scope (`approval.scope_mismatch`) · or the static heterogeneous-batch refusal (one prompt whose descendant closure unleashes two or more of `exec · write · net`) | `security_error` | false |
 | `NIKA-SEC-011` | preview-commit divergence — the commit digest recomputed at the sink over the exact bytes about to fire differs from the preview digest judged at resolution (one bit of rendered argv · a permuted context field · a mutated tool argument) · the step refuses fail-closed and the receipt carries `divergence: {preview, commit}` — judged = executed at the action scale ([NEP-0015](../governance/nep-0015-preview-commit.md) · F-P6) | `security_error` | false |
 | `NIKA-SEC-012` | unordered shared writes — two tasks incomparable in the DAG closure whose literal `nika:write`/`nika:edit` paths collide with no ordering edge (`after:` · `with:`) to serialize them, or a `for_each` fan writing one constant path · parallelism is safe exactly where the writes are provably disjoint (NEP-0014 law 1 · F-P15) | `security_error` | false |
-| `NIKA-SEC-013` | the endorsement mode law — a human gate (`invoke: nika:prompt`) declared under a `policy:` block that names no endorsement mode refuses fail-closed (`endorsement.undeclared_mode` · F-F5 · zero implicit escape), and `endorsement: solo` carried by a workflow with more than one gate refuses as the declaration lying (`endorsement.solo_count` · exactly one endorser) ([10 §policy](./10-authority.md) · NEP-0017 · F-P23) | `security_error` | false |
 | `NIKA-SEC-014` | the affirmative-consent law — a confirm-mode human gate (`invoke: nika:prompt` · mode absent or `confirm`) reaches an egress-capable task over a route no affirmative gate closes: a REFUSED confirm settles success with value `false`, so a bare `after: { gate: success }` edge, a `when:` that never reads the answer, and a `when:` provably true on the refusal all let the effect through · the gate is credited only when every route consumes the answer and proves false on it (the Kleene-falsifiable `when:` · `when: false` · a closer confirm gate owns its closure) · an undecidable gate defers to the advisory hint, never a refusal ([10 §the affirmative-consent law](./10-authority.md#the-affirmative-consent-law--normative--nep-0020) · [NEP-0020](../governance/nep-0020-affirmative-consent.md) · P0-2) | `security_error` | false |
+| `NIKA-SEC-015` | the order law — an `exec:` task sits transitively downstream of a net-effecting task (`nika:fetch` · `nika:notify`) over the derived graph (`with:` data edges ∪ `after:` control edges): content the workflow did not author must not reach a shell · the diagnostic names the PATH, which is the witness · **UNCONDITIONAL** — no block declares it and none can disable it ([10 §the unconditional laws](./10-authority.md)) | `security_error` | false |
 | `NIKA-AUTH-006` | an absent `permits:` block — DeclaredPermits is empty, so every effect the body requires is refused before any token; the diagnostic carries the inferred block, ready to paste ([10 §authority](./10-authority.md)) | `security_error` | false |
 | `NIKA-AUTH-007` | an interpolation reaches a permit BOUND (a host · glob · program · env name inside `permits:`) — a bound must be a literal, or the boundary is self-serve ([10 §authority](./10-authority.md)) | `security_error` | false |
 | `NIKA-AUTH-008` | an untrusted value reaches a permitted verb's ARGUMENT and its canonical resolved form escapes the step's permit — the diagnostic carries the taint path ([10 §authority](./10-authority.md)) | `security_error` | false |
@@ -184,15 +179,14 @@ these from this file alone.
 | `NIKA-DECIDE-001` | the decision bundle is malformed or violates its own laws (float weight · undeclared evidence key in rules · identity key feeding a technical dimension · missing contradictory fixture · monotonicity violated by the bundle's own fixtures · [11 §nika:decide](./11-decision.md#nikadecide--the-deterministic-kernel-as-a-builtin)) | `validation_error` | false |
 | `NIKA-DECIDE-002` | the evidence snapshot does not satisfy the bundle's evidence schema (type misfit · unauthorized source · integrity below the declared floor · undeclared key · [11 §evidence IR](./11-decision.md#evidence-ir-normative--g14)) | `validation_error` | false |
 | `NIKA-PORT-001` | a gateway artifact (deployment bundle · capabilities report · lowering report · fidelity report · authority delta) is malformed or violates its laws (an unknown promoted · a `permissive_unsafe` row without refusal · the disclosure ⊆-chain violated · a child authority exceeding its parent · [12 §errors](./12-gateway.md#errors-the-nika-port-namespace--new-in-this-chapter)) | `validation_error` | false |
-| `NIKA-PORT-002` | policy lowering is `permissive_unsafe` — the backend would allow what the policy forbids · refused with the divergence witness ([12 §ExecutionBackend](./12-gateway.md#executionbackend--the-enforcement-contract-normative)) | `security_error` | false |
-| `NIKA-POLICY-001` | a hard `policy:` rule is violated (`require.human_gate_before` · `forbid.exec_after` · `allow.providers` · `limits.max_tasks`) — the diagnostic names rule + task + witness · check-time, before any token ([10 §policy](./10-authority.md#the-policy-block--optional--named-workflow-law)) | `security_error` | false |
+| `NIKA-PORT-002` | authority lowering is `permissive_unsafe` — the backend would allow what the declared boundary forbids · refused with the divergence witness ([12 §ExecutionBackend](./12-gateway.md#executionbackend--the-enforcement-contract-normative)) | `security_error` | false |
 | `NIKA-TIMEOUT-001` | task (or for_each iteration) exceeded `timeout:` | `timeout_error` | false |
 | `NIKA-CANCEL-001` | task cancelled (workflow failure gate · user cancellation) | `cancelled` | false |
 | `NIKA-ASSERT-001` | ⚰️ RESERVED, not emitted in v0.1 (the envelope key it judged was removed 2026-08-11) · an assertion claims a level the evidence does not support (a `StaticProof` the IR cannot decide · a mis-leveled obligation · [15 §assert](./15-proof.md#assert--the-authors-obligations-normative)) | `validation_error` | false |
 | `NIKA-LOCK-001` | a dependency resolved that `nika.lock` does not pin, or a hand-edited lock digest does not match ([15 §lock](./15-proof.md#nikalock--the-single-lock-normative--f7)) | `validation_error` | false |
 | `NIKA-BUILTIN-001` | builtin `invoke:` violates its statically-checkable arg contract (e.g. `nika:fetch` without `url:` · `nika:jq` arg shape) | `validation_error` | false |
 | `NIKA-BUILTIN-DONE-001` | `nika:done` invoked outside an `agent:` loop | `validation_error` | false |
-| `NIKA-DRIFT-001` | declared-but-unused — an `inputs:`/`config:`/`const:`/`secrets:` name or a `permits:` entry (exec program · tool glob · net host · fs path) that nothing in the body references · **advisory check hint — never fails the audit** (the report's `is_clean` ignores hints; dead declarations are smell, not failure) · the reverse direction (used-but-undeclared) is the hard `NIKA-VAR-001`/`NIKA-DAG-002`/`NIKA-SEC-004` surface, so **no `NIKA-DRIFT-002` exists** (an unemittable code would be dead weight — the no-duplication law is structural: hard codes name references, drift names declarations, never the same yaml site) · a dynamic consumer POISONS the used set (a shell-form exec hides its programs · an exec child hides the fs path sets · a dynamic URL/path hides the host/path set · an `agent:` whitelist dispatches dynamically — glob ⊆ glob is undecidable) and the category stays silent rather than risk a false positive · the fs read set DOES model the two decidable runtime gates (`nika:glob`'s literal walk root · a `nika:fetch` `multipart:` file part's literal path) · reference implementation nika#661 | `validation_error` | false |
+| `NIKA-DRIFT-001` | declared-but-unused — an `inputs:`/`const:`/`secrets:` name or a `permits:` entry (exec program · tool glob · net host · fs path) that nothing in the body references · **advisory check hint — never fails the audit** (the report's `is_clean` ignores hints; dead declarations are smell, not failure) · the reverse direction (used-but-undeclared) is the hard `NIKA-VAR-001`/`NIKA-DAG-002`/`NIKA-SEC-004` surface, so **no `NIKA-DRIFT-002` exists** (an unemittable code would be dead weight — the no-duplication law is structural: hard codes name references, drift names declarations, never the same yaml site) · a dynamic consumer POISONS the used set (a shell-form exec hides its programs · an exec child hides the fs path sets · a dynamic URL/path hides the host/path set · an `agent:` whitelist dispatches dynamically — glob ⊆ glob is undecidable) and the category stays silent rather than risk a false positive · the fs read set DOES model the two decidable runtime gates (`nika:glob`'s literal walk root · a `nika:fetch` `multipart:` file part's literal path) · reference implementation nika#661 | `validation_error` | false |
 
 
 `NIKA-PARSE-015` is **retired** (never reuse): the typed-`vars:` 6-enum class
@@ -201,6 +195,33 @@ died with the E-split (R3b · LAW-GRAMMAR-0211) — the `type:` field of
 [09-types](./09-types.md), so what PARSE-015 refused (the rich forms) is
 admitted, and what stays outside the grammar refuses via `NIKA-TYPE-001`.
 The allocation hole is deliberate, per the additive-never-repurposed rule above.
+
+`NIKA-PARSE-020` · `NIKA-PARSE-021` are **retired** (never reuse): the
+envelope key `workflow:` died entirely at the envelope nuke (2026-08-12). It
+existed only to house `id:` and `description:`; the description died the same
+day (**one consumer across five reading surfaces**, and the `semantic_hash`
+came back byte-identical with it and without it) and the id moved onto
+`nika:`, so the object had nothing left to hold. Both migration teachings lost
+their destination. The allocation holes are deliberate.
+
+`NIKA-TYPE-002` is **retired** (never reuse): « the `types:` graph must be
+acyclic » has no object — named types died with the `types:` block
+([09-types](./09-types.md)). A type expression is self-contained, so there is
+no graph left to cycle.
+
+`NIKA-DEFAULT-002` is **retired** (never reuse): « a `config:` entry with no
+`default:` » has no object — the `config:` block died at the envelope nuke and
+a deployment knob is now an `inputs:` entry with `required: false`, which
+`--var` can reach.
+
+`NIKA-POLICY-001` and `NIKA-SEC-013` are **retired** (never reuse), and the
+whole `NIKA-POLICY` **namespace** with them: the `policy:` block died at the
+envelope nuke. Measured, it was **fail-open** — a human gate with no `policy:`
+block passed, the same gate carrying an unrelated clause refused; on the
+corpus, 26 gates escaped the endorsement rule and the 8 punished were the ones
+that had declared something else. A law that binds only the file that opts
+into it binds nothing. The surviving half is `NIKA-SEC-015`, which fires with
+no declaration at all.
 
 `NIKA-PARSE-016` is **retired** (never reuse): the jq-binding-contains-template
 class folded into `NIKA-VAR-005` at the deep-conformance registry remap: the

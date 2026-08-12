@@ -35,7 +35,7 @@ A permits block is a claim. A header is a claim. Every comment is a claim.
 □ permits  the TIGHTEST block that covers the body · never widened to silence
           a message · never a root-level `**`
 □ comments  every one is TRUE · measured, or citing a spec line
-□ authorities  only inputs: · config: · const: · secrets:
+□ authorities  only inputs: · const: · secrets:
 □ verbs   only infer · exec · invoke · agent · native-first
 ```
 
@@ -359,13 +359,14 @@ If you are about to explain a mechanism, run it first.
 
 ## §8 · The language surface
 
-**Four authorities. No others.** `vars:` and `env:` are dead and refuse with
-`NIKA-VALUES-001` / `NIKA-VALUES-002`.
+**Three authorities. No others.** `vars:` and `env:` are dead and refuse with
+`NIKA-VALUES-001` / `NIKA-VALUES-002`; the top-level `config:` block is gone
+with the envelope nuke, and a value outside the three refuses with
+`NIKA-VALUES-003`.
 
 | Authority | Role |
 |---|---|
-| `inputs:` | a typed parameter the caller may supply |
-| `config:` | non-sensitive runtime configuration |
+| `inputs:` | a typed parameter · `required: true` the caller supplies at launch · `required: false` + `default:` is the DEPLOYMENT's knob, unreachable from `--var` |
 | `const:` | a fixed value baked in · never caller-supplied |
 | `secrets:` | a governed store reference · masked · `egress:`-gated |
 

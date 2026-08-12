@@ -1,8 +1,6 @@
 # Expected: exit 0 — nesting depth exactly 64 levels (the D-2026-07-17-N5 cap) is LEGAL:
 # the cap is an exact frontier (LAW-GRAMMAR-0108 · depth-at-cap admits, depth-over-cap refuses).
-nika: v1
-workflow:
-  id: depth-at-cap
+nika: depth-at-cap
 const:
   payload:
     type: object

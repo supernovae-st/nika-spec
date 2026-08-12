@@ -1,7 +1,5 @@
 # Expected: NIKA-EXEC-001 at RUN.
-nika: v1
-workflow:
-  id: e10-exec-nonzero
+nika: e10-exec-nonzero
 # INTENT: trigger NIKA-EXEC-001 (non-zero exit code)
 # Use array form with 'false' command (always exits 1)
 permits:

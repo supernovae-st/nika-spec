@@ -1,8 +1,5 @@
 # Expected: exit 0 — the acyclic child of parent-child-acyclic; a leaf with no calls.
-nika: v1
-workflow:
-  id: comp02-child-static-echo
-  description: "Leaf child: one pure compute task, no composition"
+nika: comp02-child-static-echo
 
 permits:
   exec: ["echo"]

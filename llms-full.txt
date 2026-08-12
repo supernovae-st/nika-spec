@@ -22,9 +22,13 @@ Sovereign · multi-provider · local-first.</strong></p>
 > [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/supernovae-st/nika-spec/badge)](https://scorecard.dev/viewer/?uri=github.com/supernovae-st/nika-spec)
 > [![REUSE 3.3](https://github.com/supernovae-st/nika-spec/actions/workflows/reuse.yml/badge.svg)](https://github.com/supernovae-st/nika-spec/actions/workflows/reuse.yml)
 >
-> The language is locked at `nika: v1`, forever. That's the envelope you
-> write in every workflow file; it evolves additively and never breaks (the
-> SQL / Dockerfile contract model). The reference engine versions separately.
+> The language is locked at **v1**, forever — there is no `nika: v2`, ever.
+> What you write is `nika: <name>`: the key is the mark that says « this is a
+> nika file » AND the file's own name. The version slot is gone because it
+> carried no bits, and nothing was lost with it — pre-1.0 breaking changes
+> live INSIDE v1, and after engine 1.0.0 the family evolves additively and
+> never breaks (the SQL / Dockerfile contract model). The reference engine
+> versions separately.
 
 ---
 
@@ -54,9 +58,7 @@ is at [supernovae-st/nika](https://github.com/supernovae-st/nika)
 ## Hello world
 
 ```yaml
-nika: v1
-workflow:
-  id: hello
+nika: hello                # the mark AND the name · kebab-case
 
 model: ollama/qwen3.5:4b   # local · zero key · swap for any provider in the catalog
 
@@ -101,10 +103,10 @@ Run `nika inspect <file> --format mermaid` on any workflow and paste the output;
 
 ## The 5 pillars · immutable forever
 
-1. **Envelope**: one line · `nika: v1` + `workflow:` header (+ typed `inputs` · `config` · `const` · `secrets`)
+1. **Envelope**: one line · `nika: <name>` (the mark AND the name) + the 9 keys (`nika` · `model` · `inputs` · `const` · `secrets` · `permits` · `run` · `tasks` · `outputs`)
 2. **The 4 verbs**: `infer:` (LLM) · `exec:` (shell) · `invoke:` (tools/MCP) · `agent:` (autonomous loop)
 3. **DAG shape**: tasks + `with:` data edges + `after:` control + `when` + `for_each`
-4. **Variables**: one `${{ ... }}` syntax · <!-- canon:namespaces -->6<!-- /canon --> namespaces (`inputs` · `config` · `const` · `secrets` · `with` · `tasks`)
+4. **Variables**: one `${{ ... }}` syntax · <!-- canon:namespaces -->5<!-- /canon --> namespaces (`inputs` · `const` · `secrets` · `with` · `tasks`)
 5. **Error model**: `NIKA-<NS>-<NNN>` codes · retry semantics · structured output
 
 These 5 things never change. Everything else (providers · builtins ·
@@ -154,10 +156,10 @@ The living map: [nika.sh/map](https://nika.sh/map).
 nika-spec/
 ├── spec/                      ← THE specification (~30 pages markdown)
 │   ├── 00-overview.md           one-page vision
-│   ├── 01-envelope.md           nika: v1 + workflow + typed inputs/config/const/secrets
+│   ├── 01-envelope.md           the 9 keys · nika + typed inputs/const/secrets
 │   ├── 02-verbs.md              the 4 verbs · signatures + semantics
 │   ├── 03-dag.md                tasks · with/after edges · when · for_each
-│   ├── 04-variables.md          ${{ }} · 6 namespaces · inputs/config/const/secrets/with/tasks
+│   ├── 04-variables.md          ${{ }} · 5 namespaces · inputs/const/secrets/with/tasks
 │   ├── 05-errors.md             error codes · retry · structured output
 │   ├── 06-stdlib-contract.md    how the stdlib versions independently
 │   ├── 07-conformance.md        what « v0.1-compliant » means
@@ -359,7 +361,8 @@ The reference implementation (separate repo) is AGPL-3.0-or-later.
 > **Status** · authoring, static checking AND execution all work TODAY:
 > `brew install supernovae-st/tap/nika`, then `nika check` + `nika run` on
 > any file in this page. The spec text itself is v0.1.0-draft (GA hardening
-> in progress); the language envelope `nika: v1` is already frozen.
+> in progress); the language family v1 is already frozen — there is no
+> `nika: v2`, ever.
 
 ---
 
@@ -368,9 +371,7 @@ The reference implementation (separate repo) is AGPL-3.0-or-later.
 Two header lines + one task ·
 
 ```yaml
-nika: v1
-workflow:
-  id: hello
+nika: hello
 
 model: ollama/qwen3.5:4b
 
@@ -380,10 +381,13 @@ tasks:
       prompt: "Say hello in French"
 ```
 
-- `nika: v1`: the language contract (one line · forever).
-- `workflow:`: a name for this file.
+- `nika:`: the mark that says « this is a nika file » AND the file's name ·
+  kebab-case · one line · forever. It carries no version: the family is v1
+  and there is no `nika: v2`, ever.
 - `model:`: the default model · `<provider>/<name>` (the prefix picks the provider).
-- one task · `infer:` calls the model.
+- one task · `infer:` calls the model. **`tasks:` is what makes this a
+  workflow** — a nika file without it is a project file, and the type is read
+  from the key, never from the filename.
 
 > **Model note** · every step on this page runs local on
 > `ollama/qwen3.5:4b` · zero key, nothing leaves your machine
@@ -401,9 +405,7 @@ Add a second task that uses the first one's output. The `with:` binding IS the
 graph · `${{ tasks.<id>.output }}` reads a prior task's result ·
 
 ```yaml
-nika: v1
-workflow:
-  id: summarize-and-translate
+nika: summarize-and-translate
 
 model: ollama/qwen3.5:4b
 
@@ -431,9 +433,7 @@ Declare inputs once in `inputs:` · reference them anywhere with `${{ inputs.X }
 inside) ·
 
 ```yaml
-nika: v1
-workflow:
-  id: translate-anything
+nika: translate-anything
 
 inputs:
   text:
@@ -462,10 +462,11 @@ A `--var` value overrides the declared default · satisfies a
 [spec/01-envelope.md](./spec/01-envelope.md#inputs--optional--typed-workflow-inputs)) ·
 and an unknown key is refused before anything runs. A fixed value the
 caller never overrides is a `const:` entry instead (a bare literal ·
-`${{ const.X }}`).
+`${{ const.X }}`). A value the **deployment** supplies is an `inputs:` entry
+carrying `required: false` and a `default:` — same namespace, same read.
 
-There are 6 variable namespaces · the four value authorities `inputs` ·
-`config` · `const` · `secrets` plus the runtime `with` · `tasks`.
+There are 5 variable namespaces · the three value authorities `inputs` ·
+`const` · `secrets` plus the runtime `with` · `tasks`.
 See [spec/04-variables.md](./spec/04-variables.md).
 
 ---
@@ -479,9 +480,7 @@ Everything else (fetching a URL, querying a DB, writing a file) is a
 `nika:fetch` builtin), then `infer` summarizes ·
 
 ```yaml
-nika: v1
-workflow:
-  id: fetch-and-summarize
+nika: fetch-and-summarize
 
 model: ollama/qwen3.5:4b
 
@@ -561,9 +560,9 @@ contract, the runtime is an implementation detail.
 
 ## What you just learned
 
-You touched all 5 pillars · the **envelope** (`nika: v1` + `workflow:`) · the
+You touched all 5 pillars · the **envelope** (`nika: <name>` + `tasks:`) · the
 **4 verbs** · the **DAG** (`with:`/`after:` edges + task outputs) · **variables**
-(`${{ }}` · <!-- canon:namespaces -->6<!-- /canon --> namespaces) · and the start of the **error model** (engines
+(`${{ }}` · <!-- canon:namespaces -->5<!-- /canon --> namespaces) · and the start of the **error model** (engines
 return `NIKA-<NS>-<NNN>` codes · see [spec/05-errors.md](./spec/05-errors.md)) ·
 plus the workflow's **`outputs:`** return contract (what `nika run` prints + what
 a caller receives).
@@ -624,27 +623,27 @@ Standards work · SQL · GraphQL · OpenAPI · Dockerfile · GitHub Actions YAML
 ## The <!-- canon:pillars -->5<!-- /canon --> pillars · immutable forever
 
 ```
-1.  ENVELOPE        nika: v1
-                    workflow:
-                      id: my-workflow-id
+1.  ENVELOPE        nika: my-workflow-id        ← the mark AND the name
+                    9 keys · nika · model · inputs · const · secrets
+                              permits · run · tasks · outputs
 
 2.  THE 4 VERBS     infer:  exec:  invoke:  agent:
 
 3.  DAG SHAPE       tasks · with (data edges) · after (control) · when · for_each
 
-4.  VARIABLES       ${{ ... }} = CEL · ONE syntax · 6 namespaces
-                    inputs · config · const · secrets · with · tasks
+4.  VARIABLES       ${{ ... }} = CEL · ONE syntax · 5 namespaces
+                    inputs · const · secrets · with · tasks
 
 5.  ERROR MODEL     NIKA-<NS>-<NNN> codes · retry semantics · structured output
 ```
 
-These 5 pillars are **locked forever** at `nika: v1`. Everything else (providers · builtins · extract modes · etc.) lives in the **stdlib** and evolves independently. Minor language additions are **additive** within `v1` (feature-detected · no minor version in the file).
+These 5 pillars are **locked forever** at v1. Everything else (providers · builtins · extract modes · etc.) lives in the **stdlib** and evolves independently. Minor language additions are **additive** within `v1` (feature-detected · no version marker in the file at all).
 
 ---
 
 ## Pre-1.0 stability contract
 
-> **`nika: v1` names the first stable family of the language. Its public
+> **v1 names the first stable family of the language. Its public
 > stability begins at engine 1.0.0 — not before.**
 
 Until the reference engine ships 1.0.0, the v1 grammar is **pre-stable** ·
@@ -683,9 +682,7 @@ additive and feature-detected, exactly as the pillars section states.
 ## Hello world
 
 ```yaml
-nika: v1
-workflow:
-  id: hello
+nika: hello
 
 model: ollama/qwen3.5:4b
 tasks:
@@ -699,9 +696,7 @@ tasks:
 ## A more representative example
 
 ```yaml
-nika: v1
-workflow:
-  id: scrape-and-summarize
+nika: scrape-and-summarize
 
 model: mistral/mistral-large
 tasks:
@@ -739,16 +734,16 @@ outputs:                              # what the workflow returns · symmetric t
 
 | Section | What it covers |
 |---|---|
-| [01 envelope](./01-envelope.md) | The header · `nika: v1` · `workflow:` · typed `inputs` · `config` · `const` · `secrets` |
+| [01 envelope](./01-envelope.md) | The header · the 9 keys · `nika:` (the mark AND the name) · typed `inputs` · `const` · `secrets` |
 | [02 verbs](./02-verbs.md) | The 4 verbs · signatures · semantics |
 | [03 DAG](./03-dag.md) | Tasks · `with:` data edges · `after:` control · `when` · `for_each` · the four graphs |
-| [04 variables](./04-variables.md) | `${{ inputs · config · const · secrets · with · tasks }}` · <!-- canon:namespaces -->6<!-- /canon --> namespaces |
+| [04 variables](./04-variables.md) | `${{ inputs · const · secrets · with · tasks }}` · <!-- canon:namespaces -->5<!-- /canon --> namespaces |
 | [05 errors](./05-errors.md) | Error codes · retry · structured output schemas |
 | [06 stdlib contract](./06-stdlib-contract.md) | How the stdlib versions independently |
 | [07 conformance](./07-conformance.md) | What « v0.1-compliant » means |
 | [08 out of scope](./08-out-of-scope.md) | Explicit defer list (memory · macros · etc.) |
-| [09 types](./09-types.md) | The decidable type core · `types:` · `returns:` · `decode:` · the lattice · JSON-Schema lowering |
-| [10 authority](./10-authority.md) | The authority system · the effect vocabulary · `policy:` (named workflow law) · secret-flow codes · `certificate.effects` |
+| [09 types](./09-types.md) | The decidable type core · `returns:` (the type expression, INLINE) · `decode:` · the lattice · JSON-Schema lowering |
+| [10 authority](./10-authority.md) | The authority system · the effect vocabulary · the unconditional order law (`NIKA-SEC-015`) · secret-flow codes · `certificate.effects` |
 | [11 decision](./11-decision.md) | The decision contract · portable Decision Bundle · Evidence IR (two lattices) · Belnap logic · fixed-point Decision IR · abstention · `nika:decide` |
 | [12 gateway](./12-gateway.md) | The gateway contracts · Deployment Bundle · ExecutionBackend (capabilities · lowering · readback) · AgentRuntimeAdapter (FidelityReport · AuthorityDelta) · the separation laws |
 | [13 outcomes](./13-outcomes.md) | The Outcome IR · TerminalClass × Cause × Payload · the normative transition table (one source: canon) · `trace_format: 2` |
@@ -779,9 +774,9 @@ See [`08-out-of-scope.md`](./08-out-of-scope.md) for the explicit list.
 
 ## Frozen language envelope
 
-The **language** envelope is frozen at `nika: v1` forever. **There is no `nika: v2` — ever.** The version marker names the one language family; deep grammar changes happen INSIDE `v1` while the reference engine is pre-1.0 (per the [pre-1.0 stability contract](#pre-10-stability-contract) above), and after engine 1.0.0 changes are additive only (feature-detected · no minor version in the file). (This is the **language** version, independent of any engine version: the reference engine ships its own semver toward a 1.0 release, which does not touch `nika: v1`.)
+The **language** envelope is frozen at **v1** forever. **There is no `nika: v2` — ever.** Because that was true, the version slot carried no bits, and the envelope nuke gave it away: `nika:` now holds the file's NAME. **Nothing was lost.** v1 names the one language family; deep grammar changes happen INSIDE `v1` while the reference engine is pre-1.0 (per the [pre-1.0 stability contract](#pre-10-stability-contract) above), and after engine 1.0.0 changes are additive only (feature-detected · no version marker in the file at all). (This is the **language** family, independent of any engine version: the reference engine ships its own semver toward a 1.0 release, which does not touch v1.)
 
-In practice · we expect `nika: v1` to last 10+ years.
+In practice · we expect v1 to last 10+ years.
 
 ---
 
@@ -800,34 +795,46 @@ In practice · we expect `nika: v1` to last 10+ years.
 ## Minimal envelope
 
 ```yaml
-nika: v1
-workflow:
-  id: my-workflow-id
+nika: my-workflow-id
 
 tasks:
   my_task:
     ...
 ```
 
-The `nika:` header, a `workflow:` object with an `id`, and a non-empty
-`tasks:` map. That's the **whole minimum** to be a valid Nika workflow.
+The `nika:` line and a non-empty `tasks:` map. That's the **whole
+minimum** to be a valid Nika workflow.
+
+---
+
+## The type discriminant (normative)
+
+Two kinds of file speak Nika, and **one key tells them apart**:
+
+```
+   a `tasks:` key   →  this document is a WORKFLOW
+   no `tasks:` key  →  this document is a PROJECT (nika.yaml)
+```
+
+That is the whole rule. It holds at **100% coverage** — a workflow
+without tasks is not a workflow, and a project never carries a task
+graph — and it holds **without the filename**, which is the case that
+matters: a file arrives as a registry blob, an HTTP body, a stdin pipe
+(`nika check -`), a chat paste. In all of those `.nika.yaml` is gone and
+the bytes must still say what they are.
+
+`workflow:` used to be the discriminator. It is not a key any more (see
+[§`nika`](#nika--required--the-mark-and-the-name) below).
 
 ---
 
 ## Full envelope
 
 ```yaml
-nika: v1                                # required · language + contract version
-workflow:                               # required · the workflow object (W1: the map)
-  id: scrape-and-summarize              #   required · kebab-case · unique within file
-  description: "Fetch + summarize"      #   optional · human-readable
+nika: scrape-and-summarize              # required · the mark AND the file's name
 
 # Workflow-level default model · any task may override · <provider>/<name>
 model: ollama/qwen3.5:4b         # optional · anthropic/claude-sonnet-4-6 for cloud
-
-# Named types · referenced by returns:/outputs: (09-types.md)
-types:
-  Summary: { object: { title: string, bullets: { array: string } } }
 
 # Typed workflow inputs · supplied by the caller at launch · available as ${{ inputs.<name> }}
 inputs:
@@ -835,14 +842,14 @@ inputs:
     type: string
     required: true
     description: "Subject to research"
+  region:                                # a deployment knob is an input with a default
+    type: string
+    required: false
+    default: "eu"
 
 # Named constants · fixed values baked into the workflow · available as ${{ const.<name> }}
 const:
   output_dir: "./output"                 # bare literal
-
-# Non-sensitive runtime config · `default:` REQUIRED · available as ${{ config.<name> }}
-config:
-  log_level: { type: string, default: "info" }
 
 # Sensitive values · vault-backed · masked in logs · available as ${{ secrets.<name> }}
 secrets:
@@ -865,8 +872,6 @@ tasks:
 outputs:
   summary: ${{ tasks.summarize.output }}
 ```
-
----
 
 ## YAML profile (normative)
 
@@ -901,90 +906,78 @@ adds the belt to those suspenders.)
 
 ## Field-by-field
 
-### `nika` · **required · the contract version**
+### `nika` · **required · the mark AND the name**
 
 ```yaml
-nika: v1
+nika: scrape-and-summarize
 ```
 
 The first line of every workflow. The key `nika` declares « this is a
-Nika workflow »; the value `v1` pins the **language contract version**.
+Nika file »; the value is the **file's name**, kebab-case
+(`^[a-z][a-z0-9-]*$`), used in journal events, traces and error
+messages.
 
-`v1` is the only value for the entire lifetime of the v1 contract. Minor
-additions to the language (a new optional field, a new builtin) are
-**additive** and never change this value. **There is no `nika: v2` — ever**:
-while the reference engine is pre-1.0, deep grammar changes happen INSIDE
-`v1` (per the [pre-1.0 stability contract](./00-overview.md#pre-10-stability-contract));
-after engine 1.0.0, changes are additive only. (This is the **language**
-version, independent of any engine version.)
+**One word, one meaning, in both document types** ·
 
-**Anti-pattern** · do not write `nika: v1.0` · `nika: "1"` · or
-`nika: 1.0`. The value is exactly `v1`.
+```
+nika.yaml           →  nika: my-project      # the PROJECT's name
+deploy.nika.yaml    →  nika: deploy-to-prod  # the WORKFLOW's name
+```
 
-> **What this field actually is, stated honestly (2026-08-11).** By the two
-> sentences above — one legal value, no `v2` ever — **`nika: v1` carries zero
-> bits as a version.** It is not a version marker; it is a **magic number**, in
-> the family of `#!/bin/sh`, `%PDF-`, `\x7fELF`: the thing that says *this
-> byte-stream is a Nika workflow*. That is a real and sufficient function, and
-> it is the one to defend it by — *"specifications have versions"* does not
-> survive its own normative text.
+`nika:` always says *« this is a nika file, and it is called X »*. Which
+KIND of file it is comes from `tasks:` — see
+[§The type discriminant](#the-type-discriminant-normative) above.
+
+**Anti-pattern** · do not write `nika: v1` · `nika: My_Workflow` ·
+`nika: "1.0"`. The value is a kebab-case id. A missing `nika:` is
+`NIKA-PARSE-002`; a value that is not kebab-case is `NIKA-PARSE-003`.
+
+> **The version slot is gone, and that is LOSSLESS (2026-08-12).** This key
+> held the literal `v1` until the envelope nuke. Two normative sentences
+> already in this chapter made that slot carry **zero bits**: `v1` was the
+> only legal value for the entire lifetime of the contract, and **there is
+> no `nika: v2` — ever**. Deep grammar changes happen INSIDE `v1` while the
+> reference engine is pre-1.0 (the [pre-1.0 stability
+> contract](./00-overview.md#pre-10-stability-contract)); after engine 1.0.0
+> they are additive only. A field with one legal value is not a version — so
+> nothing was traded away, and the slot now carries the file's most necessary
+> field instead. **A key that carries the identity can never go back to being
+> dead weight.**
 >
-> **Why the file extension is not enough.** On disk, `.nika.yaml` discriminates.
-> A workflow does not always arrive on disk: it arrives as a registry blob, an
-> HTTP body, a stdin pipe (`nika check -`), a chat paste. In all of those the
-> extension is gone and the first line is the only discriminator. **The magic
-> number earns its slot on the transports the registry creates**, not on the
-> filesystem.
+> **The magic-number function survives intact.** What `nika:` was really
+> doing — the `#!/bin/sh` / `%PDF-` / `\x7fELF` job of saying *this
+> byte-stream is a Nika file* — is done by the KEY, never by the value. On
+> disk `.nika.yaml` discriminates; off disk (registry blob · HTTP body ·
+> stdin pipe · chat paste) the extension is gone and the first line is the
+> only discriminator. It still is.
 >
-> ⚠️ And the choice is **coupled** to [07 §unknown key](./07-conformance.md):
+> ⚠️ The choice stays **coupled** to [07 §unknown key](./07-conformance.md):
 > Docker Compose could demote its marker precisely because it chose
 > accept-and-warn — an old runtime meeting a new file just warns. Under our
-> strict refusal an old engine must say *why* it refuses, and the marker is
-> what lets it say *"I do not speak this contract"* rather than *"unknown key"*.
-> The two decisions are one decision, and citing Compose approvingly on the
-> first while going the other way on the second needs this sentence to stay
-> honest.
+> strict refusal an old engine must say *why* it refuses, and the `nika:`
+> KEY is what lets it say *"I do not speak this contract"* rather than
+> *"unknown key"*. The two decisions are one decision.
 
 > **Why one field, not `apiVersion` + `schema`?** Earlier drafts used a
 > Kubernetes-style `apiVersion: nika.sh/v1` (the superseded ADR-021 form)
-> plus a separate `schema: nika/workflow@v1` (superseded too). That is two version-ish fields and
-> ceremony a workflow file does not need. Modern specs converge on a
-> single version marker: OpenAPI writes `openapi: 3.1.0`, Docker
-> Compose **deprecated its `version:` field to informative-only** (it is
-> still defined by the Compose Specification for backward compatibility,
-> still parsed, and emits an obsolescence warning — the earlier wording here,
-> *"dropped it entirely"*, was a hand-typed claim and is **factually wrong**;
-> corrected 2026-08-11 against the live Compose reference). Nika takes the
-> middle, proven path: **one field, the language name as the key, the
-> contract version as the value.** The engine's internal canonical URI
-> stays `https://nika.sh/spec/v1` for RDF / conformance tooling, but
-> the author never types a URL.
+> plus a separate `schema: nika/workflow@v1` (superseded too). That is two
+> version-ish fields and ceremony a workflow file does not need. The engine's
+> internal canonical URI stays `https://nika.sh/spec/v1` for RDF /
+> conformance tooling, but the author never types a URL.
 
-### `workflow` · **required · an OBJECT · `{id, description}`**
-
-```yaml
-workflow:
-  id: scrape-and-summarize
-  description: "Fetch article, summarize in 3 bullets, write to disk"
-```
-
-The workflow object — a stable home for the file's identity and metadata.
-
-- **`id`** · required · kebab-case (`^[a-z][a-z0-9-]*$`) · unique within
-  file · used in journal events, traces and error messages.
-- **`description`** · optional · free-form text · not used by the engine
-  for execution · useful for `nika ls` listings + LSP hover hints.
-
-The presence of `workflow:` is also the **document-type discriminator**:
-it marks this file as a workflow. Future Nika document types (if any ever
-ship) would use their own top-level key; there is no separate `kind:`
-field in v1.
-
-**Dead forms (rejected with a migration teaching · W1 « the map »)** ·
-a scalar `workflow: some-id` is `NIKA-PARSE-020`; a top-level
-`description:` is `NIKA-PARSE-021` — both moved INTO the object. No alias
-survives: the old spellings left the parser in the same window that
-introduced the object.
+> **⚰️ `workflow:` (2026-08-12).** The envelope key `workflow:` is **dead**,
+> not renamed. It existed only to house `id:` and `description:`. The
+> description died the same day — **one consumer across five reading
+> surfaces**, and the `semantic_hash` came back byte-identical with « AAA »,
+> with « BBB » and with the field absent; the argument for keeping it cited a
+> `nika ls` that answers `unrecognized subcommand`. With the description gone
+> the object held one field, so the field moved onto the mark and the object
+> had nothing left to hold. `NIKA-PARSE-020` and `NIKA-PARSE-021` are
+> **retired with it** — no retired code is ever reused.
+>
+> ⚠️ **Not to be confused** · `invoke: { workflow: <path> }` is a *task-level*
+> key and is very much alive — it is how one workflow calls another
+> ([14-composition](./14-composition.md)).
 
 ### `model` · *optional · default model · `<provider>/<name>`*
 
@@ -1002,22 +995,6 @@ backend and decides local-vs-cloud (`ollama/` · `lmstudio/` = local · the rest
 
 A task may override this. If absent · each `infer:`/`agent:` task must specify
 its own `model:`.
-
-### `types` · *optional · named type declarations*
-
-```yaml
-types:
-  Summary:
-    object:
-      title: string
-      bullets: { array: string }
-```
-
-Named, PascalCase, acyclic type declarations — referenced by task
-`returns:` and typed `outputs:`. The grammar, the subtyping lattice and
-the JSON-Schema lowering are the whole of [09-types.md](./09-types.md);
-the envelope only owns the block's position. Unknown names are
-`NIKA-TYPE-001` · recursion is `NIKA-TYPE-002`.
 
 ### `inputs` · *optional · typed workflow inputs*
 
@@ -1046,6 +1023,19 @@ generation. Typed `inputs:` are the **input** half of that callable
 contract; typed [`outputs:`](#outputs--optional--the-workflows-return-value--untyped-or-typed)
 (below) are the **output** half.
 
+**The deployment's knobs live here too (2026-08-12).** A non-sensitive
+runtime value — a region label, a verbosity switch — is an `inputs:` entry
+with `required: false` and a `default:`. It used to have its own block,
+`config:`, and that block is **dead**: it had zero usage in real work, its
+`default:` was its only possible source, and — the argument that settled it —
+under the taint lattice `config.p` and `inputs.p` produced **the same**
+`NIKA-AUTH-008` by the same taint path. Two authorities the checker could not
+tell apart are one authority. The cell `config:` occupied (nobody supplies it
+× treated as untrusted) was a constant the checker was being asked to treat as
+hostile. A credential still never lands here: an input's value appears in logs
+and traces — a value that must stay masked belongs to
+[`secrets:`](#secrets--optional--vault-backed--masked).
+
 **Supplying values at launch** · the caller provides inputs when starting
 the run; how is an engine CLI concern. The reference engine's surface ·
 `nika run flow.nika.yaml --var topic="Rust async 2026"` (repeatable · one
@@ -1057,46 +1047,6 @@ boolean) · else it rides as a string. An **unknown key is refused** before
 the run, with the declared set listed: a typo that silently did nothing
 would be the worst outcome. The file stays the contract · every input a
 caller can pass is declared in `inputs:`.
-
-### `config` · *optional · non-sensitive runtime config*
-
-```yaml
-config:
-  log_level: { type: string, default: "info" }
-  region:    { type: string, default: "eu-west" }  # a default is REQUIRED · see below
-```
-
-Non-sensitive configuration available via `${{ config.<name> }}`. Each
-entry is a typed declaration (`type:` required · full TypeExpr · a
-`default:` MUST conform · `NIKA-DEFAULT-001`). Values may appear in logs
-and traces. For anything secret, use `secrets:` instead.
-
-> #### 🔴 `default:` is REQUIRED · and this paragraph is a correction
->
-> This section used to read « supplied by the deployment or environment »
-> and its own example carried `region: { type: string }  # no default ·
-> the deployment supplies it`. **Measured on 0.108.0: that workflow passes
-> `check` and dies at `run`** with `NIKA-VAR-001`. There is no deployment
-> channel — `--var` reaches `inputs:` only, by design (« the declared
-> `inputs:` the sole authority »), so **a `config:` entry's only possible
-> source is its own `default:`**.
->
-> A green check on a file that cannot run is the one thing this language
-> exists to prevent. So the contract is now the honest one · **a `config:`
-> entry without a `default:` is a CHECK error, not a run surprise**
-> (`NIKA-DEFAULT-002` · `validation_error`). The refusal teaches the two
-> repairs: give it a `default:`, or move it to `inputs:` — which is the
-> block a caller can actually reach.
->
-> What `config:` still buys over `const:` is the integrity label: a
-> `config.*` read is **untrusted** at the taint lattice, a `const.*` read
-> is **trusted**. That difference is real and it is why the two blocks
-> stay two blocks.
-
-**Declared-only · no ambient OS fallback** · a `${{ config.X }}` read
-resolves ONLY against this block (an undeclared entry is `NIKA-VAR-001`):
-the engine never silently reads the OS environment — every value a workflow
-depends on is visible in the file (sovereignty + portability).
 
 ### `const` · *optional · named constants*
 
@@ -1126,8 +1076,9 @@ See [04-variables.md](./04-variables.md) for the full substitution grammar.
 > `vars:` refuses `NIKA-VALUES-001`, `env:` refuses `NIKA-VALUES-002`.
 > Classify each old use into the authority its role commands — a typed
 > parameter is an `inputs:` declaration, a fixed value is a `const:` entry,
-> non-sensitive runtime configuration is a `config:` declaration, a
-> governed store reference is a `secrets:` entry (classify-not-rename ·
+> non-sensitive runtime configuration is an `inputs:` declaration with
+> `required: false` and a `default:`, a governed store reference is a
+> `secrets:` entry (classify-not-rename ·
 > no alias survives · LAW-SURFACE-0201/0202 · LAW-GRAMMAR-0201/0202).
 
 ### `secrets` · *optional · vault-backed · masked*
@@ -1161,10 +1112,11 @@ resolved secret values in logs, traces, and journal events.
 | `env` | name of an OS environment variable | 12-factor / CI secrets |
 | `file` | path to a file holding the value | Docker / k8s mounted secrets |
 
-The `config` / `secrets` split is the modern secure-workflow default: non-sensitive
-config in `config:` (appears in logs), masked references in `secrets:` (never
-logged). Note `source: env` reads a *secret* from an OS env var and still masks
-it, which is different from the plain `config:` block.
+The `inputs` / `secrets` split is the modern secure-workflow default:
+non-sensitive values in `inputs:` (they appear in logs), masked references in
+`secrets:` (never logged). Note `source: env` reads a *secret* from an OS env
+var and still masks it, which is different from an ordinary input that happens
+to be supplied by the deployment.
 
 #### `egress` · *optional · sanctioned destinations (declassification)*
 
@@ -1514,30 +1466,6 @@ refused in both parse modes, like `permits:`).
   per task — a run has exactly one entropy source and one clock, so the
   composition stays auditable.
 
-### `policy` · *optional · the workflow's declared law*
-
-```yaml
-policy:
-  allow:   { providers: ["mistral", "ollama"] }   # HARD · judged at check
-  limits:  { max_tasks: 20 }                      # HARD · judged at check
-  endorsement: solo                               # HARD · the named solo mode
-  prefer:  { providers: ["ollama", "mistral"] }   # SOFT · recorded, NOT judged
-```
-
-Where `permits:` declares **what the workflow may touch**, `policy:` declares
-**the law it runs under** — which brains it may reach, how many tasks it may
-open, and whether a human gate is required. The families, their hard/soft
-split and their refusals are normative in
-[10 §policy](./10-authority.md) · this section exists so the envelope's own
-inventory is complete.
-
-> ⚰️ **This key was an envelope key with no section here** (added 2026-08-11).
-> Measured: the published schema carries **13** top-level keys and this chapter
-> documented **12** — `policy:` was the one missing, while carrying hard
-> refusals. **An inventory that is one short is worse than no inventory**: it
-> reads complete, and it is exactly the document against which someone writes a
-> migration, an editor plugin, or a second engine.
-
 ### `tasks` · **required · a non-empty MAP · the key IS the identity**
 
 ```yaml
@@ -1686,9 +1614,7 @@ forever — that lesson is upstream, and this door closes pre-1.0.
 ### Minimal
 
 ```yaml
-nika: v1
-workflow:
-  id: hello
+nika: hello
 
 tasks:
   greet:
@@ -1700,10 +1626,7 @@ tasks:
 ### Full · with typed inputs (callable over MCP)
 
 ```yaml
-nika: v1
-workflow:
-  id: research-pipeline
-  description: "Research a topic and write a markdown brief"
+nika: research-pipeline
 
 model: anthropic/claude-sonnet-4-6
 inputs:
@@ -1736,10 +1659,10 @@ tasks:
 
 A v0.1-compliant engine MUST ·
 
-1. Reject any workflow missing `nika:` or `workflow:` with a clear error
-2. Accept exactly `nika: v1` · reject any other value (`v1.0` · `1` · `v2` …) with a clear error
-3. Validate `workflow` identifier kebab-case format
-4. Make workflow-level `model`, `inputs`, `config`, `const`, `secrets` available to all tasks as defaults
+1. Reject any file missing `nika:` or carrying an empty `tasks:` with a clear error (`NIKA-PARSE-002`)
+2. Validate the `nika:` value as a kebab-case id `^[a-z][a-z0-9-]*$` · reject any other shape (`v1` · `My_Flow` · `1.0` …) with a clear error (`NIKA-PARSE-003`)
+3. Read the document TYPE from `tasks:` — present means workflow, absent means project — never from the filename
+4. Make workflow-level `model`, `inputs`, `const`, `secrets` available to all tasks as defaults
 5. Validate typed `inputs` (type + required) before execution · reject missing required inputs · refuse every declared `default:` / typed `const:` value that does not conform to its declared `type:` (`NIKA-DEFAULT-001`)
 6. Validate each typed `outputs` value against its declared `type:` at run end · a value that does not match its declared type fails the run (`NIKA-VAR-009` · `validation_error`): the callable contract is enforced on BOTH halves (typed in via `inputs`, typed out via `outputs`) · symmetric with rule 5
 7. Mask resolved `secrets` values in all logs · traces · journal events
@@ -1946,12 +1869,12 @@ test:
 | `capture` | no | enum | `stdout` (default) · `stderr` · `combined` · `structured` (= `{ stdout, stderr, exit_code }`) — the **source** |
 | `decode` | no | enum | `text` (default) · `json` · `jsonl` · `bytes` — how the captured **string** becomes a value ([09 §decode](./09-types.md#decode--how-exec-bytes-become-a-value-normative)) · illegal with `capture: structured` (`NIKA-PARSE-025` — that capture already IS an object) · a non-parsing stream settles the task `failure` inside `on_error:` scope |
 
-> **`exec.env` ≠ the envelope `config:`**: different scopes, neighboring words
-> (the one overlap to know · the pre-flip envelope `env:` block is dead —
-> `NIKA-VALUES-002`). The envelope `config:` is *workflow config* read via
-> `${{ config.* }}`; `exec.env` is the *OS environment of this subprocess*. They
-> are NOT auto-connected. To pass a workflow value into the process, do it
-> explicitly: `env: { API_BASE: "${{ config.API_BASE }}" }`. The subprocess
+> **`exec.env` is a subprocess field, never an envelope block**: no top-level
+> key of that family survives — the pre-flip envelope `env:` block is dead
+> (`NIKA-VALUES-002`) and the top-level `config:` block died with the envelope
+> nuke, so `exec.env` is the *OS environment of this subprocess* and nothing
+> else. Nothing is auto-connected. To pass a workflow value into the process,
+> do it explicitly: `env: { API_BASE: "${{ inputs.api_base }}" }`. The subprocess
 > environment itself is COMPOSED, never inherited (NEP-0005 ·
 > [01 §permits](./01-envelope.md#permits--optional--the-declared-capability-boundary)):
 > the runner env floor ∪ the `permits.env:` passthrough ∪ this map, minus
@@ -2307,7 +2230,7 @@ inspected since the 4-verb lock (D-2026-05-22-N18) has resolved to a tool
 (WHO · request/response) or an ordering construct (WHEN). That is the
 closure: **the verb set is closed under decomposition into WHO × WHEN.**
 
-Field additions to each verb are **additive** within `nika: v1` (feature-detected · no minor version in the file). Field removal NEVER happens at v1.
+Field additions to each verb are **additive** within `v1` (feature-detected · no version marker in the file at all). Field removal NEVER happens at v1.
 
 A v0.1-compliant engine that encounters an unknown field on a verb may ·
 
@@ -2374,7 +2297,7 @@ nothing), use `after:` ·
 my_task:                        # the map KEY is the identity · snake_case · unique
   with:                         # optional · the DATA boundary · each tasks.* ref = one typed edge
     data: ${{ tasks.task_a.output }}
-    config: { foo: "bar" }      # literals are fine — only tasks.* refs create edges
+    opts: { foo: "bar" }        # literals are fine — only tasks.* refs create edges
     legs: ${{ group.probes }}   # a fan-in fold · one edge per declared member
   group: probes                 # optional · fan-in MEMBERSHIP · this task joins the set
   after:                        # optional · the CONTROL boundary · {producer: predicate}
@@ -2420,7 +2343,7 @@ Source order is presentation only — the graph alone schedules.
 `tasks.<id>.output`. In CEL (and almost every expression language) a hyphen is
 the **subtraction operator**: `tasks.research-topic.output` would parse as
 `tasks.research - topic.output`, a silent trap. Snake_case ids are always
-clean CEL identifiers. (The workflow-level `workflow:` id stays kebab-case:
+clean CEL identifiers. (The file-level `nika:` name stays kebab-case:
 it is a resource name, never referenced inside an expression.)
 
 ### `with` · *optional · the DATA boundary — bindings that ARE edges*
@@ -2586,10 +2509,10 @@ failure mode, not taste ·
   to is a 1-cycle (`NIKA-DAG-001`) with no special case; the projection sees
   the fan-in the way it sees any other edge; wave scheduling is unchanged.
 
-`group` is **not a 7th namespace**. It is the plural reader of the `tasks`
-runtime namespace — same family, stricter placement. The four value
-authorities (`inputs` · `config` · `const` · `secrets`) and the namespace
-count are both untouched ([04 §the 6 namespaces](./04-variables.md#the-6-namespaces)).
+`group` is **not an extra namespace**. It is the plural reader of the `tasks`
+runtime namespace — same family, stricter placement. The three value
+authorities (`inputs` · `const` · `secrets`) and the namespace
+count are both untouched ([04 §the namespaces](./04-variables.md)).
 
 #### The member record (normative · closed at v1)
 
@@ -2704,7 +2627,7 @@ notify:
 
 `when:` decides **whether an admitted task runs**. It is evaluated *after*
 the gate (§gate algebra) and it reads **local namespaces only** ·
-`inputs` · `config` · `const` · `with` · and the `for_each` locals `item` / `index`.
+`inputs` · `const` · `with` · and the `for_each` locals `item` / `index`.
 A `tasks.*` reference inside `when:` is refused at parse time
 (`NIKA-VAR-021` · « hoist it into `with:` » — the binding creates the edge,
 `when:` reads the binding).
@@ -2816,8 +2739,8 @@ STRING   = /'([^'\\]|\\.)*'/ | /"([^"\\]|\\.)*"/ ;   (* escapes · \\ \' \" \n \
    `validation_error`); an expression that passes the static shape check
    but evaluates non-boolean fails at evaluation (`NIKA-VAR-006` ·
    `variable_error`). See §`when:` shape rules below.
-6. **Identifier roots resolve against the namespaces** · the 6 global
-   namespaces (`inputs` · `config` · `const` · `secrets` · `with` · `tasks`)
+6. **Identifier roots resolve against the namespaces** · the 5 global
+   namespaces (`inputs` · `const` · `secrets` · `with` · `tasks`)
    plus the two
    `for_each` loop-locals (`item` · `index`) per
    [04-variables.md](./04-variables.md) §Resolution order — and the `tasks`
@@ -2841,11 +2764,11 @@ prompt: ${{ has(inputs.style) ? inputs.style : 'be concise' }}
 when:   ${{ with.scan_log.contains('ERROR') }}      # branch on substring · the log arrived via with:
 ```
 
-**Namespaces are CEL variables** · the <!-- canon:namespaces -->6<!-- /canon --> namespaces (`inputs` · `config`
+**Namespaces are CEL variables** · the <!-- canon:namespaces -->5<!-- /canon --> namespaces (`inputs`
 · `const` · `secrets` · `with` · `tasks`) are bound as top-level CEL variables — `tasks.*` on the
 boundary surfaces only. **Inside a `for_each` task body, two
 more scoped CEL variables are bound** · `item` (the current element) and `index`
-(its 0-based position), available ONLY within that task (the <!-- canon:namespaces -->6<!-- /canon --> namespaces are
+(its 0-based position), available ONLY within that task (the <!-- canon:namespaces -->5<!-- /canon --> namespaces are
 global · `item`/`index` are for_each-local · see `for_each` below).
 
 #### The binding is the edge — no invisible edges
@@ -3241,7 +3164,9 @@ summarize:
   with: { article: "${{ tasks.fetch.output }}" }
   infer:
     prompt: "Summarize · ${{ with.article }}"
-  returns: Summary              # a name declared in types: — or an inline type expression
+  returns:                      # the type expression, INLINE · named types are gone
+    object:
+      summary: string
 ```
 
 Declares **what `tasks.X.output` is** — the typed door. Per-verb
@@ -4093,24 +4018,34 @@ DSL. See [03-dag.md](./03-dag.md#expression-language--a-documented-subset-of-cel
 
 ---
 
-## The 6 namespaces
+## The 5 namespaces
 
 ```
-${{ inputs.X }}            typed workflow input          (declared in envelope `inputs:` · supplied by the caller at launch)
-${{ config.X }}            non-sensitive runtime config   (declared in envelope `config:` · supplied by the deployment · may appear in logs)
+${{ inputs.X }}            typed workflow input          (declared in envelope `inputs:` · supplied by the caller at launch, or by its own `default:`)
 ${{ const.X }}             named constant                 (declared in envelope `const:` · a fixed value baked into the workflow)
 ${{ secrets.X }}           masked secret reference        (vault-backed · never in logs)
 ${{ with.X }}              task-level scope               (declared per-task `with:` block · the bindings ARE the data edges)
 ${{ tasks.X.output }}      task record reference          (or .status · .error · .duration_ms · the CLOSED projection set · BOUNDARY surfaces only — see below)
 ```
 
-Six namespaces. That's it.
+Five namespaces. That's it.
 
-The first four — `inputs` · `config` · `const` · `secrets` — are the **value
+The first three — `inputs` · `const` · `secrets` — are the **value
 authorities**, the closed family every workflow value is declared under
 (LAW-SURFACE-0201 · one authority, one spelling, no alias). `with` and
 `tasks` are the **runtime namespaces** (task-scope bindings and settled task
 records) — legal in `${{ }}`, never value authorities.
+
+> **⚰️ `config` was the fourth, and it is dead (2026-08-12).** Measured:
+> **zero** usage in real work; its `default:` was its **only** possible
+> source (nothing outside the file could supply it — `--var` reaches
+> `inputs:` only); and under the taint lattice `${{ config.p }}` and
+> `${{ inputs.p }}` produced **the same** `NIKA-AUTH-008` by the same taint
+> path — **indiscernible**. The cell it occupied (nobody supplies it ×
+> treated as untrusted) was a constant the checker was being asked to treat
+> as hostile. A deployment knob is now an `inputs:` entry with
+> `required: false` and a `default:`. A `${{ config.X }}` read refuses
+> `NIKA-VALUES-003`, which teaches the three-authority family.
 
 > **Dead forms (refused with a classification teaching · the E-split).**
 > The pre-flip `vars:` and `env:` envelope fields are dead: a `vars:` block
@@ -4118,9 +4053,10 @@ records) — legal in `${{ }}`, never value authorities.
 > and a `${{ vars.X }}` / `${{ env.X }}` read with the same codes. Each
 > old use **classifies** into the authority its role commands — a typed
 > parameter is an `inputs:` declaration, a fixed value a `const:` entry,
-> non-sensitive runtime configuration a `config:` declaration, a governed
-> store reference a `secrets:` entry (classify-not-rename · never a bulk
-> rename). A value-namespace read outside the four-authority family
+> non-sensitive runtime configuration an `inputs:` declaration with
+> `required: false` and a `default:`, a governed store reference a
+> `secrets:` entry (classify-not-rename · never a bulk rename). A
+> value-namespace read outside the three-authority family
 > (`${{ params.X }}` and friends) refuses with `NIKA-VALUES-003`.
 
 ### The reference boundary · where `tasks.*` may appear
@@ -4157,7 +4093,7 @@ summarize:
 ```
 
 The task body is a **pure function of its declared inputs** (`with` · the
-four value authorities `inputs` · `config` · `const` · `secrets` · the loop
+three value authorities `inputs` · `const` · `secrets` · the loop
 locals): every cross-task dependency is
 visible at the boundary, named, and typed by its edge role. Nothing else
 reads another task.
@@ -4175,7 +4111,7 @@ reads another task.
 > **`group.<name>` is not a 7th namespace either.** It is the **plural reader
 > of `tasks`** — same runtime family, one door instead of five (a `with:`
 > value · everywhere else is `NIKA-VAR-021`). It denotes a set of task
-> records, so it belongs beside `tasks` rather than beside the four value
+> records, so it belongs beside `tasks` rather than beside the three value
 > authorities, and the count below is unchanged. See
 > [03 §group](./03-dag.md#group--optional--fan-in-membership--the-plural-of-a-data-edge)
 > for the record shape and the `fan-in` pass-set.
@@ -4184,10 +4120,10 @@ reads another task.
 > extra identifiers are in scope: `${{ item }}` (the current element) and
 > `${{ index }}` (its 0-based position). They are **loop-scoped locals**, alive
 > only within that task's body, not global namespaces. So the count stays
-> « <!-- canon:namespaces -->6<!-- /canon --> namespaces » + the for-each locals where a loop is present.
+> « <!-- canon:namespaces -->5<!-- /canon --> namespaces » + the for-each locals where a loop is present.
 
 **Shadowing is structurally impossible.** Every namespace is reached
-through its explicit prefix (`inputs.` · `config.` · `const.` · `secrets.` ·
+through its explicit prefix (`inputs.` · `const.` · `secrets.` ·
 `with.` · `tasks.`): an `inputs.item` and the loop-local `item` never collide
 (one is `inputs.item` · the other is bare `item`), a task may be named
 `item` (`tasks.item.output` is unambiguous), and `with.X` never hides an
@@ -4205,9 +4141,7 @@ boolean spelling) — validation + schema generation for callable workflows
 (see [01-envelope.md](./01-envelope.md#inputs--optional--typed-workflow-inputs)) ·
 
 ```yaml
-nika: v1
-workflow:
-  id: research-pipeline
+nika: research-pipeline
 
 inputs:
   topic:
@@ -4231,35 +4165,6 @@ engine CLI concern). A `--var` value overrides the declared default and
 satisfies a `required: true` input · an undeclared key is refused before the
 run. See [01-envelope.md](./01-envelope.md#inputs--optional--typed-workflow-inputs)
 for the launch contract.
-
-### `${{ config.X }}` · non-sensitive runtime config
-
-```yaml
-config:
-  log_level:
-    type: string
-    default: "info"
-
-tasks:
-  note:
-    infer:
-      prompt: "Running at ${{ config.log_level }} verbosity"
-```
-
-`config` holds **non-sensitive** runtime configuration. ⚠️ Its `default:`
-is **REQUIRED** and is its only source: nothing outside the file can supply
-it (`--var` reaches `inputs:` only). An entry without a `default:` is a
-check error, `NIKA-DEFAULT-002` — corrected 2026-08-11, the earlier
-« supplied by the deployment » was measured false at the binary. Each entry is a
-typed declaration (`type:` required · the full TypeExpr · a `default:` MUST
-conform to it · `NIKA-DEFAULT-001`). Values may appear in logs +
-traces. For anything secret, use `secrets:` (below) instead: never put a
-credential in `config`.
-
-**Declared-only · no ambient OS fallback** · `${{ config.X }}` resolves ONLY
-against the envelope `config:` block. An entry absent from the block is
-`NIKA-VAR-001`: the engine never silently reads the OS environment (a
-workflow's inputs are all visible in the file · sovereignty + portability).
 
 ### `${{ const.X }}` · named constants
 
@@ -4448,8 +4353,8 @@ headers:
 A secret is always a **reference to a store** (the local `nika-vault` by
 default), declared in the envelope `secrets:` block, never an inline
 literal. The engine **masks** every resolved `secrets.X` value in logs,
-traces, and journal events (it renders as `••••••`). This `config` / `secrets`
-split is the modern secure-workflow default: non-sensitive config in `config`,
+traces, and journal events (it renders as `••••••`). This `inputs` / `secrets`
+split is the modern secure-workflow default: non-sensitive values in `inputs`,
 masked references in `secrets`.
 
 > **The masking boundary (normative).** Masking covers the engine's OWN
@@ -4778,8 +4683,8 @@ field is a node the graph did not need.
 When a task is admitted · the engine resolves `${{ ... }}` references in this order ·
 
 1. **Boundary first** · the `with:` bindings materialize (their `tasks.X.field` references read the settled records — this is where the data edges deliver)
-2. **`when:`** evaluates over the local namespaces (`inputs` · `config` · `const` · `with` · loop locals)
-3. **Body** · verb-field expressions resolve (`inputs.X` · `config.X` · `const.X` · `secrets.X` · `with.X` · loop locals — never `tasks.*`)
+2. **`when:`** evaluates over the local namespaces (`inputs` · `const` · `with` · loop locals)
+3. **Body** · verb-field expressions resolve (`inputs.X` · `const.X` · `secrets.X` · `with.X` · loop locals — never `tasks.*`)
 4. **Single-pass** · a substitution result is NOT re-evaluated (no nested substitution)
 
 If a reference is unresolved · the engine raises a `NIKA-VAR-001` (undefined
@@ -4855,7 +4760,7 @@ Reasons ·
 
 ## Forward-compat
 
-The `${{ ... }}` substitution surface and the <!-- canon:namespaces -->6<!-- /canon --> namespaces are locked at v1. **Template pipe-filters (`${{ inputs.x | json }}` · `| upper`) are NOT a growth path** (they would duplicate builtins + push CEL toward a string-DSL). Data transforms live in the `nika:jq` builtin; the `${{ }}` surface grows only with CEL-native features: the conditional `?:`, the `has()` presence macro, and the `contains`/`startsWith`/`endsWith` string tests ship in `cel-subset/0.1` ([03 §grammar](./03-dag.md)); `all`/`exists` and `matches()` regex stay reserved for a later additive minor. jq is the single extraction-and-transform language (`output:` + `nika:jq`).
+The `${{ ... }}` substitution surface and the <!-- canon:namespaces -->5<!-- /canon --> namespaces are locked at v1. **Template pipe-filters (`${{ inputs.x | json }}` · `| upper`) are NOT a growth path** (they would duplicate builtins + push CEL toward a string-DSL). Data transforms live in the `nika:jq` builtin; the `${{ }}` surface grows only with CEL-native features: the conditional `?:`, the `has()` presence macro, and the `contains`/`startsWith`/`endsWith` string tests ship in `cel-subset/0.1` ([03 §grammar](./03-dag.md)); `all`/`exists` and `matches()` regex stay reserved for a later additive minor. jq is the single extraction-and-transform language (`output:` + `nika:jq`).
 
 Out of scope for v0.1 (deferred · see [`08-out-of-scope.md`](./08-out-of-scope.md)) ·
 - Expression language (no arithmetic in templates)
@@ -4937,7 +4842,6 @@ Error codes follow the format `NIKA-<NAMESPACE>-<NNN>` where namespace is 2-9 up
 | `NIKA-COMP` | Composition (`invoke: workflow:` · [14-composition](./14-composition.md)) | 001-099 |
 | `NIKA-DECIDE` | Decision bundles + evidence (`nika:decide` · [11-decision](./11-decision.md)) | 001-099 |
 | `NIKA-PORT` | Gateway artifacts (deployment bundle · lowering · fidelity · [12-gateway](./12-gateway.md)) | 001-099 |
-| `NIKA-POLICY` | `policy:` hard-rule violations ([10-authority](./10-authority.md)) | 001-099 |
 | `NIKA-ASSERT` | assertion obligations ([15-proof](./15-proof.md)) · ⚰️ the `assert:` ENVELOPE KEY was removed 2026-08-11 · the range stays RESERVED, unemitted, for the day a property returns as an addition | 001-099 |
 | `NIKA-LOCK` | `nika.lock` pin violations ([15-proof](./15-proof.md)) | 001-099 |
 | `NIKA-REG` | Registry client refusals (resolve · digest · advisory · [registry-v0.1](../registry/registry-v0.1.md) · allocated for the reference engine's `registry:` resolver — engine ADR-106) | 001-099 |
@@ -4956,8 +4860,8 @@ these from this file alone.
 | Code | Failure | Category | `transient` |
 |---|---|---|---|
 | `NIKA-PARSE-001` | the YAML itself does not parse (syntax error) | `parse_error` | false |
-| `NIKA-PARSE-002` | missing envelope field (`nika:` / `workflow:` / non-empty `tasks:`) | `validation_error` | false |
-| `NIKA-PARSE-003` | `nika:` version marker is not exactly `v1` | `parse_error` | false |
+| `NIKA-PARSE-002` | missing envelope field (`nika:` · a non-empty `tasks:`) — a file with no `nika:` key is not a nika file; `workflow:` no longer exists to be missing ([01 §envelope](./01-envelope.md)) | `validation_error` | false |
+| `NIKA-PARSE-003` | `nika:` is not a kebab-case id (`^[a-z][a-z0-9-]*$`) — the key carries the file's NAME, not a version; the version slot is gone forever and losslessly (there is no `nika: v2`, ever · [01 §nika](./01-envelope.md)) | `parse_error` | false |
 | `NIKA-PARSE-004` | `workflow:` id violates `^[a-z][a-z0-9-]*$` | `validation_error` | false |
 | `NIKA-PARSE-005` | unknown field — strict mode rejects anything outside the closed v1 set | `validation_error` | false |
 | `NIKA-PARSE-006` | task id violates `^[a-z][a-z0-9_]*$` (snake_case · CEL-safe · no hyphens) | `validation_error` | false |
@@ -4972,8 +4876,6 @@ these from this file alone.
 | `NIKA-PARSE-017` | duplicate mapping key — no silent last-wins | `validation_error` | false |
 | `NIKA-PARSE-018` | missing required field in a verb body (`infer.prompt` · `exec.command` · `invoke.tool`) | `validation_error` | false |
 | `NIKA-PARSE-019` | generic structural validation — wrong YAML shape for a field | `validation_error` | false |
-| `NIKA-PARSE-020` | `workflow:` is a scalar — the envelope became an object (`workflow:` then `id:`) | `validation_error` | false |
-| `NIKA-PARSE-021` | top-level `description:` — it moved into `workflow.description` | `validation_error` | false |
 | `NIKA-PARSE-022` | `tasks:` is a sequence — it became a map keyed by task id | `validation_error` | false |
 | `NIKA-PARSE-023` | a task carries an `id:` field — the map key IS the identity | `validation_error` | false |
 | `NIKA-PARSE-024` | a task carries `depends_on:` — dead since W2 (data → `with:` bindings · control → `after:` predicates · `check --fix` migrates) | `validation_error` | false |
@@ -4993,16 +4895,14 @@ these from this file alone.
 | `NIKA-DAG-007` | status compared against a literal outside the vocabulary (`success` · `failure` · `skipped` · `cancelled`) — `==` never matches, `!=` always holds | `validation_error` | false |
 | `NIKA-DAG-008` | a `${{ group.<name> }}` fold names a group **no task declares** — including a bare `${{ group }}`, and including the group left empty by a renamed member. Membership is declared, never matched, precisely so a rename is an error here instead of a silently smaller fold ([03 §group](./03-dag.md#declared-membership-never-a-pattern-normative)) | `validation_error` | false |
 | `NIKA-DAG-009` | an `unwind` task declares `group:` — cleanup is an `E_f` attachment that never enters `G_p`, so a `fan-in` edge from it would have no wave to schedule against ([03 §group](./03-dag.md#the-rest-of-the-contract-1)) | `validation_error` | false |
-| `NIKA-TYPE-001` | unknown type name (in `types:` · `returns:` · an `outputs:` type) — did-you-mean when close | `validation_error` | false |
-| `NIKA-TYPE-002` | recursive type reference — the `types:` graph must be acyclic | `validation_error` | false |
+| `NIKA-TYPE-001` | unknown type name (in `returns:` · an `inputs:`/`outputs:` type) — with named `types:` retired, a PascalCase name in type position resolves to nothing and the refusal teaches the inline form | `validation_error` | false |
 | `NIKA-TYPE-003` | `returns:` and `schema:` on the same task — one contract, one spelling | `validation_error` | false |
 | `NIKA-TYPE-004` | `returns:` type unreachable from the declared `decode:` (an object contract over `decode: text` · …) | `validation_error` | false |
 | `NIKA-TYPE-005` | a secret-carrying type in a lowered position (reserved with `secret<T>` · W4) | `security_error` | false |
 | `NIKA-TYPE-006` | regex pattern outside the locked dialect (backreference · lookaround · named group · inline flags · lazy/possessive · `\b` · `\p` — [09 §the regex dialect](./09-types.md#the-regex-dialect-normative--locked)) | `validation_error` | false |
 | `NIKA-TYPE-101` | run-time contract violation — the decoded value does not fit `returns:` (`exec:`/`invoke:` lane · `infer:`/`agent:` stay `NIKA-INFER-002`-class) | `validation_error` | false |
 | `NIKA-DEFAULT-001` | a `default:` that does not conform to its own `type:` — the declaration would hand a caller a value its type forbids ([09 §types](./09-types.md)) | `validation_error` | false |
-| `NIKA-DEFAULT-002` | a `config:` entry with no `default:` — nothing can supply it (`--var` reaches `inputs:` only), so the file would pass check and die at run on `NIKA-VAR-001`. Refused at CHECK so the green means something ([01 §config](./01-envelope.md)) | `validation_error` | false |
-| `NIKA-VAR-001` | unresolved reference (unknown namespace entry · undeclared `inputs`/`config`/`const`/`secrets`/`with` key) | `variable_error` | false |
+| `NIKA-VAR-001` | unresolved reference (unknown namespace entry · undeclared `inputs`/`const`/`secrets`/`with` key) | `variable_error` | false |
 | `NIKA-VAR-002` | binding cardinality — a jq binding emitted zero or multiple values (evaluation-time · data-dependent) | `variable_error` | false |
 | `NIKA-VAR-003` | provably-invalid path into a declared `schema:` (static walk · [04](./04-variables.md)) | `validation_error` | false |
 | `NIKA-VAR-004` | jq runtime error while evaluating a binding | `variable_error` | false |
@@ -5014,8 +4914,8 @@ these from this file alone.
 | `NIKA-VAR-021` | a `tasks.*` reference outside the boundary (`with:` · `after:` · `on_error.recover` · an `unwind` task reading its producer · workflow `outputs:`) — hoist it into `with:` (`check --fix` applies it) | `validation_error` | false |
 | `NIKA-VAR-009` | typed `outputs` value did not match its declared `type:` at run end (the output half of the callable contract · [01 §engine MUST](./01-envelope.md)) | `validation_error` | false |
 | `NIKA-VALUES-001` | the pre-flip envelope `vars:` block — dead since the E-split; classify each use into the authority its role commands ([04 §values](./04-variables.md)) | `validation_error` | false |
-| `NIKA-VALUES-002` | the pre-flip envelope `env:` block — dead since the E-split; `config:` is workflow config, `exec.env` is one subprocess's OS environment ([04 §values](./04-variables.md)) | `validation_error` | false |
-| `NIKA-VALUES-003` | a value-namespace read outside the four-authority family (`${{ params.X }}` and friends) ([04 §values](./04-variables.md)) | `validation_error` | false |
+| `NIKA-VALUES-002` | the pre-flip envelope `env:` block — dead since the E-split; a deployment knob is an `inputs:` entry with `required: false`, `exec.env` is one subprocess's OS environment ([04 §values](./04-variables.md)) | `validation_error` | false |
+| `NIKA-VALUES-003` | a value-namespace read outside the three-authority family (`inputs` · `const` · `secrets`) (`${{ params.X }}` and friends) ([04 §values](./04-variables.md)) | `validation_error` | false |
 | `NIKA-INFER-001` | provider call failed (HTTP error · provider refusal) | `provider_error` | engine-assessed |
 | `NIKA-INFER-003` | the provider reported no token usage for a priced model — the ledger cannot bill the call honestly (fail-closed · the usage-absence gate, R3-F1) | `validation_error` | false |
 | `NIKA-INFER-002` | structured output failed `schema:` validation (after any engine-internal retries) | `validation_error` | false |
@@ -5044,8 +4944,8 @@ these from this file alone.
 | `NIKA-SEC-010` | the approval-capability law is violated ([NEP-0013](../governance/nep-0013-approval-ticket.md) · the 6th invariant) — a rate-limited approval burst (`approval.rate_limited` · the N+1th distinct mint of a run, never a queue) · an approval whose resolved content hash differs from the shown hash (`approval.content_mismatch`) · a ticket replayed outside its run/step/hash scope (`approval.scope_mismatch`) · or the static heterogeneous-batch refusal (one prompt whose descendant closure unleashes two or more of `exec · write · net`) | `security_error` | false |
 | `NIKA-SEC-011` | preview-commit divergence — the commit digest recomputed at the sink over the exact bytes about to fire differs from the preview digest judged at resolution (one bit of rendered argv · a permuted context field · a mutated tool argument) · the step refuses fail-closed and the receipt carries `divergence: {preview, commit}` — judged = executed at the action scale ([NEP-0015](../governance/nep-0015-preview-commit.md) · F-P6) | `security_error` | false |
 | `NIKA-SEC-012` | unordered shared writes — two tasks incomparable in the DAG closure whose literal `nika:write`/`nika:edit` paths collide with no ordering edge (`after:` · `with:`) to serialize them, or a `for_each` fan writing one constant path · parallelism is safe exactly where the writes are provably disjoint (NEP-0014 law 1 · F-P15) | `security_error` | false |
-| `NIKA-SEC-013` | the endorsement mode law — a human gate (`invoke: nika:prompt`) declared under a `policy:` block that names no endorsement mode refuses fail-closed (`endorsement.undeclared_mode` · F-F5 · zero implicit escape), and `endorsement: solo` carried by a workflow with more than one gate refuses as the declaration lying (`endorsement.solo_count` · exactly one endorser) ([10 §policy](./10-authority.md) · NEP-0017 · F-P23) | `security_error` | false |
 | `NIKA-SEC-014` | the affirmative-consent law — a confirm-mode human gate (`invoke: nika:prompt` · mode absent or `confirm`) reaches an egress-capable task over a route no affirmative gate closes: a REFUSED confirm settles success with value `false`, so a bare `after: { gate: success }` edge, a `when:` that never reads the answer, and a `when:` provably true on the refusal all let the effect through · the gate is credited only when every route consumes the answer and proves false on it (the Kleene-falsifiable `when:` · `when: false` · a closer confirm gate owns its closure) · an undecidable gate defers to the advisory hint, never a refusal ([10 §the affirmative-consent law](./10-authority.md#the-affirmative-consent-law--normative--nep-0020) · [NEP-0020](../governance/nep-0020-affirmative-consent.md) · P0-2) | `security_error` | false |
+| `NIKA-SEC-015` | the order law — an `exec:` task sits transitively downstream of a net-effecting task (`nika:fetch` · `nika:notify`) over the derived graph (`with:` data edges ∪ `after:` control edges): content the workflow did not author must not reach a shell · the diagnostic names the PATH, which is the witness · **UNCONDITIONAL** — no block declares it and none can disable it ([10 §the unconditional laws](./10-authority.md)) | `security_error` | false |
 | `NIKA-AUTH-006` | an absent `permits:` block — DeclaredPermits is empty, so every effect the body requires is refused before any token; the diagnostic carries the inferred block, ready to paste ([10 §authority](./10-authority.md)) | `security_error` | false |
 | `NIKA-AUTH-007` | an interpolation reaches a permit BOUND (a host · glob · program · env name inside `permits:`) — a bound must be a literal, or the boundary is self-serve ([10 §authority](./10-authority.md)) | `security_error` | false |
 | `NIKA-AUTH-008` | an untrusted value reaches a permitted verb's ARGUMENT and its canonical resolved form escapes the step's permit — the diagnostic carries the taint path ([10 §authority](./10-authority.md)) | `security_error` | false |
@@ -5054,15 +4954,14 @@ these from this file alone.
 | `NIKA-DECIDE-001` | the decision bundle is malformed or violates its own laws (float weight · undeclared evidence key in rules · identity key feeding a technical dimension · missing contradictory fixture · monotonicity violated by the bundle's own fixtures · [11 §nika:decide](./11-decision.md#nikadecide--the-deterministic-kernel-as-a-builtin)) | `validation_error` | false |
 | `NIKA-DECIDE-002` | the evidence snapshot does not satisfy the bundle's evidence schema (type misfit · unauthorized source · integrity below the declared floor · undeclared key · [11 §evidence IR](./11-decision.md#evidence-ir-normative--g14)) | `validation_error` | false |
 | `NIKA-PORT-001` | a gateway artifact (deployment bundle · capabilities report · lowering report · fidelity report · authority delta) is malformed or violates its laws (an unknown promoted · a `permissive_unsafe` row without refusal · the disclosure ⊆-chain violated · a child authority exceeding its parent · [12 §errors](./12-gateway.md#errors-the-nika-port-namespace--new-in-this-chapter)) | `validation_error` | false |
-| `NIKA-PORT-002` | policy lowering is `permissive_unsafe` — the backend would allow what the policy forbids · refused with the divergence witness ([12 §ExecutionBackend](./12-gateway.md#executionbackend--the-enforcement-contract-normative)) | `security_error` | false |
-| `NIKA-POLICY-001` | a hard `policy:` rule is violated (`require.human_gate_before` · `forbid.exec_after` · `allow.providers` · `limits.max_tasks`) — the diagnostic names rule + task + witness · check-time, before any token ([10 §policy](./10-authority.md#the-policy-block--optional--named-workflow-law)) | `security_error` | false |
+| `NIKA-PORT-002` | authority lowering is `permissive_unsafe` — the backend would allow what the declared boundary forbids · refused with the divergence witness ([12 §ExecutionBackend](./12-gateway.md#executionbackend--the-enforcement-contract-normative)) | `security_error` | false |
 | `NIKA-TIMEOUT-001` | task (or for_each iteration) exceeded `timeout:` | `timeout_error` | false |
 | `NIKA-CANCEL-001` | task cancelled (workflow failure gate · user cancellation) | `cancelled` | false |
 | `NIKA-ASSERT-001` | ⚰️ RESERVED, not emitted in v0.1 (the envelope key it judged was removed 2026-08-11) · an assertion claims a level the evidence does not support (a `StaticProof` the IR cannot decide · a mis-leveled obligation · [15 §assert](./15-proof.md#assert--the-authors-obligations-normative)) | `validation_error` | false |
 | `NIKA-LOCK-001` | a dependency resolved that `nika.lock` does not pin, or a hand-edited lock digest does not match ([15 §lock](./15-proof.md#nikalock--the-single-lock-normative--f7)) | `validation_error` | false |
 | `NIKA-BUILTIN-001` | builtin `invoke:` violates its statically-checkable arg contract (e.g. `nika:fetch` without `url:` · `nika:jq` arg shape) | `validation_error` | false |
 | `NIKA-BUILTIN-DONE-001` | `nika:done` invoked outside an `agent:` loop | `validation_error` | false |
-| `NIKA-DRIFT-001` | declared-but-unused — an `inputs:`/`config:`/`const:`/`secrets:` name or a `permits:` entry (exec program · tool glob · net host · fs path) that nothing in the body references · **advisory check hint — never fails the audit** (the report's `is_clean` ignores hints; dead declarations are smell, not failure) · the reverse direction (used-but-undeclared) is the hard `NIKA-VAR-001`/`NIKA-DAG-002`/`NIKA-SEC-004` surface, so **no `NIKA-DRIFT-002` exists** (an unemittable code would be dead weight — the no-duplication law is structural: hard codes name references, drift names declarations, never the same yaml site) · a dynamic consumer POISONS the used set (a shell-form exec hides its programs · an exec child hides the fs path sets · a dynamic URL/path hides the host/path set · an `agent:` whitelist dispatches dynamically — glob ⊆ glob is undecidable) and the category stays silent rather than risk a false positive · the fs read set DOES model the two decidable runtime gates (`nika:glob`'s literal walk root · a `nika:fetch` `multipart:` file part's literal path) · reference implementation nika#661 | `validation_error` | false |
+| `NIKA-DRIFT-001` | declared-but-unused — an `inputs:`/`const:`/`secrets:` name or a `permits:` entry (exec program · tool glob · net host · fs path) that nothing in the body references · **advisory check hint — never fails the audit** (the report's `is_clean` ignores hints; dead declarations are smell, not failure) · the reverse direction (used-but-undeclared) is the hard `NIKA-VAR-001`/`NIKA-DAG-002`/`NIKA-SEC-004` surface, so **no `NIKA-DRIFT-002` exists** (an unemittable code would be dead weight — the no-duplication law is structural: hard codes name references, drift names declarations, never the same yaml site) · a dynamic consumer POISONS the used set (a shell-form exec hides its programs · an exec child hides the fs path sets · a dynamic URL/path hides the host/path set · an `agent:` whitelist dispatches dynamically — glob ⊆ glob is undecidable) and the category stays silent rather than risk a false positive · the fs read set DOES model the two decidable runtime gates (`nika:glob`'s literal walk root · a `nika:fetch` `multipart:` file part's literal path) · reference implementation nika#661 | `validation_error` | false |
 
 
 `NIKA-PARSE-015` is **retired** (never reuse): the typed-`vars:` 6-enum class
@@ -5071,6 +4970,33 @@ died with the E-split (R3b · LAW-GRAMMAR-0211) — the `type:` field of
 [09-types](./09-types.md), so what PARSE-015 refused (the rich forms) is
 admitted, and what stays outside the grammar refuses via `NIKA-TYPE-001`.
 The allocation hole is deliberate, per the additive-never-repurposed rule above.
+
+`NIKA-PARSE-020` · `NIKA-PARSE-021` are **retired** (never reuse): the
+envelope key `workflow:` died entirely at the envelope nuke (2026-08-12). It
+existed only to house `id:` and `description:`; the description died the same
+day (**one consumer across five reading surfaces**, and the `semantic_hash`
+came back byte-identical with it and without it) and the id moved onto
+`nika:`, so the object had nothing left to hold. Both migration teachings lost
+their destination. The allocation holes are deliberate.
+
+`NIKA-TYPE-002` is **retired** (never reuse): « the `types:` graph must be
+acyclic » has no object — named types died with the `types:` block
+([09-types](./09-types.md)). A type expression is self-contained, so there is
+no graph left to cycle.
+
+`NIKA-DEFAULT-002` is **retired** (never reuse): « a `config:` entry with no
+`default:` » has no object — the `config:` block died at the envelope nuke and
+a deployment knob is now an `inputs:` entry with `required: false`, which
+`--var` can reach.
+
+`NIKA-POLICY-001` and `NIKA-SEC-013` are **retired** (never reuse), and the
+whole `NIKA-POLICY` **namespace** with them: the `policy:` block died at the
+envelope nuke. Measured, it was **fail-open** — a human gate with no `policy:`
+block passed, the same gate carrying an unrelated clause refused; on the
+corpus, 26 gates escaped the endorsement rule and the 8 punished were the ones
+that had declared something else. A law that binds only the file that opts
+into it binds nothing. The surviving half is `NIKA-SEC-015`, which fires with
+no declaration at all.
 
 `NIKA-PARSE-016` is **retired** (never reuse): the jq-binding-contains-template
 class folded into `NIKA-VAR-005` at the deep-conformance registry remap: the
@@ -5651,9 +5577,9 @@ A higher level **includes** the lower levels.
 An engine claims « Core v0.1-compliant » if it ·
 
 1. **Parses** any valid v0.1 workflow YAML correctly
-   - Accepts exactly `nika: v1` · a `workflow:` object carrying a kebab-case `id` · rejects any other `nika:` value (a scalar `workflow:` is the dead W1 form · `NIKA-PARSE-020`)
-   - Validates the `workflow` identifier kebab-case
-   - Validates typed `inputs` (type + required) · validates `config` / `const` / `secrets` shape
+   - Accepts a kebab-case `nika:` id (`^[a-z][a-z0-9-]*$`) · rejects any other shape, `v1` included (`NIKA-PARSE-003`) — the key carries the file's NAME, and the version slot is gone forever and losslessly
+   - Reads the document TYPE from `tasks:` (present ⇒ workflow · absent ⇒ project), never from the filename
+   - Validates typed `inputs` (type + required) · validates `const` / `secrets` shape
    - Recognizes the 4 verbs (`infer` · `exec` · `invoke` · `agent`)
    - **Rejects** unknown fields with a clear error (`NIKA-PARSE-005` · strict) — at every level, not only the top (D-2026-08-11-N20)
 
@@ -5724,7 +5650,7 @@ GitHub Actions and Docker Compose. A working modeline today:
 
 ```yaml
 # yaml-language-server: $schema=https://raw.githubusercontent.com/supernovae-st/nika-spec/main/schemas/workflow.schema.json
-nika: v1
+nika: my-workflow
 ```
 
 #### The address MUST become versioned and immutable (normative · D-2026-08-11-N24)
@@ -5749,11 +5675,11 @@ point of use** — measured in this workspace, 2026-08-07.
 
 ```yaml
 # yaml-language-server: $schema=https://nika.sh/schema/v0.1/workflow.schema.json
-nika: v1
+nika: my-workflow
 ```
 
 This is what JSON Schema, OpenAPI, Kubernetes and CWL all do, and it composes
-with the `nika: v1` marker the envelope already carries. A file written in 2027
+with the `nika:` mark the envelope already carries. A file written in 2027
 still reads in 2030 against **its own** schema. Until the address ships, the
 modeline above is the pragmatic form and this paragraph is the standing debt —
 stated, not hidden.
@@ -5867,7 +5793,7 @@ conformance/
 │                              # proof · projection) + their `*_selftest.py` sweeps
 ├── yaml-profile/              # R11 profile fixtures (valid/ + invalid/)
 ├── type-corpus/               # the generated type corpus (gen-type-corpus.py)
-├── values/                    # the four-authority family (C2 · R3a · valid/ + invalid/)
+├── values/                    # the three-authority family (C2 · R3a · valid/ + invalid/)
 ├── types/                     # io-declaration predicate vocabulary (C2 · R3b · valid/ + invalid/)
 ├── gates/                     # the after: predicate vocabulary (C2 · R5 · valid/ + invalid/)
 └── runner-protocol.md         # how to run the suite against any engine
@@ -6575,10 +6501,10 @@ author defect.
 
 # 09 · Types
 
-> Nika has a **decidable type core**. A workflow declares named types
-> once (`types:`), tasks declare what they return (`returns:`), and the
-> engine checks every deep reference, compiles structured-output
-> contracts, and types every value edge — **before a token is spent**.
+> Nika has a **decidable type core**. Tasks declare what they return
+> (`returns:`) with a **self-contained type expression**, and the engine
+> checks every deep reference, compiles structured-output contracts, and
+> types every value edge — **before a token is spent**.
 > The type language is deliberately small: every judgment (subtyping ·
 > path validity · contract compilation) terminates, by construction.
 >
@@ -6591,37 +6517,53 @@ author defect.
 
 ---
 
-## The `types:` block · *optional · named type declarations*
+## Where a type is written · *inline, at its declaration position*
 
 ```yaml
-nika: v1
-workflow:
-  id: research-pipeline
-
-types:
-  Summary:
-    object:
-      title: string
-      bullets: { array: string }
-      score: { integer: { min: 0, max: 100 } }
+nika: research-pipeline
 
 tasks:
   summarize:
     with: { article: "${{ tasks.fetch.output }}" }
     infer:
       prompt: "Summarize · ${{ with.article }}"
-    returns: Summary
+    returns:
+      object:
+        title: string
+        bullets: { array: string }
+        score: { integer: { min: 0, max: 100 } }
 ```
 
-- A type name matches `^[A-Z][A-Za-z0-9]*$` (PascalCase — disjoint from
-  task ids and from the lowercase primitive names by construction).
-- A name may reference other named types. References must be **acyclic**:
-  a recursive type is rejected (`NIKA-TYPE-002` — unbounded recursion
-  would make subtyping and lowering undecidable; v1 keeps every judgment
-  total).
-- An unknown name (in `types:`, `returns:`, an `outputs:` `type:`, or a
-  field position) is `NIKA-TYPE-001`, with a did-you-mean fix when a
-  declared name is close.
+A type expression is **self-contained**: it is written where it is used
+(`returns:` · an `inputs:` `type:` · an `outputs:` `type:`) and refers to
+nothing outside itself. There is no name to look up, so there is no name
+environment, no import order, and no cycle to detect.
+
+> **⚰️ The `types:` block (2026-08-12).** Named, PascalCase type
+> declarations are **dead**. Measured: **zero** usage in real work, and
+> **14 `returns:` in total across 815 files** — nothing was ever declared
+> twice, so there was never a second site to name a type *for*. `returns:`
+> already accepted an inline type expression; the block was the
+> infrastructure of a reuse that never happened.
+>
+> Consequence in the grammar: a **PascalCase name in type position now
+> resolves to nothing** and refuses `NIKA-TYPE-001`, teaching the inline
+> form. `NIKA-TYPE-002` (« the `types:` graph must be acyclic ») is
+> **retired** — the class has no object, and no retired code is ever
+> reused.
+>
+> Nothing about the type *language* shrank. Every constructor below —
+> objects, arrays, maps, unions, enums, refinements, the optional
+> modifier, the lowering, the subtyping lattice — is unchanged. Only the
+> naming layer died.
+
+- A **PascalCase word** in type position (a `returns:`, an `inputs:`
+  `type:`, an `outputs:` `type:`, a field) is `NIKA-TYPE-001`: there is
+  no name environment to resolve it against, and the refusal teaches the
+  inline form.
+- Every judgment (subtyping · path validity · contract compilation)
+  **terminates by construction** — with no names there is no reference
+  graph, so decidability is structural rather than guarded.
 
 ## The type grammar (closed · v1)
 
@@ -6665,8 +6607,7 @@ code, the same class, one voice with the schema walk of
 Opt out per object with `additional: true` ·
 
 ```yaml
-types:
-  Loose: { object: { id: string }, additional: true }
+    returns: { object: { id: string }, additional: true }
 ```
 
 ### Optional is presence, not null (normative)
@@ -6675,13 +6616,12 @@ types:
 apart ·
 
 ```yaml
-types:
-  Story:
-    object:
-      headline: string                     # required · present · non-null
-      byline: { optional: string }         # MAY BE ABSENT · when present: a string (null refused)
-      score: { union: [integer, null] }    # required · present · may be NULL
-      note: { optional: { union: [string, null] } }   # may be absent · may be null
+    returns:
+      object:
+        headline: string                     # required · present · non-null
+        byline: { optional: string }         # MAY BE ABSENT · when present: a string (null refused)
+        score: { union: [integer, null] }    # required · present · may be NULL
+        note: { optional: { union: [string, null] } }   # may be absent · may be null
 ```
 
 - `{ optional: T }` is a **field-presence modifier**: the field may be
@@ -6689,8 +6629,8 @@ types:
   is a violation unless `T` itself admits null.
 - **Nullability is a union**: `{ union: [T, null] }` — one spelling,
   no `nullable<>` alias.
-- `optional:` anywhere OUTSIDE a field position (a `returns:`, an array
-  element, a union member, a `types:` root) is refused —
+- `optional:` anywhere OUTSIDE a field position (a `returns:` root, an
+  array element, a union member) is refused —
   `NIKA-TYPE-001`-class, with the teaching « optional is a
   field-presence modifier — for a nullable value write
   `union: [T, null]` ».
@@ -6956,8 +6896,7 @@ value MUST conform to its declared type — checked, never warnings
 
 | Code | Failure | Category | `transient` |
 |---|---|---|---|
-| `NIKA-TYPE-001` | unknown type name (in `types:` · `returns:` · an `outputs:` type) — did-you-mean when close | `validation_error` | false |
-| `NIKA-TYPE-002` | recursive type reference — the `types:` graph must be acyclic | `validation_error` | false |
+| `NIKA-TYPE-001` | unknown type name in any type position (`returns:` · an `inputs:`/`outputs:` `type:` · a field) — with named types retired the name environment is empty, so the refusal teaches the inline form | `validation_error` | false |
 | `NIKA-TYPE-003` | `returns:` and `schema:` on the same task — one contract, one spelling | `validation_error` | false |
 | `NIKA-TYPE-004` | `returns:` type unreachable from the declared `decode:` (an object over `decode: text` · …) | `validation_error` | false |
 | `NIKA-TYPE-005` | a secret-carrying type in a lowered position (reserved with `secret<T>` · W4) | `security_error` | false |
@@ -6968,7 +6907,7 @@ value MUST conform to its declared type — checked, never warnings
 | Rule | Instead of | Write |
 |---|---|---|
 | `one-obvious-way/011` | `schema:` on an `infer:`/`agent:` task whose shape fits the v1 type grammar | `returns:` (the typed door — the hatch is for out-of-core shapes) |
-| `one-obvious-way/012` | an inline `returns:` object repeated across tasks | a named type in `types:` (one declaration, N references) |
+| `one-obvious-way/012` | ⚰️ RETIRED 2026-08-12 — it routed to `types:`, which is dead. A repeated `returns:` object is repeated in the source; measured, it never happened (14 `returns:` across 815 files) |
 
 ## What v1 deliberately does not do
 
@@ -7001,8 +6940,8 @@ value MUST conform to its declared type — checked, never warnings
 > A workflow's authority is **declared in the file and judged before a
 > token is spent** — three blocks, three questions, never conflated:
 > [`permits:`](./01-envelope.md#permits--optional--the-declared-capability-boundary)
-> says what the workflow **may touch** (capability) · `policy:` says in
-> what **order and shape** it may act (law · this chapter) ·
+> says what the workflow **may touch** (capability) · the **unconditional
+> laws** say in what **order and shape** it may act (this chapter) ·
 > [`secrets:` + `egress:`](./01-envelope.md#egress--optional--sanctioned-destinations-declassification)
 > say where a sensitive value **may go** (flow). The three compose
 > without overlap; none is negotiation material for a model.
@@ -7020,7 +6959,7 @@ An **effect** is a class of interaction with the world outside the run.
 The v1 vocabulary is exactly the capability surface of
 [01 §permits](./01-envelope.md#permits--optional--the-declared-capability-boundary)
 — **five categories** (this table is the one vocabulary the checker, the
-inference, the certificate, and `policy:` rules all speak — one voice,
+inference, the certificate, and the unconditional laws all speak — one voice,
 never a parallel list):
 
 | Effect category | Carried by | Granted by |
@@ -7039,7 +6978,7 @@ never a parallel list):
 > so the spec carried exactly the parallel list it forbids. Admitting `env` is
 > **not adding a category, it is documenting one that ships**: a category with no
 > key would change the language; a key with no category made four downstream
-> surfaces (inference · certificate · `policy:` `<effect-class>` · `NIKA-SEC-004`)
+> surfaces (inference · certificate · the `<effect-class>` vocabulary · `NIKA-SEC-004`)
 > unable to name it.
 
 Two derived facts the engine computes and no author writes:
@@ -7058,99 +6997,90 @@ Two derived facts the engine computes and no author writes:
 at `nika check` (an escape = refusal before any token) and at run time
 (`NIKA-SEC-004` — the dynamic cases a static check cannot see).
 
-## The `policy:` block · *optional · named workflow law*
+## The unconditional laws · *normative · the `policy:` block is dead*
 
 `permits:` bounds capability; nothing bounded **order and shape** — «
 no shell after an untrusted fetch », « a human signs before anything
-irreversible », « only these providers » were checkable only by eyeball.
-`policy:` names those laws next to the workflow:
+irreversible ». A `policy:` block used to name those laws next to the
+workflow. **It is dead (2026-08-12), and the reason is the shape of the
+enforcement, not the shape of the syntax.**
 
-```yaml
-policy:
-  require:
-    human_gate_before: [exec, write]   # these effect classes sit behind a human
-  forbid:
-    exec_after: [net]                  # order law · no shell downstream of the network
-  allow:
-    providers: [ollama, mistral]       # infer/agent provider allowlist
-  limits:
-    max_tasks: 50                      # workflow-shape bound
-  prefer:                              # SOFT · recorded, never judged (v1)
-    providers: [ollama]
-  optimize: cost                       # SOFT · recorded, never judged (v1)
-  endorsement: solo                    # HARD · the named solo mode (NEP-0014)
-```
+### Why a declared law was not a law
 
-**Grammar (normative · closed at every level).** `policy:` is a mapping
-of up to seven **families**. Unknown families and unknown rule names are
-refusals (`NIKA-PARSE`-class): the rule set is closed per minor —
-patterns are named after the incidents they prevent, raw temporal logic
-is never exposed.
+Measured on the corpus before the ruling ·
 
-| Family | Nature | v1 rules (closed) |
-|---|---|---|
-| `require:` | **hard** · judged at check | `human_gate_before: [<effect-class>…]` |
-| `forbid:` | **hard** · judged at check | `exec_after: [<effect-class>…]` |
-| `allow:` | **hard** · judged at check | `providers: [<provider>…]` |
-| `limits:` | **hard** · judged at check | `max_tasks: <positive integer>` |
-| `endorsement:` | **hard** · judged at check | `solo` — the NAMED solo mode: exactly one endorser (one human gate), its fresh authorization bound to the action and logged as such · a gate under no declared mode refuses (`NIKA-SEC-013` · fail-closed) · a declared solo with more than one gate refuses as the declaration lying (NEP-0014 · F-P23) |
-| `prefer:` | **soft** · parsed, recorded, NOT judged | `providers: [<provider>…]` (ordered) |
-| `optimize:` | **soft** · parsed, recorded, NOT judged | `cost` \| `latency` \| `quality` |
+- **Zero usage in real work.** The 12 `policy:` blocks in the corpus were
+  all exactly `policy:` + `endorsement: solo`. Six of the seven families
+  had fan-out **zero**.
+- **The soft families were never recorded.** `prefer:` and `optimize:`
+  claimed to be « parsed and recorded »; `check --json` came back
+  **byte-identical at the sha256** with opposite values in them. Nothing
+  read them.
+- **`limits.max_tasks` asserted a bound on a literal in the same file.**
+  A number checking a number it can see.
+- **And the whole block was FAIL-OPEN.** A human gate with **no**
+  `policy:` block passed. The **same** gate carrying an unrelated clause
+  refused. Corpus tally: **26 gates spared, 8 punished** — and the 8 were
+  the ones that had declared something else entirely. A law that binds
+  only the file that opts into it binds nothing.
 
-> ⚠️ **`endorsement:` names a family and has one member, and the gap is a
-> capability gap, not a naming one** (stated 2026-08-11). A workflow that wants
-> **two** human gates on one action is **inexpressible** — not because two
-> endorsers are unsafe, but because the enum has a single value. The honest
-> reading is that the language today can say *one human authorised this* and
-> cannot say *two did*, and a reader deserves to know which of the two it is.
-> **The single member is not the defect and MUST NOT be removed**: `solo`
-> carries two live refusals (a gate under no declared mode · a declared `solo`
-> wearing more than one gate). Deleting a working refusal to make a table
-> shorter is subtraction, not simplification. The member that is missing is
-> the one to add — and since [07 §unknown key](./07-conformance.md) an unknown
-> value is an error, a second member lands additively, for free, the day its
-> semantics are decided.
+The two codes that served the block are **retired**, and the whole
+`NIKA-POLICY` namespace with them. No retired code is ever reused.
+
+### What survived, and where it went
+
+Two of the families read the **transitive graph** — they say something a
+reader cannot see by looking at one task — so they did not die with the
+key. They moved to the shelf where the lethal-trifecta law and the
+affirmative-consent law already live: **laws that fire with no
+declaration at all.**
+
+**`forbid.exec_after` became the order law, unconditional.** No `exec:`
+task may sit transitively downstream of a net-effecting task
+(`nika:fetch` · `nika:notify`) over the derived graph (`with:` data edges
+∪ `after:` control edges). Content the workflow did not author must not
+reach a shell. Fixed at `[net]`, the one parameterization it was ever
+declared with. The diagnostic names the **path**, which is the witness
+(`fetch_page → act`). Its code is in [05](./05-errors.md).
+
+> **The trifecta does NOT subsume it, and this was measured.** The
+> trifecta needs leg ① — a non-empty `permits.fs.read`. A file that
+> fetches and then shells, with no private read declared, reads **GREEN**
+> under the trifecta and **RED** under this law. That file is the
+> conformance fixture `core/order/001-net-before-exec-violation`.
 >
-> ⚠️ **Cette note vit SOUS la table, jamais au milieu** — une note insérée
-> entre deux rangées casse la lecture mécanique de la table (mesuré
-> 2026-08-12 · le générateur de la page autorité lisait une famille soft de
-> moins, et le gate GA-b l'a attrapé).
+> **Cost, measured BEFORE the ruling** · 194 `exec:` tasks across the
+> shipped corpus, **1** refused — and that one
+> (`conformance/envelope/secrets-two-sinks-one-sanctioned`) is already a
+> declared `check-reject`. Zero green files paid for it.
 
-`<effect-class>` is the closed set `exec · write · net · tools` — the
-effect vocabulary above with `fs` split at its grain of harm (`write`;
-reads are not gateable in v1) **and `env` deliberately absent: a policy
-rule over environment names is a separate decision this spec has not
-taken, and naming it here without the semantics would be a rule that
-cannot be judged** (see the soft-family law in the next sentence, which
-this set must not violate). The gap is stated rather than closed
-silently, because the table above is the one vocabulary and a reader is
-owed the reason a member of it is missing from this derived set.
-Soft families are **inert by design** in
-v1: the solver that would satisfy them is research surface, and a
-constraint that cannot be judged must never look judged — the check
-records them (a hint names them as recorded-not-judged) and nothing
-else.
+**`require.human_gate_before` did NOT make the same move, and the residue
+is owed rather than guessed.** Its unconditional substance — *a human
+gate must dominate every route by which untrusted content reaches an
+egress* — is what the trifecta law and the affirmative-consent law
+already carry, with no declaration. What is **not** covered is the
+narrower claim *a human gate before `exec:`, absent any private read*.
+Turning that into an unconditional law at its one declared
+parameterization `[exec]` would refuse **187 of the 194** `exec:` tasks in
+the corpus: that is not a law, it is a ban on `exec:`. The
+parameterization a real unconditional gate rule would need has **no
+empirical signal** — no corpus file ever declared the family — so it is
+named here as **OWED**, and left undecided rather than invented.
 
-**Semantics of the hard rules (normative · statically decided on the
-graph — the same derived graph every judge reads, [03](./03-dag.md))** ·
+**`allow.providers` and `limits.max_tasks` are simply gone.** Neither
+reads the graph; both were a declared preference the file could have
+enforced by being written differently. A provider allowlist is a
+deployment concern, not a property of the workflow text.
 
-- `require.human_gate_before: [C…]` — every task carrying an effect of
-  a listed class has, among its ancestors (data ∪ control edges), a
-  **human gate**: an `invoke:` of `nika:prompt`. The pause is the
-  consent (exit 4 · resume with the answer · [02](./02-verbs.md)).
-- `forbid.exec_after: [C…]` — no `exec:` task is a descendant of a task
-  carrying an effect of a listed class. The order law reads the graph,
-  not the schedule: any path counts, `after:` edges included.
-- `allow.providers: [P…]` — every `infer:`/`agent:` task's provider
-  (the segment of `model:` before `/`, or the run's default model when
-  the task names none) is in the list. A provider that cannot be
-  determined statically (a templated `model:`) is a violation under a
-  declared allowlist — **fail-closed**, pin the literal (same doctrine
-  as the permits argv rule: judge the shape you can actually verify).
-- `limits.max_tasks: N` — the workflow declares at most N tasks.
+### The two judges that remain
+
+`permits:` and the unconditional laws are orthogonal judges over one
+body: permits answers *may this task touch X at all*, the unconditional
+laws answer *may it do so here, in this order, unattended*. A body must
+satisfy **both**, and **neither is opt-in**.
 
 **The approval is a bounded ticket (normative · NEP-0013)** · the
-consent the pause collects is not a bare answer: it is a **ticket**
+consent a pause collects is not a bare answer: it is a **ticket**
 · (1) **content-bound** — the ticket binds the hash of the canonical
 rendering of what is shown (the message · the gated action's identity ·
 the effect classes in play · never an LLM summary); an answer whose
@@ -7161,24 +7091,11 @@ cross-run replay is refused · (3) **rate-limited** — at most N=5
 approvals per run; identical prompts dedup (the same content hash rides
 one ticket, attested `dedup`); a heterogeneous batch is refused at
 check (one prompt gates one action of one class); the N+1th prompt is a
-typed HALT (`NIKA-SEC-010` · `security_error`), never a queue · (4) **attested** — every
+typed HALT (`security_error`), never a queue · (4) **attested** — every
 decision emits a hash-chained `approval_decided` event (ticket digest ·
 shown hash · decision · remaining TTL · scope), and the digests rise to
 the receipt · (5) **revocable before execution only** — never after:
 the receipt shows what executed under which authority.
-
-**A violation is `NIKA-POLICY-001`** (`security_error` · check-time ·
-before any token). The diagnostic names the rule, the offending task,and the witness — for order rules, the path (`fetch_page → summarize →
-deploy`); for gate rules, the missing ancestor; for provider rules, the
-offending literal. Policy violations are never fed back to an `agent:`
-model: organizational law is not negotiation material.
-
-**Composition** · `policy:` and `permits:` are orthogonal judges over
-one body: permits answers *may this task touch X at all*, policy
-answers *may it do so here, in this order, unattended*. A body must
-satisfy **both**. (`allow.providers` deliberately covers the one
-authority `permits:` does not — the provider surface; capability stays
-permits' ground, and no policy rule re-spells a permits grant.)
 
 ## The affirmative-consent law · *normative · NEP-0020*
 
@@ -7216,9 +7133,9 @@ binding carrying its target's value, Kleene-3 over the fragment
 
 A violation is **`NIKA-SEC-014`** (`security_error` · check-time ·
 before any token) — the diagnostic names the gate AND the sink and
-teaches the affirmative pattern. The law binds with or without a
-`policy:` block (it is not a declared-rule violation, so it does not
-speak `NIKA-POLICY-001`), and `mode: choice` is out of scope — its
+teaches the affirmative pattern. The law binds with **no declaration at
+all** — it always did, which is why it survived the death of the declared
+block untouched — and `mode: choice` is out of scope — its
 answer is a string and the lane claims nothing there (silence, never
 wrong).
 
@@ -7388,45 +7305,43 @@ prints) · `boundary_declared` says whether the file carries a
 `permits:` block · `escapes` is the count of required-outside-permitted
 violations (0 in any clean report — the field exists so a certificate
 consumer never has to re-derive it). The certificate stays a
-projection: the judge is the check ladder, never the JSON.
+## Errors (the order law · new in this chapter)
 
-## Errors (the `NIKA-POLICY` namespace · new in this chapter)
+The order law's code, its category and its meaning live in the one error
+catalogue ([05-errors](./05-errors.md)) — this chapter names the law, never
+its wire spelling.
 
-| Code | Category | Meaning |
-|---|---|---|
-| `NIKA-POLICY-001` | `security_error` | a hard `policy:` rule is violated (the diagnostic names rule + task + witness) |
-
-`NIKA-SEC-006` / `NIKA-SEC-007` join the existing `NIKA-SEC` namespace
-([05](./05-errors.md)); `NIKA-AUTH-007` / `NIKA-AUTH-008` join the
-`NIKA-AUTH` namespace opened by NEP-0003's `NIKA-AUTH-006`;
-`NIKA-SEC-013` (the endorsement mode) and `NIKA-SEC-014` (the
-affirmative-consent law) join the same `NIKA-SEC` namespace.
+The secret-flow and permit-taint codes join the existing `NIKA-SEC` and
+`NIKA-AUTH` namespaces, as does the affirmative-consent law. The
+`NIKA-POLICY` namespace is **retired** with the block it served.
 
 ## One obvious way (normative for linters)
 
-- A capability boundary is spelled `permits:` — `policy.allow` never
-  re-spells a permits grant (providers is the one allow rule, because
-  permits has no provider category).
+- A capability boundary is spelled `permits:` — nothing else re-spells a
+  permits grant.
 - A human gate is `invoke: { tool: "nika:prompt" }` — the pause IS the
-  consent mechanism; a `when:` on a `config` flag is not a gate.
-- Soft families record intent (`prefer` · `optimize`) — an engine that
-  cannot honor them MUST still accept them (they are never judged, so
-  they can never refuse).
+  consent mechanism; a `when:` on an input flag is not a gate.
+- A law that reads the graph is UNCONDITIONAL — there is no block to
+  declare it in, and none to disable it from. A rule an author can opt
+  out of by saying nothing is not a rule (measured: 26 gates spared, 8
+  punished, and the 8 were the ones that had declared something else).
 
 ## What v1 deliberately does not do
 
-- **No solver.** Soft constraints are recorded, not satisfied —
-  Pareto/unsat-core surfaces are research (the constraint that cannot
-  be judged must never look judged).
-- **No runtime policy.** Every v1 rule is decidable at `nika check` on
+- **No solver, and no soft constraints at all.** `prefer:`/`optimize:`
+  died with the block that held them: measured, nothing read them (the
+  `check --json` sha256 was identical with opposite values). A
+  constraint that cannot be judged must never look judged, and the
+  honest way to not judge one is to not accept it.
+- **No runtime law.** Every v1 rule is decidable at `nika check` on
   the graph; rules whose truth needs runtime data are out of scope,
   deliberately (the check stays the pre-token audit).
 - **No new verbs, no `approve:`.** The human gate rides the existing
   `nika:prompt` pause; a dedicated approval surface (delegation ·
   quorum · `via:`) is future work with its own chapter.
-- **No policy inheritance.** A file's law is the file's — composition
-  across `invoke: workflow:` calls stays the callee's own policy (the
-  ceiling algebra is reserved, unwired).
+- **No law inheritance.** A file's law is the file's — composition
+  across `invoke: workflow:` calls judges the callee by the same
+  unconditional laws (the ceiling algebra is reserved, unwired).
 - **No memory category.** Recall is a **tool**, reached through `invoke:`
   like every other callable ([08 §H9](./08-out-of-scope.md) · today
   `mcp:memory-server/recall`, tomorrow the reserved `nika:connectome/*`
@@ -8235,8 +8150,14 @@ providers:                      # every model pinned by content digest
   "anthropic/claude-…": { digest: "blake3:…" }
 tools:                          # builtin + MCP surface versions
 registry:                       # every registry: ref pinned owner/name@version + digest
-policy:                         # the resolved policy decisions (10)
 ```
+
+> The `policy:` row died with the envelope block it materialized
+> (2026-08-12): the author surface and its lock materialization die
+> together — a lock field pinning « the resolved policy decisions » of a
+> block that cannot be written is a column with no source. The
+> unconditional laws ([10](./10-authority.md)) need no pin: nothing
+> declares them, so nothing about them can drift between runs.
 
 - **Pin by default**: a run resolves ONLY what the lock pins; an
   unpinned dependency is a refusal (`NIKA-LOCK-001`). Nothing floats.
@@ -9325,8 +9246,9 @@ only as a status.
 A workflow's declared inputs are its typed `inputs:`; the caller supplies values
 at launch (`nika run <file> --var key=value` · repeatable). « Launch
 inputs » is the collective noun. Distinct from `const:` (fixed values baked
-into the file) · from `with:` (per-task bindings) and from `config:`
-(non-sensitive runtime config supplied by the deployment).
+into the file) and from `with:` (per-task bindings). A value the **deployment**
+supplies is an `inputs:` entry carrying `required: false` and a `default:` —
+the same namespace, not a fourth authority.
 
 ## paused · human gate · nika:prompt
 
@@ -9352,6 +9274,22 @@ conformance claim ([07 §Claiming](./spec/07-conformance.md#claiming-conformance
 « v0.1-compliant » in normative sentences names the level *bar*, not
 the claim.
 
+## `nika:` · the mark and the name
+
+One key, one spelling, two referents resolved by the document it opens: in
+`nika.yaml` it carries the **project** name, in a `*.nika.yaml` it carries the
+**workflow** name. Kebab-case (`^[a-z][a-z0-9-]*$`) · a bad id is
+`NIKA-PARSE-003`, an absent key is `NIKA-PARSE-002`.
+
+The **document type is read from `tasks:`** — present means workflow, absent
+means project. Never from `workflow:` (the block is gone) and never from the
+filename, which does not travel in a blob, a paste or an HTTP body.
+
+The key held the literal `v1` until the envelope nuke. It carried zero bits as
+a version — there is no `nika: v2`, ever — so **nothing was lost**: the family
+is still v1, pre-1.0 breaking changes live INSIDE it, and the key now carries
+the file's most necessary field instead.
+
 ## canonical filename
 
 `<name>.nika.yaml` ([01 §File naming](./spec/01-envelope.md#file-naming-normative)).
@@ -9360,8 +9298,8 @@ the reserved media type is `application/vnd.nika+yaml`.
 
 ## envelope · pillar · stdlib · pack
 
-The **envelope** is the header contract (`nika: v1` + `workflow:` ·
-[01](./spec/01-envelope.md)). The **5 pillars** are the immutable core
+The **envelope** is the header contract — the 9 top-level keys, opening on
+`nika: <name>` ([01](./spec/01-envelope.md)). The **5 pillars** are the immutable core
 (envelope · verbs · DAG · variables · errors). The **stdlib** (providers
 · extract modes · builtins) versions independently. The **pack** is the
 versioned examples+templates bundle every engine embeds
@@ -9711,7 +9649,7 @@ private key reached from the ambient environment or an implicit on-disk
 keyring would make `nika:hash` read state its declaration does not name,
 which is exactly the pure-compute-that-is-not-pure defect the permits
 boundary exists to refuse. Declaring the key under `secrets:` keeps it inside
-the four-authority family, keeps it masked in logs, and keeps its reach
+the three-authority family, keeps it masked in logs, and keeps its reach
 governed by `egress:` like any other secret.
 
 **What this closes, and what it does NOT (bounded honestly).** It closes

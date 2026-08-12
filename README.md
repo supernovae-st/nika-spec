@@ -16,9 +16,13 @@ Sovereign · multi-provider · local-first.</strong></p>
 > [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/supernovae-st/nika-spec/badge)](https://scorecard.dev/viewer/?uri=github.com/supernovae-st/nika-spec)
 > [![REUSE 3.3](https://github.com/supernovae-st/nika-spec/actions/workflows/reuse.yml/badge.svg)](https://github.com/supernovae-st/nika-spec/actions/workflows/reuse.yml)
 >
-> The language is locked at `nika: v1`, forever. That's the envelope you
-> write in every workflow file; it evolves additively and never breaks (the
-> SQL / Dockerfile contract model). The reference engine versions separately.
+> The language is locked at **v1**, forever — there is no `nika: v2`, ever.
+> What you write is `nika: <name>`: the key is the mark that says « this is a
+> nika file » AND the file's own name. The version slot is gone because it
+> carried no bits, and nothing was lost with it — pre-1.0 breaking changes
+> live INSIDE v1, and after engine 1.0.0 the family evolves additively and
+> never breaks (the SQL / Dockerfile contract model). The reference engine
+> versions separately.
 
 ---
 
@@ -48,9 +52,7 @@ is at [supernovae-st/nika](https://github.com/supernovae-st/nika)
 ## Hello world
 
 ```yaml
-nika: v1
-workflow:
-  id: hello
+nika: hello                # the mark AND the name · kebab-case
 
 model: ollama/qwen3.5:4b   # local · zero key · swap for any provider in the catalog
 
@@ -95,10 +97,10 @@ Run `nika inspect <file> --format mermaid` on any workflow and paste the output;
 
 ## The 5 pillars · immutable forever
 
-1. **Envelope**: one line · `nika: v1` + `workflow:` header (+ typed `inputs` · `config` · `const` · `secrets`)
+1. **Envelope**: one line · `nika: <name>` (the mark AND the name) + the 9 keys (`nika` · `model` · `inputs` · `const` · `secrets` · `permits` · `run` · `tasks` · `outputs`)
 2. **The 4 verbs**: `infer:` (LLM) · `exec:` (shell) · `invoke:` (tools/MCP) · `agent:` (autonomous loop)
 3. **DAG shape**: tasks + `with:` data edges + `after:` control + `when` + `for_each`
-4. **Variables**: one `${{ ... }}` syntax · <!-- canon:namespaces -->6<!-- /canon --> namespaces (`inputs` · `config` · `const` · `secrets` · `with` · `tasks`)
+4. **Variables**: one `${{ ... }}` syntax · <!-- canon:namespaces -->5<!-- /canon --> namespaces (`inputs` · `const` · `secrets` · `with` · `tasks`)
 5. **Error model**: `NIKA-<NS>-<NNN>` codes · retry semantics · structured output
 
 These 5 things never change. Everything else (providers · builtins ·
@@ -148,10 +150,10 @@ The living map: [nika.sh/map](https://nika.sh/map).
 nika-spec/
 ├── spec/                      ← THE specification (~30 pages markdown)
 │   ├── 00-overview.md           one-page vision
-│   ├── 01-envelope.md           nika: v1 + workflow + typed inputs/config/const/secrets
+│   ├── 01-envelope.md           the 9 keys · nika + typed inputs/const/secrets
 │   ├── 02-verbs.md              the 4 verbs · signatures + semantics
 │   ├── 03-dag.md                tasks · with/after edges · when · for_each
-│   ├── 04-variables.md          ${{ }} · 6 namespaces · inputs/config/const/secrets/with/tasks
+│   ├── 04-variables.md          ${{ }} · 5 namespaces · inputs/const/secrets/with/tasks
 │   ├── 05-errors.md             error codes · retry · structured output
 │   ├── 06-stdlib-contract.md    how the stdlib versions independently
 │   ├── 07-conformance.md        what « v0.1-compliant » means

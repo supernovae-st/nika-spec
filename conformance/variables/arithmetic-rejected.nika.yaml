@@ -2,9 +2,7 @@
 # Spec: 04-variables §forward-compat "Expression language (no arithmetic in
 # templates)"; 03-dag §grammar lists NO arithmetic operators; reserved per line 124.
 # Expected: NIKA-VAR-005 (static expression violation) at CHECK time.
-nika: v1
-workflow:
-  id: c03-arithmetic-rejected
+nika: c03-arithmetic-rejected
 
 const:
   a: 2

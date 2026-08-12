@@ -1,7 +1,5 @@
 # Expected: exit 0 — NIKA-EXEC-001 fires internally, recovered via on_error (recover: task ref resolvable thanks to the value edge already ordering it).
-nika: v1
-workflow:
-  id: recover-b-edge
+nika: recover-b-edge
 permits:
   fs:
     write: ["./out/errors/recover-b.json"]

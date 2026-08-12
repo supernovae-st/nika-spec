@@ -1,7 +1,5 @@
 # Expected: NIKA-DAG-004 at CHECK.
-nika: v1
-workflow:
-  id: e30-dag-recover-downstream
+nika: e30-dag-recover-downstream
 # INTENT: NIKA-DAG-004 — on_error.recover references a downstream task (deadlock detection)
 # step_b depends on step_a, but step_a's recover references step_b
 # This creates a circular dependency that the engine must reject at parse time

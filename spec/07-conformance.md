@@ -35,9 +35,9 @@ A higher level **includes** the lower levels.
 An engine claims « Core v0.1-compliant » if it ·
 
 1. **Parses** any valid v0.1 workflow YAML correctly
-   - Accepts exactly `nika: v1` · a `workflow:` object carrying a kebab-case `id` · rejects any other `nika:` value (a scalar `workflow:` is the dead W1 form · `NIKA-PARSE-020`)
-   - Validates the `workflow` identifier kebab-case
-   - Validates typed `inputs` (type + required) · validates `config` / `const` / `secrets` shape
+   - Accepts a kebab-case `nika:` id (`^[a-z][a-z0-9-]*$`) · rejects any other shape, `v1` included (`NIKA-PARSE-003`) — the key carries the file's NAME, and the version slot is gone forever and losslessly
+   - Reads the document TYPE from `tasks:` (present ⇒ workflow · absent ⇒ project), never from the filename
+   - Validates typed `inputs` (type + required) · validates `const` / `secrets` shape
    - Recognizes the 4 verbs (`infer` · `exec` · `invoke` · `agent`)
    - **Rejects** unknown fields with a clear error (`NIKA-PARSE-005` · strict) — at every level, not only the top (D-2026-08-11-N20)
 
@@ -54,7 +54,7 @@ An engine claims « Core v0.1-compliant » if it ·
    - `${{ inputs.x }}` · `${{ const.x }}` resolve to declared envelope `inputs:` / `const:` entries
    - `${{ with.x }}` resolves to a declared task `with:` key
    - `${{ tasks.X.field }}` resolves to a declared upstream task + a valid field name
-   - `${{ config.X }}` · `${{ secrets.X }}` resolve to declared namespaces
+   - `${{ secrets.X }}` resolves to a declared `secrets:` entry
    - `when:` and `for_each:` expressions are valid **CEL** (the v0.1 subset · see 03-dag) and their references **resolve to known namespaces**: Core parses but does NOT *evaluate* them (no execution = no `tasks.X.status` to compare against · that is Runtime's job)
    - `output:` bindings are valid **jq** expressions (the one data language · see 04-variables) · `${{ }}` never appears inside a binding
    - Reports undefined references with `NIKA-VAR-001` · static expression violations with `NIKA-VAR-005` (the deep-static layer · CEL subset parse · jq compile · `when:` boolean shape)
@@ -108,7 +108,7 @@ GitHub Actions and Docker Compose. A working modeline today:
 
 ```yaml
 # yaml-language-server: $schema=https://raw.githubusercontent.com/supernovae-st/nika-spec/main/schemas/workflow.schema.json
-nika: v1
+nika: my-workflow
 ```
 
 #### The address MUST become versioned and immutable (normative · D-2026-08-11-N24)
@@ -133,11 +133,11 @@ point of use** — measured in this workspace, 2026-08-07.
 
 ```yaml
 # yaml-language-server: $schema=https://nika.sh/schema/v0.1/workflow.schema.json
-nika: v1
+nika: my-workflow
 ```
 
 This is what JSON Schema, OpenAPI, Kubernetes and CWL all do, and it composes
-with the `nika: v1` marker the envelope already carries. A file written in 2027
+with the `nika:` mark the envelope already carries. A file written in 2027
 still reads in 2030 against **its own** schema. Until the address ships, the
 modeline above is the pragmatic form and this paragraph is the standing debt —
 stated, not hidden.
@@ -251,7 +251,7 @@ conformance/
 │                              # proof · projection) + their `*_selftest.py` sweeps
 ├── yaml-profile/              # R11 profile fixtures (valid/ + invalid/)
 ├── type-corpus/               # the generated type corpus (gen-type-corpus.py)
-├── values/                    # the four-authority family (C2 · R3a · valid/ + invalid/)
+├── values/                    # the three-authority family (C2 · R3a · valid/ + invalid/)
 ├── types/                     # io-declaration predicate vocabulary (C2 · R3b · valid/ + invalid/)
 ├── gates/                     # the after: predicate vocabulary (C2 · R5 · valid/ + invalid/)
 └── runner-protocol.md         # how to run the suite against any engine

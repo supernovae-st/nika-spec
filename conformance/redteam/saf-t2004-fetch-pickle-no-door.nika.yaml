@@ -7,9 +7,7 @@
 #
 # Expected: NIKA-SEC-008 at CHECK (the serialized-executable class is
 # refused · the door stays declared, never ambient).
-nika: v1
-workflow:
-  id: saf-t2004-fetch-pickle-no-door
+nika: saf-t2004-fetch-pickle-no-door
 permits:
   net: { http: ["files.example.com"] }
   tools: ["nika:fetch"]

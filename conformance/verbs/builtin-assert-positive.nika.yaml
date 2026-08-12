@@ -1,9 +1,7 @@
 # Expected: exit 0 — nika:assert true condition.
 # W05: nika:assert — CEL condition true → pass
 # Tests: nika:assert with a numeric equality condition
-nika: v1
-workflow:
-  id: w05-assert-cel-true
+nika: w05-assert-cel-true
 
 const:
   x: 42

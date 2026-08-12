@@ -1,7 +1,5 @@
 # Expected: NIKA-BUILTIN-ASSERT-001 at RUN.
-nika: v1
-workflow:
-  id: e22-builtin-assert-fail
+nika: e22-builtin-assert-fail
 # INTENT: NIKA-BUILTIN-ASSERT-001 — assert condition is false
 const:
   value: 5

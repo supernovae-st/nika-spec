@@ -67,7 +67,8 @@ nika new --from "watch a price and ping me" p.nika.yaml   # routes to the closes
 ## The instantiation protocol (agents · follow exactly)
 
 1. **Route** with the table above — one intent, one template.
-2. **Copy** · `nika new --from <name> <dest>.nika.yaml` · set `workflow:`.
+2. **Copy** · `nika new --from <name> <dest>.nika.yaml` · set `nika:` to the
+   file's own kebab-case name.
 3. **Fill every `# SLOT:` line** · delete the slot comment once filled.
    Creativity belongs ONLY in prompts, jq expressions and paths —
    never in structure.
@@ -80,10 +81,11 @@ nika new --from "watch a price and ping me" p.nika.yaml   # routes to the closes
    else. The recurring ones:
    - `NIKA-DAG-003` → you referenced `${{ tasks.X }}` without
      the boundary. Hoist the reference into `with:` — the binding IS the edge.
-   - `NIKA-VAR-001` → undeclared `inputs./config./const./secrets./with.` name.
+   - `NIKA-VAR-001` → undeclared `inputs./const./secrets./with.` name.
      Declare it in the matching envelope authority or fix the typo. A
      declared `required: true` input is supplied at launch ·
-     `nika run <file> --var name=value` (repeatable).
+     `nika run <file> --var name=value` (repeatable); a `required: false`
+     entry with a `default:` is the deployment's, never the caller's.
    - `NIKA-SEC-004` → the boundary refused an effect at RUN. Grant the
      exact thing it names — never widen to `**` to make a message go away.
    - `NIKA-PROVIDER` → `model:` must be `<provider>/<name>` with a

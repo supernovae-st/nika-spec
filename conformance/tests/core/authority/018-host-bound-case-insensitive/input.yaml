@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: t-host-bound-case-insensitive
+nika: t-host-bound-case-insensitive
 permits:
   net: { http: ["API.Example.com"] }
   tools: ["nika:fetch"]

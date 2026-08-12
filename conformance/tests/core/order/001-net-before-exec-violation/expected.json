@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-015",
+      "category": "security_error"
+    }
+  ],
+  "note": "10-authority.md \u00a7the unconditional laws \u00b7 net-before-exec \u2014 `act` is a descendant of `fetch_page` (the path is the witness). UNCONDITIONAL: no block declares it and none can disable it. The trifecta does NOT cover this file \u2014 leg \u2460 wants a non-empty `fs.read` and there is none."
+}

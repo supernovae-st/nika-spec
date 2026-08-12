@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: t-star-stops-at-the-segment
+nika: t-star-stops-at-the-segment
 permits:
   fs: { read: ["./datasets/*.csv"] }
   tools: ["nika:read"]

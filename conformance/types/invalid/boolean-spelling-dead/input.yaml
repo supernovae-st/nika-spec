@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: io-boolean-spelling-dead
+nika: io-boolean-spelling-dead
 inputs:
   verbose: { type: boolean }
 tasks:

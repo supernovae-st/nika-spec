@@ -1,8 +1,5 @@
 # Expected: exit 0 — nika:validate surfaces valid:false + errors array without failing the task.
-nika: v1
-workflow:
-  id: validate-invalid-report
-  description: "nika:validate on DELIBERATELY-invalid data → must return { valid:false, errors:[...] } as a REPORT, not fail the task"
+nika: validate-invalid-report
 model: mock/echo
 
 const:

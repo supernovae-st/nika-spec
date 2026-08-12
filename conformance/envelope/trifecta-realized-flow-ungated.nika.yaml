@@ -4,10 +4,7 @@
 # (net.http · nika:notify), the fetched content REACHES the egress task's
 # effect surface, and no blocking invoke: nika:prompt dominates the first
 # network touch (NEP-0002 · the Rule of Two as a static check).
-nika: v1
-workflow:
-  id: sec21-trifecta-realized-flow-ungated
-  description: "ATTACK: fetch-then-notify with private read permitted and no dominating human gate — expect check refuses with NIKA-SEC-009"
+nika: sec21-trifecta-realized-flow-ungated
 
 permits:
   fs: { read: ["./docs/**"] }

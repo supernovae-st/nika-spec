@@ -47,7 +47,7 @@ Task intent:
 
 Rules:
 - Output ONE complete workflow inside a single ```yaml fenced block.
-- Start with `nika: v1`. Use only documented verbs/constructs.
+- Start with `nika: <kebab-case-id>`. Use only documented verbs/constructs.
 - No commentary outside the fence.
 """
 

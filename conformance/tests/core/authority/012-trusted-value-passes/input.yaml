@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: t-trusted-value-passes
+nika: t-trusted-value-passes
 permits:
   fs: { read: ["datasets/**"] }
   tools: ["nika:read"]

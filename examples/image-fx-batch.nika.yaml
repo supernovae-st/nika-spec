@@ -20,10 +20,7 @@
 #
 # Run · nika run examples/image-fx-batch.nika.yaml
 
-nika: v1
-workflow:
-  id: image-fx-batch
-  description: "Folder of PNG files → deterministic art (grayscale · dither · pixelate) · offline batch"
+nika: image-fx-batch
 
 const:
   # Two sample photos ship with the repo. Point this at your own folder and

@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: rt-skip-preserves-error
+nika: rt-skip-preserves-error
 model: mock/echo
 tasks:
   flaky:

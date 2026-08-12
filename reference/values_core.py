@@ -2,14 +2,17 @@
 # SPDX-License-Identifier: Apache-2.0
 """The reference value-authority core (E-split · R3a + R3b defaults).
 
-STATUS · the value authorities of nika: v1 are EXACTLY four ·
-`inputs` · `config` · `const` · `secrets` (R3a · the 4-authority family
-ratified constitution §2.8). This module is the reference judge of that
-family at the envelope. It resolves the declared authorities, refuses the
-dead forms `vars:`/`env:`, refuses a value-namespace reference outside the
-family, and validates every declared default/constant against its declared
-type (the P0 soundness hole `{type: integer, default: "abc"}` that passed
-check AND run).
+STATUS · the value authorities of nika: v1 are EXACTLY three ·
+`inputs` · `const` · `secrets`. `config` died with the envelope nuke: it
+had zero WORK usage, its `default:` was its only possible source, and
+under the taint lattice `config.p` and `inputs.p` produced the SAME
+`NIKA-AUTH-008` by the same path — indiscernible. A deployment-supplied
+value is an `inputs:` entry with `required: false` and a `default:`. This
+module is the reference judge of that family at the envelope. It resolves
+the declared authorities, refuses the dead forms `vars:`/`env:`, refuses a
+value-namespace reference outside the family, and validates every declared
+default/constant against its declared type (the P0 soundness hole
+`{type: integer, default: "abc"}` that passed check AND run).
 
 Sources (locked rulings only · nothing here is invented):
   · RULINGS_2026-07-15.md §R3a (E-split · vars/env die · classify-not-rename)
@@ -56,11 +59,13 @@ from type_core import TypeError_ as _TypeError  # noqa: E402
 import yaml  # noqa: E402
 
 
-# the closed four-authority family (R3a · LAW-SURFACE-0201)
-VALUE_AUTHORITIES = ("inputs", "config", "const", "secrets")
+# the closed three-authority family (R3a · LAW-SURFACE-0201 · `config`
+# died with the envelope nuke — the deployment-supplied role folded into
+# `inputs:` + `required: false`)
+VALUE_AUTHORITIES = ("inputs", "const", "secrets")
 # the runtime / local namespaces · legal in ${{ }}, never value authorities.
 # `group` is the fan-in reader (03 §group) — the PLURAL of `tasks`, same
-# runtime family, so the four-authority family and the namespace count are
+# runtime family, so the value-authority family and the namespace count are
 # both untouched by it.
 RUNTIME_NAMESPACES = frozenset({"tasks", "group", "with", "item", "index"})
 # the dead forms · each carries its own teaching (LAW-GRAMMAR-0201 · 0202)
@@ -93,11 +98,12 @@ def err(code: str, detail: str) -> dict:
 # ── resolution · the envelope value environment (R3a) ────────────────────
 
 def resolve_envelope(doc: dict) -> dict:
-    """Parse the envelope into the resolved value environment · the four
-    authorities keyed by name (R3a). `inputs`/`config` carry a declared
-    `type` (+ optional `default`); `const` carries a bare literal or a typed
-    `{type, value}`; `secrets` carries a governed store reference. The dead
-    forms are NOT resolved here · they refuse in values_core_errors."""
+    """Parse the envelope into the resolved value environment · the three
+    authorities keyed by name (R3a). `inputs` carries a declared
+    `type` (+ optional `required`/`default`); `const` carries a bare literal
+    or a typed `{type, value}`; `secrets` carries a governed store reference.
+    The dead forms are NOT resolved here · they refuse in
+    values_core_errors."""
     env: dict[str, dict] = {a: {} for a in VALUE_AUTHORITIES}
     if not isinstance(doc, dict):
         return env
@@ -148,21 +154,16 @@ def _walk_strings(node):
 # ── the default / constant type check (R3b · LAW-TYPE-0211) ──────────────
 
 def _default_errors(doc: dict, env: dict) -> list[dict]:
-    """Every declared default (inputs · config) and every typed constant
+    """Every declared default (inputs) and every typed constant
     value (const `{type, value}`) MUST conform to its declared type
     (R3b · LAW-TYPE-0211 · NIKA-DEFAULT-001). Reuses the reference type
     core: parse the declared type, then fit the value. An invalid declared
     type is reported elsewhere (schema · type_core) · the check skips it."""
     errs: list[dict] = []
-    raw_types = doc.get("types")
-    types_map = raw_types if isinstance(raw_types, dict) else {}
-    names = set(types_map)
+    # named types died with the `types:` block — a type expression is
+    # self-contained (spec/09-types.md), so the name environment is empty
+    names: set[str] = set()
     named: dict[str, dict] = {}
-    for n, v in types_map.items():
-        try:
-            named[n] = _parse_type(v, names, f"types.{n}")
-        except _TypeError:
-            pass  # a malformed named type is type_core's finding, not ours
 
     def _check(where: str, type_expr, value) -> None:
         try:
@@ -176,10 +177,9 @@ def _default_errors(doc: dict, env: dict) -> list[dict]:
                 f"type · the P0 soundness hole (a value that passes check and "
                 f"fails at run) is closed (R3b · LAW-TYPE-0211)"))
 
-    for auth in ("inputs", "config"):
-        for name, decl in env.get(auth, {}).items():
-            if isinstance(decl, dict) and "type" in decl and "default" in decl:
-                _check(f"{auth}.{name}.default", decl["type"], decl["default"])
+    for name, decl in env.get("inputs", {}).items():
+        if isinstance(decl, dict) and "type" in decl and "default" in decl:
+            _check(f"inputs.{name}.default", decl["type"], decl["default"])
 
     for name, decl in env.get("const", {}).items():
         if isinstance(decl, dict) and "type" in decl and "value" in decl:
@@ -211,8 +211,9 @@ def values_core_errors(doc: dict) -> list[dict]:
         errs.append(err(
             "NIKA-VALUES-002",
             "env: is a dead envelope field (R3a · the E-split) · non-sensitive "
-            "runtime configuration is a `config:` declaration, a governed store "
-            "reference is a `secrets:` entry"))
+            "runtime configuration is an `inputs:` declaration with "
+            "`required: false` and a `default:`, a governed store reference is a "
+            "`secrets:` entry"))
 
     # ── the value-namespace family (LAW-SURFACE-0201) ──────────────────
     env = resolve_envelope(doc)

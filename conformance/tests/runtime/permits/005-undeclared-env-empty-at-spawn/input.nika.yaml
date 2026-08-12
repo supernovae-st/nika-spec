@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: rt-permits-env-undeclared-empty
+nika: rt-permits-env-undeclared-empty
 permits:
   exec: true
 tasks:

@@ -170,3 +170,66 @@ tombstones:
       date: "2026-07-19"
       count: 0
     notes: "R3b verbatim : « le sous-langage 6-enum meurt (PARSE-015 class retirée), boolean↔bool meurt avec lui. » La classe typed-vars-declaration-malformed n'a plus d'objet : le champ type des declarations inputs/outputs parle le TypeExpr complet de 09-types (LAW-GRAMMAR-0211) — ce que PARSE-015 refusait (les formes riches) est admis, ce qui reste hors TypeExpr refuse via le code existant NIKA-TYPE-001 (meme classe inconnue · aucun second code minte · SSOT-2 B.21/B.22). Kill C2 : la row canon.yaml error_codes gagne le commentaire RETIRED (le trou d'allocation est delibere · meme precedent que NIKA-PARSE-016) · la row du registre diagnostics sort pour cette tombe · la table 05-errors gagne la note retired. Le code NIKA-PARSE-015 n'est JAMAIS reutilise (B.22). Census pattern = la string d'enseignement exacte (la classe, pas le nom du code : la note retired de 05-errors cite NIKA-PARSE-015 a jamais, comme PARSE-016 avant elle)."
+  - id: nika-version-marker-literal
+    status: retired
+    owner: spec
+    law_ids: ["LAW-SURFACE-0101"]
+    introduced_in: C0
+    kind: field
+    retired_in: C2
+    replaced_by: "surface:nika_mark_and_name"
+    census_pattern:
+      tool: grep
+      pattern: "^nika: v1$"
+      scope: spec
+    notes: "Envelope nuke 2026-08-12. La cle nika ne porte plus le litteral v1 : elle porte la MARQUE et le NOM du fichier (kebab-case). Le slot de VERSION disparait POUR TOUJOURS et c'est SANS PERTE — la spec verrouillait deja « there is no nika: v2 — ever » et les cassures profondes vivent DANS v1 en pre-1.0, donc le marqueur portait zero bit comme version. Un mot, un sens, dans les deux types de document : nika.yaml porte le nom du PROJET, un *.nika.yaml porte le nom du WORKFLOW ; le TYPE se lit sur tasks: (present = workflow · absent = projet), jamais sur le nom de fichier — qui ne voyage pas dans un blob, un paste ou un corps HTTP, exactement le transport pour lequel on gardait le marqueur. NIKA-PARSE-002 et NIKA-PARSE-003 SURVIVENT en changeant de sens : elles jugent desormais un id kebab-case, plus le litteral. PAS de final_census : les records verbatim canon/laws/* et les fixtures de refus citent la forme morte a jamais (le record du ruling EST la loi)."
+  - id: workflow-envelope-key
+    status: retired
+    owner: spec
+    law_ids: ["LAW-SURFACE-0101", "LAW-GRAMMAR-0222"]
+    introduced_in: C0
+    kind: field
+    retired_in: C2
+    replaced_by: "surface:nika_mark_and_name"
+    census_pattern:
+      tool: grep
+      pattern: "^workflow:"
+      scope: spec
+    notes: "Envelope nuke 2026-08-12. La cle d'enveloppe workflow MEURT ENTIEREMENT. Elle n'existait que pour loger id: et description: ; description est mort le meme jour (1 seul consommateur sur 5 surfaces de lecture · semantic_hash IDENTIQUE avec « AAA », avec « BBB » et sans · sa justification citait un `nika ls` qui rend unrecognized subcommand) et id: a demenage sur nika:, donc l'objet n'avait plus rien a tenir. Les deux diagnostics de migration meurent avec la forme : NIKA-PARSE-020 (workflow: scalaire) et NIKA-PARSE-021 (description: de premier niveau) sont RETIRES — aucun code retire n'est jamais reutilise (SSOT-2 B.22). ATTENTION carve-out permanent : `invoke: { workflow: <path|registry-ref> }` est une AUTRE cle, au niveau tache, et elle VIT (spec/14-composition.md) — le census se lit ancre en debut de ligne, jamais au grep nu."
+  - id: config-envelope-authority
+    status: retired
+    owner: spec
+    law_ids: ["LAW-SURFACE-0201", "LAW-AUTH-0325"]
+    introduced_in: C2
+    kind: surface-word
+    retired_in: C2
+    replaced_by: "surface:namespace_inputs"
+    census_pattern:
+      tool: grep
+      pattern: "config[.:]"
+      scope: spec
+    notes: "Envelope nuke 2026-08-12. La famille d'autorites passe de QUATRE a TROIS : inputs · const · secrets. Mesure : ZERO usage WORK · son default: etait sa seule source possible (corrige la veille · NIKA-DEFAULT-002) · et sous le treillis de teinte config.p et inputs.p rendaient le MEME NIKA-AUTH-008 par le meme chemin — indiscernables. La cellule qu'il occupait (personne ne fournit x untrusted) etait une constante qu'on demandait au checker de traiter comme hostile. Classification (classify-not-rename, equivalence-or-stop) : une valeur fournie par le deploiement est une entree inputs: avec required: false et un default:. Le refus vivant : la cle d'enveloppe refuse au schema (additionalProperties · la liste des 9 cles est imprimee dans le diagnostic) et une lecture ${{ inputs.X }} refuse NIKA-VALUES-003 qui enseigne la famille a trois. NIKA-DEFAULT-002 (une entree config: sans default:) est RETIRE avec sa cle. Carve-outs documentes : exec.env et une cle de map nommee config dans un with: sont d'autres mots, hors census."
+  - id: policy-envelope-block
+    status: retired
+    owner: spec
+    law_ids: ["LAW-AUTH-0312", "LAW-AUTH-0313"]
+    introduced_in: C0
+    kind: field
+    retired_in: C2
+    census_pattern:
+      tool: grep
+      pattern: "^policy:"
+      scope: spec
+    notes: "Envelope nuke 2026-08-12. Les 7 familles meurent. Mesure : ZERO usage WORK · les 12 blocs du corpus etaient EXACTEMENT `policy:\n  endorsement: solo` · 6 familles sur 7 a fan-out ZERO · prefer:/optimize: prouves non-enregistres au sha256 (check --json byte-identique avec des valeurs opposees) · limits.max_tasks asserait une borne sur un nombre litteral DANS LE MEME FICHIER. Et surtout la loi etait FAIL-OPEN : un gate humain SANS bloc policy: passait, le MEME gate avec un bloc sans rapport rendait NIKA-SEC-013 — corpus 26 gates epargnes, 8 punis ; une loi qui ne lie que ceux qui l'ont declaree ne lie rien. NIKA-POLICY-001 et NIKA-SEC-013 sont RETIRES. Ce qui SURVIT, inconditionnel : forbid.exec_after devient NIKA-SEC-015 (net-before-exec · fixe a sa seule parametrisation declaree · cout mesure sur le corpus AVANT le ruling : 194 taches exec, 1 refusee, et celle-la est deja un check-reject declare). Ce qui ne survit PAS : require.human_gate_before, dont la forme inconditionnelle [exec] refuserait 187 des 194 — ce n'est pas une loi, c'est une interdiction de exec: ; sa substance inconditionnelle est celle que TRIFECTA (NIKA-SEC-009) et CONSENT (NIKA-SEC-014) portent deja, le residu est nomme DU dans spec/10-authority.md, jamais devine."
+  - id: types-envelope-block
+    status: retired
+    owner: spec
+    law_ids: ["LAW-SURFACE-0211"]
+    introduced_in: C0
+    kind: field
+    retired_in: C2
+    census_pattern:
+      tool: grep
+      pattern: "^types:"
+      scope: spec
+    notes: "Envelope nuke 2026-08-12. Les types NOMMES meurent, la sous-langue de types VIT entierement — elle se lit inline. Mesure : ZERO usage WORK · returns: accepte deja une expression de type inline (09-types.md le dit) · 14 returns: en tout sur 815 fichiers, donc aucune reutilisation a nommer. 14-composition.md ecrivait lui-meme que « proven » n'est pas un mot que ce contrat autorise encore : une enveloppe qui porte l'infrastructure d'une fonctionnalite non livree est la definition de « pas censee etre la ». Consequence de grammaire : un nom PascalCase en position de type ne resout plus rien et refuse NIKA-TYPE-001 en enseignant la forme inline ; la branche PascalCase sort du pattern de typeExpr au schema. NIKA-TYPE-002 (le graphe types: doit etre acyclique) est RETIRE — la classe n'a plus d'objet. RESTE documente : le noeud interne {ref: Name} de l'algebre de types (conformance/type_core.py) survit INATTEIGNABLE — parse_type ne le construit qu'avec un environnement de noms non vide, et le seul appelant passe set(). Le retirer changerait la signature publique que le corpus de types partage avec le juge differentiel de l'engine (contrat cross-repo) : nomme ici, jamais efface en silence."

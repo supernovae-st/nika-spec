@@ -6,6 +6,6 @@
       "category": "validation_error"
     }
   ],
-  "note": "Dead form (W1): top-level description: is NIKA-PARSE-021 engine-side — it moved into workflow.description (strict mode sees an unknown envelope field; the teaching names the move).",
+  "note": "A top-level `description:` is an unknown envelope key \u2014 the envelope has 9 keys and prose is not one of them. NIKA-PARSE-021 (\u00ab it moved into workflow.description \u00bb) is RETIRED with its destination.",
   "mode": "strict"
 }

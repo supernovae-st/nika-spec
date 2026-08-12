@@ -1,7 +1,5 @@
 # Expected: exit 0 — NIKA-TIMEOUT-001 fires internally, recovered via on_error.
-nika: v1
-workflow:
-  id: e28-on-error-timeout-recover
+nika: e28-on-error-timeout-recover
 # INTENT: timeout is catchable by on_error — recover on NIKA-TIMEOUT-001
 permits:
   exec: ["sleep"]

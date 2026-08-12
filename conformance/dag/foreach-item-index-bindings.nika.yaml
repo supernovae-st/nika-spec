@@ -1,7 +1,5 @@
 # Expected: exit 0 — item + index bindings resolve per iteration.
-nika: v1
-workflow:
-  id: foreach-index-binding
+nika: foreach-index-binding
 # COVERS: ${{ index }} 0-based positional binding aligns exactly with input order.
 const:
   items: ["zero", "one", "two", "three", "four"]

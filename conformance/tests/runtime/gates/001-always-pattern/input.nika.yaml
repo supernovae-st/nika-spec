@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: rt-always-pattern
+nika: rt-always-pattern
 model: mock/echo
 tasks:
   work:

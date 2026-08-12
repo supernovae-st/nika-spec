@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: t-fetch-code-bearing-script
+nika: t-fetch-code-bearing-script
 permits:
   net: { http: ["news.example.com"] }
   tools: ["nika:fetch"]

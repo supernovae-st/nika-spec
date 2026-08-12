@@ -1,9 +1,7 @@
 # Expected: NIKA-YAML-005 at CHECK.
 # D-2026-07-17-N5: a scalar over 65 536 bytes (64 KiB) refuses NET — never truncation.
 # Closes gap P5 (a 200k-char scalar used to pass) · move the payload to a referenced file.
-nika: v1
-workflow:
-  id: scalar-over-cap
+nika: scalar-over-cap
 const:
   blob:
     type: string

@@ -1,6 +1,4 @@
-nika: v1
-workflow:
-  id: core-on-codes
+nika: core-on-codes
 permits:
   tools: ["nika:fetch"]
   net: { http: ["slow.example.com"] }

@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: t-net-dead-grant-floor-blocked
+nika: t-net-dead-grant-floor-blocked
 permits:
   net: { http: ["169.254.169.254"] }
   exec: ["curl"]

@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: seal
+nika: seal
 permits:
   tools: ["nika:hash"]
 secrets:

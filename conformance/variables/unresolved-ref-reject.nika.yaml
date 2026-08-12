@@ -1,7 +1,5 @@
 # Expected: NIKA-VAR-001 at CHECK.
-nika: v1
-workflow:
-  id: e19-var-unresolved
+nika: e19-var-unresolved
 # INTENT: NIKA-VAR-001 — reference to undeclared inputs key
 # No inputs block declared, so inputs.nonexistent_key is undefined
 tasks:

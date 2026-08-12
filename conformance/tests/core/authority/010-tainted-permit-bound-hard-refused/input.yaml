@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: t-tainted-permit-bound
+nika: t-tainted-permit-bound
 permits:
   net: { http: ["${{ inputs.host }}"] }
   tools: ["nika:fetch"]

@@ -1,6 +1,4 @@
-nika: v1
-workflow:
-  id: deep-003
+nika: deep-003
 const:
   threshold: 5
 tasks:

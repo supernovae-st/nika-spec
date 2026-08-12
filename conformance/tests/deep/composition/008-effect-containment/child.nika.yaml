@@ -1,6 +1,4 @@
-nika: v1
-workflow:
-  id: comp-008-child
+nika: comp-008-child
 inputs:
   url: { type: string, required: true }
 tasks:

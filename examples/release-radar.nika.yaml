@@ -35,10 +35,7 @@
 #   state, the second reports only what shipped in between.
 #   Offline rehearsal (zero key, deterministic) · add `--model mock/echo`.
 
-nika: v1
-workflow:
-  id: release-radar
-  description: "dependency release feed → diff vs last run → only the NEW ships"
+nika: release-radar
 
 model: ollama/qwen3.5:4b   # local · zero key · swap for any provider in the catalog
 

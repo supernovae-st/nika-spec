@@ -5,9 +5,7 @@
 # `null in [1,2,3]` → false (CEL membership of a non-member). These are well-typed
 # (null is a first-class literal, in-list membership doesn't require same-type to
 # return false in CEL). Each assert proves the exact boolean.
-nika: v1
-workflow:
-  id: c18-null-membership-and-compare
+nika: c18-null-membership-and-compare
 
 const:
   present: 7

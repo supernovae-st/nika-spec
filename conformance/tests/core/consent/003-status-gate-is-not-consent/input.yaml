@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t
+permits:
+  exec: ["git"]
+  tools: ["nika:prompt"]
+tasks:
+  ask:
+    invoke:
+      tool: "nika:prompt"
+      args: { mode: confirm, message: "push?", default: false }
+  push:
+    with: { st: "${{ tasks.ask.status }}" }
+    when: ${{ with.st == 'success' }}
+    exec: { command: ["git", "push"] }

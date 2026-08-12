@@ -1,7 +1,5 @@
 # Expected: NIKA-EXEC-001 at RUN. Parent fails after the batch (fail_fast: false); marker files prove a,c,d all ran.
-nika: v1
-workflow:
-  id: foreach-failfast-false
+nika: foreach-failfast-false
 # SPEC 03 §for_each.fail_fast false: iteration errors collected, REMAINING iterations keep running,
 # parent → failure ONLY after all complete. for_each.fail_fast:false + for_each.max_parallel:1.
 # Per-iteration program chosen by CEL ternary (shell-free): FAILHERE → /usr/bin/false

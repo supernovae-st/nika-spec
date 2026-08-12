@@ -494,8 +494,8 @@ def absent_permits_errors(doc: dict, tasks: list) -> list[dict]:
 # ── PERMIT-TAINT tables (NEP-0004 · LAW-AUTH-0325) ──────────────────────
 # The fit (PERMITS-FIT below) proves Required ⊆ Declared on CATEGORIES;
 # this law binds the VALUES flowing under a present block. Integ=untrusted
-# at check: inputs.* (caller-supplied) and config.* (deployment-supplied) —
-# the two roots resolvable at check via their declared defaults. Fetch/tool
+# at check: inputs.* (caller-supplied) — the one root resolvable at check
+# via its declared default. Fetch/tool
 # results, with:/tasks.* derivations, and every default-less ref DEFER to
 # the run-time re-gate (law 4 · NIKA-SEC-004), never a check error.
 _TAINT_FS_READ_TOOLS = {"nika:read", "nika:glob", "nika:grep"}
@@ -505,7 +505,7 @@ _TAINT_NET_TOOLS = {"nika:fetch", "nika:notify"}
 # that re-enters a command interpreter is never covered by a program
 # allowlist unless the permit lists the token itself.
 _TAINT_REENTRY_TOKENS = {"--exec", "--execdir", "-exec", "-execdir", "-c", "eval"}
-_TAINT_UNTRUSTED_ROOTS = ("inputs", "config")
+_TAINT_UNTRUSTED_ROOTS = ("inputs",)
 
 
 class _DeferRegate(Exception):
@@ -529,8 +529,7 @@ def _taint_lifted(t: dict) -> set[str]:
     return out
 
 
-def _resolve_untrusted(s: str, inputs: dict, config: dict,
-                       lifted: set) -> tuple:
+def _resolve_untrusted(s: str, inputs: dict, lifted: set) -> tuple:
     """Resolve the UNTRUSTED ${{ }} references of a verb-argument string at
     check. Returns (resolved, taint_paths) when ≥1 untrusted ref resolves
     and no reference stays dynamic · (None, []) when nothing untrusted
@@ -549,7 +548,7 @@ def _resolve_untrusted(s: str, inputs: dict, config: dict,
         binding = f"{root}.{name}"
         if binding in lifted:
             raise _DeferRegate  # the lift: taint door · trusted here
-        decl = (inputs if root == "inputs" else config).get(name)
+        decl = inputs.get(name)
         default = decl.get("default") if isinstance(decl, dict) else None
         if not isinstance(default, str):
             raise _DeferRegate  # no default → caller-supplied at launch
@@ -653,7 +652,7 @@ def permit_taint_errors(doc: dict, tasks: list) -> list[dict]:
     """NEP-0004 / LAW-AUTH-0325 · the permit-parameterization taint. Law 1:
     an interpolation reaching a permit BOUND is a hard refusal
     (NIKA-AUTH-007 · the bound MUST be a literal, the boundary would be
-    self-serve). Law 2: an untrusted value (inputs.* · config.*) reaching a
+    self-serve). Law 2: an untrusted value (inputs.*) reaching a
     permitted verb's ARGUMENT is re-gated on its canonical RESOLVED form
     against the STEP's permit (NIKA-AUTH-008 · the detail carries the taint
     path source-first, the canonical form, and the escaped bound). Law 4:
@@ -677,7 +676,6 @@ def permit_taint_errors(doc: dict, tasks: list) -> list[dict]:
 
     # Law 2 · the re-gate (canonicalize the RESOLVED value first)
     inputs = _as_dict(doc.get("inputs"))
-    config = _as_dict(doc.get("config"))
     fs = permits.get("fs") if isinstance(permits.get("fs"), dict) else {}
     read_globs = fs.get("read") if isinstance(fs.get("read"), list) else []
     write_globs = fs.get("write") if isinstance(fs.get("write"), list) else []
@@ -709,7 +707,7 @@ def permit_taint_errors(doc: dict, tasks: list) -> list[dict]:
                 globs = read_globs if is_read else write_globs
                 v = args.get("path")
                 if isinstance(v, str) and EXPR_BODY.search(v):
-                    resolved, paths = _resolve_untrusted(v, inputs, config, lifted)
+                    resolved, paths = _resolve_untrusted(v, inputs, lifted)
                     if resolved is not None:
                         canon = _taint_canonical_path(resolved)
                         regate(tid, paths, f"args.path ({tool})", resolved, canon,
@@ -718,7 +716,7 @@ def permit_taint_errors(doc: dict, tasks: list) -> list[dict]:
             elif tool in _TAINT_NET_TOOLS:
                 v = args.get("url")
                 if isinstance(v, str) and EXPR_BODY.search(v):
-                    resolved, paths = _resolve_untrusted(v, inputs, config, lifted)
+                    resolved, paths = _resolve_untrusted(v, inputs, lifted)
                     if resolved is not None:
                         host = _taint_canonical_host(resolved)
                         if host is not None:
@@ -732,7 +730,7 @@ def permit_taint_errors(doc: dict, tasks: list) -> list[dict]:
                 for i, el in enumerate(cmd):
                     if not isinstance(el, str) or not EXPR_BODY.search(el):
                         continue
-                    resolved, paths = _resolve_untrusted(el, inputs, config, lifted)
+                    resolved, paths = _resolve_untrusted(el, inputs, lifted)
                     if resolved is None:
                         continue
                     if i == 0:
@@ -938,7 +936,7 @@ def _code_bearing_class(url: str):
 
 def _resolve_static_url(v: str, doc: dict):
     """Resolve a fetch url at check when every island is const.* or an
-    inputs.*/config.* entry carrying a declared default (the NEP-0004
+    inputs.* entry carrying a declared default (the NEP-0004
     resolution rules extended to the trusted const root · the SINK law
     classifies the artifact, trust is not the question here). Returns the
     resolved string, or None when any island stays dynamic (law 3 · the
@@ -946,7 +944,6 @@ def _resolve_static_url(v: str, doc: dict):
     if "${{" not in v:
         return v
     inputs = _as_dict(doc.get("inputs"))
-    config = _as_dict(doc.get("config"))
     consts = _as_dict(doc.get("const"))
 
     class _Dyn(Exception):
@@ -965,8 +962,8 @@ def _resolve_static_url(v: str, doc: dict):
             if isinstance(decl, dict) and isinstance(decl.get("value"), str):
                 return decl["value"]
             raise _Dyn
-        if root in ("inputs", "config"):
-            decl = (inputs if root == "inputs" else config).get(name)
+        if root == "inputs":
+            decl = inputs.get(name)
             default = decl.get("default") if isinstance(decl, dict) else None
             if isinstance(default, str):
                 return default
@@ -1280,13 +1277,41 @@ def deep_static_errors(doc: dict) -> list[dict]:
 
     return errs
 
-# ── POLICY · the hard families judged on the graph (spec 10-authority) ──
-
-# The effect-class table for policy rules — the COARSE projection of the
-# builtin classification (10 §the effect vocabulary · one voice with the
-# engine's builtin_effect table · fs split at its grain of harm: write).
-_POLICY_NET_TOOLS = {"nika:fetch", "nika:notify"}
-_POLICY_WRITE_TOOLS = {"nika:write", "nika:edit"}
+# ── NET-BEFORE-EXEC · the order law, now unconditional (spec 10) ────────
+#
+# `policy:` died with the envelope nuke: its families were a DECLARED law,
+# and a law that only binds the file opting into it binds nothing —
+# measured on the corpus, 26 human gates escaped the endorsement rule and
+# 8 were punished, the 8 being the ones that had declared an UNRELATED
+# clause. Fail-open by construction.
+#
+# `forbid.exec_after` reads the TRANSITIVE graph, so it says something a
+# reader cannot see, and it did not die with the key: it joins the shelf
+# of TRIFECTA (`NIKA-SEC-009`) and CONSENT (`NIKA-SEC-014`), which fire
+# with no declaration at all. Fixed at its one declared parameterization —
+# `[net]`, untrusted ingress reaching a shell — because that is the class
+# the law was ever used for and because it is decidable from the graph
+# alone. TRIFECTA does NOT subsume it: the trifecta needs leg ① (a
+# non-empty `fs.read`), so `fetch → exec` with no private read read GREEN
+# under the trifecta and RED under this law (measured 2026-08-12 on the
+# ex-fixture `core/policy/003`).
+#
+# Cost, measured before the ruling: 194 `exec:` tasks across the shipped
+# corpus, 1 refused — and that one (`secrets-two-sinks-one-sanctioned`)
+# is already a declared check-reject. Zero green files pay for it.
+#
+# `require.human_gate_before` did NOT make the same move: at its one
+# declared parameterization `[exec]` it refuses 187 of those 194 tasks,
+# which is a ban on `exec:`, not a law. Its unconditional substance is
+# what TRIFECTA and CONSENT already carry; the residue (a gate before
+# exec ABSENT a private read) is owed a ruling and is named as owed in
+# spec/10-authority.md rather than guessed here.
+#
+# The coarse effect table CONSENT and this law read (10 §the effect
+# vocabulary · one voice with the engine's builtin_effect table · fs
+# split at its grain of harm: write).
+_EGRESS_NET_TOOLS = {"nika:fetch", "nika:notify"}
+_EGRESS_WRITE_TOOLS = {"nika:write", "nika:edit"}
 _HUMAN_GATE_TOOL = "nika:prompt"
 
 
@@ -1297,22 +1322,7 @@ def _task_tool(t: dict) -> str | None:
     return None
 
 
-def _task_effect_classes(t: dict) -> set[str]:
-    """The policy effect classes a task carries (exec · write · net · tools)."""
-    out: set[str] = set()
-    if "exec" in t:
-        out.add("exec")
-    tool = _task_tool(t)
-    if tool is not None:
-        out.add("tools")
-        if tool in _POLICY_NET_TOOLS:
-            out.add("net")
-        if tool in _POLICY_WRITE_TOOLS:
-            out.add("write")
-    return out
-
-
-def _policy_graph(tasks: list) -> dict[str, set[str]]:
+def _order_graph(tasks: list) -> dict[str, set[str]]:
     """tid → direct ancestor tids (E_d via with: refs ∪ E_c via after: keys) —
     the same derived graph every judge reads (03 · with/after are the two
     doors · a boundary-crossing ref outside them is NIKA-VAR-021 upstream)."""
@@ -1329,11 +1339,15 @@ def _policy_graph(tasks: list) -> dict[str, set[str]]:
         after = t.get("after")
         if isinstance(after, dict):
             refs.update(k for k in after if isinstance(k, str))
+        elif isinstance(after, list):
+            refs.update(k for k in after if isinstance(k, str))
+        elif isinstance(after, str):
+            refs.add(after)
         up[tid] = refs & ids
     return up
 
 
-def _ancestors(up: dict[str, set[str]], tid: str) -> set[str]:
+def _order_ancestors(up: dict[str, set[str]], tid: str) -> set[str]:
     seen: set[str] = set()
     stack = list(up.get(tid, ()))
     while stack:
@@ -1345,72 +1359,36 @@ def _ancestors(up: dict[str, set[str]], tid: str) -> set[str]:
     return seen
 
 
-def policy_errors(doc: dict) -> list[dict]:
-    """The hard policy: families (spec 10) · require.human_gate_before ·
-    forbid.exec_after · allow.providers · limits.max_tasks. Soft families
-    (prefer/optimize) are recorded, never judged — no rule here reads them."""
-    pol = doc.get("policy")
-    if not isinstance(pol, dict):
+def net_before_exec_errors(doc: dict) -> list[dict]:
+    """NIKA-SEC-015 · no `exec:` task may sit transitively downstream of a
+    net-effecting task. Unconditional — no block declares it, none can
+    disable it. The path IS the witness."""
+    tasks = iter_tasks(doc)
+    if not tasks:
+        return []
+    up = _order_graph(tasks)
+    net_ids = {tid for tid, t in tasks if _task_tool(t) in _EGRESS_NET_TOOLS}
+    if not net_ids:
         return []
     errs: list[dict] = []
-    tasks = iter_tasks(doc)
-    up = _policy_graph(tasks)
-    classes = {tid: _task_effect_classes(t) for tid, t in tasks}
-
-    def violation(detail: str) -> None:
-        errs.append({"code": "NIKA-POLICY-001", "namespace": "NIKA-POLICY",
-                     "category": "security_error", "detail": detail})
-
-    require = pol.get("require") if isinstance(pol.get("require"), dict) else {}
-    gated = require.get("human_gate_before")
-    if isinstance(gated, list):
-        gate_ids = {tid for tid, t in tasks if _task_tool(t) == _HUMAN_GATE_TOOL}
-        for tid, _t in tasks:
-            hit = classes[tid] & set(gated)
-            if hit and not (_ancestors(up, tid) & gate_ids):
-                violation(f"task '{tid}' · require.human_gate_before: "
-                          f"{sorted(hit)} — no {_HUMAN_GATE_TOOL} ancestor "
-                          "(the pause IS the consent · 10 §policy)")
-
-    forbid = pol.get("forbid") if isinstance(pol.get("forbid"), dict) else {}
-    upstream_classes = forbid.get("exec_after")
-    if isinstance(upstream_classes, list):
-        wanted = set(upstream_classes)
-        for tid, _t in tasks:
-            if "exec" not in classes[tid]:
-                continue
-            tainted = [a for a in _ancestors(up, tid) if classes[a] & wanted]
-            if tainted:
-                path = " → ".join(sorted(tainted)) + f" → {tid}"
-                violation(f"task '{tid}' · forbid.exec_after: "
-                          f"{sorted(wanted)} — the path is the witness: {path} "
-                          "(order law · 10 §policy)")
-
-    allow = pol.get("allow") if isinstance(pol.get("allow"), dict) else {}
-    providers = allow.get("providers")
-    if isinstance(providers, list):
-        root_model = doc.get("model") if isinstance(doc.get("model"), str) else None
-        for tid, t in tasks:
-            body = t.get("infer") if isinstance(t.get("infer"), dict) else                 t.get("agent") if isinstance(t.get("agent"), dict) else None
-            if body is None:
-                continue
-            model = body.get("model") if isinstance(body.get("model"), str)                 else root_model
-            if model is None or EXPR_BODY.search(model):
-                violation(f"task '{tid}' · allow.providers — the provider is "
-                          "not statically determinable (templated or absent "
-                          "model:) · fail-closed: pin the literal (10 §policy)")
-                continue
-            provider = model.split("/", 1)[0]
-            if provider not in providers:
-                violation(f"task '{tid}' · allow.providers — '{provider}' is "
-                          f"not in {providers} (10 §policy)")
-
-    limits = pol.get("limits") if isinstance(pol.get("limits"), dict) else {}
-    max_tasks = limits.get("max_tasks")
-    if isinstance(max_tasks, int) and not isinstance(max_tasks, bool)             and len(tasks) > max_tasks:
-        violation(f"limits.max_tasks: {max_tasks} — the workflow declares "
-                  f"{len(tasks)} tasks (10 §policy)")
-
+    for tid, t in tasks:
+        if "exec" not in t:
+            continue
+        tainted = sorted(_order_ancestors(up, tid) & net_ids)
+        if not tainted:
+            continue
+        path = " → ".join(tainted) + f" → {tid}"
+        errs.append({
+            "code": "NIKA-SEC-015", "namespace": "NIKA-SEC",
+            "category": "security_error",
+            "detail": (
+                f"task '{tid}' runs a shell downstream of network content — "
+                f"the path is the witness: {path} · content the workflow did "
+                "not author must not reach `exec:` (the order law · "
+                "unconditional since `policy:` died · 10 §the unconditional "
+                "laws) · fix: consume the fetched value with a builtin "
+                "(`nika:jq` · `nika:validate`) instead of a shell, or drop "
+                "the edge")})
     return errs
 
 
@@ -1728,14 +1706,14 @@ def _consent_egress(task):
         return True
     tool = _task_tool(task)
     if tool is not None:
-        return (tool.startswith("mcp:") or tool in _POLICY_NET_TOOLS
-                or tool in _POLICY_WRITE_TOOLS)
+        return (tool.startswith("mcp:") or tool in _EGRESS_NET_TOOLS
+                or tool in _EGRESS_WRITE_TOOLS)
     ag = task.get("agent")
     if isinstance(ag, dict):
         for g in (ag.get("tools") or []):
             if (isinstance(g, str) and not g.startswith("!")
                     and (g.startswith("mcp:") or g in ("*", "nika:*")
-                         or g in _POLICY_NET_TOOLS or g in _POLICY_WRITE_TOOLS)):
+                         or g in _EGRESS_NET_TOOLS or g in _EGRESS_WRITE_TOOLS)):
                 return True
     return False
 

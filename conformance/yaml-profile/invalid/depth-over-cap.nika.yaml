@@ -1,9 +1,7 @@
 # Expected: NIKA-YAML-009 at CHECK.
 # D-2026-07-17-N5: the profile caps nesting at 64 levels — level 65 refuses NET
 # (beyond the cap a document is generated, not authored).
-nika: v1
-workflow:
-  id: depth-over-cap
+nika: depth-over-cap
 const:
   payload:
     type: object

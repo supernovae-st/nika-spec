@@ -1,0 +1,11 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "validation_error"
+    }
+  ],
+  "note": "`config:` is not an envelope key. Zero WORK usage, its `default:` was its only possible source, and under the taint lattice `config.p` and `inputs.p` produced the SAME NIKA-AUTH-008 by the same path. A deployment-supplied value is an `inputs:` entry with `required: false` and a `default:`. The value authorities are exactly three: inputs \u00b7 const \u00b7 secrets.",
+  "mode": "strict"
+}

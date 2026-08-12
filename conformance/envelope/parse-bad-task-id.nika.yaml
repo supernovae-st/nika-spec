@@ -1,7 +1,5 @@
 # Expected: NIKA-PARSE-006 at CHECK.
-nika: v1
-workflow:
-  id: e04-parse-bad-task-id
+nika: e04-parse-bad-task-id
 # INTENT: trigger NIKA-PARSE-006 (task id with hyphen violates snake_case)
 tasks:
   bad-task-id:

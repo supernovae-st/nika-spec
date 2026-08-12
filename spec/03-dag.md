@@ -50,7 +50,7 @@ nothing), use `after:` ·
 my_task:                        # the map KEY is the identity · snake_case · unique
   with:                         # optional · the DATA boundary · each tasks.* ref = one typed edge
     data: ${{ tasks.task_a.output }}
-    config: { foo: "bar" }      # literals are fine — only tasks.* refs create edges
+    opts: { foo: "bar" }        # literals are fine — only tasks.* refs create edges
     legs: ${{ group.probes }}   # a fan-in fold · one edge per declared member
   group: probes                 # optional · fan-in MEMBERSHIP · this task joins the set
   after:                        # optional · the CONTROL boundary · {producer: predicate}
@@ -96,7 +96,7 @@ Source order is presentation only — the graph alone schedules.
 `tasks.<id>.output`. In CEL (and almost every expression language) a hyphen is
 the **subtraction operator**: `tasks.research-topic.output` would parse as
 `tasks.research - topic.output`, a silent trap. Snake_case ids are always
-clean CEL identifiers. (The workflow-level `workflow:` id stays kebab-case:
+clean CEL identifiers. (The file-level `nika:` name stays kebab-case:
 it is a resource name, never referenced inside an expression.)
 
 ### `with` · *optional · the DATA boundary — bindings that ARE edges*
@@ -262,10 +262,10 @@ failure mode, not taste ·
   to is a 1-cycle (`NIKA-DAG-001`) with no special case; the projection sees
   the fan-in the way it sees any other edge; wave scheduling is unchanged.
 
-`group` is **not a 7th namespace**. It is the plural reader of the `tasks`
-runtime namespace — same family, stricter placement. The four value
-authorities (`inputs` · `config` · `const` · `secrets`) and the namespace
-count are both untouched ([04 §the 6 namespaces](./04-variables.md#the-6-namespaces)).
+`group` is **not an extra namespace**. It is the plural reader of the `tasks`
+runtime namespace — same family, stricter placement. The three value
+authorities (`inputs` · `const` · `secrets`) and the namespace
+count are both untouched ([04 §the namespaces](./04-variables.md)).
 
 #### The member record (normative · closed at v1)
 
@@ -380,7 +380,7 @@ notify:
 
 `when:` decides **whether an admitted task runs**. It is evaluated *after*
 the gate (§gate algebra) and it reads **local namespaces only** ·
-`inputs` · `config` · `const` · `with` · and the `for_each` locals `item` / `index`.
+`inputs` · `const` · `with` · and the `for_each` locals `item` / `index`.
 A `tasks.*` reference inside `when:` is refused at parse time
 (`NIKA-VAR-021` · « hoist it into `with:` » — the binding creates the edge,
 `when:` reads the binding).
@@ -492,8 +492,8 @@ STRING   = /'([^'\\]|\\.)*'/ | /"([^"\\]|\\.)*"/ ;   (* escapes · \\ \' \" \n \
    `validation_error`); an expression that passes the static shape check
    but evaluates non-boolean fails at evaluation (`NIKA-VAR-006` ·
    `variable_error`). See §`when:` shape rules below.
-6. **Identifier roots resolve against the namespaces** · the 6 global
-   namespaces (`inputs` · `config` · `const` · `secrets` · `with` · `tasks`)
+6. **Identifier roots resolve against the namespaces** · the 5 global
+   namespaces (`inputs` · `const` · `secrets` · `with` · `tasks`)
    plus the two
    `for_each` loop-locals (`item` · `index`) per
    [04-variables.md](./04-variables.md) §Resolution order — and the `tasks`
@@ -517,11 +517,11 @@ prompt: ${{ has(inputs.style) ? inputs.style : 'be concise' }}
 when:   ${{ with.scan_log.contains('ERROR') }}      # branch on substring · the log arrived via with:
 ```
 
-**Namespaces are CEL variables** · the <!-- canon:namespaces -->6<!-- /canon --> namespaces (`inputs` · `config`
+**Namespaces are CEL variables** · the <!-- canon:namespaces -->5<!-- /canon --> namespaces (`inputs`
 · `const` · `secrets` · `with` · `tasks`) are bound as top-level CEL variables — `tasks.*` on the
 boundary surfaces only. **Inside a `for_each` task body, two
 more scoped CEL variables are bound** · `item` (the current element) and `index`
-(its 0-based position), available ONLY within that task (the <!-- canon:namespaces -->6<!-- /canon --> namespaces are
+(its 0-based position), available ONLY within that task (the <!-- canon:namespaces -->5<!-- /canon --> namespaces are
 global · `item`/`index` are for_each-local · see `for_each` below).
 
 #### The binding is the edge — no invisible edges
@@ -917,7 +917,9 @@ summarize:
   with: { article: "${{ tasks.fetch.output }}" }
   infer:
     prompt: "Summarize · ${{ with.article }}"
-  returns: Summary              # a name declared in types: — or an inline type expression
+  returns:                      # the type expression, INLINE · named types are gone
+    object:
+      summary: string
 ```
 
 Declares **what `tasks.X.output` is** — the typed door. Per-verb

@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: site-crawl
+nika: site-crawl
 permits:
   tools: ["nika:fetch"]
   net: { http: ["example.com"] }

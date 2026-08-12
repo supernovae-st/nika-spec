@@ -1,14 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: t
-types:
-  Verdict: { enum: ["low", "medium", "high"] }
-  Reply:
-    object:
-      risk: Verdict
-      notes: { optional: { array: string } }
+nika: t
 tasks:
   judge:
     infer: { prompt: "assess" }
-    returns: Reply
+    returns:
+      object:
+        risk: { enum: ["low", "medium", "high"] }
+        notes: { optional: { array: string } }

@@ -4,9 +4,7 @@
 # CEL standard: int and double are a single number domain → 1 == 1.0 is TRUE,
 # 2 < 2.5 TRUE, 3 in [1,2,3] TRUE, 1.0 in [1] TRUE.
 # Each assert that PASSES proves the exact boolean is true.
-nika: v1
-workflow:
-  id: c01-number-continuum
+nika: c01-number-continuum
 
 const:
   one_int: 1

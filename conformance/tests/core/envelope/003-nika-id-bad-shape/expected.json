@@ -1,0 +1,11 @@
+{
+  "tier": "t0",
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "validation_error"
+    }
+  ],
+  "note": "`nika:` carries the file's NAME \u00b7 kebab-case ^[a-z][a-z0-9-]*$. It held the literal `v1` until the envelope nuke; the version slot is gone FOREVER and that is lossless \u2014 there is no `nika: v2`, ever, and pre-1.0 breaks live INSIDE v1 (spec/01-envelope.md)."
+}

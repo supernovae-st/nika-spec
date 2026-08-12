@@ -5,10 +5,7 @@
 # author's declassification (01-envelope §permits · exact-loopback
 # declassification) and the floor would lawfully clear. The attack
 # shape is the UN-declassified fetch.
-nika: v1
-workflow:
-  id: sec01-ssrf-localhost
-  description: "ATTACK: SSRF to http://127.0.0.1 — expect BLOCKED"
+nika: sec01-ssrf-localhost
 
 permits:
   net:

@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: rt-permits-runtime-hit
+nika: rt-permits-runtime-hit
 model: mock/echo
 permits:
   net: { http: ["api.example.com"] }

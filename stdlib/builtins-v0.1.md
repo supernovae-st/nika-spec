@@ -317,7 +317,7 @@ private key reached from the ambient environment or an implicit on-disk
 keyring would make `nika:hash` read state its declaration does not name,
 which is exactly the pure-compute-that-is-not-pure defect the permits
 boundary exists to refuse. Declaring the key under `secrets:` keeps it inside
-the four-authority family, keeps it masked in logs, and keeps its reach
+the three-authority family, keeps it masked in logs, and keeps its reach
 governed by `egress:` like any other secret.
 
 **What this closes, and what it does NOT (bounded honestly).** It closes

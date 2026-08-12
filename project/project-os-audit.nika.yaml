@@ -12,10 +12,7 @@
 # | timeline | python3 timeline/verify.py --offline | executes the timeline proof harness | expose a Nika builtin for repository test commands |
 # | unit | python3 -m unittest ... | executes Python unit tests | expose a Nika builtin for repository test commands |
 
-nika: v1
-workflow:
-  id: project-os-audit
-  description: "Prove the Project OS contract, timeline shape and incremental reconciler without network or model spend."
+nika: project-os-audit
 
 permits:
   exec: ["python3"]

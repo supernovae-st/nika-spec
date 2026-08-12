@@ -1,7 +1,5 @@
 # Expected: NIKA-EXEC-001 at RUN. Parent fails by design (drain semantics); marker proves the unrelated sibling completed.
-nika: v1
-workflow:
-  id: diamond-inflight-drain
+nika: diamond-inflight-drain
 # SPEC 05 §workflow-level: in-flight tasks DRAIN — an engine MUST NOT abort an UNRELATED
 # running task because a sibling failed. fast_fail fails immediately; slow_sibling (no dep
 # on fast_fail) sleeps then writes. The unrelated sibling must COMPLETE (drain), not be killed.

@@ -3,9 +3,7 @@
 # Spec: 03-dag side-constraint 1: x.contains(s)/startsWith/endsWith "operands MUST
 # be strings". Calling .contains on a number → type error (NIKA-VAR-006 family).
 # when: boolean-shaped (the method returns bool by shape) → eval error expected.
-nika: v1
-workflow:
-  id: c15-string-method-type-mismatch
+nika: c15-string-method-type-mismatch
 
 const:
   n: 12345

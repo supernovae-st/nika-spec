@@ -1,6 +1,4 @@
-nika: v1
-workflow:
-  id: core-on-codes-underscore
+nika: core-on-codes-underscore
 tasks:
   merge:
     invoke: { tool: "nika:json_merge_patch", args: { target: {}, patch: {} } }

@@ -41,10 +41,7 @@
 #         (from the root of the repo under review · add --model mock/echo
 #          to rehearse the wiring without a model)
 
-nika: v1
-workflow:
-  id: pr-review-fanout
-  description: "review a pull request · changed files → one read-only review agent per file → merged REVIEW.md"
+nika: pr-review-fanout
 
 model: ollama/qwen3.5:4b   # local tool-calling model · swap for anthropic/claude-sonnet-4-6 for depth
 

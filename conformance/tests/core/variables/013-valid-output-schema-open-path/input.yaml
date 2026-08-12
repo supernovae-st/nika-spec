@@ -6,9 +6,7 @@
 # path is of course valid. The engine MUST accept. (The undeclared-SIBLING
 # read that used to ride here moved to its own pair — 014 violation ·
 # 015 boundary — per the 2026-07-30 strict-binding lock.)
-nika: v1
-workflow:
-  id: schema-path-open
+nika: schema-path-open
 permits:
   exec: ["./dump.sh", "report"]
 tasks:

@@ -1,6 +1,4 @@
-nika: v1
-workflow:
-  id: comp-006-misfit
+nika: comp-006-misfit
 tasks:
   call:
     invoke:

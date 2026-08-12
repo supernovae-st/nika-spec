@@ -2,10 +2,7 @@
 # The gate twin: fetch is itself egress-capable (an attacker-shaped URL can
 # carry data out), so the dominating gate sits BEFORE the first network
 # touch — every path to every egress-capable task passes the human.
-nika: v1
-workflow:
-  id: sec22-trifecta-human-gate-dominates
-  description: "GATED: identical trifecta boundary, human prompt dominates the network path — check PASSES"
+nika: sec22-trifecta-human-gate-dominates
 
 permits:
   fs: { read: ["./docs/**"] }

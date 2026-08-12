@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: t-canonical-back-inside-boundary
+nika: t-canonical-back-inside-boundary
 permits:
   fs: { read: ["datasets/**"] }
   tools: ["nika:read"]

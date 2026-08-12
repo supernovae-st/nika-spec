@@ -33,10 +33,7 @@
 #       `permits.net.http` TOGETHER: a permit is a literal you can read, it
 #       cannot interpolate an input (`NIKA-AUTH-007`).
 
-nika: v1
-workflow:
-  id: competitor-radar
-  description: "competitor watch · their sitemap says what shipped or changed this week → parallel page reads → one Monday brief"
+nika: competitor-radar
 
 model: ollama/qwen3.5:4b   # local · zero key · swap for anthropic/claude-sonnet-4-6 for a sharper read
 

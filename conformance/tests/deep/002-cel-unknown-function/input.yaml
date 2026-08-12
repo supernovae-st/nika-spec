@@ -1,6 +1,4 @@
-nika: v1
-workflow:
-  id: deep-002
+nika: deep-002
 const:
   data: {}
 tasks:

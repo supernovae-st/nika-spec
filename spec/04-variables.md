@@ -37,24 +37,34 @@ DSL. See [03-dag.md](./03-dag.md#expression-language--a-documented-subset-of-cel
 
 ---
 
-## The 6 namespaces
+## The 5 namespaces
 
 ```
-${{ inputs.X }}            typed workflow input          (declared in envelope `inputs:` · supplied by the caller at launch)
-${{ config.X }}            non-sensitive runtime config   (declared in envelope `config:` · supplied by the deployment · may appear in logs)
+${{ inputs.X }}            typed workflow input          (declared in envelope `inputs:` · supplied by the caller at launch, or by its own `default:`)
 ${{ const.X }}             named constant                 (declared in envelope `const:` · a fixed value baked into the workflow)
 ${{ secrets.X }}           masked secret reference        (vault-backed · never in logs)
 ${{ with.X }}              task-level scope               (declared per-task `with:` block · the bindings ARE the data edges)
 ${{ tasks.X.output }}      task record reference          (or .status · .error · .duration_ms · the CLOSED projection set · BOUNDARY surfaces only — see below)
 ```
 
-Six namespaces. That's it.
+Five namespaces. That's it.
 
-The first four — `inputs` · `config` · `const` · `secrets` — are the **value
+The first three — `inputs` · `const` · `secrets` — are the **value
 authorities**, the closed family every workflow value is declared under
 (LAW-SURFACE-0201 · one authority, one spelling, no alias). `with` and
 `tasks` are the **runtime namespaces** (task-scope bindings and settled task
 records) — legal in `${{ }}`, never value authorities.
+
+> **⚰️ `config` was the fourth, and it is dead (2026-08-12).** Measured:
+> **zero** usage in real work; its `default:` was its **only** possible
+> source (nothing outside the file could supply it — `--var` reaches
+> `inputs:` only); and under the taint lattice `${{ config.p }}` and
+> `${{ inputs.p }}` produced **the same** `NIKA-AUTH-008` by the same taint
+> path — **indiscernible**. The cell it occupied (nobody supplies it ×
+> treated as untrusted) was a constant the checker was being asked to treat
+> as hostile. A deployment knob is now an `inputs:` entry with
+> `required: false` and a `default:`. A `${{ config.X }}` read refuses
+> `NIKA-VALUES-003`, which teaches the three-authority family.
 
 > **Dead forms (refused with a classification teaching · the E-split).**
 > The pre-flip `vars:` and `env:` envelope fields are dead: a `vars:` block
@@ -62,9 +72,10 @@ records) — legal in `${{ }}`, never value authorities.
 > and a `${{ vars.X }}` / `${{ env.X }}` read with the same codes. Each
 > old use **classifies** into the authority its role commands — a typed
 > parameter is an `inputs:` declaration, a fixed value a `const:` entry,
-> non-sensitive runtime configuration a `config:` declaration, a governed
-> store reference a `secrets:` entry (classify-not-rename · never a bulk
-> rename). A value-namespace read outside the four-authority family
+> non-sensitive runtime configuration an `inputs:` declaration with
+> `required: false` and a `default:`, a governed store reference a
+> `secrets:` entry (classify-not-rename · never a bulk rename). A
+> value-namespace read outside the three-authority family
 > (`${{ params.X }}` and friends) refuses with `NIKA-VALUES-003`.
 
 ### The reference boundary · where `tasks.*` may appear
@@ -101,7 +112,7 @@ summarize:
 ```
 
 The task body is a **pure function of its declared inputs** (`with` · the
-four value authorities `inputs` · `config` · `const` · `secrets` · the loop
+three value authorities `inputs` · `const` · `secrets` · the loop
 locals): every cross-task dependency is
 visible at the boundary, named, and typed by its edge role. Nothing else
 reads another task.
@@ -119,7 +130,7 @@ reads another task.
 > **`group.<name>` is not a 7th namespace either.** It is the **plural reader
 > of `tasks`** — same runtime family, one door instead of five (a `with:`
 > value · everywhere else is `NIKA-VAR-021`). It denotes a set of task
-> records, so it belongs beside `tasks` rather than beside the four value
+> records, so it belongs beside `tasks` rather than beside the three value
 > authorities, and the count below is unchanged. See
 > [03 §group](./03-dag.md#group--optional--fan-in-membership--the-plural-of-a-data-edge)
 > for the record shape and the `fan-in` pass-set.
@@ -128,10 +139,10 @@ reads another task.
 > extra identifiers are in scope: `${{ item }}` (the current element) and
 > `${{ index }}` (its 0-based position). They are **loop-scoped locals**, alive
 > only within that task's body, not global namespaces. So the count stays
-> « <!-- canon:namespaces -->6<!-- /canon --> namespaces » + the for-each locals where a loop is present.
+> « <!-- canon:namespaces -->5<!-- /canon --> namespaces » + the for-each locals where a loop is present.
 
 **Shadowing is structurally impossible.** Every namespace is reached
-through its explicit prefix (`inputs.` · `config.` · `const.` · `secrets.` ·
+through its explicit prefix (`inputs.` · `const.` · `secrets.` ·
 `with.` · `tasks.`): an `inputs.item` and the loop-local `item` never collide
 (one is `inputs.item` · the other is bare `item`), a task may be named
 `item` (`tasks.item.output` is unambiguous), and `with.X` never hides an
@@ -149,9 +160,7 @@ boolean spelling) — validation + schema generation for callable workflows
 (see [01-envelope.md](./01-envelope.md#inputs--optional--typed-workflow-inputs)) ·
 
 ```yaml
-nika: v1
-workflow:
-  id: research-pipeline
+nika: research-pipeline
 
 inputs:
   topic:
@@ -175,35 +184,6 @@ engine CLI concern). A `--var` value overrides the declared default and
 satisfies a `required: true` input · an undeclared key is refused before the
 run. See [01-envelope.md](./01-envelope.md#inputs--optional--typed-workflow-inputs)
 for the launch contract.
-
-### `${{ config.X }}` · non-sensitive runtime config
-
-```yaml
-config:
-  log_level:
-    type: string
-    default: "info"
-
-tasks:
-  note:
-    infer:
-      prompt: "Running at ${{ config.log_level }} verbosity"
-```
-
-`config` holds **non-sensitive** runtime configuration. ⚠️ Its `default:`
-is **REQUIRED** and is its only source: nothing outside the file can supply
-it (`--var` reaches `inputs:` only). An entry without a `default:` is a
-check error, `NIKA-DEFAULT-002` — corrected 2026-08-11, the earlier
-« supplied by the deployment » was measured false at the binary. Each entry is a
-typed declaration (`type:` required · the full TypeExpr · a `default:` MUST
-conform to it · `NIKA-DEFAULT-001`). Values may appear in logs +
-traces. For anything secret, use `secrets:` (below) instead: never put a
-credential in `config`.
-
-**Declared-only · no ambient OS fallback** · `${{ config.X }}` resolves ONLY
-against the envelope `config:` block. An entry absent from the block is
-`NIKA-VAR-001`: the engine never silently reads the OS environment (a
-workflow's inputs are all visible in the file · sovereignty + portability).
 
 ### `${{ const.X }}` · named constants
 
@@ -392,8 +372,8 @@ headers:
 A secret is always a **reference to a store** (the local `nika-vault` by
 default), declared in the envelope `secrets:` block, never an inline
 literal. The engine **masks** every resolved `secrets.X` value in logs,
-traces, and journal events (it renders as `••••••`). This `config` / `secrets`
-split is the modern secure-workflow default: non-sensitive config in `config`,
+traces, and journal events (it renders as `••••••`). This `inputs` / `secrets`
+split is the modern secure-workflow default: non-sensitive values in `inputs`,
 masked references in `secrets`.
 
 > **The masking boundary (normative).** Masking covers the engine's OWN
@@ -722,8 +702,8 @@ field is a node the graph did not need.
 When a task is admitted · the engine resolves `${{ ... }}` references in this order ·
 
 1. **Boundary first** · the `with:` bindings materialize (their `tasks.X.field` references read the settled records — this is where the data edges deliver)
-2. **`when:`** evaluates over the local namespaces (`inputs` · `config` · `const` · `with` · loop locals)
-3. **Body** · verb-field expressions resolve (`inputs.X` · `config.X` · `const.X` · `secrets.X` · `with.X` · loop locals — never `tasks.*`)
+2. **`when:`** evaluates over the local namespaces (`inputs` · `const` · `with` · loop locals)
+3. **Body** · verb-field expressions resolve (`inputs.X` · `const.X` · `secrets.X` · `with.X` · loop locals — never `tasks.*`)
 4. **Single-pass** · a substitution result is NOT re-evaluated (no nested substitution)
 
 If a reference is unresolved · the engine raises a `NIKA-VAR-001` (undefined
@@ -799,7 +779,7 @@ Reasons ·
 
 ## Forward-compat
 
-The `${{ ... }}` substitution surface and the <!-- canon:namespaces -->6<!-- /canon --> namespaces are locked at v1. **Template pipe-filters (`${{ inputs.x | json }}` · `| upper`) are NOT a growth path** (they would duplicate builtins + push CEL toward a string-DSL). Data transforms live in the `nika:jq` builtin; the `${{ }}` surface grows only with CEL-native features: the conditional `?:`, the `has()` presence macro, and the `contains`/`startsWith`/`endsWith` string tests ship in `cel-subset/0.1` ([03 §grammar](./03-dag.md)); `all`/`exists` and `matches()` regex stay reserved for a later additive minor. jq is the single extraction-and-transform language (`output:` + `nika:jq`).
+The `${{ ... }}` substitution surface and the <!-- canon:namespaces -->5<!-- /canon --> namespaces are locked at v1. **Template pipe-filters (`${{ inputs.x | json }}` · `| upper`) are NOT a growth path** (they would duplicate builtins + push CEL toward a string-DSL). Data transforms live in the `nika:jq` builtin; the `${{ }}` surface grows only with CEL-native features: the conditional `?:`, the `has()` presence macro, and the `contains`/`startsWith`/`endsWith` string tests ship in `cel-subset/0.1` ([03 §grammar](./03-dag.md)); `all`/`exists` and `matches()` regex stay reserved for a later additive minor. jq is the single extraction-and-transform language (`output:` + `nika:jq`).
 
 Out of scope for v0.1 (deferred · see [`08-out-of-scope.md`](./08-out-of-scope.md)) ·
 - Expression language (no arithmetic in templates)

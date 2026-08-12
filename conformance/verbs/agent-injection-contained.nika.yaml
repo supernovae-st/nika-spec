@@ -1,8 +1,5 @@
 # Expected: exit 0 — injection text stays data; tools whitelist limits blast radius (mock agent).
-nika: v1
-workflow:
-  id: sec22-prompt-injection-contained
-  description: "PROMPT-INJECTION: untrusted doc fed to agent with limited tools whitelist — structure limits blast radius"
+nika: sec22-prompt-injection-contained
 
 permits:
   tools: ["nika:jq"]

@@ -1,7 +1,5 @@
 # Expected: exit 0 — NIKA-EXEC-001 fires internally, recovered via on_error.
-nika: v1
-workflow:
-  id: e14-on-error-recover-literal
+nika: e14-on-error-recover-literal
 # INTENT: on_error.recover with a literal value — workflow should SUCCEED
 permits:
   exec: ["false"]

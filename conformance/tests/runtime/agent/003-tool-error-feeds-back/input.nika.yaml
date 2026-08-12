@@ -9,9 +9,7 @@
 # END the loop — stays unstageable with mock/echo: the mock cannot be
 # steered to synthesize an out-of-boundary argument deterministically ·
 # noted in the README.)
-nika: v1
-workflow:
-  id: rt-agent-tool-error-feeds-back
+nika: rt-agent-tool-error-feeds-back
 model: mock/echo
 permits: { tools: ["nika:assert"] }
 tasks:

@@ -1,11 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: four-authority
+nika: four-authority
 inputs:
   region: { type: string, required: true }
-config:
-  log_level: { type: string, default: "info" }
+  log_level: { type: string, default: "info", required: false }
 const:
   retries: 3
 secrets:
@@ -19,7 +16,7 @@ tasks:
     invoke:
       tool: "nika:log"
       args:
-        message: "region ${{ inputs.region }} · level ${{ config.log_level }} · retries ${{ const.retries }}"
+        message: "region ${{ inputs.region }} · level ${{ inputs.log_level }} · retries ${{ const.retries }}"
   call:
     infer:
       prompt: "use ${{ secrets.api_key }} for region ${{ inputs.region }}"

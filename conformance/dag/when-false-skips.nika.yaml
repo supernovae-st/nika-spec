@@ -1,8 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Expected: exit 0 — when:false skips the task; workflow completes clean.
-nika: v1
-workflow:
-  id: when-false-skip
+nika: when-false-skip
 # SPEC 03 §when: runtime-false → task SKIPPED (not failed); downstream sees it settled.
 # A downstream observing the skipped task through with: (terminal-observation
 # edge — every settled state admits) → RUNS and reads status "skipped".

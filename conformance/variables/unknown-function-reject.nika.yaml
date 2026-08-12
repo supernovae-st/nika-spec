@@ -2,9 +2,7 @@
 # Spec: 03-dag side-constraint 1: "No regex — matches() is reserved (ReDoS surface
 # · a later minor). Any other call suffix is a parse error." call = (size|has) only.
 # Expected: NIKA-VAR-005 (unknown function) at CHECK.
-nika: v1
-workflow:
-  id: c16-matches-reserved
+nika: c16-matches-reserved
 
 const:
   s: "hello"

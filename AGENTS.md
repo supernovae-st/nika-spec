@@ -10,8 +10,12 @@ reference engine lives at `supernovae-st/nika` (AGPL-3.0-or-later).
 
 ## Load-bearing facts (verify in-repo · never from memory)
 
-- **Envelope** `nika: v1` — frozen forever. The single version marker
-  workflow authors type.
+- **Envelope** 9 top-level keys, frozen: `nika` · `model` · `inputs` ·
+  `const` · `secrets` · `permits` · `run` · `tasks` · `outputs`. `nika:`
+  carries the file's kebab-case NAME (the mark AND the name) · the document
+  type is read from `tasks:` (present = workflow · absent = project), never
+  from a filename. No version is typed anywhere: the family is v1, there is
+  no `nika: v2` ever, and pre-1.0 breaking changes land INSIDE v1.
 - **4 verbs, locked**: `infer` · `exec` · `invoke` · `agent`.
   HTTP fetch is the `nika:fetch` builtin under `invoke:` — NOT a verb.
 - **Counts live in `canon.yaml`** (the SSOT — verbs, builtins, providers,
@@ -44,15 +48,28 @@ INTENT ──route──▶ TEMPLATE ──fill──▶ DRAFT ──check──
    `NIKA-PARSE` = the YAML shape is wrong — the message names the key
    and what the schema allows there (exactly-one-verb · snake_case id ·
    quoted duration · unknown field) ·
+   `NIKA-PARSE-002` = a missing envelope field — add `nika:`, or a
+   non-empty `tasks:` (a file with no `nika:` key is not a nika file) ·
+   `NIKA-PARSE-003` = `nika:` is not a kebab-case id (`^[a-z][a-z0-9-]*$`) —
+   it carries the file's NAME, never a version ·
    `NIKA-DAG-001` = break the dependency cycle ·
    `NIKA-DAG-002` = a `with:`/`after:` entry names a task that doesn't exist ·
    `NIKA-VAR-021` = a `tasks.*` reference outside the boundary — hoist it into `with:` ·
    `NIKA-VALUES-001` / `NIKA-VALUES-002` = a dead `vars:` / `env:` block (or
    `${{ vars.X }}` / `${{ env.X }}` read) — classify each use: typed parameter
-   → `inputs:` · fixed value → `const:` · non-sensitive runtime config →
-   `config:` · store reference → `secrets:` ·
-   `NIKA-VALUES-003` = a `${{ }}` value read outside the four authorities
-   (`inputs` · `config` · `const` · `secrets`) — the namespace is closed ·
+   → `inputs:` · a knob the deployment supplies → an `inputs:` entry with
+   `required: false` and a `default:` · fixed value → `const:` · store
+   reference → `secrets:` ·
+   `NIKA-VALUES-003` = a `${{ }}` value read outside the three authorities
+   (`inputs` · `const` · `secrets`) — the namespace is closed ·
+   `NIKA-TYPE-001` = a PascalCase name in type position — named types are
+   gone; write the type expression INLINE in `returns:` ·
+   `NIKA-SEC-015` = the order law — an `exec:` task sits transitively
+   downstream of a net-effecting task (`nika:fetch` · `nika:notify`).
+   Consume the fetched value with a builtin (`nika:jq` · `nika:validate`)
+   instead of a shell, or drop the edge. The diagnostic names the PATH,
+   which is the witness. **Unconditional** — no block declares it and none
+   can disable it ·
    `NIKA-DAG-004` = your `recover:` points DOWNSTREAM of the failing
    task (deadlock) — recover from an upstream or independent source ·
    `NIKA-VAR-001` = declare the name or fix the typo ·
@@ -74,7 +91,7 @@ INTENT ──route──▶ TEMPLATE ──fill──▶ DRAFT ──check──
 Hard rules the validator enforces (memorize · they catch 90% of LLM
 errors): one verb per task — the verb IS the task key (`infer:` /
 `exec:` / `invoke:` / `agent:` · NEVER a `verb:` field with flattened
-args) · snake_case task ids · kebab-case `workflow:` · every
+args) · snake_case task ids · kebab-case `nika:` · every
 `${{ tasks.X }}` reference in `when:`/`with:`/`for_each:`/verb fields
 lives at the BOUNDARY: `with:` values (the binding IS the edge) · `after:`
 keys · `on_error.recover` · an `unwind` task (its producer only) · workflow

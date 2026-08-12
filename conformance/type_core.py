@@ -165,7 +165,10 @@ def parse_type(expr, names: set[str], where: str) -> dict:
         if TYPE_NAME.match(expr):
             if expr not in names:
                 close = _closest(expr, names)
-                hint = f" — did you mean `{close}`?" if close else ""
+                hint = (f" — did you mean `{close}`?" if close else
+                        " — a type expression is self-contained: write the "
+                        "shape inline (the `types:` block died with the "
+                        "envelope nuke · spec/09-types.md)")
                 raise TypeError_("NIKA-TYPE-001",
                                  f"{where} · unknown type name {expr!r}{hint}")
             return {"ref": expr}
@@ -344,50 +347,28 @@ def _lev(a: str, b: str) -> int:
 def type_core_errors(doc: dict) -> list[dict]:
     """The NIKA-TYPE static layer + NIKA-PARSE-025 (spec 09-types.md)."""
     errs: list[dict] = []
-    raw_types = doc.get("types")
-    names: set[str] = set(raw_types) if isinstance(raw_types, dict) else set()
-
-    if isinstance(raw_types, dict):
-        graph = {n: _name_refs(v) & names for n, v in raw_types.items()}
-        state: dict[str, int] = {}
-
-        def dfs(n: str) -> bool:
-            state[n] = 1
-            for m in graph.get(n, ()):
-                if state.get(m) == 1 or (state.get(m) is None and dfs(m)):
-                    return True
-            state[n] = 2
-            return False
-
-        cyclic = {n for n in graph if state.get(n) is None and dfs(n)} \
-            | {n for n, s in state.items() if s == 1}
-        for n in sorted(cyclic):
-            errs.append(err("NIKA-TYPE-002",
-                            f"types.{n} · recursive type reference — the types: graph must be acyclic"))
-        for n, v in raw_types.items():
-            if n in cyclic:
-                continue
-            try:
-                parse_type(v, names, f"types.{n}")
-            except TypeError_ as e:
-                errs.append(err(e.code, e.detail))
+    # Named types died with the `types:` block (the envelope nuke): every
+    # type expression is self-contained, so the name environment is EMPTY
+    # and a PascalCase name in type position resolves to nothing
+    # (NIKA-TYPE-001 · unknown type name). NIKA-TYPE-002 (the acyclicity
+    # of the types: graph) has no object left — the code is never reused.
+    names: set[str] = set()
 
     # ── the io declaration positions (R3b · LAW-GRAMMAR-0211) ────────────
-    # The `type:` of typed inputs:/config:/const:/outputs: speaks the SAME
-    # full TypeExpr as types:/returns: — one type truth, every declaration
+    # The `type:` of typed inputs:/const:/outputs: speaks the SAME full
+    # TypeExpr as returns: — one type truth, every declaration
     # position judged by the same parser. The schema's pattern layer refuses
     # these too (NIKA-PARSE), but the prose and the law name the class
     # (NIKA-TYPE-001 · NIKA-TYPE-006 for the regex dialect) — the type core
     # owns it at every io position, never the schema alone.
-    for auth in ("inputs", "config"):
-        block = doc.get(auth)
-        if isinstance(block, dict):
-            for name, decl in block.items():
-                if isinstance(decl, dict) and "type" in decl:
-                    try:
-                        parse_type(decl["type"], names, f"{auth}.{name}.type")
-                    except TypeError_ as e:
-                        errs.append(err(e.code, e.detail))
+    block = doc.get("inputs")
+    if isinstance(block, dict):
+        for name, decl in block.items():
+            if isinstance(decl, dict) and "type" in decl:
+                try:
+                    parse_type(decl["type"], names, f"inputs.{name}.type")
+                except TypeError_ as e:
+                    errs.append(err(e.code, e.detail))
     raw_const = doc.get("const")
     if isinstance(raw_const, dict):
         for name, decl in raw_const.items():
@@ -446,20 +427,6 @@ def type_core_errors(doc: dict) -> list[dict]:
                          "detail": f"tasks.{tid} · decode: with capture: structured — that "
                                    "capture already IS an object · type it with returns:"})
     return errs
-
-
-def _name_refs(expr) -> set[str]:
-    out: set[str] = set()
-    if isinstance(expr, str):
-        if TYPE_NAME.match(expr):
-            out.add(expr)
-    elif isinstance(expr, dict):
-        for v in expr.values():
-            out |= _name_refs(v)
-    elif isinstance(expr, list):
-        for v in expr:
-            out |= _name_refs(v)
-    return out
 
 
 def _decodable(t: dict, decode: str) -> bool:

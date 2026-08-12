@@ -1,7 +1,5 @@
 # Expected: NIKA-TIMEOUT-001 at RUN. Slow iterations exceed the per-iteration timeout.
-nika: v1
-workflow:
-  id: e37-foreach-timeout-per-iter
+nika: e37-foreach-timeout-per-iter
 # INTENT: for_each with timeout per iteration — slow iterations time out
 permits:
   exec: ["sleep"]

@@ -1,9 +1,7 @@
 # Expected: exit 0 — nika:extract over inline HTML (offline).
 # r12 · mock/echo chain: verify DAG wiring, output bindings, no LLM cost
 # Tests: mock/echo with output: bindings, chaining mock outputs into prompt
-nika: v1
-workflow:
-  id: mock-extract-chain
+nika: mock-extract-chain
 
 model: mock/echo
 

@@ -1,6 +1,4 @@
-nika: v1
-workflow:
-  id: deep-020
+nika: deep-020
 permits:
   tools: ["nika:*", "!nika:write"]
 tasks:

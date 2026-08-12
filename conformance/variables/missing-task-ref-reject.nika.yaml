@@ -5,9 +5,7 @@
 # (pre-W2 this surfaced as VAR-001 through when:; the boundary makes the
 # missing task an EDGE error — same refusal, sharper name).
 # We assert it is REJECTED, not silently null.
-nika: v1
-workflow:
-  id: c10-missing-task-ref-no-edge
+nika: c10-missing-task-ref-no-edge
 
 tasks:
   gate:

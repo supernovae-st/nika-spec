@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: curl-crawl
+nika: curl-crawl
 tasks:
   crawl:
     exec: { command: ["curl", "-s", "https://example.com", "-o", "out/site.html"] }

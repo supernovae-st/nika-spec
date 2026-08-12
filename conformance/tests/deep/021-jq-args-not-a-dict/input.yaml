@@ -1,6 +1,4 @@
-nika: v1
-workflow:
-  id: deep-021
+nika: deep-021
 tasks:
   a:
     invoke:

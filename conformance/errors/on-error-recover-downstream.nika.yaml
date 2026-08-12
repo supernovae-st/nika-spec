@@ -1,7 +1,5 @@
 # Expected: exit 0 — NIKA-EXEC-001 fires internally, recovered via on_error; downstream runs.
-nika: v1
-workflow:
-  id: onerror-recover-downstream
+nika: onerror-recover-downstream
 # SPEC 05 §on_error: recover → status success, downstream runs normally.
 # KNOWN-NUANCED: recover WITH a value edge. failing task recovers; a task bound to it
 # should run (recovered = success → default gate satisfied).

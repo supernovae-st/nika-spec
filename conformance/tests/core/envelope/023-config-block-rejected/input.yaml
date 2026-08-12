@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow: t
+config:
+  log_level: { type: string, default: "info" }
+tasks:
+  s:
+    infer: { prompt: "x" }

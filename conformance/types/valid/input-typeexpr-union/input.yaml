@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: io-typeexpr-union
+nika: io-typeexpr-union
 inputs:
   limit:
     type: { union: [{ integer: { min: 1, max: 100 } }, { enum: ["auto"] }] }

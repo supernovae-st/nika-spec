@@ -1,15 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: t
-types:
-  Story:
-    object:
-      headline: string
-      byline: { optional: string }
-      score: { union: [integer, null] }
-      note: { optional: { union: [string, null] } }
+nika: t
 tasks:
   s:
     infer: { prompt: "x" }
-    returns: Story
+    returns:
+      object:
+        headline: string
+        byline: { optional: string }
+        score: { union: [integer, null] }
+        note: { optional: { union: [string, null] } }

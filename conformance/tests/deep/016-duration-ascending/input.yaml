@@ -1,6 +1,4 @@
-nika: v1
-workflow:
-  id: deep-016
+nika: deep-016
 tasks:
   a:
     timeout: "30m1h"

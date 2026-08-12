@@ -6,10 +6,7 @@
 # form. `["sudo","rm","-rf",…]` is blocked on the `sudo` identity, proving the
 # argv form is NOT a blanket bypass — it's a DIFFERENT, structural gate.
 # Empirically confirmed 2026-07-02 (program "sudo" blocked at the exec floor).
-nika: v1
-workflow:
-  id: sec36b-exec-array-identity-floor
-  description: "argv-form sudo IS blocked (program-identity floor · spec §163 · NIKA-SEC-001)"
+nika: sec36b-exec-array-identity-floor
 
 permits:
   exec: true

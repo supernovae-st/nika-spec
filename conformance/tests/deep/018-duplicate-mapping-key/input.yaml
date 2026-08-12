@@ -1,6 +1,4 @@
-nika: v1
-workflow:
-  id: deep-018
+nika: deep-018
 tasks:
   a:
     exec:

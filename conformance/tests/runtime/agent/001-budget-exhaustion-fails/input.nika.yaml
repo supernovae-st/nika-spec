@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: rt-agent-budget-failure
+nika: rt-agent-budget-failure
 model: mock/echo
 tasks:
   loop:

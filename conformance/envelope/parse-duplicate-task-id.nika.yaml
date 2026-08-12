@@ -1,7 +1,5 @@
 # Expected: NIKA-PARSE-017 at CHECK.
-nika: v1
-workflow:
-  id: e05-parse-duplicate-id
+nika: e05-parse-duplicate-id
 # INTENT: two tasks under one `tasks:` mapping may not share an id — the file
 # must be REFUSED, never resolved by silent last-wins.
 # The refusal lands at the mapping layer: repeating `step:` IS a duplicate

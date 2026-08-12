@@ -1,7 +1,5 @@
 # Expected: NIKA-PARSE-005 at CHECK.
-nika: v1
-workflow:
-  id: e32-parse-unknown-field
+nika: e32-parse-unknown-field
 # INTENT: NIKA-PARSE-005 (unknown field in strict mode)
 tasks:
   step:

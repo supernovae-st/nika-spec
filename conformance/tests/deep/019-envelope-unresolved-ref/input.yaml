@@ -1,6 +1,4 @@
-nika: v1
-workflow:
-  id: deep-019
+nika: deep-019
 model: "${{ inputs.nope }}"
 tasks:
   a:

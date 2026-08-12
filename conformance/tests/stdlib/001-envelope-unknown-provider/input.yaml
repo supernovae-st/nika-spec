@@ -1,6 +1,4 @@
-nika: v1
-workflow:
-  id: stdlib-envelope-provider
+nika: stdlib-envelope-provider
 model: gpt-4o/latest
 tasks:
   greet:

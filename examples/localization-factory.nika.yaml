@@ -30,10 +30,7 @@
 #       `permits.fs.read` entry TOGETHER: a permit is a literal you can
 #       read, it cannot interpolate a const (`NIKA-AUTH-007`).
 
-nika: v1
-workflow:
-  id: localization-factory
-  description: "glob docs → parallel read → parallel translate → mirror tree"
+nika: localization-factory
 
 model: ollama/qwen3.5:4b   # local default · swap for mistral/mistral-large (EU model for EU locales)
 

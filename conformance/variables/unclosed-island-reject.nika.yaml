@@ -2,9 +2,7 @@
 # C17 · unclosed ${{ opener → NIKA-VAR-008 at parse.
 # Spec: 04-variables §escaping: "An unclosed ${{ ... is rejected at parse time ·
 # NIKA-VAR-008 · validation_error". This is in a prompt-position string.
-nika: v1
-workflow:
-  id: c17-unclosed-and-empty
+nika: c17-unclosed-and-empty
 
 tasks:
   t:

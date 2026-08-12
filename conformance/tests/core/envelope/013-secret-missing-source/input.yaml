@@ -1,6 +1,4 @@
-nika: v1
-workflow:
-  id: core-secret-bad
+nika: core-secret-bad
 secrets:
   api_key: {}
 tasks:

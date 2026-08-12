@@ -1,7 +1,5 @@
 # Expected: exit 0 — offline jq→write chain; minimal valid workflow (an effect declares its boundary · F-O8).
-nika: v1
-workflow:
-  id: f01-builtins-sink
+nika: f01-builtins-sink
 
 # Offline foundation smoke — exercises the run loop with zero API:
 # nika:jq (typed structured output) -> binding -> nika:write (serialize) sink.

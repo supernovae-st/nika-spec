@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t
+workflow: old-envelope-form
+tasks:
+  hello:
+    exec:
+      command: ["true"]

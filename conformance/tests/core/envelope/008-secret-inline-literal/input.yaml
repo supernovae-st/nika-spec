@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: hello
+nika: hello
 secrets:
   api_key: "sk-live-12345"
 tasks:

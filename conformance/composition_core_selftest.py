@@ -49,7 +49,7 @@ with tempfile.TemporaryDirectory() as td:
     # the child DECLARES its own boundary (NEP-0003 law 6 · a child that
     # touches the world declares it, in its own file)
     (base / "child.nika.yaml").write_text(
-        "nika: v1\nworkflow: { id: c }\npermits: { exec: [echo] }\n"
+        "nika: c\npermits: { exec: [echo] }\n"
         "inputs: { url: { type: string, required: true } }\n"
         "tasks: { fetch: { exec: { command: [echo, hi] } } }\n"
         "outputs: { report: { value: \"x\", type: string } }\n")
@@ -71,7 +71,7 @@ with tempfile.TemporaryDirectory() as td:
                        permits={"exec": ["echo"]}), base))
     # NEP-0003 · the zero wall, both directions
     (base / "bare-child.nika.yaml").write_text(
-        "nika: v1\nworkflow: { id: bc }\n"
+        "nika: bc\n"
         "tasks: { run: { exec: { command: [echo, hi] } } }\n")
     law("absent parent block = zero wall → COMP-002 (NEP-0003 law 5)",
         "NIKA-COMP-002" in codes(call("./child.nika.yaml"), base))
@@ -79,20 +79,20 @@ with tempfile.TemporaryDirectory() as td:
         "NIKA-COMP-002" in codes(
             call("./bare-child.nika.yaml", permits={"exec": ["echo"]}), base))
     (base / "pure-child.nika.yaml").write_text(
-        "nika: v1\nworkflow: { id: pc }\n"
+        "nika: pc\n"
         "tasks: { think: { infer: { prompt: pure } } }\n")
     law("pure child under absent parent → clean",
         not codes(call("./pure-child.nika.yaml"), base))
 
     # self-launch + cycle
     (base / "self.nika.yaml").write_text(
-        "nika: v1\nworkflow: { id: s }\ntasks: { c: { invoke: { workflow: ./self.nika.yaml } } }\n")
+        "nika: s\ntasks: { c: { invoke: { workflow: ./self.nika.yaml } } }\n")
     law("self-launch → COMP-003",
         "NIKA-COMP-003" in codes(call("./self.nika.yaml"), base))
     (base / "a.nika.yaml").write_text(
-        "nika: v1\nworkflow: { id: a }\ntasks: { c: { invoke: { workflow: ./bb.nika.yaml } } }\n")
+        "nika: a\ntasks: { c: { invoke: { workflow: ./bb.nika.yaml } } }\n")
     (base / "bb.nika.yaml").write_text(
-        "nika: v1\nworkflow: { id: b }\ntasks: { c: { invoke: { workflow: ./a.nika.yaml } } }\n")
+        "nika: b\ntasks: { c: { invoke: { workflow: ./a.nika.yaml } } }\n")
     law("two-file cycle → COMP-003",
         "NIKA-COMP-003" in codes(call("./a.nika.yaml"), base))
 

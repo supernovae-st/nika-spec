@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: hello
+nika: hello
 tasks:
   a:
     exec: { command: ["curl", "-H", "Authorization: Bearer ${{ secrets.api_key }}", "https://api.example.com"] }

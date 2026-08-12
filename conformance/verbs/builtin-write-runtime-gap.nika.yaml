@@ -3,9 +3,7 @@
 # Tests: does nika check catch a static error that only bites at runtime?
 # This workflow uses an invalid jq expression that the parser might not catch statically.
 # Detail: jq on a missing key legally yields null (no jq error); the failure surfaces downstream when nika:write rejects null content (NIKA-BUILTIN-WRITE-001). check passes — the gap is real, the code is WRITE-001.
-nika: v1
-workflow:
-  id: w24-check-vs-runtime-gap
+nika: w24-check-vs-runtime-gap
 
 const:
   data:

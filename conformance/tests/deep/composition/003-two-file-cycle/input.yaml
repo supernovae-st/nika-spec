@@ -1,6 +1,4 @@
-nika: v1
-workflow:
-  id: comp-003-cycle-a
+nika: comp-003-cycle-a
 tasks:
   go:
     invoke: { workflow: "./b.nika.yaml" }

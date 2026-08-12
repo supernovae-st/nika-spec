@@ -1,9 +1,7 @@
 # Expected: exit 0 — typed vars: declarations (type + default) resolve.
 # W18: typed vars — string/number/boolean declarations
 # Tests: typed vars (string/number/boolean) accessible in CEL
-nika: v1
-workflow:
-  id: w18-typed-vars
+nika: w18-typed-vars
 
 const:
   username:

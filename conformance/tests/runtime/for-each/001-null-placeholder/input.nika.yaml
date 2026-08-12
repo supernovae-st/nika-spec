@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: rt-foreach-null-placeholder
+nika: rt-foreach-null-placeholder
 model: mock/echo
 const:
   items: ["alpha", "BOOM", "gamma"]

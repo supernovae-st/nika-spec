@@ -1,6 +1,4 @@
-nika: v1
-workflow:
-  id: deep-004
+nika: deep-004
 tasks:
   a:
     timeout: "2d"

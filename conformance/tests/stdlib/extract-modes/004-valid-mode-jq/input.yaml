@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: api-extract
+nika: api-extract
 permits:
   tools: ["nika:fetch"]
   net: { http: ["api.example.com"] }

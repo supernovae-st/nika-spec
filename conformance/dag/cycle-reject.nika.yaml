@@ -1,8 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Expected: NIKA-DAG-001 at CHECK.
-nika: v1
-workflow:
-  id: e07-dag-cycle
+nika: e07-dag-cycle
 # INTENT: trigger NIKA-DAG-001 (control cycle in after: a->b->a)
 tasks:
   step_a:

@@ -1,7 +1,5 @@
 # Expected: exit 0 — NIKA-EXEC-001 fires internally, recovered via on_error (skip: true); downstream sees status=skipped.
-nika: v1
-workflow:
-  id: e15-on-error-skip
+nika: e15-on-error-skip
 # INTENT: on_error.skip:true — workflow SUCCEEDS, downstream sees status=skipped
 permits:
   exec: ["false"]

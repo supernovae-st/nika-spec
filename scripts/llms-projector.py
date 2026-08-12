@@ -78,7 +78,7 @@ def build_llms_txt(c: dict) -> str:
     return f"""# Nika
 
 > Intent as Code · a workflow language for AI. Four verbs (`infer` · `exec` ·
-> `invoke` · `agent`), a YAML envelope (`nika: v1` · forever), a closed
+> `invoke` · `agent`), a YAML envelope whose `nika:` key is the mark AND the file name, a closed
 > stdlib ({c["builtins"]} builtins · {c["providers"]} providers), and a conformance suite. Apache-2.0
 > spec · AGPL-3.0 reference engine in Rust (single static binary).
 

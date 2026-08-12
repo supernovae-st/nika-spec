@@ -7,10 +7,9 @@
 > Bundle** owned by the consuming organization — Nika is a *reference
 > implementation* of the contract, never its prison.
 >
-> Three algebras, never fused:
+> Two algebras, never fused:
 > [`permits:`](./10-authority.md) is *authority* (required ⊆ permitted)
-> · [`policy:`](./10-authority.md) is *law* (the shape of allowed
-> action) · a **decision** is *judgment* —
+> · a **decision** is *judgment* —
 > `D = Evaluate(Bundle, EvidenceSnapshot)` — deterministic, explained,
 > appealable. **The model never decides** — the law is this chapter's:
 > `infer:`/`agent:` may produce closed, cited semantic *facts*; the
@@ -227,8 +226,8 @@ never fakes it.
 
 ## Related
 
-- [10 · Authority](./10-authority.md) — permits (authority) · policy
-  (law) — the two algebras this one completes
+- [10 · Authority](./10-authority.md) — permits (authority) — the other
+  algebra this one completes
 - [09 · Types](./09-types.md) — evidence value types · `returns:` on
   the decide task
 - [05 · Errors](./05-errors.md) — the registry (DECIDE rows)

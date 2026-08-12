@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: dag-recover-independent
+nika: dag-recover-independent
 permits:
   tools: ["nika:fetch", "nika:read"]
   net: { http: ["api.example.com"] }

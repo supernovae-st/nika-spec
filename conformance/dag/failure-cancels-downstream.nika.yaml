@@ -1,7 +1,5 @@
 # Expected: NIKA-EXEC-001 at RUN. Unrecovered failure cancels downstream tasks.
-nika: v1
-workflow:
-  id: e17-cancel-downstream
+nika: e17-cancel-downstream
 # INTENT: NIKA-CANCEL-001 — unrecovered task failure cancels downstream tasks
 permits:
   exec: ["false", "echo"]

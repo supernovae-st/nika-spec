@@ -1,7 +1,5 @@
 # Expected: NIKA-EXEC-001 at RUN. Non-transient → exactly 1 attempt (01_attempts.log = 1 line); retry never fires.
-nika: v1
-workflow:
-  id: retry-exhaust
+nika: retry-exhaust
 # SPEC 05 §Retry: max_attempts strict; retries apply to TRANSIENT only.
 # exec non-zero exit = NIKA-EXEC-001, transient:false → should NOT retry at all
 # even with retry block. Expect: task fails, exit!=0, code NIKA-EXEC-001.

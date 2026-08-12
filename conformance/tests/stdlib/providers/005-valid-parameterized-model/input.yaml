@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: swap-backend
+nika: swap-backend
 const:
   model: { type: string, default: "anthropic/claude-sonnet-4-6" }
 tasks:

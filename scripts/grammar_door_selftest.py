@@ -24,10 +24,7 @@ from grammar_door import DoorRefusal, downcast_w2, downcast_w105  # noqa: E402
 SPEC_ROOT = Path(__file__).resolve().parent.parent
 
 GOLDEN_IN = """\
-nika: v1
-workflow:
-  id: golden
-  description: "the full-construct golden"
+nika: golden
 
 inputs:
   text:
@@ -60,7 +57,6 @@ tasks:
 GOLDEN_OUT = """\
 nika: v1
 workflow: golden
-description: "the full-construct golden"
 
 vars:
   text:
@@ -107,12 +103,10 @@ def main() -> int:
         fail("not idempotent on its own output")
 
     for bad, why in (
-        ("nika: v1\nworkflow: x\nconfig:\n  a: 1\ntasks:\n  t:\n    exec:\n      run: 'true'\n",
-         "config: must refuse"),
-        ("nika: v1\nworkflow:\n  id: x\n  version: 2\ntasks:\n  t:\n    exec:\n      run: 'true'\n",
-         "workflow child beyond id/description must refuse"),
-        ("nika: v1\nworkflow: x\ntasks:\n  t: { exec: { run: 'true' } }\n",
+        ("nika: x\ntasks:\n  t: { exec: { run: 'true' } }\n",
          "flow-bodied task key must refuse"),
+        ("model: mock/echo\ntasks:\n  t:\n    exec:\n      run: 'true'\n",
+         "a document with no `nika:` mark must refuse"),
     ):
         try:
             downcast_w2(bad, "stop")
@@ -126,14 +120,13 @@ def main() -> int:
     )
     if len(pack) < 30:
         fail(f"pack sweep found only {len(pack)} files — layout moved?")
-    # The pack law, post-0.106: a file either downcasts cleanly, or it
-    # refuses TYPED on a STOP-listed wnew-only construct. The refusers are
-    # NAMED below and ratcheted exactly — the top-level door sees `config:`
-    # (08) and `types:` (09); composition and `lift:` are task-level
-    # and pass through it. Any other refusal is still red, and a NEW
-    # refuser (a template gaining `config:`) moves the count and refuses
-    # here until the ratchet is deliberately retuned. (Before the train
-    # this leg demanded zero refusals and contradicted leg 3.)
+    # The pack law, post-envelope-nuke: EVERY file downcasts cleanly. The
+    # STOP-list emptied because its three members (`config:` · `types:` ·
+    # `policy:`) left the LANGUAGE, not just the door — the schema refuses
+    # them upstream now, so a refusal here would mean the pack carries a
+    # construct the oracle already rejected. The ratchet therefore demands
+    # ZERO refusals and names it: a new wnew-only construct entering the
+    # pack turns this leg red until the door learns it deliberately.
     stopped_w2: list[str] = []
     for f in pack:
         text = f.read_text()
@@ -149,7 +142,7 @@ def main() -> int:
                 stopped_w2.append(f.name)
                 continue
             fail(f"pack refusal · {e}")
-        if re.search(r"^(inputs|const|config):", w2, re.M):
+        if re.search(r"^(inputs|const):", w2, re.M):
             fail(f"{f.name} · wnew value block survived the door")
         if not re.search(r"^workflow: \S", w2, re.M):
             fail(f"{f.name} · workflow did not collapse to a scalar")
@@ -160,7 +153,7 @@ def main() -> int:
 
     # ── the w105 target · golden + stop-list + pack sweep ──────────────
     W105_IN = (
-        "nika: v1\nworkflow:\n  id: g\nmodel: mock/echo\n"
+        "nika: g\nmodel: mock/echo\n"
         "inputs:\n  text:\n    type: string\nconst:\n  n: 1\n"
         "tasks:\n  a:\n    exec: { shell: \"echo hi\" }\n"
         "  b:\n    after:\n      a: success\n"
@@ -182,15 +175,11 @@ def main() -> int:
             W105_OUT.splitlines(), got105.splitlines(), "want", "got", lineterm="")))
     if downcast_w105(got105, "w105@2") != got105:
         fail("w105 not idempotent")
-    try:
-        downcast_w105("nika: v1\nworkflow:\n  id: x\nconfig:\n  a: 1\ntasks:\n  t:\n    exec: { shell: \"true\" }\n", "stop")
-        fail("w105: config: must refuse")
-    except DoorRefusal:
-        pass
-    # types:/policy: pass through at w105 (the 0.105 schema carries them)
-    keep = "nika: v1\nworkflow:\n  id: x\ntypes:\n  T:\n    kind: string\ntasks:\n  t:\n    exec: { shell: \"true\" }\n"
-    if "types:" not in downcast_w105(keep, "keep"):
-        fail("w105 must keep types:")
+    # the envelope unfold is the w105 door's first transform too
+    if not got105.startswith("nika: v1\nworkflow:\n  id: g\n"):
+        fail("w105 must unfold `nika: <id>` into the released MAP envelope")
+    if not re.search(r"^workflow: golden$", downcast_w2(GOLDEN_IN, "g2"), re.M):
+        fail("w2 must unfold `nika: <id>` into the released SCALAR envelope")
     stopped_w105: list[str] = []
     for f in pack:
         text = f.read_text()
@@ -214,21 +203,11 @@ def main() -> int:
             fail(f"{f.name} · w105 not idempotent")
 
     # The ratchet names its MEMBERS, never just a count — a rotation
-    # (one refuser leaves, another enters) would ride a bare number
-    # unseen. Retuned 2026-07-30: NEP-0014 spread `policy:` through the
-    # pack, and `policy:` has no W2 twin (it downcasts at w105, where
-    # only `config:` still refuses).
-    want_w2 = [
-        "08-config-values.nika.yaml",       # config: · no W2 twin
-        "09-returns-typed-door.nika.yaml",  # types: · no W2 twin
-        "ceo-monday-brief.nika.yaml",       # policy: (NEP-0014)
-        "etl-state.nika.yaml",              # policy: (NEP-0014)
-        "human-gated-ship.nika.yaml",       # policy: (NEP-0014)
-        "incident-war-room.nika.yaml",      # policy: (NEP-0014)
-        "invoice-chaser.nika.yaml",         # policy: (NEP-0014)
-        "release-train.nika.yaml",          # policy: (NEP-0014)
-    ]
-    want_w105 = ["08-config-values.nika.yaml"]
+    # (one refuser leaves, another enters) would ride a bare number unseen.
+    # Retuned 2026-08-12 at the envelope nuke: the three ex-members left
+    # the language, so the expected membership is EMPTY on both targets.
+    want_w2: list[str] = []
+    want_w105: list[str] = []
     if sorted(stopped_w2) != want_w2 or sorted(stopped_w105) != want_w105:
         fail(
             f"STOP-refusal ratchet moved · w2 {sorted(stopped_w2)} want "

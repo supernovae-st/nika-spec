@@ -1,6 +1,4 @@
-nika: v1
-workflow:
-  id: deep-013
+nika: deep-013
 permits:
   tools: ["nika:read"]
 tasks:

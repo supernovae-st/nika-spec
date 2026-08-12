@@ -1,7 +1,5 @@
 # Expected: exit 0 — outputs: contract resolves and prints (spec 01-envelope §outputs).
-nika: v1
-workflow:
-  id: outputs-basic
+nika: outputs-basic
 
 # Export — the typed callable-contract return (outputs:). Question under test:
 # does `nika run` PRINT the outputs object? (spec 01-envelope:378 says it does.)

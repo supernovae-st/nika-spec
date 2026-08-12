@@ -1,5 +1,0 @@
-{
-  "valid": true,
-  "note": "W1 'the map' positive: workflow is an object {id, description}; tasks is a map whose key IS the identity. Source order is presentation only.",
-  "mode": "strict"
-}

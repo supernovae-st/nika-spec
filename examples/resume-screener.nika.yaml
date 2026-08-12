@@ -31,10 +31,7 @@
 #       `permits.fs.read` entry TOGETHER: a permit is a literal you can
 #       read, it cannot interpolate a const (`NIKA-AUTH-007`).
 
-nika: v1
-workflow:
-  id: resume-screener
-  description: "screen resumes · glob CVs → local-model rubric per candidate → deterministic hiring shortlist"
+nika: resume-screener
 
 model: ollama/qwen3.5:4b   # PII stays on the machine · the whole screen is offline
 

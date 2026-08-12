@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: f005partial
+nika: f005partial
 tasks:
   a:
     exec: { command: ["./a.sh"] }

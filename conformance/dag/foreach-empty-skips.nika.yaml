@@ -1,8 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Expected: exit 0 — empty collection skips the for_each task; the value edge passes on skipped.
-nika: v1
-workflow:
-  id: foreach-empty
+nika: foreach-empty
 # SPEC 03 §for_each semantics: "If the collection is empty · the task is skipped".
 # A skipped for_each → a downstream VALUE edge admits (pass-set {success,skipped})
 # and its binding reads defined-null. Markers: 08_iter_*.json ABSENT (no

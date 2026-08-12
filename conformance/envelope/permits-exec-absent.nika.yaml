@@ -1,8 +1,5 @@
 # Expected: check-reject (gate verdict). PERMITS: exec task under a boundary with no exec grant.
-nika: v1
-workflow:
-  id: sec14-exec-no-permit
-  description: "ATTACK: exec with permits block but exec omitted (default-deny) — expect NIKA-SEC-004"
+nika: sec14-exec-no-permit
 
 permits:
   fs:

@@ -22,9 +22,7 @@
 #
 # Run · nika run examples/05-fetch-chain.nika.yaml
 
-nika: v1
-workflow:
-  id: fetch-chain
+nika: fetch-chain
 
 model: mock/echo   # the dry twin · the lesson here is the tool call, not the prose
 

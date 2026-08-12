@@ -5,8 +5,9 @@
 # grammar_door.py — the served-grammar door · wnew → w2 · text-level.
 #
 # The pack (examples/ · templates/) is authored in the RATIFIED grammar
-# (post-C2 · workflow map · task map · inputs/const). The binary a reader
-# has installed still speaks W2 (workflow scalar · task list · vars). The
+# (post-envelope-nuke · `nika: <id>` · task map · inputs/const). The binary
+# a reader has installed still speaks W2 (`nika: v1` + `workflow: <id>` ·
+# task list · vars). The
 # door downcasts AT PROJECTION TIME so what a reader copies runs on THEIR
 # nika — the same copy-paste invariant the website's serve-time door
 # (src/lib/w1-to-w2.ts) protects, mirrored for baked surfaces (docs).
@@ -14,39 +15,40 @@
 # ratified grammar and this projection flips to identity.
 #
 # Text-level and comment-preserving BY DESIGN — comments teach, layout is
-# curated; a parse/re-dump would destroy both. Five transforms:
-#   1 · workflow: {id, description} → `workflow: <id>` + promoted
-#       top-level `description:` (the W2 envelope)
+# curated; a parse/re-dump would destroy both. Four transforms:
+#   1 · `nika: <id>` → `nika: v1` + `workflow: <id>` (the W2 envelope · the
+#       released binaries still read `nika:` as a version marker and want
+#       the identity under its own key). The direction REVERSED at the
+#       envelope nuke: the door used to fold a workflow map DOWN to a
+#       scalar; now it UNFOLDS the mark back into the two old keys.
 #   2 · inputs: / const: → ONE merged `vars:` block · entries verbatim
 #       (W2 vars accepts both literal defaults and typed declarations)
 #   3 · tasks: map → list · `  <id>:` becomes `  - id: <id>` · bodies
 #       verbatim (the 2-space discipline makes the indent invariant)
 #   4 · ${{ inputs.X }} / ${{ const.X }} → ${{ vars.X }}
-#   5 · STOP-list · any construct with no W2 twin (config:/types:/policy:
-#       · workflow children beyond id/description · flow-bodied task
-#       keys) REFUSES loudly — a surface that cannot be served pre-train
-#       waits for the train, it never ships broken.
+#   Plus the STOP-list: a flow-bodied task key REFUSES loudly — a surface
+#   that cannot be served pre-train waits for the train, it never ships
+#   broken. (`config:`/`types:`/`policy:` left the STOP-list because they
+#   left the LANGUAGE — the schema refuses them upstream of this door.)
 #
-# Idempotent · a W2 document (scalar workflow · list tasks · vars) passes
-# through byte-identical.
-#
-# TARGETS · `downcast_w2` serves the 0.104-era dialect (all five transforms).
+# TARGETS · `downcast_w2` serves the 0.104-era dialect (all four transforms).
 # `downcast_w105` serves the RELEASED 0.105 dialect (measured on the release
-# binary 2026-07-20 · map envelope + task map + after: already speak) — only
-# two transforms remain: inputs/const → one vars block (+ ref rewrite) and
-# the ratified predicate names fold to the released set (success→succeeded ·
-# failure→failed). `types:`/`policy:` pass through (0.105 schema carries
-# them) · `config:` stays on the STOP-list (no released twin yet).
+# binary 2026-07-20 · map envelope + task map + after: already speak) — the
+# envelope unfold, inputs/const → one vars block (+ ref rewrite), and the
+# ratified predicate names fold to the released set (success→succeeded ·
+# failure→failed).
+#
+# `downcast_w106` is GONE: its one transform dropped `policy.endorsement`
+# from baked fences, and `policy:` left the language — a door with no
+# object is not a door.
 
 from __future__ import annotations
 
 import re
 import sys
 
-STOP_TOP_KEYS = ("config", "types", "policy")
-
 TOP_KEY = re.compile(r"^([A-Za-z0-9_-]+):(.*)$")
-WF_CHILD = re.compile(r"^  (id|description):\s?(.*)$")
+NIKA_ID = re.compile(r"^nika:[ \t]+([a-z][a-z0-9-]*)[ \t]*(#.*)?$")
 TASK_KEY = re.compile(r"^  ([a-z][a-z0-9_-]*):\s*(#.*)?$")
 TASK_KEY_FLOW = re.compile(r"^  ([a-z][a-z0-9_-]*):\s*\S")
 TEMPLATE_REF = re.compile(r"\$\{\{.*?\}\}", re.DOTALL)
@@ -80,44 +82,44 @@ def _block_ranges(lines: list[str]) -> list[tuple[str, str, int, int]]:
     return out
 
 
+def _unfold_envelope(lines: list[str], name: str,
+                     form: str) -> dict[int, list[str]]:
+    """`nika: <id>` → the two W2 keys. The released binaries read `nika:`
+    as a version marker and want the identity under `workflow:`, so the
+    mark is unfolded, never renamed. `form` picks the released spelling:
+    "scalar" for W2 (`workflow: <id>`) · "map" for 0.105, which already
+    spoke the object envelope (`workflow:` then `  id: <id>`). Serving one
+    dialect the other's shape is a broken copy-paste, not a cosmetic.
+
+    Idempotence is decided by the PRESENCE of a top-level `workflow:` key,
+    never by the shape of the `nika:` value: `v1` is itself kebab-shaped,
+    so a value test would unfold an already-downcast document into
+    `workflow: v1` (measured — this exact false positive)."""
+    if any(TOP_KEY.match(line) and line.startswith("workflow:") for line in lines):
+        return {}               # already W2 · nothing to unfold
+    for i, line in enumerate(lines):
+        m = NIKA_ID.match(line)
+        if m:
+            trail = f"  {m.group(2)}" if m.group(2) else ""
+            wf = ([f"workflow: {m.group(1)}{trail}"] if form == "scalar"
+                  else ["workflow:", f"  id: {m.group(1)}{trail}"])
+            return {i: ["nika: v1"] + wf}
+        if line.startswith("nika:"):
+            _refuse(name, i, f"`nika:` is not a kebab-case id: {line.strip()!r}")
+    _refuse(name, 0, "no `nika:` key — the envelope mark is required")
+    return {}
+
+
 def downcast_w2(text: str, name: str = "<inline>") -> str:
     """wnew → w2, text-level. Raises DoorRefusal on the STOP-list."""
     lines = text.splitlines()
     blocks = _block_ranges(lines)
 
-    for key, _rest, start, _end in blocks:
-        if key in STOP_TOP_KEYS:
-            _refuse(name, start, f"`{key}:` has no W2 twin (STOP-list)")
-
     drop: set[int] = set()          # line indices to remove
     replace: dict[int, list[str]] = {}  # line index → replacement lines
 
-    # ── 1 · the envelope · workflow map → scalar + promoted description ──
-    wf = next((b for b in blocks if b[0] == "workflow"), None)
-    if wf is not None and wf[1].strip() == "":
-        _, _, start, end = wf
-        wf_id, wf_desc, extras = None, None, []
-        for i in range(start + 1, end):
-            line = lines[i]
-            if COMMENT_OR_BLANK.match(line):
-                extras.append(line)
-                continue
-            m = WF_CHILD.match(line)
-            if not m:
-                _refuse(name, i, f"workflow child has no W2 twin: {line.strip()!r}")
-            if m.group(1) == "id":
-                wf_id = m.group(2).strip()
-            else:
-                wf_desc = m.group(2)
-        if wf_id is None:
-            _refuse(name, start, "workflow map without `id:`")
-        promoted = [f"workflow: {wf_id}"]
-        if wf_desc is not None:
-            promoted.append(f"description: {wf_desc}")
-        promoted += [e for e in extras if e.strip()]
-        replace[start] = promoted
-        for i in range(start + 1, end):
-            drop.add(i)
+    # ── 1 · the envelope · `nika: <id>` → `nika: v1` + `workflow: <id>` ──
+    replace.update(_unfold_envelope(lines, name, "scalar"))
 
     # ── 2 · inputs + const → one merged vars block ────────────────────
     value_blocks = [b for b in blocks if b[0] in ("inputs", "const")]
@@ -240,8 +242,6 @@ def downcast_w2(text: str, name: str = "<inline>") -> str:
 
 PREDICATES_RATIFIED_TO_RELEASED = {"success": "succeeded", "failure": "failed"}
 
-W105_STOP_TOP_KEYS = ("config",)
-
 AFTER_INLINE = re.compile(r"^(\s{4}after:\s*\{)([^}]*)(\}.*)$")
 AFTER_CHILD = re.compile(r"^(\s{6}[A-Za-z0-9_-]+:\s*)([a-z]+)(\s*(?:#.*)?)$")
 
@@ -277,52 +277,13 @@ def _fold_predicates(lines: list[str]) -> list[str]:
     return out
 
 
-def downcast_w106(text: str, name: str = "<inline>") -> str:
-    """ratified → the RELEASED 0.106 dialect. ONE transform: the policy
-    rule set is closed per minor (spec 10 §policy) and v0.106.1 predates
-    the NEP-0014 endorsement family, so `policy.endorsement` is dropped
-    from the baked fence — the prose may announce the mode, but the yaml
-    a reader copies must run on the binary they installed. Everything
-    else the ratified grammar ships already parses on v0.106.1. If the
-    drop empties the policy block, the `policy:` header goes with it."""
-    lines = text.splitlines()
-    drop: set[int] = set()
-    for key, _rest, start, end in _block_ranges(lines):
-        if key != "policy":
-            continue
-        i = start + 1
-        while i < end:
-            if re.match(r"^ {2}endorsement\s*:", lines[i]):
-                drop.add(i)
-                j = i + 1
-                while j < end and lines[j].strip() \
-                        and (len(lines[j]) - len(lines[j].lstrip())) > 2:
-                    drop.add(j)
-                    j += 1
-                i = j
-            else:
-                i += 1
-        children = {i for i in range(start + 1, end) if lines[i].strip()
-                    and not lines[i].lstrip().startswith("#")}
-        if children and children <= drop:
-            for i in range(start, end):
-                drop.add(i)
-    if not drop:
-        return text
-    return "\n".join(l for i, l in enumerate(lines) if i not in drop).rstrip() + "\n"
-
-
 def downcast_w105(text: str, name: str = "<inline>") -> str:
-    """ratified → the RELEASED 0.105 dialect. Two transforms + STOP-list."""
+    """ratified → the RELEASED 0.105 dialect. Three transforms."""
     lines = text.splitlines()
     blocks = _block_ranges(lines)
 
-    for key, _rest, start, _end in blocks:
-        if key in W105_STOP_TOP_KEYS:
-            _refuse(name, start, f"`{key}:` has no released twin (w105 STOP-list)")
-
     drop: set[int] = set()
-    replace: dict[int, list[str]] = {}
+    replace: dict[int, list[str]] = _unfold_envelope(lines, name, "map")
 
     # inputs + const → one merged vars block (same fold as w2 · values only)
     value_blocks = [b for b in blocks if b[0] in ("inputs", "const")]

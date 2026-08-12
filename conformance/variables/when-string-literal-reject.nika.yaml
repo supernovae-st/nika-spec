@@ -2,9 +2,7 @@
 # W32: when: with a bare string literal → NIKA-VAR-005 at check time
 # Tests: "when: \"literal string\"" should be rejected at parse/check time
 # Detail: bare string literal in when: is statically non-boolean-shaped (spec 03 §when shape rules).
-nika: v1
-workflow:
-  id: w32-when-string-literal-rejected
+nika: w32-when-string-literal-rejected
 
 tasks:
   bad_when:

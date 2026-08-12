@@ -1,6 +1,4 @@
-nika: v1
-workflow:
-  id: comp-001-templated
+nika: comp-001-templated
 const:
   which: "a"
 tasks:

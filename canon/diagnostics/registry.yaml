@@ -266,15 +266,16 @@ diagnostics:
     introduced_in: C0
     namespace: PARSE
     plane: unclassified
-    condition: 'missing envelope field (nika: / workflow: / non-empty tasks:)'
+    condition: 'missing envelope field (nika: / non-empty tasks:)'
     outcome_class: failure
     cause: validation_error
     retryable: false
     terminal: true
     payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
     span_required: false
-    teaching: 'missing envelope field (nika: / workflow: / non-empty tasks:) · spec/05-errors.md (import-c0 · the
-      teaching string mints at C1).'
+    teaching: 'missing envelope field (nika: / non-empty tasks:) · a file with no nika: key is not a nika
+      file; workflow: no longer exists to be missing (envelope nuke 2026-08-12 · tombstone
+      workflow-envelope-key) · spec/05-errors.md.'
     notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
       verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
       mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
@@ -287,15 +288,17 @@ diagnostics:
     introduced_in: C0
     namespace: PARSE
     plane: unclassified
-    condition: 'nika: version marker is not exactly v1'
+    condition: 'nika: is not a kebab-case id (^[a-z][a-z0-9-]*$)'
     outcome_class: failure
     cause: parse_error
     retryable: false
     terminal: true
     payload_schema: to-mint-c1/diagnostics/payloads/parse_error.schema.json
     span_required: false
-    teaching: 'nika: version marker is not exactly v1 · spec/05-errors.md (import-c0 · the teaching string mints
-      at C1).'
+    teaching: 'nika: is not a kebab-case id (^[a-z][a-z0-9-]*$) · the key carries the file NAME, not a
+      version — the version slot died at the envelope nuke 2026-08-12 and that is LOSSLESS (there is no
+      nika: v2, ever · pre-1.0 breaks live INSIDE v1) · tombstone nika-version-marker-literal ·
+      spec/05-errors.md.'
     notes: 'import-c0 (canon-flip) · category: parse_error · transient: false (canon.yaml + spec/05-errors.md verbatim)
       · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping mints at
       C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
@@ -593,48 +596,6 @@ diagnostics:
     span_required: false
     teaching: generic structural validation — wrong YAML shape for a field · spec/05-errors.md (import-c0 · the
       teaching string mints at C1).
-    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
-      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
-      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
-      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
-      span obligation not stated by the source → span_required false.'
-  - id: NIKA-PARSE-020
-    status: reserved
-    owner: spec
-    law_ids: []
-    introduced_in: C0
-    namespace: PARSE
-    plane: unclassified
-    condition: 'workflow: is a scalar — the envelope became an object (workflow: then id: <value>)'
-    outcome_class: failure
-    cause: validation_error
-    retryable: false
-    terminal: true
-    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
-    span_required: false
-    teaching: 'workflow: is a scalar — the envelope became an object (workflow: then id: <value>) · spec/05-errors.md
-      (import-c0 · the teaching string mints at C1).'
-    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
-      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
-      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
-      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
-      span obligation not stated by the source → span_required false.'
-  - id: NIKA-PARSE-021
-    status: reserved
-    owner: spec
-    law_ids: []
-    introduced_in: C0
-    namespace: PARSE
-    plane: unclassified
-    condition: 'top-level description: — it moved into workflow.description'
-    outcome_class: failure
-    cause: validation_error
-    retryable: false
-    terminal: true
-    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
-    span_required: false
-    teaching: 'top-level description: — it moved into workflow.description · spec/05-errors.md (import-c0 · the
-      teaching string mints at C1).'
     notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
       verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
       mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
@@ -1062,27 +1023,6 @@ diagnostics:
     span_required: false
     teaching: 'unknown type name (in types: · returns: · an outputs: type) — did-you-mean when close · spec/05-errors.md
       (import-c0 · the teaching string mints at C1).'
-    notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
-      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
-      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
-      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
-      span obligation not stated by the source → span_required false.'
-  - id: NIKA-TYPE-002
-    status: reserved
-    owner: spec
-    law_ids: []
-    introduced_in: C0
-    namespace: TYPE
-    plane: unclassified
-    condition: 'recursive type reference — the types: graph must be acyclic'
-    outcome_class: failure
-    cause: validation_error
-    retryable: false
-    terminal: true
-    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
-    span_required: false
-    teaching: 'recursive type reference — the types: graph must be acyclic · spec/05-errors.md (import-c0 · the
-      teaching string mints at C1).'
     notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
       verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
       mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
@@ -1744,31 +1684,6 @@ diagnostics:
       mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
       is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
       span obligation not stated by the source → span_required false.'
-  - id: NIKA-POLICY-001
-    status: reserved
-    owner: spec
-    law_ids:
-      - LAW-AUTH-0313
-    introduced_in: C0
-    namespace: POLICY
-    plane: unclassified
-    condition: 'a hard policy: rule is violated (require.human_gate_before · forbid.exec_after · allow.providers
-      · limits.max_tasks) — the diagnostic names rule + task + witness (order rules: the path) · check-time, before
-      any token (spec 10)'
-    outcome_class: failure
-    cause: security_error
-    retryable: false
-    terminal: true
-    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
-    span_required: false
-    teaching: 'a hard policy: rule is violated (require.human_gate_before · forbid.exec_after · allow.providers
-      · limits.max_tasks) — the diagnostic names rule + task + witness (order rules: the path) · check-time, before
-      any token (spec 10) · spec/05-errors.md (import-c0 · the teaching string mints at C1).'
-    notes: 'import-c0 (canon-flip) · category: security_error · transient: false (canon.yaml + spec/05-errors.md
-      verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
-      mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
-      is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
-      span obligation not stated by the source → span_required false.'
   - id: NIKA-PORT-001
     status: reserved
     owner: spec
@@ -2092,36 +2007,6 @@ diagnostics:
       law_ids empty until the freeze batch names the canon law · the lane
       edited the generated canon.yaml directly (ba2754c) — this row restores
       the source so the projection regenerates (SSOT-1 §12).'
-  - id: NIKA-SEC-013
-    status: reserved
-    owner: spec
-    law_ids: []
-    introduced_in: C2
-    namespace: SEC
-    plane: check
-    condition: 'the endorsement mode law — a human gate (invoke: nika:prompt)
-      declared under a policy: block that names no endorsement mode refuses
-      fail-closed (endorsement.undeclared_mode · F-F5 · zero implicit escape),
-      and endorsement: solo carried by a workflow with more than one gate
-      refuses as the declaration lying (endorsement.solo_count · exactly one
-      endorser) (NEP-0017 · F-P23)'
-    outcome_class: failure
-    cause: security_error
-    retryable: false
-    terminal: true
-    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
-    span_required: true
-    teaching: 'name the endorsement mode on the policy: block that carries a
-      human gate — endorsement: solo means exactly one endorser: one gate, its
-      fresh authorization bound to the action and logged as such · an
-      undeclared mode refuses fail-closed · solo with a second gate is the
-      declaration lying: drop a gate or declare a mode that admits it
-      (NEP-0017 · F-P23 · 10-authority §endorsement).'
-    notes: 'nep-0017 (2026-07-29) · category: security_error · transient: false
-      (canon.yaml verbatim) · minted by the lot-3b thin-laws lane (F-P23) ·
-      law_ids empty until the freeze batch names the canon law · sister row of
-      NIKA-SEC-012 — same half-shipped lane (ba2754c edited the generated
-      projection), same restoration (SSOT-1 §12).'
   - id: NIKA-SEC-014
     status: reserved
     owner: spec
@@ -2157,6 +2042,40 @@ diagnostics:
       the refusal it was measuring) · law_ids empty until the freeze batch
       names the canon law · the engine emission lands with the same PR
       (nika-check consent.rs).'
+  - id: NIKA-SEC-015
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: SEC
+    plane: check
+    condition: 'the order law — an exec: task sits transitively downstream of a
+      net-effecting task (nika:fetch · nika:notify) over the derived graph
+      (with: data edges ∪ after: control edges) · content the workflow did not
+      author must not reach a shell · UNCONDITIONAL: no block declares it and
+      none can disable it'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: true
+    teaching: 'consume the fetched value with a builtin (nika:jq · nika:validate)
+      instead of a shell, or drop the edge · the diagnostic names the PATH, which
+      is the witness (10-authority §the unconditional laws).'
+    notes: 'envelope nuke (2026-08-12) · category: security_error · transient: false (registry-born ·
+      no canon.yaml ancestor) · the surviving half of the dead policy: block. forbid.exec_after was
+      a DECLARED family and a law that binds only the file opting into it binds
+      nothing (measured fail-open: 26 corpus gates escaped the endorsement rule,
+      the 8 punished had declared an unrelated clause), so it moves to the shelf
+      of NIKA-SEC-009 (trifecta) and NIKA-SEC-014 (consent), which fire with no
+      declaration at all. Fixed at [net], its one declared parameterization.
+      TRIFECTA does NOT subsume it: leg ① wants a non-empty fs.read, so
+      fetch → exec with no private read read GREEN under the trifecta and RED
+      here (measured on the ex-fixture core/policy/003). Cost measured BEFORE the
+      ruling: 194 exec: tasks across the shipped corpus, 1 refused, and that one
+      is already a declared check-reject. law_ids empty until the freeze batch
+      names the canon law · the engine emission is owed.'
   - id: NIKA-TIMEOUT-001
     status: reserved
     owner: spec

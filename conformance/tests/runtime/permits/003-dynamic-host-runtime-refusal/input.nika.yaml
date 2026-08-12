@@ -7,9 +7,7 @@
 # nika:jq is pure internal, so pick succeeds (law 4).
 # (Reworked 2026-07-30: the previous premise — ABSENT permits deferring to
 # run — is unexercisable: absent + an effect refuses AT CHECK per F-O8.)
-nika: v1
-workflow:
-  id: rt-permits-dynamic-host-refusal
+nika: rt-permits-dynamic-host-refusal
 model: mock/echo
 permits:
   net: { http: ["allowed.example.com"] }

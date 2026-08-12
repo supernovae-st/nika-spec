@@ -3,9 +3,7 @@
 # 2026-07-30) · same workflow, same undeclared-sibling read — but the level
 # EXPLICITLY opens extras with additionalProperties: true, so the read is
 # legal again. Proves the strict refusal is precise, never blanket.
-nika: v1
-workflow:
-  id: schema-sibling-opted-open
+nika: schema-sibling-opted-open
 permits:
   exec: ["report"]
 tasks:

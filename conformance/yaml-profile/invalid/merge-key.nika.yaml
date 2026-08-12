@@ -1,9 +1,7 @@
 # Expected: NIKA-YAML-003 at CHECK.
 # R11 point 1: merge keys (<<) are forbidden — compose mappings explicitly. The inline
 # form needs no anchor, so this fixture carries EXACTLY the merge-key violation.
-nika: v1
-workflow:
-  id: merge-key
+nika: merge-key
 tasks:
   t:
     <<: { exec: { command: [echo, ok] } }

@@ -1,8 +1,5 @@
 # Expected: check-reject (gate verdict). PERMITS: tool not in permits.tools.
-nika: v1
-workflow:
-  id: sec25-tool-not-permitted
-  description: "ATTACK: invoke a tool not in permits.tools — expect NIKA-SEC-004 at check"
+nika: sec25-tool-not-permitted
 
 permits:
   tools: ["nika:jq"]

@@ -1,6 +1,4 @@
-nika: v1
-workflow:
-  id: comp-008-contain
+nika: comp-008-contain
 permits:
   net:
     http: ["api.example.com"]

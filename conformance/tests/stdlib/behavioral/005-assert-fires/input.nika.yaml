@@ -4,9 +4,7 @@
 # product): a failing condition is NIKA-BUILTIN-ASSERT-001 and the
 # workflow FAILS. The arg is `condition:` (the ARGS gate teaches its
 # own contract: declared = condition · message — probed).
-nika: v1
-workflow:
-  id: rt-stdlib-assert-fires
+nika: rt-stdlib-assert-fires
 permits: { tools: ["nika:assert"] }
 const:
   n: 3

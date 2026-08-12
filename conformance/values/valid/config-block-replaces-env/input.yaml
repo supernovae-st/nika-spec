@@ -1,13 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: config-block
-config:
-  log_level: { type: string, default: "info" }
-  region: { type: string }
+nika: config-block
+inputs:
+  log_level: { type: string, default: "info", required: false }
+  region: { type: string, required: false }
 tasks:
   note:
     invoke:
       tool: "nika:log"
       args:
-        message: "level ${{ config.log_level }} in ${{ config.region }}"
+        message: "level ${{ inputs.log_level }} in ${{ inputs.region }}"

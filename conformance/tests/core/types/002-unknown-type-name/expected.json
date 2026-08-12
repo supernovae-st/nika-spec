@@ -6,5 +6,5 @@
       "category": "validation_error"
     }
   ],
-  "note": "09-types.md \u00b7 unknown type name \u2014 did-you-mean `Summary`."
+  "note": "09-types.md \u00b7 unknown type name \u2014 with `types:` retired the name environment is empty, so a PascalCase name in type position resolves to nothing and the refusal teaches the inline form."
 }

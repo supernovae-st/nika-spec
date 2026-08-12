@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: t-dotted-star-bound-never-grants-escape
+nika: t-dotted-star-bound-never-grants-escape
 permits:
   fs: { read: ["./**"] }
   tools: ["nika:read"]

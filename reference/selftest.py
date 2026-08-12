@@ -36,7 +36,7 @@ def check(name: str, cond: bool, detail: str = "") -> None:
 
 
 def wf(tasks: str) -> str:
-    return f"nika: v1\nworkflow:\n  id: selftest\ntasks:\n{tasks}"
+    return f"nika: selftest\ntasks:\n{tasks}"
 
 
 T = "    exec: {command: [\"true\"]}"

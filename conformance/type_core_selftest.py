@@ -268,8 +268,8 @@ law("io · inputs.type full TypeExpr admits (union + refinements)",
         "shape": {"type": {"string": {"pattern": "^[a-z]+$"}}}}}) == [])
 law("io · unknown name at inputs refuses NIKA-TYPE-001",
     "NIKA-TYPE-001" in _io_codes({**_BASE, "inputs": {"x": {"type": "Summary"}}}))
-law("io · the dead boolean spelling refuses at config",
-    "NIKA-TYPE-001" in _io_codes({**_BASE, "config": {"x": {"type": "boolean"}}}))
+law("io · the dead boolean spelling refuses at inputs",
+    "NIKA-TYPE-001" in _io_codes({**_BASE, "inputs": {"x": {"type": "boolean"}}}))
 law("io · a typed const's type is judged · a bare literal's type key never is",
     "NIKA-TYPE-001" in _io_codes({**_BASE, "const": {"w": {"type": "float", "value": 1}}})
     and _io_codes({**_BASE, "const": {"settings": {"type": "custom"}}}) == [])

@@ -28,8 +28,7 @@ def judge(text: str) -> list[dict]:
 
 
 TRIFECTA = """
-nika: v1
-workflow: { id: t }
+nika: t
 permits:
   fs: { read: ["./inbox/**"], write: ["./out/**"] }
   net: { http: ["api.example.com"] }
@@ -72,8 +71,7 @@ law("① dropped → clean", not judge(TRIFECTA.replace(
     '  fs: { read: ["./inbox/**"], write: ["./out/**"] }',
     '  fs: { write: ["./out/**"] }', 1)))
 law("② dropped → clean", not judge("""
-nika: v1
-workflow: { id: t }
+nika: t
 permits:
   fs: { read: ["./inbox/**"], write: ["./out/**"] }
   net: { http: ["api.example.com"] }
@@ -82,8 +80,7 @@ tasks:
     infer: { prompt: "summarize", max_tokens: 9 }
 """))
 law("③ dropped → clean", not judge("""
-nika: v1
-workflow: { id: t }
+nika: t
 permits:
   fs: { read: ["./inbox/**"], write: ["./out/**"] }
   tools: ["nika:fetch", "nika:write"]
@@ -117,8 +114,7 @@ law("defaulted prompt answers without a human", len(v) == 1 and v[0]["task"] == 
 
 # ── no `permits:` block → the lane is inert (no claim) ──
 law("no declared boundary → no claim", not judge("""
-nika: v1
-workflow: { id: t }
+nika: t
 tasks:
   fetch_page:
     invoke:
@@ -131,8 +127,7 @@ tasks:
 
 # ── an unanalyzable DAG yields NO claim (skipped, never wrong) ──
 law("broken dag (ghost after) skips the lane", not judge("""
-nika: v1
-workflow: { id: t }
+nika: t
 permits:
   fs: { read: ["./inbox/**"] }
   net: { http: ["api.example.com"] }
@@ -145,8 +140,7 @@ tasks:
 
 # ── v2.0 pins · the realized-flow judgment ──
 law("granted-but-never-invoked ingress arms nothing", not judge("""
-nika: v1
-workflow: { id: t }
+nika: t
 permits:
   fs: { read: ["./inbox/**"], write: ["./out/**"] }
   net: { http: ["api.example.com"] }
@@ -159,8 +153,7 @@ tasks:
 """))
 
 v = judge("""
-nika: v1
-workflow: { id: t }
+nika: t
 permits:
   fs: { read: ["./inbox/**"], write: ["./out/**"] }
   net: { http: ["api.example.com"] }
@@ -183,8 +176,7 @@ law("a model summary carries the payload (integrity inversion)",
     len(v) == 1 and v[0]["task"] == "tell" and v[0]["source"] == "fetch_page")
 
 v = judge("""
-nika: v1
-workflow: { id: t }
+nika: t
 permits:
   fs: { read: ["./inbox/**"], write: ["./out/**"] }
   net: { http: ["api.example.com"] }
@@ -209,8 +201,7 @@ law("a recovery read re-arms the chain",
     len(v) == 1 and v[0]["task"] == "leak" and v[0]["source"] == "fetch_page")
 
 v = judge("""
-nika: v1
-workflow: { id: t }
+nika: t
 permits:
   fs: { read: ["./inbox/**"], write: ["./out/**"] }
   exec: ["sh"]
@@ -235,8 +226,7 @@ law("the opacity witness is the untrusted ORIGIN",
     len(v) == 2 and v[1]["source"] == "fetch_page")
 
 law("an egress no untrusted content reaches is clean", not judge("""
-nika: v1
-workflow: { id: t }
+nika: t
 permits:
   fs: { read: ["./inbox/**"], write: ["./out/**"] }
   exec: ["git"]
@@ -251,8 +241,7 @@ tasks:
 """))
 
 law("a pure-compute agent whitelist is not egress", not judge("""
-nika: v1
-workflow: { id: t }
+nika: t
 model: mock/echo
 permits:
   fs: { read: ["./inbox/**"], write: ["./out/**"] }
@@ -264,8 +253,7 @@ tasks:
 """))
 
 v = judge("""
-nika: v1
-workflow: { id: t }
+nika: t
 model: mock/echo
 permits:
   fs: { read: ["./inbox/**"], write: ["./out/**"] }
@@ -284,8 +272,7 @@ law("a browsing agent's output is a content source",
     len(v) == 1 and v[0]["task"] == "leak" and v[0]["source"] == "browse")
 
 law("one gate dominating both sinks disarms the run", not judge("""
-nika: v1
-workflow: { id: t }
+nika: t
 permits:
   fs: { read: ["./inbox/**"], write: ["./out/**"] }
   net: { http: ["api.example.com"] }
@@ -327,8 +314,7 @@ for _tool, _args in [
     ("nika:tts_generate", '{ text: "${{ with.d }}", output_dir: "./out" }'),
 ]:
     _v = judge(f"""
-nika: v1
-workflow: {{ id: media }}
+nika: media
 model: mock/echo
 permits:
   tools: ["nika:fetch", "{_tool}"]

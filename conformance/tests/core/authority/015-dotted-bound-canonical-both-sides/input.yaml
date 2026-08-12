@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: t-dotted-bound-canonical-both-sides
+nika: t-dotted-bound-canonical-both-sides
 permits:
   fs: { read: ["./examples/fixtures/kpis.csv"] }
   tools: ["nika:read"]

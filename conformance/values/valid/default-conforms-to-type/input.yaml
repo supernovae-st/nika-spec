@@ -1,12 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: default-conforms
+nika: default-conforms
 inputs:
   count: { type: integer, default: 5 }
   mode: { type: { enum: ["fast", "slow"] }, default: "fast" }
-config:
-  timeout_s: { type: number, default: 30 }
+  timeout_s: { type: number, default: 30, required: false }
 const:
   label: { type: string, value: "prod" }
 tasks:
@@ -14,4 +11,4 @@ tasks:
     invoke:
       tool: "nika:log"
       args:
-        message: "${{ inputs.count }} ${{ inputs.mode }} ${{ config.timeout_s }} ${{ const.label }}"
+        message: "${{ inputs.count }} ${{ inputs.mode }} ${{ inputs.timeout_s }} ${{ const.label }}"

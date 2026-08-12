@@ -31,10 +31,7 @@
 #       · arm the on-call ping · add --var alert=true — ONCALL_WEBHOOK_URL must be
 #         set or the armed run dies NIKA-VAR-001 at `alert` (see permits.net.http)
 
-nika: v1
-workflow:
-  id: incident-war-room
-  description: "parallel evidence → typed timeline → settle + recheck → refuse or draft → record"
+nika: incident-war-room
 
 model: ollama/qwen3.5:4b   # local · zero key · `--model mock/echo` rehearses the whole file
 
@@ -85,8 +82,6 @@ permits:
     # permit bound IS the wall and cannot interpolate (NIKA-AUTH-007).
     read: ["./examples/fixtures/checkout-api-runbook.md"]
     write: ["./incidents/checkout-api-postmortem.md"]
-policy:                              # NEP-0014 · the gate runs under a NAMED endorsement mode
-  endorsement: solo
 
 tasks:
   # ── the human gate · FIRST, before any evidence is gathered ──

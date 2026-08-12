@@ -7,9 +7,7 @@
 #
 # Expected: NIKA-SEC-008 at CHECK (`legacy%2epkl%2e` ≡ `legacy.pkl.` ·
 # both refused — never one inert, one dead).
-nika: v1
-workflow:
-  id: saf-t3009-encoded-extension-refused
+nika: saf-t3009-encoded-extension-refused
 permits:
   net: { http: ["files.example.com"] }
   tools: ["nika:fetch"]

@@ -1,7 +1,5 @@
 # Expected: NIKA-TIMEOUT-001 at RUN. Verified via event stream: ZERO task_retrying events even with NIKA-TIMEOUT-001 in on_codes (timeout is never retryable, spec 03 §timeout).
-nika: v1
-workflow:
-  id: timeout-not-retried
+nika: timeout-not-retried
 # COVERS: timeout is NEVER retryable, EVEN when on_codes lists NIKA-TIMEOUT-001
 # (spec 03 L433: "never retryable · the timeout already covered the retries by definition").
 # This is the special-case that OVERRIDES the general on_codes-forces-retry rule

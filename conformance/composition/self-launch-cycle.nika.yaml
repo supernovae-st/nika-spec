@@ -2,10 +2,7 @@
 # Self-launch: the static call graph contains a one-node cycle (this file
 # invokes itself). Spec 14 law 7 — a call graph you cannot draw acyclic
 # cannot be bounded; NIKA-SEC-003 is the runtime depth backstop.
-nika: v1
-workflow:
-  id: comp01-self-launch-cycle
-  description: "ATTACK: workflow invokes itself — expect check refuses with NIKA-COMP-003"
+nika: comp01-self-launch-cycle
 
 tasks:
   loop:

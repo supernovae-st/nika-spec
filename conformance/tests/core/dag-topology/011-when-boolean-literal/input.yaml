@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: core-when-true
+nika: core-when-true
 permits:
   tools: ["nika:notify"]
   exec: ["./build.sh"]

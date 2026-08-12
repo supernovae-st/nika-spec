@@ -1,0 +1,11 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "validation_error"
+    }
+  ],
+  "note": "`types:` is not an envelope key. Named types had zero WORK usage and `returns:` accepts a type expression inline, so there was never a second site to name a type FOR. A type expression is self-contained (spec/09-types.md).",
+  "mode": "strict"
+}

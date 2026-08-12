@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: v1
-workflow:
-  id: ledger
+nika: ledger
 permits:
   exec: ["./lint.sh", "./audit.sh", "./report.sh", "./rm-tmp.sh"]
   tools: ["nika:jq"]

@@ -1,7 +1,5 @@
 # Expected: exit 0 — NIKA-BUILTIN-JQ-001 fires internally on iterations 1 and 4, recovered via on_error (recover: null keeps positional alignment).
-nika: v1
-workflow:
-  id: onerror-recover-null
+nika: onerror-recover-null
 # COVERS: per-iteration on_error: { recover: null } -> failed iters become null at index.
 # Then a fan-in aggregator partitions good vs null (the locales pattern).
 # items 0..5, indices 1 and 4 fail -> null. Assert: good count 4, null count 2.
