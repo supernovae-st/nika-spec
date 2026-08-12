@@ -509,6 +509,11 @@
         }
       ],
       "properties": {
+        "group": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "description": "Fan-in MEMBERSHIP · this task joins the named group, and a consumer folds the whole group with one `${{ group.<name> }}` binding in its `with:` (spec/03-dag.md §group). Membership is DECLARED, never matched: a renamed member leaves its group loudly (NIKA-DAG-008 on the reference), where a glob would shrink the fold in silence. A group exists iff at least one task declares it. An `unwind` task may not join one (NIKA-DAG-009 · cleanup never schedules)."
+        },
         "after": {
           "type": "object",
           "description": "The CONTROL boundary · {producer-task: predicate}. Each entry is one control edge (spec/03-dag.md §after). State, never data — observe outcomes through with:.",

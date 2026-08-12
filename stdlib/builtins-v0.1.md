@@ -284,8 +284,55 @@ Timestamp arithmetic · op-discriminated single builtin · timezone-aware (IANA 
 ### `nika:hash`
 ```yaml
 invoke: { tool: "nika:hash", args: { algo: blake3, content: "${{ tasks.X.output }}", encoding: hex } }
+
+# op-discriminated · hash (default) | sign | verify
+invoke: { tool: "nika:hash", args: { op: sign,   content: "${{ with.manifest }}", key: "${{ secrets.release_key }}" } }
+invoke: { tool: "nika:hash", args: { op: verify, content: "${{ with.manifest }}", public_key: "${{ const.release_pub }}", signature: "${{ with.sig }}" } }
 ```
 Content hashing · default **blake3** (fastest modern cryptographic hash · parallel · secure) · or `sha256`/`sha512`. md5/sha1 NOT supported (cryptographically broken · `NIKA-BUILTIN-HASH-001` `validation_error` on an unsupported algo). `encoding:` `hex` (default) | `base64`. Use cases · cache keys · content addressing · provenance.
+
+**`op:` · `hash` (default) · `sign` · `verify` (normative · v0.1 surface).**
+The engine already signs and verifies Ed25519 — the run seal is one Ed25519
+signature over the journal, minted by `nika key init` and checked by the
+evidence verifier. **The language could not reach any of it.** A capability
+that ships and stays unreachable from the file is not a shipped capability,
+so `op:` exposes it through the builtin that already owns the digest.
+
+| Arg | Ops | Notes |
+|---|---|---|
+| `content` | all | required · the bytes under the operation |
+| `algo` | `hash` | `blake3` (default) · `sha256` · `sha512` |
+| `encoding` | `hash` · `sign` | `hex` (default) · `base64` — the output encoding |
+| `key` | `sign` | required · the Ed25519 private key · **MUST be a `${{ secrets.X }}` reference** |
+| `public_key` | `verify` | required · the Ed25519 public key (a `const:`/`inputs:` value — a public key is not a secret) |
+| `signature` | `verify` | required · the signature to check, in `encoding:` |
+
+`sign` returns the signature string; `verify` returns a boolean and never
+throws on a bad signature (a *false* verdict is data, not an error — a
+workflow branches on it with `when:`). A malformed key, an unknown `op:`, or
+a missing per-op required arg is `NIKA-BUILTIN-HASH-001` (`validation_error`).
+
+**The key rides `secrets:` — that is a hard rule, not a convention.** A
+private key reached from the ambient environment or an implicit on-disk
+keyring would make `nika:hash` read state its declaration does not name,
+which is exactly the pure-compute-that-is-not-pure defect the permits
+boundary exists to refuse. Declaring the key under `secrets:` keeps it inside
+the four-authority family, keeps it masked in logs, and keeps its reach
+governed by `egress:` like any other secret.
+
+**What this closes, and what it does NOT (bounded honestly).** It closes
+**Ed25519** signing and verification — detached signatures over content the
+workflow already holds: release manifests, provenance attestations,
+inter-workflow handoffs, checkpoint verification. It does **not** close
+RS256/JWT: that is RSA with a different key format, a different padding
+scheme and a token envelope, none of which this surface has. A GitHub App
+credential exchange is RS256 and stays out of reach — do not read this
+section as authenticating anything that mints a JWT. `capability_classification`
+for the builtin moves from `pure_internal` to secret-reading under `op: sign`;
+the classification row in `canon/builtins.yaml` follows when the engine wires
+the op (today the engine's `ARGS` gate declares `content · algo · encoding`
+only, so `op:` is spec-ahead-of-engine and this file says so rather than
+implying a green that does not exist).
 
 ---
 

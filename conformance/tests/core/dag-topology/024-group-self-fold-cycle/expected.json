@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-DAG-001",
+      "category": "validation_error"
+    }
+  ],
+  "note": "03-dag.md §group · fan-in edges join E_d, so a task folding a group it belongs to edges to itself. The acyclicity law needed no special case — the members ARE edges."
+}

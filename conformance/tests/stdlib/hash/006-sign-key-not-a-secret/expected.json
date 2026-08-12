@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-BUILTIN",
+      "category": "validation_error"
+    }
+  ],
+  "note": "builtins-v0.1.md §nika:hash · the key MUST be a ${{ secrets.X }} reference. A literal (or an ambient path, or a fetched value) makes the builtin read key material its declaration does not name — the pure-compute-that-is-not-pure defect the permits boundary refuses."
+}

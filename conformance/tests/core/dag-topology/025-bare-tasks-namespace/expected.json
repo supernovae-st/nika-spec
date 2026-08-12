@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-VAR-020",
+      "category": "validation_error"
+    }
+  ],
+  "note": "04 §namespaces · a bare `tasks` root is a namespace, not a value. Measured 2026-08-12: the engine refused this (NIKA-DAG-002) while this oracle read it VALID — the projection scan needs a `tasks.<id>` to fire and the resolution scan skips the tasks root on boundary surfaces. The fold a reader reaches for here is `group.<name>`."
+}

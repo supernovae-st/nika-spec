@@ -58,8 +58,11 @@ import yaml  # noqa: E402
 
 # the closed four-authority family (R3a · LAW-SURFACE-0201)
 VALUE_AUTHORITIES = ("inputs", "config", "const", "secrets")
-# the runtime / local namespaces · legal in ${{ }}, never value authorities
-RUNTIME_NAMESPACES = frozenset({"tasks", "with", "item", "index"})
+# the runtime / local namespaces · legal in ${{ }}, never value authorities.
+# `group` is the fan-in reader (03 §group) — the PLURAL of `tasks`, same
+# runtime family, so the four-authority family and the namespace count are
+# both untouched by it.
+RUNTIME_NAMESPACES = frozenset({"tasks", "group", "with", "item", "index"})
 # the dead forms · each carries its own teaching (LAW-GRAMMAR-0201 · 0202)
 DEAD_FORMS = {"vars": "NIKA-VALUES-001", "env": "NIKA-VALUES-002"}
 

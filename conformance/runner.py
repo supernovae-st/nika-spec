@@ -93,6 +93,16 @@ BODY_FIELDS = ("when", "for_each", "infer", "exec", "invoke", "agent")
 # is a legal after: predicate but carries no pass-set (see _AFTER_PASS) and
 # never enters G_p (03 §unwind · "the rest of the contract").
 AFTER_PREDICATES = {"success", "failure", "skipped", "terminal", "unwind"}
+# `group.<name>` · the fan-in reader (03 §group). A group is DECLARED by its
+# members (`group: <name>` on each task); one binding folds them all. Same
+# runtime family as `tasks.` — NOT a 7th namespace — and legal in a `with:`
+# value ONLY (the tightest door · everywhere else is NIKA-VAR-021).
+GROUP_REF = re.compile(r"(?<![.\w])group\.([a-z][a-z0-9_]*)\b")
+# a `group` root carrying no `.name` names no group (the DAG-008 bare form)
+BARE_GROUP_REF = re.compile(r"(?<![.\w])group\b(?!\s*[.\[])")
+# the same defect one namespace over: a bare `tasks` root. Measured 2026-08-12
+# — `${{ tasks }}` passed this oracle while the engine refused it (NIKA-DAG-002).
+BARE_TASKS_REF = re.compile(r"(?<![.\w])tasks\b(?!\s*[.\[])")
 
 
 
@@ -220,6 +230,58 @@ def _fetch_traverse_errors(where: str, args: dict) -> list[dict]:
     return errs
 
 
+_HASH_OPS = ("hash", "sign", "verify")
+_HASH_ALGOS = ("blake3", "sha256", "sha512")
+# per-op required args (builtins-v0.1.md §nika:hash · op-discriminated)
+_HASH_REQUIRED = {"hash": ("content",),
+                  "sign": ("content", "key"),
+                  "verify": ("content", "public_key", "signature")}
+# args that belong to exactly one op · naming one under another op is a
+# declaration that does not mean what it says
+_HASH_OP_ONLY = {"algo": ("hash",), "key": ("sign",),
+                 "public_key": ("verify",), "signature": ("verify",)}
+_SECRET_REF = re.compile(r"\$\{\{\s*secrets\.[A-Za-z_][A-Za-z0-9_]*\s*\}\}")
+
+
+def _hash_op_errors(where: str, args: dict) -> list[dict]:
+    """`nika:hash` static surface (builtins-v0.1.md §nika:hash) · the op enum
+    is closed · each op declares its own required args · an arg belonging to
+    another op is refused · and `sign`'s key MUST be a `${{ secrets.X }}`
+    reference: a private key reached any other way makes the builtin read
+    state its declaration does not name."""
+    errs: list[dict] = []
+    err = lambda detail: errs.append({"namespace": "NIKA-BUILTIN",
+                                      "category": "validation_error",
+                                      "detail": f"{where} · {detail}"})
+    op = args.get("op", "hash")
+    if not _is_static(op):
+        return errs                      # templated op · runtime's job
+    if op not in _HASH_OPS:
+        err(f"op '{op}' is not an op — one of {' · '.join(_HASH_OPS)} "
+            "(builtins-v0.1.md §nika:hash)")
+        return errs
+    for req in _HASH_REQUIRED[op]:
+        if req not in args:
+            err(f"op: {op} requires `{req}:` (builtins-v0.1.md §nika:hash)")
+    for key, ops in _HASH_OP_ONLY.items():
+        if key in args and op not in ops:
+            err(f"`{key}:` belongs to op: {' · '.join(ops)} — not op: {op}")
+    algo = args.get("algo")
+    if _is_static(algo) and algo not in _HASH_ALGOS:
+        err(f"algo '{algo}' is not supported — {' · '.join(_HASH_ALGOS)} "
+            "(md5/sha1 are cryptographically broken)")
+    enc = args.get("encoding")
+    if _is_static(enc) and enc not in ("hex", "base64"):
+        err(f"encoding '{enc}' is not an encoding — hex · base64")
+    key = args.get("key")
+    if op == "sign" and key is not None and not _SECRET_REF.fullmatch(str(key).strip()):
+        err("op: sign · `key:` MUST be a `${{ secrets.<name> }}` reference — a "
+            "private key reached from anywhere else (a literal · an ambient "
+            "path · a fetched value) makes the builtin read state its "
+            "declaration does not name (builtins-v0.1.md §nika:hash)")
+    return errs
+
+
 def stdlib_surface_errors(doc: dict, canon: dict) -> list[dict]:
     """Stdlib v0.1 STATIC surface (names + shapes · no execution) ·
     - `model:` MUST be `<provider>/<name>` with a canonical provider prefix
@@ -281,6 +343,10 @@ def stdlib_surface_errors(doc: dict, canon: dict) -> list[dict]:
             errs.extend(_fetch_payload_errors(where, args))
             if "traverse" in args:
                 errs.extend(_fetch_traverse_errors(where, args))
+        if isinstance(inv, dict) and inv.get("tool") == "nika:hash":
+            args = inv.get("args")
+            if isinstance(args, dict):
+                errs.extend(_hash_op_errors(where, args))
         if isinstance(inv, dict) and inv.get("tool") == "nika:image_generate":
             args = inv.get("args")
             if not isinstance(args, dict):
@@ -373,6 +439,11 @@ def _expr_task_refs(value) -> set[str]:
     return {ref for body in _expr_bodies(value) for ref in TASK_REF.findall(body)}
 
 
+def _expr_group_refs(value) -> set[str]:
+    """All `group.<name>` groups folded inside `${{ }}` expressions of a value."""
+    return {g for body in _expr_bodies(value) for g in GROUP_REF.findall(body)}
+
+
 BARE_TASK_REF = re.compile(
     r"\btasks\.([a-z][a-z0-9_]*)(?![a-z0-9_])(?!\s*[.\[])")
 
@@ -389,6 +460,12 @@ def _bare_envelope_errors(value, where: str) -> list[dict]:
                          "detail": f"{where} - bare `tasks.{m.group(1)}` is the envelope, "
                                    "not a value - pick `.output` (or .status/.error/"
                                    ".duration_ms - 04 namespaces - closed projection set)"})
+        if BARE_TASKS_REF.search(body):
+            errs.append({"code": "NIKA-VAR-020", "namespace": "NIKA-VAR",
+                         "category": "validation_error",
+                         "detail": f"{where} · bare `tasks` is a namespace, not a value — "
+                                   "name one task (`tasks.<id>.output`) or fold a declared "
+                                   "group (`group.<name>` · 03 §group)"})
     return errs
 
 
@@ -427,6 +504,8 @@ def _resolution_errors(value, scopes: dict, where: str) -> list[dict]:
                     continue  # boundary surfaces report DAG-002/VAR-021 instead
                 if seg and seg not in scopes["tasks"]:
                     var_err(f"tasks.{seg} references a non-existent task")
+            elif root == "group":
+                continue  # the fan-in reader · judged by NIKA-DAG-008 / VAR-021
             elif seg:  # dotted unknown root · not one of the 6 namespaces
                 var_err(f"'{root}.{seg}' uses an undefined namespace '{root}'")
             # bare unknown identifiers are tolerated (conservative · CEL terms)
@@ -546,7 +625,7 @@ def _binding_pass(field: str) -> frozenset:
     return _PASS_VALUE            # value (output · named output)
 
 
-def _static_liveness_errors(tasks, idset) -> list[dict]:
+def _static_liveness_errors(tasks, idset, groups=None) -> list[dict]:
     """NIKA-DAG-006 · fold reachable settled-state sets over G_p (acyclic
     by the time this runs). `when:` literal false → {skipped}; literal
     true/absent → {success·failure}; a string expression widens to all
@@ -554,6 +633,7 @@ def _static_liveness_errors(tasks, idset) -> list[dict]:
     errs: list[dict] = []
     by_id = dict(tasks)
     possible: dict[str, frozenset] = {}
+    groups = groups or {}
 
     def incoming(t: dict) -> list[tuple[str, frozenset, str]]:
         edges = []
@@ -561,6 +641,13 @@ def _static_liveness_errors(tasks, idset) -> list[dict]:
             for producer, field in TASK_FIELD_REF.findall(body):
                 if producer in idset:
                     edges.append((producer, _binding_pass(field), "with"))
+        # a fan-in edge is a TERMINAL observation of each member (03 §group):
+        # pass-set = all four, so a fold is never the thing that kills a task
+        # — which is the point, a report runs whatever happened.
+        for g in _expr_group_refs(t.get("with")):
+            for member in groups.get(g, []):
+                if member in idset:
+                    edges.append((member, _PASS_ALL, f"group.{g}"))
         raw_after = t.get("after")
         for target, pred in (raw_after if isinstance(raw_after, dict) else {}).items():
             if isinstance(target, str) and target in idset \
@@ -704,11 +791,57 @@ def cross_ref_errors(doc: dict) -> list[dict]:
                 errs.append({"code": "NIKA-DAG-002", "category": "validation_error",
                              "detail": f"task '{tid}' with: references undeclared '{r}'"})
 
+    # ---- the fan-in group (03 §group) --------------------------------
+    # Membership is DECLARED, never matched: a group EXISTS iff at least one
+    # task carries `group: <name>`. An empty group and an undeclared one are
+    # therefore the SAME fact, judged by one code — a fold can never harvest
+    # zero and read as clean.
+    groups: dict[str, list[str]] = {}
+    for tid, t in tasks:
+        g = t.get("group")
+        if isinstance(g, str):
+            groups.setdefault(g, []).append(tid)
+
+    # NIKA-DAG-009 · an `unwind` task never enters G_p (it does not schedule),
+    # so it cannot be a fan-in member: the consumer's edge would have no wave.
+    for tid, t in tasks:
+        if isinstance(t.get("group"), str) and _unwinds(t):
+            errs.append({"code": "NIKA-DAG-009", "category": "validation_error",
+                         "detail": f"task '{tid}' is an unwind task and declares "
+                                   f"group: {t['group']} — cleanup attaches to a settled "
+                                   "producer and never schedules (E_f, never G_p), so it "
+                                   "cannot be folded (03 §group · §unwind)"})
+
+    # NIKA-DAG-008 · a `${{ group.X }}` fold naming a group no task declares —
+    # the anti-rename law. A renamed member leaves its group HERE, loudly,
+    # instead of shrinking the fold in silence the way a glob would.
+    for tid, t in tasks:
+        for gname in sorted(_expr_group_refs(t.get("with"))):
+            if gname not in groups:
+                near = sorted(groups)
+                hint = f" · declared groups: {' · '.join(near)}" if near else \
+                       " · no task in this workflow declares a group:"
+                errs.append({"code": "NIKA-DAG-008", "category": "validation_error",
+                             "detail": f"task '{tid}' with: folds group.{gname} — no task "
+                                       f"declares `group: {gname}`{hint}"})
+        for body in _expr_bodies(t.get("with")):
+            if BARE_GROUP_REF.search(body):
+                errs.append({"code": "NIKA-DAG-008", "category": "validation_error",
+                             "detail": f"task '{tid}' with: bare `group` names no group — "
+                                       "write `group.<name>` (03 §group)"})
+
+    # The fold's members are edges: one per member, role `fan-in`, and they
+    # join E_d so a self-fold is a 1-cycle like any other (NIKA-DAG-001).
+    def _group_members(t: dict) -> set[str]:
+        return {m for g in _expr_group_refs(t.get("with"))
+                for m in groups.get(g, [])}
+
     # NIKA-DAG-001 · cycle in G_p = E_d(with) ∪ E_c(after) (DFS).
     # E_f (`after: {x: unwind}`) is EXCLUDED · cleanup attaches to a settled
     # producer and never schedules, so it cannot close a precedence cycle.
     graph = {
         tid: sorted((_expr_task_refs(t.get("with")) & idset)
+                    | (_group_members(t) & idset)
                     | {k for k in _after(t)
                        if isinstance(k, str) and k in idset
                        and k not in _unwinds(t)})
@@ -748,7 +881,7 @@ def cross_ref_errors(doc: dict) -> list[dict]:
     # status-observation judge can refuse MORE — this oracle only refuses
     # what is provably dead from structure alone, never a valid program).
     if not (has_cycle or self_cycle):
-        errs.extend(_static_liveness_errors(tasks, idset))
+        errs.extend(_static_liveness_errors(tasks, idset, groups))
     errs.extend(_status_vocabulary_errors(tasks))
 
     # NIKA-VAR-021 · a tasks.* reference outside the boundary (04 §the
@@ -771,6 +904,26 @@ def cross_ref_errors(doc: dict) -> list[dict]:
                               "sibling may still be RUNNING (the read would race)")
                 errs.append({"code": "NIKA-VAR-021", "category": "validation_error",
                              "detail": detail})
+
+    # NIKA-VAR-021 · `group.<name>` is TIGHTER than `tasks.*`: it has ONE
+    # door, a `with:` value. Not `when:`, not a verb body, not
+    # `on_error.recover`, not workflow `outputs:` — the fold is an import,
+    # and keeping it inside the existing boundary is why the boundary law
+    # needed no widening to admit it.
+    _GROUP_OUTSIDE = BODY_FIELDS + ("after", "on_error", "output", "returns")
+    for tid, t in tasks:
+        for field in _GROUP_OUTSIDE:
+            for g in sorted(_expr_group_refs(t.get(field))):
+                errs.append({"code": "NIKA-VAR-021", "category": "validation_error",
+                             "detail": f"task '{tid}' {field}: folds group.{g} — the fan-in "
+                                       "reader lives in a with: value ONLY · bind it "
+                                       "(`legs: ${{ group." + g + " }}`) and read "
+                                       "${{ with.legs }} (03 §group · 04 §boundary)"})
+    for g in sorted(_expr_group_refs(doc.get("outputs"))):
+        errs.append({"code": "NIKA-VAR-021", "category": "validation_error",
+                     "detail": f"outputs: folds group.{g} — the fan-in reader lives in a "
+                               "with: value ONLY · fold it in a task, export that task's "
+                               "output (03 §group · 04 §boundary)"})
 
     # NIKA-VAR-005 · for_each is a PRE-fan-out surface: a with-binding it
     # reads must not itself reference item/index (circular · 03 §for_each)

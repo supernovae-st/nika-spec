@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-BUILTIN",
+      "category": "validation_error"
+    }
+  ],
+  "note": "builtins-v0.1.md §nika:hash · `signature:` belongs to op: verify · under the default hash op it is a declaration that does not mean what it says, so it is refused rather than ignored."
+}

@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-DAG-008",
+      "category": "validation_error"
+    }
+  ],
+  "note": "03-dag.md §group · `group` is a reader, not a value — it names no group. Same shape as the bare-`tasks.X` refusal (04 §namespaces): a root without its selector is never a value."
+}

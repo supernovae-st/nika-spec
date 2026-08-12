@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "03-dag.md §group · one binding folds every declared member · the fold is an ordinary with: value, so the boundary law (04 §the reference boundary) needed no widening. Two members, one edge each, role fan-in."
+}

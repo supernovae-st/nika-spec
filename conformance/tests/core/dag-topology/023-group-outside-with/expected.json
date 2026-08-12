@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-VAR-021",
+      "category": "validation_error"
+    }
+  ],
+  "note": "04 §the reference boundary · the fan-in reader has ONE door, a with: value — tighter than `tasks.*`, which has five. Bind it, then read the binding."
+}

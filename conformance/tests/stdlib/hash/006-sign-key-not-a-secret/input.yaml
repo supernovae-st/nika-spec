@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: seal
+permits:
+  tools: ["nika:hash"]
+secrets:
+  release_key:
+    source: vault
+    key: prod/nika/release-ed25519
+const:
+  release_pub: "MCowBQYDK2VwAyEAexamplepublickeybytesbase64"
+tasks:
+  bad:
+    invoke:
+      tool: nika:hash
+      args:
+        op: sign
+        content: "abc"
+        key: "-----BEGIN PRIVATE KEY-----inline-----END PRIVATE KEY-----"

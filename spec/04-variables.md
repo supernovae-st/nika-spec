@@ -75,6 +75,7 @@ Since W2 « the flow », the `tasks` namespace is **boundary-only**. A
 | surface | why it is a boundary | graph effect |
 |---|---|---|
 | `with:` values | the binding imports the data — **the binding IS the edge** | one typed edge per reference ([03 §with](./03-dag.md)) |
+| `with:` values, plural · `${{ group.<name> }}` | the fan-in fold imports a whole declared set — **this is the ONLY door it has**, tighter than `tasks.*` | one `fan-in` edge per declared member ([03 §group](./03-dag.md#group--optional--fan-in-membership--the-plural-of-a-data-edge)) |
 | `after:` keys | the entry names the producer | one control edge per entry |
 | `on_error.recover:` | a fallback reads a settled record | a recovery edge (parking · `NIKA-DAG-004`) |
 | an `unwind` task body | cleanup reads the **producer it unwinds** — the ONLY legal target there (a sibling may still be running · the read would race) | none (the E_f attachment never enters `G_p`) |
@@ -114,6 +115,14 @@ reads another task.
 > before 0.103 it silently denoted the whole envelope, the source of
 > the golden-drift trap engine#524 had to teach around. No aliases —
 > one meaning per spelling.
+
+> **`group.<name>` is not a 7th namespace either.** It is the **plural reader
+> of `tasks`** — same runtime family, one door instead of five (a `with:`
+> value · everywhere else is `NIKA-VAR-021`). It denotes a set of task
+> records, so it belongs beside `tasks` rather than beside the four value
+> authorities, and the count below is unchanged. See
+> [03 §group](./03-dag.md#group--optional--fan-in-membership--the-plural-of-a-data-edge)
+> for the record shape and the `fan-in` pass-set.
 
 > **Loop-locals are not a 7th namespace.** Inside a `for_each` task body, two
 > extra identifiers are in scope: `${{ item }}` (the current element) and

@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "03-dag.md §group · the fan-in pass-set is all four settled states, so a member that can only settle {skipped · cancelled} (the documented never-pattern `when: false`) does NOT prove the fold dead. The contrast is the point: `after: {leg_flagged_off: success}` on the same producer IS NIKA-DAG-006. A report runs whatever happened — that is what the fold buys over a strict gate."
+}

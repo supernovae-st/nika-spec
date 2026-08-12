@@ -51,6 +51,8 @@ my_task:                        # the map KEY is the identity · snake_case · u
   with:                         # optional · the DATA boundary · each tasks.* ref = one typed edge
     data: ${{ tasks.task_a.output }}
     config: { foo: "bar" }      # literals are fine — only tasks.* refs create edges
+    legs: ${{ group.probes }}   # a fan-in fold · one edge per declared member
+  group: probes                 # optional · fan-in MEMBERSHIP · this task joins the set
   after:                        # optional · the CONTROL boundary · {producer: predicate}
     task_b: success             # predicate ∈ success | failure | skipped | terminal | unwind
   when: ${{ inputs.enabled }}   # optional · LOCAL business condition · evaluated POST-gate
@@ -193,6 +195,149 @@ already bind through `with:` is meaningful ONLY if it *tightens* the gate
 the skipped-`null` case). A non-tightening restatement (`after: {x: terminal}`
 next to a value edge) changes nothing and the reference linter warns
 (`one-obvious-way/010`).
+
+### `group` · *optional · fan-in MEMBERSHIP — the plural of a data edge*
+
+```yaml
+tasks:
+  leg_hygiene:  { group: probes, exec: { command: ["./hygiene.sh"] } }
+  leg_machete:  { group: probes, exec: { command: ["./machete.sh"] } }
+  leg_licenses: { group: probes, exec: { command: ["./licenses.sh"] } }
+
+  summary:
+    with:
+      legs: ${{ group.probes }}          # ← ONE binding · every member folded
+    invoke:
+      tool: nika:jq
+      args:
+        input: "${{ with.legs }}"
+        expression: 'map(select(.output.exit_code != 0)) | {failed: length}'
+```
+
+`group:` names a set this task **joins**. A consumer folds the whole set with a
+single `${{ group.<name> }}` binding in its `with:`, and gets **one array of
+member records**. It is not a third way to connect two tasks — it is the
+**plural of the data edge already described above**: each member contributes
+exactly one edge, derived exactly as a `with:` reference is.
+
+**Why the language needed a plural.** The three fan-in spellings an author
+reaches for first are all refused, and none of the refusals teaches a way
+forward ·
+
+```yaml
+after: { "leg_*": success }              # NIKA-DAG-002 — read as a literal task name
+with:  { l: ${{ tasks.leg_*.output }} }  # NIKA-VAR-005 — `*` is not in the CEL subset
+with:  { l: ${{ tasks }} }               # the namespace is not a value
+```
+
+So the fold moves out of the language and into a shell script beside it — and
+the moment it does, it stops being checkable, stops appearing in the graph, and
+stops being covered by any law in this chapter. Measured on the studio's own
+ledger workflows: the summary task alone carried **31 % of the file** as
+hand-listed bindings, `after:` entries and argv, for a fold the graph could
+have derived.
+
+#### Declared membership, never a pattern (normative)
+
+A group **exists iff at least one task declares it**. There is no glob, no
+prefix match, no regex. That is the load-bearing choice, and the reason is a
+failure mode, not taste ·
+
+- **A rename must be an ERROR, not a smaller fold.** With `leg_*`, renaming
+  `leg_licenses` to `license_check` silently drops it from every ledger that
+  globbed it — the run stays **green** while covering less. With a declared
+  name, the member simply stops declaring `group: probes`, and any reference
+  to a group nobody declares is **`NIKA-DAG-008`**. The failure is loud and
+  it lands at check time, before the ledger lies.
+- **An empty group is the same fact as an absent one**, so one code covers
+  both: a fold can never harvest zero members and read as clean.
+- **The reference boundary is untouched.** `group.<name>` is legal in a
+  `with:` value and **nowhere else** — one door, where `tasks.*` has five.
+  `when:`, verb bodies, `on_error.recover:`, `output:` and workflow
+  `outputs:` all refuse it with the existing `NIKA-VAR-021`
+  ([04 §the reference boundary](./04-variables.md#the-reference-boundary--where-tasks-may-appear)).
+  Nothing in that law needed widening to admit the fold.
+- **The graph stays statically derivable**, so every law in this chapter
+  survives unchanged: members are edges, so a task folding a group it belongs
+  to is a 1-cycle (`NIKA-DAG-001`) with no special case; the projection sees
+  the fan-in the way it sees any other edge; wave scheduling is unchanged.
+
+`group` is **not a 7th namespace**. It is the plural reader of the `tasks`
+runtime namespace — same family, stricter placement. The four value
+authorities (`inputs` · `config` · `const` · `secrets`) and the namespace
+count are both untouched ([04 §the 6 namespaces](./04-variables.md#the-6-namespaces)).
+
+#### The member record (normative · closed at v1)
+
+Each member contributes one record, and the array is ordered by **declaration
+order** — the source order of the `tasks:` map, not completion order. Source
+order does not schedule anything (§the task key); it is used here only to make
+the fold's shape **deterministic and stable across re-runs**, which completion
+order would not be.
+
+```
+[ { id, status, output, duration_ms, error }, … ]
+```
+
+| field | what it carries |
+|---|---|
+| `id` | the member's task key — the only field a fold cannot reconstruct from the others |
+| `status` | `success` · `failure` · `skipped` · `cancelled` (the closed enum) |
+| `output` | the member's output · defined-`null` when it did not settle `success` |
+| `duration_ms` | integer milliseconds |
+| `error` | the typed error record · defined-`null` when there is none |
+
+**`status` and `output` are both required, and neither is redundant** — this is
+the subtle half of the contract. `status` alone is not enough: a member
+carrying `on_error: { skip: true }` settles **`skipped`**, so a leg that
+genuinely failed is indistinguishable by status from a leg that was never
+meant to run, and the red/green fact survives **only inside the output** (an
+`exit_code`, a body, a count). `output` alone is not enough either: it reads
+defined-`null` for a cancelled member, which says nothing about why. A fold
+that judges a ledger reads both.
+
+The record set is CLOSED at v1; adding a field is a spec minor, exactly as for
+the `tasks.X` projection set.
+
+#### The fan-in edge · role and pass-set (normative)
+
+A `${{ group.<name> }}` binding creates **one edge per member**, role
+**`fan-in`**, joining `E_d` (§the four graphs) ·
+
+```
+fan-in edge               {success, failure, skipped, cancelled}
+```
+
+The pass-set is **all four settled states** — the same as
+`after: { x: terminal }` and a `.status` observation. It is deliberately NOT
+the intersection of its members' field roles: a value edge admits on
+`{success, skipped}` and a failure-observation on `{failure, skipped}`, so an
+intersection would leave `{skipped}` and every fold would be
+**`NIKA-DAG-006`-dead on arrival**. The fold is a *terminal observation of
+each member*, which is what a report is: **it runs whatever happened.** The
+per-member truth lives in the record, not in the gate.
+
+Consequence, stated plainly: a fan-in edge can never be the thing that proves
+a task dead. A member that can only settle `{skipped · cancelled}` (the
+documented `when: false` never-pattern) still admits the fold — where
+`after: { that_member: success }` on the same producer would be `NIKA-DAG-006`.
+That contrast is the whole value of the construct.
+
+#### The rest of the contract
+
+- A member that fans out (`for_each`) contributes its positional array as
+  `output`, under the observability rule in §for_each semantics.
+- An **`unwind` task may not join a group** (`NIKA-DAG-009`): cleanup is an
+  `E_f` attachment that never enters `G_p`, so a fan-in edge from it would
+  have no wave to schedule against.
+- A group name matches `^[a-z][a-z0-9_]*$`, like a task key. A group name and
+  a task key MAY coincide — the roots disambiguate structurally
+  (`group.probes` vs `tasks.probes`), the same argument that lets a task be
+  named `item` (§shadowing, 04).
+- A bare `${{ group }}` names no group and is `NIKA-DAG-008`.
+- `group:` declares membership only. It carries no predicate, no ordering and
+  no data — everything about *what admits* lives in the pass-set above, and
+  everything about *what is read* lives in the record.
 
 ### `depends_on` · **dead — the teaching survives**
 
@@ -811,6 +956,56 @@ Defines named bindings extracted from the verb's raw response via a jq expressio
 
 If `output` is absent · the task output defaults to the verb's raw response, referenced as `${{ tasks.task_id.output }}`.
 
+#### The name is wrong · `extract:` is the decided replacement (normative decision · not yet executed)
+
+The field named `output:` **does not write `output`**. Two measurements, both
+taken on the shipped 0.108.0 binary ·
+
+1. **The parser forbids the field's own name inside itself.** A binding
+   `output: { output: "." }` is refused — `NIKA-PARSE-013`, *« output binding
+   `output` collides with a reserved field »*. It is one of six reserved
+   names (`output` · `status` · `error` · `started_at` · `ended_at` ·
+   `duration_ms`), but it is the only one that is also **the name of the
+   block doing the refusing**.
+2. **`tasks.X.output` stays RAW when `output:` is declared.** A task
+   declaring `output: { picked: ".foo" }` still serves the unextracted verb
+   response at `tasks.X.output`, alongside `tasks.X.picked`. Both reads
+   check green in the same file. The block adds named siblings; it never
+   touches `output`.
+
+So the field is named after the one thing it neither produces nor may
+contain. It also sits one letter from the envelope's `outputs:` (the run's
+exports), making singular-vs-plural carry a semantic distinction that nothing
+in the spelling signals.
+
+**The replacement is `extract:`** — and the argument is deliberately *not*
+that it is clearer. Furnas et al. measured that intuition dead in 1987 (*The
+vocabulary problem in human-system communication*, CACM 30(11) — two people
+pick the same name for the same thing under 20 % of the time; « the idea of
+an obvious, self-evident, or natural term is a myth »). The argument is that
+the current word **states a falsehood** and the candidate states a fact ·
+
+- `extract:` names the **operation** (run this jq over the raw response),
+  which is what the block does and all it does.
+- It is not a projection name, so the reserved-name collision disappears:
+  `extract: { output: "." }` becomes sayable, because `output` is no longer
+  the block's own identity.
+- It cannot be confused with `outputs:`: different word, not different
+  number.
+- The raw/named duality becomes readable — `tasks.X.output` is the response,
+  `tasks.X.<name>` is an extraction of it.
+
+**Status · decided here, executed in one cascade, not yet run.** Measured
+blast radius 2026-08-12 · **76 tasks in 42 files** (12 in this repo). The
+rename is small, but it lands in the engine parser, this schema, the corpus,
+the VS Code extension and the website simultaneously — and flipping the spec
+alone would make every shipped example refuse at `nika check` while passing
+the reference oracle, which is the divergence this repo exists to prevent.
+The migration is a `canon/migrations.yaml` row (`old_form: output` ·
+`new_form: extract` · mechanical 1:1, equivalence-or-stop) with a
+`canon/tombstones.yaml` entry for the dead spelling, per the discipline every
+prior rename followed.
+
 ---
 
 ## The four graphs (normative)
@@ -820,7 +1015,7 @@ declaration surface — nothing else creates an edge ·
 
 | graph | derived from | role | schedules? |
 |---|---|---|---|
-| **E_d** · data | `with:` bindings referencing `tasks.*` | `value` · `terminal-observation` · `failure-observation` (per field shape · §with) | yes |
+| **E_d** · data | `with:` bindings referencing `tasks.*` — **and `group.*`, one edge per declared member** (§group) | `value` · `terminal-observation` · `failure-observation` (per field shape · §with) · `fan-in` (§group) | yes |
 | **E_c** · control | `after:` entries | `control` (with its predicate) | yes |
 | **E_r** · recovery | `on_error.recover:` references | `recovery` — a parking read at recovery time, NOT an execution-order edge (`NIKA-DAG-004` guards the deadlock) | no |
 | **E_f** · finally | `after: {x: unwind}` (producer → its cleanup task · and cleanup → cleanup) | `finally` — cleanup ordering after the parent settles | no · cleanup units are not tasks and never enter `G_p` — but they ARE **nodes** in the projection (`kind: "finally"` · format 3), because a judge that cannot see an effect carrier cannot govern it |
@@ -840,6 +1035,7 @@ that admit the consumer ·
 value edge                {success, skipped}
 terminal-observation      {success, failure, skipped, cancelled}
 failure-observation       {failure, skipped}
+fan-in (§group)           {success, failure, skipped, cancelled}
 control · success         {success}
 control · failure         {failure}
 control · skipped         {skipped}
@@ -1025,7 +1221,10 @@ A conformant engine MUST ·
    known (`NIKA-DAG-005`) · every `with:`/`after:` edge target declared
    (`NIKA-DAG-002`) · `tasks.*` confined to the boundary (`NIKA-VAR-021`) ·
    `depends_on` refused (`NIKA-PARSE-024`)
-2. **Derive** · E_d from `with:` bindings (role per field shape) · E_c from
+2. **Derive** · E_d from `with:` bindings (role per field shape · **plus one
+   `fan-in` edge per member of every folded `group.*`** · a fold naming a
+   group no task declares is `NIKA-DAG-008` · an `unwind` member is
+   `NIKA-DAG-009`) · E_c from
    `after:` (predicate per entry) · G_p = E_d ∪ E_c · detect cycles
    (`NIKA-DAG-001`) · refuse statically dead tasks + out-of-vocabulary
    status literals (`NIKA-DAG-006` · `NIKA-DAG-007` · §static liveness) ·

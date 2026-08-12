@@ -121,6 +121,8 @@ these from this file alone.
 | `NIKA-DAG-005` | `after:` predicate outside the closed set (`success` · `failure` · `skipped` · `terminal`) | `validation_error` | false |
 | `NIKA-DAG-006` | statically dead task — an incoming edge’s pass-set excludes every reachable producer state, or the `when:` gate is false under every reachable upstream combination ([03 §gate algebra](./03-dag.md#the-gate-algebra-v2-normative)) | `validation_error` | false |
 | `NIKA-DAG-007` | status compared against a literal outside the vocabulary (`success` · `failure` · `skipped` · `cancelled`) — `==` never matches, `!=` always holds | `validation_error` | false |
+| `NIKA-DAG-008` | a `${{ group.<name> }}` fold names a group **no task declares** — including a bare `${{ group }}`, and including the group left empty by a renamed member. Membership is declared, never matched, precisely so a rename is an error here instead of a silently smaller fold ([03 §group](./03-dag.md#declared-membership-never-a-pattern-normative)) | `validation_error` | false |
+| `NIKA-DAG-009` | an `unwind` task declares `group:` — cleanup is an `E_f` attachment that never enters `G_p`, so a `fan-in` edge from it would have no wave to schedule against ([03 §group](./03-dag.md#the-rest-of-the-contract-1)) | `validation_error` | false |
 | `NIKA-TYPE-001` | unknown type name (in `types:` · `returns:` · an `outputs:` type) — did-you-mean when close | `validation_error` | false |
 | `NIKA-TYPE-002` | recursive type reference — the `types:` graph must be acyclic | `validation_error` | false |
 | `NIKA-TYPE-003` | `returns:` and `schema:` on the same task — one contract, one spelling | `validation_error` | false |
@@ -256,6 +258,32 @@ The `category` field is a closed enum at v1 ·
 ## Retry policy
 
 A task MAY declare a `retry:` block. Retries apply to **transient** errors only (`error.transient == true`).
+
+> **`retry:` and `on_error:` are two STAGES, not two answers (normative ·
+> the reason they stay two fields).** They look like one decision — « what
+> happens when this task fails » — and the merged spelling
+> (`on_error: { retry: …, then: … }`) has been proposed more than once. It is
+> refused, on two grounds ·
+>
+> 1. **They fire at different times.** `retry:` governs the attempt loop and
+>    fires on the FIRST failure; `on_error:` fires exactly once, on the LAST
+>    one, after `retry:` is exhausted (§`on_error:` below · §recover
+>    resolution step 1). Nesting a « keep trying » block inside a field named
+>    *on error* would put the two on the same clock in the reader's head, and
+>    they are not.
+> 2. **The corpus does not pay for it.** Measured 2026-08-12 over every
+>    `*.nika.yaml` in the studio (873 files · 3 093 tasks · walked from disk,
+>    not grepped) · `on_error:` alone **240** tasks · `retry:` alone **41** ·
+>    **both on one task 31**. Co-occurrence is **31/312 = 9.9 %** of the
+>    tasks that carry either. A merge would fold 31 sites and hand the other
+>    281 an indentation level they have no sibling to share — including 41
+>    `retry:`-only tasks that would gain a wrapper named after an event they
+>    are trying to avoid. That is ceremony, and the number says so.
+>
+> Both stages govern the **verb run only**. Neither is consulted for a
+> boundary failure — a `with:` binding that fails to materialize, or a `when:`
+> that fails to evaluate, settles the task `failure` with the armor bypassed
+> ([03 §the dispatch pipeline](./03-dag.md#the-gate-algebra-v2-normative)).
 
 ### Syntax
 

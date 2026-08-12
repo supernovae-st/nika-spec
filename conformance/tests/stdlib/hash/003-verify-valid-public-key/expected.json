@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "builtins-v0.1.md §nika:hash · a public key is not a secret · verify returns a boolean, so a false verdict is data a when: branches on."
+}

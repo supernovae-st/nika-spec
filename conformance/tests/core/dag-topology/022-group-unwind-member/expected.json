@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-DAG-009",
+      "category": "validation_error"
+    }
+  ],
+  "note": "03-dag.md §group · an unwind task is an E_f attachment and never enters G_p, so a fan-in edge from it would have no wave to schedule against. Cleanup is not a member."
+}

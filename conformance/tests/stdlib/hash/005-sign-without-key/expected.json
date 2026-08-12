@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-BUILTIN",
+      "category": "validation_error"
+    }
+  ],
+  "note": "builtins-v0.1.md §nika:hash · each op declares its own required args · a signature with no key is not a shape the runtime should discover."
+}

@@ -7,7 +7,7 @@
 #   sealed outcome_class enum) · the 15 ledger sections (canon/EXCEPTIONS.md ·
 #   SSOT-1 §18) stay AUTHORED and are carried verbatim — editing those is legal.
 # regenerate: python3 scripts/ssot-compiler.py --emit-canon
-# body-sha256: 8a2df326bc2d107653d7f773c9a614861cccdd5ca8c5cbbda9295b7889f941be
+# body-sha256: 1ba4d58d83879ed8dc866ca908e0d2fcc89baca5f1840d502359f0eea20ade18
 #   (digest of every byte below the end-of-header line · detached self-hash per PAA-006)
 # ---- end generated header (SSOT-1 §21-23 · the canon flip · C0)
 # nika canonical registry · the single source of truth for Nika canonical facts
@@ -65,7 +65,7 @@ counts:
   templates: 10
   error_namespaces: 25
   error_categories: 12
-  error_codes: 104
+  error_codes: 106
   pillars: 5
   # ---- extended v0.2 · 2026-05-27 · lifecycle + diamond + steal + severity
   lifecycle_product: 4
@@ -296,7 +296,7 @@ error_categories:
 # check binds the prose table to it (same row set · same fields).
 # transient · false | engine-assessed
 error_codes:
-  count: 104
+  count: 106
   reference: spec/05-errors.md
   items:
     - { code: NIKA-PARSE-001, category: parse_error, transient: "false", failure: "the YAML itself does not parse (syntax error)" }
@@ -347,6 +347,8 @@ error_codes:
     - { code: NIKA-DAG-005, category: validation_error, transient: "false", failure: "after: predicate outside the closed set (success · failure · skipped · terminal)" }
     - { code: NIKA-DAG-006, category: validation_error, transient: "false", failure: "statically dead task — an incoming edge's pass-set excludes every reachable producer state, or the when: gate is false under every reachable upstream combination (gate algebra v2)" }
     - { code: NIKA-DAG-007, category: validation_error, transient: "false", failure: "status compared against a literal outside the vocabulary (success · failure · skipped · cancelled) — == never matches, != always holds" }
+    - { code: NIKA-DAG-008, category: validation_error, transient: "false", failure: "a group.<name> fold names a group no task declares — including a bare group and the group a renamed member left empty" }
+    - { code: NIKA-DAG-009, category: validation_error, transient: "false", failure: "an unwind task declares group: — cleanup never enters G_p, so it cannot be a fan-in member" }
     - { code: NIKA-TYPE-001, category: validation_error, transient: "false", failure: "unknown type name (in types: · returns: · an outputs: type) — did-you-mean when close" }
     - { code: NIKA-TYPE-002, category: validation_error, transient: "false", failure: "recursive type reference — the types: graph must be acyclic" }
     - { code: NIKA-TYPE-003, category: validation_error, transient: "false", failure: "returns: and schema: on the same task — one contract, one spelling" }

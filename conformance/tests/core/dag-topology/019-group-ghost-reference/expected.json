@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-DAG-008",
+      "category": "validation_error"
+    }
+  ],
+  "note": "03-dag.md §group · membership is DECLARED, never matched. A fold naming a group no task declares is refused HERE — which is the whole reason the selector is a declared name and not a glob: `leg_*` would have quietly folded one member instead of two and the ledger would still read green."
+}

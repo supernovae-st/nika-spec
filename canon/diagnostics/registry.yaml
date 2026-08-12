@@ -1000,6 +1000,47 @@ diagnostics:
       mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
       is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
       span obligation not stated by the source → span_required false.'
+  - id: NIKA-DAG-008
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C1
+    namespace: DAG
+    plane: check
+    condition: a group.<name> fold names a group no task declares — including a bare group and the group a renamed
+      member left empty
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: a group.<name> fold names a group no task declares — including a bare group and the group a renamed
+      member left empty · spec/03-dag.md §group · membership is DECLARED, never matched, so a renamed member is
+      an error here instead of a silently smaller fold.
+    notes: 'the fan-in selector (spec/03-dag.md §group) · category: validation_error · transient: false (canon.yaml
+      + spec/05-errors.md verbatim) · plane check (the fold is derived statically from declared membership) · an empty
+      group and an undeclared one are the SAME fact, so one code covers both — a fold can never harvest zero
+      members and read as clean. terminal=true is the unhandled-floor.'
+  - id: NIKA-DAG-009
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C1
+    namespace: DAG
+    plane: check
+    condition: 'an unwind task declares group: — cleanup never enters G_p, so it cannot be a fan-in member'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'an unwind task declares group: — cleanup never enters G_p, so it cannot be a fan-in member ·
+      spec/03-dag.md §group · an E_f attachment does not schedule, so a fan-in edge from it would have no wave.'
+    notes: 'the fan-in selector (spec/03-dag.md §group) · category: validation_error · transient: false (canon.yaml
+      + spec/05-errors.md verbatim) · plane check · pairs with the §unwind contract (E_f is never in G_p) ·
+      terminal=true is the unhandled-floor.'
   - id: NIKA-TYPE-001
     status: reserved
     owner: spec

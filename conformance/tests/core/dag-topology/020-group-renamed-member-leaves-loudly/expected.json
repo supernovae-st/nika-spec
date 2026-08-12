@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-DAG-008",
+      "category": "validation_error"
+    }
+  ],
+  "note": "03-dag.md §group · a group with zero members and an undeclared group are the SAME fact, so one code covers both: a fold can never harvest zero and read as clean (the house law · a gate that reaps nothing must go red on the empty reap)."
+}

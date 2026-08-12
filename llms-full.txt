@@ -1405,6 +1405,39 @@ So `permits: {}` is a workflow limited to compute (`infer:` + CEL +
 passthrough (its children see the runner env floor plus their task `env:`
 maps, nothing else). That property is checkable BEFORE the run.
 
+> #### 🔴 `permits: {}` MUST be identical to an absent block · corrected 2026-08-11
+>
+> **Measured on 0.108.0, two files differing by one line ·**
+>
+> ```
+> no permits:      rc=0 · « ○ PERMITS zero authority · pure compute
+>                            · `permits: {}` states it »        ← the engine's own hint
+> permits: {}      rc=2 · « ✖ NIKA-SEC-004 · invoke tool `nika:jq`
+>                            is outside permits.tools »
+> ```
+>
+> **The engine teaches a repair that breaks the file**, and the sentence
+> directly above this note names `nika:jq` as legal under `{}`. Three
+> surfaces, three answers, on the same body.
+>
+> The root cause is a rule that is too broad: `permits.tools` was written
+> to govern *the `invoke:` surface*, and `invoke:` also carries the
+> builtins that have **no effect at all**. So the contract is now stated
+> at the grain that matters ·
+>
+> **A pure-compute builtin requires NO `tools` grant, under any form of
+> the block.** `nika:jq` · `hash` · `date` · `uuid` · `validate` ·
+> `convert` · `json_diff` · `json_merge_patch` · `decide` compute a value
+> from their arguments and reach nothing. `permits.tools` governs the
+> tools that CARRY an effect — `mcp:` targets, and any builtin whose
+> catalog entry declares an `fs` · `net` · `exec` category.
+>
+> The consequence is the invariant NEP-0003 always claimed: **an absent
+> block and `{}` are the same declaration** — zero authority — and the
+> only difference between them is that one says it out loud. A language
+> whose thesis is « the file IS the blast radius » cannot have a blast
+> radius that changes when you write the zero down.
+
 > ⚠️ **The word `provably` was here and it was measured FALSE on 2026-08-11.**
 > The passthrough claim above holds — it is about what a CHILD PROCESS
 > inherits. What did not hold is the stronger reading a reader takes away:
@@ -2342,6 +2375,8 @@ my_task:                        # the map KEY is the identity · snake_case · u
   with:                         # optional · the DATA boundary · each tasks.* ref = one typed edge
     data: ${{ tasks.task_a.output }}
     config: { foo: "bar" }      # literals are fine — only tasks.* refs create edges
+    legs: ${{ group.probes }}   # a fan-in fold · one edge per declared member
+  group: probes                 # optional · fan-in MEMBERSHIP · this task joins the set
   after:                        # optional · the CONTROL boundary · {producer: predicate}
     task_b: success             # predicate ∈ success | failure | skipped | terminal | unwind
   when: ${{ inputs.enabled }}   # optional · LOCAL business condition · evaluated POST-gate
@@ -2484,6 +2519,149 @@ already bind through `with:` is meaningful ONLY if it *tightens* the gate
 the skipped-`null` case). A non-tightening restatement (`after: {x: terminal}`
 next to a value edge) changes nothing and the reference linter warns
 (`one-obvious-way/010`).
+
+### `group` · *optional · fan-in MEMBERSHIP — the plural of a data edge*
+
+```yaml
+tasks:
+  leg_hygiene:  { group: probes, exec: { command: ["./hygiene.sh"] } }
+  leg_machete:  { group: probes, exec: { command: ["./machete.sh"] } }
+  leg_licenses: { group: probes, exec: { command: ["./licenses.sh"] } }
+
+  summary:
+    with:
+      legs: ${{ group.probes }}          # ← ONE binding · every member folded
+    invoke:
+      tool: nika:jq
+      args:
+        input: "${{ with.legs }}"
+        expression: 'map(select(.output.exit_code != 0)) | {failed: length}'
+```
+
+`group:` names a set this task **joins**. A consumer folds the whole set with a
+single `${{ group.<name> }}` binding in its `with:`, and gets **one array of
+member records**. It is not a third way to connect two tasks — it is the
+**plural of the data edge already described above**: each member contributes
+exactly one edge, derived exactly as a `with:` reference is.
+
+**Why the language needed a plural.** The three fan-in spellings an author
+reaches for first are all refused, and none of the refusals teaches a way
+forward ·
+
+```yaml
+after: { "leg_*": success }              # NIKA-DAG-002 — read as a literal task name
+with:  { l: ${{ tasks.leg_*.output }} }  # NIKA-VAR-005 — `*` is not in the CEL subset
+with:  { l: ${{ tasks }} }               # the namespace is not a value
+```
+
+So the fold moves out of the language and into a shell script beside it — and
+the moment it does, it stops being checkable, stops appearing in the graph, and
+stops being covered by any law in this chapter. Measured on the studio's own
+ledger workflows: the summary task alone carried **31 % of the file** as
+hand-listed bindings, `after:` entries and argv, for a fold the graph could
+have derived.
+
+#### Declared membership, never a pattern (normative)
+
+A group **exists iff at least one task declares it**. There is no glob, no
+prefix match, no regex. That is the load-bearing choice, and the reason is a
+failure mode, not taste ·
+
+- **A rename must be an ERROR, not a smaller fold.** With `leg_*`, renaming
+  `leg_licenses` to `license_check` silently drops it from every ledger that
+  globbed it — the run stays **green** while covering less. With a declared
+  name, the member simply stops declaring `group: probes`, and any reference
+  to a group nobody declares is **`NIKA-DAG-008`**. The failure is loud and
+  it lands at check time, before the ledger lies.
+- **An empty group is the same fact as an absent one**, so one code covers
+  both: a fold can never harvest zero members and read as clean.
+- **The reference boundary is untouched.** `group.<name>` is legal in a
+  `with:` value and **nowhere else** — one door, where `tasks.*` has five.
+  `when:`, verb bodies, `on_error.recover:`, `output:` and workflow
+  `outputs:` all refuse it with the existing `NIKA-VAR-021`
+  ([04 §the reference boundary](./04-variables.md#the-reference-boundary--where-tasks-may-appear)).
+  Nothing in that law needed widening to admit the fold.
+- **The graph stays statically derivable**, so every law in this chapter
+  survives unchanged: members are edges, so a task folding a group it belongs
+  to is a 1-cycle (`NIKA-DAG-001`) with no special case; the projection sees
+  the fan-in the way it sees any other edge; wave scheduling is unchanged.
+
+`group` is **not a 7th namespace**. It is the plural reader of the `tasks`
+runtime namespace — same family, stricter placement. The four value
+authorities (`inputs` · `config` · `const` · `secrets`) and the namespace
+count are both untouched ([04 §the 6 namespaces](./04-variables.md#the-6-namespaces)).
+
+#### The member record (normative · closed at v1)
+
+Each member contributes one record, and the array is ordered by **declaration
+order** — the source order of the `tasks:` map, not completion order. Source
+order does not schedule anything (§the task key); it is used here only to make
+the fold's shape **deterministic and stable across re-runs**, which completion
+order would not be.
+
+```
+[ { id, status, output, duration_ms, error }, … ]
+```
+
+| field | what it carries |
+|---|---|
+| `id` | the member's task key — the only field a fold cannot reconstruct from the others |
+| `status` | `success` · `failure` · `skipped` · `cancelled` (the closed enum) |
+| `output` | the member's output · defined-`null` when it did not settle `success` |
+| `duration_ms` | integer milliseconds |
+| `error` | the typed error record · defined-`null` when there is none |
+
+**`status` and `output` are both required, and neither is redundant** — this is
+the subtle half of the contract. `status` alone is not enough: a member
+carrying `on_error: { skip: true }` settles **`skipped`**, so a leg that
+genuinely failed is indistinguishable by status from a leg that was never
+meant to run, and the red/green fact survives **only inside the output** (an
+`exit_code`, a body, a count). `output` alone is not enough either: it reads
+defined-`null` for a cancelled member, which says nothing about why. A fold
+that judges a ledger reads both.
+
+The record set is CLOSED at v1; adding a field is a spec minor, exactly as for
+the `tasks.X` projection set.
+
+#### The fan-in edge · role and pass-set (normative)
+
+A `${{ group.<name> }}` binding creates **one edge per member**, role
+**`fan-in`**, joining `E_d` (§the four graphs) ·
+
+```
+fan-in edge               {success, failure, skipped, cancelled}
+```
+
+The pass-set is **all four settled states** — the same as
+`after: { x: terminal }` and a `.status` observation. It is deliberately NOT
+the intersection of its members' field roles: a value edge admits on
+`{success, skipped}` and a failure-observation on `{failure, skipped}`, so an
+intersection would leave `{skipped}` and every fold would be
+**`NIKA-DAG-006`-dead on arrival**. The fold is a *terminal observation of
+each member*, which is what a report is: **it runs whatever happened.** The
+per-member truth lives in the record, not in the gate.
+
+Consequence, stated plainly: a fan-in edge can never be the thing that proves
+a task dead. A member that can only settle `{skipped · cancelled}` (the
+documented `when: false` never-pattern) still admits the fold — where
+`after: { that_member: success }` on the same producer would be `NIKA-DAG-006`.
+That contrast is the whole value of the construct.
+
+#### The rest of the contract
+
+- A member that fans out (`for_each`) contributes its positional array as
+  `output`, under the observability rule in §for_each semantics.
+- An **`unwind` task may not join a group** (`NIKA-DAG-009`): cleanup is an
+  `E_f` attachment that never enters `G_p`, so a fan-in edge from it would
+  have no wave to schedule against.
+- A group name matches `^[a-z][a-z0-9_]*$`, like a task key. A group name and
+  a task key MAY coincide — the roots disambiguate structurally
+  (`group.probes` vs `tasks.probes`), the same argument that lets a task be
+  named `item` (§shadowing, 04).
+- A bare `${{ group }}` names no group and is `NIKA-DAG-008`.
+- `group:` declares membership only. It carries no predicate, no ordering and
+  no data — everything about *what admits* lives in the pass-set above, and
+  everything about *what is read* lives in the record.
 
 ### `depends_on` · **dead — the teaching survives**
 
@@ -3102,6 +3280,56 @@ Defines named bindings extracted from the verb's raw response via a jq expressio
 
 If `output` is absent · the task output defaults to the verb's raw response, referenced as `${{ tasks.task_id.output }}`.
 
+#### The name is wrong · `extract:` is the decided replacement (normative decision · not yet executed)
+
+The field named `output:` **does not write `output`**. Two measurements, both
+taken on the shipped 0.108.0 binary ·
+
+1. **The parser forbids the field's own name inside itself.** A binding
+   `output: { output: "." }` is refused — `NIKA-PARSE-013`, *« output binding
+   `output` collides with a reserved field »*. It is one of six reserved
+   names (`output` · `status` · `error` · `started_at` · `ended_at` ·
+   `duration_ms`), but it is the only one that is also **the name of the
+   block doing the refusing**.
+2. **`tasks.X.output` stays RAW when `output:` is declared.** A task
+   declaring `output: { picked: ".foo" }` still serves the unextracted verb
+   response at `tasks.X.output`, alongside `tasks.X.picked`. Both reads
+   check green in the same file. The block adds named siblings; it never
+   touches `output`.
+
+So the field is named after the one thing it neither produces nor may
+contain. It also sits one letter from the envelope's `outputs:` (the run's
+exports), making singular-vs-plural carry a semantic distinction that nothing
+in the spelling signals.
+
+**The replacement is `extract:`** — and the argument is deliberately *not*
+that it is clearer. Furnas et al. measured that intuition dead in 1987 (*The
+vocabulary problem in human-system communication*, CACM 30(11) — two people
+pick the same name for the same thing under 20 % of the time; « the idea of
+an obvious, self-evident, or natural term is a myth »). The argument is that
+the current word **states a falsehood** and the candidate states a fact ·
+
+- `extract:` names the **operation** (run this jq over the raw response),
+  which is what the block does and all it does.
+- It is not a projection name, so the reserved-name collision disappears:
+  `extract: { output: "." }` becomes sayable, because `output` is no longer
+  the block's own identity.
+- It cannot be confused with `outputs:`: different word, not different
+  number.
+- The raw/named duality becomes readable — `tasks.X.output` is the response,
+  `tasks.X.<name>` is an extraction of it.
+
+**Status · decided here, executed in one cascade, not yet run.** Measured
+blast radius 2026-08-12 · **76 tasks in 42 files** (12 in this repo). The
+rename is small, but it lands in the engine parser, this schema, the corpus,
+the VS Code extension and the website simultaneously — and flipping the spec
+alone would make every shipped example refuse at `nika check` while passing
+the reference oracle, which is the divergence this repo exists to prevent.
+The migration is a `canon/migrations.yaml` row (`old_form: output` ·
+`new_form: extract` · mechanical 1:1, equivalence-or-stop) with a
+`canon/tombstones.yaml` entry for the dead spelling, per the discipline every
+prior rename followed.
+
 ---
 
 ## The four graphs (normative)
@@ -3111,7 +3339,7 @@ declaration surface — nothing else creates an edge ·
 
 | graph | derived from | role | schedules? |
 |---|---|---|---|
-| **E_d** · data | `with:` bindings referencing `tasks.*` | `value` · `terminal-observation` · `failure-observation` (per field shape · §with) | yes |
+| **E_d** · data | `with:` bindings referencing `tasks.*` — **and `group.*`, one edge per declared member** (§group) | `value` · `terminal-observation` · `failure-observation` (per field shape · §with) · `fan-in` (§group) | yes |
 | **E_c** · control | `after:` entries | `control` (with its predicate) | yes |
 | **E_r** · recovery | `on_error.recover:` references | `recovery` — a parking read at recovery time, NOT an execution-order edge (`NIKA-DAG-004` guards the deadlock) | no |
 | **E_f** · finally | `after: {x: unwind}` (producer → its cleanup task · and cleanup → cleanup) | `finally` — cleanup ordering after the parent settles | no · cleanup units are not tasks and never enter `G_p` — but they ARE **nodes** in the projection (`kind: "finally"` · format 3), because a judge that cannot see an effect carrier cannot govern it |
@@ -3131,6 +3359,7 @@ that admit the consumer ·
 value edge                {success, skipped}
 terminal-observation      {success, failure, skipped, cancelled}
 failure-observation       {failure, skipped}
+fan-in (§group)           {success, failure, skipped, cancelled}
 control · success         {success}
 control · failure         {failure}
 control · skipped         {skipped}
@@ -3316,7 +3545,10 @@ A conformant engine MUST ·
    known (`NIKA-DAG-005`) · every `with:`/`after:` edge target declared
    (`NIKA-DAG-002`) · `tasks.*` confined to the boundary (`NIKA-VAR-021`) ·
    `depends_on` refused (`NIKA-PARSE-024`)
-2. **Derive** · E_d from `with:` bindings (role per field shape) · E_c from
+2. **Derive** · E_d from `with:` bindings (role per field shape · **plus one
+   `fan-in` edge per member of every folded `group.*`** · a fold naming a
+   group no task declares is `NIKA-DAG-008` · an `unwind` member is
+   `NIKA-DAG-009`) · E_c from
    `after:` (predicate per entry) · G_p = E_d ∪ E_c · detect cycles
    (`NIKA-DAG-001`) · refuse statically dead tasks + out-of-vocabulary
    status literals (`NIKA-DAG-006` · `NIKA-DAG-007` · §static liveness) ·
@@ -3899,6 +4131,7 @@ Since W2 « the flow », the `tasks` namespace is **boundary-only**. A
 | surface | why it is a boundary | graph effect |
 |---|---|---|
 | `with:` values | the binding imports the data — **the binding IS the edge** | one typed edge per reference ([03 §with](./03-dag.md)) |
+| `with:` values, plural · `${{ group.<name> }}` | the fan-in fold imports a whole declared set — **this is the ONLY door it has**, tighter than `tasks.*` | one `fan-in` edge per declared member ([03 §group](./03-dag.md#group--optional--fan-in-membership--the-plural-of-a-data-edge)) |
 | `after:` keys | the entry names the producer | one control edge per entry |
 | `on_error.recover:` | a fallback reads a settled record | a recovery edge (parking · `NIKA-DAG-004`) |
 | an `unwind` task body | cleanup reads the **producer it unwinds** — the ONLY legal target there (a sibling may still be running · the read would race) | none (the E_f attachment never enters `G_p`) |
@@ -3938,6 +4171,14 @@ reads another task.
 > before 0.103 it silently denoted the whole envelope, the source of
 > the golden-drift trap engine#524 had to teach around. No aliases —
 > one meaning per spelling.
+
+> **`group.<name>` is not a 7th namespace either.** It is the **plural reader
+> of `tasks`** — same runtime family, one door instead of five (a `with:`
+> value · everywhere else is `NIKA-VAR-021`). It denotes a set of task
+> records, so it belongs beside `tasks` rather than beside the four value
+> authorities, and the count below is unchanged. See
+> [03 §group](./03-dag.md#group--optional--fan-in-membership--the-plural-of-a-data-edge)
+> for the record shape and the `fan-in` pass-set.
 
 > **Loop-locals are not a 7th namespace.** Inside a `for_each` task body, two
 > extra identifiers are in scope: `${{ item }}` (the current element) and
@@ -4005,9 +4246,11 @@ tasks:
       prompt: "Running at ${{ config.log_level }} verbosity"
 ```
 
-`config` holds **non-sensitive** runtime configuration, supplied by the
-deployment or environment (engine launch concern, the same way inputs are
-caller-supplied) with `default:` as the declared fallback. Each entry is a
+`config` holds **non-sensitive** runtime configuration. ⚠️ Its `default:`
+is **REQUIRED** and is its only source: nothing outside the file can supply
+it (`--var` reaches `inputs:` only). An entry without a `default:` is a
+check error, `NIKA-DEFAULT-002` — corrected 2026-08-11, the earlier
+« supplied by the deployment » was measured false at the binary. Each entry is a
 typed declaration (`type:` required · the full TypeExpr · a `default:` MUST
 conform to it · `NIKA-DEFAULT-001`). Values may appear in logs +
 traces. For anything secret, use `secrets:` (below) instead: never put a
@@ -4399,6 +4642,32 @@ internal corpora, the functions actually used are `map · sort · last ·
 fromjson · join · length`, plus paths, the pipe, object/array construction and
 arithmetic. Everything above is that set plus its obvious companions.
 
+> ### 🔴 This table is the TARGET gate, and it does not fire yet
+>
+> **Measured on 0.108.0, 2026-08-11.** The engine embeds a full jaq and
+> the subset below is **not enforced**. A workflow whose only task is ·
+>
+> ```yaml
+> invoke: { tool: "nika:jq", args: { input: "a LOC=120 b LOC=45",
+>   expression: '[ match("LOC=([0-9]+)";"g").captures[0].string | tonumber ] | add' } }
+> ```
+>
+> …passes `check` with **rc=0**. So do `sub` · `gsub` · `scan` · `now` ·
+> `strftime`. The single production actually refused is `$ENV`, and it is
+> refused by **jaq's own compiler**, not by any gate of ours.
+>
+> Saying so here is not a footnote: **a spec that asserts a refusal the
+> engine does not make teaches a boundary that is not there.** Two rows
+> of this table are security-adjacent (`now` is the ambient clock that
+> N27 forbids; the regex family is the data-dependent blowup the ceiling
+> exists to bound) — and a reader who trusts the table would believe both
+> are already closed.
+>
+> The table stands as the **specification of the gate**, unchanged. What
+> changes is its status: it describes what `jq-subset/0.1` MUST refuse
+> when the gate ships, not what 0.108.0 refuses today. Until then the
+> honest sentence is « the grammar is written, the gate is owed ».
+
 **What the grammar refuses BY CONSTRUCTION, and why ·**
 
 | Absent | Why |
@@ -4722,6 +4991,8 @@ these from this file alone.
 | `NIKA-DAG-005` | `after:` predicate outside the closed set (`success` · `failure` · `skipped` · `terminal`) | `validation_error` | false |
 | `NIKA-DAG-006` | statically dead task — an incoming edge’s pass-set excludes every reachable producer state, or the `when:` gate is false under every reachable upstream combination ([03 §gate algebra](./03-dag.md#the-gate-algebra-v2-normative)) | `validation_error` | false |
 | `NIKA-DAG-007` | status compared against a literal outside the vocabulary (`success` · `failure` · `skipped` · `cancelled`) — `==` never matches, `!=` always holds | `validation_error` | false |
+| `NIKA-DAG-008` | a `${{ group.<name> }}` fold names a group **no task declares** — including a bare `${{ group }}`, and including the group left empty by a renamed member. Membership is declared, never matched, precisely so a rename is an error here instead of a silently smaller fold ([03 §group](./03-dag.md#declared-membership-never-a-pattern-normative)) | `validation_error` | false |
+| `NIKA-DAG-009` | an `unwind` task declares `group:` — cleanup is an `E_f` attachment that never enters `G_p`, so a `fan-in` edge from it would have no wave to schedule against ([03 §group](./03-dag.md#the-rest-of-the-contract-1)) | `validation_error` | false |
 | `NIKA-TYPE-001` | unknown type name (in `types:` · `returns:` · an `outputs:` type) — did-you-mean when close | `validation_error` | false |
 | `NIKA-TYPE-002` | recursive type reference — the `types:` graph must be acyclic | `validation_error` | false |
 | `NIKA-TYPE-003` | `returns:` and `schema:` on the same task — one contract, one spelling | `validation_error` | false |
@@ -4857,6 +5128,32 @@ The `category` field is a closed enum at v1 ·
 ## Retry policy
 
 A task MAY declare a `retry:` block. Retries apply to **transient** errors only (`error.transient == true`).
+
+> **`retry:` and `on_error:` are two STAGES, not two answers (normative ·
+> the reason they stay two fields).** They look like one decision — « what
+> happens when this task fails » — and the merged spelling
+> (`on_error: { retry: …, then: … }`) has been proposed more than once. It is
+> refused, on two grounds ·
+>
+> 1. **They fire at different times.** `retry:` governs the attempt loop and
+>    fires on the FIRST failure; `on_error:` fires exactly once, on the LAST
+>    one, after `retry:` is exhausted (§`on_error:` below · §recover
+>    resolution step 1). Nesting a « keep trying » block inside a field named
+>    *on error* would put the two on the same clock in the reader's head, and
+>    they are not.
+> 2. **The corpus does not pay for it.** Measured 2026-08-12 over every
+>    `*.nika.yaml` in the studio (873 files · 3 093 tasks · walked from disk,
+>    not grepped) · `on_error:` alone **240** tasks · `retry:` alone **41** ·
+>    **both on one task 31**. Co-occurrence is **31/312 = 9.9 %** of the
+>    tasks that carry either. A merge would fold 31 sites and hand the other
+>    281 an indentation level they have no sibling to share — including 41
+>    `retry:`-only tasks that would gain a wrapper named after an event they
+>    are trying to avoid. That is ceremony, and the number says so.
+>
+> Both stages govern the **verb run only**. Neither is consulted for a
+> boundary failure — a `with:` binding that fails to materialize, or a `when:`
+> that fails to evaluate, settles the task `failure` with the armor bypassed
+> ([03 §the dispatch pipeline](./03-dag.md#the-gate-algebra-v2-normative)).
 
 ### Syntax
 
@@ -6949,7 +7246,8 @@ nothing about the resolved VALUES flowing under a present block. Every
 value carries an integrity label — **Integ ∈ {trusted, untrusted}** —
 orthogonal to Conf (the secrets axis): literals, `const.*`, and
 `secrets.*` are trusted; `inputs.*` (caller-supplied at launch),
-`config.*` (deployment-supplied, outside the file), fetch/tool results,
+`config.*` (untrusted by DECLARATION, not by provenance — see below),
+fetch/tool results,
 and anything derived from them are untrusted, with monotone propagation
 (one untrusted operand taints the whole interpolation). Two rules bind
 untrusted values under a `permits:` block (NEP-0004 · LAW-AUTH-0325):
@@ -9380,8 +9678,55 @@ Timestamp arithmetic · op-discriminated single builtin · timezone-aware (IANA 
 ### `nika:hash`
 ```yaml
 invoke: { tool: "nika:hash", args: { algo: blake3, content: "${{ tasks.X.output }}", encoding: hex } }
+
+# op-discriminated · hash (default) | sign | verify
+invoke: { tool: "nika:hash", args: { op: sign,   content: "${{ with.manifest }}", key: "${{ secrets.release_key }}" } }
+invoke: { tool: "nika:hash", args: { op: verify, content: "${{ with.manifest }}", public_key: "${{ const.release_pub }}", signature: "${{ with.sig }}" } }
 ```
 Content hashing · default **blake3** (fastest modern cryptographic hash · parallel · secure) · or `sha256`/`sha512`. md5/sha1 NOT supported (cryptographically broken · `NIKA-BUILTIN-HASH-001` `validation_error` on an unsupported algo). `encoding:` `hex` (default) | `base64`. Use cases · cache keys · content addressing · provenance.
+
+**`op:` · `hash` (default) · `sign` · `verify` (normative · v0.1 surface).**
+The engine already signs and verifies Ed25519 — the run seal is one Ed25519
+signature over the journal, minted by `nika key init` and checked by the
+evidence verifier. **The language could not reach any of it.** A capability
+that ships and stays unreachable from the file is not a shipped capability,
+so `op:` exposes it through the builtin that already owns the digest.
+
+| Arg | Ops | Notes |
+|---|---|---|
+| `content` | all | required · the bytes under the operation |
+| `algo` | `hash` | `blake3` (default) · `sha256` · `sha512` |
+| `encoding` | `hash` · `sign` | `hex` (default) · `base64` — the output encoding |
+| `key` | `sign` | required · the Ed25519 private key · **MUST be a `${{ secrets.X }}` reference** |
+| `public_key` | `verify` | required · the Ed25519 public key (a `const:`/`inputs:` value — a public key is not a secret) |
+| `signature` | `verify` | required · the signature to check, in `encoding:` |
+
+`sign` returns the signature string; `verify` returns a boolean and never
+throws on a bad signature (a *false* verdict is data, not an error — a
+workflow branches on it with `when:`). A malformed key, an unknown `op:`, or
+a missing per-op required arg is `NIKA-BUILTIN-HASH-001` (`validation_error`).
+
+**The key rides `secrets:` — that is a hard rule, not a convention.** A
+private key reached from the ambient environment or an implicit on-disk
+keyring would make `nika:hash` read state its declaration does not name,
+which is exactly the pure-compute-that-is-not-pure defect the permits
+boundary exists to refuse. Declaring the key under `secrets:` keeps it inside
+the four-authority family, keeps it masked in logs, and keeps its reach
+governed by `egress:` like any other secret.
+
+**What this closes, and what it does NOT (bounded honestly).** It closes
+**Ed25519** signing and verification — detached signatures over content the
+workflow already holds: release manifests, provenance attestations,
+inter-workflow handoffs, checkpoint verification. It does **not** close
+RS256/JWT: that is RSA with a different key format, a different padding
+scheme and a token envelope, none of which this surface has. A GitHub App
+credential exchange is RS256 and stays out of reach — do not read this
+section as authenticating anything that mints a JWT. `capability_classification`
+for the builtin moves from `pure_internal` to secret-reading under `op: sign`;
+the classification row in `canon/builtins.yaml` follows when the engine wires
+the op (today the engine's `ARGS` gate declares `content · algo · encoding`
+only, so `op:` is spec-ahead-of-engine and this file says so rather than
+implying a green that does not exist).
 
 ---
 

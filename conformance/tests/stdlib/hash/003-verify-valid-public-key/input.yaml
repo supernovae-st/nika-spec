@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: v1
+workflow:
+  id: seal
+permits:
+  tools: ["nika:hash"]
+secrets:
+  release_key:
+    source: vault
+    key: prod/nika/release-ed25519
+const:
+  release_pub: "MCowBQYDK2VwAyEAexamplepublickeybytesbase64"
+tasks:
+  check_manifest:
+    invoke:
+      tool: nika:hash
+      args:
+        op: verify
+        content: "manifest-bytes"
+        public_key: "${{ const.release_pub }}"
+        signature: "deadbeef"

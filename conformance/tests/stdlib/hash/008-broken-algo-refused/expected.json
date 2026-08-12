@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-BUILTIN",
+      "category": "validation_error"
+    }
+  ],
+  "note": "builtins-v0.1.md §nika:hash · md5/sha1 stay unsupported · the op surface did not reopen them."
+}
