@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: config-block
+nika: deployment-knob
 inputs:
   log_level: { type: string, default: "info", required: false }
   region: { type: string, required: false }

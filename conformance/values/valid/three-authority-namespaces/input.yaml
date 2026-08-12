@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: four-authority
+nika: three-authority
 inputs:
   region: { type: string, required: true }
   log_level: { type: string, default: "info", required: false }

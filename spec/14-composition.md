@@ -27,7 +27,10 @@ tasks:
       workflow: "./audits/site-audit.nika.yaml"   # a STATIC path …
       args:                                        # … or registry:owner/name@version (pinned)
         url: "${{ inputs.target }}"
-    returns: AuditReport      # the child's typed outputs — composed, not re-declared
+    returns:                  # the child's typed outputs — composed, not re-declared
+      object:
+        score: integer
+        findings: { array: string }
 ```
 
 - `invoke:` is a **tagged union** — exactly one of `tool:` | `workflow:`,

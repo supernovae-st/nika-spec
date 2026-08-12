@@ -21,7 +21,7 @@ foundation:
   - file: examples/07-for-each-locales.nika.yaml
     sha256_16: 734f275201ce6320
   - file: examples/08-config-values.nika.yaml
-    sha256_16: 038c62d3eb4720c4
+    sha256_16: 51d6368c9128d967
   - file: examples/09-returns-typed-door.nika.yaml
     sha256_16: ed87e4299db36f29
   - file: examples/10-compose-child.nika.yaml

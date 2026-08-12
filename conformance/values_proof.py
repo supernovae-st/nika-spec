@@ -105,7 +105,7 @@ def inverse_mutation() -> bool:
     """Strip the source: from a secret of a passing positive fixture · the
     schema MUST catch it (secrets.source is required · R8). A guard that
     proves the positive was passing FOR THE RIGHT REASON, not by accident."""
-    src = FIXTURES / "valid" / "four-authority-namespaces" / "input.yaml"
+    src = FIXTURES / "valid" / "three-authority-namespaces" / "input.yaml"
     doc = yaml.safe_load(src.read_text(encoding="utf-8"))
     before = verdict(doc)
     if not before["valid"]:
