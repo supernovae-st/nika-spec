@@ -577,6 +577,32 @@ internal corpora, the functions actually used are `map · sort · last ·
 fromjson · join · length`, plus paths, the pipe, object/array construction and
 arithmetic. Everything above is that set plus its obvious companions.
 
+> ### 🔴 This table is the TARGET gate, and it does not fire yet
+>
+> **Measured on 0.108.0, 2026-08-11.** The engine embeds a full jaq and
+> the subset below is **not enforced**. A workflow whose only task is ·
+>
+> ```yaml
+> invoke: { tool: "nika:jq", args: { input: "a LOC=120 b LOC=45",
+>   expression: '[ match("LOC=([0-9]+)";"g").captures[0].string | tonumber ] | add' } }
+> ```
+>
+> …passes `check` with **rc=0**. So do `sub` · `gsub` · `scan` · `now` ·
+> `strftime`. The single production actually refused is `$ENV`, and it is
+> refused by **jaq's own compiler**, not by any gate of ours.
+>
+> Saying so here is not a footnote: **a spec that asserts a refusal the
+> engine does not make teaches a boundary that is not there.** Two rows
+> of this table are security-adjacent (`now` is the ambient clock that
+> N27 forbids; the regex family is the data-dependent blowup the ceiling
+> exists to bound) — and a reader who trusts the table would believe both
+> are already closed.
+>
+> The table stands as the **specification of the gate**, unchanged. What
+> changes is its status: it describes what `jq-subset/0.1` MUST refuse
+> when the gate ships, not what 0.108.0 refuses today. Until then the
+> honest sentence is « the grammar is written, the gate is owed ».
+
 **What the grammar refuses BY CONSTRUCTION, and why ·**
 
 | Absent | Why |
