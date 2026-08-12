@@ -49,7 +49,7 @@ inputs:
 const:
   output_dir: "./output"                 # bare literal
 
-# Non-sensitive runtime config · supplied by the deployment · available as ${{ config.<name> }}
+# Non-sensitive runtime config · `default:` REQUIRED · available as ${{ config.<name> }}
 config:
   log_level: { type: string, default: "info" }
 
@@ -272,14 +272,35 @@ caller can pass is declared in `inputs:`.
 ```yaml
 config:
   log_level: { type: string, default: "info" }
-  region:    { type: string }                     # no default · the deployment supplies it
+  region:    { type: string, default: "eu-west" }  # a default is REQUIRED · see below
 ```
 
-Non-sensitive configuration available via `${{ config.<name> }}`, supplied
-by the deployment or environment (engine launch concern · `default:` is the
-declared fallback). Each entry is a typed declaration (`type:` required ·
-full TypeExpr · a `default:` MUST conform · `NIKA-DEFAULT-001`). Values may
-appear in logs and traces. For anything secret, use `secrets:` instead.
+Non-sensitive configuration available via `${{ config.<name> }}`. Each
+entry is a typed declaration (`type:` required · full TypeExpr · a
+`default:` MUST conform · `NIKA-DEFAULT-001`). Values may appear in logs
+and traces. For anything secret, use `secrets:` instead.
+
+> #### 🔴 `default:` is REQUIRED · and this paragraph is a correction
+>
+> This section used to read « supplied by the deployment or environment »
+> and its own example carried `region: { type: string }  # no default ·
+> the deployment supplies it`. **Measured on 0.108.0: that workflow passes
+> `check` and dies at `run`** with `NIKA-VAR-001`. There is no deployment
+> channel — `--var` reaches `inputs:` only, by design (« the declared
+> `inputs:` the sole authority »), so **a `config:` entry's only possible
+> source is its own `default:`**.
+>
+> A green check on a file that cannot run is the one thing this language
+> exists to prevent. So the contract is now the honest one · **a `config:`
+> entry without a `default:` is a CHECK error, not a run surprise**
+> (`NIKA-DEFAULT-002` · `validation_error`). The refusal teaches the two
+> repairs: give it a `default:`, or move it to `inputs:` — which is the
+> block a caller can actually reach.
+>
+> What `config:` still buys over `const:` is the integrity label: a
+> `config.*` read is **untrusted** at the taint lattice, a `const.*` read
+> is **trusted**. That difference is real and it is why the two blocks
+> stay two blocks.
 
 **Declared-only · no ambient OS fallback** · a `${{ config.X }}` read
 resolves ONLY against this block (an undeclared entry is `NIKA-VAR-001`):

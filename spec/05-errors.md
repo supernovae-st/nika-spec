@@ -129,6 +129,7 @@ these from this file alone.
 | `NIKA-TYPE-006` | regex pattern outside the locked dialect (backreference · lookaround · named group · inline flags · lazy/possessive · `\b` · `\p` — [09 §the regex dialect](./09-types.md#the-regex-dialect-normative--locked)) | `validation_error` | false |
 | `NIKA-TYPE-101` | run-time contract violation — the decoded value does not fit `returns:` (`exec:`/`invoke:` lane · `infer:`/`agent:` stay `NIKA-INFER-002`-class) | `validation_error` | false |
 | `NIKA-DEFAULT-001` | a `default:` that does not conform to its own `type:` — the declaration would hand a caller a value its type forbids ([09 §types](./09-types.md)) | `validation_error` | false |
+| `NIKA-DEFAULT-002` | a `config:` entry with no `default:` — nothing can supply it (`--var` reaches `inputs:` only), so the file would pass check and die at run on `NIKA-VAR-001`. Refused at CHECK so the green means something ([01 §config](./01-envelope.md)) | `validation_error` | false |
 | `NIKA-VAR-001` | unresolved reference (unknown namespace entry · undeclared `inputs`/`config`/`const`/`secrets`/`with` key) | `variable_error` | false |
 | `NIKA-VAR-002` | binding cardinality — a jq binding emitted zero or multiple values (evaluation-time · data-dependent) | `variable_error` | false |
 | `NIKA-VAR-003` | provably-invalid path into a declared `schema:` (static walk · [04](./04-variables.md)) | `validation_error` | false |
@@ -138,7 +139,7 @@ these from this file alone.
 | `NIKA-VAR-007` | bytes value substituted into a string position | `variable_error` | false |
 | `NIKA-VAR-008` | unclosed `${{` opener | `validation_error` | false |
 | `NIKA-VAR-020` | bare `tasks.X` is the envelope, not a value — pick `.output` (closed projection set · 04 §namespaces) | `validation_error` | false |
-| `NIKA-VAR-021` | a `tasks.*` reference outside the boundary (`with:` · `after:` · `on_error.recover` · `on_finally` parent-only · workflow `outputs:`) — hoist it into `with:` (`check --fix` applies it) | `validation_error` | false |
+| `NIKA-VAR-021` | a `tasks.*` reference outside the boundary (`with:` · `after:` · `on_error.recover` · an `unwind` task reading its producer · workflow `outputs:`) — hoist it into `with:` (`check --fix` applies it) | `validation_error` | false |
 | `NIKA-VAR-009` | typed `outputs` value did not match its declared `type:` at run end (the output half of the callable contract · [01 §engine MUST](./01-envelope.md)) | `validation_error` | false |
 | `NIKA-VALUES-001` | the pre-flip envelope `vars:` block — dead since the E-split; classify each use into the authority its role commands ([04 §values](./04-variables.md)) | `validation_error` | false |
 | `NIKA-VALUES-002` | the pre-flip envelope `env:` block — dead since the E-split; `config:` is workflow config, `exec.env` is one subprocess's OS environment ([04 §values](./04-variables.md)) | `validation_error` | false |
@@ -480,7 +481,7 @@ blanket kill** ·
 - The workflow's final state stays `failure` even when always-pattern tasks
   ran afterward (any unrecovered task failure decides it).
 - **User cancellation** (Ctrl+C · API) IS a blanket kill · in-flight tasks
-  are cancelled (their `on_finally:` still runs · [03](./03-dag.md#on_finally--optional--cleanup-hook--always-runs)).
+  are cancelled (the tasks that `unwind` them still run · [03](./03-dag.md#unwind--a-settle-state-on-after--cleanup-that-always-runs)).
 
 A workflow's final state is one of ·
 
