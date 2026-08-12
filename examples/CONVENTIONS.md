@@ -306,7 +306,7 @@ Offline-runnable is the default expectation. Reach for it in this order:
 2. **A committed fixture** — the file the workflow reads lives in the repo.
 3. **`on_error: recover:`** — the honest dry run. A fetch at a placeholder
    host resolves nowhere, a literal recovery value mirroring the API's shape
-   takes over, and the same `output:` bindings work on both paths.
+   takes over, and the same `extract:` bindings work on both paths.
 
 When an effect genuinely prevents it, the header says **exactly which one**,
 in one sentence, on the `Needs ·` line. Not "requires setup" — the effect:

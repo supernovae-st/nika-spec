@@ -221,7 +221,7 @@ tasks:
     invoke:
       tool: "nika:date"
       args: { op: now }
-    output:
+    extract:
       day: ".[:10]"                  # nika:date returns the ISO string itself · slice YYYY-MM-DD
 
   save:

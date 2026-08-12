@@ -20,7 +20,7 @@
 | [`02-parallel-fanout`](02-parallel-fanout.nika.yaml) | the DAG | implicit parallelism · `const:` · `with:` value edges · `${{ tasks.<id>.output }}` |
 | [`03-exec-pipeline`](03-exec-pipeline.nika.yaml) | shells and gates | `exec:` (`shell:` + `command:`) · `capture: structured` · `timeout:` · `run.clock` · `when:` · `after:` control edges · `after: {…: unwind}` cleanup |
 | [`04-schema-retry`](04-schema-retry.nika.yaml) | typed calls | typed `inputs:` + `default:` · `infer.schema:` · `additionalProperties: false` · `retry:` · the long `outputs:` form |
-| [`05-fetch-chain`](05-fetch-chain.nika.yaml) | reaching outside | `invoke:` · `nika:fetch` · `permits.tools` + `permits.net.http` · `output:` jq bindings · `on_error: recover:` |
+| [`05-fetch-chain`](05-fetch-chain.nika.yaml) | reaching outside | `invoke:` · `nika:fetch` · `permits.tools` + `permits.net.http` · `extract:` jq bindings · `on_error: recover:` |
 | [`06-code-review`](06-code-review.nika.yaml) | the agent loop | `agent:` · default-deny `tools:` · `max_turns:` + `max_tokens_total:` · `nika:done` · `permits.fs` inside the loop |
 | [`07-for-each-locales`](07-for-each-locales.nika.yaml) | mapping | `for_each:` · `${{ item }}` / `${{ index }}` · `for_each.max_parallel:` · `for_each.fail_fast:` · array-preserving recovery |
 | [`08-config-values`](08-config-values.nika.yaml) | the value authorities | the deployment's knobs — an `inputs:` entry with `required: false` + `default:`, typed and unreachable from the caller (measured: `--var region=…` refuses) |

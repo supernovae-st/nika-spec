@@ -757,11 +757,12 @@ If `outputs:` is omitted, the workflow still runs; its result is
 engine-defined (a reusable/callable workflow SHOULD declare `outputs:`). The
 referenced task ids must exist (parse-time validated).
 
-> **`outputs:` (envelope · plural) ≠ `output:` (task · singular).** The
-> workflow-level `outputs:` is the *return contract*; the task-level `output:`
-> ([04-variables.md](./04-variables.md#output-binding--output)) defines *named
-> jq bindings* on one task. Plural-at-the-top, singular-per-task: the
-> same split GitHub Actions uses for `workflow_call.outputs` vs step `outputs`.
+> **`outputs:` (envelope) ≠ `extract:` (task).** The workflow-level
+> `outputs:` is the *return contract*; the task-level `extract:`
+> ([04-variables.md](./04-variables.md#extraction-bindings--extract)) defines
+> *named jq bindings* on one task. Two different words for two different
+> jobs — until 2026-08-12 the task field was `output:`, and the distinction
+> rode on a single letter (see [03 §extract](./03-dag.md#extract--optional--extraction-bindings)).
 
 ### What leaves a run · the export contract (normative)
 

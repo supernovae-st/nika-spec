@@ -20,7 +20,7 @@ multi-agent swarm without ever leaving validated ground.
 |---|---|---|---|
 | [`standup-digest`](standup-digest.nika.yaml) | engineering | the standup note writes itself from real commits | parallel start · `nika:date` · exec→infer |
 | [`meeting-actions`](meeting-actions.nika.yaml) | every office | transcript → tracker-ready typed action items | `infer.schema:` · input `default:` vs literal permit |
-| [`price-watch`](price-watch.nika.yaml) | e-commerce / personal | a price alert with **zero** model calls | `output:` jq · CEL `when:` · `egress:` **and** `net.http` |
+| [`price-watch`](price-watch.nika.yaml) | e-commerce / personal | a price alert with **zero** model calls | `extract:` jq · CEL `when:` · `egress:` **and** `net.http` |
 | [`social-repurpose`](social-repurpose.nika.yaml) | marketing / creators | one post → thread + LinkedIn + newsletter, in parallel | diamond DAG · `with:` aliasing |
 | [`og-images`](og-images.nika.yaml) | marketing / content | brief in → OG PNG + provenance manifest out, one task | `nika:image_generate` · dir-writing permit |
 | [`image-fx-batch`](image-fx-batch.nika.yaml) | creators / media | a folder of photos → deterministic art, byte-identical forever | `nika:glob` · jq-derived paths · `nika:image_fx` ops chain |
@@ -72,7 +72,7 @@ rm -rf out                                                                    # 
 - **Offline by default.** Any `infer:` file rehearses with `--model mock/echo`
   — deterministic, zero keys. Files that reach the network carry an
   `on_error: recover:` sample so the run stays green with no network at all;
-  a recovery stands in for the RAW response, so the `output:` jq bindings run
+  a recovery stands in for the RAW response, so the `extract:` jq bindings run
   over it unchanged.
 - **Every job checks green — including `release-radar`.** It crosses the
   lethal trifecta (private read + feed ingress + state-file write), so it

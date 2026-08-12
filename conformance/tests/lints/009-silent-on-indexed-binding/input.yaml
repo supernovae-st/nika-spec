@@ -3,5 +3,5 @@ nika: f009indexed
 tasks:
   fetch:
     invoke: { tool: "nika:read", args: { path: "users.json" } }
-    output:
+    extract:
       first_user: ".users[0]"

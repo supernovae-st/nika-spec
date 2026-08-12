@@ -177,7 +177,7 @@ half of the original design survived unchanged.
 **The sibling-run workaround stays valid** · `exec: shell: "nika run
 subroutine.yaml --output json"` launches a sibling workflow PROCESS ·
 `--output json` (engine CLI) prints the child's typed `outputs:` as JSON on
-stdout · the parent binds it back with `capture: stdout` + a jq `output:`
+stdout · the parent binds it back with `capture: stdout` + a jq `extract:`
 (the typed contract survives the process boundary). It remains floor 1 below
 and the one form for what a static call graph cannot express (an unbounded
 cursor chain · H23) · wherever the target is static, a linter recommends the
@@ -267,7 +267,7 @@ stream_chat:
     infer:
       prompt: "..."
       stream: true
-    output:
+    extract:
       chunks: .stream                 # not in v0.1
 ```
 

@@ -10,7 +10,7 @@
 # Demonstrates ·
 #   - `invoke:` · calling a TOOL · fetching is `nika:fetch`, not a verb
 #   - `permits.net.http` · the hosts this workflow may reach, named exactly
-#   - `output:` · named jq bindings → `${{ tasks.<id>.<name> }}`
+#   - `extract:` · named jq bindings → `${{ tasks.<id>.<name> }}`
 #   - `on_error: recover:` · a literal fallback that substitutes the raw
 #     output BEFORE extraction, so the SAME bindings work on both paths
 #   - chaining a tool result into an `infer:` prompt
@@ -50,7 +50,7 @@ tasks:
         url: "${{ const.api_url }}"
         mode: jq    # extract structured fields · not a markdown dump
         jq: "."
-    output:
+    extract:
       # Named jq bindings over the tool's result. Downstream reads
       # `${{ tasks.fetch_article.title }}` — not `.output.data.title`.
       title: ".data.title"

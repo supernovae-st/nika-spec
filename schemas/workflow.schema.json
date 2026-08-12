@@ -442,9 +442,9 @@
           "type": "object",
           "description": "Task-level scope injection · `${{ with.X }}`."
         },
-        "output": {
+        "extract": {
           "type": "object",
-          "description": "Named jq-expression bindings · `${{ tasks.X.<name> }}`. jq is the single data extraction-and-transform language (the former RFC 9535 JSONPath was dropped · jq is a superset · per spec/04-variables.md §216-225). Reserved names forbidden at parse time (spec/04-variables.md §Rules): output · status · error · started_at · ended_at · duration_ms — enforced via propertyNames.",
+          "description": "Named jq-expression bindings extracted from the verb's raw response · read downstream as `${{ tasks.X.<name> }}`. The field names the OPERATION (run this jq); it does not write `output` — `${{ tasks.X.output }}` stays the raw response (spec/03-dag.md §extract). jq is the single data extraction-and-transform language (the former RFC 9535 JSONPath was dropped · jq is a superset · per spec/04-variables.md §216-225). A binding may not shadow a record projection: output · status · error · started_at · ended_at · duration_ms are forbidden at parse time (spec/04-variables.md §Rules) — enforced via propertyNames.",
           "propertyNames": {
             "not": {
               "enum": [

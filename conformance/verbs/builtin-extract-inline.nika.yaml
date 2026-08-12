@@ -24,7 +24,7 @@ tasks:
             title: "Mock Article Title"
             body: "${{ const.article_content }}"
         expression: ".data"
-    output:
+    extract:
       title: ".title"
       body: ".body"
 

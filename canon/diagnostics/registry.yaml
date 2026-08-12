@@ -503,7 +503,7 @@ diagnostics:
     introduced_in: C0
     namespace: PARSE
     plane: unclassified
-    condition: 'with:/output: binding uses a reserved name (output · status · error · started_at · ended_at · duration_ms)'
+    condition: 'with:/extract: binding uses a reserved name (output · status · error · started_at · ended_at · duration_ms)'
     outcome_class: failure
     cause: validation_error
     retryable: false

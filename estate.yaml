@@ -258,7 +258,7 @@ patterns:
 - glob: "spec/**"
   class: authored
   match_count: 18
-  aggregate_sha256: 3d6d6043485988e711153fe55e4cc2e4506e9dd4af078eff819d2774dea5c164
+  aggregate_sha256: ceced92a625ab79a88914408add89fd175bc3df9ca3bcda9cc35a56b3014f2c4
   evidence: "the normative prose law (00-overview → 16-projections) — THE spec; no generation markers"
   note: "spec/00-04 · 06-08 carry tool-maintained '<!-- canon:KEY -->N<!-- /canon -->' count markers inside the authored prose (canon-projectors.py TARGET 0 · --check gated) — the class stays authored"
 - glob: "stdlib/**"

@@ -55,7 +55,7 @@ tasks:
         url: "${{ const.source_url }}"
         mode: jq
         jq: "."
-    output:
+    extract:
       value: ".value"               # SLOT: the jq path to the watched field
     on_error:
       # Offline rehearsal · a sample UNDER the threshold — the gate stays

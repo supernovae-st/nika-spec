@@ -3,5 +3,5 @@ nika: f009collected
 tasks:
   fetch:
     invoke: { tool: "nika:read", args: { path: "users.json" } }
-    output:
+    extract:
       emails: "[.users[].email]"

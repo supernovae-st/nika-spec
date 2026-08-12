@@ -71,7 +71,7 @@ my_task:                        # the map KEY is the identity · snake_case · u
   returns:                      # optional · the OUTPUT CONTRACT · the type expression, INLINE (09-types.md)
     object:
       summary: string
-  output:                       # optional · named jq bindings
+  extract:                      # optional · named jq bindings
     result: ".choices[0].message.content"
     tokens: ".usage.total_tokens"
 ```
@@ -255,7 +255,7 @@ failure mode, not taste ·
   both: a fold can never harvest zero members and read as clean.
 - **The reference boundary is untouched.** `group.<name>` is legal in a
   `with:` value and **nowhere else** — one door, where `tasks.*` has five.
-  `when:`, verb bodies, `on_error.recover:`, `output:` and workflow
+  `when:`, verb bodies, `on_error.recover:`, `extract:` and workflow
   `outputs:` all refuse it with the existing `NIKA-VAR-021`
   ([04 §the reference boundary](./04-variables.md#the-reference-boundary--where-tasks-may-appear)).
   Nothing in that law needed widening to admit the fold.
@@ -707,7 +707,7 @@ for_each:
 
 - **Every expression in the task body is re-evaluated PER ITERATION** with
   `item`/`index` bound: `with:`, the verb fields (`prompt:` · `command:` ·
-  `args:` · …), `when:`, AND the `output:` bindings. (A binding that does
+  `args:` · …), `when:`, AND the `extract:` bindings. (A binding that does
   not reference `item`/`index` evaluates to the same value every iteration —
   expressions are pure over settled state — so an engine MAY materialize it
   once; the observable behavior is identical.) The only expression evaluated
@@ -716,7 +716,7 @@ for_each:
 - The task's output is the **array of per-iteration outputs**, in input
   order · referenced downstream as `${{ tasks.scrape_all.output }}`
   (an array) · `${{ tasks.scrape_all.output[0] }}` for one element.
-- **`output:` bindings apply per iteration**: each binding's jq runs over
+- **`extract:` bindings apply per iteration**: each binding's jq runs over
   that iteration's raw response · downstream `tasks.X.<name>` is the
   **array of that binding's per-iteration values**, input order (so
   `tasks.X.output` = array of raw outputs · `tasks.X.title` = array of
@@ -958,7 +958,7 @@ producer reads defined-`null` · [09 §typed value edges](./09-types.md#typed-va
 
 ---
 
-### `output` · *optional · output binding*
+### `extract` · *optional · extraction bindings*
 
 ```yaml
 api_call:
@@ -967,7 +967,7 @@ api_call:
       args:
         url: "https://api.example.com/data"
         mode: raw
-    output:
+    extract:
       user_count: ".data.users | length"
       first_user: ".data.users[0]"
       raw: "."
@@ -975,12 +975,17 @@ api_call:
 
 Defines named bindings extracted from the verb's raw response via a jq expression. These bindings are available downstream as `${{ tasks.task_id.user_count }}`, `${{ tasks.task_id.first_user }}`, etc. — imported through a consumer's `with:` like any output (a named binding is a **value**-role field).
 
-If `output` is absent · the task output defaults to the verb's raw response, referenced as `${{ tasks.task_id.output }}`.
+If `extract` is absent · the task output defaults to the verb's raw response, referenced as `${{ tasks.task_id.output }}`.
 
-#### The name is wrong · `extract:` is the decided replacement (normative decision · not yet executed)
+The two trees are disjoint and both stay readable · `tasks.X.output` is the
+raw response, `tasks.X.<name>` is an extraction of it. Declaring `extract:`
+adds named siblings; it never replaces `output`.
 
-The field named `output:` **does not write `output`**. Two measurements, both
-taken on the shipped 0.108.0 binary ·
+#### Why the field is `extract:` and not `output:` (the rename, and what it cost)
+
+The field was called `output:` until 2026-08-12. That name **stated a
+falsehood**, and the falsehood was measured twice on the shipped 0.108.0
+binary ·
 
 1. **The parser forbids the field's own name inside itself.** A binding
    `output: { output: "." }` is refused — `NIKA-PARSE-013`, *« output binding
@@ -988,44 +993,53 @@ taken on the shipped 0.108.0 binary ·
    names (`output` · `status` · `error` · `started_at` · `ended_at` ·
    `duration_ms`), but it is the only one that is also **the name of the
    block doing the refusing**.
-2. **`tasks.X.output` stays RAW when `output:` is declared.** A task
-   declaring `output: { picked: ".foo" }` still serves the unextracted verb
+2. **`tasks.X.output` stayed RAW when `output:` was declared.** A task
+   declaring `output: { picked: ".foo" }` still served the unextracted verb
    response at `tasks.X.output`, alongside `tasks.X.picked`. Both reads
-   check green in the same file. The block adds named siblings; it never
-   touches `output`.
+   checked green in the same file. The block adds named siblings; it never
+   touched `output`.
 
-So the field is named after the one thing it neither produces nor may
-contain. It also sits one letter from the envelope's `outputs:` (the run's
+So the field was named after the one thing it neither produces nor may
+contain. It also sat one letter from the envelope's `outputs:` (the run's
 exports), making singular-vs-plural carry a semantic distinction that nothing
-in the spelling signals.
+in the spelling signalled.
 
 **The replacement is `extract:`** — and the argument is deliberately *not*
 that it is clearer. Furnas et al. measured that intuition dead in 1987 (*The
 vocabulary problem in human-system communication*, CACM 30(11) — two people
 pick the same name for the same thing under 20 % of the time; « the idea of
 an obvious, self-evident, or natural term is a myth »). The argument is that
-the current word **states a falsehood** and the candidate states a fact ·
+the old word **stated a falsehood** and the new one states a fact ·
 
 - `extract:` names the **operation** (run this jq over the raw response),
   which is what the block does and all it does.
-- It is not a projection name, so the reserved-name collision disappears:
-  `extract: { output: "." }` becomes sayable, because `output` is no longer
-  the block's own identity.
 - It cannot be confused with `outputs:`: different word, not different
   number.
-- The raw/named duality becomes readable — `tasks.X.output` is the response,
+- The raw/named duality became readable — `tasks.X.output` is the response,
   `tasks.X.<name>` is an extraction of it.
 
-**Status · decided here, executed in one cascade, not yet run.** Measured
-blast radius 2026-08-12 · **76 tasks in 42 files** (12 in this repo). The
-rename is small, but it lands in the engine parser, this schema, the corpus,
-the VS Code extension and the website simultaneously — and flipping the spec
-alone would make every shipped example refuse at `nika check` while passing
-the reference oracle, which is the divergence this repo exists to prevent.
-The migration is a `canon/migrations.yaml` row (`old_form: output` ·
-`new_form: extract` · mechanical 1:1, equivalence-or-stop) with a
-`canon/tombstones.yaml` entry for the dead spelling, per the discipline every
-prior rename followed.
+**What did NOT change.** The rename is key-to-key and nothing else
+(equivalence-or-stop). `tasks.X.output` — the record read — is untouched, and
+so is the envelope's `outputs:`. The reserved-binding list is also untouched:
+`extract: { output: "." }` is **still refused** (`NIKA-PARSE-013`), because a
+binding may not shadow a record projection. That refusal now carries a reason
+the spelling can state — you cannot name a binding after the raw response —
+where before it was the block forbidding its own name. The reserved list dies
+separately, with the `tasks.X.out.<name>` disjoint tree; until then it stands.
+
+**Status · executed in this repo 2026-08-12 · the engine leg is owed.**
+Measured here at execution · **17 workflow files + 6 spec fences** carry the
+field (the earlier « 12 in this repo » estimate was low). The rename lands in
+the engine parser, this schema, the corpus, the VS Code extension and the
+website; **this repo's leg is done and its own oracle moved with it** (schema
+`$defs/task`, `conformance/deep_static.py`, `conformance/runner.py`,
+`scripts/showcase-projector.py`). The shipped 0.108.0 binary refuses
+`extract:` with `NIKA-PARSE-005` and will until the engine leg lands — the
+same lead the corpus already carries on the envelope (`nika: v1`), not a new
+class of divergence. The migration is `canon/migrations.yaml` row
+`mig-r4-task-extract-replaces-output` (`old_form: output` · `new_form:
+extract` · mechanical 1:1, equivalence-or-stop) with a `canon/tombstones.yaml`
+entry for the dead spelling, per the discipline every prior rename followed.
 
 ---
 
@@ -1381,7 +1395,7 @@ tasks:
       args:
         url: "https://example.com/sitemap.xml"
         mode: sitemap
-    output:
+    extract:
       pages: "map(.loc)"   # sitemap output IS the root array of {loc, …} · a binding is single-valued, so collect the URLs into one array
 
   summarize:
@@ -1561,7 +1575,7 @@ linter (the reference `native-first` rule set) warns on each class ·
 |---|---|---|
 | `native-first/001 exec-http` | `curl` · `wget` · `xh` · `http(s)` · an interpreter one-liner around `fetch(`/`axios`/`http.request` | `nika:fetch` (uploads · `multipart:` · crawls · `traverse:`) |
 | `native-first/002 exec-file` | `cat` · `tee` · `cp` · `mv` · `mkdir` · `touch` · `head` · `tail` · `ls` | `nika:read` / `nika:write` (`create_dirs: true`) / `nika:glob` |
-| `native-first/003 exec-data` | `jq` · `sed` · `awk` | `nika:jq` (or an `output:` binding) for JSON · `nika:edit` for in-place literal file edits |
+| `native-first/003 exec-data` | `jq` · `sed` · `awk` | `nika:jq` (or an `extract:` binding) for JSON · `nika:edit` for in-place literal file edits |
 | `native-first/004 exec-media` | an image/speech provider endpoint in the command (`images/generations` · `/v1/audio/speech` · …) | `nika:image_generate` / `nika:tts_generate` |
 | `native-first/005 exec-helper` | an interpreter (`node` · `python` · `sh` · …) running a script file | inventory the helper · HTTP→`nika:fetch` · files→`nika:read`/`nika:write` · JSON→`nika:jq` · YAML/TOML/CSV in or out→`nika:convert` (then `nika:jq`) · a product API→an MCP server (`mcp:<server>/<tool>`) · a helper script is not one of the genuine subprocesses that stay silent below, so a ledger row records the intent without clearing this rule |
 
@@ -1710,7 +1724,7 @@ wire contract:
 |---|---|---|
 | always | `id` · `kind` · `verb` · `permits` | `kind` is `"task"` or `"finally"` (format 3 · a reader MUST branch on it before assuming a node schedules) · `permits` may be empty — per-task capability attribution (`exec:` · `fs.read:` · `fs.write:` · `net.http:` · `tool:` families, deterministic order), the un-aggregated voice of the same effect walk `infer_permits` folds into the workflow boundary |
 | present-as-null when undeclared | `when` · `fan_out` · `cost_interval` | `when` carries the business-condition source (`"true"`/`"false"` literal or the CEL island — POST-gate, never the gate itself) · `fan_out` is `{ "kind": "list" \| "expression" }` with `count` only for the literal-list form · `cost_interval` is `[min_path, worst_case]` USD for **priced inference tasks only** (no price, no interval — never a fabricated 0) |
-| absent when undeclared | `tool` · `model` · `retry_max_attempts` · `timeout_ms` · `on_error` · `outputs` | declared POLICY, projected so clients read it here instead of re-parsing YAML: `tool` for `invoke` tasks · `model` as resolved `provider/name` (task override else workflow default) · `retry.max_attempts` (05) · `timeout:` as parsed milliseconds (unambiguous where the source string is not) · `on_error:` action (`recover` · `skip`) · declared `output:` binding names in source order (04) |
+| absent when undeclared | `tool` · `model` · `retry_max_attempts` · `timeout_ms` · `on_error` · `outputs` | declared POLICY, projected so clients read it here instead of re-parsing YAML: `tool` for `invoke` tasks · `model` as resolved `provider/name` (task override else workflow default) · `retry.max_attempts` (05) · `timeout:` as parsed milliseconds (unambiguous where the source string is not) · `on_error:` action (`recover` · `skip`) · declared `extract:` binding names in source order (04) |
 
 **Edges** carry `from` · `to` · `kind` — and per kind ·
 
@@ -1741,7 +1755,7 @@ that paints run state onto this graph joins the two by task `id`.
 
 ## Forward-compat
 
-v1 ships with these task fields · `with` · `after` · `when` · `for_each` · `retry` · `on_error` · `timeout` · `output` · `returns` · `lift` · plus the verb selector. (`max_parallel` and `fail_fast` are sub-fields of `for_each`; `on_finally` is dead — cleanup is a task on an `unwind` edge.) Additional fields may be added in minor bumps (additive only). (Output *shape* is per-verb · not a task field · see [02-verbs.md](./02-verbs.md#what--tasksidoutput--holds--per-verb).)
+v1 ships with these task fields · `with` · `after` · `when` · `for_each` · `retry` · `on_error` · `timeout` · `extract` · `returns` · `lift` · plus the verb selector. (`max_parallel` and `fail_fast` are sub-fields of `for_each`; `on_finally` is dead — cleanup is a task on an `unwind` edge.) Additional fields may be added in minor bumps (additive only). (Output *shape* is per-verb · not a task field · see [02-verbs.md](./02-verbs.md#what--tasksidoutput--holds--per-verb).)
 
 Out of scope for v1 · `parallel:` for explicit concurrency control · `include:` for sub-workflow composition (workaround · `exec: nika run sub.yaml`). See [08-out-of-scope.md](./08-out-of-scope.md).
 

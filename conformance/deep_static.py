@@ -12,7 +12,7 @@
 #                 (spec/03-dag.md §Formal grammar · cel-subset/0.1) ·
 #                 every `${{ }}` body must parse · `when:` roots must be
 #                 boolean-shaped (03-dag §when: MUST be a CEL boolean)
-#   JQ-COMPILE    every jq expression (output: bindings · nika:jq
+#   JQ-COMPILE    every jq expression (extract: bindings · nika:jq
 #                 expression · nika:fetch jq arg) must COMPILE · uses the
 #                 system `jq` (exit 3 = compile error · runtime errors
 #                 accepted) · skipped gracefully when jq is absent
@@ -25,7 +25,7 @@
 #   WHEN-FORM     `when:` must be a `${{ }}` CEL string OR a YAML boolean
 #                 (03-dag §when: shape rules) · a bare non-${{ }} string
 #                 is silently-never-an-expression · rejected
-#   OUTPUT-PURE   `output:` binding values are pure jq · `${{ }}` never
+#   EXTRACT-PURE  `extract:` binding values are pure jq · `${{ }}` never
 #                 appears inside them (04 §binding rules)
 #   BUILTIN-SHAPE nika:write requires `content:` (a write with nothing to
 #                 write is an authoring bug) · nika:done is valid only
@@ -1038,14 +1038,14 @@ def deep_static_errors(doc: dict) -> list[dict]:
                              "detail": f"{path} · when: must be boolean-shaped CEL "
                                        f"(comparison · && · || · !) · bare {shape} rejected"})
 
-    # JQ-COMPILE · output: bindings + nika:jq expression + nika:fetch jq arg
+    # JQ-COMPILE · extract: bindings + nika:jq expression + nika:fetch jq arg
     jq_exprs: list[tuple[str, str]] = []
     for tid, t in tasks:
-        out = t.get("output")
+        out = t.get("extract")
         if isinstance(out, dict):
             for name, expr in out.items():
                 if isinstance(expr, str) and _is_static(expr):
-                    jq_exprs.append((f"task '{tid}' output.{name}", expr))
+                    jq_exprs.append((f"task '{tid}' extract.{name}", expr))
         inv = t.get("invoke")
         if isinstance(inv, dict):
             args = _as_dict(inv.get("args"))
@@ -1135,15 +1135,15 @@ def deep_static_errors(doc: dict) -> list[dict]:
         # same per-task check, there is no nested cleanup surface left.
         check_when(f"task '{tid}'", t.get("when"))
 
-    # OUTPUT-PURE · binding values are pure jq over the task's own raw output
+    # EXTRACT-PURE · binding values are pure jq over the task's own raw output
     for tid, t in tasks:
-        out = t.get("output")
+        out = t.get("extract")
         if isinstance(out, dict):
             for name, expr in out.items():
                 if isinstance(expr, str) and EXPR_BODY.search(expr):
                     errs.append({"namespace": "NIKA-VAR", "category": "validation_error",
-                                 "detail": f"task '{tid}' output.{name} · ${{{{ }}}} never "
-                                           "appears inside an output: binding · bindings are "
+                                 "detail": f"task '{tid}' extract.{name} · ${{{{ }}}} never "
+                                           "appears inside an extract: binding · bindings are "
                                            "pure jq over the task's own raw output · shape the "
                                            "verb's INPUT with ${{ }} instead (04 §binding rules)"})
 

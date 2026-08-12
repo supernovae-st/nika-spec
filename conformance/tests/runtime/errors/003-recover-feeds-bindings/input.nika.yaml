@@ -7,7 +7,7 @@ tasks:
   fetchish:
     on_error:
       recover: ${{ const.fallback }}
-    output:
+    extract:
       title: ".data.title"
     invoke:
       tool: "nika:assert"

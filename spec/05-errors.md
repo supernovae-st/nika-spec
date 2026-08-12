@@ -96,7 +96,7 @@ these from this file alone.
 | `NIKA-PARSE-010` | `timeout:` violates the quoted Go-duration contract (positive · max 24h · descending units) | `validation_error` | false |
 | `NIKA-PARSE-011` | `retry:` block violates the spec shape (§retry below) | `validation_error` | false |
 | `NIKA-PARSE-012` | `on_error:` block violates the spec shape (fields mutually exclusive) | `validation_error` | false |
-| `NIKA-PARSE-013` | `with:`/`output:` binding uses a reserved name (`output` · `status` · `error` · `started_at` · `ended_at` · `duration_ms`) | `validation_error` | false |
+| `NIKA-PARSE-013` | `with:`/`extract:` binding uses a reserved name (`output` · `status` · `error` · `started_at` · `ended_at` · `duration_ms`) | `validation_error` | false |
 | `NIKA-PARSE-014` | `secrets:` entry is not a store reference — inline literals forbidden ([01 §secrets](./01-envelope.md)) | `validation_error` | false |
 | `NIKA-PARSE-017` | duplicate mapping key — no silent last-wins | `validation_error` | false |
 | `NIKA-PARSE-018` | missing required field in a verb body (`infer.prompt` · `exec.command` · `invoke.tool`) | `validation_error` | false |
@@ -431,9 +431,9 @@ Resolution happens at **recovery time** ·
    `skipped`), the reference is unresolved → `NIKA-VAR-001` → the recovery
    itself fails → the task fails as if `on_error:` were absent.
 
-**Recovery × `output:` bindings (normative)** · when `recover:` fires, the
+**Recovery × `extract:` bindings (normative)** · when `recover:` fires, the
 recovery value **substitutes the raw output BEFORE binding extraction**:
-the task's `output:` jq bindings evaluate over the recovered value exactly
+the task's `extract:` jq bindings evaluate over the recovered value exactly
 as they would over a verb response. Downstream consumers stay shape-stable
 (`tasks.X.title` works whether the live call or the fallback produced the
 data), which is why a recovery source SHOULD match the raw output's shape.

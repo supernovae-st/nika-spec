@@ -95,7 +95,7 @@ args) · snake_case task ids · kebab-case `nika:` · every
 `${{ tasks.X }}` reference in `when:`/`with:`/`for_each:`/verb fields
 lives at the BOUNDARY: `with:` values (the binding IS the edge) · `after:`
 keys · `on_error.recover` · an `unwind` task (its producer only) · workflow
-`outputs:` (the ONLY other exemptions · `output:` is pure jq
+`outputs:` (the ONLY other exemptions · `extract:` is pure jq
 — `${{ }}` never appears there at all — and `on_error.recover:` / an
 `unwind` body read recovery/producer state · 03 §carve-out) · `invoke`
 arguments live under `args:` (not `input:` / `params:`) · quote any

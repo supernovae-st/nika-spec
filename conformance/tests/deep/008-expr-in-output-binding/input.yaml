@@ -4,5 +4,5 @@ const:
 tasks:
   fetch:
     invoke: { tool: "nika:fetch", args: { url: "https://api.example.com/data" } }
-    output:
+    extract:
       value: ".items[0].${{ const.key }}"

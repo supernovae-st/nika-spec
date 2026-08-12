@@ -15,7 +15,7 @@ tasks:
       args:
         input: ${{ const.data }}
         expression: "."
-    output:
+    extract:
       status: ".value"
 
   write_result:

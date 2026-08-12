@@ -56,7 +56,7 @@ An engine claims « Core v0.1-compliant » if it ·
    - `${{ tasks.X.field }}` resolves to a declared upstream task + a valid field name
    - `${{ secrets.X }}` resolves to a declared `secrets:` entry
    - `when:` and `for_each:` expressions are valid **CEL** (the v0.1 subset · see 03-dag) and their references **resolve to known namespaces**: Core parses but does NOT *evaluate* them (no execution = no `tasks.X.status` to compare against · that is Runtime's job)
-   - `output:` bindings are valid **jq** expressions (the one data language · see 04-variables) · `${{ }}` never appears inside a binding
+   - `extract:` bindings are valid **jq** expressions (the one data language · see 04-variables) · `${{ }}` never appears inside a binding
    - Reports undefined references with `NIKA-VAR-001` · static expression violations with `NIKA-VAR-005` (the deep-static layer · CEL subset parse · jq compile · `when:` boolean shape)
 
 4. **Produces typed errors** matching the v0.1 spec

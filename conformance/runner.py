@@ -916,7 +916,7 @@ def cross_ref_errors(doc: dict) -> list[dict]:
     # `on_error.recover`, not workflow `outputs:` — the fold is an import,
     # and keeping it inside the existing boundary is why the boundary law
     # needed no widening to admit it.
-    _GROUP_OUTSIDE = BODY_FIELDS + ("after", "on_error", "output", "returns")
+    _GROUP_OUTSIDE = BODY_FIELDS + ("after", "on_error", "extract", "returns")
     for tid, t in tasks:
         for field in _GROUP_OUTSIDE:
             for g in sorted(_expr_group_refs(t.get(field))):

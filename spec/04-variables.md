@@ -261,7 +261,7 @@ ${{ tasks.X.error }}                 typed error record · present iff status ==
 ${{ tasks.X.started_at }}            RFC 3339 start timestamp
 ${{ tasks.X.ended_at }}              RFC 3339 end timestamp
 ${{ tasks.X.duration_ms }}           execution time · integer milliseconds
-${{ tasks.X.<name> }}                a named output: binding (jq · see below)
+${{ tasks.X.<name> }}                a named extract: binding (jq · see below)
 ```
 
 #### Defined-null reads (normative · the branch-join unlock)
@@ -395,17 +395,17 @@ masked references in `secrets`.
 
 ---
 
-## Output binding · `output:`
+## Extraction bindings · `extract:`
 
-Use `output:` to define **named bindings** extracted from a task's raw response via a **jq expression** (the one data language). These bindings appear in the task's typed output and are referenced as `${{ tasks.X.<name> }}` ·
+Use `extract:` to define **named bindings** extracted from a task's raw response via a **jq expression** (the one data language). These bindings appear in the task's typed output and are referenced as `${{ tasks.X.<name> }}` ·
 
 ```yaml
 api_call:
     invoke:
       tool: "nika:fetch"
       args:
-        url: "https://api.example.com/v1/users"   # returns JSON · output: jq extracts
-    output:
+        url: "https://api.example.com/v1/users"   # returns JSON · extract: jq extracts
+    extract:
       user_count: ".data.users | length"
       first_user: ".data.users[0]"
       user_emails: "[.data.users[].email]"   # [...] collects the stream into an array
@@ -426,7 +426,7 @@ notify:
 
 #### Raw output vs named bindings · dual-accessible
 
-When a task has an `output:` block defining named bindings · downstream
+When a task has an `extract:` block defining named bindings · downstream
 access is **dual-accessible** ·
 
 ```yaml
@@ -434,7 +434,7 @@ api_call:
     invoke:
       tool: nika:fetch
       args: { url: "..." }
-    output:
+    extract:
       body: .body
       http_status: .status     # NOT `status:` — that name is reserved (the task's own .status)
 ```
@@ -446,7 +446,7 @@ reference boundary) ·
 # Raw output (whole structure · pre-binding extraction)
 ${{ tasks.api_call.output }}             # full raw JSON · including all fields the verb returned
 
-# Named bindings (defined in output: block above) · value-role fields
+# Named bindings (defined in extract: block above) · value-role fields
 ${{ tasks.api_call.body }}               # jq .body  · the response body
 ${{ tasks.api_call.http_status }}        # jq .status · the HTTP status field
 ${{ tasks.api_call.status }}             # RESERVED · the task's own status (success|failure|…) · NOT a binding · terminal-observation role
@@ -455,14 +455,14 @@ ${{ tasks.api_call.status }}             # RESERVED · the task's own status (su
 **Rules** ·
 - `tasks.X.output` ALWAYS returns the raw output (unmodified value
   returned by the verb · before any binding extraction)
-- `tasks.X.<name>` for any `<name>` declared in `output:` block returns
+- `tasks.X.<name>` for any `<name>` declared in `extract:` block returns
   the extracted jq result
 - `<name>` collisions with reserved words `output` · `status` · `error` ·
   `started_at` · `ended_at` · `duration_ms` are forbidden at parse time
   (`NIKA-PARSE` · `validation_error`: the rule is structural · schema-checkable
   via `propertyNames` · `NIKA-VAR-NNN` stays reserved for reference *resolution*
   and binding *evaluation* errors)
-- If no `output:` block · only `tasks.X.output` is accessible (named
+- If no `extract:` block · only `tasks.X.output` is accessible (named
   bindings are an opt-in convenience)
 
 ### Path grammar · jq (the one data language)
@@ -473,7 +473,7 @@ RFC 9535 JSONPath was dropped because jq is a superset (any JSONPath query + mor
 and a workflow language must not force the author (or an LLM) to choose between
 two extraction syntaxes (SOTA « one obvious way · ≤2 expression layers »). The two
 expression layers are **CEL** (inside `${{ }}` · conditions + value substitution)
-and **jq** (inside `output:` bindings + `nika:jq` · extraction + transform).
+and **jq** (inside `extract:` bindings + `nika:jq` · extraction + transform).
 Reference engines use `jaq` (Rust jq) so paths behave identically everywhere.
 
 v0.1 jq conformance subset (every engine MUST support) ·
@@ -489,7 +489,7 @@ v0.1 jq conformance subset (every engine MUST support) ·
 The subset above is the portability floor every engine MUST support. Full jq
 (the `jaq` Rust impl · « full stdlib ») MAY be used **minus what the next
 section refuses** (D-2026-08-11-N26 · ambient reads and the wall clock): it is
-the single data extraction-and-transform language (`output:` bindings + the
+the single data extraction-and-transform language (`extract:` bindings + the
 `nika:jq` builtin). ⚠️ *Full-minus-a-prose-list is a floor, not a ceiling.* The
 ceiling is a named, versioned grammar — `jq-subset/0.1`, the sibling of
 [`cel-subset/0.1`](./03-dag.md) — which **does not exist yet**
@@ -499,7 +499,7 @@ and a boundary written in prose is weaker than one written in EBNF.
 ##### Formal grammar · jq v0.1 subset (normative · grammar version `jq-subset/0.1`)
 
 Prose + examples are not re-implementable; this EBNF is. A conformant engine
-parses exactly this grammar in an `output:` binding and in `nika:jq` (it is a
+parses exactly this grammar in an `extract:` binding and in `nika:jq` (it is a
 strict subset of jq: **any full jq parser accepts every expression below**) ·
 
 ```ebnf
@@ -665,17 +665,17 @@ hole; it does not close it.
   · take one with an index (`.users[0]`) or `first(…)`. One obvious way · no
   silent first-match, no implicit array-wrap.
 
-#### `output:` or `nika:jq` · the choice, decided (normative for linters · 2026-08-11)
+#### `extract:` or `nika:jq` · the choice, decided (normative for linters · 2026-08-11)
 
 | Rule | Instead of | Write |
 |---|---|---|
-| `one-obvious-way/013` | `invoke: {tool: nika:jq}` reshaping **one** producer's output | an `output:` binding on that producer |
+| `one-obvious-way/013` | `invoke: {tool: nika:jq}` reshaping **one** producer's output | an `extract:` binding on that producer |
 
 **They are the same jq over the same value, and until now nothing said which
 to reach for** — the only genuine unguarded overlap left in the language. The
 rule follows from what each one IS, not from taste ·
 
-- An `output:` binding is **boundary work**: it costs no task, no wave and no
+- An `extract:` binding is **boundary work**: it costs no task, no wave and no
   node in the graph, it runs per iteration inside a `for_each`, and it carries
   a normative cardinality law (exactly one value · `NIKA-VAR-002`).
 - `nika:jq` is **a task**: it has an id, a place in the DAG, its own gate and
@@ -687,7 +687,7 @@ rule follows from what each one IS, not from taste ·
 builtin stays because the many-input case is real and inexpressible otherwise;
 the binding wins the single-input case because a whole task node to rename a
 field is a node the graph did not need.
-- **An `output:` jq expression is pure jq over the task's raw output**: it does
+- **An `extract:` jq expression is pure jq over the task's raw output**: it does
   NOT contain `${{ }}` (the two expression layers never nest in one string ·
   CEL reads the namespaces · jq reads the task output). To parametrize an
   extraction by a workflow value, shape the verb's *input* with `${{ }}` ·
@@ -719,7 +719,7 @@ as **compact JSON** · deterministic (object keys sorted · no insignificant
 whitespace). Scalars render as their natural string (numbers · booleans ·
 `null` → `null`). There are **no template pipe-filters** (`${{ x | json }}` is
 NOT a thing · per the §locked substitution surface). To control the rendering,
-extract a string with jq in `output:` (`@json` for JSON text · `tostring` /
+extract a string with jq in `extract:` (`@json` for JSON text · `tostring` /
 `@text` for scalar coercion) and reference that binding. One obvious way ·
 implicit compact-JSON by default · explicit jq when you need a specific shape.
 
@@ -779,7 +779,7 @@ Reasons ·
 
 ## Forward-compat
 
-The `${{ ... }}` substitution surface and the <!-- canon:namespaces -->5<!-- /canon --> namespaces are locked at v1. **Template pipe-filters (`${{ inputs.x | json }}` · `| upper`) are NOT a growth path** (they would duplicate builtins + push CEL toward a string-DSL). Data transforms live in the `nika:jq` builtin; the `${{ }}` surface grows only with CEL-native features: the conditional `?:`, the `has()` presence macro, and the `contains`/`startsWith`/`endsWith` string tests ship in `cel-subset/0.1` ([03 §grammar](./03-dag.md)); `all`/`exists` and `matches()` regex stay reserved for a later additive minor. jq is the single extraction-and-transform language (`output:` + `nika:jq`).
+The `${{ ... }}` substitution surface and the <!-- canon:namespaces -->5<!-- /canon --> namespaces are locked at v1. **Template pipe-filters (`${{ inputs.x | json }}` · `| upper`) are NOT a growth path** (they would duplicate builtins + push CEL toward a string-DSL). Data transforms live in the `nika:jq` builtin; the `${{ }}` surface grows only with CEL-native features: the conditional `?:`, the `has()` presence macro, and the `contains`/`startsWith`/`endsWith` string tests ship in `cel-subset/0.1` ([03 §grammar](./03-dag.md)); `all`/`exists` and `matches()` regex stay reserved for a later additive minor. jq is the single extraction-and-transform language (`extract:` + `nika:jq`).
 
 Out of scope for v0.1 (deferred · see [`08-out-of-scope.md`](./08-out-of-scope.md)) ·
 - Expression language (no arithmetic in templates)

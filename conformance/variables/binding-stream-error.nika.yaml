@@ -4,6 +4,6 @@ nika: jq-binding-stream
 tasks:
   t:
     invoke: { tool: nika:jq, args: { input: { users: [{"email":"a@x"},{"email":"b@x"}] }, expression: "." } }
-    output:
+    extract:
       emails: ".users[].email"
 outputs: { r: "${{ tasks.t.emails }}" }

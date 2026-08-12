@@ -4,6 +4,6 @@ nika: jq-binding-badsyntax
 tasks:
   t:
     invoke: { tool: nika:jq, args: { input: { a: 1 }, expression: "." } }
-    output:
+    extract:
       x: ".a |"
 outputs: { r: "${{ tasks.t.x }}" }

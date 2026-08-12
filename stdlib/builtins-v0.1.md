@@ -199,7 +199,7 @@ sorted by `(path, line)`. `pattern:` is a **Rust-regex-class** expression
 ```yaml
 invoke: { tool: "nika:jq", args: { expression: ".items | map(.price) | add", input: "${{ tasks.X.output }}" } }
 ```
-Run a jq expression. **The single data-transform-and-extraction language**: map · filter · select · group_by · reshape · string-interpolation `"\(.x)"` · `@base64`/`@base64d` encoders (the embedded jaq has NO `@csv`/`@tsv` — use `nika:convert to: csv`) · array `flatten` · `leaf_paths`/`getpath`/`setpath`. The same jq used in `output:` bindings (see `04-variables.md`).
+Run a jq expression. **The single data-transform-and-extraction language**: map · filter · select · group_by · reshape · string-interpolation `"\(.x)"` · `@base64`/`@base64d` encoders (the embedded jaq has NO `@csv`/`@tsv` — use `nika:convert to: csv`) · array `flatten` · `leaf_paths`/`getpath`/`setpath`. The same jq used in `extract:` bindings (see `04-variables.md`).
 
 **`input` is any JSON value**: a single ref (`input: "${{ tasks.X.output }}"`) OR a **constructed array for multi-input ops**. Recursive merge of two objects (this is exactly why `json_merge` is NOT a builtin · jaq's `*` does it) ·
 ```yaml

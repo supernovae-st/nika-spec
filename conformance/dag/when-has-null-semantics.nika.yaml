@@ -17,7 +17,7 @@ tasks:
     invoke:
       tool: nika:jq
       args: { input: { maybe: null }, expression: "." }
-    output:
+    extract:
       maybe: ".maybe"
 
   consumer_present:

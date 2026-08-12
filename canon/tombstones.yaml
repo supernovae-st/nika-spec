@@ -233,3 +233,19 @@ tombstones:
       pattern: "^types:"
       scope: spec
     notes: "Envelope nuke 2026-08-12. Les types NOMMES meurent, la sous-langue de types VIT entierement — elle se lit inline. Mesure : ZERO usage WORK · returns: accepte deja une expression de type inline (09-types.md le dit) · 14 returns: en tout sur 815 fichiers, donc aucune reutilisation a nommer. 14-composition.md ecrivait lui-meme que « proven » n'est pas un mot que ce contrat autorise encore : une enveloppe qui porte l'infrastructure d'une fonctionnalite non livree est la definition de « pas censee etre la ». Consequence de grammaire : un nom PascalCase en position de type ne resout plus rien et refuse NIKA-TYPE-001 en enseignant la forme inline ; la branche PascalCase sort du pattern de typeExpr au schema. NIKA-TYPE-002 (le graphe types: doit etre acyclique) est RETIRE — la classe n'a plus d'objet. RESTE documente : le noeud interne {ref: Name} de l'algebre de types (conformance/type_core.py) survit INATTEIGNABLE — parse_type ne le construit qu'avec un environnement de noms non vide, et le seul appelant passe set(). Le retirer changerait la signature publique que le corpus de types partage avec le juge differentiel de l'engine (contrat cross-repo) : nomme ici, jamais efface en silence."
+  - id: task-output-field-spelling
+    status: retired
+    owner: spec
+    law_ids: ["LAW-GRAMMAR-0221"]
+    introduced_in: C0
+    kind: field
+    retired_in: C0
+    replaced_by: "grammar:task_extract_field"
+    census_pattern:
+      tool: grep
+      pattern: "^[[:space:]]+output:"
+      scope: .
+    final_census:
+      date: "2026-08-12"
+      count: 0
+    notes: "D-2026-08-11-N67 · execute 2026-08-12 (leg spec-repo). R4 verbatim : « Task `output:` -> **`extract:`** (le misnomer meurt · la paire singulier/pluriel meurt) ». Le mot MENTAIT, mesure deux fois au binaire 0.108.0 : (a) `output: { output: \".\" }` REFUSE (NIKA-PARSE-013 · le bloc interdisait son PROPRE nom) · (b) `tasks.X.output` restait BRUT quand `output:` etait declare, donc le champ nomme `output:` N ECRIVAIT PAS `output`. Rayon MESURE ici (jamais repris de l estimation) : 17 fichiers workflow + 6 fences spec + 1 propriete schema + 5 sites oracle ; l estimation anterieure « 12 in this repo » (spec/03-dag.md) etait BASSE et est corrigee dans la meme passe. Codemod cle-a-cle par POSITION DE PARSE (jamais une heuristique d indentation) : 17/17 edites, 0 stop. Ce qui NE bouge PAS et a ete classe avant la premiere edition : `outputs:` (cle d ENVELOPPE) · `tasks.X.output` (l ACCESSEUR · le record survit, R8 point 11 « le quartet intact ») · le mot anglais en prose · proofs/mutation-kill/** (arbres de preuve FIGES · 0 occurrence du champ verifiee). La liste reservee (output · status · error · started_at · ended_at · duration_ms) SURVIT telle quelle : `extract: { output: \".\" }` reste REFUSE, verifie au juge apres migration — sa mort appartient a LAW-SURFACE-0221 (l arbre disjoint tasks.X.out.<name>), jamais a ce rename. Faux positif documente du pattern : une TACHE nommee `output` matcherait (aucune au pin · les taches nommees `extract` existent deja et sont un AUTRE espace de noms, jamais une collision de champ). Le pattern est ANCRE et le scope est le depot ENTIER, pas un sous-arbre : une moitie de surface achete un vert. LEGS DUS, jamais revendiques ici : parser engine (0.108.0 refuse `extract:` avec NIKA-PARSE-005 · MESURE) · VS Code · website · et le champ graph-node `outputs` qui porte les noms de bindings, dont le rename exige un BUMP graph_format 3->4 (contrat de fil consomme par CLI/LSP/MCP) et n a pas ete fait ici."

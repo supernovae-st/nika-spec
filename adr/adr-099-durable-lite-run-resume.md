@@ -89,7 +89,7 @@ store, no new artifact, no daemon.
 A task is skippable iff the trace holds a `task.completed` record whose
 
 - **task-definition hash** — a canonical serialization of the task's
-  behavior-bearing fields (the verb body · `with:` · `output:` ·
+  behavior-bearing fields (the verb body · `with:` · `extract:` ·
   `retry:` / `on_error:` / `on_finally:` · `when:` · `for_each:`) —
   matches the task as now written, AND
 - **resolved-input hash** — the values its `${{ }}` references resolved

@@ -321,7 +321,7 @@ CONSTRUCTS = [
     ("on_error",      "fallback recovery",                 "/reference/error-codes"),
     ("with",          "the data boundary · bindings ARE edges", "/concepts/bindings"),
     ("after",         "state-predicate control edges",     "/concepts/workflows"),
-    ("output",        "jq output bindings",                "/concepts/bindings"),
+    ("extract",       "jq extraction bindings",            "/concepts/bindings"),
     ("schema",        "typed (structured) output",         "/concepts/verbs"),
     ("thinking",      "extended thinking budget",          "/concepts/verbs"),
     ("secrets",       "vault-backed secrets",              "/reference/yaml-syntax"),
@@ -350,7 +350,7 @@ def _constructs_of(lean_text: str) -> set[str]:
             found.add("typed_vars")
     for tid, t in tasks:
         for k in ("for_each", "when", "retry",
-                  "timeout", "on_error", "with", "output"):
+                  "timeout", "on_error", "with", "extract"):
             if k in t:
                 found.add(k)
         # max_parallel / fail_fast are sub-fields of the for_each block
