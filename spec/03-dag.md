@@ -68,7 +68,9 @@ my_task:                        # the map KEY is the identity · snake_case · u
   timeout: "60s"                # optional · task-level timeout (Go duration string)
   infer:                        # required · one of the 4 verbs
     prompt: "... ${{ with.data }} ..."
-  returns: Summary              # optional · the OUTPUT CONTRACT (a named type or inline · 09-types.md)
+  returns:                      # optional · the OUTPUT CONTRACT · the type expression, INLINE (09-types.md)
+    object:
+      summary: string
   output:                       # optional · named jq bindings
     result: ".choices[0].message.content"
     tokens: ".usage.total_tokens"

@@ -158,7 +158,10 @@ tasks:
       args:
         bundle: "./decisions/pr-triage.bundle.json"   # path or inline object
         evidence: "${{ tasks.collect.output }}"       # the snapshot items
-    returns: DecisionResult   # the receipt shape · typed via 09-types
+    returns:                  # the receipt shape · the type expression, INLINE (09-types)
+      object:
+        decision: string
+        rationale: string
 ```
 
 - The builtin is **pure compute**: zero required effects (the bundle
