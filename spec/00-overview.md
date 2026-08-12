@@ -185,6 +185,41 @@ The following are **deferred** to stdlib v0.x or beyond ·
 
 See [`08-out-of-scope.md`](./08-out-of-scope.md) for the explicit list.
 
+## What supervises a run — *and what does not*
+
+Nika is a **local process**, and this is a claim about its limits, not a
+feature list.
+
+Restate states the constraint that applies here better than a
+self-assessment would: *"A library cannot supervise itself. It dies
+together with the process… the component that guarantees a process runs
+to completion has to see the whole process — it cannot live inside the
+thing whose lifetime it is guaranteeing."* That reasoning reaches Nika.
+`nika run` is not a supervised workflow service; it is a program on your
+machine, and **the supervisor of a local CLI is whatever started it** —
+your shell, your CI job, your systemd unit.
+
+What Nika does guarantee is narrower and worth stating exactly. Every
+effect is recorded in a hash-chained trace as it happens, so a killed
+run leaves an **auditable prefix** rather than an unknown state, and
+`nika run --resume <trace>` continues from it.
+
+Resumption is keyed by **task identity**, never by position. A task is
+skipped only when its identity matches a journaled success — and that
+identity covers the task's content, so **an edited task or a changed
+input always re-runs**. Nothing in the journal is addressed by index, by
+ordinal, or by rank within a wave; a reader that indexes a trace
+positionally is non-conforming. The consequence is worth stating
+positively: replaying a trace against a file that has since been edited
+cannot silently re-associate a record with a task that is no longer the
+one that produced it. The edit is visible, and the work is redone.
+
+What Nika does **not** claim: that a run survives its own process being
+killed without a supervisor restarting it, that a crashed machine
+resumes on reboot by itself, or that any daemon is watching. Durable
+execution against those failures is a different architecture with a
+different operational cost, and v1 does not pretend to it.
+
 ---
 
 ## Frozen language envelope
