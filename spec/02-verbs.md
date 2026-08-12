@@ -485,7 +485,7 @@ Every candidate operation decomposes along **two orthogonal axes** ·
   the `invoke` model.
 - **WHEN it runs**: ordering. Edges (`with:` data · `after:` control) ·
   conditions (`when`) · iteration (`for_each`) · time-bounds (`timeout`) ·
-  recovery (`retry` · `on_error` · `on_finally`). Ordering never executes
+  recovery (`retry` · `on_error` · an `unwind` task). Ordering never executes
   anything: it is DAG-side, or host-side when it concerns *starting* a run
   at all.
 

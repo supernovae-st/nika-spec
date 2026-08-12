@@ -7,7 +7,7 @@
 #   sealed outcome_class enum) · the 15 ledger sections (canon/EXCEPTIONS.md ·
 #   SSOT-1 §18) stay AUTHORED and are carried verbatim — editing those is legal.
 # regenerate: python3 scripts/ssot-compiler.py --emit-canon
-# body-sha256: 5829d0a0eb9b99c967ad420bfe7c007217c491270a71be7f954c39d142d916ae
+# body-sha256: 8a2df326bc2d107653d7f773c9a614861cccdd5ca8c5cbbda9295b7889f941be
 #   (digest of every byte below the end-of-header line · detached self-hash per PAA-006)
 # ---- end generated header (SSOT-1 §21-23 · the canon flip · C0)
 # nika canonical registry · the single source of truth for Nika canonical facts
@@ -363,7 +363,7 @@ error_codes:
     - { code: NIKA-VAR-007, category: variable_error, transient: "false", failure: "bytes value substituted into a string position" }
     - { code: NIKA-VAR-008, category: validation_error, transient: "false", failure: "unclosed ${{ opener" }
     - { code: NIKA-VAR-020, category: validation_error, transient: "false", failure: "bare tasks.X is the envelope, not a value — the projection set (.output/.status/.error/.duration_ms) is closed and required (04 §namespaces · 0.103 · #75 D2)" }
-    - { code: NIKA-VAR-021, category: validation_error, transient: "false", failure: "a tasks.* reference outside the boundary (with: · after: · on_error.recover · on_finally parent-only · workflow outputs) — hoist it into with: (check --fix applies it)" }
+    - { code: NIKA-VAR-021, category: validation_error, transient: "false", failure: "a tasks.* reference outside the boundary (with: · after: · on_error.recover · an unwind task reading its producer · workflow outputs) — hoist it into with: (check --fix applies it)" }
     - { code: NIKA-VAR-009, category: validation_error, transient: "false", failure: "typed outputs value did not match its declared type: at run end (the output half of the callable contract)" }
     - { code: NIKA-INFER-001, category: provider_error, transient: "engine-assessed", failure: "provider call failed (HTTP error · provider refusal)" }
     - { code: NIKA-INFER-002, category: validation_error, transient: "false", failure: "structured output failed schema validation (after any engine-internal retries)" }

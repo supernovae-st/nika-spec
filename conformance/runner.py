@@ -86,10 +86,13 @@ CEL_BUILTINS = {"true", "false", "null", "in", "size"}  # v0.1 CEL subset · 03-
 LOOP_LOCALS = {"item", "index"}  # for_each-scoped locals · 04-variables.md §namespaces
 # Body fields where a `tasks.X` ref is OUTSIDE the boundary (NIKA-VAR-021 ·
 # 04 §the reference boundary) · with:/after: are the edge doors · on_error.
-# recover reads a fallback source · on_finally reads its PARENT only ·
+# recover reads a fallback source · an `unwind` task reads its PRODUCER only ·
 # workflow outputs: read the settled world.
 BODY_FIELDS = ("when", "for_each", "infer", "exec", "invoke", "agent")
-AFTER_PREDICATES = {"success", "failure", "skipped", "terminal"}
+# `unwind` is the E_f cleanup attachment, NOT a settle-state comparison: it
+# is a legal after: predicate but carries no pass-set (see _AFTER_PASS) and
+# never enters G_p (03 §unwind · "the rest of the contract").
+AFTER_PREDICATES = {"success", "failure", "skipped", "terminal", "unwind"}
 
 
 
@@ -671,6 +674,13 @@ def cross_ref_errors(doc: dict) -> list[dict]:
         raw = t.get("after")
         return raw if isinstance(raw, dict) else {}
 
+    # The producers this task UNWINDS · an E_f attachment, never an E_c edge.
+    # 03 §unwind · "never in G_p: unwind edges do not schedule, do not
+    # participate in cycle detection, and do not enter wave assignment".
+    def _unwinds(t: dict) -> set[str]:
+        return {k for k, v in _after(t).items()
+                if isinstance(k, str) and v == "unwind"}
+
     # NIKA-DAG-005 · after: predicate outside the closed set
     # NIKA-DAG-002 · after: references an undeclared task
     for tid, t in tasks:
@@ -683,7 +693,8 @@ def cross_ref_errors(doc: dict) -> list[dict]:
             if not (isinstance(pred, str) and pred in AFTER_PREDICATES):
                 errs.append({"code": "NIKA-DAG-005", "category": "validation_error",
                              "detail": f"task '{tid}' after.{target}: {pred!r} ∉ "
-                                       "{success · failure · skipped · terminal}"})
+                                       "{success · failure · skipped · terminal · "
+                                       "unwind}"})
 
     # NIKA-DAG-002 · a with: binding references an undeclared task (the
     # binding IS an edge · an edge to nowhere is a DAG error, not a VAR one)
@@ -693,10 +704,14 @@ def cross_ref_errors(doc: dict) -> list[dict]:
                 errs.append({"code": "NIKA-DAG-002", "category": "validation_error",
                              "detail": f"task '{tid}' with: references undeclared '{r}'"})
 
-    # NIKA-DAG-001 · cycle in G_p = E_d(with) ∪ E_c(after) (DFS)
+    # NIKA-DAG-001 · cycle in G_p = E_d(with) ∪ E_c(after) (DFS).
+    # E_f (`after: {x: unwind}`) is EXCLUDED · cleanup attaches to a settled
+    # producer and never schedules, so it cannot close a precedence cycle.
     graph = {
         tid: sorted((_expr_task_refs(t.get("with")) & idset)
-                    | {k for k in _after(t) if isinstance(k, str) and k in idset})
+                    | {k for k in _after(t)
+                       if isinstance(k, str) and k in idset
+                       and k not in _unwinds(t)})
         for tid, t in tasks
     }
     WHITE, GREY, BLACK = 0, 1, 2
@@ -738,24 +753,32 @@ def cross_ref_errors(doc: dict) -> list[dict]:
 
     # NIKA-VAR-021 · a tasks.* reference outside the boundary (04 §the
     # reference boundary) · body fields read LOCAL names only — hoist into
-    # with: (the machine-applicable fix) · on_finally reads its PARENT only
+    # with: (the machine-applicable fix).
+    # An `unwind` task reads its PRODUCER directly — settled by definition
+    # when the cleanup runs (03 §unwind · "what it may read"). Every OTHER
+    # task is still VAR-021: a sibling may be RUNNING, so the read would race.
     for tid, t in tasks:
+        readable = _unwinds(t)
         for field in BODY_FIELDS:
-            for r in sorted(_expr_task_refs(t.get(field))):
+            for r in sorted(_expr_task_refs(t.get(field)) - readable):
+                detail = (f"task '{tid}' {field}: references tasks.{r} — "
+                          "outside the boundary · hoist it into with: "
+                          "and read ${{ with.<name> }}")
+                if readable:
+                    detail = (f"task '{tid}' {field}: references tasks.{r} — "
+                              f"an unwind task reads only the producer it "
+                              f"unwinds ({' · '.join(sorted(readable))}) · a "
+                              "sibling may still be RUNNING (the read would race)")
                 errs.append({"code": "NIKA-VAR-021", "category": "validation_error",
-                             "detail": f"task '{tid}' {field}: references tasks.{r} — "
-                                       "outside the boundary · hoist it into with: "
-                                       "and read ${{ with.<name> }}"})
-        for r in sorted(_expr_task_refs(t.get("on_finally")) - {tid}):
-            errs.append({"code": "NIKA-VAR-021", "category": "validation_error",
-                         "detail": f"task '{tid}' on_finally references tasks.{r} — "
-                                   "the parent is the only readable task inside a "
-                                   "cleanup (a sibling read would race)"})
+                             "detail": detail})
 
     # NIKA-VAR-005 · for_each is a PRE-fan-out surface: a with-binding it
     # reads must not itself reference item/index (circular · 03 §for_each)
     for tid, t in tasks:
-        fe = t.get("for_each")
+        fe_block = t.get("for_each")
+        # for_each is a BLOCK · the collection lives at .items (03 §for_each).
+        # Reading the block itself here would silently stop this check.
+        fe = fe_block.get("items") if isinstance(fe_block, dict) else None
         if not isinstance(fe, str):
             continue
         with_block = t.get("with") if isinstance(t.get("with"), dict) else {}

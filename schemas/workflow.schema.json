@@ -520,9 +520,10 @@
                 "success",
                 "failure",
                 "skipped",
-                "terminal"
+                "terminal",
+                "unwind"
               ],
-              "description": "The producer states that admit this task · terminal = any settled state INCLUDING cancelled (spec/03-dag.md §gate algebra v2)."
+              "description": "The producer states that admit this task · terminal = any settled state INCLUDING cancelled (spec/03-dag.md §gate algebra v2). `unwind` is NOT a settle-state comparison · it is the E_f cleanup attachment (spec/03-dag.md §unwind) · it fires on cancel and timeout for a producer that STARTED, runs before the failure settles outward, never enters G_p, and its own failure does not propagate."
             }
           }
         },
@@ -541,20 +542,30 @@
           "description": "LOCAL business condition · false skips the task · evaluated POST-gate over {vars · env · with · item · index}. Referring to `tasks.*` is illegal here (NIKA-VAR-021 · hoist it into `with:`) · spec/03-dag.md §when."
         },
         "for_each": {
-          "description": "Map this task over a collection · `${{ ... }}` reference OR a literal array.",
-          "type": [
-            "string",
-            "array"
-          ]
-        },
-        "max_parallel": {
-          "type": "integer",
-          "minimum": 1,
-          "description": "Cap concurrent for_each iterations · default unbounded · 1 = sequential."
-        },
-        "fail_fast": {
-          "type": "boolean",
-          "description": "Whether a `for_each` fan-out abandons the batch on the first failure · default true. False finishes every item and yields null at a failed index, so the batch reports what it could."
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "items"
+          ],
+          "description": "Fan this task out over a collection · ONE block, so the concurrency is visible where the fan-out is declared. `max_parallel` and `fail_fast` live here because they have no meaning without it.",
+          "properties": {
+            "items": {
+              "type": [
+                "string",
+                "array"
+              ],
+              "description": "The collection · a `${{ ... }}` reference OR a literal array. Evaluated EXACTLY ONCE, before the fan-out; no iteration feeds back into it (spec 03 §where this sits)."
+            },
+            "max_parallel": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Cap concurrent iterations · default unbounded · 1 = sequential."
+            },
+            "fail_fast": {
+              "type": "boolean",
+              "description": "Whether the fan-out abandons the batch on the first failure · default true. False finishes every item and yields null at a failed index, so the batch reports what it could."
+            }
+          }
         },
         "retry": {
           "description": "Retry policy for this task · `{ max_attempts, backoff_ms, backoff_strategy, backoff_max_ms, jitter, on_codes }`. Retries run BEFORE `on_error` sees anything — the catch handles the last error only (spec/05-errors.md §Retry policy).",
@@ -567,13 +578,6 @@
           "type": "string",
           "pattern": "^[0-9]+(\\.[0-9]+)?(ns|us|µs|ms|s|m|h)([0-9]+(\\.[0-9]+)?(ns|us|µs|ms|s|m|h))*$",
           "description": "Go-duration string · quoted · e.g. \"30s\" \"5m\" \"1h30m\" \"2.5s\". Max 24h."
-        },
-        "on_finally": {
-          "type": "array",
-          "description": "Cleanup mini-tasks · ALWAYS run (success/fail/timeout/cancel) · sequential · best-effort.",
-          "items": {
-            "$ref": "#/$defs/finallyStep"
-          }
         },
         "with": {
           "type": "object",
@@ -1021,63 +1025,6 @@
         {
           "required": [
             "skip"
-          ]
-        }
-      ]
-    },
-    "finallyStep": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "when": {
-          "oneOf": [
-            {
-              "type": "boolean",
-              "description": "YAML boolean literal."
-            },
-            {
-              "type": "string",
-              "format": "cel-expression",
-              "description": "A ${{ }} CEL boolean expression (cel-subset/0.1 · spec/03-dag.md). Statically non-boolean-shaped roots are rejected (NIKA-VAR-005)."
-            }
-          ],
-          "description": "Cleanup condition · may read the PARENT task's record (tasks.<parent>.status / .error — the only legal tasks.* target inside on_finally · spec/03-dag.md §on_finally)."
-        },
-        "timeout": {
-          "type": "string"
-        },
-        "infer": {
-          "$ref": "#/$defs/infer"
-        },
-        "exec": {
-          "$ref": "#/$defs/exec"
-        },
-        "invoke": {
-          "$ref": "#/$defs/invoke"
-        },
-        "agent": {
-          "$ref": "#/$defs/agent"
-        }
-      },
-      "oneOf": [
-        {
-          "required": [
-            "infer"
-          ]
-        },
-        {
-          "required": [
-            "exec"
-          ]
-        },
-        {
-          "required": [
-            "invoke"
-          ]
-        },
-        {
-          "required": [
-            "agent"
           ]
         }
       ]

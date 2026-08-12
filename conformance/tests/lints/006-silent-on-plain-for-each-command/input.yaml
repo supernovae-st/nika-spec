@@ -4,6 +4,7 @@ workflow:
   id: f006ok
 tasks:
   shards:
-    for_each: [1, 2, 3]
+    for_each:
+      items: [1, 2, 3]
     timeout: 30s
     exec: { command: ["./process.sh"] }

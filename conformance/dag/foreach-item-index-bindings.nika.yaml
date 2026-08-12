@@ -13,7 +13,8 @@ permits:
 
 tasks:
   loop:
-    for_each: ${{ const.items }}
+    for_each:
+      items: ${{ const.items }}
     with:
       name: ${{ item }}
       i: ${{ index }}

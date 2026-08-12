@@ -35,13 +35,13 @@ multi-agent swarm without ever leaving validated ground.
 | [`csv-chart-report`](csv-chart-report.nika.yaml) | data → picture | paste the spreadsheet, get the slide — offline, deterministic | `nika:convert` · jq group_by · `nika:chart` |
 | [`transcript-shownotes`](transcript-shownotes.nika.yaml) | podcasts / meetings | raw transcript → typed show-notes, ONE bounded infer | `infer.schema:` strict · typed→markdown |
 | [`bookmark-triage`](bookmark-triage.nika.yaml) | personal / research | the bookmark pile triaged — dead links survive the batch | `mode: metadata` · resilient `for_each` · recover |
-| [`competitor-radar`](competitor-radar.nika.yaml) | strategy / PMM | everything they shipped last week, one brief | `for_each` · `max_parallel` · retry · fan-in |
+| [`competitor-radar`](competitor-radar.nika.yaml) | strategy / PMM | everything they shipped last week, one brief | `for_each` · `for_each.max_parallel` · retry · fan-in |
 | [`localization-factory`](localization-factory.nika.yaml) | product / i18n | the whole docs tree translated, voice intact | chained fan-outs · jq `transpose` zip |
 | [`config-drift-sentinel`](config-drift-sentinel.nika.yaml) | SRE / platform | only UNSANCTIONED prod drift wakes anyone | RFC 7396 merge + RFC 6902 diff · blake3 |
 | [`pr-review-fanout`](pr-review-fanout.nika.yaml) | engineering | one read-only review agent **per changed file** | `for_each`+`agent:` swarm · default-deny tools |
 | [`resume-screener`](resume-screener.nika.yaml) | HR / recruiting | one local-model rubric per candidate · PII stays home | `ollama/…` · `for_each` · schema enums · jq sort_by |
 | [`deep-research-brief`](deep-research-brief.nika.yaml) | research / VC | plan → budgeted agent → thinking synthesis | plan-then-execute · budgets · `thinking:` |
-| [`incident-war-room`](incident-war-room.nika.yaml) | SRE / on-call | the postmortem drafts itself — after recovery is PROVEN | `nika:wait` settle · assert · `on_finally:` |
+| [`incident-war-room`](incident-war-room.nika.yaml) | SRE / on-call | the postmortem drafts itself — after recovery is PROVEN | `nika:wait` settle · assert · `after: {…: terminal}` always-pattern |
 | [`ceo-monday-brief`](ceo-monday-brief.nika.yaml) | founders / execs | the Monday brief assembles itself — and the human decision sits at the ROOT of the lethal trifecta | 3-branch gather · root `nika:prompt` gate · capped synthesis |
 | [`release-train`](release-train.nika.yaml) | devops / release | gates → human GO → hold until the window → ship · verify | `nika:wait until:` · `nika:date diff` · `nika:prompt` |
 

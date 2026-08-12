@@ -6,7 +6,8 @@ const:
   source: "Hello world"
 tasks:
   translate:
-    for_each: ["fr", "de", "ja"]
+    for_each:
+      items: ["fr", "de", "ja"]
     with:
       locale: ${{ item }}
       n: ${{ index }}

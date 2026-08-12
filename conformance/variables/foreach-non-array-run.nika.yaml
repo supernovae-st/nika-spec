@@ -9,7 +9,8 @@ const:
   not_a_list: { a: 1, b: 2 }
 tasks:
   loop:
-    for_each: ${{ const.not_a_list }}
+    for_each:
+      items: ${{ const.not_a_list }}
     invoke:
       tool: nika:jq
       args: { input: "${{ item }}", expression: "." }

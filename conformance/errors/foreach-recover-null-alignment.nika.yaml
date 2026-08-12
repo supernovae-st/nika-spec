@@ -15,8 +15,9 @@ permits:
 
 tasks:
   loop:
-    for_each: ${{ const.items }}
-    max_parallel: 3
+    for_each:
+      items: ${{ const.items }}
+      max_parallel: 3
     with: { v: "${{ item }}" }
     on_error:
       recover: null

@@ -7,8 +7,9 @@ const:
   items: ["alpha", "BOOM", "gamma"]
 tasks:
   work:
-    for_each: ${{ const.items }}
-    fail_fast: false
+    for_each:
+      items: ${{ const.items }}
+      fail_fast: false
     on_error:
       recover: null
     invoke:

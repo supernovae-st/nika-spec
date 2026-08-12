@@ -11,5 +11,6 @@ tasks:
       data: "${{ tasks.a.output }}"
     exec: { command: ["./b.sh", "${{ with.data }}"] }
   shards:
-    for_each: [1, 2]
+    for_each:
+      items: [1, 2]
     exec: { command: ["timeout", "5", "./p.sh"] }

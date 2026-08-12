@@ -21,8 +21,9 @@ tasks:
         expression: "(.raw | split(\",\"))"
 
   process:
-    for_each: ${{ with.discover }}
-    max_parallel: 2
+    for_each:
+      items: ${{ with.discover }}
+      max_parallel: 2
     with:
       discover: ${{ tasks.discover.output }}
       tok: ${{ item }}

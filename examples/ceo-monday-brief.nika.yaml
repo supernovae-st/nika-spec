@@ -15,9 +15,9 @@
 #   - the root human gate · NEP-0002, and WHY it cannot sit anywhere else
 #   - `on_error: recover:` · the offline rehearsal for the untrusted leg
 #   - the always-pattern · `after: {save: terminal}`, so an armed ping fires on
-#     every settled outcome — landed, failed, or declined. It is a TASK and not
-#     an `on_finally:` hook because 03 §on_finally makes cleanup failures
-#     LOG-ONLY: an alert that cannot fail loudly is not an alert.
+#     every settled outcome — landed, failed, or declined. It rides `terminal`
+#     and not `unwind` because 03 §unwind makes cleanup failures LOG-ONLY:
+#     an alert that cannot fail loudly is not an alert.
 #
 # Needs · a git repo (the pulse reads YOUR week; anywhere else it recovers to a
 # labelled stand-in and the brief is told the pulse is missing). The KPI sheet
@@ -246,10 +246,10 @@ tasks:
   #
   # `after: {save: terminal}` admits all four settled states, so this fires
   # whether the brief landed, failed, or was skipped by a « no » at the gate.
-  # It is deliberately not an `on_finally:` hook: cleanup errors are LOGGED and
-  # DO NOT PROPAGATE (03 §on_finally · best-effort lane), so a webhook that
+  # It deliberately does not ride an `unwind` edge: cleanup errors are LOGGED
+  # and DO NOT PROPAGATE (03 §unwind · best-effort lane), so a webhook that
   # dies there dies in silence — measured: an unresolved secret in a cleanup
-  # hook leaves the run green with nothing sent. An alert you cannot trust to
+  # task leaves the run green with nothing sent. An alert you cannot trust to
   # fail loudly is not an alert.
   alert:
     after:

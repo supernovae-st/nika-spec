@@ -1100,9 +1100,8 @@ def deep_static_errors(doc: dict) -> list[dict]:
             args = _as_dict(inv.get("args"))
             check_duration(f"task '{tid}' wait.duration", args.get("duration"))
             check_duration(f"task '{tid}' wait.timeout", args.get("timeout"))
-        for step in (t.get("on_finally") or []):
-            if isinstance(step, dict):
-                check_duration(f"task '{tid}' on_finally.timeout", step.get("timeout"))
+        # cleanup is a TASK now (`after: {x: unwind}`), so its timeout: is
+        # covered by the per-task check above — no second surface to walk.
 
     # SCHEMA-META · every schema: must itself be a valid JSON Schema
     def check_schema(where: str, schema):
@@ -1135,10 +1134,9 @@ def deep_static_errors(doc: dict) -> list[dict]:
                                    "is never evaluated (03-dag §when: shape rules)"})
 
     for tid, t in tasks:
+        # cleanup is a TASK now (`after: {x: unwind}`) · its when: rides the
+        # same per-task check, there is no nested cleanup surface left.
         check_when(f"task '{tid}'", t.get("when"))
-        for i, step in enumerate(t.get("on_finally") or []):
-            if isinstance(step, dict):
-                check_when(f"task '{tid}' on_finally[{i}]", step.get("when"))
 
     # OUTPUT-PURE · binding values are pure jq over the task's own raw output
     for tid, t in tasks:

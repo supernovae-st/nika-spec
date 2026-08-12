@@ -13,7 +13,8 @@ tasks:
   process:
     with:
       fetch_items: ${{ tasks.fetch.output.items }}
-    for_each: "${{ with.fetch_items }}"
-    max_parallel: 4
+    for_each:
+      items: "${{ with.fetch_items }}"
+      max_parallel: 4
     timeout: 60s
     exec: { command: ["./process.sh"] }

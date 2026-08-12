@@ -138,9 +138,10 @@ tasks:
   reviews:
     with:
       files: ${{ tasks.files.output }}
-    for_each: ${{ with.files }}
-    max_parallel: 4                    # four reviewers in flight · not forty
-    fail_fast: false                   # one reviewer's bad day is not the swarm's
+    for_each:
+      items: ${{ with.files }}
+      max_parallel: 4                    # four reviewers in flight · not forty
+      fail_fast: false                   # one reviewer's bad day is not the swarm's
     on_error:
       recover: null                    # a budget-exhausted review yields null · filtered below
     agent:

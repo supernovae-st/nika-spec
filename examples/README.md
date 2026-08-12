@@ -18,11 +18,11 @@
 |---|---|---|
 | [`01-hello`](01-hello.nika.yaml) | the complete minimum | `nika: v1` · `workflow.id` · `model:` · `permits: {}` · `infer:` · `max_tokens:` · `outputs:` |
 | [`02-parallel-fanout`](02-parallel-fanout.nika.yaml) | the DAG | implicit parallelism · `const:` · `with:` value edges · `${{ tasks.<id>.output }}` |
-| [`03-exec-pipeline`](03-exec-pipeline.nika.yaml) | shells and gates | `exec:` (`shell:` + `command:`) · `capture: structured` · `timeout:` · `run.clock` · `when:` · `after:` control edges · `on_finally:` |
+| [`03-exec-pipeline`](03-exec-pipeline.nika.yaml) | shells and gates | `exec:` (`shell:` + `command:`) · `capture: structured` · `timeout:` · `run.clock` · `when:` · `after:` control edges · `after: {…: unwind}` cleanup |
 | [`04-schema-retry`](04-schema-retry.nika.yaml) | typed calls | typed `inputs:` + `default:` · `infer.schema:` · `additionalProperties: false` · `retry:` · the long `outputs:` form |
 | [`05-fetch-chain`](05-fetch-chain.nika.yaml) | reaching outside | `invoke:` · `nika:fetch` · `permits.tools` + `permits.net.http` · `output:` jq bindings · `on_error: recover:` |
 | [`06-code-review`](06-code-review.nika.yaml) | the agent loop | `agent:` · default-deny `tools:` · `max_turns:` + `max_tokens_total:` · `nika:done` · `permits.fs` inside the loop |
-| [`07-for-each-locales`](07-for-each-locales.nika.yaml) | mapping | `for_each:` · `${{ item }}` / `${{ index }}` · `max_parallel:` · `fail_fast:` · array-preserving recovery |
+| [`07-for-each-locales`](07-for-each-locales.nika.yaml) | mapping | `for_each:` · `${{ item }}` / `${{ index }}` · `for_each.max_parallel:` · `for_each.fail_fast:` · array-preserving recovery |
 | [`08-config-values`](08-config-values.nika.yaml) | the value authorities | `config:` — typed, defaulted, and unreachable from the caller (measured: `--var region=…` refuses) |
 | [`09-returns-typed-door`](09-returns-typed-door.nika.yaml) | typed task outputs | `returns:` — the declared shape deep references are proven against |
 | [`10-compose-pipeline`](10-compose-pipeline.nika.yaml) | composition · the caller | `workflow:` under `invoke:` — one workflow calls another, statically resolved |

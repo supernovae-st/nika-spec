@@ -272,6 +272,11 @@ them at length:
 | `on_finally:` | 1 |
 | the `failure` edge predicate | 1 |
 
+> **Spelling note (post-count)** · `on_finally:` has since left the language ·
+> cleanup is a task on an `unwind` edge ([03 §unwind](./spec/03-dag.md)). The
+> row keeps its 2026-07-29 name for the reason stated above — the count belongs
+> to that spelling. The construct it counts is today's `unwind`.
+
 Everything else is healthy: `invoke:` 37 · `infer:` 30 · `const:` 30 · `on_error:`
 23 · `when:` 16 · `schema:` 16 · `after:` 12 · `inputs:` 12 · `for_each` 8 ·
 `retry` 7 · `agent:` 4.

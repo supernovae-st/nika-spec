@@ -12,7 +12,8 @@ const:
     - "three"
 tasks:
   slow_iter:
-    for_each: ${{ const.items }}
+    for_each:
+      items: ${{ const.items }}
     timeout: "1s"
     fail_fast: false
     exec:

@@ -2,18 +2,19 @@
 nika: v1
 workflow:
   id: foreach-failfast-true
-# SPEC 03 §fail_fast default true: first iteration error aborts remaining iterations;
-# parent → failure immediately. max_parallel:1 (sequential, in order).
+# SPEC 03 §for_each.fail_fast default true: first iteration error aborts remaining iterations;
+# parent → failure immediately. for_each.max_parallel:1 (sequential, in order).
 # Per-iteration program chosen by CEL ternary (shell-free): the FAILHERE item runs
 # /usr/bin/false (exit 1, no marker); normal items run /usr/bin/touch (marker written).
-# fail_fast default(true): iterations after FAILHERE must NOT run.
+# for_each.fail_fast default(true): iterations after FAILHERE must NOT run.
 # Markers: 09_iter_a + 09_iter_b present; 09_iter_d ABSENT (aborted). exit!=0.
 const:
   items: { type: array, default: ["a", "b", "FAILHERE", "d"] }
 tasks:
   mapped:
-    for_each: ${{ const.items }}
-    max_parallel: 1
+    for_each:
+      items: ${{ const.items }}
+      max_parallel: 1
     exec:
       command:
         - "${{ item == 'FAILHERE' ? '/usr/bin/false' : '/usr/bin/touch' }}"

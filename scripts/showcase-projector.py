@@ -196,10 +196,11 @@ def _gloss(task: dict) -> str:
 
 def _flags(task: dict) -> list[str]:
     flags: list[str] = []
-    if "for_each" in task:
-        mp = task.get("max_parallel")
+    fe = task.get("for_each")
+    if isinstance(fe, dict):
+        mp = fe.get("max_parallel")
         flags.append(f"fan-out · ≤{mp} in flight" if mp else "fan-out")
-        if task.get("fail_fast") is False:
+        if fe.get("fail_fast") is False:
             flags.append("collects errors")
     if "when" in task:
         flags.append("conditional")
@@ -207,7 +208,7 @@ def _flags(task: dict) -> list[str]:
         flags.append("retry")
     if "timeout" in task:
         flags.append(f"timeout {task['timeout']}")
-    if "on_finally" in task:
+    if "unwind" in (task.get("after") or {}).values():
         flags.append("cleanup always runs")
     for verb in ("infer", "agent"):
         body = task.get(verb)
@@ -316,10 +317,10 @@ CONSTRUCTS = [
     ("for_each",      "fan-out over a collection",         "/concepts/workflows"),
     ("max_parallel",  "bounded concurrency",               "/concepts/workflows"),
     ("fail_fast",     "collect-errors batches",            "/concepts/workflows"),
+    ("unwind",        "cleanup that always runs",          "/concepts/workflows"),
     ("when",          "CEL conditional gate",              "/concepts/workflows"),
     ("retry",         "transient-error retry",             "/reference/error-codes"),
     ("timeout",       "task time-bound",                   "/concepts/workflows"),
-    ("on_finally",    "cleanup that always runs",          "/concepts/workflows"),
     ("on_error",      "fallback recovery",                 "/reference/error-codes"),
     ("with",          "the data boundary · bindings ARE edges", "/concepts/bindings"),
     ("after",         "state-predicate control edges",     "/concepts/workflows"),
@@ -351,10 +352,16 @@ def _constructs_of(lean_text: str) -> set[str]:
         if isinstance(v, dict) and "type" in v:
             found.add("typed_vars")
     for tid, t in tasks:
-        for k in ("for_each", "max_parallel", "fail_fast", "when", "retry",
-                  "timeout", "on_finally", "on_error", "with", "output"):
+        for k in ("for_each", "when", "retry",
+                  "timeout", "on_error", "with", "output"):
             if k in t:
                 found.add(k)
+        # max_parallel / fail_fast are sub-fields of the for_each block
+        for k in ("max_parallel", "fail_fast"):
+            if k in (t.get("for_each") or {}):
+                found.add(k)
+        if "unwind" in (t.get("after") or {}).values():
+            found.add("unwind")
         for verb in ("infer", "agent"):
             body = t.get(verb)
             if isinstance(body, dict):

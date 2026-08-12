@@ -44,10 +44,10 @@ How each one holds that promise:
 |---|---|---|
 | « take data, produce words, save them » | [`chain`](chain.nika.yaml) | deterministic gather · one model job · explicit persist |
 | « watch X, act when Y » | [`gate-and-act`](gate-and-act.nika.yaml) | jq extraction · CEL skip-gate · often zero model calls |
-| « do this for EVERY item » | [`fanout`](fanout.nika.yaml) | runtime collection · the full leash (max_parallel · fail_fast · retry) |
+| « do this for EVERY item » | [`fanout`](fanout.nika.yaml) | runtime collection · the full leash (`for_each.max_parallel` · `for_each.fail_fast` · retry) |
 | « only what changed since last run » / « survive bad input » | [`etl-state`](etl-state.nika.yaml) | state read→parse→diff→write · `on_error: on_codes:` quarantine |
 | « research / review / open-ended » | [`agent-loop`](agent-loop.nika.yaml) | plan-then-execute · default-deny tools · budgets · engine-owned typed result |
-| « anything irreversible (deploy · send · publish) » | [`human-gated-ship`](human-gated-ship.nika.yaml) | parallel gates · assert · `nika:prompt` GO · `on_finally` record |
+| « anything irreversible (deploy · send · publish) » | [`human-gated-ship`](human-gated-ship.nika.yaml) | parallel gates · assert · `nika:prompt` GO · `after: {…: terminal}` record |
 | « understand a site (domain · theme · assets) from a URL » | [`website-brief`](website-brief.nika.yaml) | fetch `traverse:` crawl · one typed infer · explicit persist · zero exec |
 | « generate image/audio assets from a brief » | [`media-asset-pack`](media-asset-pack.nika.yaml) | `nika:image_generate` · `nika:jq` manifest · local/mock provider first |
 | « call a product API: upload a file and create from it » | [`api-upload-and-create`](api-upload-and-create.nika.yaml) | fetch `multipart:` (file + text parts) · masked secrets header · mode/jq extraction |

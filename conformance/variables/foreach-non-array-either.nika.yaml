@@ -16,6 +16,7 @@ permits:
   exec: ["/usr/bin/touch"]
 tasks:
   mapped:
-    for_each: ${{ const.not_a_list }}
+    for_each:
+      items: ${{ const.not_a_list }}
     exec:
       command: ["/usr/bin/touch", "./out/ctrlflow/11_iter_${{ index }}.json"]

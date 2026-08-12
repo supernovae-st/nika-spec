@@ -77,7 +77,7 @@ Since W2 « the flow », the `tasks` namespace is **boundary-only**. A
 | `with:` values | the binding imports the data — **the binding IS the edge** | one typed edge per reference ([03 §with](./03-dag.md)) |
 | `after:` keys | the entry names the producer | one control edge per entry |
 | `on_error.recover:` | a fallback reads a settled record | a recovery edge (parking · `NIKA-DAG-004`) |
-| `on_finally:` blocks | cleanup reads its **parent** — the ONLY legal target there (a sibling may still be running · the read would race) | none (cleanup is not a task) |
+| an `unwind` task body | cleanup reads the **producer it unwinds** — the ONLY legal target there (a sibling may still be running · the read would race) | none (the E_f attachment never enters `G_p`) |
 | workflow `outputs:` | the run's exports read the settled world | none (everything is terminal at read time) |
 
 **Everywhere else — verb fields (`prompt:` · `command:` · `args:` · …),

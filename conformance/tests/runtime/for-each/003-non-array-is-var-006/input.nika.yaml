@@ -7,5 +7,6 @@ const:
   not_a_list: "just a string"
 tasks:
   work:
-    for_each: ${{ const.not_a_list }}
+    for_each:
+      items: ${{ const.not_a_list }}
     infer: { prompt: "never runs" }

@@ -6,5 +6,5 @@
       "category": "validation_error"
     }
   ],
-  "note": "03-dag.md §on_finally · the parent is the only readable task inside a cleanup (a sibling may still be RUNNING — the read would race, unchecked pre-W2)."
+  "note": "03-dag.md §unwind · an unwind task reads ONLY the producer it unwinds (a sibling may still be RUNNING — the read would race, unchecked pre-W2)."
 }

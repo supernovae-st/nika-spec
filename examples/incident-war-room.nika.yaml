@@ -270,9 +270,9 @@ tasks:
   # `after: {save: terminal}` admits all four settled states, so this task runs
   # when the draft lands AND when `confirmed` refused it and `save` was
   # cancelled — which is precisely the outcome on-call needs to hear about.
-  # It is a TASK, not an `on_finally:` hook: cleanup errors are LOGGED and DO
-  # NOT PROPAGATE (03 §on_finally · best-effort lane), so a webhook that dies
-  # in a hook dies in silence — measured, the run stays green with nothing
+  # It rides `terminal`, not `unwind`: cleanup errors are LOGGED and DO
+  # NOT PROPAGATE (03 §unwind · best-effort lane), so a webhook that dies
+  # on that edge dies in silence — measured, the run stays green with nothing
   # sent. An alert you cannot trust to fail loudly is not an alert.
   alert:
     after:

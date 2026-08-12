@@ -52,9 +52,12 @@ my_task:                        # the map KEY is the identity · snake_case · u
     data: ${{ tasks.task_a.output }}
     config: { foo: "bar" }      # literals are fine — only tasks.* refs create edges
   after:                        # optional · the CONTROL boundary · {producer: predicate}
-    task_b: success             # predicate ∈ success | failure | skipped | terminal
+    task_b: success             # predicate ∈ success | failure | skipped | terminal | unwind
   when: ${{ inputs.enabled }}   # optional · LOCAL business condition · evaluated POST-gate
-  for_each: ${{ with.pages }}   # optional · map this task over a collection (local namespaces)
+  for_each:                     # optional · map this task over a collection (local namespaces)
+    items: ${{ with.pages }}    #   the collection · evaluated ONCE, before the fan-out
+    max_parallel: 5             #   optional · cap concurrent iterations
+    fail_fast: false            #   optional · false = finish the batch
   retry:                        # optional · retry policy (see 05-errors.md)
     max_attempts: 3
     backoff_ms: 1000
@@ -383,7 +386,7 @@ declaration and a missing one was an error (the retired `NIKA-DAG-003`
 class). W2 removes the double bookkeeping in both directions: a `tasks.X`
 reference is **legal only where it declares an edge by existing** (`with:` ·
 `after:`) or reads a settled record on a declared surface (`on_error.recover`
-· `on_finally` · workflow `outputs:`). The engine never infers a hidden
+· an `unwind` task · workflow `outputs:`). The engine never infers a hidden
 edge and never asks you to restate a visible one — **the binding IS the
 edge · no invisible edges** · and a reference outside those surfaces is
 `NIKA-VAR-021` with a machine-applicable fix (hoist into `with:`).
@@ -465,19 +468,30 @@ when: ${{ size(inputs.items) > 0 }}            # collection size check
 
 ---
 
-### `for_each` · *optional · map a task over a collection*
+### `for_each` · *optional · fan this task out over a collection*
 
 ```yaml
 scrape_all:
     with:
       pages: ${{ tasks.discover.pages }}         # the collection crosses the boundary here
-    for_each: ${{ with.pages }}                  # a local read · a literal list also works
-    max_parallel: 5                              # optional · cap concurrent iterations · default unbounded
-    fail_fast: false                             # optional · false = keep going on errors · default true
+    for_each:
+      items: ${{ with.pages }}                   # a local read · a literal list also works
+      max_parallel: 5                            # optional · cap concurrent iterations · default unbounded
+      fail_fast: false                           # optional · false = keep going on errors · default true
     invoke:
       tool: nika:fetch
       args: { url: "${{ item }}", mode: article }
 ```
+
+> **One block, and that is the whole point.** `max_parallel` and
+> `fail_fast` were once task-level fields. Measured over the corpus they
+> appeared **45 and 39 times, and ZERO times without `for_each`** — they
+> never had an autonomous existence, so they were sub-fields wearing the
+> costume of fields. Folding them in costs the language two fields and
+> buys something the old shape could not: **the concurrency is declared
+> where the fan-out is**, so `for_each:` no longer reads like a
+> sequential loop with unrelated knobs beside it. There is no bare
+> `for_each: <expr>` form — one construct, one spelling.
 
 `for_each` runs the task **once per element** of the collection. Inside the
 task body, `${{ item }}` resolves to the current element (and `${{ index }}`
@@ -496,24 +510,26 @@ crosses through `with:` (`NIKA-VAR-021` teaches the hoist).
 #### ⚠️ Parallel by default
 
 By default · `for_each` iterations run **in parallel** (engine spawns all
-iterations concurrently · bounded by `max_parallel:` if set).
+iterations concurrently · bounded by `for_each.max_parallel:` if set).
 
 This is **different from Python's sequential `for` loop**. If you need
 sequential iteration · set `max_parallel: 1` ·
 
 ```yaml
 process_in_order:
-    for_each: ${{ inputs.items }}
-    max_parallel: 1                              # iterations run one-at-a-time, in order
+    for_each:
+      items: ${{ inputs.items }}
+      max_parallel: 1                            # iterations run one-at-a-time, in order
     exec:
       command: ["process", "${{ item }}"]
 ```
 
-#### `max_parallel:` · *optional · cap concurrent iterations*
+#### `for_each.max_parallel:` · *optional · cap concurrent iterations*
 
 ```yaml
-for_each: ${{ inputs.urls }}   # 1000 URLs
-max_parallel: 5                # at most 5 in-flight at any time
+for_each:
+  items: ${{ inputs.urls }}    # 1000 URLs
+  max_parallel: 5              # at most 5 in-flight at any time
 ```
 
 - **Default · unbounded** (subject to engine-wide concurrency budget · v0.3
@@ -524,11 +540,12 @@ max_parallel: 5                # at most 5 in-flight at any time
 - **Use cases** · rate-limiting provider APIs · avoiding resource
   exhaustion · compliance with concurrency limits.
 
-#### `fail_fast:` · *optional · abort-on-error policy*
+#### `for_each.fail_fast:` · *optional · abort-on-error policy*
 
 ```yaml
-for_each: ${{ inputs.urls }}
-fail_fast: false                # default true · false = process all even if some fail
+for_each:
+  items: ${{ inputs.urls }}
+  fail_fast: false             # default true · false = process all even if some fail
 ```
 
 - **Default · `true`** · first iteration error aborts remaining iterations ·
@@ -588,9 +605,9 @@ fail_fast: false                # default true · false = process all even if so
   `on_error:` / **`timeout:`** apply **per iteration**: the timeout
   clock covers one element's execution including its own retries (and
   backoff sleeps · wall-clock). There is **no whole-fan-out timer** in
-  v0.1 (bound total work via `max_parallel:` + the per-iteration cap).
-- `max_parallel:` + `fail_fast:` apply uniformly across all iterations.
-- `on_finally:` (see below) runs **once** after all iterations complete
+  v0.1 (bound total work via `for_each.max_parallel:` + the per-iteration cap).
+- `for_each.max_parallel:` + `for_each.fail_fast:` apply uniformly across all iterations.
+- an `unwind` task (see below) runs **once** after all iterations complete
   (success OR failure): `item` / `index` are NOT in scope there (there
   is no current element after the fan-out).
 
@@ -677,11 +694,11 @@ partly-measured confusion cost ·
 
 - A rename touches every existing workflow, doc and example, for zero
   semantic gain.
-- **42% of `for_each` tasks in the corpus also set `max_parallel:`**
+- **42% of `for_each` tasks in the corpus also set `max_parallel`**
   (45 of 106, derived). Setting a concurrency cap *proves* the author
   saw the concurrency. The remaining 58% prove nothing either way — so
   42% is a **floor on informed authorship**, not a comprehension rate.
-- `max_parallel:` is therefore the load-bearing mitigation: it is the
+- `for_each.max_parallel:` is therefore the load-bearing mitigation: it is the
   field that makes concurrency visible at the call site, and it is
   already reached for by a large minority unprompted.
 
@@ -806,7 +823,7 @@ declaration surface — nothing else creates an edge ·
 | **E_d** · data | `with:` bindings referencing `tasks.*` | `value` · `terminal-observation` · `failure-observation` (per field shape · §with) | yes |
 | **E_c** · control | `after:` entries | `control` (with its predicate) | yes |
 | **E_r** · recovery | `on_error.recover:` references | `recovery` — a parking read at recovery time, NOT an execution-order edge (`NIKA-DAG-004` guards the deadlock) | no |
-| **E_f** · finally | `on_finally:` attachment (parent → its cleanup units · then unit → next unit) | `finally` — cleanup ordering after the parent settles | no · cleanup units are not tasks and never enter `G_p` — but they ARE **nodes** in the projection (`kind: "finally"` · format 3), because a judge that cannot see an effect carrier cannot govern it |
+| **E_f** · finally | `after: {x: unwind}` (producer → its cleanup task · and cleanup → cleanup) | `finally` — cleanup ordering after the parent settles | no · cleanup units are not tasks and never enter `G_p` — but they ARE **nodes** in the projection (`kind: "finally"` · format 3), because a judge that cannot see an effect carrier cannot govern it |
 
 **The precedence graph is `G_p = E_d ∪ E_c`** · it MUST be acyclic
 (`NIKA-DAG-001` · including self-edges) · Kahn wave scheduling runs over
@@ -1150,7 +1167,8 @@ tasks:
   summarize:
     with:
       pages: ${{ tasks.discover.pages }}
-    for_each: ${{ with.pages }}
+    for_each:
+      items: ${{ with.pages }}
     invoke:
       tool: "nika:fetch"
       args:
@@ -1210,82 +1228,75 @@ in pre-public hardening and **removed** · it duplicated `capture`/`schema` and
 its default table had drifted out of sync with 02-verbs (the very drift a
 single source prevents).
 
-### `on_finally` · *optional · cleanup hook · ALWAYS runs*
+### `unwind` · *a settle-state on `after:` · cleanup that ALWAYS runs*
+
+Cleanup is a **task**, not a nested block. It declares itself with the
+`unwind` predicate on `after:` ·
 
 ```yaml
-process:
+tasks:
+  process:
     exec:
-      shell: "./process.sh > /tmp/output.json"   # redirect → the explicit shell door
-    on_finally:                                  # runs always · success/fail/timeout/cancel
-      - exec:
-          command: ["rm", "-f", "/tmp/output.json"]
-      - invoke:
-          tool: nika:emit
-          args: { event: "task_completed", task_id: "process" }
-```
+      shell: "./process.sh > /tmp/output.json"
 
-`on_finally:` declares **cleanup tasks** that run after the parent task
-completes · REGARDLESS of outcome (success · failure · timeout · cancel).
+  drop_temp:
+    after: { process: unwind }                  # an E_f edge · never schedules in G_p
+    exec:
+      command: ["rm", "-f", "/tmp/output.json"]
 
-#### Semantics (closed at v1)
-
-- **List of mini-tasks** · zero or more · each with its own verb (`exec:` ·
-  `invoke:` · or `infer:` · `agent:` rarely used here).
-- **Runs sequentially** in declared order · cleanup-task-N starts after
-  cleanup-task-(N-1) completes.
-- **Cleanup errors are LOGGED but DO NOT propagate** · the parent task's
-  final status reflects ONLY the main verb's outcome · NOT the cleanup
-  outcomes (best-effort semantics).
-- **The parent is the only readable task (normative · W2)** · inside an
-  `on_finally:` block, `tasks.*` may reference the PARENT task only
-  (`${{ tasks.<parent>.status }}` · `.error` · `.output` — settled by
-  definition when cleanup runs). Any other task is `NIKA-VAR-021`: a
-  sibling may still be RUNNING when this parent's cleanup fires — the
-  read would race, and pre-W2 engines silently allowed it (the class is
-  now inexpressible).
-- **Default cleanup timeout** · 30 seconds per cleanup task (overridable
-  per cleanup task via `timeout:` field).
-- **Failed parent task's `on_finally:` runs BEFORE** the failure settles
-  outward in the DAG (gives cleanup a chance to undo side effects).
-- **Engine MUST execute** `on_finally:` on cancel (Ctrl+C) and timeout,
-  for a task that **started**. A task that never ran (a gate that did not
-  admit · `when: false` · cancelled-before-start) runs NO `on_finally:`
-  (there is nothing to clean up). A record that must land on EVERY
-  workflow outcome is a **terminal `after: {…: terminal}` task** (the
-  always-pattern · §gate algebra), not a cleanup hook.
-- **Engine MAY skip** `on_finally:` only if the workflow process itself
-  crashes (SIGSEGV · OOM · hard kill).
-
-#### Use cases
-
-```yaml
-# 1 · cleanup temp files (scratch_dir declared in envelope const:)
-on_finally:
-  - exec: { command: ["rm", "-rf", "${{ const.scratch_dir }}"] }   # argv: the constant cannot break out
-
-# 2 · always-emit completion event
-on_finally:
-  - invoke:
-      tool: nika:emit
-      args: { event: "task_done", status: "${{ tasks.process.status }}" }
-
-# 3 · on-error notification only
-on_finally:
-  - when: ${{ tasks.process.status == 'failure' }}
+  announce:
+    after: { drop_temp: unwind }                # cleanup chains like anything else
     invoke:
-      tool: nika:fetch
-      args:
-        url: "https://hooks.slack.com/..."
-        method: POST
-        body: { text: "Task failed · ${{ tasks.process.error }}" }
+      tool: nika:emit
+      args: { event: "task_completed", task_id: "process" }
 ```
 
-(Inside `on_finally:`, the parent's record is the local context — its
-`when:` reads the parent directly; the `with:`/hoist law governs TASK
-bodies, not cleanup mini-tasks, whose only legal `tasks.*` target is the
-parent.)
+> **Why this replaced `on_finally:`.** The old shape nested a *list of
+> mini-tasks* inside a task. Measured, those units carried real verbs
+> (`invoke` 8 · `exec` 2), real `when:`, real `timeout:`, real permits,
+> and since `graph_format: 3` they are real **nodes**. They were tasks in
+> everything but name, living in a **second grammar** the rest of the
+> language did not share: unreferenceable, unreusable, untestable. One
+> construct, one grammar — a task body now appears in exactly ONE place.
 
----
+#### What `unwind` guarantees (normative · closed at v1)
+
+An `unwind` edge is **not** a settle-state comparison like `success` or
+`terminal`. It is the **E_f** attachment ([§the four graphs](#the-four-graphs-normative))
+and it carries three properties no `after: {…: terminal}` task can have ·
+
+1. **It fires on cancel (Ctrl+C) and on timeout**, for a producer that
+   **started**. A producer that never ran (gate did not admit · `when:
+   false` · cancelled-before-start) unwinds nothing — there is nothing to
+   clean up. *A record that must land on EVERY workflow outcome is a
+   terminal `after: {…: terminal}` task, not an unwind.*
+2. **It runs BEFORE the producer's failure settles outward**, so cleanup
+   can undo a side effect before anything downstream observes the
+   failure.
+3. **Its own failure does not propagate.** The producer's status reflects
+   its own verb only — unwind is best-effort by construction, and its
+   errors are logged.
+
+#### The rest of the contract
+
+- **Never in `G_p`.** `unwind` edges do not schedule, do not participate
+  in cycle detection, and do not enter wave assignment. An engine that
+  adds them to the precedence graph is wrong.
+- **Ordering** · multiple tasks unwinding the same producer run in
+  declaration order; chaining is just another `unwind` edge (see
+  `announce` above).
+- **Default timeout** · 30 seconds, overridable with the task's own
+  `timeout:`.
+- **What it may read** · the producer only (`${{ tasks.<producer>.status
+  }}` · `.error` · `.output` — settled by definition when unwind runs).
+  Any other task is `NIKA-VAR-021`: a sibling may still be RUNNING, so
+  the read would race.
+- **`for_each` producers** · the unwind runs **once**, after every
+  iteration has completed. `item` / `index` are not in scope — there is
+  no current element after a fan-out.
+- **Engine MAY skip** only if the workflow process itself dies
+  (SIGSEGV · OOM · hard kill).
+
 
 ## One obvious way · control-flow preference rules (normative for lints)
 
@@ -1300,9 +1311,9 @@ discouraged form ·
 | `/002` | « depend on a skippable producer » | decide the skip path: `after: {a: success}` (skip cancels me) or read the value (`with:` · skip passes as `null`) | an `on_error: { skip: true }` producer whose dependents never acknowledge the skip either way |
 | `/003` | « retry on transient failure » | `retry:` · the ONE retry shape (`max_attempts` · `backoff_*` · `on_codes`) | an `after: {a: failure}` duplicate of the failing task · a self-referencing recovery chain |
 | `/004` | « provide a fallback value » | `on_error: { recover: … }` · the route stays *in the failing task* | a second task `after: {a: failure}` for a mere value · use a task only when real *work* runs on failure |
-| `/005` | « cleanup that always runs » | `on_finally:` (per task) · or ONE terminal report task | a task with `after: {…: terminal}` on everything — a cleanup smuggled into the graph |
-| `/006` | « time-bound an iteration » | `timeout:` on the `for_each` task · it applies **per iteration** (§for_each semantics) | per-element timing tricks inside the body · a whole-fan-out timer (none exists in v0.1) |
-| `/007` | « cap fan-out concurrency » | `max_parallel:` | manual sharding into N sequential tasks |
+| `/005` | « cleanup that always runs » | `after: {x: unwind}` · or ONE terminal report task | a task with `after: {…: terminal}` on everything — a cleanup smuggled into the graph |
+| `/006` | « time-bound an iteration » | `timeout:` on the fan-out task · it applies **per iteration** (§for_each semantics) | per-element timing tricks inside the body · a whole-fan-out timer (none exists in v0.1) |
+| `/007` | « cap fan-out concurrency » | `for_each.max_parallel:` | manual sharding into N sequential tasks |
 
 (`one-obvious-way/001` — the pre-W2 « redundant success `when:` » class —
 is **retired**: its discouraged form, a `tasks.*` status test inside
@@ -1444,7 +1455,7 @@ forever. The window is a courtesy with an end, not a second format.
 
 ### Cleanup units are nodes (normative · new in format 3)
 
-Every `on_finally:` unit is projected as a node. Before format 3 they
+Every `unwind` task is projected as a node. Before format 3 the cleanup units they succeeded
 were executed, they checked permits, and they emitted trace events — but
 they had **no place in the derived graph**, so every graph-shaped judge
 (order · consent · flow) was blind to them while the runtime ran them.
@@ -1456,8 +1467,8 @@ from such a judge is a claim about a subset.
 | `id` | `<parent>::finally:<ordinal>` · ordinal is the 0-based declaration index. Not an author-visible name: `tasks.*` never resolves it, and `after:`/`with:` can never reference it. |
 | `kind` | `"finally"` |
 | `parent` | the task id this unit cleans up after |
-| `ordinal` | 0-based position in the declared `on_finally:` list |
-| `verb` · `permits` · `timeout_ms` | as for any node — `permits` is the reason this projection exists · `timeout_ms` defaults to 30000 (§on_finally) |
+| `ordinal` | 0-based position among the tasks unwinding this producer |
+| `verb` · `permits` · `timeout_ms` | as for any node — `permits` is the reason this projection exists · `timeout_ms` defaults to 30000 (§unwind) |
 | `when` · `fan_out` · `cost_interval` | present-as-null · a cleanup unit takes no gate and no fan-out |
 
 **They are NOT in `G_p`.** `finally` edges never schedule (the `E_f` row
@@ -1510,7 +1521,7 @@ that paints run state onto this graph joins the two by task `id`.
 
 ## Forward-compat
 
-v1 ships with these task fields · `with` · `after` · `when` · `for_each` · `max_parallel` · `fail_fast` · `retry` · `on_error` · `timeout` · `on_finally` · `output` · plus the verb selector. Additional fields may be added in minor bumps (additive only). (Output *shape* is per-verb · not a task field · see [02-verbs.md](./02-verbs.md#what--tasksidoutput--holds--per-verb).)
+v1 ships with these task fields · `with` · `after` · `when` · `for_each` · `retry` · `on_error` · `timeout` · `output` · `returns` · `lift` · plus the verb selector. (`max_parallel` and `fail_fast` are sub-fields of `for_each`; `on_finally` is dead — cleanup is a task on an `unwind` edge.) Additional fields may be added in minor bumps (additive only). (Output *shape* is per-verb · not a task field · see [02-verbs.md](./02-verbs.md#what--tasksidoutput--holds--per-verb).)
 
 Out of scope for v1 · `parallel:` for explicit concurrency control · `include:` for sub-workflow composition (workaround · `exec: nika run sub.yaml`). See [08-out-of-scope.md](./08-out-of-scope.md).
 

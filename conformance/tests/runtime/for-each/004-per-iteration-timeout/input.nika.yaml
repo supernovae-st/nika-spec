@@ -12,7 +12,8 @@ const:
   waits: ["0", "3"]
 tasks:
   work:
-    for_each: ${{ const.waits }}
+    for_each:
+      items: ${{ const.waits }}
     on_error: { skip: true }
     timeout: 1s
     exec: { command: ["sleep", "${{ item }}"] }

@@ -1355,16 +1355,16 @@ diagnostics:
     introduced_in: C0
     namespace: VAR
     plane: unclassified
-    condition: 'a tasks.* reference outside the boundary (with: · after: · on_error.recover · on_finally parent-only
-      · workflow outputs) — hoist it into with: (check --fix applies it)'
+    condition: 'a tasks.* reference outside the boundary (with: · after: · on_error.recover · an unwind task
+      reading its producer · workflow outputs) — hoist it into with: (check --fix applies it)'
     outcome_class: failure
     cause: validation_error
     retryable: false
     terminal: true
     payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
     span_required: false
-    teaching: 'a tasks.* reference outside the boundary (with: · after: · on_error.recover · on_finally parent-only
-      · workflow outputs) — hoist it into with: (check --fix applies it) · spec/05-errors.md (import-c0 · the teaching
+    teaching: 'a tasks.* reference outside the boundary (with: · after: · on_error.recover · an unwind task
+      reading its producer · workflow outputs) — hoist it into with: (check --fix applies it) · spec/05-errors.md (import-c0 · the teaching
       string mints at C1).'
     notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
       verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping

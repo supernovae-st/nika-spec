@@ -840,7 +840,7 @@ inputs:
 const:
   output_dir: "./output"                 # bare literal
 
-# Non-sensitive runtime config · supplied by the deployment · available as ${{ config.<name> }}
+# Non-sensitive runtime config · `default:` REQUIRED · available as ${{ config.<name> }}
 config:
   log_level: { type: string, default: "info" }
 
@@ -1063,14 +1063,35 @@ caller can pass is declared in `inputs:`.
 ```yaml
 config:
   log_level: { type: string, default: "info" }
-  region:    { type: string }                     # no default · the deployment supplies it
+  region:    { type: string, default: "eu-west" }  # a default is REQUIRED · see below
 ```
 
-Non-sensitive configuration available via `${{ config.<name> }}`, supplied
-by the deployment or environment (engine launch concern · `default:` is the
-declared fallback). Each entry is a typed declaration (`type:` required ·
-full TypeExpr · a `default:` MUST conform · `NIKA-DEFAULT-001`). Values may
-appear in logs and traces. For anything secret, use `secrets:` instead.
+Non-sensitive configuration available via `${{ config.<name> }}`. Each
+entry is a typed declaration (`type:` required · full TypeExpr · a
+`default:` MUST conform · `NIKA-DEFAULT-001`). Values may appear in logs
+and traces. For anything secret, use `secrets:` instead.
+
+> #### 🔴 `default:` is REQUIRED · and this paragraph is a correction
+>
+> This section used to read « supplied by the deployment or environment »
+> and its own example carried `region: { type: string }  # no default ·
+> the deployment supplies it`. **Measured on 0.108.0: that workflow passes
+> `check` and dies at `run`** with `NIKA-VAR-001`. There is no deployment
+> channel — `--var` reaches `inputs:` only, by design (« the declared
+> `inputs:` the sole authority »), so **a `config:` entry's only possible
+> source is its own `default:`**.
+>
+> A green check on a file that cannot run is the one thing this language
+> exists to prevent. So the contract is now the honest one · **a `config:`
+> entry without a `default:` is a CHECK error, not a run surprise**
+> (`NIKA-DEFAULT-002` · `validation_error`). The refusal teaches the two
+> repairs: give it a `default:`, or move it to `inputs:` — which is the
+> block a caller can actually reach.
+>
+> What `config:` still buys over `const:` is the integrity label: a
+> `config.*` read is **untrusted** at the taint lattice, a `const.*` read
+> is **trusted**. That difference is real and it is why the two blocks
+> stay two blocks.
 
 **Declared-only · no ambient OS fallback** · a `${{ config.X }}` read
 resolves ONLY against this block (an undeclared entry is `NIKA-VAR-001`):
@@ -2233,7 +2254,7 @@ Every candidate operation decomposes along **two orthogonal axes** ·
   the `invoke` model.
 - **WHEN it runs**: ordering. Edges (`with:` data · `after:` control) ·
   conditions (`when`) · iteration (`for_each`) · time-bounds (`timeout`) ·
-  recovery (`retry` · `on_error` · `on_finally`). Ordering never executes
+  recovery (`retry` · `on_error` · an `unwind` task). Ordering never executes
   anything: it is DAG-side, or host-side when it concerns *starting* a run
   at all.
 
@@ -2322,9 +2343,12 @@ my_task:                        # the map KEY is the identity · snake_case · u
     data: ${{ tasks.task_a.output }}
     config: { foo: "bar" }      # literals are fine — only tasks.* refs create edges
   after:                        # optional · the CONTROL boundary · {producer: predicate}
-    task_b: success             # predicate ∈ success | failure | skipped | terminal
+    task_b: success             # predicate ∈ success | failure | skipped | terminal | unwind
   when: ${{ inputs.enabled }}   # optional · LOCAL business condition · evaluated POST-gate
-  for_each: ${{ with.pages }}   # optional · map this task over a collection (local namespaces)
+  for_each:                     # optional · map this task over a collection (local namespaces)
+    items: ${{ with.pages }}    #   the collection · evaluated ONCE, before the fan-out
+    max_parallel: 5             #   optional · cap concurrent iterations
+    fail_fast: false            #   optional · false = finish the batch
   retry:                        # optional · retry policy (see 05-errors.md)
     max_attempts: 3
     backoff_ms: 1000
@@ -2365,6 +2389,14 @@ clean CEL identifiers. (The workflow-level `workflow:` id stays kebab-case:
 it is a resource name, never referenced inside an expression.)
 
 ### `with` · *optional · the DATA boundary — bindings that ARE edges*
+
+> **A name collision worth knowing about.** In Nix, `with` is the
+> canonical *hidden-dependency* construct: `with pkgs;` pulls an
+> unknown set of names into scope, and a reader cannot tell where an
+> identifier came from without evaluating the set. nika's `with:` is the
+> **exact opposite** — every binding is named at the boundary, and each
+> one *creates a visible edge*. Same token, inverted property. If you
+> arrive from Nix, read this block as `let … in`, not as `with`.
 
 ```yaml
 summarize:
@@ -2645,7 +2677,7 @@ declaration and a missing one was an error (the retired `NIKA-DAG-003`
 class). W2 removes the double bookkeeping in both directions: a `tasks.X`
 reference is **legal only where it declares an edge by existing** (`with:` ·
 `after:`) or reads a settled record on a declared surface (`on_error.recover`
-· `on_finally` · workflow `outputs:`). The engine never infers a hidden
+· an `unwind` task · workflow `outputs:`). The engine never infers a hidden
 edge and never asks you to restate a visible one — **the binding IS the
 edge · no invisible edges** · and a reference outside those surfaces is
 `NIKA-VAR-021` with a machine-applicable fix (hoist into `with:`).
@@ -2727,19 +2759,30 @@ when: ${{ size(inputs.items) > 0 }}            # collection size check
 
 ---
 
-### `for_each` · *optional · map a task over a collection*
+### `for_each` · *optional · fan this task out over a collection*
 
 ```yaml
 scrape_all:
     with:
       pages: ${{ tasks.discover.pages }}         # the collection crosses the boundary here
-    for_each: ${{ with.pages }}                  # a local read · a literal list also works
-    max_parallel: 5                              # optional · cap concurrent iterations · default unbounded
-    fail_fast: false                             # optional · false = keep going on errors · default true
+    for_each:
+      items: ${{ with.pages }}                   # a local read · a literal list also works
+      max_parallel: 5                            # optional · cap concurrent iterations · default unbounded
+      fail_fast: false                           # optional · false = keep going on errors · default true
     invoke:
       tool: nika:fetch
       args: { url: "${{ item }}", mode: article }
 ```
+
+> **One block, and that is the whole point.** `max_parallel` and
+> `fail_fast` were once task-level fields. Measured over the corpus they
+> appeared **45 and 39 times, and ZERO times without `for_each`** — they
+> never had an autonomous existence, so they were sub-fields wearing the
+> costume of fields. Folding them in costs the language two fields and
+> buys something the old shape could not: **the concurrency is declared
+> where the fan-out is**, so `for_each:` no longer reads like a
+> sequential loop with unrelated knobs beside it. There is no bare
+> `for_each: <expr>` form — one construct, one spelling.
 
 `for_each` runs the task **once per element** of the collection. Inside the
 task body, `${{ item }}` resolves to the current element (and `${{ index }}`
@@ -2758,24 +2801,26 @@ crosses through `with:` (`NIKA-VAR-021` teaches the hoist).
 #### ⚠️ Parallel by default
 
 By default · `for_each` iterations run **in parallel** (engine spawns all
-iterations concurrently · bounded by `max_parallel:` if set).
+iterations concurrently · bounded by `for_each.max_parallel:` if set).
 
 This is **different from Python's sequential `for` loop**. If you need
 sequential iteration · set `max_parallel: 1` ·
 
 ```yaml
 process_in_order:
-    for_each: ${{ inputs.items }}
-    max_parallel: 1                              # iterations run one-at-a-time, in order
+    for_each:
+      items: ${{ inputs.items }}
+      max_parallel: 1                            # iterations run one-at-a-time, in order
     exec:
       command: ["process", "${{ item }}"]
 ```
 
-#### `max_parallel:` · *optional · cap concurrent iterations*
+#### `for_each.max_parallel:` · *optional · cap concurrent iterations*
 
 ```yaml
-for_each: ${{ inputs.urls }}   # 1000 URLs
-max_parallel: 5                # at most 5 in-flight at any time
+for_each:
+  items: ${{ inputs.urls }}    # 1000 URLs
+  max_parallel: 5              # at most 5 in-flight at any time
 ```
 
 - **Default · unbounded** (subject to engine-wide concurrency budget · v0.3
@@ -2786,11 +2831,12 @@ max_parallel: 5                # at most 5 in-flight at any time
 - **Use cases** · rate-limiting provider APIs · avoiding resource
   exhaustion · compliance with concurrency limits.
 
-#### `fail_fast:` · *optional · abort-on-error policy*
+#### `for_each.fail_fast:` · *optional · abort-on-error policy*
 
 ```yaml
-for_each: ${{ inputs.urls }}
-fail_fast: false                # default true · false = process all even if some fail
+for_each:
+  items: ${{ inputs.urls }}
+  fail_fast: false             # default true · false = process all even if some fail
 ```
 
 - **Default · `true`** · first iteration error aborts remaining iterations ·
@@ -2850,9 +2896,9 @@ fail_fast: false                # default true · false = process all even if so
   `on_error:` / **`timeout:`** apply **per iteration**: the timeout
   clock covers one element's execution including its own retries (and
   backoff sleeps · wall-clock). There is **no whole-fan-out timer** in
-  v0.1 (bound total work via `max_parallel:` + the per-iteration cap).
-- `max_parallel:` + `fail_fast:` apply uniformly across all iterations.
-- `on_finally:` (see below) runs **once** after all iterations complete
+  v0.1 (bound total work via `for_each.max_parallel:` + the per-iteration cap).
+- `for_each.max_parallel:` + `for_each.fail_fast:` apply uniformly across all iterations.
+- an `unwind` task (see below) runs **once** after all iterations complete
   (success OR failure): `item` / `index` are NOT in scope there (there
   is no current element after the fan-out).
 
@@ -2882,7 +2928,8 @@ the whole reason the language stays checkable ·
    BDF · Boolean dataflow              Buck & Lee 1993 · Lee & Parks,
      data-dependent switch/select      Proc. IEEE 83(5), 1995
      ⇒ TURING-COMPLETE
-     ⇒ bounded-memory scheduling and deadlock-freedom become UNDECIDABLE
+     ⇒ bounded-memory scheduling and strong consistency become UNDECIDABLE
+       (Buck 1993 · deadlock-freedom specifically is NOT what is proved)
 ```
 
 In the vendor-neutral workflow-pattern vocabulary (Russell, ter Hofstede,
@@ -2896,6 +2943,61 @@ everything in [§static liveness](#static-liveness-check-time--normative).
 
 **So the refusal of `while:` is not conservatism.** It is the same line,
 named twice.
+
+#### The name, examined rather than left alone
+
+`for_each` reads sequential and runs **parallel**. That is a real
+mismatch, and the empirical literature on keyword choice is not on its
+side: Stefik & Siebert (ACM TOCE 13(4), 2013) showed novice accuracy
+varies measurably with keyword choice — Perl's was statistically
+indistinguishable from a language whose keywords were drawn *at random*
+— and Lappi et al. (Software Quality Journal, 2023) replicated it. Two
+better names exist: `map:` (states the semantics) and `fan_out:` (states
+the execution).
+
+**It keeps the name — but three of the arguments usually offered for
+keeping it do not survive contact, and they are struck here rather than
+left for a reviewer to strike.**
+
+❌ *« every neighbour uses this word, so a reader guesses it »* —
+**self-refuting.** The neighbours spell it `scatter` (WDL/CWL), `Map`
+(ASL), `withItems` (Argo), `matrix` (GHA). `for_each` is a **fifth**
+spelling, not one of the four, so « a reader of those four guesses ours »
+has no support whatsoever. (The precedent that *would* support it is
+Terraform's `for_each`, whose applies are also concurrent by default —
+that is the citation to check before anyone leans on this argument.)
+
+❌ *« parallel-by-default is pillar 3, locked »* — **a category error.**
+Pillar 3 constrains the **semantics**, not the **spelling**. `map:` with
+parallel-by-default satisfies pillar 3 identically. A semantic lock
+cannot defend a naming choice, and using it that way is precisely the
+after-the-fact justification this spec tries not to commit.
+
+❌ *« renaming changes only the first-read expectation »* — **the word
+« only » is doing illegitimate work.** The studies cited above exist
+*because* first-read expectation is measurable. Their real limit is
+scope: they measure novice accuracy on general-purpose languages, and
+whether that transfers to one field name in a workflow DSL is
+**unknown**. That is the honest caveat, not a dismissal.
+
+**What actually survives** is a migration cost against a bounded and
+partly-measured confusion cost ·
+
+- A rename touches every existing workflow, doc and example, for zero
+  semantic gain.
+- **42% of `for_each` tasks in the corpus also set `max_parallel`**
+  (45 of 106, derived). Setting a concurrency cap *proves* the author
+  saw the concurrency. The remaining 58% prove nothing either way — so
+  42% is a **floor on informed authorship**, not a comprehension rate.
+- `for_each.max_parallel:` is therefore the load-bearing mitigation: it is the
+  field that makes concurrency visible at the call site, and it is
+  already reached for by a large minority unprompted.
+
+**Nobody has measured this specific case.** This is a judgement recorded
+with its evidence, its cost, and its three dead arguments — not a
+result. If someone runs the experiment (`for_each` vs `map:` vs
+`fan_out:`, first-read expectation of ordering) the finding wins over
+this paragraph.
 
 ### `timeout` · *optional · task-level timeout (Go duration string)*
 
@@ -3012,7 +3114,7 @@ declaration surface — nothing else creates an edge ·
 | **E_d** · data | `with:` bindings referencing `tasks.*` | `value` · `terminal-observation` · `failure-observation` (per field shape · §with) | yes |
 | **E_c** · control | `after:` entries | `control` (with its predicate) | yes |
 | **E_r** · recovery | `on_error.recover:` references | `recovery` — a parking read at recovery time, NOT an execution-order edge (`NIKA-DAG-004` guards the deadlock) | no |
-| **E_f** · finally | `on_finally:` attachment (parent → its cleanup units · then unit → next unit) | `finally` — cleanup ordering after the parent settles | no · cleanup units are not tasks and never enter `G_p` — but they ARE **nodes** in the projection (`kind: "finally"` · format 3), because a judge that cannot see an effect carrier cannot govern it |
+| **E_f** · finally | `after: {x: unwind}` (producer → its cleanup task · and cleanup → cleanup) | `finally` — cleanup ordering after the parent settles | no · cleanup units are not tasks and never enter `G_p` — but they ARE **nodes** in the projection (`kind: "finally"` · format 3), because a judge that cannot see an effect carrier cannot govern it |
 
 **The precedence graph is `G_p = E_d ∪ E_c`** · it MUST be acyclic
 (`NIKA-DAG-001` · including self-edges) · Kahn wave scheduling runs over
@@ -3104,8 +3206,12 @@ intent, and downstream edges judge that state like any other.
 approximation** of condition (iii) of **soundness**, the workflow-net
 correctness property defined by van der Aalst (1997/1998) and surveyed
 in *Soundness of workflow nets: classification, decidability, and
-analysis* (Formal Aspects of Computing 23(3):333–363, 2011). The three
-conditions are ·
+analysis* (Formal Aspects of Computing 23(3):333–363, 2011). Two
+attributions worth keeping straight: the condition **names** below are
+the 2011 survey's, not the 1997 paper's, and that survey classifies
+**eight** soundness notions — « structural soundness » in the complexity
+results cited further down is one of those eight, not one of these
+three. The three conditions of classical soundness are ·
 
 | Soundness condition | Where nika earns it |
 |---|---|
@@ -3143,10 +3249,40 @@ conditions are ·
 > known, bounded piece of work; claiming it already decides condition
 > (iii) would not be.
 
+#### The two declared back-offs (normative · conformance)
+
+Per-gate, the analysis is **exact**: it enumerates the referenced
+upstream status sets in Kleene three-valued logic (a non-status atom
+evaluates *Unknown*, and an Unknown gate is never declared dead). The
+approximation above is at the **joint** level only.
+
+That exactness is bought with two bounds, and a conformant engine MUST
+declare them because they change the verdict ·
+
+| Bound | Reference engine | Behaviour past it |
+|---|---|---|
+| distinct tasks referenced by one gate | **6** (4⁶ = 4096 leaf evaluations per gate) | the gate is treated **satisfiable** — it widens, never narrows |
+| items in one gate's `in [...]` list | **256** | same widening. A status list has ≤4 meaningful values, so a longer one is adversarial padding (a 3.6 MiB gate costs ≈0.9 s to enumerate) |
+
+Both back-offs move in the **sound** direction: past the bound the
+checker gives up on proving death, never on admitting life. The
+observable consequence is that **the same contradiction is refused at 6
+gate references and accepted at 7** — that is the contract, not a bug,
+and it is stated here because a conformance suite cannot test a
+threshold it was never told about.
+
+This is the shape the surrounding literature converges on: an exact
+analysis is purchasable only against a **declared bound** on the input,
+and where the bound is absent the static gate is abandoned rather than
+faked (cf. Kubernetes KEP-3488, which drops static CEL cost estimation
+exactly where `maxItems`/`maxLength` are unavailable).
+
 The reason this is worth stating: **soundness is EXPSPACE-complete in
 general** (Blondin, Mazowiecki, Offtermatt, LICS 2022 · arXiv:2201.05588 ·
 generalised soundness PSPACE-complete), and PTIME only for the free-choice
-subclass. In nika, (i) and (ii) hold **by shape** and (iii) is
+subclass (van der Aalst 1998, Corollary 1 — **not** Esparza et al.
+arXiv:1704.04190, which cites that result as background rather than
+establishing it). In nika, (i) and (ii) hold **by shape** and (iii) is
 approximated in polynomial time over `G_p` — because the shape was
 chosen to make the question tractable, not because the check is clever.
 The honest scoreboard: two conditions structural, one condition sound
@@ -3156,9 +3292,12 @@ can never fire at all.
 
 > **The permanent rule this buys.** A construct that cancels an **arbitrary
 > region** — rather than propagating along declared edges — is a *reset arc*,
-> and reset arcs make **every** variant of soundness **undecidable** (Blondin,
-> Finkel, Hofman, Mazowiecki, Offtermatt, LICS 2024 · DOI
-> 10.1145/3661814.3662086). YAWL cancellation regions and BPMN
+> and reset arcs make soundness **undecidable** — classical, structural and
+> generalised alike (the last of those closed by Blondin, Finkel, Hofman,
+> Mazowiecki, Offtermatt, LICS 2024 · DOI 10.1145/3661814.3662086; the others
+> were already known). That paper also exhibits a variant that *stays*
+> decidable (1-in-between soundness), so « every variant » would be too
+> strong. YAWL cancellation regions and BPMN
 > cancel/compensate/error events are exactly this. nika's cancellation is
 > monotone propagation along edges that already exist, computed from
 > context-free pass-sets — it never leaves the decidable class. **This is a
@@ -3319,7 +3458,8 @@ tasks:
   summarize:
     with:
       pages: ${{ tasks.discover.pages }}
-    for_each: ${{ with.pages }}
+    for_each:
+      items: ${{ with.pages }}
     invoke:
       tool: "nika:fetch"
       args:
@@ -3379,82 +3519,75 @@ in pre-public hardening and **removed** · it duplicated `capture`/`schema` and
 its default table had drifted out of sync with 02-verbs (the very drift a
 single source prevents).
 
-### `on_finally` · *optional · cleanup hook · ALWAYS runs*
+### `unwind` · *a settle-state on `after:` · cleanup that ALWAYS runs*
+
+Cleanup is a **task**, not a nested block. It declares itself with the
+`unwind` predicate on `after:` ·
 
 ```yaml
-process:
+tasks:
+  process:
     exec:
-      shell: "./process.sh > /tmp/output.json"   # redirect → the explicit shell door
-    on_finally:                                  # runs always · success/fail/timeout/cancel
-      - exec:
-          command: ["rm", "-f", "/tmp/output.json"]
-      - invoke:
-          tool: nika:emit
-          args: { event: "task_completed", task_id: "process" }
-```
+      shell: "./process.sh > /tmp/output.json"
 
-`on_finally:` declares **cleanup tasks** that run after the parent task
-completes · REGARDLESS of outcome (success · failure · timeout · cancel).
+  drop_temp:
+    after: { process: unwind }                  # an E_f edge · never schedules in G_p
+    exec:
+      command: ["rm", "-f", "/tmp/output.json"]
 
-#### Semantics (closed at v1)
-
-- **List of mini-tasks** · zero or more · each with its own verb (`exec:` ·
-  `invoke:` · or `infer:` · `agent:` rarely used here).
-- **Runs sequentially** in declared order · cleanup-task-N starts after
-  cleanup-task-(N-1) completes.
-- **Cleanup errors are LOGGED but DO NOT propagate** · the parent task's
-  final status reflects ONLY the main verb's outcome · NOT the cleanup
-  outcomes (best-effort semantics).
-- **The parent is the only readable task (normative · W2)** · inside an
-  `on_finally:` block, `tasks.*` may reference the PARENT task only
-  (`${{ tasks.<parent>.status }}` · `.error` · `.output` — settled by
-  definition when cleanup runs). Any other task is `NIKA-VAR-021`: a
-  sibling may still be RUNNING when this parent's cleanup fires — the
-  read would race, and pre-W2 engines silently allowed it (the class is
-  now inexpressible).
-- **Default cleanup timeout** · 30 seconds per cleanup task (overridable
-  per cleanup task via `timeout:` field).
-- **Failed parent task's `on_finally:` runs BEFORE** the failure settles
-  outward in the DAG (gives cleanup a chance to undo side effects).
-- **Engine MUST execute** `on_finally:` on cancel (Ctrl+C) and timeout,
-  for a task that **started**. A task that never ran (a gate that did not
-  admit · `when: false` · cancelled-before-start) runs NO `on_finally:`
-  (there is nothing to clean up). A record that must land on EVERY
-  workflow outcome is a **terminal `after: {…: terminal}` task** (the
-  always-pattern · §gate algebra), not a cleanup hook.
-- **Engine MAY skip** `on_finally:` only if the workflow process itself
-  crashes (SIGSEGV · OOM · hard kill).
-
-#### Use cases
-
-```yaml
-# 1 · cleanup temp files (scratch_dir declared in envelope const:)
-on_finally:
-  - exec: { command: ["rm", "-rf", "${{ const.scratch_dir }}"] }   # argv: the constant cannot break out
-
-# 2 · always-emit completion event
-on_finally:
-  - invoke:
-      tool: nika:emit
-      args: { event: "task_done", status: "${{ tasks.process.status }}" }
-
-# 3 · on-error notification only
-on_finally:
-  - when: ${{ tasks.process.status == 'failure' }}
+  announce:
+    after: { drop_temp: unwind }                # cleanup chains like anything else
     invoke:
-      tool: nika:fetch
-      args:
-        url: "https://hooks.slack.com/..."
-        method: POST
-        body: { text: "Task failed · ${{ tasks.process.error }}" }
+      tool: nika:emit
+      args: { event: "task_completed", task_id: "process" }
 ```
 
-(Inside `on_finally:`, the parent's record is the local context — its
-`when:` reads the parent directly; the `with:`/hoist law governs TASK
-bodies, not cleanup mini-tasks, whose only legal `tasks.*` target is the
-parent.)
+> **Why this replaced `on_finally:`.** The old shape nested a *list of
+> mini-tasks* inside a task. Measured, those units carried real verbs
+> (`invoke` 8 · `exec` 2), real `when:`, real `timeout:`, real permits,
+> and since `graph_format: 3` they are real **nodes**. They were tasks in
+> everything but name, living in a **second grammar** the rest of the
+> language did not share: unreferenceable, unreusable, untestable. One
+> construct, one grammar — a task body now appears in exactly ONE place.
 
----
+#### What `unwind` guarantees (normative · closed at v1)
+
+An `unwind` edge is **not** a settle-state comparison like `success` or
+`terminal`. It is the **E_f** attachment ([§the four graphs](#the-four-graphs-normative))
+and it carries three properties no `after: {…: terminal}` task can have ·
+
+1. **It fires on cancel (Ctrl+C) and on timeout**, for a producer that
+   **started**. A producer that never ran (gate did not admit · `when:
+   false` · cancelled-before-start) unwinds nothing — there is nothing to
+   clean up. *A record that must land on EVERY workflow outcome is a
+   terminal `after: {…: terminal}` task, not an unwind.*
+2. **It runs BEFORE the producer's failure settles outward**, so cleanup
+   can undo a side effect before anything downstream observes the
+   failure.
+3. **Its own failure does not propagate.** The producer's status reflects
+   its own verb only — unwind is best-effort by construction, and its
+   errors are logged.
+
+#### The rest of the contract
+
+- **Never in `G_p`.** `unwind` edges do not schedule, do not participate
+  in cycle detection, and do not enter wave assignment. An engine that
+  adds them to the precedence graph is wrong.
+- **Ordering** · multiple tasks unwinding the same producer run in
+  declaration order; chaining is just another `unwind` edge (see
+  `announce` above).
+- **Default timeout** · 30 seconds, overridable with the task's own
+  `timeout:`.
+- **What it may read** · the producer only (`${{ tasks.<producer>.status
+  }}` · `.error` · `.output` — settled by definition when unwind runs).
+  Any other task is `NIKA-VAR-021`: a sibling may still be RUNNING, so
+  the read would race.
+- **`for_each` producers** · the unwind runs **once**, after every
+  iteration has completed. `item` / `index` are not in scope — there is
+  no current element after a fan-out.
+- **Engine MAY skip** only if the workflow process itself dies
+  (SIGSEGV · OOM · hard kill).
+
 
 ## One obvious way · control-flow preference rules (normative for lints)
 
@@ -3469,9 +3602,9 @@ discouraged form ·
 | `/002` | « depend on a skippable producer » | decide the skip path: `after: {a: success}` (skip cancels me) or read the value (`with:` · skip passes as `null`) | an `on_error: { skip: true }` producer whose dependents never acknowledge the skip either way |
 | `/003` | « retry on transient failure » | `retry:` · the ONE retry shape (`max_attempts` · `backoff_*` · `on_codes`) | an `after: {a: failure}` duplicate of the failing task · a self-referencing recovery chain |
 | `/004` | « provide a fallback value » | `on_error: { recover: … }` · the route stays *in the failing task* | a second task `after: {a: failure}` for a mere value · use a task only when real *work* runs on failure |
-| `/005` | « cleanup that always runs » | `on_finally:` (per task) · or ONE terminal report task | a task with `after: {…: terminal}` on everything — a cleanup smuggled into the graph |
-| `/006` | « time-bound an iteration » | `timeout:` on the `for_each` task · it applies **per iteration** (§for_each semantics) | per-element timing tricks inside the body · a whole-fan-out timer (none exists in v0.1) |
-| `/007` | « cap fan-out concurrency » | `max_parallel:` | manual sharding into N sequential tasks |
+| `/005` | « cleanup that always runs » | `after: {x: unwind}` · or ONE terminal report task | a task with `after: {…: terminal}` on everything — a cleanup smuggled into the graph |
+| `/006` | « time-bound an iteration » | `timeout:` on the fan-out task · it applies **per iteration** (§for_each semantics) | per-element timing tricks inside the body · a whole-fan-out timer (none exists in v0.1) |
+| `/007` | « cap fan-out concurrency » | `for_each.max_parallel:` | manual sharding into N sequential tasks |
 
 (`one-obvious-way/001` — the pre-W2 « redundant success `when:` » class —
 is **retired**: its discouraged form, a `tasks.*` status test inside
@@ -3586,9 +3719,34 @@ the run stream follows). Node `kind` is the exception that forced the
 bump: it is not additive, because its absence has a meaning
 (*everything is a task*) that is now false.
 
+**What a bump costs downstream, stated rather than discovered.** A
+format-pinned reader stops reading the day the producer moves. That is
+the *intended* behaviour — refusing beats guessing — but it is a real
+migration, not a free one, and the producer owes consumers three things ·
+
+1. **The bump is announced before it ships.** A consumer pinned to
+   format 2 (`graph_format === 2`) is not broken by the spec; it is
+   broken by the day the engine starts emitting 3. Those are different
+   dates and the gap is the migration window.
+2. **The engine SHOULD be able to emit the older format on request** for
+   the length of that window. The precedent worth copying is
+   Kubernetes' split CEL environments: a **narrow, version-pinned gate
+   on what may be written**, and a **permissive runtime that still reads
+   everything already persisted**. Write-time strict, read-time
+   tolerant — that is what makes a rollback safe by construction.
+3. **The marker must not reach the interop boundary.** Rust editions are
+   the clean form: crates of different editions link, because the
+   edition changes the parser and never the artifact. A projection
+   format that splits its own consumer ecosystem has bought the split it
+   was meant to avoid.
+
+The v1 position: format 3 is the wire, format 2 is dead, and any
+consumer pinned to 2 MUST be migrated rather than served a downgrade
+forever. The window is a courtesy with an end, not a second format.
+
 ### Cleanup units are nodes (normative · new in format 3)
 
-Every `on_finally:` unit is projected as a node. Before format 3 they
+Every `unwind` task is projected as a node. Before format 3 the cleanup units they succeeded
 were executed, they checked permits, and they emitted trace events — but
 they had **no place in the derived graph**, so every graph-shaped judge
 (order · consent · flow) was blind to them while the runtime ran them.
@@ -3600,8 +3758,8 @@ from such a judge is a claim about a subset.
 | `id` | `<parent>::finally:<ordinal>` · ordinal is the 0-based declaration index. Not an author-visible name: `tasks.*` never resolves it, and `after:`/`with:` can never reference it. |
 | `kind` | `"finally"` |
 | `parent` | the task id this unit cleans up after |
-| `ordinal` | 0-based position in the declared `on_finally:` list |
-| `verb` · `permits` · `timeout_ms` | as for any node — `permits` is the reason this projection exists · `timeout_ms` defaults to 30000 (§on_finally) |
+| `ordinal` | 0-based position among the tasks unwinding this producer |
+| `verb` · `permits` · `timeout_ms` | as for any node — `permits` is the reason this projection exists · `timeout_ms` defaults to 30000 (§unwind) |
 | `when` · `fan_out` · `cost_interval` | present-as-null · a cleanup unit takes no gate and no fan-out |
 
 **They are NOT in `G_p`.** `finally` edges never schedule (the `E_f` row
@@ -3654,7 +3812,7 @@ that paints run state onto this graph joins the two by task `id`.
 
 ## Forward-compat
 
-v1 ships with these task fields · `with` · `after` · `when` · `for_each` · `max_parallel` · `fail_fast` · `retry` · `on_error` · `timeout` · `on_finally` · `output` · plus the verb selector. Additional fields may be added in minor bumps (additive only). (Output *shape* is per-verb · not a task field · see [02-verbs.md](./02-verbs.md#what--tasksidoutput--holds--per-verb).)
+v1 ships with these task fields · `with` · `after` · `when` · `for_each` · `retry` · `on_error` · `timeout` · `output` · `returns` · `lift` · plus the verb selector. (`max_parallel` and `fail_fast` are sub-fields of `for_each`; `on_finally` is dead — cleanup is a task on an `unwind` edge.) Additional fields may be added in minor bumps (additive only). (Output *shape* is per-verb · not a task field · see [02-verbs.md](./02-verbs.md#what--tasksidoutput--holds--per-verb).)
 
 Out of scope for v1 · `parallel:` for explicit concurrency control · `include:` for sub-workflow composition (workaround · `exec: nika run sub.yaml`). See [08-out-of-scope.md](./08-out-of-scope.md).
 
@@ -3743,7 +3901,7 @@ Since W2 « the flow », the `tasks` namespace is **boundary-only**. A
 | `with:` values | the binding imports the data — **the binding IS the edge** | one typed edge per reference ([03 §with](./03-dag.md)) |
 | `after:` keys | the entry names the producer | one control edge per entry |
 | `on_error.recover:` | a fallback reads a settled record | a recovery edge (parking · `NIKA-DAG-004`) |
-| `on_finally:` blocks | cleanup reads its **parent** — the ONLY legal target there (a sibling may still be running · the read would race) | none (cleanup is not a task) |
+| an `unwind` task body | cleanup reads the **producer it unwinds** — the ONLY legal target there (a sibling may still be running · the read would race) | none (the E_f attachment never enters `G_p`) |
 | workflow `outputs:` | the run's exports read the settled world | none (everything is terminal at read time) |
 
 **Everywhere else — verb fields (`prompt:` · `command:` · `args:` · …),
@@ -4572,6 +4730,7 @@ these from this file alone.
 | `NIKA-TYPE-006` | regex pattern outside the locked dialect (backreference · lookaround · named group · inline flags · lazy/possessive · `\b` · `\p` — [09 §the regex dialect](./09-types.md#the-regex-dialect-normative--locked)) | `validation_error` | false |
 | `NIKA-TYPE-101` | run-time contract violation — the decoded value does not fit `returns:` (`exec:`/`invoke:` lane · `infer:`/`agent:` stay `NIKA-INFER-002`-class) | `validation_error` | false |
 | `NIKA-DEFAULT-001` | a `default:` that does not conform to its own `type:` — the declaration would hand a caller a value its type forbids ([09 §types](./09-types.md)) | `validation_error` | false |
+| `NIKA-DEFAULT-002` | a `config:` entry with no `default:` — nothing can supply it (`--var` reaches `inputs:` only), so the file would pass check and die at run on `NIKA-VAR-001`. Refused at CHECK so the green means something ([01 §config](./01-envelope.md)) | `validation_error` | false |
 | `NIKA-VAR-001` | unresolved reference (unknown namespace entry · undeclared `inputs`/`config`/`const`/`secrets`/`with` key) | `variable_error` | false |
 | `NIKA-VAR-002` | binding cardinality — a jq binding emitted zero or multiple values (evaluation-time · data-dependent) | `variable_error` | false |
 | `NIKA-VAR-003` | provably-invalid path into a declared `schema:` (static walk · [04](./04-variables.md)) | `validation_error` | false |
@@ -4581,7 +4740,7 @@ these from this file alone.
 | `NIKA-VAR-007` | bytes value substituted into a string position | `variable_error` | false |
 | `NIKA-VAR-008` | unclosed `${{` opener | `validation_error` | false |
 | `NIKA-VAR-020` | bare `tasks.X` is the envelope, not a value — pick `.output` (closed projection set · 04 §namespaces) | `validation_error` | false |
-| `NIKA-VAR-021` | a `tasks.*` reference outside the boundary (`with:` · `after:` · `on_error.recover` · `on_finally` parent-only · workflow `outputs:`) — hoist it into `with:` (`check --fix` applies it) | `validation_error` | false |
+| `NIKA-VAR-021` | a `tasks.*` reference outside the boundary (`with:` · `after:` · `on_error.recover` · an `unwind` task reading its producer · workflow `outputs:`) — hoist it into `with:` (`check --fix` applies it) | `validation_error` | false |
 | `NIKA-VAR-009` | typed `outputs` value did not match its declared `type:` at run end (the output half of the callable contract · [01 §engine MUST](./01-envelope.md)) | `validation_error` | false |
 | `NIKA-VALUES-001` | the pre-flip envelope `vars:` block — dead since the E-split; classify each use into the authority its role commands ([04 §values](./04-variables.md)) | `validation_error` | false |
 | `NIKA-VALUES-002` | the pre-flip envelope `env:` block — dead since the E-split; `config:` is workflow config, `exec.env` is one subprocess's OS environment ([04 §values](./04-variables.md)) | `validation_error` | false |
@@ -4923,7 +5082,7 @@ blanket kill** ·
 - The workflow's final state stays `failure` even when always-pattern tasks
   ran afterward (any unrecovered task failure decides it).
 - **User cancellation** (Ctrl+C · API) IS a blanket kill · in-flight tasks
-  are cancelled (their `on_finally:` still runs · [03](./03-dag.md#on_finally--optional--cleanup-hook--always-runs)).
+  are cancelled (the tasks that `unwind` them still run · [03](./03-dag.md#unwind--a-settle-state-on-after--cleanup-that-always-runs)).
 
 A workflow's final state is one of ·
 
@@ -5573,7 +5732,8 @@ arms a cadence; it does not become a control plane.
 
 **A6 · More than one thread of control per node.** A task settles
 exactly once. This permanently refuses the discriminator family
-(WCP-9, WCP-28–31), Multi-Merge (WCP-8), and N-of-M joins. It is not a
+(WCP-9, WCP-28–32 — six members), Multi-Merge (WCP-8), and N-of-M
+joins. It is not a
 gap to patch — it is the property that makes
 [soundness conditions (i) and (ii)](./03-dag.md#what-that-liveness-check-is--soundness-and-what-it-costs-elsewhere)
 structural rather than checked.
@@ -5604,12 +5764,16 @@ against this design ·
 **The rebuttal, in one line:** nika's escape hatches are *declared floors,
 not ambient capability* — `exec:` (lint-discouraged, `native-first/*`),
 `agent:` (budget-bounded, cap in the file), `invoke: workflow:`
-(authority intersected). And the measurement now runs the other way: in
-260K workflows over six years, custom shell commands carry **4.12× the
-odds of failure**, ambient environment variables 1.84×, and **each
-additional language feature used adds ~19% to the odds of failure**
-(Bardsiri, Decan, Mens, arXiv:2605.26825, 2026 — usage Gini 0.84, with
-74.6% of constructs accounting for 7.1% of use).
+(authority intersected). And the measurement now runs the other way:
+custom shell commands carry **4.12× the odds of failure**, environment
+variables 1.84×, and **each additional language feature used adds ~19%
+to the odds of failure** (Bardsiri, Decan, Mens, arXiv:2605.26825,
+2026). Attribution matters and the first version of this paragraph got
+it wrong: those odds ratios are regressed over **13,915 workflows across
+six months**, not over the paper's larger 260K/six-year usage corpus —
+the Gini 0.84 and the 74.6%-of-constructs-at-7.1%-of-use figures come
+from the usage study, the odds ratios from the reliability study. Two
+populations, one paper.
 
 ### The same metric, turned on ourselves
 
@@ -6035,15 +6199,15 @@ or a non-goal, with the line that says whose job it is.
 | H12 | Security in-language vs runtime | **WRITTEN** | Language-visible security is now FOUR surfaces · the `exec:` blocklist (MUST · + the argv form as the structural injection fix) · the `agent:` tools whitelist (default-deny MUST) · secrets masking + no-inline-literals (`secrets:` envelope) · and the workflow-level **`permits:`** capability boundary ([01 §permits](./01-envelope.md#permits--optional--the-declared-capability-boundary) · default-deny once present · enforced statically + at runtime · NIKA-SEC-004). Everything else, trust levels · spotlighting · canaries · taint tracking (the reference engine's Shield · NIKA-SEC family), is **runtime-side** and intentionally NOT in YAML v0.1. |
 | H13 | Packaging / distribution (registries · semver · signing) | **OUT** | The envelope pin `nika: v1` is the only versioning surface in the language. Workflow registries · package manifests · signing are ecosystem/engine concerns (the reference engine plans `nika-pck`) · not spec surface. |
 | H14 | Testing workflows (dry-run · mocks · goldens) | **IN (pieces)** | The `mock/` provider is one of the <!-- canon:providers -->17<!-- /canon --> (deterministic · no LLM call): `model: mock/echo` per task or via one `inputs.model` swap turns any workflow into a test. Golden runs reuse the conformance fixture pattern. `--dry-run` (parse + plan · execute nothing) is an engine CLI concern · MAY. A workflow without a test story is a script: the test story is · swap to `mock/`, assert with `nika:assert`/`schema:`. |
-| H15 | Concurrency / rate governance | **PARTIAL** | In-language · `max_parallel` (per `for_each`) + `fail_fast` + wave-parallel scheduling (normative · [03 §execution model](./03-dag.md#dag-execution-model)). Per-provider rate limits · engine config (the engine MUST honor declared caps · how it throttles providers is its business). Cross-run/global scheduling · NEVER (§Multi-workflow orchestration). |
-| H16 | Interop (import/export GHA · LangGraph · Temporal) | **PROUD NON-GOAL** | Nika is a source language, not a compatibility layer: no importers/exporters, ever (a translated workflow is a worse workflow). The interop boundaries are **MCP** (any MCP tool is callable · `mcp:<server>/<tool>`) and **`exec:`** (anything with a CLI). That covers the actual need (calling the world) without chaining the language to others' semantics. |
+| H15 | Concurrency / rate governance | **PARTIAL** | In-language · `for_each.max_parallel` + `for_each.fail_fast` + wave-parallel scheduling (normative · [03 §execution model](./03-dag.md#dag-execution-model)). Per-provider rate limits · engine config (the engine MUST honor declared caps · how it throttles providers is its business). Cross-run/global scheduling · NEVER (§Multi-workflow orchestration). |
+| H16 | Interop (import/export GHA · LangGraph · Temporal) | **PROUD NON-GOAL** | Nika is a source language, not a compatibility layer: no importers/exporters, ever (a translated workflow is a worse workflow). **⚠️ AMENDED 2026-08-11 — the old wording said the interop boundaries are MCP and `exec:` « anything with a CLI ». That sentence manufactured the problem it pretended to solve: everything has a CLI, so it routed the world to the escape hatch.** The reach-for order is now a LADDER, and `exec:` is its last rung — see [§the interop ladder](#the-interop-ladder-normative) below. |
 | H17 | Step caching / memoization (`cache_key:`) | **OUT (durable-adjacent)** | A v0.1 run executes every non-skipped task: no memoize field. The dominant cacheable class (deterministic `exec:`/`invoke:`) collides with side effects, and `infer:` is non-deterministic (a wrong default poisons correctness). Lands as an additive task field WITH the durable-execution waypoint (a run store exists then · H1). Until then · cache at the tool layer (`nika:read`/`nika:write` a content-keyed path · HTTP caches honor ETags). |
 | H18 | Matrix strategy (cartesian product · include/exclude) | **PARTIAL (idiom · no field)** | `for_each` is one-dimensional by design: a matrix is **precomputed data, not control flow** · emit the product with `nika:jq` (`[ .os[] as $o | .ver[] as $v | {os:$o, ver:$v} ]`) · `for_each` over it (`item.os` · `item.ver`) · include/exclude = jq filters on the product. A `matrix:` sugar field would restate this in control-flow clothing · deferred unless empirical demand. |
 | H19 | Value-conditioned retry / polling (« retry until the VALUE says done ») | **OUT (v0.2 `retry_when:` candidate)** | `retry:` fires on ERRORS · never on values. The v0.1 canonical polling pattern · make not-ready an error INSIDE the task: `nika:fetch` with a jq `mode` whose program `error("not ready")`s on the pending shape + `retry: { max_attempts: N, backoff_strategy: fixed, backoff_ms: 30000, on_codes: [...] }` · OR an `agent:` with fetch+wait+done (budget-bounded). `retry_when: ${{ … }}` is the additive v0.2 shape: it must not ship before the error-vs-value semantics are provably clean. |
 | H20 | Environment targeting (dev / staging / prod) | **WRITTEN (idiom · no field)** | No `environments:` block. The pattern is **launch-time `inputs` + per-env secret paths** · pass `--var env=prod` (engine CLI), branch values with the CEL conditional (`model: ${{ inputs.env == 'prod' ? … : … }}`), and select the secret store path the same way (`secrets.api_key.key` is a per-env vault path the deploy supplies, OR two declared secrets gated by `when:`). Connection-set switching as a first-class construct (GHA environments · Prefect deployments) is a host/deploy concern: the language stays single-file and the env is just another input. An `environments:` sugar block is deferred unless empirical demand. |
 | H21 | Else / default branch (exhaustive choice) | **WRITTEN (idiom · no construct)** | No `else:` / `Choice.Default` construct. Mutually-exclusive branches are two tasks with negated `when:` joined by the defined-null diamond pattern ([03 §branch joins](./03-dag.md)); an N-way switch is N tasks each `when: ${{ inputs.mode == '<case>' }}`. Exhaustiveness is author-maintained (a missing case = all-skip = a `null` at the join, which downstream sees explicitly: it does not silently corrupt). A dedicated `switch:`/`else:` would add a second control-flow primitive beside `when:`/`after:` · deferred · the CEL conditional `?:` already covers conditional VALUES (the common case) without any branch at all. |
 | H22 | Embeddings (`embed(text) → vector`) | **WRITTEN (deliberate absence · `mcp:` / Connectome territory)** | No `embed:` verb and no `nika:embed` builtin. Raw embedding generation is not a language primitive: it is a tool, reached via `invoke: mcp:<embedder>/embed` (any embedding server) or `exec:` (a local model). Semantic RECALL (the RAG read path) is the reference engine's **Connectome** (`nika:connectome/*` · a deferred capability · [§Connectome](#the-connectome--deferred-capability--not-a-deferred-verb)), not a language verb. The language stays about ORCHESTRATION; embedding is a capability the orchestrated tools provide. Stated here because « an AI workflow language with no embeddings » is a fair « did you think of X »: yes · it is `mcp:`/tool territory by design, not a silent gap. |
-| H23 | Cursor pagination / unbounded iteration (« fetch page → follow next-cursor until none ») | **OUT (the bounded forms are written · `while:` stays deferred)** | `for_each` iterates a collection KNOWN up front ([03 §fan-out](./03-dag.md)) and a task cannot `for_each` its own output: cursor-following is inherently unbounded iteration, which is `while:` (deferred above · it breaks the acyclic guarantee AND the static cost story: a workflow whose request count depends on a server's answers is not auditable-before-run). The v0.1 canonical forms · **(a) depth-known** · precompute the page list (`[range(1; N+1)]` via `nika:jq`) + `for_each` with `max_parallel` (page-numbered APIs); **(b) depth-unknown** · an `agent:` task whitelisted to `nika:fetch` + `nika:done` with `max_turns` as the page budget: the loop is budget-bounded and the cap is IN the file (auditable); **(c) heavy crawls** · the host loop (`exec: nika run fetch-page.yaml` per cursor · the sibling-run floor above — an unbounded cursor chain has no static call graph, so the native `invoke: workflow:` form cannot express it). A dedicated bounded construct (`while_bounded:` / `unfold:` with a MANDATORY `max_iterations:`) is the additive v0.2 candidate IF empirical demand shows (b) too heavy: it must carry a static iteration cap or it never ships. |
+| H23 | Cursor pagination / unbounded iteration (« fetch page → follow next-cursor until none ») | **OUT (the bounded forms are written · `while:` stays deferred)** | `for_each` iterates a collection KNOWN up front ([03 §fan-out](./03-dag.md)) and a task cannot `for_each` its own output: cursor-following is inherently unbounded iteration, which is `while:` (deferred above · it breaks the acyclic guarantee AND the static cost story: a workflow whose request count depends on a server's answers is not auditable-before-run). The v0.1 canonical forms · **(a) depth-known** · precompute the page list (`[range(1; N+1)]` via `nika:jq`) + `for_each` with `for_each.max_parallel` (page-numbered APIs); **(b) depth-unknown** · an `agent:` task whitelisted to `nika:fetch` + `nika:done` with `max_turns` as the page budget: the loop is budget-bounded and the cap is IN the file (auditable); **(c) heavy crawls** · the host loop (`exec: nika run fetch-page.yaml` per cursor · the sibling-run floor above — an unbounded cursor chain has no static call graph, so the native `invoke: workflow:` form cannot express it). A dedicated bounded construct (`while_bounded:` / `unfold:` with a MANDATORY `max_iterations:`) is the additive v0.2 candidate IF empirical demand shows (b) too heavy: it must carry a static iteration cap or it never ships. |
 
 ---
 
@@ -6059,6 +6223,56 @@ This is the spec's structural protection against feature creep · Rams principle
 ---
 
 🦋 *End of the v0.1 spec. The 5 pillars are locked. The defer list is canon.*
+
+---
+
+## The interop ladder (normative)
+
+`exec:` is not an interop boundary. It is the **last rung of a ladder**,
+and a workflow that reaches it has usually skipped a rung above.
+
+> **Why this section exists.** The rule it replaces read « the interop
+> boundaries are MCP and `exec:` (anything with a CLI) ». Everything has
+> a CLI. That sentence made the escape hatch the default answer for the
+> entire outside world, and the corpus shows the result: **13% of work
+> tasks are `exec:`, and 54% of those are `bash` calling a shell-script
+> library that lives outside any checkable file.** A language cannot
+> claim a declared blast radius and then route the world through a rung
+> that grants « run this program, and whatever it runs ».
+
+Reach in this order. Each rung buys something the rung below cannot ·
+
+| | rung | what it buys | reach for it when |
+|---|---|---|---|
+| 1 | **a builtin** (`invoke: tool: nika:*`) | typed args · typed output · per-operation permits · deterministic · no process | the capability is in the stdlib |
+| 2 | **a sub-workflow** (`invoke: workflow:`) | **the reuse unit** · typed inputs/outputs · authority intersected · checkable · testable | you are about to write the same thing twice |
+| 3 | **MCP** (`invoke: tool: mcp:<server>/<tool>`) | a typed tool contract someone already maintains | a server exposes it |
+| 4 | **`agent:`** | a bounded loop that picks among tools | the sequence is not known in advance |
+| 5 | **`exec:`** | a process | **nothing above fits, and you can say why** |
+
+**Rung 2 is the one authors skip, and it is the one that matters.** It
+shipped in engine 0.105 ([14 · Composition](./14-composition.md)) and
+the corpus still contains workflows that `exec: bash -c "nika run ..."`
+— shelling out to the very engine that was already offering the typed
+call. Independent evidence that this is the load-bearing rung: in 68K
+GitHub repositories, **half of all steps are shell, and half of THOSE
+repeat a command that exists elsewhere in the corpus** (Decan, Mens et
+al., ICSME 2022 — 139,501 distinct commands across 287,868 steps). The
+missing thing was never a builtin. It was a place to put the second copy.
+
+**What `exec:` is still for, and it is a short list** · a program with no
+tool contract anywhere (`git`, `docker`, `cargo`), a one-off local
+script, an OS operation with no builtin (`tar`). Those are legitimate and
+they are why the rung exists. What is NOT legitimate is reaching rung 5
+because rung 1 or 2 was never looked at — and the `native-first/*` lint
+set exists to say so at check time.
+
+**The measurable form of this rule.** A workflow whose `exec:` count
+exceeds its `invoke:` count is not automatically wrong, but it is
+answerable: *which rung did each `exec:` skip, and why?* If the answer is
+« none, nothing above fits », the file is honest. If the answer is
+« I did not know rung 2 existed », that is a documentation defect, not an
+author defect.
 
 <!-- ═══ spec/09-types.md ═══ -->
 
@@ -6584,6 +6798,7 @@ is never exposed.
 | `limits:` | **hard** · judged at check | `max_tasks: <positive integer>` |
 | `endorsement:` | **hard** · judged at check | `solo` — the NAMED solo mode: exactly one endorser (one human gate), its fresh authorization bound to the action and logged as such · a gate under no declared mode refuses (`NIKA-SEC-013` · fail-closed) · a declared solo with more than one gate refuses as the declaration lying (NEP-0014 · F-P23) |
 | `prefer:` | **soft** · parsed, recorded, NOT judged | `providers: [<provider>…]` (ordered) |
+| `optimize:` | **soft** · parsed, recorded, NOT judged | `cost` \| `latency` \| `quality` |
 
 > ⚠️ **`endorsement:` names a family and has one member, and the gap is a
 > capability gap, not a naming one** (stated 2026-08-11). A workflow that wants
@@ -6598,7 +6813,11 @@ is never exposed.
 > the one to add — and since [07 §unknown key](./07-conformance.md) an unknown
 > value is an error, a second member lands additively, for free, the day its
 > semantics are decided.
-| `optimize:` | **soft** · parsed, recorded, NOT judged | `cost` \| `latency` \| `quality` |
+>
+> ⚠️ **Cette note vit SOUS la table, jamais au milieu** — une note insérée
+> entre deux rangées casse la lecture mécanique de la table (mesuré
+> 2026-08-12 · le générateur de la page autorité lisait une famille soft de
+> moins, et le gate GA-b l'a attrapé).
 
 `<effect-class>` is the closed set `exec · write · net · tools` — the
 effect vocabulary above with `fs` split at its grain of harm (`write`;
@@ -6842,8 +7061,9 @@ The contract, for every entry ·
 
 **Why one construct and not one field per law.** A door per law grows
 the language linearly in laws, and each language feature an author uses
-carries a measured **+18.9% odds of workflow failure** across 260K
-workflows (see [08 §antivalues](./08-out-of-scope.md)). The provider is
+carries a measured **+18.9% odds of workflow failure** (regressed over
+13,915 workflows · see [08 §antivalues](./08-out-of-scope.md) for the
+population and its limits). The provider is
 a parameter of `infer:`, not a verb; the law is a parameter of `lift:`,
 not a field. The predecessors — a task-level `declassify:` list and a
 task-level `inert: "<because>"` string — are **dead**: same job, two
@@ -8267,7 +8487,8 @@ authors and tooling ·
   - cycle detection, including self-dependency (`NIKA-DAG-001`)
   - an unresolved `with:`/`after:` edge target (`NIKA-DAG-002`)
   - a `tasks.*` reference outside the boundary — `when:` · `for_each:` · any
-    verb body · a non-parent `on_finally` read (`NIKA-VAR-021` · per
+    verb body · an `unwind` task reading a task other than the producer it
+    unwinds (`NIKA-VAR-021` · per
     [04-variables.md](../spec/04-variables.md) §the reference boundary ·
     the fix is machine-applicable: hoist into `with:`)
   - a dead `depends_on:` (`NIKA-PARSE-024`) · an unknown `after:` predicate

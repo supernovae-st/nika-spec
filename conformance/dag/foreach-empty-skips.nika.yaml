@@ -17,7 +17,8 @@ permits:
 
 tasks:
   mapped:
-    for_each: ${{ const.empty_list }}
+    for_each:
+      items: ${{ const.empty_list }}
     invoke:
       tool: nika:write
       args: { path: "./out/ctrlflow/08_iter_${{ index }}.json", content: "${{ item }}" }

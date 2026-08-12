@@ -205,7 +205,7 @@ SCOPE_NODES = (
     ("agent", ("$defs", "agent")),
     ("retry", ("$defs", "retry")),
     ("on_error", ("$defs", "onError")),
-    ("on_finally", ("$defs", "finallyStep")),
+    ("for_each", ("$defs", "task", "properties", "for_each")),
 )
 
 
