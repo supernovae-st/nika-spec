@@ -181,9 +181,11 @@ tasks:
       prompt: "Running at ${{ config.log_level }} verbosity"
 ```
 
-`config` holds **non-sensitive** runtime configuration, supplied by the
-deployment or environment (engine launch concern, the same way inputs are
-caller-supplied) with `default:` as the declared fallback. Each entry is a
+`config` holds **non-sensitive** runtime configuration. ⚠️ Its `default:`
+is **REQUIRED** and is its only source: nothing outside the file can supply
+it (`--var` reaches `inputs:` only). An entry without a `default:` is a
+check error, `NIKA-DEFAULT-002` — corrected 2026-08-11, the earlier
+« supplied by the deployment » was measured false at the binary. Each entry is a
 typed declaration (`type:` required · the full TypeExpr · a `default:` MUST
 conform to it · `NIKA-DEFAULT-001`). Values may appear in logs +
 traces. For anything secret, use `secrets:` (below) instead: never put a

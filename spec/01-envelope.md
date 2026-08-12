@@ -614,6 +614,39 @@ So `permits: {}` is a workflow limited to compute (`infer:` + CEL +
 passthrough (its children see the runner env floor plus their task `env:`
 maps, nothing else). That property is checkable BEFORE the run.
 
+> #### 🔴 `permits: {}` MUST be identical to an absent block · corrected 2026-08-11
+>
+> **Measured on 0.108.0, two files differing by one line ·**
+>
+> ```
+> no permits:      rc=0 · « ○ PERMITS zero authority · pure compute
+>                            · `permits: {}` states it »        ← the engine's own hint
+> permits: {}      rc=2 · « ✖ NIKA-SEC-004 · invoke tool `nika:jq`
+>                            is outside permits.tools »
+> ```
+>
+> **The engine teaches a repair that breaks the file**, and the sentence
+> directly above this note names `nika:jq` as legal under `{}`. Three
+> surfaces, three answers, on the same body.
+>
+> The root cause is a rule that is too broad: `permits.tools` was written
+> to govern *the `invoke:` surface*, and `invoke:` also carries the
+> builtins that have **no effect at all**. So the contract is now stated
+> at the grain that matters ·
+>
+> **A pure-compute builtin requires NO `tools` grant, under any form of
+> the block.** `nika:jq` · `hash` · `date` · `uuid` · `validate` ·
+> `convert` · `json_diff` · `json_merge_patch` · `decide` compute a value
+> from their arguments and reach nothing. `permits.tools` governs the
+> tools that CARRY an effect — `mcp:` targets, and any builtin whose
+> catalog entry declares an `fs` · `net` · `exec` category.
+>
+> The consequence is the invariant NEP-0003 always claimed: **an absent
+> block and `{}` are the same declaration** — zero authority — and the
+> only difference between them is that one says it out loud. A language
+> whose thesis is « the file IS the blast radius » cannot have a blast
+> radius that changes when you write the zero down.
+
 > ⚠️ **The word `provably` was here and it was measured FALSE on 2026-08-11.**
 > The passthrough claim above holds — it is about what a CHILD PROCESS
 > inherits. What did not hold is the stronger reading a reader takes away:

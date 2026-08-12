@@ -248,7 +248,8 @@ nothing about the resolved VALUES flowing under a present block. Every
 value carries an integrity label — **Integ ∈ {trusted, untrusted}** —
 orthogonal to Conf (the secrets axis): literals, `const.*`, and
 `secrets.*` are trusted; `inputs.*` (caller-supplied at launch),
-`config.*` (deployment-supplied, outside the file), fetch/tool results,
+`config.*` (untrusted by DECLARATION, not by provenance — see below),
+fetch/tool results,
 and anything derived from them are untrusted, with monotone propagation
 (one untrusted operand taints the whole interpolation). Two rules bind
 untrusted values under a `permits:` block (NEP-0004 · LAW-AUTH-0325):
