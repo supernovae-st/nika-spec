@@ -2338,6 +2338,23 @@ diagnostics:
     span_required: false
     teaching: 'a glob delegates the permit to the zone operator (ambient authority · every host under the suffix, present and future · invariant 1) · name exact hosts, or use the bare * for explicit full egress (NEP-0008 law 1).'
     notes: 'nep-0008 (2026-07-23) · category: security_error · transient: false (canon.yaml verbatim) · minted by the F-P5 spec lane · the AUTH family carries the defects of the boundary block itself (006 absent · 007 non-literal bound · 008 re-gate escape · 009 dead grant env · 010 wildcard net) · the dead-grant net twin rides NIKA-SEC-005 (the floor parity · permits_fit.rs « Dead grants »), never a new code · the engine emission lands with the egress permit-bound lane (F-P5 engine PR).'
+  - id: NIKA-AUTH-011
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0332
+    introduced_in: C1
+    namespace: AUTH
+    plane: unclassified
+    condition: 'a lift: entry whose named law would not have fired on this task — a trapdoor that lifts nothing is refused, never a silent no-op (10 §the authored doors rule 6)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'a lift is countable and reviewable only if it actually moves a law · drop the entry, or point it at a law this task trips (taint needs an untrusted inputs.* reaching a verb arg · data-as-code needs a code-bearing fetch).'
+    notes: 'lot2 / 10-authority rule 6 (2026-08-13) · category: validation_error · transient: false (canon.yaml verbatim) · NEP-0008 originally cited AUTH-011 for the net dead-grant then recollated that class onto NIKA-SEC-005 · this slot is the lift-that-lifts-nothing class · the reference oracle emits it (deep_static.lift_that_lifts_nothing_errors) · the engine emission is still owed.'
   - id: NIKA-VALUES-001
     status: reserved
     owner: spec

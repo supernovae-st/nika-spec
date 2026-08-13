@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-AUTH-011", "category": "validation_error" }
+  ],
+  "note": "LAW-AUTH-0332 · 10 §the authored doors rule 6 · a well-shaped lift: naming taint on a task that never uses the named untrusted binding (const.q is trusted · inputs.p is declared but does not reach a verb arg) is a trapdoor that lifts nothing · refused, never a silent no-op · pair of 011 (the live taint door) and 012 (trusted-value, no lift)."
+}

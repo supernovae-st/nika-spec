@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-lift-that-lifts-nothing
+permits:
+  fs: { read: ["datasets/**"] }
+  tools: ["nika:read"]
+inputs:
+  p: { type: string, default: "vendor/q3.csv" }
+const:
+  q: "datasets/q3.csv"
+tasks:
+  load:
+    invoke:
+      tool: nika:read
+      args: { path: "${{ const.q }}" }
+    lift:
+      - law: taint
+        from: inputs.p
+        because: "this path is author-baked, the taint law never fires"

@@ -801,7 +801,9 @@ def env_dead_grant_errors(doc: dict) -> list[dict]:
 # differential keeps engine and reference honest) · the `*` wildcard
 # outside the bare `*` entry is refused (NIKA-AUTH-010) and an exact
 # entry naming a floor-blocked target is an inert dead grant
-# (NIKA-AUTH-011). The mirror covers the STATIC classes only · a hostname
+# (NIKA-SEC-005 · floor parity · NEP-0008 recollated the net dead-grant
+# off NIKA-AUTH-011; 011 now names the lift-that-lifts-nothing class).
+# The mirror covers the STATIC classes only · a hostname
 # that merely RESOLVES to a blocked address is the runtime dial's half
 # (the proxy-side per-address check), never the static check's.
 _NET_METADATA_HOSTNAMES = frozenset({"metadata.google.internal", "metadata.goog"})
@@ -1015,6 +1017,85 @@ def data_as_code_errors(doc: dict, tasks: list) -> list[dict]:
     return errs
 
 
+_TAINT_UNTRUSTED_PREFIX = "inputs."
+
+
+def _task_mentions_binding(t: dict, binding: str) -> bool:
+    """True when the task's inspected verb surface names this binding.
+    The taint law only watches invoke args and exec argv — a mention in
+    `because:` or a sibling field is not a firing."""
+    inv = t.get("invoke")
+    if isinstance(inv, dict):
+        for v in _as_dict(inv.get("args")).values():
+            if isinstance(v, str) and binding in v:
+                return True
+    body = t.get("exec")
+    cmd = body.get("command") if isinstance(body, dict) else None
+    if isinstance(cmd, list):
+        if any(isinstance(el, str) and binding in el for el in cmd):
+            return True
+    elif isinstance(cmd, str) and binding in cmd:
+        return True
+    return False
+
+
+def _data_as_code_would_fire(t: dict, doc: dict) -> bool:
+    """The sink law fires on a nika:fetch whose URL is statically
+    code-bearing, OR stays dynamic (the run twin owns it — a lift on
+    that door is live, never AUTH-011)."""
+    inv = t.get("invoke")
+    if not isinstance(inv, dict) or inv.get("tool") != "nika:fetch":
+        return False
+    v = _as_dict(inv.get("args")).get("url")
+    if not isinstance(v, str):
+        return False
+    resolved = _resolve_static_url(v, doc)
+    if resolved is None:
+        return True  # deferred · the door is the run twin
+    return _code_bearing_class(resolved) is not None
+
+
+def lift_that_lifts_nothing_errors(doc: dict, tasks: list) -> list[dict]:
+    """LAW-AUTH-0332 · a `lift:` entry whose named law would not have
+    fired on this task is refused (NIKA-AUTH-011 · validation_error).
+    A trapdoor that lifts nothing stops being greppable (10 §the
+    authored doors rule 6 · the Terraform nonsensitive() regression).
+    Shape defects (empty because · missing from on taint) stay the
+    schema's — this walker only judges a well-shaped entry."""
+    errs: list[dict] = []
+    for tid, t in tasks:
+        entries = t.get("lift")
+        if not isinstance(entries, list):
+            continue
+        for e in entries:
+            if not isinstance(e, dict):
+                continue
+            law = e.get("law")
+            because = e.get("because")
+            if not isinstance(because, str) or not because:
+                continue  # schema minLength 1 · fixture 022
+            live = False
+            if law == "taint":
+                binding = e.get("from")
+                if isinstance(binding, str) and binding.startswith(_TAINT_UNTRUSTED_PREFIX):
+                    live = _task_mentions_binding(t, binding)
+            elif law == "data-as-code":
+                live = _data_as_code_would_fire(t, doc)
+            else:
+                continue  # unknown law is the schema's enum
+            if live:
+                continue
+            errs.append({"code": "NIKA-AUTH-011", "namespace": "NIKA-AUTH",
+                         "category": "validation_error",
+                         "detail": f"task '{tid}' declares a lift: entry for {law!r} "
+                                   "that would not have fired on this task · a trapdoor "
+                                   "that lifts nothing is refused, never a silent no-op "
+                                   "(LAW-AUTH-0332 · 10 §the authored doors rule 6) · "
+                                   "drop the entry, or point it at a law this task "
+                                   "actually trips"})
+    return errs
+
+
 def deep_static_errors(doc: dict) -> list[dict]:
     errs: list[dict] = []
     if not isinstance(doc, dict):
@@ -1197,14 +1278,18 @@ def deep_static_errors(doc: dict) -> list[dict]:
     # in permits.env: is an inert dead grant (NIKA-AUTH-009)
     errs.extend(env_dead_grant_errors(doc))
 
-    # NET-EGRESS-BOUNDARY · NEP-0008 (LAW-AUTH-0328) · the wildcard is
+    # NET-EGRESS-BOUNDARY · NEP-0008 (LAW-AUTH-0329) · the wildcard is
     # refused (NIKA-AUTH-010) · a floor-blocked entry is an inert dead
-    # grant (NIKA-AUTH-011)
+    # grant (NIKA-SEC-005 · never AUTH-011)
     errs.extend(net_egress_boundary_errors(doc))
 
     # DATA-AS-CODE · NEP-0006 (LAW-AUTH-0327) · a code-bearing fetch is
     # refused unless the task lifts the law (NIKA-SEC-008)
     errs.extend(data_as_code_errors(doc, tasks))
+
+    # LIFT-THAT-LIFTS-NOTHING · LAW-AUTH-0332 · a trapdoor whose named
+    # law would not have fired on this task (NIKA-AUTH-011)
+    errs.extend(lift_that_lifts_nothing_errors(doc, tasks))
 
     # PERMITS-FIT · the declared boundary must contain the body (01 §permits)
     permits = doc.get("permits")

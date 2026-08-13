@@ -1928,3 +1928,59 @@ laws:
       - approval-ticket-content-bound
       - approval-burst-typed-halt
       - approval-decided-attested
+  - id: LAW-AUTH-0332
+    slug: authority/lift-that-lifts-nothing
+    status: active
+    owner: spec
+    domain: AUTH
+    title: "Un lift: dont la loi nommée n'aurait pas tiré sur cette tâche refuse · jamais un no-op silencieux"
+    prose_projection:
+      chapters: ["10-authority", "05-errors"]
+      text: "10 §the authored doors rule 6 (2026-08-13) · a well-shaped `lift:` entry whose named law would not have fired on this task is refused (NIKA-AUTH-011 · validation_error), never a silent no-op. A trapdoor that lifts nothing stops being greppable (the Terraform `nonsensitive()` regression: v1.5.0 refused a redundant call; main deleted the mark unconditionally). Shape defects stay the schema's (empty `because:` · missing `from:` on taint · unknown law). Live doors stay live: taint fires when an untrusted `inputs.*` binding named in `from:` reaches a verb arg (fixture 011); data-as-code fires on a statically code-bearing fetch, or stays deferred to the run twin (fixture 021). NEP-0008 originally cited AUTH-011 for the net dead-grant then recollated that class onto NIKA-SEC-005 (LAW-AUTH-0329 · fixture 026)."
+    inputs:
+      - registry: ir
+        id: lift_entry
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: ir
+            id: lift_that_lifts_nothing
+        quantifier: exists
+    conclusion:
+      verdict: refuse
+      diagnostics_on_refuse: ["NIKA-AUTH-011"]
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: lift_that_lifts_nothing
+      independent_judgment: true
+    domain_payload:
+      kind: authority
+      sets: ["DeclaredPermits", "EffectiveAuthority"]
+      relation: equality
+      pipeline_stage: permits_check
+    diagnostics: ["NIKA-AUTH-011"]
+    fixtures:
+      - conformance/tests/core/authority/011-declassify-declared-opens-the-door
+      - conformance/tests/core/authority/021-inert-door-declared-passes
+    negative_fixtures:
+      - conformance/tests/core/authority/028-lift-that-lifts-nothing-refused
+      - conformance/tests/core/authority/029-lift-data-as-code-on-inert-refused
+    projections: ["prose:10-authority", "prose:05-errors", "cli:check"]
+    implementation_surfaces:
+      - engine:nika-engine
+      - reference:deep_static.py
+      - cli:nika-check
+      - conformance:authority-suite
+    introduced_in: C1
+    proof_obligations:
+      - "Rule 6 taint arm · fixture 028 observes NIKA-AUTH-011 on a well-shaped lift: taint whose from: inputs.p never reaches a verb arg (const.q is the trusted path) · fixture 011 is the live-door twin (inputs.p does reach nika:read) · fixture 012 is the no-lift trusted sibling."
+      - "Rule 6 data-as-code arm · fixture 029 observes NIKA-AUTH-011 on a well-shaped lift: data-as-code over an inert .csv fetch · fixture 021 is the live-door twin (.pkl with because) · fixture 020 is the no-lift inert sibling · fixture 022 stays the schema's empty-because refusal (NIKA-PARSE)."
+      - "NEP-0008 recollation · fixture 026 still observes NIKA-SEC-005 for the net dead-grant · AUTH-011 is never that class."
+    closure_gates:
+      - lift-that-lifts-nothing-taint
+      - lift-that-lifts-nothing-data-as-code

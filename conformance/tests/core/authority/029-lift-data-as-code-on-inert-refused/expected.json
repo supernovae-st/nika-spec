@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-AUTH-011", "category": "validation_error" }
+  ],
+  "note": "LAW-AUTH-0332 · the data-as-code arm · a well-shaped lift: naming data-as-code on an inert fetch (.csv) is a trapdoor that lifts nothing · the sink law would not have fired (020 is the clean sibling · 021 is the live door on .pkl) · refused, never a silent no-op."
+}

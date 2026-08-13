@@ -48,6 +48,13 @@ by omission. NEP-0005 established the dead-grant teaching for the env
 plane (`NIKA-AUTH-009`); this NEP applies it to the net plane
 (`NIKA-AUTH-011`).
 
+> **§2.7 amendment 2026-08-13** · the net dead-grant class recollated onto
+> `NIKA-SEC-005` (Specification §5 already names SEC-005; the engine
+> `permits_fit.rs` « Dead grants » has always spoken SEC-005; fixture 026
+> observes SEC-005). `NIKA-AUTH-011` is now the lift-that-lifts-nothing
+> class (10 §the authored doors rule 6 · LAW-AUTH-0332). The citation
+> above is historical; do not mint a second code for the net dead-grant.
+
 ## Specification
 
 The law (MUST):
