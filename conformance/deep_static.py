@@ -32,6 +32,13 @@
 #                 none|seeded×system) · entropy: none × a live structural
 #                 randomness source refuses at check (NIKA-PARSE-028) ·
 #                 judged on the DECLARED pair (LAW-TEMPORAL-0435 · NEP-0010)
+#   AGENT-SKILLS  agent.skills: paths resolve at compose time
+#                 (02-verbs §Agent Skills · check≡run) · a missing /
+#                 unreadable / templated / glob path is NIKA-AGENT-003 ·
+#                 a readable file that is not a valid Agent Skill
+#                 (frontmatter mapping · non-empty name + description)
+#                 is NIKA-AGENT-004 · relative paths resolve from
+#                 base_dir (the fixture / workflow parent)
 #   BUILTIN-SHAPE nika:write requires `content:` (a write with nothing to
 #                 write is an authoring bug) · nika:done is valid only
 #                 inside an agent tools whitelist · never a standalone
@@ -56,6 +63,7 @@ import re
 import shutil
 import subprocess
 import sys
+from pathlib import Path
 
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import SchemaError
@@ -1126,6 +1134,96 @@ def run_entropy_clock_errors(doc: dict, tasks: list) -> list[dict]:
     return errs
 
 
+_SKILL_GLOB = re.compile(r"[*?[]")
+
+
+def _parse_skill_md(text: str) -> str | None:
+    """Return None when the file is a valid Agent Skill; else a short
+    reason. 02-verbs §Agent Skills: YAML frontmatter (`---` fences)
+    carrying a non-empty name and description. Extra keys are tolerated."""
+    import yaml
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        return "no/unterminated/non-mapping frontmatter"
+    close = None
+    for i, line in enumerate(lines[1:], start=1):
+        if line.strip() == "---":
+            close = i
+            break
+    if close is None:
+        return "no/unterminated/non-mapping frontmatter"
+    try:
+        data = yaml.safe_load("\n".join(lines[1:close]))
+    except yaml.YAMLError:
+        return "no/unterminated/non-mapping frontmatter"
+    if not isinstance(data, dict):
+        return "no/unterminated/non-mapping frontmatter"
+    name = data.get("name")
+    desc = data.get("description")
+    if not isinstance(name, str) or not name.strip():
+        return "missing/empty name"
+    if not isinstance(desc, str) or not desc.strip():
+        return "missing/empty description"
+    return None
+
+
+def agent_skills_errors(doc: dict, tasks: list, base_dir=None) -> list[dict]:
+    """02-verbs §Agent Skills · check≡run.
+    A skills: path that does not resolve (missing, unreadable, a
+    `${{ }}` template, or a glob) is NIKA-AGENT-003. A readable file
+    that is not a valid Agent Skill is NIKA-AGENT-004. Relative paths
+    resolve from base_dir. When base_dir is absent, only the
+    template/glob shape is judged (same skip as composition_errors)."""
+    errs: list[dict] = []
+    for tid, t in tasks:
+        agent = t.get("agent")
+        if not isinstance(agent, dict):
+            continue
+        skills = agent.get("skills")
+        if not isinstance(skills, list):
+            continue
+        for raw in skills:
+            if not isinstance(raw, str) or not raw:
+                errs.append({
+                    "code": "NIKA-AGENT-003", "namespace": "NIKA-AGENT",
+                    "category": "validation_error",
+                    "detail": f"task '{tid}' skills: path does not resolve "
+                              "(empty) · 02-verbs §Agent Skills · check≡run"})
+                continue
+            if "${{" in raw or _SKILL_GLOB.search(raw):
+                errs.append({
+                    "code": "NIKA-AGENT-003", "namespace": "NIKA-AGENT",
+                    "category": "validation_error",
+                    "detail": f"task '{tid}' skills: path {raw!r} does not "
+                              "resolve (templates and globs are refused · "
+                              "the same explicitness law as permits:) · "
+                              "02-verbs §Agent Skills · check≡run"})
+                continue
+            if base_dir is None:
+                continue
+            resolved = Path(raw) if Path(raw).is_absolute() else (Path(base_dir) / raw)
+            try:
+                text = resolved.read_text(encoding="utf-8")
+            except (OSError, UnicodeError):
+                errs.append({
+                    "code": "NIKA-AGENT-003", "namespace": "NIKA-AGENT",
+                    "category": "validation_error",
+                    "detail": f"task '{tid}' skills: path {raw!r} does not "
+                              "resolve (file missing/unreadable at compose "
+                              "time) · 02-verbs §Agent Skills · check≡run"})
+                continue
+            reason = _parse_skill_md(text)
+            if reason is None:
+                continue
+            errs.append({
+                "code": "NIKA-AGENT-004", "namespace": "NIKA-AGENT",
+                "category": "validation_error",
+                "detail": f"task '{tid}' skills: file {raw!r} is not a "
+                          f"valid Agent Skill ({reason}) · 02-verbs "
+                          "§Agent Skills · check≡run"})
+    return errs
+
+
 def lift_that_lifts_nothing_errors(doc: dict, tasks: list) -> list[dict]:
     """LAW-AUTH-0332 · a `lift:` entry whose named law would not have
     fired on this task is refused (NIKA-AUTH-011 · validation_error).
@@ -1167,7 +1265,7 @@ def lift_that_lifts_nothing_errors(doc: dict, tasks: list) -> list[dict]:
     return errs
 
 
-def deep_static_errors(doc: dict) -> list[dict]:
+def deep_static_errors(doc: dict, base_dir=None) -> list[dict]:
     errs: list[dict] = []
     if not isinstance(doc, dict):
         return errs
@@ -1177,6 +1275,10 @@ def deep_static_errors(doc: dict) -> list[dict]:
     # contradictions (NIKA-PARSE-026 / 027) and entropy: none × a live
     # structural randomness source (NIKA-PARSE-028)
     errs.extend(run_entropy_clock_errors(doc, tasks))
+
+    # AGENT-SKILLS · 02-verbs §Agent Skills · check≡run
+    # NIKA-AGENT-003 missing/unreadable/templated/glob · NIKA-AGENT-004 invalid
+    errs.extend(agent_skills_errors(doc, tasks, base_dir=base_dir))
 
     # CEL-PARSE · every expression body everywhere · boolean shape on when:
     for path, s in _walk(doc):

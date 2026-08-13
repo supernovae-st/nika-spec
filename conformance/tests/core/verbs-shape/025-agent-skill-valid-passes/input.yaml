@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-agent-skill-valid
+permits:
+  tools: ["nika:done"]
+tasks:
+  review:
+    agent:
+      prompt: "Review the change"
+      tools: ["nika:done"]
+      skills:
+        - "skills/review/SKILL.md"

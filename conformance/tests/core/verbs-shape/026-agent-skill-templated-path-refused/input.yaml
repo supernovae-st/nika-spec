@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-agent-skill-templated
+permits:
+  tools: ["nika:done"]
+inputs:
+  pack: { type: string, default: "review" }
+tasks:
+  review:
+    agent:
+      prompt: "Review the change"
+      tools: ["nika:done"]
+      skills:
+        - "skills/${{ inputs.pack }}/SKILL.md"
