@@ -212,6 +212,11 @@ bounds either.
 Minting a key is a persistent identity act on the operator's machine,
 not a fixture decision, so it is named here rather than taken.
 
+**A second gate of the same shape, different currency.** The blame
+polarity is only ever raised by the `agent:` verb, so exercising it
+costs a provider call — network and spend. Neither is a wall the suite
+can climb by being cleverer; both are decisions with an owner.
+
 The other eight have none, and the reason is **structural, not
 negligence**. The suite has three fixture families ·
 
@@ -229,7 +234,7 @@ Every uncovered law needs a surface neither family models ·
 | artifact decode bounds (`Oversized` · `TooDeep` · `ProofFlood` · `IdOverflow`) | a **receipt** fixture family — these guard the whole-document decoder, not the walk |
 | ~~the readable-receipt projection~~ | ✅ closed by `runtime/receipt/001` + `002` |
 | ~~input origins~~ · ~~the boot manifest~~ | ✅ closed by `runtime/trace/007` + the family's new `prologue` field, which asserts CONTENT (including what is legitimately ABSENT) rather than a verdict |
-| blame polarity | a receipt fixture whose subject is a REFUSAL — a green run's receipt carries no blame to project |
+| blame polarity | measured 2026-08-13: it is spoken by NEITHER the check diagnostic NOR the receipt (spec 05 corrected same day) — only by the `agent:` verb's runtime refusal, so proving it needs an agent run against a provider: network and spend, not a fixture the suite can hold offline |
 | the teardown seal (`receipt_digest` · budgets · effects) · the quarantine fold | a journal carrying a VALID ed25519 seal — producible only by running with a key, never by construction |
 | the boot manifest (`spec_pin` · `stamper_kind` · `clock` · `seed`) | a shape that asserts prologue CONTENT; absence is honest here, so there is no verdict to key on |
 | judged ≠ booted | nothing to hold it: the refusal fires BEFORE the first frame, and the lazy-open law means no journal exists to verify |

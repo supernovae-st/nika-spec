@@ -4939,8 +4939,9 @@ Every error is a typed structure ·
 ### Blame polarity (normative · when a refusal names a bound)
 
 A refusal that trips a *bound* also names WHO set that bound. The
-polarity is a vocabulary, kebab-case on the wire, spoken by the check
-diagnostic and by the receipt ·
+polarity is a vocabulary, kebab-case on the wire, carried by the
+**refusal itself** — the typed error a verb raises when the bound is
+hit, beside the reason the bound exists ·
 
 | Polarity | Who is named |
 |---|---|
@@ -4957,6 +4958,23 @@ where to go and change it.
 The set is closed but **extensible by law** — a future rule may add a
 polarity, so a consumer matches with a wildcard arm rather than
 assuming three forever.
+
+**Where it is spoken, measured 2026-08-13 · `nika 0.108.0`.** The
+polarity is decided where the bound is *chosen*, not where it is
+tripped: an `agent:` task declaring `max_turns:` gets `by-the-caller`
+with the source « the task's own `max_turns:` », and one that omits it
+gets `by-the-contract` with the source « spec 02-verbs.md §agent ·
+`max_turns` default 10 ». That pairing — a polarity AND the rule that
+set the bound — is what makes the refusal actionable.
+
+Two surfaces do **not** carry it today and this text used to claim they
+did: `nika check` speaks no polarity (it judges statically, before any
+bound is consumed), and the run receipt has no blame field. The claim
+belonged to the proposal that became this section and was carried
+forward without being run. A conformant engine MAY widen the carrier;
+what is normative is the vocabulary, the pairing with a source, and the
+rule that a contract-set default is never imputed to a value nobody
+wrote or a caller who typed nothing.
 
 ---
 
