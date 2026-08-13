@@ -11,8 +11,9 @@ a numbered, public, git-versioned document.
 > proposal again, the maintainers included.
 >
 > That is why the drafts that used to sit here are gone: on 2026-08-14 the
-> twenty of them stopped being proposals and became the language. The
-> table below says where each law lives now.
+> twenty of them stopped being proposals. Eighteen became the language;
+> two were never built and are buried as such. The tables below say where
+> each one went — a number that resolves to nothing does so on purpose.
 
 - The process itself: [NEP-0000 · The NEP Process](nep-0000-the-nep-process.md)
 - The shape a future proposal takes: [nep-template.md](nep-template.md)
@@ -53,17 +54,8 @@ hunting a law that does not exist.
 | NEP | What died | Why |
 |---|---|---|
 | 0017 law 4 | the named solo endorsement (`endorsement: solo`) | the `policy:` block left the envelope on 2026-08-12, and `NIKA-POLICY-001` + `NIKA-SEC-013` are **retired** with it ([`spec/05-errors.md`](../spec/05-errors.md) §retired · [`canon/tombstones.yaml`](../canon/tombstones.yaml)). The law's other three fold above; this one had no carrier left |
-
-## Still folding
-
-These carry law the spec does not yet hold in full. Each descends into
-`spec/` before its file goes — deleting first would lose normative text
-nothing else carries.
-
-| NEP | Title | Type | Status |
-|---|---|---|---|
-| [0019](nep-0019-workflow-token-budget.md) | The workflow token budget — the portable cap leaves the agent verb | Standards Track | Draft |
-| [0021](nep-0021-delegation-block.md) | The `delegation:` block — bounded, attenuated, attested sub-runs under `agent:` | Standards Track | Draft |
+| 0019 | the workflow-level token budget | a SKETCH, never built: no engine carries it, and the `policy:` surface it proposed to hang from left the envelope on 2026-08-12 ([`spec/10-authority.md`](../spec/10-authority.md) §the unconditional laws). The verb-level `agent.max_tokens_total` it wanted to generalize is untouched ([`spec/02-verbs.md`](../spec/02-verbs.md)). Text at `509472c` |
+| 0021 | the `delegation:` block and its three builtins | a SKETCH, never built: `nika:delegate` · `nika:take` · `nika:scratch` exist in no engine and no stdlib. Writing it into the spec would promise a surface nothing implements. Text at `509472c`, and on the branch `nep/0021-delegation-block` |
 
 ## Numbering
 
