@@ -223,7 +223,7 @@ patterns:
 - glob: "conformance/**"
   class: authored
   match_count: 201
-  aggregate_sha256: 62dc51449c368a0aee1d3af67dd49112656ca5892e1cd84bfc9288948edc5274
+  aggregate_sha256: ae9af336127cf00bc1f5dc486260b848fee5f1700e94e3ed21b39f26510f2814
   evidence: "the 95-workflow corpus (envelope · variables · verbs · errors · dag · gates · types · yaml-profile · values · composition · decision-goldens frozen at authoring time and consumed by decision_core_selftest.py) + the Python cores/selftests/runner + README/FINDINGS/runner-protocol; type-corpus + coverage-matrix excepted in files:"
 - glob: "proofs/**"
   class: testimonial
@@ -258,7 +258,7 @@ patterns:
 - glob: "spec/**"
   class: authored
   match_count: 18
-  aggregate_sha256: c40293525dfcd5b71b41200ddaff0ab8281233437d7e266452ba405c8240a9d7
+  aggregate_sha256: 5adab9a09fe9ff04aa376ae086eabc077f9f4470564be9b565e07ae5f965e46e
   evidence: "the normative prose law (00-overview → 16-projections) — THE spec; no generation markers"
   note: "spec/00-04 · 06-08 carry tool-maintained '<!-- canon:KEY -->N<!-- /canon -->' count markers inside the authored prose (canon-projectors.py TARGET 0 · --check gated) — the class stays authored"
 - glob: "stdlib/**"

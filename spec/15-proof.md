@@ -245,16 +245,29 @@ artifacts this engine produced a moment ago: an attacker who can write
 the file is the threat, not the producer.
 
 **The decode bounds are spec constants** — not engine folklore, so a
-second implementation inherits them instead of re-deriving them ·
+second implementation inherits them instead of re-deriving them. Each
+one names **the surface it guards**: the two reading surfaces are the
+JOURNAL (a chained NDJSON walk) and the ARTIFACT (a receipt · a sidecar
+· an anchor token — one JSON document decoded whole), and a bound that
+guards one does not guard the other ·
 
-| Bound | Value | What it stops |
-|---|---|---|
-| artifact size | 1 MiB | a receipt is kilobytes; the rest is a denial of service |
-| journal line | 1 MiB | one line beyond this is refused before the JSON parser sees it |
-| journal total | 256 MiB | past this it is not a run this engine produced |
-| JSON nesting depth | 32 | unbounded recursion at decode |
-| proof-node count | 64 | a proof flood |
-| identifier length | 256 bytes | an identifier used to overflow a render |
+| Bound | Value | Surface | What it stops |
+|---|---|---|---|
+| line length | 1 MiB | journal, per line | one line beyond this is refused before the JSON parser sees it |
+| file size | 256 MiB | journal, whole | past this it is not a run this engine produced |
+| artifact size | 1 MiB | artifact | a receipt is kilobytes; the rest is a denial of service |
+| JSON nesting depth | 32 | artifact | unbounded recursion at decode |
+| proof-node count | 64 | artifact | a proof flood |
+| identifier length | 256 bytes | artifact | an identifier used to overflow a render |
+
+The split is not an accident of implementation, it is the shape of the
+two readers. A journal is walked **line by line** and each line is
+bounded before it is parsed, so a hostile line costs one bound-check and
+nothing else; the structural bounds (depth · proof nodes · identifier
+length) belong to the reader that decodes a document **whole**, where
+recursion and fan-out are the attack. Stating a bound without its
+surface invites a second implementation to enforce it in the wrong
+place — which is both a false refusal and a real hole.
 
 The law (MUST) ·
 

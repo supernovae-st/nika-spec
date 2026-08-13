@@ -82,3 +82,37 @@ loop · `reference/selftest.py` (28 laws · 300 seeds) · `scripts/gen-gate-matr
 --check` · `scripts/lints-differential.py --selftest` (5/5) ·
 `scripts/mutation-adequacy.py --check` (15/15 selftests die under a permissive
 judge). All green at this commit.
+
+## F-4 · The 1 MiB decode grain has three independent definitions, not one
+
+**Measured 2026-08-13 · reference engine `origin/main`.** The
+untrusted-decode bounds of [15 §the verifier is a fortress](../spec/15-proof.md)
+are stated as spec constants precisely so a second implementation
+inherits them. The reference engine's own tree carries the 1 MiB grain
+in **three** places that no gate ties together ·
+
+```
+crates/nika-dap/src/bounded.rs:27        MAX_ARTIFACT_BYTES = 1024 * 1024
+crates/nika-registry-client/src/lib.rs:70  MAX_ARTIFACT_BYTES = 1024 * 1024   (own const)
+crates/nika-harness/src/client.rs:39     MAX_LINE_BYTES    = 1024 * 1024   (own const)
+```
+
+`nika-dap`'s journal walk is the one that composes correctly —
+`chain.rs:110` aliases `MAX_LINE_BYTES` **to** `bounded::MAX_ARTIFACT_BYTES`
+rather than restating the literal, so those two can never drift apart.
+The registry client and the harness restate it. Three literals agreeing
+today is not one source; it is three sources that happen to agree, and
+the failure mode is silent — a bound raised in one place leaves the
+other two quietly stricter, and nothing goes red.
+
+**Also measured, and worth writing down because the prose invites the
+opposite reading:** on the JOURNAL surface only the line bound and the
+whole-file bound are enforced. A journal line carrying a 300-byte
+identifier, or forty levels of nesting, walks clean — those two bounds
+guard the ARTIFACT decoder (`decode_untrusted_json`), never the walk.
+Spec 15's table now names the surface per bound for that reason.
+
+Not blocking, and not asserted by any fixture: a conformance corpus
+cannot see a second implementation's internal constants. This is an
+upstream note — one const, re-exported, or a gate that proves the three
+agree.
