@@ -198,6 +198,18 @@ Every proof consumer reads THIS stream: the receipt folds from it
 show|replay` renders it, the verify walk re-hashes it. One stream, no
 side-channel.
 
+**Resuming across engine versions is judged, never assumed**
+(normative) · a journal records the `engine_version` that wrote it. A
+resume under a DIFFERENT engine is either an explicit refusal naming
+both versions, or a compatibility the operator DECLARES — and the
+declaration must name the recorded version exactly (a journal from
+before versioning is named `unrecorded`). A blanket force is not
+available, because a blanket force is precisely the silent degradation
+this law retires: the old implicit fallback quietly replanned an empty
+plan and called it a resume. The declared compatibility is journaled on
+the new run's boot manifest, so the attestation says under whose
+authority the versions were crossed.
+
 ## Conformance
 
 A v1-conformant engine MUST ·

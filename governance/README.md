@@ -37,6 +37,7 @@ resolve to.** A number is never reused.
 | 0011 | The run's lifecycle is attested: boot manifest, teardown seal, verifier-borne `incomplete` | [`spec/17-trace.md`](../spec/17-trace.md) §the prologue · §the end of the run |
 | 0012 | The receipt is untrusted input: bounds as constants, recognize-don't-sanitize | [`spec/15-proof.md`](../spec/15-proof.md) §the verifier is a fortress |
 | 0013 | Human approval is a bounded, content-bound, attested ticket | [`spec/10-authority.md`](../spec/10-authority.md) §the approval is a bounded ticket · `NIKA-SEC-010` |
+| 0014 | The thin-laws (3a): observable independence · input origins · the readable receipt · cross-version resume | [`spec/05-errors.md`](../spec/05-errors.md) `NIKA-SEC-012` · [`04`](../spec/04-variables.md) §origin · [`15`](../spec/15-proof.md) §receipt · [`17`](../spec/17-trace.md) §fold law |
 | 0015 | Preview-commit: judged = executed, at the action scale | [`spec/05-errors.md`](../spec/05-errors.md) · `NIKA-SEC-011` |
 | 0018 | Energy honesty: unknown stays unknown, and never a fabricated zero | [`spec/07-conformance.md`](../spec/07-conformance.md) §the spend-honesty law |
 | 0020 | A refused confirm must not reach an effect | [`spec/10-authority.md`](../spec/10-authority.md) §the affirmative-consent law · `NIKA-SEC-014` |
@@ -49,7 +50,6 @@ nothing else carries.
 
 | NEP | Title | Type | Status |
 |---|---|---|---|
-| [0014](nep-0014-thin-laws.md) | The thin-laws (lot 3a): observable independence · input origins · the readable receipt · cross-version resume | Standards Track | Draft |
 | [0016](nep-0016-provenance-tiers.md) | Provenance tiers: a closed ladder admitted by evidence, an operator-owned floor, the tier attested | Standards Track | Draft |
 | [0017](nep-0017-thin-laws-3b.md) | The thin-laws (lot 3b): the pricing pin · the end obligation · the third blame · the named solo | Standards Track | Draft |
 | [0019](nep-0019-workflow-token-budget.md) | The workflow token budget — the portable cap leaves the agent verb | Standards Track | Draft |

@@ -185,6 +185,26 @@ satisfies a `required: true` input · an undeclared key is refused before the
 run. See [01-envelope.md](./01-envelope.md#inputs--optional--typed-workflow-inputs)
 for the launch contract.
 
+**Every bound input carries its ORIGIN** (normative) · a value is not
+only *what* it is, it is *where it came from*, and the run records
+which ·
+
+| Origin | The channel that supplied the value |
+|---|---|
+| `cli-operator` | `--var name=value`, typed by a human at a terminal |
+| `ci-context` | `--var name=value` arriving through a pipeline — the caller is not a human |
+| `env` | `--var name=@env:VAR` · the **declared** environment channel, read through its explicit spelling |
+| `file` | the workflow's own declared `default:` filled the input |
+
+The origin rises to the receipt, so a proof answers *who supplied this*
+and not merely *what was supplied*. The distinction that carries the
+weight is `env`: an environment value enters through a spelling the
+author wrote, never through an ambient guess — the same law the
+[`permits.env`](./01-envelope.md) passthrough enforces for child
+processes, applied to the launch surface. A pipeline and a person are
+likewise not the same caller, and a receipt that conflated them would
+lose the fact an auditor is looking for.
+
 ### `${{ const.X }}` · named constants
 
 ```yaml

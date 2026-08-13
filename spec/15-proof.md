@@ -214,6 +214,17 @@ receipt = (
   to the semantic hash it proves: given a receipt you can verify it
   proves *this* workflow and no other.
 
+**Every receipt field carries a readable projection** (normative) · the
+schema itself holds, per field, the stable human text that renders it;
+a new field WITHOUT one refuses the schema. The ratchet is the point —
+a proof surface grows only in forms a human can read, so the readable
+half can never fall behind the machine half.
+
+**And the projection is never the evidence.** Reading a receipt and
+verifying one are two acts at two trust levels: the rendered text is a
+convenience, the verification is the proof. A surface that lets the
+first pass for the second has quietly made prose authoritative.
+
 ## The verifier is a fortress (normative · reading untrusted proof)
 
 The trace, the receipt and the seal exist to be **verified** — which
