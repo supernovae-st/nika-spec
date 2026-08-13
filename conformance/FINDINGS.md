@@ -220,6 +220,20 @@ polarity is only ever raised by the `agent:` verb, so exercising it
 costs a provider call — network and spend. Neither is a wall the suite
 can climb by being cleverer; both are decisions with an owner.
 
+### An honest note about this table
+
+**Four rows of it have named the wrong blocker.** Provenance tiers was
+filed as needing a network (the cache-hit arm is local). The
+spend-honesty rungs were filed as needing a rendered-text family
+(`--json` carries the reading as data). Cross-version resume was filed
+as needing two engine builds (the judgment reads the version the
+JOURNAL records). And judged ≠ booted was filed with the wrong
+mechanism. Each was written by reasoning from the law's statement
+instead of probing the surface — the same error the findings above are
+about. **A blocker is measured, never deduced from what a law says.**
+Every remaining row here was probed against the shipped binary before
+being left in place.
+
 The other eight have none, and the reason is **structural, not
 negligence**. The suite has three fixture families ·
 
@@ -240,7 +254,7 @@ Every uncovered law needs a surface neither family models ·
 | blame polarity | measured 2026-08-13: it is spoken by NEITHER the check diagnostic NOR the receipt (spec 05 corrected same day) — only by the `agent:` verb's runtime refusal, so proving it needs an agent run against a provider: network and spend, not a fixture the suite can hold offline |
 | the teardown seal (`receipt_digest` · budgets · effects) · the quarantine fold | a journal carrying a VALID ed25519 seal — producible only by running with a key, never by construction |
 | the boot manifest (`spec_pin` · `stamper_kind` · `clock` · `seed`) | a shape that asserts prologue CONTENT; absence is honest here, so there is no verdict to key on |
-| judged ≠ booted | nothing to hold it: the refusal fires BEFORE the first frame, and the lazy-open law means no journal exists to verify |
+| judged ≠ booted | re-measured 2026-08-13, and the earlier reason here was wrong in mechanism though right in conclusion. It is not that « no journal exists » — it is that **no CLI invocation can produce the mismatch**: the load seam stamps the report with the semantic hash of the workflow it just read, and the run gate compares it against that same workflow, in one breath. No flag passes a report in (`grep` for one returns nothing). The clause guards a LIBRARY embedder handing `run` a report stamped over other bytes, which is a Rust-level test in the engine, not a corpus fixture |
 | ~~cross-version resume~~ | ✅ closed by `runtime/resume/001..003`. This row said it needed two engine builds; wrong — the judgment reads the version the JOURNAL RECORDS, so rewriting the boot manifest and recomputing the chain is enough. Third time a row here named the wrong blocker |
 | ~~provenance tiers~~ | ✅ closed by `runtime/registry/001` + `002` — and it needed no network: the CACHE-HIT arm of law 4 is exercisable offline against a scratch `HOME` |
 | ~~the spend-honesty rungs~~ | ✅ closed by `runtime/energy/001` + `002`. This row claimed a rendered-text family was needed; wrong — `nika check --json` exposes the reading STRUCTURALLY under an `energy` key, so it compares as data. The rendered rung is ergonomics; the reading beneath it is the law |
