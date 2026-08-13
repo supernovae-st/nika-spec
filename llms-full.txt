@@ -6008,7 +6008,8 @@ conformance/
 │   ├── lints/                 # advisory-lint fixtures
 │   ├── runtime/               # verb execution · task fields · events (behavioral half)
 │   │   ├── trace/            #   the journal, judged by the walk (a verdict)
-│   │   └── receipt/          #   the receipt, judged by its reading (what projects)
+│   │   ├── receipt/          #   the receipt, judged by its reading (what projects)
+│   │   └── registry/         #   a cache record × an operator floor, judged by admission
 │   └── stdlib/                # provider/extract/builtin canonical surface
 │
 ├── runner.py                  # the static oracle · `all` is the CI gate

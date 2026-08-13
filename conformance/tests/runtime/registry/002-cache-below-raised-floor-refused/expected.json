@@ -1,0 +1,7 @@
+{
+ "admitted": false,
+ "tier": "unprovenanced",
+ "code": "NIKA-REG-008",
+ "exit": 3,
+ "note": "registry-v0.1 §3b law 4 (NEP-0016) · THE CACHE DOES NOT GRANDFATHER. Byte-identical record to 001 — the pair differs by the policy file alone, which is what makes 001's admission a certificate rather than a default. The operator raises the floor to `provenanced`; the already-cached artifact sits at `unprovenanced`, so the resolve REFUSES rather than serving what was admissible under the old policy. Measured 2026-08-13 · nika 0.108.0, exit 3: `[NIKA-REG-008] … resolves at tier `unprovenanced`, below this machine's admission floor `provenanced` · the policy changed under the cache — the cache does not grandfather`. The refusal also names law 3 in its own words — « the floor is operator data: ~/.nika/registry/policy.toml » — and law 6 in its fix line: re-fetch re-proves, a registry-side upgrade rewrites nothing on its own."
+}

@@ -1,0 +1,11 @@
+{
+  "sha256": "8116b035a22dbcac19860e5ce7e6b464224b201aa61bd22b3e5a08eb8f400f10",
+  "coordinate": "supernovae-st/release-radar@0.1.0",
+  "source": {
+    "repo": "supernovae-st/nika-spec",
+    "rev": "699ebb08585da2b4b908e8dac6ca584332fe0783",
+    "path": "examples/release-radar.nika.yaml"
+  },
+  "signed": false,
+  "tier": "unprovenanced"
+}

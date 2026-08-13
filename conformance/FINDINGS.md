@@ -163,7 +163,7 @@ residual inline rather than claiming a parity that does not exist.
 Not blocking · upstream: give the cost arm the same class, or say in the
 COST legend that a `$0.0000` row can mean « provably never runs ».
 
-## F-6 · Six laws of fourteen are proven; three sit behind one decision
+## F-6 · Seven laws of fourteen are proven; the rest sit behind two decisions
 
 **Measured 2026-08-13**, after the NEP fold moved twenty design records
 into normative spec text. Fourteen distinct laws landed in `spec/` and
@@ -177,6 +177,7 @@ into normative spec text. Fourteen distinct laws landed in `spec/` and
 | the readable-receipt projection | 15 §the one receipt | `runtime/receipt/001` + `002` |
 | the boot manifest | 17 §the prologue | `runtime/trace/007` |
 | input origins | 04 §typed workflow inputs | `runtime/trace/007` |
+| provenance tiers · the floor | `registry-v0.1` §3b | `runtime/registry/001` + `002` |
 
 > **Amended twice the same day** — this finding first read « three
 > proven, two families missing », then « four ». The receipt family and
@@ -239,7 +240,7 @@ Every uncovered law needs a surface neither family models ·
 | the boot manifest (`spec_pin` · `stamper_kind` · `clock` · `seed`) | a shape that asserts prologue CONTENT; absence is honest here, so there is no verdict to key on |
 | judged ≠ booted | nothing to hold it: the refusal fires BEFORE the first frame, and the lazy-open law means no journal exists to verify |
 | cross-version resume | two engine versions in one fixture |
-| provenance tiers (`NIKA-REG-008`) | a **registry** fixture family — a fetch, a policy file, a cache record |
+| ~~provenance tiers~~ | ✅ closed by `runtime/registry/001` + `002` — and it needed no network: the CACHE-HIT arm of law 4 is exercisable offline against a scratch `HOME` |
 | the spend-honesty rungs (ENERGY · COST) | a shape that asserts RENDERED text; `valid` + `errors` cannot express a rung |
 
 Three of the fixtures written today only exist because the trace family

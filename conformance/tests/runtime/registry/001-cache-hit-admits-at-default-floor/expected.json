@@ -1,0 +1,5 @@
+{
+ "admitted": true,
+ "tier": "unprovenanced",
+ "note": "registry-v0.1 §3b laws 3 + 5 (NEP-0016) · NO policy file, so the admission floor is `unprovenanced` — today's behaviour stated out loud rather than assumed. The cache record carries its tier beside the digest, and a hit RE-TELLS the recorded truth: evidence is not re-sought, the record IS the evidence of what that fetch proved. Measured 2026-08-13 · nika 0.108.0 renders `cache · digest re-verified (sha256 8116b035…) · offline · tier unprovenanced · unsigned entry (v0.1 digest floor) (recorded at fetch)` and admits. `signed: false` is why the tier is the digest floor: bytes provably consistent with the pinned sha256, origin unproven."
+}
