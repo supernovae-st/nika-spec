@@ -214,6 +214,59 @@ receipt = (
   to the semantic hash it proves: given a receipt you can verify it
   proves *this* workflow and no other.
 
+## The verifier is a fortress (normative · reading untrusted proof)
+
+The trace, the receipt and the seal exist to be **verified** — which
+makes the verifier the one component guaranteed to parse bytes an
+attacker chose. Everything it reads is untrusted input, including
+artifacts this engine produced a moment ago: an attacker who can write
+the file is the threat, not the producer.
+
+**The decode bounds are spec constants** — not engine folklore, so a
+second implementation inherits them instead of re-deriving them ·
+
+| Bound | Value | What it stops |
+|---|---|---|
+| artifact size | 1 MiB | a receipt is kilobytes; the rest is a denial of service |
+| journal line | 1 MiB | one line beyond this is refused before the JSON parser sees it |
+| journal total | 256 MiB | past this it is not a run this engine produced |
+| JSON nesting depth | 32 | unbounded recursion at decode |
+| proof-node count | 64 | a proof flood |
+| identifier length | 256 bytes | an identifier used to overflow a render |
+
+The law (MUST) ·
+
+1. **Refusal is total.** An artifact past any bound is refused with a
+   **typed** class — `Oversized` · `TooDeep` · `Malformed` ·
+   `ProofFlood` · `IdOverflow` — never truncated, never partially
+   decoded, never repaired-and-continued. The order is fixed (size →
+   depth scan → parse → structural scan) so two implementations refuse
+   the *same* artifact for the *same* reason.
+2. **Bounds are code, on every build profile.** A bound carried by a
+   debug assertion is absent in the build that meets the attacker.
+3. **Recognize, never sanitize.** A malicious artifact is classified
+   and refused. A verifier that repairs hostile input into
+   acceptability becomes the vulnerability it was meant to catch — the
+   shotgun-parser diagnosis. Refusal classes are proven against a
+   golden corpus that lives with the implementation and runs on every
+   change; a crash, a hang or an overflow on that corpus is a defect of
+   the highest class, by definition.
+4. **The terminal is escaped, the machine surface is not.** Every
+   artifact-derived string rendered to a TTY has its C0, C1, DEL and
+   OSC/CSI sequences escaped: a title injection, a clipboard write or
+   hidden text is an attack that lands on the human, not on the
+   pipeline. `--json` and non-TTY output stay **byte-exact** — escaping
+   them would break the exactness the proofs depend on.
+5. **Two decoders, one verdict.** The reference decoder and an engine
+   decoder MUST render the same verdict over the same artifact. A
+   divergence is a defect of this specification until proven otherwise
+   — the discipline `nika.lock` already lives by, applied to the
+   reading side.
+
+Within bounds, nothing changes: an artifact that verified before
+verifies identically. Beyond them, behavior that was never a promise
+becomes a **named** refusal.
+
 ## Distribution (normative note · the local boundary · G35)
 
 A distributable pack ships as an OCI content-addressed artifact with
