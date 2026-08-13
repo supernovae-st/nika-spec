@@ -18,11 +18,11 @@ classes:
   testimonial: "captured evidence — fixtures, corpora, traces, receipts: proves behavior; neither shipped source nor regenerable output"
   foreign: "pointer to a third-party sovereign source"
 summary:
-  classified_files: 1345
+  classified_files: 1355
   file_rows: 15
   pattern_rows: 29
   by_class:
-    authored: 1017
+    authored: 1027
     authored-pin: 1
     generated: 130
     pinned-copy: 4
@@ -89,7 +89,7 @@ files:
     - "schemas/registries.schema.json"
 - path: "canon/ssot.lock"
   class: generated
-  sha256: 8ac50a7fecdc2384e0e3e932b8e749b3dc000e2e462a1ce277485ff41f44dfc6
+  sha256: 578a8b8133fa774f6fdaeb2a9d8c8b589dc3c70b993a578b96a2cbf8887a5225
   evidence: "single-line canonical JSON carrying generator identity ('ssot-compiler' 0.2.0-sandbox + its own source_sha256), the 27 leaf digests and law_count — no human writes a lock"
   derivation:
     tool: "python3 scripts/ssot-compiler.py (write mode · leaf digests only, digest-dag layer 1, own digest DETACHED per PAA-006)"
@@ -100,7 +100,7 @@ files:
     - "canon/laws-index.json (leaf-hashed)"
 - path: "canon/ssot.lock.sha256"
   class: generated
-  sha256: f57d666a5a9f08eef9fe0859ef3438ce5322400435677ddb9fbee9b995de5065
+  sha256: a5cf6cd15b8fa5bf22d547c65d35cf6fd3db95c2ae27622fa08c5c54dc16fd53
   evidence: "the lock's own digest, DETACHED into a sidecar per PAA-006 (a file cannot contain its own hash) — written by the compiler alongside the lock"
   derivation:
     tool: "python3 scripts/ssot-compiler.py (write mode · the detached-sidecar emission)"
@@ -109,7 +109,7 @@ files:
     - "canon/ssot.lock"
 - path: "conformance/coverage-matrix.tsv"
   class: authored
-  sha256: ccb1f05b714bdbbe567857b69a231fb2ecd9f8110bfeab3aa9552c348ea39c8d
+  sha256: caa2ebfd6e2e6ecc33cfb76ab57ab1cb0facf20e62f5b860f64db93063784826
   evidence: "conformance/README.md §Scope + coverage: 'Curated 2026-07-08 from the reference engine's private e2e lab (475 workflows → 95 by per-cell best-file selection)' — hand-curated, no script in the tree writes it; empty cells are the declared v0.2 backlog"
 - path: "conformance/type-corpus/corpus.jsonl"
   class: generated
@@ -171,7 +171,7 @@ patterns:
 - glob: "canon/**"
   class: authored
   match_count: 14
-  aggregate_sha256: ffee58179f252e8d30715222433332151bb7e8a6446aaca8f9a8a7b3881083fd
+  aggregate_sha256: 4a82f8e8f5f7d44d6466e169f9e92b2fad45001f830bfcc8c48f55854013a60d
   evidence: "the registries humans edit (surface · builtins · features · conformance · grammar · types · providers · migrations · projections · tombstones · snippets · templates · diagnostics) + canon/EXCEPTIONS.md (the §18 exception ledger) — the SOURCES the compiler seals; ssot.lock + sidecar excepted in files:"
 - glob: "conformance/tests/runtime/gates/**"
   class: generated
@@ -207,8 +207,8 @@ patterns:
     - "the VOCAB_FIXTURE constant in scripts/gen-gate-matrix.py"
 - glob: "conformance/tests/**"
   class: authored
-  match_count: 581
-  aggregate_sha256: 50e67e4207b862a02ce6ad0d3010abd4355f7bfacf23eb82f353fc5095cf731b
+  match_count: 591
+  aggregate_sha256: 6581a6ea0f8fd096d81d3c802e9b32eac3256acdacd9969b30c7e7da033a1016
   evidence: "the executable law — the 5-tier fixture corpus (core · deep 001-022 · lints · runtime · stdlib): input + expected pairs written at spec-authoring time, consumed by conformance/runner.py; no generation markers"
 - glob: "conformance/.nika/**"
   class: testimonial
@@ -223,7 +223,7 @@ patterns:
 - glob: "conformance/**"
   class: authored
   match_count: 201
-  aggregate_sha256: 0c9444fb551e4917ad4331c6d613647fc93b25a7855d29b10242734bf06819e3
+  aggregate_sha256: 04c2423847e2bacd32570ef6d084a12a9661a98508040a2a338c8a087b2a2160
   evidence: "the 95-workflow corpus (envelope · variables · verbs · errors · dag · gates · types · yaml-profile · values · composition · decision-goldens frozen at authoring time and consumed by decision_core_selftest.py) + the Python cores/selftests/runner + README/FINDINGS/runner-protocol; type-corpus + coverage-matrix excepted in files:"
 - glob: "proofs/**"
   class: testimonial
@@ -285,7 +285,7 @@ patterns:
 - glob: "reference/**"
   class: authored
   match_count: 6
-  aggregate_sha256: 8903b11f870d0f68215f01faa008ae02a9280cb87371160190d0a2ae200e31e1
+  aggregate_sha256: 2165a7ba662926ce6d474a3c3aefbcb23b3dd4bc99fa67d795d051b067779043
   evidence: "the executable reference semantics (semantics.py — the model that DEFINES gate-matrix outcomes · values_core.py · differential.py · generate.py · selftest.py) — hand-written Python, ruff-gated"
 - glob: "schemas/**"
   class: authored

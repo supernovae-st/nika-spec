@@ -170,8 +170,6 @@ def parse(text: str) -> dict:
             armor = ("recover", on_error["recover"])
         elif on_error.get("skip") is True:
             armor = ("skip", None)
-        elif on_error.get("fail_workflow") is True:
-            armor = ("fail_workflow", None)
         tasks[tid] = {
             "fails": cmd[0] == "false" or decode_fails or fit_fails,
             "when": bool(when),
@@ -220,9 +218,9 @@ def evaluate(model: dict) -> dict[str, dict]:
       WHEN     evaluated POST-gate: gate passes + when is false → SKIPPED
                (not cancelled) — downstream default gates treat it as
                passable, exactly like on_error.skip.
-      RETRY / RECOVER / SKIP / HALT / DEFAULT — identical to semantics.py
-               (HALT: fail_workflow fails the RUN, independent branches
-               still complete — the 120/120 differential law of W0).
+      RETRY / RECOVER / SKIP / DEFAULT — identical to semantics.py
+               (the DEFAULT fails the RUN while independent branches still
+               complete — the 120/120 differential law of W0).
     """
     tasks = model["tasks"]
     incoming: dict[str, list] = {tid: [] for tid in model["order"]}

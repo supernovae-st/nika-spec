@@ -7,5 +7,5 @@
       "category": "validation_error"
     }
   ],
-  "note": "05-errors.md §Fields (mutually exclusive) · recover / skip / fail_workflow · exactly one · declaring both recover: and skip: is rejected at parse time."
+  "note": "05-errors.md §Fields (mutually exclusive) · recover / skip · exactly one · declaring both recover: and skip: is rejected at parse time. (fail_workflow was the third and is REMOVED 2026-08-11 · a no-op in every combination; the fixture's subject is unchanged, only the count it recited.)"
 }

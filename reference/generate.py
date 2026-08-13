@@ -93,9 +93,6 @@ def generate(seed: int) -> str:
                 lines.append("    on_error:")
                 lines.append("      skip: true")
                 skippable = True
-            elif armor < 0.55:
-                lines.append("    on_error:")
-                lines.append("      fail_workflow: true")
         can_skip[i] = skippable
         never_runs[i] = wf_never_runs
     return "\n".join(lines) + "\n"
