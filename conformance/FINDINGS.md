@@ -116,3 +116,35 @@ Not blocking, and not asserted by any fixture: a conformance corpus
 cannot see a second implementation's internal constants. This is an
 upstream note — one const, re-exported, or a gate that proves the three
 agree.
+
+## F-5 · `never-run` is an energy-arm class: COST still prices a task that cannot execute
+
+**Measured 2026-08-13 · `nika 0.108.0`.** A task whose `for_each`
+iterates a literal EMPTY list provably never executes. The two spend
+rungs of `nika check` describe it differently ·
+
+```
+ ✔ COST    $0.0006 – $0.0006 worst-case output ceiling …
+   jamais  groq/qwen/qwen3-32b  ≤1000 tk  $0.0000      ← a row, priced zero
+   vrai    groq/qwen/qwen3-32b  ≤1000 tk  $0.0006
+ ✔ ENERGY  ≤ 0.087 Wh worst-case OUTPUT ceiling · gpu scope · 1 of 2 tasks measured · 1 never-run …
+   vrai    groq/qwen/qwen3-32b  ≤1000 tk  ≤ 0.087 Wh   ← no row for `jamais`
+```
+
+The energy arm carries the `never_runs` counter and withholds the row;
+the cost arm has no such class and prints `$0.0000`. The engine's own
+header records why the class was born (`nika-check/src/energy.rs`): a
+ceiling over a task that cannot execute is invented, and the probe that
+found it in July saw *« two adjacent rungs disagreeing about the same
+task »*. That sentence still describes the pair — the fix landed on one
+side.
+
+`$0.0000` here is a PROVEN zero, not the fabricated zero
+[15 §the spend-honesty law](../spec/07-conformance.md) bans, so nothing
+is dishonest. What is left is the asymmetry: the same task is a row on
+one rung and a counted absence on the other, and a reader has to know
+which arm they are reading to interpret it. Spec 07 law 3 names the
+residual inline rather than claiming a parity that does not exist.
+
+Not blocking · upstream: give the cost arm the same class, or say in the
+COST legend that a `$0.0000` row can mean « provably never runs ».

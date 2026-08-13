@@ -114,10 +114,12 @@ The law (MUST) ·
 
 1. **Name the bounded part, name every unbounded task, and never print
    a total that hides either.** A surface that cannot honor this prints
-   nothing rather than a wrong number. The two rungs read ONE
-   classification of the tasks, so they can never disagree about a
-   task's shape, and an unbounded task is named once — not once per
-   rung.
+   nothing rather than a wrong number. The two rungs MUST read ONE
+   classification of the tasks — the same task has the same shape on
+   both — and an unbounded task is named **once**, not once per rung:
+   the second rung counts it and points at the first. Two adjacent
+   readings that describe one task differently teach the reader to
+   distrust both.
 2. **Unknown stays unknown.** A figure the engine cannot source renders
    `unpriced`, never zero. A local model is `unpriced` — the operator's
    watts — never « free ». Absence of a rate is not a rate of zero, and
@@ -126,7 +128,11 @@ The law (MUST) ·
    iterates a literal EMPTY collection provably never runs: it is
    counted **never-run** and gets no row. A ceiling over a task that
    cannot execute would be invented, and two adjacent rungs would
-   describe the same task differently.
+   describe the same task differently. *(Measured residual, 2026-08-13 ·
+   `nika 0.108.0` — the ENERGY rung honours this; the COST rung still
+   prints such a task at `$0.0000`, so the two rungs do disagree about
+   it today. The `never-run` class exists on the energy arm only. The
+   law is the target for both.)*
 4. **Watt-hours sum inside a scope class and never across one.** An
    energy fact declares what it covers — `gpu` (accelerator only) ·
    `device` (whole host) · `fleet` (host + idle + datacenter overhead)
