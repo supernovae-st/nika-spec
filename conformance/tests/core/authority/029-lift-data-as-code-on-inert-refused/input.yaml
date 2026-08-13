@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-lift-data-as-code-on-inert
+permits:
+  net: { http: ["data.example.com"] }
+  tools: ["nika:fetch"]
+tasks:
+  rows:
+    invoke:
+      tool: nika:fetch
+      args: { url: "https://data.example.com/q3/rows.csv" }
+    lift:
+      - law: data-as-code
+        because: "this url is inert csv, the sink law never fires"
