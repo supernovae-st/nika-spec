@@ -18,11 +18,11 @@ classes:
   testimonial: "captured evidence — fixtures, corpora, traces, receipts: proves behavior; neither shipped source nor regenerable output"
   foreign: "pointer to a third-party sovereign source"
 summary:
-  classified_files: 1359
+  classified_files: 1361
   file_rows: 15
   pattern_rows: 29
   by_class:
-    authored: 1031
+    authored: 1033
     authored-pin: 1
     generated: 130
     pinned-copy: 4
@@ -54,7 +54,7 @@ files:
   evidence: "its own header: 'Bump deliberately: edit this' · the rev the shared estate tool is mirrored from, and the INPUT the mirror gate compares against"
 - path: "SSOT.md"
   class: authored
-  sha256: 4993939fcc28bb29a33b29fd915476346c64cd6e6fcc89e6079dfe0152ea9df8
+  sha256: e13f398377281aab12a150988970f375cacdb690c0c68db50b37c54828c5cd76
   evidence: "the map of where every fact lives — prose and judgments are authored, but it carries ONE generated island (the estate:map markers · §9): scripts/ssot-map-projector.py --write derives the gated-surfaces table from THIS manifest, and --check (exit 5 · conformance.yml 'Projection gates') refuses a hand edit inside the markers — the canon.yaml hybrid, inverted"
 - path: "VERSION"
   class: authored
@@ -207,8 +207,8 @@ patterns:
     - "the VOCAB_FIXTURE constant in scripts/gen-gate-matrix.py"
 - glob: "conformance/tests/**"
   class: authored
-  match_count: 595
-  aggregate_sha256: ec6e7069ce81a8c222414e55e9f5308b058f04d06c1b423fd453aa7cb51c5484
+  match_count: 597
+  aggregate_sha256: a764b252c185c9c749b7dba202bc5021fe92d510ebc5c7671f0cca55a294cbc5
   evidence: "the executable law — the 5-tier fixture corpus (core · deep 001-022 · lints · runtime · stdlib): input + expected pairs written at spec-authoring time, consumed by conformance/runner.py; no generation markers"
 - glob: "conformance/.nika/**"
   class: testimonial

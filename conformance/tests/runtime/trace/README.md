@@ -14,8 +14,15 @@ verdict).
 tests/runtime/trace/<NNN-name>/
 ├── golden.nika.yaml        the workflow the journal ran (001 only)
 ├── trace.ndjson            the journal under verification
-└── expected-verify.json    { "verdict": "clean" | "finding" | "forged", "note": … }
+└── expected-verify.json    { "verdict": …, "cost_replay"?: …, "note": … }
 ```
+
+`verdict` is the WALK's (below). `cost_replay` is optional and asserts
+the independent budget-meaning leg (15 §the semantic hash · the pinned
+pricing table) — `refused` when the pin names a table the engine does
+not know, `unrecorded` when the journal carries no pin at all. Absent
+means the fixture makes no claim there. The two legs never gate each
+other: a refused cost-replay leaves a `clean` walk clean.
 
 Verdict law · four classes, and the first three all mean « the chain
 walks » ·
