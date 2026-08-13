@@ -163,7 +163,7 @@ residual inline rather than claiming a parity that does not exist.
 Not blocking · upstream: give the cost arm the same class, or say in the
 COST legend that a `$0.0000` row can mean « provably never runs ».
 
-## F-6 · Seven laws of fourteen are proven; the rest sit behind two decisions
+## F-6 · Eight laws of fourteen are proven; the rest sit behind two decisions and a wall
 
 **Measured 2026-08-13**, after the NEP fold moved twenty design records
 into normative spec text. Fourteen distinct laws landed in `spec/` and
@@ -178,6 +178,7 @@ into normative spec text. Fourteen distinct laws landed in `spec/` and
 | the boot manifest | 17 §the prologue | `runtime/trace/007` |
 | input origins | 04 §typed workflow inputs | `runtime/trace/007` |
 | provenance tiers · the floor | `registry-v0.1` §3b | `runtime/registry/001` + `002` |
+| the spend-honesty reading | 07 §the spend-honesty law | `runtime/energy/001` + `002` |
 
 > **Amended twice the same day** — this finding first read « three
 > proven, two families missing », then « four ». The receipt family and
@@ -241,7 +242,7 @@ Every uncovered law needs a surface neither family models ·
 | judged ≠ booted | nothing to hold it: the refusal fires BEFORE the first frame, and the lazy-open law means no journal exists to verify |
 | cross-version resume | two engine versions in one fixture |
 | ~~provenance tiers~~ | ✅ closed by `runtime/registry/001` + `002` — and it needed no network: the CACHE-HIT arm of law 4 is exercisable offline against a scratch `HOME` |
-| the spend-honesty rungs (ENERGY · COST) | a shape that asserts RENDERED text; `valid` + `errors` cannot express a rung |
+| ~~the spend-honesty rungs~~ | ✅ closed by `runtime/energy/001` + `002`. This row claimed a rendered-text family was needed; wrong — `nika check --json` exposes the reading STRUCTURALLY under an `energy` key, so it compares as data. The rendered rung is ergonomics; the reading beneath it is the law |
 
 Three of the fixtures written today only exist because the trace family
 could be **extended** (a fourth walk verdict, then a fifth entry that is

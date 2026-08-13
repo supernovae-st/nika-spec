@@ -1,0 +1,16 @@
+{
+ "counts": { "total": 3, "uncapped": 1, "unpriced": 1, "unpriced_local": 0, "never_runs": 0 },
+ "scope_subtotals": [["gpu", 5.5424]],
+ "tasks": [
+  {
+   "task": "capped",
+   "model": "groq/qwen/qwen3-32b",
+   "per_call_tokens": 64000,
+   "wh": 5.5424,
+   "provenance": "independent-measured",
+   "scope": "gpu",
+   "measured_at": "2025-12"
+  }
+ ],
+ "note": "07 §the spend-honesty law · the three fates of a task, in one workflow. `capped` has BOTH a max_tokens cap and a sourced Wh rate, so it is the only one with a ceiling — and its row carries the three axes without which two honest numbers are incomparable: provenance (WHO produced the figure), scope (WHAT it covers), measured_at (figures rot with hardware generations). `uncapped` has no provable limit: it is COUNTED here and NAMED at COST, once, not once per rung. `unmeasured` will spend but no sourced rate exists for its model: `unpriced`, never a zero. The subtotal is keyed by scope class because watt-hours sum WITHIN a class and never across one. Measured 2026-08-13 · nika 0.108.0."
+}

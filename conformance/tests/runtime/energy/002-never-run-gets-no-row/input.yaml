@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-energy-never-run-gets-no-row
+permits: {}
+tasks:
+  jamais:
+    for_each: []
+    infer:
+      model: groq/qwen/qwen3-32b
+      prompt: "hello"
+      max_tokens: 1000
+  vrai:
+    infer:
+      model: groq/qwen/qwen3-32b
+      prompt: "hello"
+      max_tokens: 1000

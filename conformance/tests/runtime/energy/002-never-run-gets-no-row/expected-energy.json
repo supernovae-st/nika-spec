@@ -1,0 +1,16 @@
+{
+ "counts": { "total": 2, "uncapped": 0, "unpriced": 0, "unpriced_local": 0, "never_runs": 1 },
+ "scope_subtotals": [["gpu", 0.0866]],
+ "tasks": [
+  {
+   "task": "vrai",
+   "model": "groq/qwen/qwen3-32b",
+   "per_call_tokens": 1000,
+   "wh": 0.0866,
+   "provenance": "independent-measured",
+   "scope": "gpu",
+   "measured_at": "2025-12"
+  }
+ ],
+ "note": "07 §the spend-honesty law, law 3 · A PROVEN ZERO IS NOT AN UNKNOWN. `jamais` iterates a literal EMPTY list, so it provably never executes: it is counted `never_runs` and gets NO ROW, and the subtotal counts only the task that can actually run. The pair with 001 is the discrimination — same two-task shape, and the ONLY difference is that `jamais` cannot run: it is absent from `tasks[]` while every capped-and-measured task in 001 is present. A ceiling over a task that cannot execute would be invented. Note the residual spec 07 names inline: the COST rung still prints such a task at $0.0000, so the two rungs do disagree about it today — the `never-run` class exists on the energy arm only. Measured 2026-08-13 · nika 0.108.0."
+}

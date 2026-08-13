@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-energy-ceiling-names-its-axes
+permits: {}
+tasks:
+  capped:
+    infer:
+      model: groq/qwen/qwen3-32b
+      prompt: "hello"
+      max_tokens: 64000
+  uncapped:
+    infer:
+      model: groq/qwen/qwen3-32b
+      prompt: "hello"
+  unmeasured:
+    infer:
+      model: anthropic/claude-sonnet-4-20250514
+      prompt: "hello"
+      max_tokens: 1000
