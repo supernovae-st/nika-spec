@@ -6,7 +6,7 @@ model → production implementation → differential random testing).
 
 - **`semantics.py`** — the model (W2 « the flow »). Each law is a normative
   sentence (GATE-v2 per-edge pass-sets · WHEN post-gate · RETRY · RECOVER ·
-  SKIP · HALT · DEFAULT); evaluation is a pure function of the parsed
+  SKIP · DEFAULT); evaluation is a pure function of the parsed
   workflow. Edge roles: value · terminal-observation · failure-observation ·
   control (after predicates · terminal includes cancelled).
 - **`generate.py`** — seeded generator of small valid W2 workflows built
@@ -22,6 +22,17 @@ model → production implementation → differential random testing).
 python3 reference/differential.py --seeds 120        # 120/120 agree @ 0.103.0
 python3 reference/differential.py --seeds 1 --start 38   # inspect one seed
 ```
+
+> ⚠️ **Measured 2026-08-13 · `0/120` against the SHIPPED binary, and the
+> cause is not this model.** `nika 0.108.0` still requires the old
+> `nika: v1` envelope while `generate.py` already emits the new
+> `nika: <id>` identity form, so every generated workflow is refused at
+> parse and every task reads `engine=None`. The harness is AHEAD of the
+> shipped engine, not broken: it goes green again when the envelope
+> cascade ships. **Until then this differential proves nothing** — the
+> live proofs are `reference/selftest.py` (28 laws · 300 seeds) and
+> `scripts/gen-gate-matrix.py --check`, both green. The `120/120` above
+> is kept as the claim's provenance, not as a current reading.
 
 First catch (2026-07-13, the day the harness was born): the model's HALT
 law assumed `fail_workflow` cancels every unsettled task; seeds 4/6/38
