@@ -4,14 +4,23 @@ Thanks for wanting to improve the standard. This project follows the
 [Contributor Covenant](./CODE_OF_CONDUCT.md). Two doors, depending on
 what you are changing:
 
-## Normative changes → a NEP
+## Normative changes → a PR against `spec/`, until the v1 pre-freeze
 
 Anything that changes the language surface, the stdlib contract, the
-conformance suite's meaning, or the trace formats goes through a **NEP**
-(Nika Enhancement Proposal). Start at
-[governance/NEP-0000](./governance/nep-0000-the-nep-process.md), copy
-[the template](./governance/nep-template.md), open a PR. Nobody amends
-the standard directly — the maintainers included.
+conformance suite's meaning, or the trace formats is a **normative**
+change. Until the language is pre-frozen at v1 it goes through a plain
+PR that edits [`spec/`](./spec/) directly, with its conformance fixtures
+in the same PR — a proposal process only has meaning against something
+frozen, and this draft is not.
+
+At the pre-freeze that flips: every normative change becomes a **NEP**
+(Nika Enhancement Proposal) and nobody amends the standard directly, the
+maintainers included. The door is already built and waiting —
+[governance/NEP-0000](./governance/nep-0000-the-nep-process.md) carries
+the process and [the template](./governance/nep-template.md) the shape.
+[governance/README.md](./governance/README.md) records the twenty
+proposals folded into the draft on 2026-08-14, and where each law lives
+now.
 
 Not sure it deserves a NEP yet? Ideate first in the engine's
 [Ideas discussions](https://github.com/supernovae-st/nika/discussions/categories/ideas) —

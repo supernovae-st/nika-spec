@@ -3,9 +3,25 @@
 - **NEP**: 0000
 - **Title**: The NEP Process
 - **Author**: SuperNovae Studio maintainers
-- **Status**: Active (process NEP · never Final)
+- **Status**: Active · **DORMANT until the v1 pre-freeze** (process NEP · never Final)
 - **Type**: Process
 - **Created**: 2026-07-18
+
+> **Dormant, and this is what wakes it: the pre-freeze of the language
+> at v1.** A proposal process only has meaning against something FROZEN.
+> Before the freeze there is nothing to propose *against* — a new law is
+> written **directly** into [`spec/`](../spec/), and the deep breaks live
+> inside `v1` itself. On 2026-08-14 the twenty Standards-Track drafts
+> were resolved on exactly that reading: eighteen became the language,
+> two were never built and are buried as such, and
+> [`README.md`](README.md) records where each one went.
+>
+> This process becomes load-bearing at the pre-freeze, when every change
+> is a proposal again — the maintainers included. **An `Active` status
+> with zero open proposals is not a dead ceremony: it is a mechanism
+> waiting on a named trigger.** That sentence is here because a reader
+> concluded the opposite in under an hour, and a clause that says why it
+> sleeps beats a status you have to guess.
 
 ## Abstract
 
@@ -15,11 +31,12 @@ decided. This document defines the process itself: the lifecycle, the
 template, who decides, and how the process evolves.
 
 **Pre-ratification clause.** Until `1.0.0` ratifies the language, the
-spec on `main` is the draft and the draft evolves directly — the NEPs of
-this era are **design records of the draft** (all Standards-Track NEPs
-carry `Status: Draft` accordingly), their numbers already load-bearing
-in engine code and traces. **From 1.0 on, this process is binding**:
-nobody amends the standard directly, the maintainers included.
+spec on `main` is the draft and the draft evolves directly — so this era
+opens **no** Standards Track NEP: a law is written into `spec/` where it
+belongs, and the numbers already spent stay load-bearing in engine code
+and traces (see [`README.md`](README.md) for what each resolves to).
+**From the pre-freeze on, this process is binding**: nobody amends the
+standard directly, the maintainers included.
 
 The lineage is deliberate: [PEP 1](https://peps.python.org/pep-0001/)
 governs Python this way, the
@@ -79,8 +96,8 @@ this same door.
 
 ### Numbering and the founding era
 
-NEP numbering runs through this door from NEP-0000 onward — a pre-1.0
-Draft claims its number the same way (NEP-0002 is the living proof).
+NEP numbering runs through this door from NEP-0000 onward, and a number
+is spent for good — the twenty folded on 2026-08-14 are not recycled.
 The pre-1.0 rulings are the founding era: their verbatim record (the
 RULINGS documents and the ADR line) remains canonical history, not
 retroactive NEPs. One retroactive exception is reserved: NEP-0001,

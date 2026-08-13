@@ -304,10 +304,11 @@ Forever after GA · the 5 pillars are locked. Stdlib evolves independently.
 ## Governance
 
 - **Editor** · SuperNovae Studio (Thibaut Melen + Nicolas)
-- **Evolution** · every change to the standard goes through a **NEP**
-  (Nika Enhancement Proposal) · start at
-  [governance/NEP-0000](./governance/nep-0000-the-nep-process.md) ·
-  propose via [the template](./governance/nep-template.md)
+- **Evolution** · until the v1 pre-freeze, a normative change is a PR
+  against [`spec/`](./spec/) with its fixtures · the **NEP** process
+  ([governance/NEP-0000](./governance/nep-0000-the-nep-process.md) ·
+  [the template](./governance/nep-template.md)) is built and **dormant**,
+  and becomes binding at the freeze
 - **Discussion** · the NEP's pull request (public · no private track)
 - **Decisions** · accepted AND rejected NEPs stay published in
   [governance/](./governance/) · summaries in CHANGELOG.md
