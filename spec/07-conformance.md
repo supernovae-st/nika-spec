@@ -303,6 +303,8 @@ conformance/
 │   │                          # durations · schema-meta · when shape · binding purity
 │   ├── lints/                 # advisory-lint fixtures
 │   ├── runtime/               # verb execution · task fields · events (behavioral half)
+│   │   ├── trace/            #   the journal, judged by the walk (a verdict)
+│   │   └── receipt/          #   the receipt, judged by its reading (what projects)
 │   └── stdlib/                # provider/extract/builtin canonical surface
 │
 ├── runner.py                  # the static oracle · `all` is the CI gate

@@ -1,0 +1,4 @@
+{
+ "unprojected": [],
+ "note": "15 §the one receipt (NEP-0014 law 3) · every field of the receipt schema carries a READABLE PROJECTION in the schema itself, so `receipt explain` renders stable text for each one and lists nothing as unprojected. The REAL receipt of a one-task exec run (`receipt_format: 1` · certificate + trace_verdict + assertions + lock_digest + proves + digest). Its `lock_digest` reads `unrecorded` — the journal never carried one — which is the same absence-is-honest posture the boot manifest takes: never a guessed value. Measured 2026-08-13 · nika 0.108.0 · zero unprojected fields. The header the verb prints is law 3's second half verbatim: « a READING, never a proof — the digest is NOT recomputed here · `verify` is the proof »."
+}

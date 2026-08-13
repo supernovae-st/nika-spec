@@ -1,0 +1,4 @@
+{
+ "unprojected": ["champ_neuf_sans_projection"],
+ "note": "15 §the one receipt (NEP-0014 law 3) · THE RATCHET, fired. The same receipt as 001 with one field added that the schema holds no projection for. `receipt explain` names it under « unprojected fields (the schema refuses them) » instead of rendering it or passing it through silently — so the readable half can never fall behind the machine half: a field that grows without its human text is visible the moment anyone reads the receipt. This fixture is 001's mutant and exists to prove 001's green is earned: the pair differs by exactly one key, and the reading differs by exactly that key. Measured 2026-08-13 · nika 0.108.0."
+}
