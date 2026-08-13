@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-PARSE-026", "category": "validation_error" }
+  ],
+  "note": "LAW-TEMPORAL-0435 · NEP-0010 law 4 · a declared ambient × virtual pair cannot be both live and reproducible · judged on the DECLARED pair · the twin of 025."
+}

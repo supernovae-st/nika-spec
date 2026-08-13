@@ -681,7 +681,7 @@ diagnostics:
     payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
     span_required: false
     teaching: 'the dimensions couple · byte-identical journals need deterministic TIME as much as deterministic randomness · the only legal pairs are ambient x system (the status quo) and none|seeded x virtual (the deterministic states) · drop the virtual clock, or declare the deterministic pair.'
-    notes: 'nep-0010 (2026-07-23) · category: validation_error · transient: false (canon.yaml verbatim) · minted by the F-P3 spec lane · the engine parses with the registered generic NIKA-PARSE-019 until this mint lands (the commit names the follow-up) · the mirror contradiction is NIKA-PARSE-027.'
+    notes: 'nep-0010 (2026-07-23) · category: validation_error · transient: false (canon.yaml verbatim) · minted by the F-P3 spec lane · reference oracle emits NIKA-PARSE-026 (deep_static.run_entropy_clock_errors · fixture 026) · engine emission still owed · the mirror contradiction is NIKA-PARSE-027.'
   - id: NIKA-PARSE-028
     status: reserved
     owner: spec
@@ -698,7 +698,7 @@ diagnostics:
     payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
     span_required: false
     teaching: 'entropy: none promises zero consumed randomness · a live retry jitter (attempts > 1 with backoff) or nika:uuid consumes some by construction · relax the declaration to ambient, or remove the source.'
-    notes: 'nep-0010 (2026-07-23) · category: validation_error · transient: false (canon.yaml verbatim) · minted by the F-P3 spec lane · judged at CHECK (the two parse contradictions are NIKA-PARSE-026/027) · only a LIVE source is judged (a dead jitter consumes nothing).'
+    notes: 'nep-0010 (2026-07-23) · category: validation_error · transient: false (canon.yaml verbatim) · minted by the F-P3 spec lane · judged at CHECK (the two parse contradictions are NIKA-PARSE-026/027) · only a LIVE source is judged (a dead jitter consumes nothing · fixture 032) · reference oracle emits NIKA-PARSE-028 (fixture 028) · engine emission still owed.'
   - id: NIKA-PARSE-027
     status: reserved
     owner: spec
@@ -715,7 +715,7 @@ diagnostics:
     payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
     span_required: false
     teaching: 'byte-identical journals require deterministic TIME as much as deterministic randomness · a seeded or none entropy declaration must pair with clock: virtual (NEP-0010) · the wall clock leaks wall time into the journal and the promise dies.'
-    notes: 'nep-0010 (2026-07-23) · category: validation_error · transient: false (canon.yaml verbatim) · minted by the F-P3 spec lane · the mirror contradiction is NIKA-PARSE-026.'
+    notes: 'nep-0010 (2026-07-23) · category: validation_error · transient: false (canon.yaml verbatim) · minted by the F-P3 spec lane · reference oracle emits NIKA-PARSE-027 (fixtures 027 none×system · 031 seeded×system) · engine emission still owed · the mirror contradiction is NIKA-PARSE-026.'
   - id: NIKA-PARSE-025
     status: reserved
     owner: spec

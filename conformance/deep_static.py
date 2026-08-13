@@ -27,6 +27,11 @@
 #                 is silently-never-an-expression · rejected
 #   EXTRACT-PURE  `extract:` binding values are pure jq · `${{ }}` never
 #                 appears inside them (04 §binding rules)
+#   RUN-PAIR      declared `run.entropy` × `run.clock` contradictions
+#                 refuse (NIKA-PARSE-026 ambient×virtual · NIKA-PARSE-027
+#                 none|seeded×system) · entropy: none × a live structural
+#                 randomness source refuses at check (NIKA-PARSE-028) ·
+#                 judged on the DECLARED pair (LAW-TEMPORAL-0435 · NEP-0010)
 #   BUILTIN-SHAPE nika:write requires `content:` (a write with nothing to
 #                 write is an authoring bug) · nika:done is valid only
 #                 inside an agent tools whitelist · never a standalone
@@ -1055,6 +1060,72 @@ def _data_as_code_would_fire(t: dict, doc: dict) -> bool:
     return _code_bearing_class(resolved) is not None
 
 
+def _entropy_is_seeded(entropy) -> bool:
+    return isinstance(entropy, dict) and "seeded" in entropy
+
+
+def _consumes_live_randomness(tasks: list) -> bool:
+    """True when the body consumes a structural randomness source
+    NEP-0010 names: a LIVE retry jitter, or nika:uuid.
+    A dead jitter (jitter: false) or a single-attempt retry consumes
+    nothing. jitter defaults true; backoff_ms defaults 1000."""
+    for _tid, t in tasks:
+        retry = t.get("retry")
+        if isinstance(retry, dict):
+            attempts = retry.get("max_attempts", 1)
+            backoff = retry.get("backoff_ms", 1000)
+            jitter = retry.get("jitter", True)
+            if (isinstance(attempts, int) and attempts > 1
+                    and isinstance(backoff, int) and backoff > 0
+                    and jitter is not False):
+                return True
+        inv = t.get("invoke")
+        if isinstance(inv, dict) and inv.get("tool") == "nika:uuid":
+            return True
+    return False
+
+
+def run_entropy_clock_errors(doc: dict, tasks: list) -> list[dict]:
+    """LAW-TEMPORAL-0435 · NEP-0010 · a declared entropy × clock
+    contradiction is refused at parse (NIKA-PARSE-026 / 027);
+    entropy: none × a live structural randomness source is refused
+    at check (NIKA-PARSE-028). Judged on the DECLARED pair: clock:
+    virtual alone (entropy left implicit) stays legal. Absent run:
+    is ambient × system, the status quo."""
+    run = doc.get("run")
+    if not isinstance(run, dict):
+        return []
+    entropy = run.get("entropy")
+    clock = run.get("clock")
+    errs: list[dict] = []
+    if entropy == "ambient" and clock == "virtual":
+        errs.append({"code": "NIKA-PARSE-026", "namespace": "NIKA-PARSE",
+                     "category": "validation_error",
+                     "detail": "run: declares entropy: ambient with clock: virtual "
+                               "· ambient and virtual cannot be both live and "
+                               "reproducible (LAW-TEMPORAL-0435 · NEP-0010) · drop "
+                               "the virtual clock, or declare none|seeded × virtual"})
+    seeded = _entropy_is_seeded(entropy)
+    if clock == "system" and (entropy == "none" or seeded):
+        kind = "seeded" if seeded else "none"
+        errs.append({"code": "NIKA-PARSE-027", "namespace": "NIKA-PARSE",
+                     "category": "validation_error",
+                     "detail": f"run: declares entropy: {kind} with clock: system "
+                               "· a deterministic journal cannot ride the wall "
+                               "clock (LAW-TEMPORAL-0435 · NEP-0010) · pair "
+                               "none|seeded with clock: virtual"})
+    if entropy == "none" and _consumes_live_randomness(tasks):
+        errs.append({"code": "NIKA-PARSE-028", "namespace": "NIKA-PARSE",
+                     "category": "validation_error",
+                     "detail": "run: declares entropy: none while a live "
+                               "structural randomness source is consumed "
+                               "(retry jitter with attempts > 1, or nika:uuid) "
+                               "· the claim and the run disagree "
+                               "(LAW-TEMPORAL-0435 · NEP-0010) · relax the "
+                               "declaration to ambient, or remove the source"})
+    return errs
+
+
 def lift_that_lifts_nothing_errors(doc: dict, tasks: list) -> list[dict]:
     """LAW-AUTH-0332 · a `lift:` entry whose named law would not have
     fired on this task is refused (NIKA-AUTH-011 · validation_error).
@@ -1101,6 +1172,11 @@ def deep_static_errors(doc: dict) -> list[dict]:
     if not isinstance(doc, dict):
         return errs
     tasks = iter_tasks(doc)
+
+    # RUN-PAIR · NEP-0010 (LAW-TEMPORAL-0435) · declared entropy × clock
+    # contradictions (NIKA-PARSE-026 / 027) and entropy: none × a live
+    # structural randomness source (NIKA-PARSE-028)
+    errs.extend(run_entropy_clock_errors(doc, tasks))
 
     # CEL-PARSE · every expression body everywhere · boolean shape on when:
     for path, s in _walk(doc):

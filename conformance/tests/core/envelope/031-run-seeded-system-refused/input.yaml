@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-run-seeded-system
+run:
+  entropy: { seeded: 42 }
+  clock: system
+tasks:
+  greet:
+    infer:
+      prompt: "hi"
