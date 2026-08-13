@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-run-none-dead-jitter
+run:
+  entropy: none
+  clock: virtual
+tasks:
+  greet:
+    infer:
+      prompt: "hi"
+    retry:
+      max_attempts: 2
+      backoff_ms: 1000
+      jitter: false

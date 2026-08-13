@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "LAW-TEMPORAL-0435 · clock: virtual alone (entropy left implicit) stays legal · the contradiction is judged on the DECLARED pair · a test configuration that makes no determinism claim (NEP-0010)."
+}

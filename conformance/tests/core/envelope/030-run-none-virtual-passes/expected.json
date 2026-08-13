@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "LAW-TEMPORAL-0435 · the deterministic pair (none × virtual) is legal when no structural randomness is consumed · the twin of 027 (pair) and of 028 (live jitter)."
+}

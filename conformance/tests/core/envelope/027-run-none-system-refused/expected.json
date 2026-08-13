@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-PARSE-027", "category": "validation_error" }
+  ],
+  "note": "LAW-TEMPORAL-0435 · NEP-0010 law 4 · a declared none|seeded × system pair cannot ride the wall clock · judged on the DECLARED pair · the twin of 030."
+}

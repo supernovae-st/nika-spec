@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-PARSE-027", "category": "validation_error" }
+  ],
+  "note": "LAW-TEMPORAL-0435 · the other 027 arm · seeded × system cannot ride the wall clock · 027 is the none arm."
+}

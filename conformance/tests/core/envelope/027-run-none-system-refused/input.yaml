@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-run-none-system
+run:
+  entropy: none
+  clock: system
+tasks:
+  greet:
+    infer:
+      prompt: "hi"

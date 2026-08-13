@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-run-clock-virtual-alone
+run:
+  clock: virtual
+tasks:
+  greet:
+    infer:
+      prompt: "hi"

@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-PARSE-028", "category": "validation_error" }
+  ],
+  "note": "LAW-TEMPORAL-0435 · NEP-0010 · entropy: none × a LIVE retry jitter (attempts > 1, backoff > 0, jitter true) is a consumed structural randomness source · the pair none × virtual is otherwise legal (030) · only a live source is judged."
+}
