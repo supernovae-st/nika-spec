@@ -1,0 +1,13 @@
+nika: v1
+workflow:
+  id: receipt-probe
+permits:
+  exec: ["echo"]
+inputs:
+  qui:
+    type: string
+    default: "defaut-du-fichier"
+tasks:
+  dire:
+    exec:
+      command: ["echo", "${{ inputs.qui }}"]

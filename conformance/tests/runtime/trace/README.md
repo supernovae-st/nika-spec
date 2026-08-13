@@ -17,12 +17,24 @@ tests/runtime/trace/<NNN-name>/
 └── expected-verify.json    { "verdict": …, "cost_replay"?: …, "note": … }
 ```
 
-`verdict` is the WALK's (below). `cost_replay` is optional and asserts
-the independent budget-meaning leg (15 §the semantic hash · the pinned
-pricing table) — `refused` when the pin names a table the engine does
-not know, `unrecorded` when the journal carries no pin at all. Absent
-means the fixture makes no claim there. The two legs never gate each
-other: a refused cost-replay leaves a `clean` walk clean.
+`verdict` is the WALK's (below). Two optional fields assert what the
+walk does not ·
+
+- **`cost_replay`** — the independent budget-meaning leg (15 §the
+  semantic hash · the pinned pricing table): `replayed` when the pin
+  names a table this engine holds and the budget verdict is re-judged ·
+  `refused` when it names one the engine does not · `unrecorded` when
+  the journal carries no pin at all. The three arms live at `007`,
+  `006` and `001`. The legs never gate each other: a refused
+  cost-replay leaves a `clean` walk clean.
+- **`prologue`** — `{present: [...], absent: [...]}` over the boot
+  manifest's fields (17 §the prologue). It asserts CONTENT, not a
+  verdict, which is why it is a field of its own: `absent` is a real
+  claim, because a manifest states only what exists and a reader says
+  « unrecorded » rather than guessing. An ambient run listing `seed`
+  under `absent` is the law holding, not a gap.
+
+Absent fields mean the fixture makes no claim there.
 
 Verdict law · four classes, and the first three all mean « the chain
 walks » ·
