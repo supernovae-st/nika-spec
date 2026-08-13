@@ -198,12 +198,14 @@ init` mints one »*. That single absence closes three laws at once ·
 - **the quarantine fold** rides that same seal.
 - **the artifact decode bounds** are unreachable a second way: measured
   2026-08-13, `decode_untrusted_json` has exactly ONE production caller
-  — the anchor-sidecar read (`nika-dap/src/anchor/mod.rs:141`) — and
-  `trace verify --anchored` refuses **before** reading the sidecar when
-  the journal is unsealed (*« the anchor verifies against the seal's
-  key, so the tier is unattainable »*). An early refusal buys the
-  silence of everything downstream, here including the bounds
-  themselves.
+  — the anchor-sidecar read (`nika-dap/src/anchor/mod.rs:141`). **All
+  three read paths were probed with an out-of-bound sidecar in place**
+  (nesting 40 > 32): `trace verify` plain never opens it · `trace
+  evidence` never opens it · `trace verify --anchored` refuses
+  **before** opening it when the journal is unsealed (*« the anchor
+  verifies against the seal's key, so the tier is unattainable »*). An
+  early refusal buys the silence of everything downstream, here
+  including the bounds themselves.
 
 Also measured, and worth stating because the prose invites the opposite
 reading: `trace receipt explain` does **not** apply those bounds. Three
@@ -232,7 +234,13 @@ mechanism. Each was written by reasoning from the law's statement
 instead of probing the surface — the same error the findings above are
 about. **A blocker is measured, never deduced from what a law says.**
 Every remaining row here was probed against the shipped binary before
-being left in place.
+being left in place — and re-probed on 2026-08-13 after the fourth
+correction, by trying to get AROUND each blocker rather than by
+re-reading it. The two most likely to have an angle (the mock plane
+for blame polarity, the three sidecar read paths for the decode
+bounds) were tried and closed. That is what « measured » means here:
+not that the reason sounds right, but that the way around it was
+attempted and failed.
 
 The other eight have none, and the reason is **structural, not
 negligence**. The suite has three fixture families ·
@@ -251,7 +259,7 @@ Every uncovered law needs a surface neither family models ·
 | artifact decode bounds (`Oversized` · `TooDeep` · `ProofFlood` · `IdOverflow`) | a **receipt** fixture family — these guard the whole-document decoder, not the walk |
 | ~~the readable-receipt projection~~ | ✅ closed by `runtime/receipt/001` + `002` |
 | ~~input origins~~ · ~~the boot manifest~~ | ✅ closed by `runtime/trace/007` + the family's new `prologue` field, which asserts CONTENT (including what is legitimately ABSENT) rather than a verdict |
-| blame polarity | measured 2026-08-13: it is spoken by NEITHER the check diagnostic NOR the receipt (spec 05 corrected same day) — only by the `agent:` verb's runtime refusal, so proving it needs an agent run against a provider: network and spend, not a fixture the suite can hold offline |
+| blame polarity | measured 2026-08-13: spoken by NEITHER the check diagnostic NOR the receipt (spec 05 corrected same day) — only by the `agent:` verb's runtime refusal. **And the mock plane does not reach it**, probed the same day: `nika test` runs the agent offline under `mock(echo)`, which returns a final answer in ONE turn, so the turn budget is never exhausted and the polarity never fires; `max_turns: 0` (the only way to force it) is refused at parse — « must be 1-1000 ». Proving it needs a provider that keeps looping: network and spend |
 | the teardown seal (`receipt_digest` · budgets · effects) · the quarantine fold | a journal carrying a VALID ed25519 seal — producible only by running with a key, never by construction |
 | the boot manifest (`spec_pin` · `stamper_kind` · `clock` · `seed`) | a shape that asserts prologue CONTENT; absence is honest here, so there is no verdict to key on |
 | judged ≠ booted | re-measured 2026-08-13, and the earlier reason here was wrong in mechanism though right in conclusion. It is not that « no journal exists » — it is that **no CLI invocation can produce the mismatch**: the load seam stamps the report with the semantic hash of the workflow it just read, and the run gate compares it against that same workflow, in one breath. No flag passes a report in (`grep` for one returns nothing). The clause guards a LIBRARY embedder handing `run` a report stamped over other bytes, which is a Rust-level test in the engine, not a corpus fixture |
