@@ -83,7 +83,7 @@ loop · `reference/selftest.py` (28 laws · 300 seeds) · `scripts/gen-gate-matr
 `scripts/mutation-adequacy.py --check` (15/15 selftests die under a permissive
 judge). All green at this commit.
 
-## F-4 · The 1 MiB decode grain has three independent definitions, not one
+## F-4 · The 1 MiB decode grain has two independent definitions — and a third constant that only looks like one
 
 **Measured 2026-08-13 · reference engine `origin/main`.** The
 untrusted-decode bounds of [15 §the verifier is a fortress](../spec/15-proof.md)
@@ -97,13 +97,25 @@ crates/nika-registry-client/src/lib.rs:70  MAX_ARTIFACT_BYTES = 1024 * 1024   (o
 crates/nika-harness/src/client.rs:39     MAX_LINE_BYTES    = 1024 * 1024   (own const)
 ```
 
+> **Corrected 2026-08-13, same day, by reading the third one.** This
+> finding first counted THREE duplicates. `nika-harness`'s constant is
+> not one: its doc-comment says *« one incoming line may not exceed
+> this (bounded reads · spec §4): a hostile or broken peer overflows
+> into a refusal, never an OOM »* — a **transport** bound on the
+> harness wire protocol, which merely happens to share the number. Two
+> bounds that agree by coincidence are not a duplication, and forcing
+> them onto one constant would couple a wire protocol to a forensics
+> decoder. Counting by grep and concluding by name is the same error
+> this finding is about.
+
 `nika-dap`'s journal walk is the one that composes correctly —
 `chain.rs:110` aliases `MAX_LINE_BYTES` **to** `bounded::MAX_ARTIFACT_BYTES`
 rather than restating the literal, so those two can never drift apart.
-The registry client and the harness restate it. Three literals agreeing
-today is not one source; it is three sources that happen to agree, and
+The **registry client** restates it, and that one IS a duplicate: same
+meaning (an artifact this process reads whole must not exceed 1 MiB),
+two literals. Two sources that happen to agree are not one source, and
 the failure mode is silent — a bound raised in one place leaves the
-other two quietly stricter, and nothing goes red.
+other quietly stricter, and nothing goes red.
 
 **Also measured, and worth writing down because the prose invites the
 opposite reading:** on the JOURNAL surface only the line bound and the
@@ -114,8 +126,10 @@ Spec 15's table now names the surface per bound for that reason.
 
 Not blocking, and not asserted by any fixture: a conformance corpus
 cannot see a second implementation's internal constants. This is an
-upstream note — one const, re-exported, or a gate that proves the three
-agree.
+upstream note — one const, re-exported, or a gate that proves the two
+decode-grain definitions agree. The transport bound stays its own, and
+SHOULD say so in a line of its own doc rather than leaving the next
+reader to re-derive the distinction.
 
 ## F-5 · `never-run` is an energy-arm class: COST still prices a task that cannot execute
 
