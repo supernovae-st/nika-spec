@@ -310,10 +310,11 @@ Forever after GA · the 5 pillars are locked. Stdlib evolves independently.
 ## Governance
 
 - **Editor** · SuperNovae Studio (Thibaut Melen + Nicolas)
-- **Evolution** · every change to the standard goes through a **NEP**
-  (Nika Enhancement Proposal) · start at
-  [governance/NEP-0000](./governance/nep-0000-the-nep-process.md) ·
-  propose via [the template](./governance/nep-template.md)
+- **Evolution** · until the v1 pre-freeze, a normative change is a PR
+  against [`spec/`](./spec/) with its fixtures · the **NEP** process
+  ([governance/NEP-0000](./governance/nep-0000-the-nep-process.md) ·
+  [the template](./governance/nep-template.md)) is built and **dormant**,
+  and becomes binding at the freeze
 - **Discussion** · the NEP's pull request (public · no private track)
 - **Decisions** · accepted AND rejected NEPs stay published in
   [governance/](./governance/) · summaries in CHANGELOG.md
@@ -4259,6 +4260,26 @@ satisfies a `required: true` input · an undeclared key is refused before the
 run. See [01-envelope.md](./01-envelope.md#inputs--optional--typed-workflow-inputs)
 for the launch contract.
 
+**Every bound input carries its ORIGIN** (normative) · a value is not
+only *what* it is, it is *where it came from*, and the run records
+which ·
+
+| Origin | The channel that supplied the value |
+|---|---|
+| `cli-operator` | `--var name=value`, typed by a human at a terminal |
+| `ci-context` | `--var name=value` arriving through a pipeline — the caller is not a human |
+| `env` | `--var name=@env:VAR` · the **declared** environment channel, read through its explicit spelling |
+| `file` | the workflow's own declared `default:` filled the input |
+
+The origin rises to the receipt, so a proof answers *who supplied this*
+and not merely *what was supplied*. The distinction that carries the
+weight is `env`: an environment value enters through a spelling the
+author wrote, never through an ambient guess — the same law the
+[`permits.env`](./01-envelope.md) passthrough enforces for child
+processes, applied to the launch surface. A pipeline and a person are
+likewise not the same caller, and a receipt that conflated them would
+lose the fact an auditor is looking for.
+
 ### `${{ const.X }}` · named constants
 
 ```yaml
@@ -4908,6 +4929,28 @@ Every error is a typed structure ·
 | `task_id` | yes (runtime) | string | Which task this error occurred in |
 | `attempt` | yes (runtime) | integer | Which attempt failed (1-indexed) |
 
+### Blame polarity (normative · when a refusal names a bound)
+
+A refusal that trips a *bound* also names WHO set that bound. The
+polarity is a vocabulary, kebab-case on the wire, spoken by the check
+diagnostic and by the receipt ·
+
+| Polarity | Who is named |
+|---|---|
+| `by-the-value` | the VALUE violated the bound — a written literal the schema rejects |
+| `by-the-caller` | the CALLER wrote the bound the failure tripped — the task's own `max_turns:`, exhausted |
+| `by-the-contract` | NEITHER — the bound is a default this specification declares, applied to an absent key (`max_turns` at its [02](./02-verbs.md) default of 10): the refusal names the rule that declares it |
+
+The third exists because the first two, alone, force a lie. A default
+inserted by normalization belongs to no one present: blaming the value
+accuses text nobody wrote, and blaming the caller accuses a key nobody
+typed. So the polarity names the contract instead, and the author reads
+where to go and change it.
+
+The set is closed but **extensible by law** — a future rule may add a
+polarity, so a consumer matches with a wildcard arm rather than
+assuming three forever.
+
 ---
 
 ## Error code namespaces
@@ -5033,11 +5076,11 @@ these from this file alone.
 | `NIKA-SEC-006` | secret flow — a `secrets.<name>` value reaches an unsanctioned sink (an `exec:` argument · an `invoke:` payload · an `infer:`/`agent:` prompt) · the diagnostic carries the **taint path** + the exact `egress:` clause that would sanction it ([10 §secret flow](./10-authority.md#secret-flow-refusals-carry-their-codes-normative) · rules in [01 §egress](./01-envelope.md#egress--optional--sanctioned-destinations-declassification)) | `security_error` | false |
 | `NIKA-SEC-007` | secret egress — a tainted value reaches the workflow boundary (`outputs:` · where a result leaves the run) · the diagnostic carries the taint path ([10 §secret flow](./10-authority.md#secret-flow-refusals-carry-their-codes-normative)) | `security_error` | false |
 | `NIKA-SEC-008` | a `nika:fetch` whose RESOLVED URL path names a data-as-code class — matched case-insensitively on the final extension; the diagnostic names the class and both repairs ([10 §authority](./10-authority.md)) | `security_error` | false |
-| `NIKA-SEC-009` | lethal trifecta complete — the declared boundary grants private read (`fs.read` non-empty) + untrusted ingress (a `nika:fetch` builtin invoked · an `mcp:*` tool invoked · an `agent:` whose whitelist admits ingress · **v2.2: an `exec:` task, `permits.exec` itself the ingress channel**) + external egress (`net.http` non-empty · an escaping `fs.write` glob · `exec` enabled), the untrusted content **reaches** an egress-capable task's effect surface (a realized flow), and no blocking `invoke: nika:prompt` (no `default:`) dominates it · one finding per ungated tainted egress task, witness-named `source → sink` ([NEP-0002](../governance/nep-0002-lethal-trifecta-human-gate.md) v2.0 · the Rule of Two as a static check · SEC-008 stays allocated to the AUTH plane) | `security_error` | false |
-| `NIKA-SEC-010` | the approval-capability law is violated ([NEP-0013](../governance/nep-0013-approval-ticket.md) · the 6th invariant) — a rate-limited approval burst (`approval.rate_limited` · the N+1th distinct mint of a run, never a queue) · an approval whose resolved content hash differs from the shown hash (`approval.content_mismatch`) · a ticket replayed outside its run/step/hash scope (`approval.scope_mismatch`) · or the static heterogeneous-batch refusal (one prompt whose descendant closure unleashes two or more of `exec · write · net`) | `security_error` | false |
-| `NIKA-SEC-011` | preview-commit divergence — the commit digest recomputed at the sink over the exact bytes about to fire differs from the preview digest judged at resolution (one bit of rendered argv · a permuted context field · a mutated tool argument) · the step refuses fail-closed and the receipt carries `divergence: {preview, commit}` — judged = executed at the action scale ([NEP-0015](../governance/nep-0015-preview-commit.md) · F-P6) | `security_error` | false |
+| `NIKA-SEC-009` | lethal trifecta complete — the declared boundary grants private read (`fs.read` non-empty) + untrusted ingress (a `nika:fetch` builtin invoked · an `mcp:*` tool invoked · an `agent:` whose whitelist admits ingress · **v2.2: an `exec:` task, `permits.exec` itself the ingress channel**) + external egress (`net.http` non-empty · an escaping `fs.write` glob · `exec` enabled), the untrusted content **reaches** an egress-capable task's effect surface (a realized flow), and no blocking `invoke: nika:prompt` (no `default:`) dominates it · one finding per ungated tainted egress task, witness-named `source → sink` (NEP-0002 v2.0 · the Rule of Two as a static check · SEC-008 stays allocated to the AUTH plane) | `security_error` | false |
+| `NIKA-SEC-010` | the approval-capability law is violated (NEP-0013 · the 6th invariant) — a rate-limited approval burst (`approval.rate_limited` · the N+1th distinct mint of a run, never a queue) · an approval whose resolved content hash differs from the shown hash (`approval.content_mismatch`) · a ticket replayed outside its run/step/hash scope (`approval.scope_mismatch`) · or the static heterogeneous-batch refusal (one prompt whose descendant closure unleashes two or more of `exec · write · net`) | `security_error` | false |
+| `NIKA-SEC-011` | preview-commit divergence — the commit digest recomputed at the sink over the exact bytes about to fire differs from the preview digest judged at resolution (one bit of rendered argv · a permuted context field · a mutated tool argument) · the step refuses fail-closed and the receipt carries `divergence: {preview, commit}` — judged = executed at the action scale (NEP-0015 · F-P6) | `security_error` | false |
 | `NIKA-SEC-012` | unordered shared writes — two tasks incomparable in the DAG closure whose literal `nika:write`/`nika:edit` paths collide with no ordering edge (`after:` · `with:`) to serialize them, or a `for_each` fan writing one constant path · parallelism is safe exactly where the writes are provably disjoint (NEP-0014 law 1 · F-P15) | `security_error` | false |
-| `NIKA-SEC-014` | the affirmative-consent law — a confirm-mode human gate (`invoke: nika:prompt` · mode absent or `confirm`) reaches an egress-capable task over a route no affirmative gate closes: a REFUSED confirm settles success with value `false`, so a bare `after: { gate: success }` edge, a `when:` that never reads the answer, and a `when:` provably true on the refusal all let the effect through · the gate is credited only when every route consumes the answer and proves false on it (the Kleene-falsifiable `when:` · `when: false` · a closer confirm gate owns its closure) · an undecidable gate defers to the advisory hint, never a refusal ([10 §the affirmative-consent law](./10-authority.md#the-affirmative-consent-law--normative--nep-0020) · [NEP-0020](../governance/nep-0020-affirmative-consent.md) · P0-2) | `security_error` | false |
+| `NIKA-SEC-014` | the affirmative-consent law — a confirm-mode human gate (`invoke: nika:prompt` · mode absent or `confirm`) reaches an egress-capable task over a route no affirmative gate closes: a REFUSED confirm settles success with value `false`, so a bare `after: { gate: success }` edge, a `when:` that never reads the answer, and a `when:` provably true on the refusal all let the effect through · the gate is credited only when every route consumes the answer and proves false on it (the Kleene-falsifiable `when:` · `when: false` · a closer confirm gate owns its closure) · an undecidable gate defers to the advisory hint, never a refusal ([10 §the affirmative-consent law](./10-authority.md#the-affirmative-consent-law--normative--nep-0020) · NEP-0020 · P0-2) | `security_error` | false |
 | `NIKA-SEC-015` | the order law — an `exec:` task sits transitively downstream of a net-effecting task (`nika:fetch` · `nika:notify`) over the derived graph (`with:` data edges ∪ `after:` control edges): content the workflow did not author must not reach a shell · the diagnostic names the PATH, which is the witness · **UNCONDITIONAL** — no block declares it and none can disable it ([10 §the unconditional laws](./10-authority.md)) | `security_error` | false |
 | `NIKA-AUTH-006` | an absent `permits:` block — DeclaredPermits is empty, so every effect the body requires is refused before any token; the diagnostic carries the inferred block, ready to paste ([10 §authority](./10-authority.md)) | `security_error` | false |
 | `NIKA-AUTH-007` | an interpolation reaches a permit BOUND (a host · glob · program · env name inside `permits:`) — a bound must be a literal, or the boundary is self-serve ([10 §authority](./10-authority.md)) | `security_error` | false |
@@ -5710,13 +5753,14 @@ Because the language is **statically analyzable by construction** (the DAG
 is acyclic, `for_each` is bounded, CEL is non-Turing, and effects are
 declared), a conformant engine can answer « what will this workflow do, cost,
 and touch? » with **zero API calls and zero tokens spent**. `nika check` is
-the canonical CLI surface for that (Core conformance + the four static
+the canonical CLI surface for that (Core conformance + the static
 guarantees below) ·
 
 | Guarantee | What it reports · zero execution | Backed by |
 |---|---|---|
 | **Plan** | the wave topology · which tasks run in parallel · the critical path | DAG waves (Core §2) |
 | **Cost ceiling** | the worst-case spend · `Σ (max_tokens × provider price)` across `infer:`/`agent:` tasks · before one token is spent | the `nika:inspect view: cost` model, run statically |
+| **Energy ceiling** | the worst-case watt-hours over the same tasks, per scope class · the honesty law below | a sourced `Wh` per million OUTPUT tokens, catalog data |
 | **Secret leak** | every `secrets.X` that flows into an `exec` capture or a tool whose output is bound (the masking boundary · [04 §secrets](./04-variables.md)) | reference graph |
 | **Capability escape** | any effect outside a declared `permits:` block: a write outside `fs.write`, a fetch to an unlisted host, an `exec` under `exec: false`, an unlisted tool | `permits:` ([01](./01-envelope.md)) |
 | **Provider parity** | (`--providers`) that the workflow uses zero provider-specific fields → the same `schema:` runs identically on all <!-- canon:providers -->17<!-- /canon --> providers (incl. the 5 local) | the closed verb-field set |
@@ -5729,6 +5773,59 @@ an engine CLI surface (not a separate conformance level: it composes Core
 validation with the cost/secret/permits/parity reports); the guarantees it
 surfaces ARE normative (they derive from Core conformance + the `permits:`
 and `secrets:` MUSTs), the CLI ergonomics around them are the engine's.
+
+### The spend-honesty law · *normative · cost and energy alike*
+
+The two spend readings are one doctrine in two units. Money is the
+volatile one — it rots with every price change and means nothing on a
+local provider; watt-hours are the durable one. Both speak **the same
+four words**, and neither may print a number that hides what it could
+not bound ·
+
+| Word | What it claims |
+|---|---|
+| **floor** (`≥`) | the provable minimum · the real figure can only be higher |
+| **ceiling** (`≤`) | the provable worst case · a task's declared cap × a sourced rate, summed over the bounded tasks |
+| **UNBOUNDED** | a task with no provable limit, **named** one by one, carrying the why (`no max_tokens declared` · the author can fix it) |
+| **unpriced** | the task will spend, and no sourced rate exists for its model |
+
+The law (MUST) ·
+
+1. **Name the bounded part, name every unbounded task, and never print
+   a total that hides either.** A surface that cannot honor this prints
+   nothing rather than a wrong number. The two rungs read ONE
+   classification of the tasks, so they can never disagree about a
+   task's shape, and an unbounded task is named once — not once per
+   rung.
+2. **Unknown stays unknown.** A figure the engine cannot source renders
+   `unpriced`, never zero. A local model is `unpriced` — the operator's
+   watts — never « free ». Absence of a rate is not a rate of zero, and
+   `0` is the one rendering a reader takes as a promise.
+3. **A proven zero is not an unknown.** A task whose `for_each`
+   iterates a literal EMPTY collection provably never runs: it is
+   counted **never-run** and gets no row. A ceiling over a task that
+   cannot execute would be invented, and two adjacent rungs would
+   describe the same task differently.
+4. **Watt-hours sum inside a scope class and never across one.** An
+   energy fact declares what it covers — `gpu` (accelerator only) ·
+   `device` (whole host) · `fleet` (host + idle + datacenter overhead)
+   — and the same model differs by roughly 2× between the ends of that
+   ladder. A mixed workflow reports one subtotal per class: not a
+   refusal, and never a sum that describes nothing.
+5. **A figure carries its origin and its date, or it does not enter.**
+   Every energy rate is stated per million OUTPUT tokens (decode
+   dominates measured inference; a per-total figure would dilute the
+   number with nearly-free prefill), and rides a closed provenance —
+   `measured-local` · `independent-measured` · `vendor-claim` ·
+   `independent-estimate` — with the month it was measured. Modelling
+   may enter, wearing its label; it may never enter as a silent
+   default. Figures rot with hardware generations: a dateless or
+   sourceless one is refused rather than believed.
+
+The rate table itself is engine data, not language surface — as is any
+budget that *enforces* a ceiling (§Observability in
+[08](./08-out-of-scope.md) defers those). What is normative here is the
+reading: what a spend claim is allowed to say.
 
 ### Editor tooling · the canonical JSON Schema
 
@@ -8309,6 +8406,17 @@ Cache and resume are **re-keyed semantically**: a result is reused iff
 the semantic identity matches — the same law the composition cache
 (14 §law 10) was waiting on.
 
+**The versioned rate table is part of the run's semantic pin**
+(normative) · a cost bound means nothing without the table it was
+computed against, so the table's version rides the pin the way the lock
+digest does. A replay reads cost against the **pinned** table and
+yields the identical budget verdict. A run whose pin lacks the table,
+or names a table version this engine does not know, **refuses the
+cost-meaning replay** — it never silently re-prices against today's
+numbers, which would rewrite yesterday's verdict and call it
+verification. The replay of EFFECTS is untouched: it is the budget
+claim, and only that, which needs the table.
+
 ## `nika.lock` · *the single lock (normative · F7)*
 
 One lockfile pins everything a run resolves, by **digest**:
@@ -8465,6 +8573,70 @@ receipt = (
 - The receipt is domain-separated (`receipt` domain) and Merkle-linked
   to the semantic hash it proves: given a receipt you can verify it
   proves *this* workflow and no other.
+
+**Every receipt field carries a readable projection** (normative) · the
+schema itself holds, per field, the stable human text that renders it;
+a new field WITHOUT one refuses the schema. The ratchet is the point —
+a proof surface grows only in forms a human can read, so the readable
+half can never fall behind the machine half.
+
+**And the projection is never the evidence.** Reading a receipt and
+verifying one are two acts at two trust levels: the rendered text is a
+convenience, the verification is the proof. A surface that lets the
+first pass for the second has quietly made prose authoritative.
+
+## The verifier is a fortress (normative · reading untrusted proof)
+
+The trace, the receipt and the seal exist to be **verified** — which
+makes the verifier the one component guaranteed to parse bytes an
+attacker chose. Everything it reads is untrusted input, including
+artifacts this engine produced a moment ago: an attacker who can write
+the file is the threat, not the producer.
+
+**The decode bounds are spec constants** — not engine folklore, so a
+second implementation inherits them instead of re-deriving them ·
+
+| Bound | Value | What it stops |
+|---|---|---|
+| artifact size | 1 MiB | a receipt is kilobytes; the rest is a denial of service |
+| journal line | 1 MiB | one line beyond this is refused before the JSON parser sees it |
+| journal total | 256 MiB | past this it is not a run this engine produced |
+| JSON nesting depth | 32 | unbounded recursion at decode |
+| proof-node count | 64 | a proof flood |
+| identifier length | 256 bytes | an identifier used to overflow a render |
+
+The law (MUST) ·
+
+1. **Refusal is total.** An artifact past any bound is refused with a
+   **typed** class — `Oversized` · `TooDeep` · `Malformed` ·
+   `ProofFlood` · `IdOverflow` — never truncated, never partially
+   decoded, never repaired-and-continued. The order is fixed (size →
+   depth scan → parse → structural scan) so two implementations refuse
+   the *same* artifact for the *same* reason.
+2. **Bounds are code, on every build profile.** A bound carried by a
+   debug assertion is absent in the build that meets the attacker.
+3. **Recognize, never sanitize.** A malicious artifact is classified
+   and refused. A verifier that repairs hostile input into
+   acceptability becomes the vulnerability it was meant to catch — the
+   shotgun-parser diagnosis. Refusal classes are proven against a
+   golden corpus that lives with the implementation and runs on every
+   change; a crash, a hang or an overflow on that corpus is a defect of
+   the highest class, by definition.
+4. **The terminal is escaped, the machine surface is not.** Every
+   artifact-derived string rendered to a TTY has its C0, C1, DEL and
+   OSC/CSI sequences escaped: a title injection, a clipboard write or
+   hidden text is an attack that lands on the human, not on the
+   pipeline. `--json` and non-TTY output stay **byte-exact** — escaping
+   them would break the exactness the proofs depend on.
+5. **Two decoders, one verdict.** The reference decoder and an engine
+   decoder MUST render the same verdict over the same artifact. A
+   divergence is a defect of this specification until proven otherwise
+   — the discipline `nika.lock` already lives by, applied to the
+   reading side.
+
+Within bounds, nothing changes: an artifact that verified before
+verifies identically. Beyond them, behavior that was never a promise
+becomes a **named** refusal.
 
 ## Distribution (normative note · the local boundary · G35)
 
@@ -9084,9 +9256,25 @@ conformance · open a PR on `supernovae-st/nika-spec` to be listed in
 - **NEP**: 0000
 - **Title**: The NEP Process
 - **Author**: SuperNovae Studio maintainers
-- **Status**: Active (process NEP · never Final)
+- **Status**: Active · **DORMANT until the v1 pre-freeze** (process NEP · never Final)
 - **Type**: Process
 - **Created**: 2026-07-18
+
+> **Dormant, and this is what wakes it: the pre-freeze of the language
+> at v1.** A proposal process only has meaning against something FROZEN.
+> Before the freeze there is nothing to propose *against* — a new law is
+> written **directly** into [`spec/`](../spec/), and the deep breaks live
+> inside `v1` itself. On 2026-08-14 the twenty Standards-Track drafts
+> were resolved on exactly that reading: eighteen became the language,
+> two were never built and are buried as such, and
+> [`README.md`](README.md) records where each one went.
+>
+> This process becomes load-bearing at the pre-freeze, when every change
+> is a proposal again — the maintainers included. **An `Active` status
+> with zero open proposals is not a dead ceremony: it is a mechanism
+> waiting on a named trigger.** That sentence is here because a reader
+> concluded the opposite in under an hour, and a clause that says why it
+> sleeps beats a status you have to guess.
 
 ## Abstract
 
@@ -9096,11 +9284,12 @@ decided. This document defines the process itself: the lifecycle, the
 template, who decides, and how the process evolves.
 
 **Pre-ratification clause.** Until `1.0.0` ratifies the language, the
-spec on `main` is the draft and the draft evolves directly — the NEPs of
-this era are **design records of the draft** (all Standards-Track NEPs
-carry `Status: Draft` accordingly), their numbers already load-bearing
-in engine code and traces. **From 1.0 on, this process is binding**:
-nobody amends the standard directly, the maintainers included.
+spec on `main` is the draft and the draft evolves directly — so this era
+opens **no** Standards Track NEP: a law is written into `spec/` where it
+belongs, and the numbers already spent stay load-bearing in engine code
+and traces (see [`README.md`](README.md) for what each resolves to).
+**From the pre-freeze on, this process is binding**: nobody amends the
+standard directly, the maintainers included.
 
 The lineage is deliberate: [PEP 1](https://peps.python.org/pep-0001/)
 governs Python this way, the
@@ -9160,8 +9349,8 @@ this same door.
 
 ### Numbering and the founding era
 
-NEP numbering runs through this door from NEP-0000 onward — a pre-1.0
-Draft claims its number the same way (NEP-0002 is the living proof).
+NEP numbering runs through this door from NEP-0000 onward, and a number
+is spent for good — the twenty folded on 2026-08-14 are not recycled.
 The pre-1.0 rulings are the founding era: their verbatim record (the
 RULINGS documents and the ADR line) remains canonical history, not
 retroactive NEPs. One retroactive exception is reserved: NEP-0001,
@@ -11435,6 +11624,55 @@ action = "upgrade to 1.2.1"     # or "do not run · no fix"
 
 A conformant client MUST consult advisories before install and MUST
 refuse (not warn) on a matching one unless explicitly overridden.
+
+## 3b · Provenance tiers (normative)
+
+Trust in an artifact is not a boolean. A client resolves every artifact
+with a **tier**, on a closed, totally-ordered ladder ·
+
+```
+unprovenanced  <  provenanced  <  stage-clear  <  verified
+```
+
+1. **The ladder is closed.** An unknown tier string — in a policy file,
+   in a cache record, in any registry statement — REFUSES. It grows by
+   amending this specification, never by parsing something new.
+2. **Evidence admits; a claim admits nothing.** A tier is earned only
+   by evidence observed AT FETCH ·
+   - `unprovenanced` — the digest floor of §1: bytes provably
+     consistent with the pinned `sha256`, origin unproven.
+   - `provenanced` — the artifact's signature verifies under the
+     publisher's anchored key: origin proven to a key, key continuity
+     proven by the anchor record.
+   - `stage-clear` · `verified` — reserved: their evidence formats (a
+     staged-window statement · a complete publish layout) land with
+     the work that defines them.
+
+   The `index.json` of §4 is a convenience projection: a tier asserted
+   there and not re-derived from evidence admits **nothing**. This is
+   §0 law 2 — trust lives in the artifact, not the gatekeeper —
+   applied to provenance.
+3. **The admission floor is operator DATA, never a constant in code.**
+   A versioned policy file names it; an absent file means
+   `unprovenanced`, which is today's behavior stated out loud rather
+   than assumed. An unknown policy version or an unknown floor refuses.
+   No floor lives in source, so every change to it is an operator edit
+   — reviewable, greppable, attributable to a person.
+4. **Below the floor, nothing is written.** A fetch whose admitted tier
+   is under the floor refuses (`NIKA-REG-008`) AFTER verification and BEFORE the store,
+   so a rejected artifact never lands on disk. A cache hit whose
+   recorded tier is under the floor refuses identically: the policy
+   changed over the cache, and **the cache does not grandfather**.
+5. **The tier is recorded, and it is attested.** The cache record
+   carries the tier beside the digest, and a hit re-tells the recorded
+   truth — evidence is not re-sought on a hit, the record IS the
+   evidence of what that fetch proved. The tier of every registry
+   artifact a run consumes rises to the receipt: a run attests the
+   provenance of what it consumed, not merely its hash.
+6. **No inflation, and no retroactive upgrade.** A record naming a tier
+   its evidence class cannot admit is treated as tampered. A later
+   registry-side improvement rewrites nothing: re-fetch re-proves, and
+   the receipt of the day tells the truth of the day.
 
 ## 4 · Machine surfaces (normative for discovery)
 
