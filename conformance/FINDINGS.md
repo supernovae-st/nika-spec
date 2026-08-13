@@ -48,3 +48,37 @@ v0.2 backlog pending the spec call.
 > `NIKA-VAR-001 · unresolved template reference` with the whole
 > expression as the reference name. Both halves of the finding hold; the
 > v0.2 spec call stays owed.
+
+## F-3 · Every binary-differential is dark: the corpus is ahead of the shipped engine
+
+**Measured 2026-08-13 · `nika 0.108.0` (the shipped binary).** Both
+differentials that run the real binary against this repo's corpus agree on
+*nothing*, and it is one cause, not two ·
+
+```
+python3 reference/differential.py --seeds 120     →   0/120 agree
+python3 scripts/oracle-differential.py --bin nika →   0/50 agree · 50 unexplained
+```
+
+Every divergence is the same line ·
+`NIKA-PARSE-003 · invalid `nika:` version "<id>" — the value is exactly `v1``.
+The shipped engine still requires the OLD envelope (`nika: v1`); the corpus,
+the templates and `reference/generate.py` already carry the NEW identity form
+(`nika: <workflow-id>`). The workflow is refused at parse, so every task reads
+`engine=None` and the comparison has no subject.
+
+**This is a cascade state, not a defect on either side.** The teaching surface
+was migrated first, by design; the engine arm lands with the envelope window.
+Both harnesses go green again on their own when it ships — no fixture and no
+model needs a change here.
+
+**What it costs while it lasts, and why it is written down.** Two proof
+surfaces read GREEN in prose and BLACK in fact: `reference/README.md` published
+`120/120 agree` beside the command until 2026-08-13. A differential that
+compares nothing reports no divergence, so *the failure mode is silence* — it
+cannot be distinguished from success by anyone who does not run it. Until the
+engine arm lands, the proofs that hold are the ones with no binary in the
+loop · `reference/selftest.py` (28 laws · 300 seeds) · `scripts/gen-gate-matrix.py
+--check` · `scripts/lints-differential.py --selftest` (5/5) ·
+`scripts/mutation-adequacy.py --check` (15/15 selftests die under a permissive
+judge). All green at this commit.

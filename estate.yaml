@@ -223,7 +223,7 @@ patterns:
 - glob: "conformance/**"
   class: authored
   match_count: 201
-  aggregate_sha256: 04c2423847e2bacd32570ef6d084a12a9661a98508040a2a338c8a087b2a2160
+  aggregate_sha256: 62dc51449c368a0aee1d3af67dd49112656ca5892e1cd84bfc9288948edc5274
   evidence: "the 95-workflow corpus (envelope · variables · verbs · errors · dag · gates · types · yaml-profile · values · composition · decision-goldens frozen at authoring time and consumed by decision_core_selftest.py) + the Python cores/selftests/runner + README/FINDINGS/runner-protocol; type-corpus + coverage-matrix excepted in files:"
 - glob: "proofs/**"
   class: testimonial
