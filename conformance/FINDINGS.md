@@ -149,7 +149,7 @@ residual inline rather than claiming a parity that does not exist.
 Not blocking · upstream: give the cost arm the same class, or say in the
 COST legend that a `$0.0000` row can mean « provably never runs ».
 
-## F-6 · Three fixture families now; the registry still has none
+## F-6 · Six laws of fourteen are proven; three sit behind one decision
 
 **Measured 2026-08-13**, after the NEP fold moved twenty design records
 into normative spec text. Fourteen distinct laws landed in `spec/` and
@@ -161,13 +161,44 @@ into normative spec text. Fourteen distinct laws landed in `spec/` and
 | `incomplete` | 17 §the end of the run | `runtime/trace/004` |
 | the pinned pricing table | 15 §the semantic hash | `runtime/trace/001` + `006` |
 | the readable-receipt projection | 15 §the one receipt | `runtime/receipt/001` + `002` |
+| the boot manifest | 17 §the prologue | `runtime/trace/007` |
+| input origins | 04 §typed workflow inputs | `runtime/trace/007` |
 
-> **Amended same day** — this finding first read « three proven, two
-> families missing ». The receipt family shipped hours later and closed
-> the fourth law; the count and the header follow the tree rather than
-> the sentence that was true when it was written.
+> **Amended twice the same day** — this finding first read « three
+> proven, two families missing », then « four ». The receipt family and
+> then a single real journal (`trace/007`, which carries the manifest,
+> the origin AND the known-pin arm at once) moved it to six. The count
+> is a dated measurement like every other figure here, not a live claim:
+> re-derive it, never quote it.
 
-The other ten have none, and the reason is **structural, not
+### The three that sit behind one decision
+
+`nika key trust` on this machine says *« no run-signing key — `nika key
+init` mints one »*. That single absence closes three laws at once ·
+
+- **the teardown seal** (`receipt_digest` · budgets · effects) needs a
+  `run_sealed` frame, which needs a key.
+- **the quarantine fold** rides that same seal.
+- **the artifact decode bounds** are unreachable a second way: measured
+  2026-08-13, `decode_untrusted_json` has exactly ONE production caller
+  — the anchor-sidecar read (`nika-dap/src/anchor/mod.rs:141`) — and
+  `trace verify --anchored` refuses **before** reading the sidecar when
+  the journal is unsealed (*« the anchor verifies against the seal's
+  key, so the tier is unattainable »*). An early refusal buys the
+  silence of everything downstream, here including the bounds
+  themselves.
+
+Also measured, and worth stating because the prose invites the opposite
+reading: `trace receipt explain` does **not** apply those bounds. Three
+mutants — nesting 40, a 400-byte identifier, 200 proof nodes — all read
+clean, exit 0. That is consistent with the law (`explain` is a reading,
+`verify` is the proof), but it means the receipt family cannot hold the
+bounds either.
+
+Minting a key is a persistent identity act on the operator's machine,
+not a fixture decision, so it is named here rather than taken.
+
+The other eight have none, and the reason is **structural, not
 negligence**. The suite has three fixture families ·
 
 - `tests/core/**` — a workflow (`input.yaml`) judged by a static check,
@@ -183,8 +214,8 @@ Every uncovered law needs a surface neither family models ·
 |---|---|
 | artifact decode bounds (`Oversized` · `TooDeep` · `ProofFlood` · `IdOverflow`) | a **receipt** fixture family — these guard the whole-document decoder, not the walk |
 | ~~the readable-receipt projection~~ | ✅ closed by `runtime/receipt/001` + `002` |
+| ~~input origins~~ · ~~the boot manifest~~ | ✅ closed by `runtime/trace/007` + the family's new `prologue` field, which asserts CONTENT (including what is legitimately ABSENT) rather than a verdict |
 | blame polarity | a receipt fixture whose subject is a REFUSAL — a green run's receipt carries no blame to project |
-| input origins | measured 2026-08-13: the origin does NOT ride the receipt (7 keys, none of them origins) — it rides the journal prologue and the evidence PACK. A pack fixture, or a trace-family shape that asserts prologue CONTENT rather than a walk verdict |
 | the teardown seal (`receipt_digest` · budgets · effects) · the quarantine fold | a journal carrying a VALID ed25519 seal — producible only by running with a key, never by construction |
 | the boot manifest (`spec_pin` · `stamper_kind` · `clock` · `seed`) | a shape that asserts prologue CONTENT; absence is honest here, so there is no verdict to key on |
 | judged ≠ booted | nothing to hold it: the refusal fires BEFORE the first frame, and the lazy-open law means no journal exists to verify |
