@@ -208,7 +208,7 @@ patterns:
 - glob: "conformance/tests/**"
   class: authored
   match_count: 597
-  aggregate_sha256: a764b252c185c9c749b7dba202bc5021fe92d510ebc5c7671f0cca55a294cbc5
+  aggregate_sha256: f47926f56497ff7d7c7a478b1fd15fe91a6e9a6d063d8c77f920f6b5ed24a5e5
   evidence: "the executable law — the 5-tier fixture corpus (core · deep 001-022 · lints · runtime · stdlib): input + expected pairs written at spec-authoring time, consumed by conformance/runner.py; no generation markers"
 - glob: "conformance/.nika/**"
   class: testimonial
@@ -223,7 +223,7 @@ patterns:
 - glob: "conformance/**"
   class: authored
   match_count: 201
-  aggregate_sha256: 78823e11442b1916382a83da2f4f1da4be25530bea654d81839044b6a60b45de
+  aggregate_sha256: fadd4503cf21057780c6574ce4916ea9a0280261160600cb8e89eb1dcc65969c
   evidence: "the 95-workflow corpus (envelope · variables · verbs · errors · dag · gates · types · yaml-profile · values · composition · decision-goldens frozen at authoring time and consumed by decision_core_selftest.py) + the Python cores/selftests/runner + README/FINDINGS/runner-protocol; type-corpus + coverage-matrix excepted in files:"
 - glob: "proofs/**"
   class: testimonial

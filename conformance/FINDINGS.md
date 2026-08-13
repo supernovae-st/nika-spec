@@ -148,3 +148,47 @@ residual inline rather than claiming a parity that does not exist.
 
 Not blocking · upstream: give the cost arm the same class, or say in the
 COST legend that a `$0.0000` row can mean « provably never runs ».
+
+## F-6 · The suite has a family for the workflow and one for the journal — none for the receipt, none for the registry
+
+**Measured 2026-08-13**, after the NEP fold moved twenty design records
+into normative spec text. Fourteen distinct laws landed in `spec/` and
+`registry/`. The conformance suite proves **three** ·
+
+| Law | Where it lives | Fixture |
+|---|---|---|
+| journal line bound | 15 §the verifier is a fortress | `runtime/trace/005` |
+| `incomplete` | 17 §the end of the run | `runtime/trace/004` |
+| the pinned pricing table | 15 §the semantic hash | `runtime/trace/001` + `006` |
+
+The other eleven have none, and the reason is **structural, not
+negligence**. The suite has exactly two fixture families ·
+
+- `tests/core/**` — a workflow (`input.yaml`) judged by a static check,
+  asserting `valid` + `errors`.
+- `tests/runtime/trace/**` — a journal (`trace.ndjson`) judged by the
+  walk, asserting a verdict.
+
+Every uncovered law needs a surface neither family models ·
+
+| Uncovered | What it would need |
+|---|---|
+| artifact decode bounds (`Oversized` · `TooDeep` · `ProofFlood` · `IdOverflow`) | a **receipt** fixture family — these guard the whole-document decoder, not the walk |
+| the readable-receipt projection · input origins · blame polarity | the same: a receipt fixture, asserting fields and their rendering |
+| the teardown seal (`receipt_digest` · budgets · effects) · the quarantine fold | a journal carrying a VALID ed25519 seal — producible only by running with a key, never by construction |
+| the boot manifest (`spec_pin` · `stamper_kind` · `clock` · `seed`) | a shape that asserts prologue CONTENT; absence is honest here, so there is no verdict to key on |
+| judged ≠ booted | nothing to hold it: the refusal fires BEFORE the first frame, and the lazy-open law means no journal exists to verify |
+| cross-version resume | two engine versions in one fixture |
+| provenance tiers (`NIKA-REG-008`) | a **registry** fixture family — a fetch, a policy file, a cache record |
+| the spend-honesty rungs (ENERGY · COST) | a shape that asserts RENDERED text; `valid` + `errors` cannot express a rung |
+
+Two of the three fixtures written today only exist because the trace
+family could be **extended** (a fourth walk verdict, then a fifth entry
+that is not a walk verdict at all, then an optional second leg). That
+lever is spent: the next laws need a family, not another field.
+
+Named, not blocking. A law without a fixture is not wrong — all fourteen
+were verified against the shipped binary before being written — but
+[NEP-0000 §Relationship to conformance](../governance/nep-0000-the-nep-process.md)
+is explicit that the proof is the suite's job, so the gap belongs on the
+record rather than in the gap between two people's memories.
