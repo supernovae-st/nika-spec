@@ -149,7 +149,7 @@ residual inline rather than claiming a parity that does not exist.
 Not blocking · upstream: give the cost arm the same class, or say in the
 COST legend that a `$0.0000` row can mean « provably never runs ».
 
-## F-6 · The suite has a family for the workflow and one for the journal — none for the receipt, none for the registry
+## F-6 · Three fixture families now; the registry still has none
 
 **Measured 2026-08-13**, after the NEP fold moved twenty design records
 into normative spec text. Fourteen distinct laws landed in `spec/` and
@@ -160,21 +160,31 @@ into normative spec text. Fourteen distinct laws landed in `spec/` and
 | journal line bound | 15 §the verifier is a fortress | `runtime/trace/005` |
 | `incomplete` | 17 §the end of the run | `runtime/trace/004` |
 | the pinned pricing table | 15 §the semantic hash | `runtime/trace/001` + `006` |
+| the readable-receipt projection | 15 §the one receipt | `runtime/receipt/001` + `002` |
 
-The other eleven have none, and the reason is **structural, not
-negligence**. The suite has exactly two fixture families ·
+> **Amended same day** — this finding first read « three proven, two
+> families missing ». The receipt family shipped hours later and closed
+> the fourth law; the count and the header follow the tree rather than
+> the sentence that was true when it was written.
+
+The other ten have none, and the reason is **structural, not
+negligence**. The suite has three fixture families ·
 
 - `tests/core/**` — a workflow (`input.yaml`) judged by a static check,
   asserting `valid` + `errors`.
 - `tests/runtime/trace/**` — a journal (`trace.ndjson`) judged by the
   walk, asserting a verdict.
+- `tests/runtime/receipt/**` — a receipt (`receipt.json`) judged by its
+  reading, asserting what projects (NEW · 2026-08-13).
 
 Every uncovered law needs a surface neither family models ·
 
 | Uncovered | What it would need |
 |---|---|
 | artifact decode bounds (`Oversized` · `TooDeep` · `ProofFlood` · `IdOverflow`) | a **receipt** fixture family — these guard the whole-document decoder, not the walk |
-| the readable-receipt projection · input origins · blame polarity | the same: a receipt fixture, asserting fields and their rendering |
+| ~~the readable-receipt projection~~ | ✅ closed by `runtime/receipt/001` + `002` |
+| blame polarity | a receipt fixture whose subject is a REFUSAL — a green run's receipt carries no blame to project |
+| input origins | measured 2026-08-13: the origin does NOT ride the receipt (7 keys, none of them origins) — it rides the journal prologue and the evidence PACK. A pack fixture, or a trace-family shape that asserts prologue CONTENT rather than a walk verdict |
 | the teardown seal (`receipt_digest` · budgets · effects) · the quarantine fold | a journal carrying a VALID ed25519 seal — producible only by running with a key, never by construction |
 | the boot manifest (`spec_pin` · `stamper_kind` · `clock` · `seed`) | a shape that asserts prologue CONTENT; absence is honest here, so there is no verdict to key on |
 | judged ≠ booted | nothing to hold it: the refusal fires BEFORE the first frame, and the lazy-open law means no journal exists to verify |
@@ -182,10 +192,13 @@ Every uncovered law needs a surface neither family models ·
 | provenance tiers (`NIKA-REG-008`) | a **registry** fixture family — a fetch, a policy file, a cache record |
 | the spend-honesty rungs (ENERGY · COST) | a shape that asserts RENDERED text; `valid` + `errors` cannot express a rung |
 
-Two of the three fixtures written today only exist because the trace
-family could be **extended** (a fourth walk verdict, then a fifth entry
-that is not a walk verdict at all, then an optional second leg). That
-lever is spent: the next laws need a family, not another field.
+Three of the fixtures written today only exist because the trace family
+could be **extended** (a fourth walk verdict, then a fifth entry that is
+not a walk verdict at all, then an optional second leg). That lever is
+spent, and the receipt family is the proof of what comes after it: the
+remaining laws need a **surface**, not another field. Two are named
+above (a pack shape · a registry family); the rest need a run with a
+key, or two engine versions, or a rendered-text assertion.
 
 Named, not blocking. A law without a fixture is not wrong — all fourteen
 were verified against the shipped binary before being written — but
