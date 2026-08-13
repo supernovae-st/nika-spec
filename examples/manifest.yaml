@@ -15,7 +15,7 @@ foundation:
   - file: examples/04-schema-retry.nika.yaml
     sha256_16: dfb28dabdf785a50
   - file: examples/05-fetch-chain.nika.yaml
-    sha256_16: 0f5aa74c1168e9fb
+    sha256_16: 505902fd44232584
   - file: examples/06-code-review.nika.yaml
     sha256_16: 6dea6e697eddff15
   - file: examples/07-for-each-locales.nika.yaml
@@ -46,7 +46,7 @@ templates:
   - file: templates/fanout.nika.yaml
     sha256_16: 4faf5c91cb9bc689
   - file: templates/gate-and-act.nika.yaml
-    sha256_16: 73aa01a4c99c9078
+    sha256_16: 7e5da4d28a5d9cb0
   - file: templates/human-gated-ship.nika.yaml
     sha256_16: e6e88773342f90f3
   - file: templates/media-asset-pack.nika.yaml
@@ -60,8 +60,8 @@ showcase:
     sha256_16: 8dd0a12b1fad12ba
   - file: examples/ceo-monday-brief.nika.yaml
     name: ceo-monday-brief
-    constructs: [local_model, on_error, output, outputs, secrets, thinking, when, with]
-    sha256_16: 7e750fc78484f5e8
+    constructs: [extract, local_model, on_error, outputs, secrets, thinking, when, with]
+    sha256_16: b63ceb7fe702cbb4
   - file: examples/competitor-radar.nika.yaml
     name: competitor-radar
     constructs: [fail_fast, for_each, local_model, max_parallel, on_error, outputs, retry, timeout, when, with]
@@ -124,16 +124,16 @@ showcase:
     sha256_16: 5aa3b133425ece0f
   - file: examples/price-watch.nika.yaml
     name: price-watch
-    constructs: [on_error, output, outputs, secrets, when, with]
-    sha256_16: 76b950684fbe7c9e
+    constructs: [extract, on_error, outputs, secrets, when, with]
+    sha256_16: 9a16ba306cd0cfc2
   - file: examples/release-notes.nika.yaml
     name: release-notes
     constructs: [local_model, on_error, outputs, schema, secrets, when, with]
     sha256_16: ddf483b2a30f2df0
   - file: examples/release-radar.nika.yaml
     name: release-radar
-    constructs: [local_model, on_error, output, outputs, when, with]
-    sha256_16: d6e51f69782eafb3
+    constructs: [extract, local_model, on_error, outputs, when, with]
+    sha256_16: 9f50cd4cfcd85f22
   - file: examples/release-train.nika.yaml
     name: release-train
     constructs: [outputs, retry, timeout, when, with]
@@ -144,8 +144,8 @@ showcase:
     sha256_16: baed1fb536104108
   - file: examples/seo-content-brief.nika.yaml
     name: seo-content-brief
-    constructs: [local_model, on_error, output, outputs, schema, with]
-    sha256_16: 81d3c0cbcca134bc
+    constructs: [extract, local_model, on_error, outputs, schema, with]
+    sha256_16: ce48adbca8489680
   - file: examples/social-repurpose.nika.yaml
     name: social-repurpose
     constructs: [local_model, outputs, with]
