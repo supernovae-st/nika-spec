@@ -18,11 +18,11 @@ classes:
   testimonial: "captured evidence — fixtures, corpora, traces, receipts: proves behavior; neither shipped source nor regenerable output"
   foreign: "pointer to a third-party sovereign source"
 summary:
-  classified_files: 1355
+  classified_files: 1357
   file_rows: 15
   pattern_rows: 29
   by_class:
-    authored: 1027
+    authored: 1029
     authored-pin: 1
     generated: 130
     pinned-copy: 4
@@ -207,8 +207,8 @@ patterns:
     - "the VOCAB_FIXTURE constant in scripts/gen-gate-matrix.py"
 - glob: "conformance/tests/**"
   class: authored
-  match_count: 591
-  aggregate_sha256: 6581a6ea0f8fd096d81d3c802e9b32eac3256acdacd9969b30c7e7da033a1016
+  match_count: 593
+  aggregate_sha256: f0b7dbe4fe955242f88a9266fa9b384df6292bb3f168e768459d492c7e853040
   evidence: "the executable law — the 5-tier fixture corpus (core · deep 001-022 · lints · runtime · stdlib): input + expected pairs written at spec-authoring time, consumed by conformance/runner.py; no generation markers"
 - glob: "conformance/.nika/**"
   class: testimonial
