@@ -260,8 +260,16 @@ guards one does not guard the other ·
 | proof-node count | 64 | artifact | a proof flood |
 | identifier length | 256 bytes | artifact | an identifier used to overflow a render |
 
+A THIRD reading surface has its own bounds and is not governed here:
+the workflow file an author writes, capped by the YAML profile
+([01 §YAML profile](./01-envelope.md) · depth and size caps · the
+`NIKA-YAML` namespace). Three readers, three bound sets — the authoring
+parser, the journal walk, the artifact decoder — and none of them
+inherits another's. A bound quoted without its reader is a bound
+enforced somewhere it does not belong.
+
 The split is not an accident of implementation, it is the shape of the
-two readers. A journal is walked **line by line** and each line is
+two readers judged here. A journal is walked **line by line** and each line is
 bounded before it is parsed, so a hostile line costs one bound-check and
 nothing else; the structural bounds (depth · proof nodes · identifier
 length) belong to the reader that decodes a document **whole**, where

@@ -37,3 +37,15 @@ A journal whose LAST line is half-written is a fourth thing again (a
 torn tail · a crash mid-write, not tampering) and the engine names it
 separately: conflating it with `forged` would make every crashed run
 look tampered with.
+
+`refused` is the fifth entry and the only one that is NOT a walk
+verdict: a decode bound fired **before** the walk ran (15 §the verifier
+is a fortress · the 1 MiB line bound · the 256 MiB file bound), so the
+journal has no verdict at all. Refusal is total — never a truncate and
+continue — and it exits nonzero, where every walk verdict exits on the
+tier ladder.
+
+A bound fixture costs its bound: `005` carries a 1 MiB line because
+that is the only way to cross a 1 MiB bound. One repeated byte packs to
+about 1.7 KiB, the same trade `yaml-profile/invalid/document-over-cap.nika.yaml`
+already makes on the authoring side.
