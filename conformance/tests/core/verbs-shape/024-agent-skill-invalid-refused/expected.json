@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-AGENT-004", "category": "validation_error" }
+  ],
+  "note": "02-verbs §Agent Skills · a readable SKILL.md without a mapping frontmatter carrying non-empty name + description is NIKA-AGENT-004 · the file exists so this is not AGENT-003."
+}

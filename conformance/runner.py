@@ -1127,7 +1127,7 @@ def validate_workflow(doc: dict, validator: Draft202012Validator,
         errs.append({"namespace": "NIKA-PARSE", "category": "validation_error",
                      "detail": detail})
     errs.extend(cross_ref_errors(doc))
-    errs.extend(deep_static_errors(doc))
+    errs.extend(deep_static_errors(doc, base_dir=base_dir))
     errs.extend(type_core_errors(doc))
     errs.extend(values_core_errors(doc))
     errs.extend(consent_errors(doc))
@@ -1369,7 +1369,8 @@ def main(argv: list[str]) -> int:
     validator = load_schema()
     canon = load_canon()
     if len(argv) >= 2 and argv[1] == "validate" and len(argv) == 3:
-        v = validate_text(pathlib.Path(argv[2]).read_text(), validator, canon)
+        path = pathlib.Path(argv[2])
+        v = validate_text(path.read_text(), validator, canon, base_dir=path.parent)
         print(json.dumps(v, indent=2))
         return 0 if v["valid"] else 1
     if len(argv) >= 2 and argv[1] == "run":

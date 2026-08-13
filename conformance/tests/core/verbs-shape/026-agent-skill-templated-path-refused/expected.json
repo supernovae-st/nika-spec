@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-AGENT-003", "category": "validation_error" }
+  ],
+  "note": "02-verbs §Agent Skills · paths are static — no globs, no ${{ }} templates (the same explicitness law as permits:) · a template in a skill path is a parse error, named AGENT-003 because the path does not resolve."
+}

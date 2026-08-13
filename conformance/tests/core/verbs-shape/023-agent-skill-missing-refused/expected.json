@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-AGENT-003", "category": "validation_error" }
+  ],
+  "note": "02-verbs §Agent Skills · check≡run · a skills: path that does not resolve at compose time is NIKA-AGENT-003 · never start a run with a half-composed context."
+}
