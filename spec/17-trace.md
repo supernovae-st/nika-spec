@@ -167,6 +167,14 @@ four-field form and verifies exactly as before; a seal that carries
 them binds them under the same signature. One signature surface, not a
 second artifact.
 
+A failed run owes the same seal an **attested quarantine**: when it
+dies after producing partly-written outputs, the teardown names those
+artifacts and marks them quarantined, and a quarantined artifact
+re-entering as a later run's input is a finding. v1 owes the NAMING and
+the CONTAINMENT — not the undoing. Compensating actions across services
+are a different problem and stay out; what a half-written file must
+never do is pass for a whole one.
+
 **2 · A journal with no terminal frame is `incomplete`.** A chain walk
 that reaches no lifecycle-terminal frame (`workflow_completed` ·
 `workflow_failed` · `workflow_cancelled` · `workflow_paused` ·

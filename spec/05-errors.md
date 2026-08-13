@@ -40,6 +40,28 @@ Every error is a typed structure ·
 | `task_id` | yes (runtime) | string | Which task this error occurred in |
 | `attempt` | yes (runtime) | integer | Which attempt failed (1-indexed) |
 
+### Blame polarity (normative · when a refusal names a bound)
+
+A refusal that trips a *bound* also names WHO set that bound. The
+polarity is a vocabulary, kebab-case on the wire, spoken by the check
+diagnostic and by the receipt ·
+
+| Polarity | Who is named |
+|---|---|
+| `by-the-value` | the VALUE violated the bound — a written literal the schema rejects |
+| `by-the-caller` | the CALLER wrote the bound the failure tripped — the task's own `max_turns:`, exhausted |
+| `by-the-contract` | NEITHER — the bound is a default this specification declares, applied to an absent key (`max_turns` at its [02](./02-verbs.md) default of 10): the refusal names the rule that declares it |
+
+The third exists because the first two, alone, force a lie. A default
+inserted by normalization belongs to no one present: blaming the value
+accuses text nobody wrote, and blaming the caller accuses a key nobody
+typed. So the polarity names the contract instead, and the author reads
+where to go and change it.
+
+The set is closed but **extensible by law** — a future rule may add a
+polarity, so a consumer matches with a wildcard arm rather than
+assuming three forever.
+
 ---
 
 ## Error code namespaces

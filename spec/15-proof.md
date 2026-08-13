@@ -57,6 +57,17 @@ Cache and resume are **re-keyed semantically**: a result is reused iff
 the semantic identity matches — the same law the composition cache
 (14 §law 10) was waiting on.
 
+**The versioned rate table is part of the run's semantic pin**
+(normative) · a cost bound means nothing without the table it was
+computed against, so the table's version rides the pin the way the lock
+digest does. A replay reads cost against the **pinned** table and
+yields the identical budget verdict. A run whose pin lacks the table,
+or names a table version this engine does not know, **refuses the
+cost-meaning replay** — it never silently re-prices against today's
+numbers, which would rewrite yesterday's verdict and call it
+verification. The replay of EFFECTS is untouched: it is the budget
+claim, and only that, which needs the table.
+
 ## `nika.lock` · *the single lock (normative · F7)*
 
 One lockfile pins everything a run resolves, by **digest**:
