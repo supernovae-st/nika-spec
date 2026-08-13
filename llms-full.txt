@@ -770,6 +770,41 @@ The following are **deferred** to stdlib v0.x or beyond ·
 
 See [`08-out-of-scope.md`](./08-out-of-scope.md) for the explicit list.
 
+## What supervises a run — *and what does not*
+
+Nika is a **local process**, and this is a claim about its limits, not a
+feature list.
+
+Restate states the constraint that applies here better than a
+self-assessment would: *"A library cannot supervise itself. It dies
+together with the process… the component that guarantees a process runs
+to completion has to see the whole process — it cannot live inside the
+thing whose lifetime it is guaranteeing."* That reasoning reaches Nika.
+`nika run` is not a supervised workflow service; it is a program on your
+machine, and **the supervisor of a local CLI is whatever started it** —
+your shell, your CI job, your systemd unit.
+
+What Nika does guarantee is narrower and worth stating exactly. Every
+effect is recorded in a hash-chained trace as it happens, so a killed
+run leaves an **auditable prefix** rather than an unknown state, and
+`nika run --resume <trace>` continues from it.
+
+Resumption is keyed by **task identity**, never by position. A task is
+skipped only when its identity matches a journaled success — and that
+identity covers the task's content, so **an edited task or a changed
+input always re-runs**. Nothing in the journal is addressed by index, by
+ordinal, or by rank within a wave; a reader that indexes a trace
+positionally is non-conforming. The consequence is worth stating
+positively: replaying a trace against a file that has since been edited
+cannot silently re-associate a record with a task that is no longer the
+one that produced it. The edit is visible, and the work is redone.
+
+What Nika does **not** claim: that a run survives its own process being
+killed without a supervisor restarting it, that a crashed machine
+resumes on reboot by itself, or that any daemon is watching. Durable
+execution against those failures is a different architecture with a
+different operational cost, and v1 does not pretend to it.
+
 ---
 
 ## Frozen language envelope
@@ -1108,9 +1143,33 @@ resolved secret values in logs, traces, and journal events.
 
 | `source` | `key` means | Use |
 |---|---|---|
-| `vault` (default) | path in the local `nika-vault` | the sovereign default |
 | `env` | name of an OS environment variable | 12-factor / CI secrets |
 | `file` | path to a file holding the value | Docker / k8s mounted secrets |
+| ~~`vault`~~ | — | **withdrawn from the contract · see below** |
+
+> #### 🔴 `vault` is withdrawn until it runs · corrected 2026-08-12
+>
+> This table called `vault` **« the sovereign default »**. The reference
+> engine's own hint says otherwise, verbatim ·
+>
+> > `secrets.k` uses source `vault`, **not yet runtime-resolvable — the
+> > check is green but `${{ secrets.k }}` will fail at run with
+> > NIKA-1702**; use `source: env` or `source: file` until vault
+> > resolution ships
+>
+> There is no `nika vault` verb and no `nika-vault` crate. Corpus vote,
+> derived: **`env` 19 · `vault` 0 · `file` 0.**
+>
+> This is the same class as the `config:`-without-`default:` defect fixed
+> the day before — **green at check, dead at run** — except it sat on the
+> member this table designated as THE default. A spec that names a
+> non-functioning member as the recommended one does not merely fail to
+> help: it steers every new author into the failure.
+>
+> The enum is therefore `env | file` until vault resolution ships, at
+> which point `vault` returns **additively** and reclaims the default. A
+> capability re-enters the contract when it runs, never before — and
+> nothing is lost meanwhile, because nothing was working.
 
 The `inputs` / `secrets` split is the modern secure-workflow default:
 non-sensitive values in `inputs:` (they appear in logs), masked references in
@@ -1519,11 +1578,12 @@ If `outputs:` is omitted, the workflow still runs; its result is
 engine-defined (a reusable/callable workflow SHOULD declare `outputs:`). The
 referenced task ids must exist (parse-time validated).
 
-> **`outputs:` (envelope · plural) ≠ `output:` (task · singular).** The
-> workflow-level `outputs:` is the *return contract*; the task-level `output:`
-> ([04-variables.md](./04-variables.md#output-binding--output)) defines *named
-> jq bindings* on one task. Plural-at-the-top, singular-per-task: the
-> same split GitHub Actions uses for `workflow_call.outputs` vs step `outputs`.
+> **`outputs:` (envelope) ≠ `extract:` (task).** The workflow-level
+> `outputs:` is the *return contract*; the task-level `extract:`
+> ([04-variables.md](./04-variables.md#extraction-bindings--extract)) defines
+> *named jq bindings* on one task. Two different words for two different
+> jobs — until 2026-08-12 the task field was `output:`, and the distinction
+> rode on a single letter (see [03 §extract](./03-dag.md#extract--optional--extraction-bindings)).
 
 ### What leaves a run · the export contract (normative)
 
@@ -2318,7 +2378,7 @@ my_task:                        # the map KEY is the identity · snake_case · u
   returns:                      # optional · the OUTPUT CONTRACT · the type expression, INLINE (09-types.md)
     object:
       summary: string
-  output:                       # optional · named jq bindings
+  extract:                      # optional · named jq bindings
     result: ".choices[0].message.content"
     tokens: ".usage.total_tokens"
 ```
@@ -2502,7 +2562,7 @@ failure mode, not taste ·
   both: a fold can never harvest zero members and read as clean.
 - **The reference boundary is untouched.** `group.<name>` is legal in a
   `with:` value and **nowhere else** — one door, where `tasks.*` has five.
-  `when:`, verb bodies, `on_error.recover:`, `output:` and workflow
+  `when:`, verb bodies, `on_error.recover:`, `extract:` and workflow
   `outputs:` all refuse it with the existing `NIKA-VAR-021`
   ([04 §the reference boundary](./04-variables.md#the-reference-boundary--where-tasks-may-appear)).
   Nothing in that law needed widening to admit the fold.
@@ -2954,7 +3014,7 @@ for_each:
 
 - **Every expression in the task body is re-evaluated PER ITERATION** with
   `item`/`index` bound: `with:`, the verb fields (`prompt:` · `command:` ·
-  `args:` · …), `when:`, AND the `output:` bindings. (A binding that does
+  `args:` · …), `when:`, AND the `extract:` bindings. (A binding that does
   not reference `item`/`index` evaluates to the same value every iteration —
   expressions are pure over settled state — so an engine MAY materialize it
   once; the observable behavior is identical.) The only expression evaluated
@@ -2963,7 +3023,7 @@ for_each:
 - The task's output is the **array of per-iteration outputs**, in input
   order · referenced downstream as `${{ tasks.scrape_all.output }}`
   (an array) · `${{ tasks.scrape_all.output[0] }}` for one element.
-- **`output:` bindings apply per iteration**: each binding's jq runs over
+- **`extract:` bindings apply per iteration**: each binding's jq runs over
   that iteration's raw response · downstream `tasks.X.<name>` is the
   **array of that binding's per-iteration values**, input order (so
   `tasks.X.output` = array of raw outputs · `tasks.X.title` = array of
@@ -3066,9 +3126,26 @@ left for a reviewer to strike.**
 **self-refuting.** The neighbours spell it `scatter` (WDL/CWL), `Map`
 (ASL), `withItems` (Argo), `matrix` (GHA). `for_each` is a **fifth**
 spelling, not one of the four, so « a reader of those four guesses ours »
-has no support whatsoever. (The precedent that *would* support it is
-Terraform's `for_each`, whose applies are also concurrent by default —
-that is the citation to check before anyone leans on this argument.)
+has no support whatsoever.
+
+**The precedent that DOES support it — checked, 2026-08-12.** Terraform's
+`for_each` is the fifth-spelling ancestor, and its applies are indeed
+concurrent by default: *« Graph walking is done in parallel: a node is
+walked as soon as all of its dependencies are walked »*, bounded by a
+semaphore whose `-parallelism` *« Defaults to 10 »* (`internals/graph.mdx`
+· `plan.mdx`). So the word does arrive with a concurrent connotation from
+the largest infrastructure-as-code ecosystem — **bounded, not unbounded**,
+which is exactly what `for_each.max_parallel:` expresses here.
+
+⭐ **And the same page hands us a stronger law than the naming one.**
+Terraform requires `for_each` keys to be known before any remote call, and
+refuses them outright when they are not: *« Keys in the `for_each` argument
+cannot be the result of or rely on the result of impure functions,
+including `uuid`, `bcrypt`, or `timestamp` »*. **Unknowns travel in the
+VALUES, never in the STRUCTURE.** That is the same line this section draws
+between SDF and BDF, reached independently by a declarative system with no
+dataflow vocabulary — and it is why a fan-out cardinality that depended on
+its own iterations would not be a feature but a different language.
 
 ❌ *« parallel-by-default is pillar 3, locked »* — **a category error.**
 Pillar 3 constrains the **semantics**, not the **spelling**. `map:` with
@@ -3188,7 +3265,7 @@ producer reads defined-`null` · [09 §typed value edges](./09-types.md#typed-va
 
 ---
 
-### `output` · *optional · output binding*
+### `extract` · *optional · extraction bindings*
 
 ```yaml
 api_call:
@@ -3197,7 +3274,7 @@ api_call:
       args:
         url: "https://api.example.com/data"
         mode: raw
-    output:
+    extract:
       user_count: ".data.users | length"
       first_user: ".data.users[0]"
       raw: "."
@@ -3205,12 +3282,17 @@ api_call:
 
 Defines named bindings extracted from the verb's raw response via a jq expression. These bindings are available downstream as `${{ tasks.task_id.user_count }}`, `${{ tasks.task_id.first_user }}`, etc. — imported through a consumer's `with:` like any output (a named binding is a **value**-role field).
 
-If `output` is absent · the task output defaults to the verb's raw response, referenced as `${{ tasks.task_id.output }}`.
+If `extract` is absent · the task output defaults to the verb's raw response, referenced as `${{ tasks.task_id.output }}`.
 
-#### The name is wrong · `extract:` is the decided replacement (normative decision · not yet executed)
+The two trees are disjoint and both stay readable · `tasks.X.output` is the
+raw response, `tasks.X.<name>` is an extraction of it. Declaring `extract:`
+adds named siblings; it never replaces `output`.
 
-The field named `output:` **does not write `output`**. Two measurements, both
-taken on the shipped 0.108.0 binary ·
+#### Why the field is `extract:` and not `output:` (the rename, and what it cost)
+
+The field was called `output:` until 2026-08-12. That name **stated a
+falsehood**, and the falsehood was measured twice on the shipped 0.108.0
+binary ·
 
 1. **The parser forbids the field's own name inside itself.** A binding
    `output: { output: "." }` is refused — `NIKA-PARSE-013`, *« output binding
@@ -3218,44 +3300,53 @@ taken on the shipped 0.108.0 binary ·
    names (`output` · `status` · `error` · `started_at` · `ended_at` ·
    `duration_ms`), but it is the only one that is also **the name of the
    block doing the refusing**.
-2. **`tasks.X.output` stays RAW when `output:` is declared.** A task
-   declaring `output: { picked: ".foo" }` still serves the unextracted verb
+2. **`tasks.X.output` stayed RAW when `output:` was declared.** A task
+   declaring `output: { picked: ".foo" }` still served the unextracted verb
    response at `tasks.X.output`, alongside `tasks.X.picked`. Both reads
-   check green in the same file. The block adds named siblings; it never
-   touches `output`.
+   checked green in the same file. The block adds named siblings; it never
+   touched `output`.
 
-So the field is named after the one thing it neither produces nor may
-contain. It also sits one letter from the envelope's `outputs:` (the run's
+So the field was named after the one thing it neither produces nor may
+contain. It also sat one letter from the envelope's `outputs:` (the run's
 exports), making singular-vs-plural carry a semantic distinction that nothing
-in the spelling signals.
+in the spelling signalled.
 
 **The replacement is `extract:`** — and the argument is deliberately *not*
 that it is clearer. Furnas et al. measured that intuition dead in 1987 (*The
 vocabulary problem in human-system communication*, CACM 30(11) — two people
 pick the same name for the same thing under 20 % of the time; « the idea of
 an obvious, self-evident, or natural term is a myth »). The argument is that
-the current word **states a falsehood** and the candidate states a fact ·
+the old word **stated a falsehood** and the new one states a fact ·
 
 - `extract:` names the **operation** (run this jq over the raw response),
   which is what the block does and all it does.
-- It is not a projection name, so the reserved-name collision disappears:
-  `extract: { output: "." }` becomes sayable, because `output` is no longer
-  the block's own identity.
 - It cannot be confused with `outputs:`: different word, not different
   number.
-- The raw/named duality becomes readable — `tasks.X.output` is the response,
+- The raw/named duality became readable — `tasks.X.output` is the response,
   `tasks.X.<name>` is an extraction of it.
 
-**Status · decided here, executed in one cascade, not yet run.** Measured
-blast radius 2026-08-12 · **76 tasks in 42 files** (12 in this repo). The
-rename is small, but it lands in the engine parser, this schema, the corpus,
-the VS Code extension and the website simultaneously — and flipping the spec
-alone would make every shipped example refuse at `nika check` while passing
-the reference oracle, which is the divergence this repo exists to prevent.
-The migration is a `canon/migrations.yaml` row (`old_form: output` ·
-`new_form: extract` · mechanical 1:1, equivalence-or-stop) with a
-`canon/tombstones.yaml` entry for the dead spelling, per the discipline every
-prior rename followed.
+**What did NOT change.** The rename is key-to-key and nothing else
+(equivalence-or-stop). `tasks.X.output` — the record read — is untouched, and
+so is the envelope's `outputs:`. The reserved-binding list is also untouched:
+`extract: { output: "." }` is **still refused** (`NIKA-PARSE-013`), because a
+binding may not shadow a record projection. That refusal now carries a reason
+the spelling can state — you cannot name a binding after the raw response —
+where before it was the block forbidding its own name. The reserved list dies
+separately, with the `tasks.X.out.<name>` disjoint tree; until then it stands.
+
+**Status · executed in this repo 2026-08-12 · the engine leg is owed.**
+Measured here at execution · **17 workflow files + 6 spec fences** carry the
+field (the earlier « 12 in this repo » estimate was low). The rename lands in
+the engine parser, this schema, the corpus, the VS Code extension and the
+website; **this repo's leg is done and its own oracle moved with it** (schema
+`$defs/task`, `conformance/deep_static.py`, `conformance/runner.py`,
+`scripts/showcase-projector.py`). The shipped 0.108.0 binary refuses
+`extract:` with `NIKA-PARSE-005` and will until the engine leg lands — the
+same lead the corpus already carries on the envelope (`nika: v1`), not a new
+class of divergence. The migration is `canon/migrations.yaml` row
+`mig-r4-task-extract-replaces-output` (`old_form: output` · `new_form:
+extract` · mechanical 1:1, equivalence-or-stop) with a `canon/tombstones.yaml`
+entry for the dead spelling, per the discipline every prior rename followed.
 
 ---
 
@@ -3611,7 +3702,7 @@ tasks:
       args:
         url: "https://example.com/sitemap.xml"
         mode: sitemap
-    output:
+    extract:
       pages: "map(.loc)"   # sitemap output IS the root array of {loc, …} · a binding is single-valued, so collect the URLs into one array
 
   summarize:
@@ -3791,7 +3882,7 @@ linter (the reference `native-first` rule set) warns on each class ·
 |---|---|---|
 | `native-first/001 exec-http` | `curl` · `wget` · `xh` · `http(s)` · an interpreter one-liner around `fetch(`/`axios`/`http.request` | `nika:fetch` (uploads · `multipart:` · crawls · `traverse:`) |
 | `native-first/002 exec-file` | `cat` · `tee` · `cp` · `mv` · `mkdir` · `touch` · `head` · `tail` · `ls` | `nika:read` / `nika:write` (`create_dirs: true`) / `nika:glob` |
-| `native-first/003 exec-data` | `jq` · `sed` · `awk` | `nika:jq` (or an `output:` binding) for JSON · `nika:edit` for in-place literal file edits |
+| `native-first/003 exec-data` | `jq` · `sed` · `awk` | `nika:jq` (or an `extract:` binding) for JSON · `nika:edit` for in-place literal file edits |
 | `native-first/004 exec-media` | an image/speech provider endpoint in the command (`images/generations` · `/v1/audio/speech` · …) | `nika:image_generate` / `nika:tts_generate` |
 | `native-first/005 exec-helper` | an interpreter (`node` · `python` · `sh` · …) running a script file | inventory the helper · HTTP→`nika:fetch` · files→`nika:read`/`nika:write` · JSON→`nika:jq` · YAML/TOML/CSV in or out→`nika:convert` (then `nika:jq`) · a product API→an MCP server (`mcp:<server>/<tool>`) · a helper script is not one of the genuine subprocesses that stay silent below, so a ledger row records the intent without clearing this rule |
 
@@ -3940,7 +4031,7 @@ wire contract:
 |---|---|---|
 | always | `id` · `kind` · `verb` · `permits` | `kind` is `"task"` or `"finally"` (format 3 · a reader MUST branch on it before assuming a node schedules) · `permits` may be empty — per-task capability attribution (`exec:` · `fs.read:` · `fs.write:` · `net.http:` · `tool:` families, deterministic order), the un-aggregated voice of the same effect walk `infer_permits` folds into the workflow boundary |
 | present-as-null when undeclared | `when` · `fan_out` · `cost_interval` | `when` carries the business-condition source (`"true"`/`"false"` literal or the CEL island — POST-gate, never the gate itself) · `fan_out` is `{ "kind": "list" \| "expression" }` with `count` only for the literal-list form · `cost_interval` is `[min_path, worst_case]` USD for **priced inference tasks only** (no price, no interval — never a fabricated 0) |
-| absent when undeclared | `tool` · `model` · `retry_max_attempts` · `timeout_ms` · `on_error` · `outputs` | declared POLICY, projected so clients read it here instead of re-parsing YAML: `tool` for `invoke` tasks · `model` as resolved `provider/name` (task override else workflow default) · `retry.max_attempts` (05) · `timeout:` as parsed milliseconds (unambiguous where the source string is not) · `on_error:` action (`recover` · `skip`) · declared `output:` binding names in source order (04) |
+| absent when undeclared | `tool` · `model` · `retry_max_attempts` · `timeout_ms` · `on_error` · `outputs` | declared POLICY, projected so clients read it here instead of re-parsing YAML: `tool` for `invoke` tasks · `model` as resolved `provider/name` (task override else workflow default) · `retry.max_attempts` (05) · `timeout:` as parsed milliseconds (unambiguous where the source string is not) · `on_error:` action (`recover` · `skip`) · declared `extract:` binding names in source order (04) |
 
 **Edges** carry `from` · `to` · `kind` — and per kind ·
 
@@ -3971,7 +4062,7 @@ that paints run state onto this graph joins the two by task `id`.
 
 ## Forward-compat
 
-v1 ships with these task fields · `with` · `after` · `when` · `for_each` · `retry` · `on_error` · `timeout` · `output` · `returns` · `lift` · plus the verb selector. (`max_parallel` and `fail_fast` are sub-fields of `for_each`; `on_finally` is dead — cleanup is a task on an `unwind` edge.) Additional fields may be added in minor bumps (additive only). (Output *shape* is per-verb · not a task field · see [02-verbs.md](./02-verbs.md#what--tasksidoutput--holds--per-verb).)
+v1 ships with these task fields · `with` · `after` · `when` · `for_each` · `retry` · `on_error` · `timeout` · `extract` · `returns` · `lift` · plus the verb selector. (`max_parallel` and `fail_fast` are sub-fields of `for_each`; `on_finally` is dead — cleanup is a task on an `unwind` edge.) Additional fields may be added in minor bumps (additive only). (Output *shape* is per-verb · not a task field · see [02-verbs.md](./02-verbs.md#what--tasksidoutput--holds--per-verb).)
 
 Out of scope for v1 · `parallel:` for explicit concurrency control · `include:` for sub-workflow composition (workaround · `exec: nika run sub.yaml`). See [08-out-of-scope.md](./08-out-of-scope.md).
 
@@ -4244,7 +4335,7 @@ ${{ tasks.X.error }}                 typed error record · present iff status ==
 ${{ tasks.X.started_at }}            RFC 3339 start timestamp
 ${{ tasks.X.ended_at }}              RFC 3339 end timestamp
 ${{ tasks.X.duration_ms }}           execution time · integer milliseconds
-${{ tasks.X.<name> }}                a named output: binding (jq · see below)
+${{ tasks.X.<name> }}                a named extract: binding (jq · see below)
 ```
 
 #### Defined-null reads (normative · the branch-join unlock)
@@ -4378,17 +4469,17 @@ masked references in `secrets`.
 
 ---
 
-## Output binding · `output:`
+## Extraction bindings · `extract:`
 
-Use `output:` to define **named bindings** extracted from a task's raw response via a **jq expression** (the one data language). These bindings appear in the task's typed output and are referenced as `${{ tasks.X.<name> }}` ·
+Use `extract:` to define **named bindings** extracted from a task's raw response via a **jq expression** (the one data language). These bindings appear in the task's typed output and are referenced as `${{ tasks.X.<name> }}` ·
 
 ```yaml
 api_call:
     invoke:
       tool: "nika:fetch"
       args:
-        url: "https://api.example.com/v1/users"   # returns JSON · output: jq extracts
-    output:
+        url: "https://api.example.com/v1/users"   # returns JSON · extract: jq extracts
+    extract:
       user_count: ".data.users | length"
       first_user: ".data.users[0]"
       user_emails: "[.data.users[].email]"   # [...] collects the stream into an array
@@ -4409,7 +4500,7 @@ notify:
 
 #### Raw output vs named bindings · dual-accessible
 
-When a task has an `output:` block defining named bindings · downstream
+When a task has an `extract:` block defining named bindings · downstream
 access is **dual-accessible** ·
 
 ```yaml
@@ -4417,7 +4508,7 @@ api_call:
     invoke:
       tool: nika:fetch
       args: { url: "..." }
-    output:
+    extract:
       body: .body
       http_status: .status     # NOT `status:` — that name is reserved (the task's own .status)
 ```
@@ -4429,7 +4520,7 @@ reference boundary) ·
 # Raw output (whole structure · pre-binding extraction)
 ${{ tasks.api_call.output }}             # full raw JSON · including all fields the verb returned
 
-# Named bindings (defined in output: block above) · value-role fields
+# Named bindings (defined in extract: block above) · value-role fields
 ${{ tasks.api_call.body }}               # jq .body  · the response body
 ${{ tasks.api_call.http_status }}        # jq .status · the HTTP status field
 ${{ tasks.api_call.status }}             # RESERVED · the task's own status (success|failure|…) · NOT a binding · terminal-observation role
@@ -4438,14 +4529,14 @@ ${{ tasks.api_call.status }}             # RESERVED · the task's own status (su
 **Rules** ·
 - `tasks.X.output` ALWAYS returns the raw output (unmodified value
   returned by the verb · before any binding extraction)
-- `tasks.X.<name>` for any `<name>` declared in `output:` block returns
+- `tasks.X.<name>` for any `<name>` declared in `extract:` block returns
   the extracted jq result
 - `<name>` collisions with reserved words `output` · `status` · `error` ·
   `started_at` · `ended_at` · `duration_ms` are forbidden at parse time
   (`NIKA-PARSE` · `validation_error`: the rule is structural · schema-checkable
   via `propertyNames` · `NIKA-VAR-NNN` stays reserved for reference *resolution*
   and binding *evaluation* errors)
-- If no `output:` block · only `tasks.X.output` is accessible (named
+- If no `extract:` block · only `tasks.X.output` is accessible (named
   bindings are an opt-in convenience)
 
 ### Path grammar · jq (the one data language)
@@ -4456,7 +4547,7 @@ RFC 9535 JSONPath was dropped because jq is a superset (any JSONPath query + mor
 and a workflow language must not force the author (or an LLM) to choose between
 two extraction syntaxes (SOTA « one obvious way · ≤2 expression layers »). The two
 expression layers are **CEL** (inside `${{ }}` · conditions + value substitution)
-and **jq** (inside `output:` bindings + `nika:jq` · extraction + transform).
+and **jq** (inside `extract:` bindings + `nika:jq` · extraction + transform).
 Reference engines use `jaq` (Rust jq) so paths behave identically everywhere.
 
 v0.1 jq conformance subset (every engine MUST support) ·
@@ -4472,7 +4563,7 @@ v0.1 jq conformance subset (every engine MUST support) ·
 The subset above is the portability floor every engine MUST support. Full jq
 (the `jaq` Rust impl · « full stdlib ») MAY be used **minus what the next
 section refuses** (D-2026-08-11-N26 · ambient reads and the wall clock): it is
-the single data extraction-and-transform language (`output:` bindings + the
+the single data extraction-and-transform language (`extract:` bindings + the
 `nika:jq` builtin). ⚠️ *Full-minus-a-prose-list is a floor, not a ceiling.* The
 ceiling is a named, versioned grammar — `jq-subset/0.1`, the sibling of
 [`cel-subset/0.1`](./03-dag.md) — which **does not exist yet**
@@ -4482,7 +4573,7 @@ and a boundary written in prose is weaker than one written in EBNF.
 ##### Formal grammar · jq v0.1 subset (normative · grammar version `jq-subset/0.1`)
 
 Prose + examples are not re-implementable; this EBNF is. A conformant engine
-parses exactly this grammar in an `output:` binding and in `nika:jq` (it is a
+parses exactly this grammar in an `extract:` binding and in `nika:jq` (it is a
 strict subset of jq: **any full jq parser accepts every expression below**) ·
 
 ```ebnf
@@ -4648,17 +4739,17 @@ hole; it does not close it.
   · take one with an index (`.users[0]`) or `first(…)`. One obvious way · no
   silent first-match, no implicit array-wrap.
 
-#### `output:` or `nika:jq` · the choice, decided (normative for linters · 2026-08-11)
+#### `extract:` or `nika:jq` · the choice, decided (normative for linters · 2026-08-11)
 
 | Rule | Instead of | Write |
 |---|---|---|
-| `one-obvious-way/013` | `invoke: {tool: nika:jq}` reshaping **one** producer's output | an `output:` binding on that producer |
+| `one-obvious-way/013` | `invoke: {tool: nika:jq}` reshaping **one** producer's output | an `extract:` binding on that producer |
 
 **They are the same jq over the same value, and until now nothing said which
 to reach for** — the only genuine unguarded overlap left in the language. The
 rule follows from what each one IS, not from taste ·
 
-- An `output:` binding is **boundary work**: it costs no task, no wave and no
+- An `extract:` binding is **boundary work**: it costs no task, no wave and no
   node in the graph, it runs per iteration inside a `for_each`, and it carries
   a normative cardinality law (exactly one value · `NIKA-VAR-002`).
 - `nika:jq` is **a task**: it has an id, a place in the DAG, its own gate and
@@ -4670,7 +4761,7 @@ rule follows from what each one IS, not from taste ·
 builtin stays because the many-input case is real and inexpressible otherwise;
 the binding wins the single-input case because a whole task node to rename a
 field is a node the graph did not need.
-- **An `output:` jq expression is pure jq over the task's raw output**: it does
+- **An `extract:` jq expression is pure jq over the task's raw output**: it does
   NOT contain `${{ }}` (the two expression layers never nest in one string ·
   CEL reads the namespaces · jq reads the task output). To parametrize an
   extraction by a workflow value, shape the verb's *input* with `${{ }}` ·
@@ -4702,7 +4793,7 @@ as **compact JSON** · deterministic (object keys sorted · no insignificant
 whitespace). Scalars render as their natural string (numbers · booleans ·
 `null` → `null`). There are **no template pipe-filters** (`${{ x | json }}` is
 NOT a thing · per the §locked substitution surface). To control the rendering,
-extract a string with jq in `output:` (`@json` for JSON text · `tostring` /
+extract a string with jq in `extract:` (`@json` for JSON text · `tostring` /
 `@text` for scalar coercion) and reference that binding. One obvious way ·
 implicit compact-JSON by default · explicit jq when you need a specific shape.
 
@@ -4762,7 +4853,7 @@ Reasons ·
 
 ## Forward-compat
 
-The `${{ ... }}` substitution surface and the <!-- canon:namespaces -->5<!-- /canon --> namespaces are locked at v1. **Template pipe-filters (`${{ inputs.x | json }}` · `| upper`) are NOT a growth path** (they would duplicate builtins + push CEL toward a string-DSL). Data transforms live in the `nika:jq` builtin; the `${{ }}` surface grows only with CEL-native features: the conditional `?:`, the `has()` presence macro, and the `contains`/`startsWith`/`endsWith` string tests ship in `cel-subset/0.1` ([03 §grammar](./03-dag.md)); `all`/`exists` and `matches()` regex stay reserved for a later additive minor. jq is the single extraction-and-transform language (`output:` + `nika:jq`).
+The `${{ ... }}` substitution surface and the <!-- canon:namespaces -->5<!-- /canon --> namespaces are locked at v1. **Template pipe-filters (`${{ inputs.x | json }}` · `| upper`) are NOT a growth path** (they would duplicate builtins + push CEL toward a string-DSL). Data transforms live in the `nika:jq` builtin; the `${{ }}` surface grows only with CEL-native features: the conditional `?:`, the `has()` presence macro, and the `contains`/`startsWith`/`endsWith` string tests ship in `cel-subset/0.1` ([03 §grammar](./03-dag.md)); `all`/`exists` and `matches()` regex stay reserved for a later additive minor. jq is the single extraction-and-transform language (`extract:` + `nika:jq`).
 
 Out of scope for v0.1 (deferred · see [`08-out-of-scope.md`](./08-out-of-scope.md)) ·
 - Expression language (no arithmetic in templates)
@@ -4873,7 +4964,7 @@ these from this file alone.
 | `NIKA-PARSE-010` | `timeout:` violates the quoted Go-duration contract (positive · max 24h · descending units) | `validation_error` | false |
 | `NIKA-PARSE-011` | `retry:` block violates the spec shape (§retry below) | `validation_error` | false |
 | `NIKA-PARSE-012` | `on_error:` block violates the spec shape (fields mutually exclusive) | `validation_error` | false |
-| `NIKA-PARSE-013` | `with:`/`output:` binding uses a reserved name (`output` · `status` · `error` · `started_at` · `ended_at` · `duration_ms`) | `validation_error` | false |
+| `NIKA-PARSE-013` | `with:`/`extract:` binding uses a reserved name (`output` · `status` · `error` · `started_at` · `ended_at` · `duration_ms`) | `validation_error` | false |
 | `NIKA-PARSE-014` | `secrets:` entry is not a store reference — inline literals forbidden ([01 §secrets](./01-envelope.md)) | `validation_error` | false |
 | `NIKA-PARSE-017` | duplicate mapping key — no silent last-wins | `validation_error` | false |
 | `NIKA-PARSE-018` | missing required field in a verb body (`infer.prompt` · `exec.command` · `invoke.tool`) | `validation_error` | false |
@@ -4952,6 +5043,7 @@ these from this file alone.
 | `NIKA-AUTH-007` | an interpolation reaches a permit BOUND (a host · glob · program · env name inside `permits:`) — a bound must be a literal, or the boundary is self-serve ([10 §authority](./10-authority.md)) | `security_error` | false |
 | `NIKA-AUTH-008` | an untrusted value reaches a permitted verb's ARGUMENT and its canonical resolved form escapes the step's permit — the diagnostic carries the taint path ([10 §authority](./10-authority.md)) | `security_error` | false |
 | `NIKA-AUTH-009` | an `env:` entry naming one of the engine's dangerous variables — an inert dead grant, flagged rather than silently passed ([01 §permits](./01-envelope.md)) | `security_error` | false |
+| `NIKA-AUTH-011` | a `lift:` entry whose named law would not have fired on this task — a trapdoor that lifts nothing is refused, never a silent no-op, because a lift's whole value is being countable and reviewable ([10 §the authored doors](./10-authority.md)) | `validation_error` | false |
 | `NIKA-AUTH-010` | a `net.http` entry carrying a `*` anywhere but as the whole bare-`*` entry — hosts are exact names, and the bare `*` stays the explicit, visible escape ([01 §permits](./01-envelope.md)) | `security_error` | false |
 | `NIKA-DECIDE-001` | the decision bundle is malformed or violates its own laws (float weight · undeclared evidence key in rules · identity key feeding a technical dimension · missing contradictory fixture · monotonicity violated by the bundle's own fixtures · [11 §nika:decide](./11-decision.md#nikadecide--the-deterministic-kernel-as-a-builtin)) | `validation_error` | false |
 | `NIKA-DECIDE-002` | the evidence snapshot does not satisfy the bundle's evidence schema (type misfit · unauthorized source · integrity below the declared floor · undeclared key · [11 §evidence IR](./11-decision.md#evidence-ir-normative--g14)) | `validation_error` | false |
@@ -5207,9 +5299,9 @@ Resolution happens at **recovery time** ·
    `skipped`), the reference is unresolved → `NIKA-VAR-001` → the recovery
    itself fails → the task fails as if `on_error:` were absent.
 
-**Recovery × `output:` bindings (normative)** · when `recover:` fires, the
+**Recovery × `extract:` bindings (normative)** · when `recover:` fires, the
 recovery value **substitutes the raw output BEFORE binding extraction**:
-the task's `output:` jq bindings evaluate over the recovered value exactly
+the task's `extract:` jq bindings evaluate over the recovered value exactly
 as they would over a verb response. Downstream consumers stay shape-stable
 (`tasks.X.title` works whether the live call or the fallback produced the
 data), which is why a recovery source SHOULD match the raw output's shape.
@@ -5600,7 +5692,7 @@ An engine claims « Core v0.1-compliant » if it ·
    - `${{ tasks.X.field }}` resolves to a declared upstream task + a valid field name
    - `${{ secrets.X }}` resolves to a declared `secrets:` entry
    - `when:` and `for_each:` expressions are valid **CEL** (the v0.1 subset · see 03-dag) and their references **resolve to known namespaces**: Core parses but does NOT *evaluate* them (no execution = no `tasks.X.status` to compare against · that is Runtime's job)
-   - `output:` bindings are valid **jq** expressions (the one data language · see 04-variables) · `${{ }}` never appears inside a binding
+   - `extract:` bindings are valid **jq** expressions (the one data language · see 04-variables) · `${{ }}` never appears inside a binding
    - Reports undefined references with `NIKA-VAR-001` · static expression violations with `NIKA-VAR-005` (the deep-static layer · CEL subset parse · jq compile · `when:` boolean shape)
 
 4. **Produces typed errors** matching the v0.1 spec
@@ -6070,7 +6162,7 @@ half of the original design survived unchanged.
 **The sibling-run workaround stays valid** · `exec: shell: "nika run
 subroutine.yaml --output json"` launches a sibling workflow PROCESS ·
 `--output json` (engine CLI) prints the child's typed `outputs:` as JSON on
-stdout · the parent binds it back with `capture: stdout` + a jq `output:`
+stdout · the parent binds it back with `capture: stdout` + a jq `extract:`
 (the typed contract survives the process boundary). It remains floor 1 below
 and the one form for what a static call graph cannot express (an unbounded
 cursor chain · H23) · wherever the target is static, a linter recommends the
@@ -6160,7 +6252,7 @@ stream_chat:
     infer:
       prompt: "..."
       stream: true
-    output:
+    extract:
       chunks: .stream                 # not in v0.1
 ```
 
@@ -7275,6 +7367,29 @@ The contract, for every entry ·
 5. **`from:` is law-specific** — required by `taint`, forbidden
    elsewhere. The schema enforces the discrimination; a `from:` on the
    wrong law is a parse error.
+6. **A lift that lifts nothing is an ERROR** (`NIKA-AUTH-011` ·
+   `validation_error`), never a silent no-op. If the named law would not
+   have fired on this task, the entry is refused and the diagnostic says
+   so.
+
+> **Rule 6 is borrowed from a regression, and the regression is the
+> argument.** Terraform's `nonsensitive()` is the same shape: an authored
+> trapdoor that lowers one label, with the responsibility transfer stated
+> in its own docs (*« you are declaring to Terraform that you have done
+> all that is necessary … that's a bug in your module and not a bug in
+> Terraform itself »*). In `v1.5.0` a redundant call was an **error**
+> — `if args[0].IsKnown() && !args[0].HasMark(marks.Sensitive) { return …
+> "this call is redundant" }`. On `main` that guard is **gone**: the mark
+> is deleted unconditionally, so a redundant declassification is a silent
+> no-op. Their own documentation page has not caught up — its prose says
+> no-op, its example still shows the error.
+>
+> **The cost is not the wasted line. It is that the trapdoor stops being
+> greppable.** A reviewer auditing « every declassification in this repo
+> carries its weight » can do that under the strict rule and cannot under
+> the lax one, because dead lifts accumulate indistinguishably from live
+> ones. A trapdoor whose whole value is being **countable and reviewable**
+> must refuse to be written when it does nothing.
 
 **Why one construct and not one field per law.** A door per law grows
 the language linearly in laws, and each language feature an author uses
@@ -7327,6 +7442,54 @@ The secret-flow and permit-taint codes join the existing `NIKA-SEC` and
   declare it in, and none to disable it from. A rule an author can opt
   out of by saying nothing is not a rule (measured: 26 gates spared, 8
   punished, and the 8 were the ones that had declared something else).
+
+## What `permits:` is, formally — *and what it is not*
+
+`permits:` is **not a capability system**, and this chapter says so
+plainly rather than borrowing a word it has not earned.
+
+In the capability model as Dennis and Van Horn defined it (CACM 9(3),
+1966), a reference is a pair `[i, a]` where `i` is an index **into the
+holder's own C-list**, and each C-list entry *"locates by means of a
+pointer some computing object"*. A computation cannot name an object it
+was not handed. **Authority comes from the indirection.**
+
+`permits.fs.write: ["./out/**"]` is a **name**, resolved at use against
+an ambient filesystem the engine process can already reach in full. Two
+paths therefore exist through the system: the designation, which travels
+in `args`, and the authority, which travels in `permits`. They are
+recombined at the moment of access by a reference monitor. Miller, Yee
+and Shapiro (SRL2003-02, 2003) call the absence of that split *Property
+A · No Designation Without Authority*, and state that **no ACL system
+can have it**. `permits:` does not have it.
+
+The shape is closer than the label suggests — `permits:` is per-subject
+and lists objects, which is a C-list's shape rather than an access
+list's. But a C-list of **strings** is not a C-list. The accurate name
+is **a per-subject permission manifest over a shared namespace**: the
+family of Android manifests and Deno flags, not the family of seL4
+capabilities.
+
+The known cost is stated with it. A manifest is declared once, before
+the work exists, so it must be written wide enough for every call the
+file could ever make — *"you often do not know in advance what
+authorities the program actually needs"* (Miller, 2006, §3.1). That is
+authority granted **just-in-case**, where the principle of least
+authority asks for **just-in-time**.
+
+What v1 buys instead is the thing none of those systems attempts: **the
+bound is judged before the program runs.** A capability is checked when
+it is invoked — which is to say after the tokens are spent and the
+request is already out. `nika check` reads the whole declared boundary
+against the whole graph and refuses ahead of the first effect, and
+`--infer-permits` lets the machine derive the boundary so the author is
+not the one who has to be exhaustive. That is a different guarantee, not
+a weaker version of the same one, and it is the one this file is built
+to give.
+
+> **Citation note.** The law usually quoted as *"No Ambient Authority"*
+> is Property D of SRL2003-02, **not** of Miller's 2006 dissertation:
+> the word `ambient` does not occur in the dissertation text.
 
 ## What v1 deliberately does not do
 
@@ -9538,7 +9701,7 @@ sorted by `(path, line)`. `pattern:` is a **Rust-regex-class** expression
 ```yaml
 invoke: { tool: "nika:jq", args: { expression: ".items | map(.price) | add", input: "${{ tasks.X.output }}" } }
 ```
-Run a jq expression. **The single data-transform-and-extraction language**: map · filter · select · group_by · reshape · string-interpolation `"\(.x)"` · `@base64`/`@base64d` encoders (the embedded jaq has NO `@csv`/`@tsv` — use `nika:convert to: csv`) · array `flatten` · `leaf_paths`/`getpath`/`setpath`. The same jq used in `output:` bindings (see `04-variables.md`).
+Run a jq expression. **The single data-transform-and-extraction language**: map · filter · select · group_by · reshape · string-interpolation `"\(.x)"` · `@base64`/`@base64d` encoders (the embedded jaq has NO `@csv`/`@tsv` — use `nika:convert to: csv`) · array `flatten` · `leaf_paths`/`getpath`/`setpath`. The same jq used in `extract:` bindings (see `04-variables.md`).
 
 **`input` is any JSON value**: a single ref (`input: "${{ tasks.X.output }}"`) OR a **constructed array for multi-input ops**. Recursive merge of two objects (this is exactly why `json_merge` is NOT a builtin · jaq's `*` does it) ·
 ```yaml
@@ -10958,7 +11121,7 @@ invoke:
     jq: "[.data.users[].email]"
 ```
 
-**Behavior** · parses response as JSON · applies the jq expression · returns the result. The SAME jq language used in `output:` bindings and the `nika:jq` builtin: Nika has ONE data language (replaces the former JSONPath mode · jq is a superset of JSONPath). **The exactly-one-output law applies** (same engine · same law as `nika:jq` per [04 §bindings](../spec/04-variables.md)) · an expression producing 0 or N outputs is `NIKA-BUILTIN-FETCH-001` (wrap streams in `[…]` to collect).
+**Behavior** · parses response as JSON · applies the jq expression · returns the result. The SAME jq language used in `extract:` bindings and the `nika:jq` builtin: Nika has ONE data language (replaces the former JSONPath mode · jq is a superset of JSONPath). **The exactly-one-output law applies** (same engine · same law as `nika:jq` per [04 §bindings](../spec/04-variables.md)) · an expression producing 0 or N outputs is `NIKA-BUILTIN-FETCH-001` (wrap streams in `[…]` to collect).
 
 **Implementation** · reference engine uses `jaq` (Rust jq).
 
