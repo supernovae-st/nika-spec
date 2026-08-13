@@ -1,0 +1,7 @@
+{
+ "resume_compat": null,
+ "verdict": "refused",
+ "exit": 3,
+ "names_both_versions": true,
+ "note": "17 §the fold law (NEP-0014 law 4) · a resume of a trace recorded under a DIFFERENT engine is judged, never assumed. No compat is declared here, so the resume refuses and the message names BOTH versions plus the exact door out. The journal's chain is intact — the only thing wrong with it is the version it claims, which is the point: this is not a tamper case. Constructed, and it must be: a second engine build cannot be produced by running anything, so the recorded `engine_version` in the boot manifest is rewritten and every later `chain` recomputed over exact bytes. Measured 2026-08-13 · nika 0.108.0, exit 3: `the trace was recorded under engine 0.99.0-ancien · this engine is 0.108.0 — a cross-version resume is judged, never assumed (F-P21): re-run live, or declare the compat with --resume-compat 0.99.0-ancien`."
+}

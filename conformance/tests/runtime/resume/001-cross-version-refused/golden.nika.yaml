@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-resume-cross-version
+permits:
+  exec: ["echo"]
+inputs:
+  qui:
+    type: string
+    default: "defaut-du-fichier"
+tasks:
+  dire:
+    exec:
+      command: ["echo", "${{ inputs.qui }}"]

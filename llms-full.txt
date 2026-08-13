@@ -6010,7 +6010,8 @@ conformance/
 │   │   ├── trace/            #   the journal, judged by the walk (a verdict)
 │   │   ├── receipt/          #   the receipt, judged by its reading (what projects)
 │   │   ├── registry/         #   a cache record × an operator floor, judged by admission
-│   │   └── energy/           #   a workflow, judged by the energy reading it must report
+│   │   ├── energy/           #   a workflow, judged by the energy reading it must report
+│   │   └── resume/           #   a journal × a compat declaration, judged by the version crossing
 │   └── stdlib/                # provider/extract/builtin canonical surface
 │
 ├── runner.py                  # the static oracle · `all` is the CI gate

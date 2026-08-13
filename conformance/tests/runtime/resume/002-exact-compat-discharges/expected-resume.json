@@ -1,0 +1,7 @@
+{
+ "resume_compat": "0.99.0-ancien",
+ "verdict": "proceeds",
+ "exit": 0,
+ "attested_on_boot_manifest": true,
+ "note": "17 §the fold law (NEP-0014 law 4) · the DECLARED compatibility, the only door. The operator names the recorded version exactly and the resume proceeds — and the declaration is journaled on the NEW run's boot manifest, so the attestation says under whose authority the versions were crossed. Byte-identical journal to 001; the pair differs by the declaration alone. Measured 2026-08-13 · nika 0.108.0, exit 0: `cross-version compat declared — the trace was recorded under engine 0.99.0-ancien, this engine is 0.108.0 (attested on the run's boot manifest)`."
+}
