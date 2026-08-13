@@ -127,6 +127,55 @@ action = "upgrade to 1.2.1"     # or "do not run · no fix"
 A conformant client MUST consult advisories before install and MUST
 refuse (not warn) on a matching one unless explicitly overridden.
 
+## 3b · Provenance tiers (normative)
+
+Trust in an artifact is not a boolean. A client resolves every artifact
+with a **tier**, on a closed, totally-ordered ladder ·
+
+```
+unprovenanced  <  provenanced  <  stage-clear  <  verified
+```
+
+1. **The ladder is closed.** An unknown tier string — in a policy file,
+   in a cache record, in any registry statement — REFUSES. It grows by
+   amending this specification, never by parsing something new.
+2. **Evidence admits; a claim admits nothing.** A tier is earned only
+   by evidence observed AT FETCH ·
+   - `unprovenanced` — the digest floor of §1: bytes provably
+     consistent with the pinned `sha256`, origin unproven.
+   - `provenanced` — the artifact's signature verifies under the
+     publisher's anchored key: origin proven to a key, key continuity
+     proven by the anchor record.
+   - `stage-clear` · `verified` — reserved: their evidence formats (a
+     staged-window statement · a complete publish layout) land with
+     the work that defines them.
+
+   The `index.json` of §4 is a convenience projection: a tier asserted
+   there and not re-derived from evidence admits **nothing**. This is
+   §0 law 2 — trust lives in the artifact, not the gatekeeper —
+   applied to provenance.
+3. **The admission floor is operator DATA, never a constant in code.**
+   A versioned policy file names it; an absent file means
+   `unprovenanced`, which is today's behavior stated out loud rather
+   than assumed. An unknown policy version or an unknown floor refuses.
+   No floor lives in source, so every change to it is an operator edit
+   — reviewable, greppable, attributable to a person.
+4. **Below the floor, nothing is written.** A fetch whose admitted tier
+   is under the floor refuses (`NIKA-REG-008`) AFTER verification and BEFORE the store,
+   so a rejected artifact never lands on disk. A cache hit whose
+   recorded tier is under the floor refuses identically: the policy
+   changed over the cache, and **the cache does not grandfather**.
+5. **The tier is recorded, and it is attested.** The cache record
+   carries the tier beside the digest, and a hit re-tells the recorded
+   truth — evidence is not re-sought on a hit, the record IS the
+   evidence of what that fetch proved. The tier of every registry
+   artifact a run consumes rises to the receipt: a run attests the
+   provenance of what it consumed, not merely its hash.
+6. **No inflation, and no retroactive upgrade.** A record naming a tier
+   its evidence class cannot admit is treated as tampered. A later
+   registry-side improvement rewrites nothing: re-fetch re-proves, and
+   the receipt of the day tells the truth of the day.
+
 ## 4 · Machine surfaces (normative for discovery)
 
 A conformant registry MUST serve, at stable paths:

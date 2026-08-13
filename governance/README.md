@@ -39,6 +39,7 @@ resolve to.** A number is never reused.
 | 0013 | Human approval is a bounded, content-bound, attested ticket | [`spec/10-authority.md`](../spec/10-authority.md) §the approval is a bounded ticket · `NIKA-SEC-010` |
 | 0014 | The thin-laws (3a): observable independence · input origins · the readable receipt · cross-version resume | [`spec/05-errors.md`](../spec/05-errors.md) `NIKA-SEC-012` · [`04`](../spec/04-variables.md) §origin · [`15`](../spec/15-proof.md) §receipt · [`17`](../spec/17-trace.md) §fold law |
 | 0015 | Preview-commit: judged = executed, at the action scale | [`spec/05-errors.md`](../spec/05-errors.md) · `NIKA-SEC-011` |
+| 0016 | Provenance tiers: a closed ladder admitted by evidence, an operator-owned floor, the tier attested | [`registry/registry-v0.1.md`](../registry/registry-v0.1.md) §3b · `NIKA-REG-008` |
 | 0017 | The thin-laws (3b): the pricing table rides the pin · a failed run owes an attested quarantine · the third blame polarity | [`15`](../spec/15-proof.md) §the semantic hash · [`17`](../spec/17-trace.md) §the end of the run · [`05`](../spec/05-errors.md) §blame polarity |
 | 0018 | Energy honesty: unknown stays unknown, and never a fabricated zero | [`spec/07-conformance.md`](../spec/07-conformance.md) §the spend-honesty law |
 | 0020 | A refused confirm must not reach an effect | [`spec/10-authority.md`](../spec/10-authority.md) §the affirmative-consent law · `NIKA-SEC-014` |
@@ -61,7 +62,6 @@ nothing else carries.
 
 | NEP | Title | Type | Status |
 |---|---|---|---|
-| [0016](nep-0016-provenance-tiers.md) | Provenance tiers: a closed ladder admitted by evidence, an operator-owned floor, the tier attested | Standards Track | Draft |
 | [0019](nep-0019-workflow-token-budget.md) | The workflow token budget — the portable cap leaves the agent verb | Standards Track | Draft |
 | [0021](nep-0021-delegation-block.md) | The `delegation:` block — bounded, attenuated, attested sub-runs under `agent:` | Standards Track | Draft |
 
