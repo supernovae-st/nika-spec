@@ -143,7 +143,7 @@ files:
     - "README.md · QUICKSTART.md · spec/00-16 · stdlib/ · registry/ · GLOSSARY.md (the ordered normative reading path, concatenated)"
 - path: "llms.txt"
   class: generated
-  sha256: 8d5a8e3242abc20bc91510a9476e09cf6cb90c5c9c4560c8a4924e7f1c8d812e
+  sha256: 183302c281b5268ec67b2c11b0c43cd9e1c09acc6fd76c0e4b978fa08dddd7d5
   evidence: "scripts/llms-projector.py:2 'generates llms.txt + llms-full.txt from the spec sources' · build_llms_txt() interpolates counts from canon.yaml — 'never hand-maintained'"
   derivation:
     tool: "python3 scripts/llms-projector.py --write"
@@ -295,7 +295,7 @@ patterns:
 - glob: "scripts/**"
   class: authored
   match_count: 24
-  aggregate_sha256: ab27e5f5fe1b922e5b3375c8d673fdf0613bfa3929086dcc73c5c625f256d1d1
+  aggregate_sha256: 4ba69bf36b9af944420fa8ae9eb9b4023c2b6be961535da25b8041cd701af44f
   evidence: "the compiler + projectors humans wrote (ssot-compiler · canon/showcase/llms/starters/authoring/design projectors · gen-gate-matrix · gen-type-corpus · grammar_door + selftest · check-md-refs) — the tools that WRITE the generated surfaces; estate.py excepted in files: (the self row)"
 - glob: "timeline/**"
   class: authored
@@ -325,7 +325,7 @@ patterns:
 - glob: "*"
   class: authored
   match_count: 16
-  aggregate_sha256: 1a73726667c4a67409d7f1f625664a4ba2870caa2d81e8b13c503764bfe32266
+  aggregate_sha256: de6fe9d988f9a7545e8847fa6e0183d8b7016cf3be4bc52a4c8291b70fd9754b
   evidence: "root prose + config (README · QUICKSTART · GLOSSARY · CONTRIBUTING · CHANGELOG hand-kept per Keep a Changelog · SECURITY · CITATION.cff · CONFORMANT_IMPLEMENTATIONS · PROOFS.md the receipts ledger · LICENSE · REUSE.toml · ruff.toml · .gitignore · .pre-commit-hooks.yaml · .bestpractices.json) — no generation markers; VERSION · llms*.txt · canon.yaml · CODE_OF_CONDUCT.md excepted in files:"
   note: "README · QUICKSTART · GLOSSARY · CONTRIBUTING · CHANGELOG carry the canon-projected count markers — tool-maintained blocks inside authored prose"
 - glob: "**"

@@ -113,7 +113,7 @@ one claim form, one governance door.
 
 - [Conformance runner protocol]({RAW}/conformance/runner-protocol.md): run the suite against ANY engine · fixture contract (input.yaml + expected.json)
 - [Conformant implementations]({RAW}/CONFORMANT_IMPLEMENTATIONS.md): the registry · claim form « Nika v1 Conformant — <Level> (spec <commit>) » · how to be listed
-- [NEP process]({RAW}/governance/nep-0000-the-nep-process.md): the one public door for evolving the standard · nobody amends it directly, maintainers included
+- [NEP process]({RAW}/governance/nep-0000-the-nep-process.md): the evolution door, DORMANT until the v1 pre-freeze · until then a normative change is a PR against spec/ with its fixtures · at the freeze every change becomes a proposal again, maintainers included
 - [Certifications]({RAW}/governance/certifications.md): the earned-badges matrix (Scorecard · REUSE · SLSA · best-practices) with evidence links
 - [Glossary]({RAW}/GLOSSARY.md): canonical referents for overloaded words (oracle · gate · golden · …)
 - [Timeline]({RAW}/timeline/timeline.yaml): the one verifiable record — eras · releases · milestones · forward gates (every provable claim re-proven in CI)
