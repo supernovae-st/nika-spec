@@ -18,11 +18,11 @@ classes:
   testimonial: "captured evidence — fixtures, corpora, traces, receipts: proves behavior; neither shipped source nor regenerable output"
   foreign: "pointer to a third-party sovereign source"
 summary:
-  classified_files: 1329
+  classified_files: 1345
   file_rows: 15
   pattern_rows: 29
   by_class:
-    authored: 1001
+    authored: 1017
     authored-pin: 1
     generated: 130
     pinned-copy: 4
@@ -78,7 +78,7 @@ files:
   note: "hybrid by design: the 15 ledger sections (canon/EXCEPTIONS.md · SSOT-1 §18) stay AUTHORED and are carried verbatim through the regeneration — editing those sections is legal, editing an imported section is rc=5"
 - path: "canon/laws-index.json"
   class: generated
-  sha256: 8a6f79f4384fd48f91caf12c104448bf691444572569c82c815220ff2ad4be27
+  sha256: ff3b030e317c1e6751c3b7b7fcb105f3eca59757be2ef54e51bb33647d5386c1
   evidence: "carries the generator identity block ('ssot-compiler' + source_sha256) · scripts/ssot-compiler.py header: 'emits ONE deterministic projection (canon/laws-index.json, stable sort by law id, canonical JSON, NFC, LF)'"
   derivation:
     tool: "python3 scripts/ssot-compiler.py (write mode)"
@@ -89,7 +89,7 @@ files:
     - "schemas/registries.schema.json"
 - path: "canon/ssot.lock"
   class: generated
-  sha256: 1f6737d207393827c60861447b86f14d4e7f2ed621d195bd89199c724accf86e
+  sha256: 8ac50a7fecdc2384e0e3e932b8e749b3dc000e2e462a1ce277485ff41f44dfc6
   evidence: "single-line canonical JSON carrying generator identity ('ssot-compiler' 0.2.0-sandbox + its own source_sha256), the 27 leaf digests and law_count — no human writes a lock"
   derivation:
     tool: "python3 scripts/ssot-compiler.py (write mode · leaf digests only, digest-dag layer 1, own digest DETACHED per PAA-006)"
@@ -100,7 +100,7 @@ files:
     - "canon/laws-index.json (leaf-hashed)"
 - path: "canon/ssot.lock.sha256"
   class: generated
-  sha256: 203e26411bda92cba3a6ed7f58898d6a03714e2c6f799d7f6188cd421963fa88
+  sha256: f57d666a5a9f08eef9fe0859ef3438ce5322400435677ddb9fbee9b995de5065
   evidence: "the lock's own digest, DETACHED into a sidecar per PAA-006 (a file cannot contain its own hash) — written by the compiler alongside the lock"
   derivation:
     tool: "python3 scripts/ssot-compiler.py (write mode · the detached-sidecar emission)"
@@ -109,7 +109,7 @@ files:
     - "canon/ssot.lock"
 - path: "conformance/coverage-matrix.tsv"
   class: authored
-  sha256: 316dfbd4980a9552c43d399c4ee85c7662793355d688631885f0c80f289cf4b1
+  sha256: ccb1f05b714bdbbe567857b69a231fb2ecd9f8110bfeab3aa9552c348ea39c8d
   evidence: "conformance/README.md §Scope + coverage: 'Curated 2026-07-08 from the reference engine's private e2e lab (475 workflows → 95 by per-cell best-file selection)' — hand-curated, no script in the tree writes it; empty cells are the declared v0.2 backlog"
 - path: "conformance/type-corpus/corpus.jsonl"
   class: generated
@@ -166,12 +166,12 @@ patterns:
 - glob: "canon/laws/**"
   class: authored
   match_count: 13
-  aggregate_sha256: c3bbb47cff9431c7854854619344bffc904ae9bed0b747bdee9add1ae583b5e5
+  aggregate_sha256: ea1a4ed902a284b103b798ee2d56c9f6e538718dec7e5ae089ea5d39ca84fb72
   evidence: "the law registries humans edit — every entry schema-validated against schemas/law.schema.json, leaf-hashed into canon/ssot.lock by the ssot-compiler (law_count lives in the lock, never typed here); the compiler CONSUMES these, nothing writes them"
 - glob: "canon/**"
   class: authored
   match_count: 14
-  aggregate_sha256: cc66f7d38b9f39bac0cf62b113d32c10bcc1071221d65d58d738e54cd0ce7af8
+  aggregate_sha256: ffee58179f252e8d30715222433332151bb7e8a6446aaca8f9a8a7b3881083fd
   evidence: "the registries humans edit (surface · builtins · features · conformance · grammar · types · providers · migrations · projections · tombstones · snippets · templates · diagnostics) + canon/EXCEPTIONS.md (the §18 exception ledger) — the SOURCES the compiler seals; ssot.lock + sidecar excepted in files:"
 - glob: "conformance/tests/runtime/gates/**"
   class: generated
@@ -207,8 +207,8 @@ patterns:
     - "the VOCAB_FIXTURE constant in scripts/gen-gate-matrix.py"
 - glob: "conformance/tests/**"
   class: authored
-  match_count: 565
-  aggregate_sha256: b7736cd747fe98e763c683481e13aca8087cc577d2621c289b602cba0db75f65
+  match_count: 581
+  aggregate_sha256: 50e67e4207b862a02ce6ad0d3010abd4355f7bfacf23eb82f353fc5095cf731b
   evidence: "the executable law — the 5-tier fixture corpus (core · deep 001-022 · lints · runtime · stdlib): input + expected pairs written at spec-authoring time, consumed by conformance/runner.py; no generation markers"
 - glob: "conformance/.nika/**"
   class: testimonial
@@ -223,7 +223,7 @@ patterns:
 - glob: "conformance/**"
   class: authored
   match_count: 201
-  aggregate_sha256: 2af99bc4bdb29857c6538a1997a80877533f9e9d108c8260c66c34dc7e0c9e06
+  aggregate_sha256: 0c9444fb551e4917ad4331c6d613647fc93b25a7855d29b10242734bf06819e3
   evidence: "the 95-workflow corpus (envelope · variables · verbs · errors · dag · gates · types · yaml-profile · values · composition · decision-goldens frozen at authoring time and consumed by decision_core_selftest.py) + the Python cores/selftests/runner + README/FINDINGS/runner-protocol; type-corpus + coverage-matrix excepted in files:"
 - glob: "proofs/**"
   class: testimonial
