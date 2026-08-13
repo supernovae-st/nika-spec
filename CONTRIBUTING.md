@@ -19,7 +19,7 @@ maintainers included. The door is already built and waiting —
 [governance/NEP-0000](./governance/nep-0000-the-nep-process.md) carries
 the process and [the template](./governance/nep-template.md) the shape.
 [governance/README.md](./governance/README.md) records the twenty
-proposals folded into the draft on 2026-08-14, and where each law lives
+proposals folded into the draft on 2026-08-13, and where each law lives
 now.
 
 Not sure it deserves a NEP yet? Ideate first in the engine's

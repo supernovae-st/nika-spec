@@ -10,7 +10,7 @@ a numbered, public, git-versioned document.
 > pre-freeze this door becomes binding — from then on every change is a
 > proposal again, the maintainers included.
 >
-> That is why the drafts that used to sit here are gone: on 2026-08-14 the
+> That is why the drafts that used to sit here are gone: on 2026-08-13 the
 > twenty of them stopped being proposals. Eighteen became the language;
 > two were never built and are buried as such. The tables below say where
 > each one went — a number that resolves to nothing does so on purpose.
@@ -18,11 +18,16 @@ a numbered, public, git-versioned document.
 - The process itself: [NEP-0000 · The NEP Process](nep-0000-the-nep-process.md)
 - The shape a future proposal takes: [nep-template.md](nep-template.md)
 
-## The fold · 2026-08-14 · where each law lives now
+## The fold · 2026-08-13 · where each law lives now
 
 The numbers stay load-bearing: engine code, traces and commit messages
 cite `NEP-0009`, `NEP-0012`, … . **This table is what those citations
 resolve to.** A number is never reused.
+
+*(The date above is when the fold was **done**, read off the clock. The
+decision that authorised it is `D-2026-08-14-N1` and keeps its own id —
+an identifier is not a timestamp, and reading one as the other is how
+this heading was wrong for a day.)*
 
 | NEP | The law | Lives now in |
 |---|---|---|
