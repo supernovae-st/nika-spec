@@ -8,8 +8,8 @@ workflow files.
 
 ## Supported Versions
 
-The spec is pinned at the `nika: v1` contract · additions are additive
-within v1. Only the latest tagged release and `main` receive fixes.
+The spec is the v1 contract (a workflow file types no version · `nika:`
+carries its name) · additions are additive within v1. Only the latest tagged release and `main` receive fixes.
 
 ## Reporting a Vulnerability
 

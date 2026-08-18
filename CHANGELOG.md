@@ -1,9 +1,10 @@
 # Nika spec · CHANGELOG
 
 All notable changes to the **Nika workflow language specification** are
-documented here. The spec is pinned at the `nika: v1` contract forever ·
-language additions are additive within v1 (feature-detected · no minor
-version in the file). Stdlib (providers · extract modes · builtins) versions
+documented here. The spec is the v1 contract forever · a workflow file
+types no version (`nika:` carries its name since 2026-08-12) · language
+additions are additive within v1 (feature-detected · no minor version in
+the file). Stdlib (providers · extract modes · builtins) versions
 independently.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).

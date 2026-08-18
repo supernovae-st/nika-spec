@@ -3,8 +3,9 @@
 """C2 Session B local proof harness · maker != checker.
 
 The maker (this branch feat/c2-language-def) wrote the new-world language
-definition: schemas/workflow.schema.json v-next (the four value authorities
-inputs/config/const/secrets · vars/env dead · TypeExpr widen) and
+definition: schemas/workflow.schema.json v-next (the value authorities ·
+four then, `config` since folded into `inputs:` at the envelope nuke, three
+now: inputs/const/secrets · vars/env dead · TypeExpr widen) and
 reference/values_core.py (the reference judge · NIKA-VALUES-001..003 ·
 NIKA-DEFAULT-001). This checker judges every conformance/values/** fixture
 against BOTH surfaces and compares the verdict to expected.json ·

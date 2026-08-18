@@ -6,5 +6,5 @@
       "category": "variable_error"
     }
   ],
-  "note": "04-variables.md \u00a7Resolution order \u00b7 config.X resolves against the envelope config: block (R3a \u00b7 the config: authority succeeds the dead env:) \u00b7 no config: block declares MISSING \u2192 unresolved \u2192 NIKA-VAR-001."
+  "note": "04-variables.md \u00a7Resolution order \u00b7 inputs.X resolves against the envelope inputs: block (R3a \u00b7 the E-split \u00b7 config: died at the envelope nuke 2026-08-12) \u00b7 no inputs: entry declares MISSING \u2192 unresolved \u2192 NIKA-VAR-001."
 }

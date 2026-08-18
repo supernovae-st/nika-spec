@@ -1,4 +1,4 @@
 {
   "valid": true,
-  "note": "builtins-v0.1.md §nika:hash · Ed25519 signing, key declared under secrets: — the four-authority family, masked in logs, egress-governed."
+  "note": "builtins-v0.1.md §nika:hash · Ed25519 signing, key declared under secrets: — one of the three value authorities, masked in logs, egress-governed."
 }

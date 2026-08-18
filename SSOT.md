@@ -145,10 +145,12 @@ Every fenced YAML block in a doc, a README, a test fixture or a source comment
 teaches something. The count is a MEASUREMENT — run it, never quote it:
 
 ```
-git grep -l 'nika: v1' -- ':!*.nika.yaml' | wc -l        # per repo, tracked files
+git grep -l 'nika: v1' -- ':!*.nika.yaml' | wc -l        # per repo, tracked files · the 2026-07-29 probe
 ```
 
-Last run 2026-07-29: engine 742 · spec 320 · agents 7 (an earlier pass
+(That probe counted the then-live marker; since the envelope nuke a `nika: v1`
+in a fenced block is itself a dead form, and the marker to count is `nika:` at
+column 0.) Last run 2026-07-29: engine 742 · spec 320 · agents 7 (an earlier pass
 reported engine 2869 by counting untracked run traces — the command above
 is the reproducible form). Inside THIS repo, 112 of the 213 fenced ```yaml
 blocks in tracked *.md carry `nika:` — the surface a dead-forms scanner
@@ -251,9 +253,11 @@ they came back worse.
 > `lift:` construct (`law:` a closed enum · `from:` required by `taint` and
 > forbidden elsewhere · `because:` non-empty · `to: trusted` deleted outright).
 > See [`spec/10-authority.md` §the authored doors](spec/10-authority.md). The
-> rows keep their original spelling because they record what was measured on
-> 2026-07-29 — the count columns belong to that spelling and re-labelling them
-> would put a new name on an old number.
+> `config:` row is in the same case: that authority died at the envelope nuke
+> (2026-08-12 · three authorities since · a deployment knob is an `inputs:`
+> entry with a `default:`). The rows keep their original spelling because they
+> record what was measured on 2026-07-29 — the count columns belong to that
+> spelling and re-labelling them would put a new name on an old number.
 
 **Four core constructs have ZERO examples**, while the spec discusses each of
 them at length:

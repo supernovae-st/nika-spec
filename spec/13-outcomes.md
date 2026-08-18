@@ -76,8 +76,8 @@ So the trace format bumps:
   class) on every terminal task event;
 - format-1 stays what it was — a photograph of the pre-W5 world;
   engines do not emit it past this chapter;
-- machine formats version independently — **the language stays
-  `nika: v1`**, forever.
+- machine formats version independently — **the language stays v1**,
+  forever, and no workflow file types it ([01 §nika](./01-envelope.md)).
 
 ## One obvious way (normative for linters)
 

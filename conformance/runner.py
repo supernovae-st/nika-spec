@@ -1388,11 +1388,11 @@ def main(argv: list[str]) -> int:
         rc |= run_fixtures(HERE / "tests" / "stdlib", validator, canon, engine_cmd=engine_cmd)
         print("\n== tests/deep (CEL parse · jq compile · durations · schema-meta) ==")
         rc |= run_fixtures(HERE / "tests" / "deep", validator, canon, engine_cmd=engine_cmd)
-        # The value-authority lanes (C2 · R3a/R3b/R5) — the four-authority
+        # The value-authority lanes (C2 · R3a/R3b/R5) — the three-authority
         # family + the io-declaration and after: predicate vocabularies the
         # canon laws name (canon/laws/values · types · gates). Fixtures here
         # are law-cited: an ungated lane rots, so `all` drives them too.
-        print("\n== values (the four-authority family · E-split) ==")
+        print("\n== values (the three-authority family · E-split) ==")
         rc |= run_fixtures(HERE / "values", validator, canon, engine_cmd=engine_cmd)
         print("\n== types (io-declaration predicate vocabulary) ==")
         rc |= run_fixtures(HERE / "types", validator, canon, engine_cmd=engine_cmd)
