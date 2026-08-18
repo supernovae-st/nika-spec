@@ -18,9 +18,11 @@ surfaces (the binary boundary · never linkage):
   Each fixture runs in its own throwaway cwd (traces and fs effects stay
   out of the repo).
 - the TRACE door · `nika trace verify <trace.ndjson>` — expected-verify
-  verdicts map to measured surfaces: clean = rc 0 without the
-  `FINDING — ` marker · finding = rc 0 with it · forged = rc 2 ·
-  (rc 3 = unchained/missing input · no fixture expects it today).
+  verdicts map to measured surfaces: clean = rc 0 without a marker ·
+  finding = rc 0 with `FINDING — ` · incomplete = rc 0 with
+  `INCOMPLETE — ` · forged = rc 2 · refused = rc 2 with the decode-bound
+  wording « beyond the verifier's » (rc 3 = unchained/missing input · no
+  fixture expects it today).
 
 Verdicts per fixture: AGREE · DIVERGE (each difference named) ·
 ENGINE-ERROR (crash / no events — counted loud, never folded into
@@ -168,12 +170,17 @@ def diff_run(expected: dict, got: dict) -> list[str]:
 
 
 def trace_verdict(rc: int, out: str) -> str:
-    """The verify exit-map, pure — MEASURED, never assumed: forged rides
-    rc 2 · finding exits 0 like clean and only the `FINDING — ` marker
-    discriminates (selftest-pinned)."""
+    """The verify exit-map, pure — MEASURED, never assumed (0.109.0):
+    forged rides rc 2 · a decode-bound refusal (17 §refused · the walk
+    never ran) rides rc 2 too and only its « beyond the verifier's »
+    wording discriminates · finding and incomplete exit 0 like clean and
+    only their `FINDING — ` / `INCOMPLETE — ` markers discriminate
+    (selftest-pinned)."""
     if rc == 2:
-        return "forged"
+        return "refused" if "beyond the verifier's" in out else "forged"
     if rc == 0:
+        if "INCOMPLETE — " in out:
+            return "incomplete"
         return "finding" if "FINDING — " in out else "clean"
     return f"rc={rc}"
 
@@ -242,8 +249,16 @@ def selftest() -> int:
     checks.append(("trace exit-map · clean / finding / forged / other",
                    trace_verdict(0, "OK — chain intact") == "clean"
                    and trace_verdict(0, "FINDING — witness absent") == "finding"
-                   and trace_verdict(2, "") == "forged"
+                   and trace_verdict(2, "BROKEN at line 4 — recorded chain") == "forged"
                    and trace_verdict(3, "") == "rc=3"))
+    # The two verdicts the fixtures 004/005 pin (measured on 0.109.0):
+    # incomplete exits 0 like clean and only its marker discriminates ·
+    # a decode-bound refusal exits 2 like forged and only its wording does.
+    checks.append(("trace exit-map · incomplete rides rc 0 behind its marker",
+                   trace_verdict(0, "INCOMPLETE — 9 events · chain intact") == "incomplete"))
+    checks.append(("trace exit-map · a bound refusal rides rc 2 behind its wording",
+                   trace_verdict(2, "line 2 is 1048890 bytes — beyond the verifier's "
+                                    "line bound (1048576 bytes)") == "refused"))
     bad = [name for name, ok in checks if not ok]
     for name, ok in checks:
         print(f"{'ok  ' if ok else 'FAIL'}  {name}")
