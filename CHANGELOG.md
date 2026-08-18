@@ -65,6 +65,28 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- **The served-grammar door retires · every source here speaks the nine
+  keys** (2026-08-19 · the 0.109.0 release train). `scripts/grammar_door.py`
+  downcast the ratified pack to the dialect the released binary still
+  spoke, at projection time; 0.109.0 speaks the ratified grammar, so the
+  door and its selftest leave whole and `scripts/showcase-projector.py`
+  serves the lean source byte-for-byte (the docs managed blocks now carry
+  `nika: <id>` · `inputs:`/`const:` · `after:` with `success`/`failure` ·
+  consumers re-project). The last sources that still presented the old
+  forms as current follow: the trace fixture `runtime/trace/007` golden
+  (`nika: v1` + `workflow:`), the value-authority wording in
+  `reference/values_core.py`, the diagnostics registry (`NIKA-VAR-001` ·
+  `VALUES-002` teaching · `VALUES-003` · `DEFAULT-001` no longer name
+  `config` as an authority · canon.yaml re-emitted), the `envelope_forever`
+  one-voice phrase and 01 §intro (« names the language and names the
+  file »), the pillar semantic, the llms.txt index (`nika: v1` · `types:` ·
+  `policy:` · « six namespaces »), and the spec sentences that still called
+  the header a version pin (06 · 08 · 13 · 17). `reference/generate.py`
+  declares its `permits:` block, so the model differential reads 120/120
+  again on 0.109.0 (it read 0/120 since 2026-08-13 · two walls, one of
+  them the envelope). `scripts/runtime-differential.py` learns the
+  `incomplete` and `refused` verify verdicts its own fixtures 004/005 pin.
+
 - **Skill reads are INSIDE `permits.fs.read`** (02 §Agent Skills ·
   normative · 2026-08-18). The paragraph that placed `skills:` reads
   « outside `permits.fs` (exactly like the workflow file itself) » is
