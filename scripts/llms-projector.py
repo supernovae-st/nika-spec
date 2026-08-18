@@ -71,6 +71,8 @@ def load_counts() -> dict:
         "providers": canon["providers"]["count"],
         "extract_modes": canon["extract_modes"]["count"],
         "error_namespaces": canon["error_namespaces"]["count"],
+        "namespaces": canon["namespaces"]["count"],
+        "namespace_names": " · ".join(canon["namespaces"]["items"]),
     }
 
 
@@ -89,16 +91,16 @@ autocomplete + validation via a `yaml-language-server` modeline:
 ## Spec
 
 - [Overview]({RAW}/spec/00-overview.md): what Nika is · the five design pillars
-- [Envelope]({RAW}/spec/01-envelope.md): the `nika: v1` marker · top-level shape
+- [Envelope]({RAW}/spec/01-envelope.md): `nika: <id>` the mark AND the name · the nine top-level keys
 - [Verbs]({RAW}/spec/02-verbs.md): the four closed verbs · infer · exec · invoke · agent
 - [DAG]({RAW}/spec/03-dag.md): the two doors — with: data edges · after: control · gate v2 · fan-out
-- [Variables]({RAW}/spec/04-variables.md): the six namespaces (four value authorities + two runtime) · CEL + jq expressions
+- [Variables]({RAW}/spec/04-variables.md): the {c["namespaces"]} namespaces · {c["namespace_names"]} · CEL + jq expressions
 - [Errors]({RAW}/spec/05-errors.md): the NIKA-XXX code contract · {c["error_namespaces"]} namespaces
 - [Stdlib contract]({RAW}/spec/06-stdlib-contract.md): {c["builtins"]} builtins · {c["providers"]} providers · {c["extract_modes"]} extract modes
 - [Conformance]({RAW}/spec/07-conformance.md): three levels · the fixture suite · editor tooling
 - [Out of scope]({RAW}/spec/08-out-of-scope.md): what Nika deliberately does not do
-- [Types]({RAW}/spec/09-types.md): the decidable type core · types: · returns: · decode:
-- [Authority]({RAW}/spec/10-authority.md): permits: capability · policy: law · secrets/egress flow · required ⊆ permitted
+- [Types]({RAW}/spec/09-types.md): the decidable type core · inline at the declaration · returns: · decode:
+- [Authority]({RAW}/spec/10-authority.md): permits: the declared boundary · the unconditional laws · secrets/egress flow · required ⊆ permitted
 - [Decision]({RAW}/spec/11-decision.md): the decision surface · receipts as verdict carriers
 - [Gateway]({RAW}/spec/12-gateway.md): run gates · pause/resume · the human door
 - [Outcomes]({RAW}/spec/13-outcomes.md): terminal states · success/failure predicates

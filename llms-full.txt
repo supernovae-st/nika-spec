@@ -822,9 +822,10 @@ In practice · we expect v1 to last 10+ years.
 
 # 01 · Envelope
 
-> Every Nika workflow starts with one header line. That line names the
-> language and pins the contract version. Everything else is the
-> workflow id, optional defaults, and the task graph.
+> Every Nika workflow starts with one header line, `nika: <id>`. That
+> line names the language and names the file · the mark AND the name, no
+> version typed anywhere. Everything else is optional defaults, the
+> declared boundary, and the task graph.
 
 ---
 
@@ -4246,7 +4247,7 @@ reads another task.
 > the golden-drift trap engine#524 had to teach around. No aliases —
 > one meaning per spelling.
 
-> **`group.<name>` is not a 7th namespace either.** It is the **plural reader
+> **`group.<name>` is not a namespace either.** It is the **plural reader
 > of `tasks`** — same runtime family, one door instead of five (a `with:`
 > value · everywhere else is `NIKA-VAR-021`). It denotes a set of task
 > records, so it belongs beside `tasks` rather than beside the three value
@@ -4254,7 +4255,7 @@ reads another task.
 > [03 §group](./03-dag.md#group--optional--fan-in-membership--the-plural-of-a-data-edge)
 > for the record shape and the `fan-in` pass-set.
 
-> **Loop-locals are not a 7th namespace.** Inside a `for_each` task body, two
+> **Loop-locals are not a namespace.** Inside a `for_each` task body, two
 > extra identifiers are in scope: `${{ item }}` (the current element) and
 > `${{ index }}` (its 0-based position). They are **loop-scoped locals**, alive
 > only within that task's body, not global namespaces. So the count stays
@@ -8237,7 +8238,8 @@ The cause axis changes what a trace line MEANS: a format-1 consumer
 ignoring an additive `cause` field would read `failure(timeout)` and
 `failure(retry_exhausted)` as the same old failure — semantic
 incompatibility under readable JSON, the
-[`graph_format: 2` precedent](./03-dag.md). So the trace format bumps:
+[`graph_format` bump precedent](./03-dag.md#graph-projection-graph_format-3).
+So the trace format bumps:
 
 - format-2 lines carry `outcome: {class, cause}` (+ the payload per
   class) on every terminal task event;

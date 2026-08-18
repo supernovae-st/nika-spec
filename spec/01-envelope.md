@@ -1,8 +1,9 @@
 # 01 · Envelope
 
-> Every Nika workflow starts with one header line. That line names the
-> language and pins the contract version. Everything else is the
-> workflow id, optional defaults, and the task graph.
+> Every Nika workflow starts with one header line, `nika: <id>`. That
+> line names the language and names the file · the mark AND the name, no
+> version typed anywhere. Everything else is optional defaults, the
+> declared boundary, and the task graph.
 
 ---
 

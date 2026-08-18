@@ -35,10 +35,12 @@ python3 reference/differential.py --seeds 1 --start 38   # inspect one seed
 > is kept as the claim's provenance, not as a current reading.
 
 First catch (2026-07-13, the day the harness was born): the model's HALT
-law assumed `fail_workflow` cancels every unsettled task; seeds 4/6/38
-proved the engine lets independent branches run to completion — the law
-was rewritten from the evidence, and the long-DAG abort question now has
-a named witness owed to the outcome chapter.
+law assumed the workflow-failure arm of `on_error` (then spelled
+`fail_workflow`, removed 2026-08-11 · an unrecovered failure IS the
+default) cancels every unsettled task; seeds 4/6/38 proved the engine
+lets independent branches run to completion — the law was rewritten from
+the evidence, and the long-DAG abort question now has a named witness
+owed to the outcome chapter.
 
 v0 scope = today's grammar subset the generator emits. Extensions land
 wave by wave (typed edges · returns/decoders · outcome causes · callables

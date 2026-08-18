@@ -1143,16 +1143,17 @@ diagnostics:
     introduced_in: C0
     namespace: VAR
     plane: unclassified
-    condition: unresolved reference (unknown namespace entry · undeclared inputs/config/const/secrets/with key)
+    condition: unresolved reference (unknown namespace entry · undeclared inputs/const/secrets/with key)
     outcome_class: failure
     cause: variable_error
     retryable: false
     terminal: true
     payload_schema: to-mint-c1/diagnostics/payloads/variable_error.schema.json
     span_required: false
-    teaching: unresolved reference (unknown namespace entry · undeclared inputs/config/const/secrets/with key) ·
+    teaching: unresolved reference (unknown namespace entry · undeclared inputs/const/secrets/with key) ·
       spec/05-errors.md (import-c0 · the teaching string mints at C1 · the undeclared-key vocabulary flipped with
-      the E-split prose cascade C2 — env/vars died into the four-authority family · LAW-SURFACE-0201).
+      the E-split prose cascade C2 — env/vars died into the four-authority family · LAW-SURFACE-0201 · and config
+      left the family at the envelope nuke 2026-08-12, three authorities since).
     notes: 'import-c0 (canon-flip) · category: variable_error · transient: false (canon.yaml + spec/05-errors.md
       verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
       mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
@@ -2392,7 +2393,7 @@ diagnostics:
     terminal: true
     payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
     span_required: false
-    teaching: 'non-sensitive runtime configuration is a `config:` declaration, a governed store reference is a `secrets:` entry.'
+    teaching: 'non-sensitive runtime configuration is an `inputs:` entry with `required: false` and a `default:`, a governed store reference is a `secrets:` entry.'
     notes: 'r3a e-split · category: validation_error · transient: false (canon.yaml verbatim) · registered from the engine vendored canon (downstream drift closed).'
   - id: NIKA-VALUES-003
     status: reserved
@@ -2402,14 +2403,14 @@ diagnostics:
     introduced_in: C0
     namespace: VALUES
     plane: unclassified
-    condition: 'a value-namespace read outside the four-authority family (R3a · LAW-SURFACE-0201)'
+    condition: 'a value-namespace read outside the three-authority family (R3a · LAW-SURFACE-0201)'
     outcome_class: failure
     cause: validation_error
     retryable: false
     terminal: true
     payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
     span_required: false
-    teaching: 'the authorities are exactly inputs · config · const · secrets (rides alongside NIKA-VAR-001 — the layered oracle emits both).'
+    teaching: 'the authorities are exactly inputs · const · secrets (rides alongside NIKA-VAR-001 — the layered oracle emits both).'
     notes: 'r3a e-split · category: validation_error · transient: false (canon.yaml verbatim) · registered from the engine vendored canon (downstream drift closed).'
   - id: NIKA-DEFAULT-001
     status: reserved
@@ -2419,7 +2420,7 @@ diagnostics:
     introduced_in: C0
     namespace: DEFAULT
     plane: unclassified
-    condition: 'a declared default (inputs · config) or typed const value does not conform to its declared type (R3b · LAW-TYPE-0211)'
+    condition: 'a declared inputs default or typed const value does not conform to its declared type (R3b · LAW-TYPE-0211)'
     outcome_class: failure
     cause: validation_error
     retryable: false
