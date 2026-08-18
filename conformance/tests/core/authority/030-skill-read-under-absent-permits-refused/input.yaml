@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-skill-read-under-absent-permits
+tasks:
+  review:
+    agent:
+      prompt: "Review the change"
+      skills:
+        - "skills/review/SKILL.md"

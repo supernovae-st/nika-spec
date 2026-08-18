@@ -394,7 +394,40 @@ def _task_required_absent(t: dict) -> set[str]:
             if _static_str(w) is not None and not w.startswith("!") \
                     and w not in _PURE_INTERNAL_TOOLS:
                 req.add("tools")
+        # 02 §Agent Skills · a skill read is INSIDE permits.fs.read: the
+        # file's text is carried into the model's context (a read whose
+        # bytes reach a destination · the nika:read class), so a static
+        # skills: entry is an fs requirement — under an absent block it is
+        # NIKA-AUTH-006 before the file is ever opened. A templated entry
+        # is the parse-time AGENT-003, never a boundary question.
+        for sk in _static_skill_paths(ag):
+            req.add("fs")
+            break
     return req
+
+
+def _static_skill_paths(agent: dict) -> list[str]:
+    """The `skills:` entries that are static paths (a `${{ }}` template or
+    a glob is AGENT-003 at parse and never reaches the boundary)."""
+    out: list[str] = []
+    skills = agent.get("skills")
+    if not isinstance(skills, list):
+        return out
+    for raw in skills:
+        if isinstance(raw, str) and raw and _is_static(raw) \
+                and not _SKILL_GLOB.search(raw):
+            out.append(raw)
+    return out
+
+
+def _skill_path_admitted(path: str, permits: dict) -> bool:
+    """Whether a static skills: path is inside the declared `permits.fs.read`
+    (the same lexical segment-glob the fs effects use · both sides
+    canonical · a `..` escape never re-enters an in-tree bound)."""
+    import posixpath
+    fs = permits.get("fs") if isinstance(permits.get("fs"), dict) else {}
+    reads = fs.get("read") if isinstance(fs.get("read"), list) else []
+    return _taint_globbed(posixpath.normpath(path), reads)
 
 
 def _infer_permits_block(tasks: list) -> dict:
@@ -446,6 +479,8 @@ def _infer_permits_block(tasks: list) -> dict:
             for w in ag.get("tools") or []:
                 if isinstance(w, str) and not w.startswith("!"):
                     keep(tools, _static_str(w))
+            for sk in _static_skill_paths(ag):
+                keep(reads, sk)
     block: dict = {}
     if tools:
         block["tools"] = sorted(tools)
@@ -1173,8 +1208,13 @@ def agent_skills_errors(doc: dict, tasks: list, base_dir=None) -> list[dict]:
     `${{ }}` template, or a glob) is NIKA-AGENT-003. A readable file
     that is not a valid Agent Skill is NIKA-AGENT-004. Relative paths
     resolve from base_dir. When base_dir is absent, only the
-    template/glob shape is judged (same skip as composition_errors)."""
+    template/glob shape is judged (same skip as composition_errors).
+    The boundary is judged FIRST: a path the declared permits.fs.read
+    does not admit (or any path under an absent block) is never opened
+    here — that refusal is AUTH-006 / SEC-004 elsewhere, and reading the
+    file anyway would leak whether it exists."""
     errs: list[dict] = []
+    permits = doc.get("permits")
     for tid, t in tasks:
         agent = t.get("agent")
         if not isinstance(agent, dict):
@@ -1201,6 +1241,8 @@ def agent_skills_errors(doc: dict, tasks: list, base_dir=None) -> list[dict]:
                 continue
             if base_dir is None:
                 continue
+            if not isinstance(permits, dict) or not _skill_path_admitted(raw, permits):
+                continue  # the boundary refuses (AUTH-006 · SEC-004) · never opened
             resolved = Path(raw) if Path(raw).is_absolute() else (Path(base_dir) / raw)
             try:
                 text = resolved.read_text(encoding="utf-8")
@@ -1537,6 +1579,16 @@ def deep_static_errors(doc: dict, base_dir=None) -> list[dict]:
                                      "category": "security_error",
                                      "detail": f"task '{tid}' · agent whitelist '{w}' outside "
                                                "permits.tools (the agent cannot exceed the file)"})
+                # 02 §Agent Skills · the skill read is inside permits.fs.read
+                # and judged BEFORE the file is opened (an ungranted path
+                # never leaks whether it exists).
+                for sk in _static_skill_paths(ag):
+                    if not _skill_path_admitted(sk, permits):
+                        errs.append({"code": "NIKA-SEC-004", "namespace": "NIKA-SEC",
+                                     "category": "security_error",
+                                     "detail": f"task '{tid}' · skills: path '{sk}' outside "
+                                               "permits.fs.read (02 §Agent Skills · the skill "
+                                               "text reaches the model · grant the path)"})
 
     return errs
 

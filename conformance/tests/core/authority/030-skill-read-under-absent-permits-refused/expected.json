@@ -1,0 +1,7 @@
+{
+  "valid": false,
+  "errors": [
+    { "code": "NIKA-AUTH-006", "category": "security_error" }
+  ],
+  "note": "02-verbs §Agent Skills · a skill read is INSIDE permits.fs.read (its text reaches the model · the nika:read class) · under an absent block it is an effect with zero authority · the boundary is judged BEFORE the file is opened, so the well-shaped SKILL.md beside this fixture is never read (the twin of authority/004 for the skills door)."
+}

@@ -64,6 +64,27 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- **Skill reads are INSIDE `permits.fs.read`** (02 §Agent Skills ·
+  normative · 2026-08-18). The paragraph that placed `skills:` reads
+  « outside `permits.fs` (exactly like the workflow file itself) » is
+  retired: a skill's text is carried into the model's context — a file
+  read whose bytes reach a destination, the `nika:read` class — while a
+  composed child's text goes nowhere (its effects are re-judged under the
+  parent). The path as written must be admitted by the declared read
+  boundary, judged BEFORE the file is opened (an ungranted path never
+  leaks whether it exists): an absent `permits:` block is
+  `NIKA-AUTH-006`, a declared boundary that does not admit the path is
+  `NIKA-SEC-004`, and only inside the boundary is a missing file
+  `NIKA-AGENT-003` or a malformed one `NIKA-AGENT-004`. Relative skill
+  paths resolve from the workflow file's directory (like a composed
+  child · 14), never the working directory; a template or a glob is
+  `NIKA-AGENT-003` at parse. Measured on the shipped 0.108.0 (2026-08-12):
+  under `permits: {}` a skill path of `/etc/hosts` was read and reported
+  on. Conformance: `verbs-shape/023-025` gain the `fs.read` grant they
+  now need · `core/authority/030` (absent block · AUTH-006) and
+  `deep/029` (declared boundary · SEC-004) are the negative pair · the
+  reference oracle judges the boundary first (`deep_static.py`).
+
 - **The E-split · `vars`/`env` die, four value authorities rise** (#142
   machine flip + the prose cascade) — the envelope `vars:`/`env:` blocks
   and the `${{ vars.X }}`/`${{ env.X }}` reads are dead forms, refused with
