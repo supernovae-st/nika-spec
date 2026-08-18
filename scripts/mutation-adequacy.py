@@ -17,17 +17,18 @@ fixture-parity sweep · trifecta on the realized-flow witness (conformance/envel
 `0/3 fixtures die as named`).
 
 Extended 2026-07-30 (wave 2) beyond the conformance cores to every
-remaining judge with a probeable death surface: the served-grammar door
-(scripts/grammar_door.py · a silenced _refuse melts the STOP-list) · the
-C2 value-authority proof (reference/values_core.py · a permissive judge
-admits every negative values fixture) · the dup-keys gate (its selftest
-lives inside its own file · a judge answering ok-to-everything fails its
-own dup cases). NOT probed here, by design: ssot-map --selftest and
-gen-type-corpus --mutate discriminate tampers by construction (their
-selftests ARE mutation probes) · estate.py is a byte-pinned mirror with
-its own mutation-proven selftest upstream · deep_static/cross-ref/stdlib
-layers die through the fixture corpus (runner all IS their death
-surface, re-proven every gate run).
+remaining judge with a probeable death surface: the C2 value-authority
+proof (reference/values_core.py · a permissive judge admits every negative
+values fixture) · the dup-keys gate (its selftest lives inside its own
+file · a judge answering ok-to-everything fails its own dup cases). The
+served-grammar door probe left with the door itself (0.109.0 · the
+released binary speaks the ratified grammar · nothing downcasts). NOT
+probed here, by design: ssot-map --selftest and gen-type-corpus --mutate
+discriminate tampers by construction (their selftests ARE mutation
+probes) · estate.py is a byte-pinned mirror with its own mutation-proven
+selftest upstream · deep_static/cross-ref/stdlib layers die through the
+fixture corpus (runner all IS their death surface, re-proven every gate
+run).
 
 Mutations run in a throwaway detached git worktree of HEAD — the working
 tree is never touched, and the worktree is removed on every exit path.
@@ -78,10 +79,6 @@ PROBES = [
     # validate_text means every seeded attack "PASSED SILENTLY".
     ("conformance/redteam_core_selftest.py", "conformance/runner.py",
      "def validate_text(*a, **k):\n    return {'valid': True, 'errors': []}\n"),
-    # The served-grammar door: a _refuse that stops raising melts the
-    # STOP-list — the selftest's refusal leg must catch it.
-    ("scripts/grammar_door_selftest.py", "scripts/grammar_door.py",
-     "def _refuse(*a, **k):\n    return None\n"),
     # The C2 value-authority proof judges conformance/values/** through
     # values_core: a permissive judge admits every negative fixture.
     ("conformance/values_proof.py", "reference/values_core.py",
@@ -132,8 +129,9 @@ def probe_all(worktree: Path) -> int:
         _git("-C", str(worktree), "checkout", "--", judged)
         # Baseline gate: a selftest RED before any mutation makes its
         # death meaningless — the probe would report DIES on a corpse.
-        # (Found live: grammar_door_selftest sat red-on-clean — it is in
-        # no CI gate — and its first DIES proved nothing.)
+        # (Found live 2026-07-30: the served-grammar door's selftest — a
+        # judge in no CI gate, retired with the door at 0.109.0 — sat
+        # red-on-clean and its first DIES proved nothing.)
         clean = subprocess.run(
             [sys.executable, str(worktree / cmd[0]), *cmd[1:]],
             capture_output=True, text=True, timeout=300,

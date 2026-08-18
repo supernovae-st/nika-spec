@@ -289,7 +289,7 @@ PATTERNS = [
     {
         "glob": "scripts/**",
         "class": "authored",
-        "evidence": "the compiler + projectors humans wrote (ssot-compiler · canon/showcase/llms/starters/authoring/design projectors · gen-gate-matrix · gen-type-corpus · grammar_door + selftest · check-md-refs) — the tools that WRITE the generated surfaces; estate.py excepted in files: (the self row)",
+        "evidence": "the compiler + projectors humans wrote (ssot-compiler · canon/showcase/llms/starters/authoring/design projectors · gen-gate-matrix · gen-type-corpus · check-md-refs) — the tools that WRITE the generated surfaces; estate.py excepted in files: (the self row)",
     },
     {
         "glob": "timeline/**",
