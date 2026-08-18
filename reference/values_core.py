@@ -23,7 +23,7 @@ Sources (locked rulings only · nothing here is invented):
 Diagnostic codes (canon/laws/values.yaml + types.yaml · c0-proposed namespace):
   NIKA-VALUES-001   the dead `vars:` envelope field OR a `${{ vars.X }}` read
   NIKA-VALUES-002   the dead `env:` envelope field OR a `${{ env.X }}` read
-  NIKA-VALUES-003   a value-namespace read outside the four-authority family
+  NIKA-VALUES-003   a value-namespace read outside the three-authority family
   NIKA-DEFAULT-001  a declared default/constant value not conforming to its type
 
 Independence stance: this value core is the SECOND evaluator · written BY
@@ -233,7 +233,7 @@ def values_core_errors(doc: dict) -> list[dict]:
                 code = "NIKA-VALUES-003"
                 detail = (
                     f"${{{{ {root}.X }}}} reads `{root}`, a value namespace outside "
-                    f"the four-authority family (R3a · LAW-SURFACE-0201) · the "
+                    f"the three-authority family (R3a · LAW-SURFACE-0201) · the "
                     f"authorities are exactly {' · '.join(VALUE_AUTHORITIES)}")
             key = (code, root)
             if key not in seen:
