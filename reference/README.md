@@ -19,20 +19,26 @@ model → production implementation → differential random testing).
   is wrong (fix the sentence) or the engine drifted (ledger it).
 
 ```
-python3 reference/differential.py --seeds 120        # 120/120 agree @ 0.103.0
+python3 reference/differential.py --seeds 120        # 120/120 agree @ 0.109.0 (2026-08-19 · the nine-key envelope)
 python3 reference/differential.py --seeds 1 --start 38   # inspect one seed
 ```
 
-> ⚠️ **Measured 2026-08-13 · `0/120` against the SHIPPED binary, and the
-> cause is not this model.** `nika 0.108.0` still requires the old
-> `nika: v1` envelope while `generate.py` already emits the new
-> `nika: <id>` identity form, so every generated workflow is refused at
-> parse and every task reads `engine=None`. The harness is AHEAD of the
-> shipped engine, not broken: it goes green again when the envelope
-> cascade ships. **Until then this differential proves nothing** — the
-> live proofs are `reference/selftest.py` (28 laws · 300 seeds) and
-> `scripts/gen-gate-matrix.py --check`, both green. The `120/120` above
-> is kept as the claim's provenance, not as a current reading.
+> **Re-measured 2026-08-19 · `120/120` on 0.109.0** (the release that speaks
+> the nine-key envelope · a local build of the release code, engine commit
+> `9f7042827` inside the `v0.109.0` tag). Two things had to move, and only
+> one of them was the engine. On 2026-08-13 the reading was `0/120`
+> against the shipped `nika 0.108.0`, which still required the old
+> version-marker envelope while `generate.py` already emitted the
+> `nika: <id>` identity form: every generated workflow was refused at
+> parse and every task read `engine=None` — the harness was AHEAD of the
+> shipped engine. With 0.109.0 that wall fell and a second one showed
+> behind it: the generator declared no `permits:` block, and an absent
+> boundary on an effectful file is zero authority (`NIKA-AUTH-006`), so
+> every run refused at its embedded check before the first event. The
+> generator now declares the three programs it uses (`echo` · `true` ·
+> `false`), and the differential is a current reading again. The binary-
+> free proofs stayed green throughout: `reference/selftest.py` (28 laws ·
+> 300 seeds) and `scripts/gen-gate-matrix.py --check`.
 
 First catch (2026-07-13, the day the harness was born): the model's HALT
 law assumed the workflow-failure arm of `on_error` (then spelled
