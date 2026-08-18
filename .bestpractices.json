@@ -13,7 +13,7 @@
   "documentation_basics_status": "Met",
   "documentation_basics_justification": "The README plus the normative spec/ tree document the language and its conformance model.",
   "documentation_interface_status": "Met",
-  "documentation_interface_justification": "spec/ documents the external interface (the nika: v1 envelope, verbs, schema); the published JSON schema documents editor/CI integration.",
+  "documentation_interface_justification": "spec/ documents the external interface (the nine-key nika: envelope, verbs, schema); the published JSON schema documents editor/CI integration.",
   "sites_https_status": "Met",
   "sites_https_justification": "The repository, its tracker, and referenced sites are served over HTTPS (github.com, bestpractices.dev, schemastore).",
   "discussion_status": "Met",

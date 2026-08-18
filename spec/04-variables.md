@@ -127,7 +127,7 @@ reads another task.
 > the golden-drift trap engine#524 had to teach around. No aliases —
 > one meaning per spelling.
 
-> **`group.<name>` is not a 7th namespace either.** It is the **plural reader
+> **`group.<name>` is not a namespace either.** It is the **plural reader
 > of `tasks`** — same runtime family, one door instead of five (a `with:`
 > value · everywhere else is `NIKA-VAR-021`). It denotes a set of task
 > records, so it belongs beside `tasks` rather than beside the three value
@@ -135,7 +135,7 @@ reads another task.
 > [03 §group](./03-dag.md#group--optional--fan-in-membership--the-plural-of-a-data-edge)
 > for the record shape and the `fan-in` pass-set.
 
-> **Loop-locals are not a 7th namespace.** Inside a `for_each` task body, two
+> **Loop-locals are not a namespace.** Inside a `for_each` task body, two
 > extra identifiers are in scope: `${{ item }}` (the current element) and
 > `${{ index }}` (its 0-based position). They are **loop-scoped locals**, alive
 > only within that task's body, not global namespaces. So the count stays

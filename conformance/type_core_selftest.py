@@ -249,8 +249,8 @@ law("order · open ⋢ closed rides assignable too",
     not assignable(OPEN0, CLOSED_AOPT, N))
 
 # ── the io declaration walk (R3b · LAW-GRAMMAR-0211 · one type truth) ───
-# The type: of typed inputs:/config:/const:/outputs: is judged by the SAME
-# parser as types:/returns: — every declaration position, one type truth.
+# The type: of typed inputs:/const:/outputs: is judged by the SAME parser
+# as returns: — every declaration position, one type truth.
 from type_core import type_core_errors  # noqa: E402
 
 

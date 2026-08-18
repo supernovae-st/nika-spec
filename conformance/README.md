@@ -1,6 +1,6 @@
 # Conformance corpus v0.1
 
-Prove an engine implements **`nika: v1`** without reading the reference
+Prove an engine implements **Nika v1** (the nine-key envelope · `nika: <id>`) without reading the reference
 implementation: run every workflow here through YOUR engine and match each
 file's **declared intent**. Five pillars — `envelope/` · `variables/` ·
 `verbs/` · `errors/` · `dag/` (the tree is the count: `ls <pillar>/*.nika.yaml`

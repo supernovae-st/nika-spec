@@ -6,5 +6,5 @@
       "category": "validation_error"
     }
   ],
-  "note": "R3a · LAW-SURFACE-0201 · params is not one of the four authorities · a value read outside the family refuses with NIKA-VALUES-003."
+  "note": "R3a · LAW-SURFACE-0201 · params is not one of the three authorities · a value read outside the family refuses with NIKA-VALUES-003."
 }

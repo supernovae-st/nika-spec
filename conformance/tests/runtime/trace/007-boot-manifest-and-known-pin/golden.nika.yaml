@@ -1,6 +1,4 @@
-nika: v1
-workflow:
-  id: receipt-probe
+nika: receipt-probe
 permits:
   exec: ["echo"]
 inputs:

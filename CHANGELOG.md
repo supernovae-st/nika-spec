@@ -1,9 +1,10 @@
 # Nika spec · CHANGELOG
 
 All notable changes to the **Nika workflow language specification** are
-documented here. The spec is pinned at the `nika: v1` contract forever ·
-language additions are additive within v1 (feature-detected · no minor
-version in the file). Stdlib (providers · extract modes · builtins) versions
+documented here. The spec is the v1 contract forever · a workflow file
+types no version (`nika:` carries its name since 2026-08-12) · language
+additions are additive within v1 (feature-detected · no minor version in
+the file). Stdlib (providers · extract modes · builtins) versions
 independently.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
@@ -63,6 +64,28 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   only out-of-gate — and the law files cite the minted paths.
 
 ### Changed
+
+- **The served-grammar door retires · every source here speaks the nine
+  keys** (2026-08-19 · the 0.109.0 release train). `scripts/grammar_door.py`
+  downcast the ratified pack to the dialect the released binary still
+  spoke, at projection time; 0.109.0 speaks the ratified grammar, so the
+  door and its selftest leave whole and `scripts/showcase-projector.py`
+  serves the lean source byte-for-byte (the docs managed blocks now carry
+  `nika: <id>` · `inputs:`/`const:` · `after:` with `success`/`failure` ·
+  consumers re-project). The last sources that still presented the old
+  forms as current follow: the trace fixture `runtime/trace/007` golden
+  (`nika: v1` + `workflow:`), the value-authority wording in
+  `reference/values_core.py`, the diagnostics registry (`NIKA-VAR-001` ·
+  `VALUES-002` teaching · `VALUES-003` · `DEFAULT-001` no longer name
+  `config` as an authority · canon.yaml re-emitted), the `envelope_forever`
+  one-voice phrase and 01 §intro (« names the language and names the
+  file »), the pillar semantic, the llms.txt index (`nika: v1` · `types:` ·
+  `policy:` · « six namespaces »), and the spec sentences that still called
+  the header a version pin (06 · 08 · 13 · 17). `reference/generate.py`
+  declares its `permits:` block, so the model differential reads 120/120
+  again on 0.109.0 (it read 0/120 since 2026-08-13 · two walls, one of
+  them the envelope). `scripts/runtime-differential.py` learns the
+  `incomplete` and `refused` verify verdicts its own fixtures 004/005 pin.
 
 - **Skill reads are INSIDE `permits.fs.read`** (02 §Agent Skills ·
   normative · 2026-08-18). The paragraph that placed `skills:` reads

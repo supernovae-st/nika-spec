@@ -53,34 +53,14 @@ SPEC_ROOT = Path(__file__).resolve().parent.parent
 JOBS_DIR = SPEC_ROOT / "examples"
 IS_LESSON = re.compile(r"^\d{2}-")
 
-# ── the served-grammar door (docs targets only) ──────────────────────
-# The pack is authored in the RATIFIED grammar; docs are a BAKED visitor
-# surface, so the yaml a reader copies must run on the RELEASED binary
-# (the website applies the same law at serve time via src/lib/w1-to-w2.ts).
-# Flips to identity at the release train: NIKA_SERVED_GRAMMAR=wnew.
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from grammar_door import downcast_w2, downcast_w105  # noqa: E402
-
-# The default = the grammar the LATEST RELEASED binary speaks. w106 died
-# with `policy:` (its one transform dropped `policy.endorsement` from baked
-# fences and the family left the language), so the default falls back to
-# w105 — the released dialect the door can still fully serve: `nika: v1` +
-# `workflow: <id>`, one `vars:` block, the released predicate names. The
-# identity flip (`wnew`) returns when the released asset parses the
-# post-nuke envelope; until then the default tracks the PUBLISHED asset,
-# never a local rebuild (empirical 2026-07-29: a same-version brew rebake
-# accepted what the asset refuses — the asset is the judge). Era door w2
-# (0.104) stays a per-bake override.
-SERVED_GRAMMAR = os.environ.get("NIKA_SERVED_GRAMMAR", "w105")
-
-
-def served(yaml_text: str, fname: str) -> str:
-    """The grammar a docs reader copies · the released dialect via the door."""
-    if SERVED_GRAMMAR == "wnew":
-        return yaml_text
-    if SERVED_GRAMMAR == "w105":
-        return downcast_w105(yaml_text, fname)
-    return downcast_w2(yaml_text, fname)
+# The served grammar IS the authored grammar. The pack (examples/ ·
+# templates/) is authored in the ratified nine-key envelope and the
+# released binary speaks it (0.109.0 · 2026-08-18), so a docs reader copies
+# the file byte-for-byte as it sits here. The served-grammar door (a
+# text-level downcast to the dialect the released binary still spoke, in
+# force from the E-split until that release) retired with 0.109.0: a door
+# with no object is not a door, and an identity projection is one more place
+# to drift. There is one grammar; nothing here rewrites it.
 
 BEGIN = re.compile(r"\{/\* showcase:begin ([a-z0-9-]+\.nika\.yaml) \*/\}")
 END = "{/* showcase:end */}"
@@ -107,7 +87,7 @@ MERMAID_CLASSES = _mermaid_classes()
 
 
 def lean(yaml_text: str) -> str:
-    """Strip the comment banner (everything before the `nika: v1` line)."""
+    """Strip the comment banner (everything before the `nika:` line)."""
     lines = yaml_text.splitlines()
     for i, line in enumerate(lines):
         if line.startswith("nika:"):
@@ -325,7 +305,7 @@ CONSTRUCTS = [
     ("schema",        "typed (structured) output",         "/concepts/verbs"),
     ("thinking",      "extended thinking budget",          "/concepts/verbs"),
     ("secrets",       "vault-backed secrets",              "/reference/yaml-syntax"),
-    ("typed_vars",    "typed workflow inputs",             "/reference/yaml-syntax"),
+    ("typed_inputs",  "typed workflow inputs",             "/reference/yaml-syntax"),
     ("outputs",       "typed workflow outputs (callable)", "/reference/yaml-syntax"),
     ("agent_tools",   "default-deny tool grants",          "/concepts/verbs"),
     ("capture",       "structured exec capture",           "/concepts/verbs"),
@@ -345,9 +325,9 @@ def _constructs_of(lean_text: str) -> set[str]:
         found.add("secrets")
     if doc.get("outputs"):
         found.add("outputs")
-    for v in (doc.get("vars") or {}).values():
+    for v in (doc.get("inputs") or {}).values():
         if isinstance(v, dict) and "type" in v:
-            found.add("typed_vars")
+            found.add("typed_inputs")
     for tid, t in tasks:
         for k in ("for_each", "when", "retry",
                   "timeout", "on_error", "with", "extract"):
@@ -508,7 +488,7 @@ def render_ts(workflows: dict[str, str]) -> str:
         "export const SHOWCASE_DAG: Record<string, ShowcaseDag> = {\n"
         f"{dag_joined}\n"
         "}\n\n"
-        "/** the 6 instantiable skeletons (spec templates/ · SLOT comments\n"
+        "/** the instantiable skeletons (spec templates/ · SLOT comments\n"
         "    kept — they are the instructions) · the playground's seeds */\n"
         "export const TEMPLATES_YAML: Record<string, string> = {\n"
         f"{templates_joined}\n"
@@ -547,7 +527,7 @@ def project_docs_page(page: Path, workflows: dict[str, str], templates: dict[str
             print(f"showcase-projector · {page.name} references unknown {fname}",
                   file=sys.stderr)
             sys.exit(2)
-        return f"\n```yaml {fname}\n{served(workflows[fname], fname)}```\n"
+        return f"\n```yaml {fname}\n{workflows[fname]}```\n"
 
     def dag_for(fname):
         if fname not in workflows:
@@ -561,7 +541,7 @@ def project_docs_page(page: Path, workflows: dict[str, str], templates: dict[str
             print(f"showcase-projector · {page.name} references unknown template {fname}",
                   file=sys.stderr)
             sys.exit(2)
-        return f"\n```yaml {fname}\n{served(templates[fname], fname)}```\n"
+        return f"\n```yaml {fname}\n{templates[fname]}```\n"
 
     text, d1 = _replace_blocks(text, BEGIN, END, page.name, yaml_for)
     text, d2 = _replace_blocks(text, DAG_BEGIN, DAG_END, page.name, dag_for)

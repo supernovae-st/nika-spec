@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 # conformance/run.sh — the reference conformance runner (v0.1).
 #
-# Prove an engine implements `nika: v1` by running every corpus file and
+# Prove an engine implements Nika v1 by running every corpus file and
 # verdicting it against its DECLARED intent (the `# Expected:` header),
 # never against raw exit codes. POSIX sh · zero deps beyond the engine
 # binary under test.

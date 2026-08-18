@@ -6,5 +6,5 @@
       "category": "validation_error"
     }
   ],
-  "note": "R3a · LAW-GRAMMAR-0202 · the env: envelope field is dead · non-sensitive config becomes a config: declaration · NIKA-VALUES-002."
+  "note": "R3a · LAW-GRAMMAR-0202 · the env: envelope field is dead · non-sensitive runtime configuration becomes an inputs: entry with required: false and a default: · NIKA-VALUES-002."
 }
