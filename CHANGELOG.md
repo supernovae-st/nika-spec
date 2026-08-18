@@ -13,6 +13,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- **`NIKA-PARSE-004` reads as what it is.** RESERVED — retired with the
+  nine-key envelope (the id moved onto `nika:`, `NIKA-PARSE-003` judges
+  it, the number is never reused) — in 05-errors, the diagnostics
+  registry and the projected canon; the row had kept teaching
+  « `workflow:` id violates » four days after `workflow:` left the
+  language. No normative change: the registry already carried
+  `status: reserved`.
+
 ### Added
 
 - **The affirmative-consent law** (10 §the affirmative-consent law ·
