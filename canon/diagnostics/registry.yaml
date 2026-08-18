@@ -1554,7 +1554,9 @@ diagnostics:
       mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
       is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
       span obligation not stated by the source → span_required false · reference oracle emits NIKA-AGENT-003
-      (deep_static.agent_skills_errors · fixtures 023 missing · 026 templated) · engine emission still owed.'
+      (deep_static.agent_skills_errors · fixtures 023 missing · 026 templated) · the reference engine emits it
+      (nika-schema skill.rs · check≡run) · judged INSIDE the declared read boundary since 2026-08-18 (02 §Agent
+      Skills · an ungranted path is AUTH-006 / SEC-004 before the read · core/authority/030 · deep/029).'
   - id: NIKA-AGENT-004
     status: reserved
     owner: spec
@@ -1576,7 +1578,8 @@ diagnostics:
       mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
       is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
       span obligation not stated by the source → span_required false · reference oracle emits NIKA-AGENT-004
-      (deep_static.agent_skills_errors · fixture 024 invalid SKILL.md) · engine emission still owed.'
+      (deep_static.agent_skills_errors · fixture 024 invalid SKILL.md) · the reference engine emits it
+      (nika-schema skill.rs · check≡run) · reached only for a path the declared read boundary admits (2026-08-18).'
   - id: NIKA-AGENT-005
     status: reserved
     owner: spec

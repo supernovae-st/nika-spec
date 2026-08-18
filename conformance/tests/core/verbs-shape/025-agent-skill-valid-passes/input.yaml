@@ -2,6 +2,7 @@
 nika: t-agent-skill-valid
 permits:
   tools: ["nika:done"]
+  fs: { read: ["skills/**"] }   # the skill text reaches the model · a read inside the boundary
 tasks:
   review:
     agent:

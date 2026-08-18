@@ -1,12 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
-nika: t-agent-skill-missing
+nika: t-skill-outside-fs-read-boundary
 permits:
   tools: ["nika:done"]
-  fs: { read: ["skills/**"] }   # the skill text reaches the model · a read inside the boundary
+  fs: { read: ["docs/**"] }
 tasks:
   review:
     agent:
       prompt: "Review the change"
       tools: ["nika:done"]
       skills:
-        - "skills/does-not-exist/SKILL.md"
+        - "skills/review/SKILL.md"
