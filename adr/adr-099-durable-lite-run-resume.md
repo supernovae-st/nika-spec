@@ -38,8 +38,13 @@ follow_ups: ["register ADR-099 in the engine docs/adr index when the implementat
   clean — laundering. This ADR held zero occurrences of verify / trust
   / tamper: the assumption was never stated, which is how it was never
   questioned.
+- **Nine-key amendment (2026-08-19)** — the skip-rule field lists follow
+  the envelope that shipped. Cleanup is a task on an `unwind` edge
+  (`on_finally:` left 2026-08-11). Resolved inputs are `inputs` · `const`
+  · `secrets` (by name, already) · `with` (`vars`/`env` died at the
+  E-split). The 4-verbs and the v1 family lock are untouched.
 - **Surface**: CLI + trace/event vocabulary ONLY. Zero envelope change ·
-  zero new YAML · the 4-verbs and `nika: v1` locks are untouched.
+  zero new YAML · the 4-verbs and the v1 family lock are untouched.
 - **Home**: first entry of this repo's `adr/` (language-surface
   decisions). The number continues the shared Nika ADR series (engine
   `docs/adr/` · ADR-098 is taken by the in-flight underspecified-schema
@@ -89,12 +94,12 @@ store, no new artifact, no daemon.
 A task is skippable iff the trace holds a `task.completed` record whose
 
 - **task-definition hash** — a canonical serialization of the task's
-  behavior-bearing fields (the verb body · `with:` · `extract:` ·
-  `retry:` / `on_error:` / `on_finally:` · `when:` · `for_each:`) —
-  matches the task as now written, AND
+  behavior-bearing fields (the verb body · `with:` · `after:` ·
+  `extract:` · `retry:` / `on_error:` · `when:` · `for_each:` · `lift:`
+  · `returns:`) — matches the task as now written, AND
 - **resolved-input hash** — the values its `${{ }}` references resolved
-  to at execution time (upstream outputs · `vars` · `with` · `env`) —
-  matches the values the resumed run resolves.
+  to at execution time (upstream outputs · `inputs` · `const` · `with`)
+  — matches the values the resumed run resolves.
 
 Edit a prompt → that task re-runs. Change a var an early task consumes →
 it re-runs, and the mismatch cascades through resolved-input hashes
@@ -283,7 +288,7 @@ to the runner protocol:
   only the remainder live, and end `workflow_state: success` with
   outputs identical to an uninterrupted run.
 - **(b) `002-input-change-rehashes-and-reruns`** — same trace, one
-  `vars` value changed in `run.json`: the consuming task's
+  `inputs` value changed in `run.json`: the consuming task's
   resolved-input hash mismatches → it re-runs (no `task.cache_hit` for
   it) · an untouched sibling branch still cache-hits.
 - **(c) `003-paused-prompt-rearms`** — a non-interactive run hits a
