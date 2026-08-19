@@ -15,6 +15,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- **Leftover teaching of dead forms.** After #270 the live path still
+  named two retired spellings as if they were current: `config.*` sat
+  on the 10-authority taint lattice (and in the 11-lesson header) as an
+  untrusted source, and the lesson that teaches `lift:` was still
+  called `11-declassify-the-door`. The lattice is `inputs.*` + fetch/
+  tool results; `${{ config.X }}` refuses `NIKA-VALUES-003` and never
+  reaches a taint judgment; the lesson is `11-lift-the-door`. Exemptions
+  unchanged (dated RFC · laws that quote what they kill · REJECT
+  fixtures · SSOT.md 2026-07-29 census · PARSE-004 reserved).
 - **`NIKA-PARSE-004` reads as what it is.** RESERVED — retired with the
   nine-key envelope (the id moved onto `nika:`, `NIKA-PARSE-003` judges
   it, the number is never reused) — in 05-errors, the diagnostics
