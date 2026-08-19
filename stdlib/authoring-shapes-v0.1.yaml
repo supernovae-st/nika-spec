@@ -67,13 +67,25 @@ schema_shapes:
           reason: { type: string }
   - id: grade
     label: "a grade"
-    hint: "enum: the closed set — the model cannot invent a fifth answer."
+    hint: "Letter grades stay strings. Numeric levels are type: integer — models emit JSON 3, never \"3\"."
     body: |
       schema:
         type: object
         required: [grade]
         properties:
           grade: { type: string, enum: [A, B, C] }   # SLOT: the closed set
+  - id: count
+    label: "an integer count"
+    hint: "Numeric facts are integers with a numeric enum. A string enum of digits is the shape models do not emit."
+    body: |
+      schema:
+        type: object
+        additionalProperties: false
+        required: [count]
+        properties:
+          count:
+            type: integer
+            enum: [0, 1, 2, 3]   # SLOT: the closed numeric set
 
 armor_shapes:
   - id: retry

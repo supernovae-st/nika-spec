@@ -115,6 +115,19 @@ or paraphrase the schema in prose. The engine owns the format
 negotiation; a prompt that re-states it fights the engine and degrades
 weak-model output (the eval measures exactly this).
 
+**Extract facts, then the law.** A model may produce closed, cited
+semantic *facts*. Scoring, routing, publish/abstain is `nika:jq` or
+`nika:decide` — never a second `infer:` to "pick the level". Numeric
+facts are `type: integer` with a numeric `enum` (`-1|0|1|3`); a
+string enum of digits (`"0"|"1"|"3"`) is the shape models do not emit
+(JSON `3`). The engine hints `digit-string-enum`. The shape is
+`examples/13-extract-then-law.nika.yaml`.
+
+**Paid-infer order** (cheaper than discovering this with tokens) ·
+`nika check --native-strict` → one-task `mock/echo` probe of every
+new builtin → freeze the extract schema type → pin the glob
+(`exclude: "**/README.md"`) → then wire a paid model.
+
 The judgment layer (after validity) is the 12 patterns ·
 docs `guides/patterns` — deterministic core · parallel by default ·
 typed boundaries · leashed fan-outs · the three gates · sovereignty ·
