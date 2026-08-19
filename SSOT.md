@@ -305,7 +305,7 @@ non-trivial is built at all.
 
 ```
 1  ✔ the four zero-coverage constructs have their lessons (08-config ·
-     09-returns · 10-compose ×2 · 11-declassify · 12-failure-routing) —
+     09-returns · 10-compose ×2 · 11-lift · 12-failure-routing) —
      the path covers 16/16, and the claims in those files were RUN, not
      written (the door map, the config refusal, the ⊘ gate line)
 2  still open · a second example for on_finally and the failure predicate
@@ -339,7 +339,7 @@ Turning the index on the path itself gave a clean result and one anomaly:
 09-returns-typed-door   returns:
 10-compose-child        ⚠ nothing new      (the callee half of lesson 10)
 10-compose-pipeline     workflow:
-11-declassify-the-door  declassify:
+11-lift-the-door        lift:
 12-failure-routing      ⚠ nothing new
 
 ⟹ 16/16 constructs covered · none missing

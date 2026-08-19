@@ -128,6 +128,18 @@ string enum of digits (`"0"|"1"|"3"`) is the shape models do not emit
 new builtin → freeze the extract schema type → pin the glob
 (`exclude: "**/README.md"`) → then wire a paid model.
 
+**After valid, is there a better one-way?** A green check is legal,
+not best. Recurse on the file as an environment (Zhang/Kraska/Khattab
+2026 · arXiv:2512.24601): do not swallow it — inspect two examples,
+decompose (`for_each` / `invoke: { workflow: }`), verify with
+`nika:jq` not a second infer. Loop until `nika check --json` reports
+`paid_ready: true` (the paid-run family is empty) AND
+`--native-strict` is clean, or every remaining *non-paid* hint has an
+in-file reason (CONVENTIONS §10). The engine hints `infer-as-law` when
+a prompt asks the model to assign a belt. A second infer whose schema
+is a language enum is language, not the law. The MCP `nika_check`
+oracle fails `infer-as-law` and `digit-string-enum` by default.
+
 The judgment layer (after validity) is the 12 patterns ·
 docs `guides/patterns` — deterministic core · parallel by default ·
 typed boundaries · leashed fan-outs · the three gates · sovereignty ·
