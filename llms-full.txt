@@ -551,10 +551,18 @@ The cheapest authoring order, measured on a 40+ task paid extract run:
 4. **The model extracts facts. `nika:jq` (or `nika:decide`) is the law.**
    Do not pay a second infer to pick a level. Hint `infer-as-law`.
    `nika check --json` must report `paid_ready: true` before you leave
-   `mock/`.
+   `mock/` (`.next` is the first repair; `.compiled` is the proven-law
+   bit).
    The shape is
    [`13-extract-then-law`](./examples/13-extract-then-law.nika.yaml).
-5. **Pin the glob** (`exclude: "**/README.md"`) before a fan-out infer
+   Prove the law on const fixtures (`unproven-law`). The named bundle
+   is [`14-decide-publish`](./examples/14-decide-publish.nika.yaml).
+5. **An agent that drafts a workflow checks it in the loop.** Grant
+   `nika:compose` on `agent.tools` after `nika:done`. Iterate on the
+   check JSON until `valid`. Never a standalone `invoke:`
+   (`NIKA-BUILTIN-COMPOSE-001`). Checking never executes. Shape:
+   [`15-compose-self-check`](./examples/15-compose-self-check.nika.yaml).
+6. **Pin the glob** (`exclude: "**/README.md"`) before a fan-out infer
    classifies the table of contents.
 
 Then, and only then, swap `model:` to a paid seat.
@@ -2174,7 +2182,12 @@ drafting**: pass a `workflow_yaml` string, get the full `nika check` verdict
 back (conformance + secret-flow + permits + the termination/cost certificate)
 as the tool result. It **never executes** the draft: verification yields an
 artifact + its certificate, and running it stays a separate, gated decision.
-See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md) §`nika:compose`.
+The teaching shape is
+[`examples/15-compose-self-check.nika.yaml`](../examples/15-compose-self-check.nika.yaml)
+(`nika:done` first so `mock/echo` closes at turn one). See
+[stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md) §`nika:compose`.
+Do not confuse this loop intrinsic with parent→child composition
+(`invoke: { workflow: }` · [14](./14-composition.md) · lesson 10).
 
 **Termination outcomes (normative)** ·
 
@@ -8332,6 +8345,10 @@ So the trace format bumps:
 > receipts · semantic resume · and reference-model parity. Until that
 > whole receipt exists, « proven » is not a word this contract lets an
 > implementation use.
+>
+> This chapter is **parent→child** composition (`invoke: { workflow: }`
+> · lesson 10). The agent loop's self-check builtin `nika:compose` is a
+> different door (ADR-096 · loop-only · lesson 15). Do not fuse them.
 
 ---
 
@@ -10263,8 +10280,10 @@ Send notifications · `channel:` enum (`webhook`/`slack`/`email`/`discord`/`sms`
 ```yaml
 agent:
   prompt: "Draft a workflow, then check it before you finish."
-  tools: ["nika:compose"]            # the agent grants itself the self-check
+  tools: ["nika:done", "nika:compose"]   # done first · mock/echo closes at turn one
 ```
+The teaching shape is
+[`examples/15-compose-self-check.nika.yaml`](../examples/15-compose-self-check.nika.yaml).
 The agent loop's self-verification intrinsic · the model passes a workflow
 YAML draft it wrote, and gets the FULL `nika check` verdict back as JSON:
 conformance violations (with codes + repair hints), secret-flow findings,
