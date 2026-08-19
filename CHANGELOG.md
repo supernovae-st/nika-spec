@@ -22,6 +22,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   « `workflow:` id violates » four days after `workflow:` left the
   language. No normative change: the registry already carried
   `status: reserved`.
+- **Nine-key residue.** After the grammar door retired (#269), three
+  live-teaching surfaces still named a dead form as if it were current:
+  ADR-099's skip-rule field lists (`on_finally:` · `vars`/`env`), the
+  default-failure example's comment (`fail_workflow:`), and 16-projections
+  citing `graph_format: 2` as the implicit document version. They now
+  speak the nine keys; the census remainder on this repo is exemptions
+  only (dated RFC · laws that name what they kill · REJECT fixtures ·
+  tombstone tables · FINDINGS transcript · AGENTS repair instructions).
 
 ### Added
 

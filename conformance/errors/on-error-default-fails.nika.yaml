@@ -1,8 +1,9 @@
 # Expected: NIKA-EXEC-001 at RUN. No on_error: — the default IS the failure.
 nika: e35-on-error-default-fails
-# INTENT: the deliberate default · 05-errors.md §on_error (fail_workflow: true
-# was REMOVED 2026-08-11 · it was a keyword whose whole meaning was "do the
-# default"). An author who WANTS to say they chose it writes the comment below.
+# INTENT: the deliberate default · 05-errors.md §on_error. The third on_error
+# arm was REMOVED 2026-08-11 · it was a keyword whose whole meaning was "do
+# the default". An author who WANTS to say they chose it writes the comment
+# below.
 permits:
   exec: ["false"]
 tasks:
