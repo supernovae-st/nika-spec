@@ -121,7 +121,9 @@ semantic *facts*. Scoring, routing, publish/abstain is `nika:jq` or
 facts are `type: integer` with a numeric `enum` (`-1|0|1|3`); a
 string enum of digits (`"0"|"1"|"3"`) is the shape models do not emit
 (JSON `3`). The engine hints `digit-string-enum`. The shape is
-`examples/13-extract-then-law.nika.yaml`.
+`examples/13-extract-then-law.nika.yaml`. The named bundle is
+`examples/14-decide-publish.nika.yaml`. Prove the law on const
+fixtures (`unproven-law`) before leaving `mock/`.
 
 **Paid-infer order** (cheaper than discovering this with tokens) ·
 `nika check --native-strict` → one-task `mock/echo` probe of every
