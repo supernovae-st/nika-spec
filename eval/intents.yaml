@@ -1,7 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # eval/intents.yaml — the agent-authoring benchmark intents.
 #
-# 12 plain-language jobs, two per canonical template family. Each is
+# Plain-language jobs (this file is the count). Two per canonical
+# template family, plus the extract-then-law class. Each is
 # what a real user would type — no Nika vocabulary, no construct hints.
 # The harness (run-eval.py) asks a model to author the workflow under
 # two conditions (protocol vs freeform) and validates with the oracle.
@@ -45,3 +46,6 @@ intents:
   - id: docker-health-brief
     template_family: docker-report
     prompt: "Read my Docker daemon's containers and disk usage with pinned commands, have a local model write a short health report, and save it as a markdown file."
+  - id: score-notes-by-facts
+    template_family: fanout
+    prompt: "Read every note in a folder and extract how many parallel work streams each one describes as a number, then compute a level from those numbers without asking the model to pick the level, and write a one-page summary."
