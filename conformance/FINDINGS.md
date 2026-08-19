@@ -83,6 +83,15 @@ loop · `reference/selftest.py` (28 laws · 300 seeds) · `scripts/gen-gate-matr
 `scripts/mutation-adequacy.py --check` (15/15 selftests die under a permissive
 judge). All green at this commit.
 
+> **Re-measured 2026-08-19 · `nika 0.109.2` (1da35b685) — CLOSED.** The
+> shipped binary now speaks the nine-key envelope. `nika: v1` +
+> `workflow:` PARSE-refuses `NIKA-PARSE-005` (identity moved onto
+> `nika: <id>`). `reference/README.md` already records `120/120 agree`
+> on 0.109.0 (the wall that made every generated workflow
+> `engine=None` fell with that release). This finding stays as the
+> dated photo of the 0.108 cascade; it is not a live claim about the
+> published judge.
+
 ## F-4 · The 1 MiB decode grain has two independent definitions — and a third constant that only looks like one
 
 **Measured 2026-08-13 · reference engine `origin/main`.** The

@@ -1,5 +1,17 @@
 # The v1 constitution — surface tournament (RFC)
 
+> **⚠️ AMENDMENT 2026-08-19 · SPELLING, NOT THE RULING.** This tournament
+> is a dated photo (2026-07-13). Candidate A remains the only canonical
+> *surface shape* (verb-keyed tasks). The YAML identity inside the
+> witness fences (`nika: v1` + `workflow: {id, description}` +
+> `types:` / `config:` / `on_finally:`) is the fourteen-key envelope
+> that PARSE-refuses since 0.109. Live files start `nika: <kebab-id>`;
+> description is a `#` comment; the nine keys are `nika · model ·
+> inputs · const · secrets · permits · run · tasks · outputs`. Do not
+> copy-paste a fence from this file as a current workflow. Normative
+> spelling: [`spec/01-envelope.md`](../spec/01-envelope.md). Original
+> status block preserved below per §2.7 (zero silent rewrite).
+
 > **Status · RATIFIED — operator ruling 2026-07-13.** Candidate A is the ONLY
 > canonical public surface of nika v1; B's tagged-record elegance is absorbed
 > into the internal IR (the verb key promotes to a tag at lowering); C is
