@@ -258,6 +258,10 @@ they came back worse.
 > entry with a `default:`). The rows keep their original spelling because they
 > record what was measured on 2026-07-29 — the count columns belong to that
 > spelling and re-labelling them would put a new name on an old number.
+> **Path note (post-count)** · the live lesson that settled the `declassify:`
+> zero-coverage row is now [`examples/11-lift-the-door.nika.yaml`](examples/11-lift-the-door.nika.yaml)
+> (`lift:` · the field `declassify:` is dead). The table below keeps the
+> 2026-07-29 filename.
 
 **Four core constructs have ZERO examples**, while the spec discusses each of
 them at length:
