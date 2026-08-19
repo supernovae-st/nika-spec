@@ -196,10 +196,18 @@ The cheapest authoring order, measured on a 40+ task paid extract run:
 4. **The model extracts facts. `nika:jq` (or `nika:decide`) is the law.**
    Do not pay a second infer to pick a level. Hint `infer-as-law`.
    `nika check --json` must report `paid_ready: true` before you leave
-   `mock/`.
+   `mock/` (`.next` is the first repair; `.compiled` is the proven-law
+   bit).
    The shape is
    [`13-extract-then-law`](./examples/13-extract-then-law.nika.yaml).
-5. **Pin the glob** (`exclude: "**/README.md"`) before a fan-out infer
+   Prove the law on const fixtures (`unproven-law`). The named bundle
+   is [`14-decide-publish`](./examples/14-decide-publish.nika.yaml).
+5. **An agent that drafts a workflow checks it in the loop.** Grant
+   `nika:compose` on `agent.tools` after `nika:done`. Iterate on the
+   check JSON until `valid`. Never a standalone `invoke:`
+   (`NIKA-BUILTIN-COMPOSE-001`). Checking never executes. Shape:
+   [`15-compose-self-check`](./examples/15-compose-self-check.nika.yaml).
+6. **Pin the glob** (`exclude: "**/README.md"`) before a fan-out infer
    classifies the table of contents.
 
 Then, and only then, swap `model:` to a paid seat.

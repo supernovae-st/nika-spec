@@ -123,7 +123,12 @@ string enum of digits (`"0"|"1"|"3"`) is the shape models do not emit
 (JSON `3`). The engine hints `digit-string-enum`. The shape is
 `examples/13-extract-then-law.nika.yaml`. The named bundle is
 `examples/14-decide-publish.nika.yaml`. Prove the law on const
-fixtures (`unproven-law`) before leaving `mock/`.
+fixtures (`unproven-law`) before leaving `mock/`. An agent that
+*writes* Nika grants `nika:compose` on `agent.tools` after
+`nika:done` and iterates on the check JSON until `valid`
+(`examples/15-compose-self-check.nika.yaml`). A standalone
+`invoke: nika:compose` is `NIKA-BUILTIN-COMPOSE-001`. Checking
+never executes the draft.
 
 **Paid-infer order** (cheaper than discovering this with tokens) ·
 `nika check --native-strict` → one-task `mock/echo` probe of every
