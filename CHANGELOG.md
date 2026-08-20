@@ -15,6 +15,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- **CEL authoring truth.** The quick-reference table, agent briefing, and
+  authoring eval prompt now teach the same closed callable set as the normative
+  grammar: `size(x)` · `has(x)` · `x.size()` · `x.contains(s)` ·
+  `x.startsWith(s)` · `x.endsWith(s)`. A conformance selftest prevents the
+  retired `size()`-only claim from returning on any of those surfaces.
 - **Leftover teaching of dead forms.** After #270 the live path still
   named two retired spellings as if they were current: `config.*` sat
   on the 10-authority taint lattice (and in the 11-lesson header) as an
