@@ -65,8 +65,9 @@ instantiated, never invented.
    crosses ONLY through with: (the binding IS the edge — bodies read
    ${{ with.name }}) · pure control = after: {task: success|failure|
    skipped|terminal} · when: is a ${{ }} CEL boolean over LOCAL names or the
-   literal true/false (a bare string is rejected) · size() is the only
-   CEL function · nika:jq's arg is `expression:` (never query/expr) ·
+   literal true/false (a bare string is rejected) · CEL callables are the
+   closed set size(x), has(x), x.size(), x.contains(s), x.startsWith(s), and
+   x.endsWith(s) · nika:jq's arg is `expression:` (never query/expr) ·
    nika:wait takes duration: XOR until: · nika:write needs content: ·
    nika:done only inside agent.tools · output: bindings are pure jq
    (never ${{ }} inside them) · timeout is a QUOTED Go-duration.

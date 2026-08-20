@@ -101,8 +101,10 @@ keys · `on_error.recover` · an `unwind` task (its producer only) · workflow
 arguments live under `args:` (not `input:` / `params:`) · quote any
 YAML scalar that starts with `${{` (an unquoted leading `${{` breaks
 the YAML parse) · `when:` is a `${{ }}` CEL boolean OR the literal
-`true`/`false` — a bare string is rejected · `size()` is the only CEL
-function · `nika:write` without `content:` is rejected ·
+`true`/`false` — a bare string is rejected · CEL callables are a closed
+set: `size(x)` · `has(x)` · `x.size()` · `x.contains(s)` ·
+`x.startsWith(s)` · `x.endsWith(s)` · `nika:write` without `content:` is
+rejected ·
 `nika:done` outside `agent.tools` is rejected.
 
 (Every rule above is enforced STATICALLY by this repo's oracle — the
