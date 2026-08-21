@@ -9,7 +9,7 @@
 # sa source (vérifiée sur disque) · la parité registre↔canon.yaml est gardée par
 # `ssot-compiler --check-canon` (rc=5 sur divergence).
 registry_document_format: 1
-$comment: 'canon-flip import 2026-07-17 · the 10 instantiable skeletons imported verbatim from canon.yaml (prose
+$comment: 'canon-flip import 2026-07-17 · the instantiable skeletons imported from canon.yaml (prose
   home templates/README.md) · the C0-sandbox all-zero-digest placeholder row is REPLACED per its own declaration
   · every source_digest is the real sha256 of templates/<id>.nika.yaml · gate: ssot-compiler --check-canon.'
 templates:
@@ -19,8 +19,9 @@ templates:
     law_ids: []
     introduced_in: C0
     source_path: templates/agent-loop.nika.yaml
-    source_digest: sha256:0f1cbbe36fe92bbfefd565944ddb1efe12ca721150d600495af531c9f080c926
-    category: skeleton
+    source_digest: sha256:5ded8b7dbdc23065d47ed48f32e8072ac74765cdde30101b2b03d6b5a59992da
+    category: agent-loop
+    tags: [research, review]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
       inventory) · source verified on disk · digest = real sha256 of the source bytes at import · routing intent
       per templates/README.md.'
@@ -30,8 +31,9 @@ templates:
     law_ids: []
     introduced_in: C0
     source_path: templates/api-upload-and-create.nika.yaml
-    source_digest: sha256:ece58461cf534963cdc98e6bceff0d51fa954f076cf29beceb7beddf1765bc47
-    category: skeleton
+    source_digest: sha256:e823c5f3d2b8935c31eb69a87ec4367b11cef285a0198c164a213a6801e12f54
+    category: api-upload
+    tags: [product-api, upload]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
       inventory) · source verified on disk · digest = real sha256 of the source bytes at import · routing intent
       per templates/README.md.'
@@ -41,41 +43,89 @@ templates:
     law_ids: []
     introduced_in: C0
     source_path: templates/chain.nika.yaml
-    source_digest: sha256:bd9197b0a806081aaad87c3467737d09abcec419ffdca6dffd32a441c7f22455
-    category: skeleton
+    source_digest: sha256:68c26c13060fce2279634f0640ccacd054f65f04b00a583ae1b73568e494d624
+    category: linear
+    tags: [content]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
       inventory) · source verified on disk · digest = real sha256 of the source bytes at import · routing intent
       per templates/README.md.'
+  - id: classify-and-route
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: 0.113.0
+    source_path: templates/classify-and-route.nika.yaml
+    source_digest: sha256:b60a2a996cf0ff9d338660b67971af7eb7a13cba0fb33186b24eaf2f5d8a13e1
+    category: decision-routing
+    tags: [operations]
+    notes: 'Typed facts become an EvidenceSnapshot consumed by nika:decide · the model extracts evidence, while
+      the deterministic bundle owns the queue law and its fixture proof.'
+  - id: corpus-qa
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: 0.113.0
+    source_path: templates/corpus-qa.nika.yaml
+    source_digest: sha256:11569864668decf78c8c929d9014de46140b22dae6c4a82f8c6c4f1c1ebc5f20
+    category: retrieval
+    tags: [knowledge]
+    notes: 'Sort-and-unique indexing is idempotent · an empty retrieval resolves to an explicit unknown answer with
+      zero citations before any model is allowed to speak.'
   - id: docker-report
     status: reserved
     owner: spec
     law_ids: []
     introduced_in: C0
     source_path: templates/docker-report.nika.yaml
-    source_digest: sha256:8f2281ce8c816fc508c608a8a7ef0b61645923f6d7be3d0640af68d4f5da1d44
-    category: skeleton
+    source_digest: sha256:d90e7384122ba0f78e1b8a97d2c0cc8d506d8d151c5d468eedea580f1d8b6d12
+    category: parallel-fan-in
+    tags: [operations, report]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
       inventory) · source verified on disk · digest = real sha256 of the source bytes at import · routing intent
       per templates/README.md.'
+  - id: document-to-fields
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: 0.113.0
+    source_path: templates/document-to-fields.nika.yaml
+    source_digest: sha256:d5281049dc858f0d2331464b1856829fbd127a7dff623775476cec8411d4632c
+    category: structured-extraction
+    tags: [documents]
+    notes: 'Typed field extraction keeps an exact source anchor beside every value · an empty or unanchored result
+      is refused by a deterministic assertion.'
   - id: etl-state
     status: reserved
     owner: spec
     law_ids: []
     introduced_in: C0
     source_path: templates/etl-state.nika.yaml
-    source_digest: sha256:dd894559fad69754dcf38404bbf34ac3cd9e8a51ef2246dae82423ca35445511
-    category: skeleton
+    source_digest: sha256:f58cc453b0441dfe99f12438620dfea0739b26128b9c38f3923588e55953419f
+    category: state-resume
+    tags: [etl]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
       inventory) · source verified on disk · digest = real sha256 of the source bytes at import · routing intent
       per templates/README.md.'
+  - id: evaluate-and-optimize
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: 0.113.0
+    source_path: templates/evaluate-and-optimize.nika.yaml
+    source_digest: sha256:524c7d5ba630a196487f1d6289ace1aaf0d445e7777a8499c74b3cac3ce9a288
+    category: bounded-loop
+    tags: [quality]
+    notes: 'Two evaluate-and-optimize rounds are unrolled in the DAG · the bound lives outside the model and every
+      infer task carries an explicit token ceiling.'
   - id: fanout
     status: reserved
     owner: spec
     law_ids: []
     introduced_in: C0
     source_path: templates/fanout.nika.yaml
-    source_digest: sha256:0b54e48df2fc0d53e0fe512a38c5842d1fa58b965212b1afac4ac56c1e15afc4
-    category: skeleton
+    source_digest: sha256:8b5cbe300b478daaf00ee57100883f1e5c0212292bb6c9844ba6b045559c1de2
+    category: fanout
+    tags: [batch]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
       inventory) · source verified on disk · digest = real sha256 of the source bytes at import · routing intent
       per templates/README.md.'
@@ -85,8 +135,9 @@ templates:
     law_ids: []
     introduced_in: C0
     source_path: templates/gate-and-act.nika.yaml
-    source_digest: sha256:1301f2d6d7d3bc9930281f1e159accf0f34e08d8727e8b97c6c47fcdcc168659
-    category: skeleton
+    source_digest: sha256:4870c70f7a6198f86b1da8587e7e1345bbece86ce07446d74e16866cbe514610
+    category: conditional-gate
+    tags: [monitoring]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
       inventory) · source verified on disk · digest = real sha256 of the source bytes at import · routing intent
       per templates/README.md.'
@@ -96,8 +147,9 @@ templates:
     law_ids: []
     introduced_in: C0
     source_path: templates/human-gated-ship.nika.yaml
-    source_digest: sha256:7398940b9744413cc38367e7bf574ab8c43c4026347c3304d8abd980891012f1
-    category: skeleton
+    source_digest: sha256:e7f233d8d6a016003fef360b80b9ffb4cc21cce19c733f465103b38adb3b6821
+    category: human-gate
+    tags: [release]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
       inventory) · source verified on disk · digest = real sha256 of the source bytes at import · routing intent
       per templates/README.md.'
@@ -107,8 +159,9 @@ templates:
     law_ids: []
     introduced_in: C0
     source_path: templates/media-asset-pack.nika.yaml
-    source_digest: sha256:ebf9ea261f64f5eccbb6f9fd51e8c832d437f07ee3840e2fd642876533ffb0e5
-    category: skeleton
+    source_digest: sha256:565a0b8080a077435e47474798e4e33fe31ebeea39044455170c765435466a84
+    category: linear
+    tags: [media]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
       inventory) · source verified on disk · digest = real sha256 of the source bytes at import · routing intent
       per templates/README.md.'
@@ -118,8 +171,9 @@ templates:
     law_ids: []
     introduced_in: C0
     source_path: templates/website-brief.nika.yaml
-    source_digest: sha256:93f91f88bbd46444a3130d355621c257942bd1975b97753981f65bed0864ba9f
-    category: skeleton
+    source_digest: sha256:bb0fe02ead87623166cfdd57647346344959ccc622447a7651a2209c52f19d8a
+    category: linear
+    tags: [website]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
       inventory) · source verified on disk · digest = real sha256 of the source bytes at import · routing intent
       per templates/README.md.'
