@@ -3,9 +3,9 @@
 #
 # TEMPLATE · document-to-fields · source text → anchored facts → nonempty proof.
 #
-# The extraction is typed, and every value carries the exact source fragment
-# that supports it. An empty extraction is refused before it can look like a
-# successful document read.
+# The source is trimmed and proved nonempty before inference. The extraction
+# is typed, and every value carries the exact source fragment that supports it.
+# An empty extraction is refused before it can look like a successful read.
 #
 # Needs · nothing. Runs offline in an empty directory with mock/echo.
 # Run · nika run <file> --model mock/echo
@@ -24,14 +24,34 @@ permits:
   tools: ["nika:jq", "nika:assert"]
 
 tasks:
+  normalize_document:
+    invoke:
+      tool: nika:jq
+      args:
+        input: ${{ const.document }}
+        expression: 'gsub("^\\s+|\\s+$"; "")'
+
+  document_nonempty:
+    with:
+      document: ${{ tasks.normalize_document.output }}
+    invoke:
+      tool: nika:assert
+      args:
+        condition: ${{ size(with.document) > 0 }}
+        message: "Document is empty after whitespace is trimmed"
+
   extract:
+    with:
+      document: ${{ tasks.normalize_document.output }}
+    after:
+      document_nonempty: success
     infer:
       max_tokens: 600                # SLOT: extraction spend ceiling
       prompt: |
         Extract only facts explicitly present in this document. For every
         value, copy the shortest exact source fragment that anchors it.
 
-        ${{ const.document }}
+        ${{ with.document }}
       schema:
         type: object
         additionalProperties: false
@@ -52,7 +72,7 @@ tasks:
   anchors_present:
     with:
       fields: ${{ tasks.extract.output.fields }}
-      document: ${{ const.document }}
+      document: ${{ tasks.normalize_document.output }}
     invoke:
       tool: nika:jq
       args:

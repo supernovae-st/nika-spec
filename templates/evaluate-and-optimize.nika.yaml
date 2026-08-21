@@ -3,8 +3,9 @@
 #
 # TEMPLATE · evaluate-and-optimize · draft → two fixed critique/revision rounds.
 #
-# The bound is structural: exactly two rounds are unrolled in the DAG. The
-# model cannot add another turn, and every infer has its own token ceiling.
+# The bound is structural: exactly two revision rounds are unrolled in the DAG,
+# followed by one score-only measurement of the final result. The model cannot
+# add another turn, and every infer has its own token ceiling.
 #
 # Needs · nothing. Runs offline in an empty directory with mock/echo.
 # Run · nika run <file> --model mock/echo
@@ -97,6 +98,24 @@ tasks:
         properties:
           text: { type: string, minLength: 1 }
 
+  final_evaluate:
+    with:
+      candidate: ${{ tasks.optimize_2.output.text }}
+    infer:
+      max_tokens: 200
+      prompt: |
+        Score the final candidate against the brief. Evaluate the candidate
+        exactly as written without proposing another revision.
+        Brief: ${{ const.brief }}
+        Candidate: ${{ with.candidate }}
+      schema:
+        type: object
+        additionalProperties: false
+        required: [score, reason]
+        properties:
+          score: { type: integer, minimum: 0, maximum: 100 }
+          reason: { type: string, minLength: 1 }
+
 outputs:
   result: ${{ tasks.optimize_2.output.text }}
-  final_score: ${{ tasks.evaluate_2.output.score }}
+  final_score: ${{ tasks.final_evaluate.output.score }}
