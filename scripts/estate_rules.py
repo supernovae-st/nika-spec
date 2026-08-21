@@ -247,7 +247,7 @@ PATTERNS = [
     {
         "glob": "templates/**",
         "class": "authored",
-        "evidence": "the 10 verb-template originals + README — each row in canon/templates/registry.yaml carries 'source_digest is the real sha256 of templates/<id>.nika.yaml · gate: ssot-compiler --check-canon' (the registry digests these, nothing writes them)",
+        "evidence": "the canonical template originals + adjacent refusal/golden proofs + README — each row in canon/templates/registry.yaml carries 'source_digest is the real sha256 of templates/<id>.nika.yaml · gate: ssot-compiler --check-canon' (the registry digests these, nothing writes them)",
     },
     {
         "glob": "spec/**",

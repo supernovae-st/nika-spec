@@ -40,18 +40,26 @@ How each one holds that promise:
 
 ## Intent → template routing (deterministic)
 
-| Your intent sounds like… | Template | Patterns it locks in |
-|---|---|---|
-| « take data, produce words, save them » | [`chain`](chain.nika.yaml) | deterministic gather · one model job · explicit persist |
-| « watch X, act when Y » | [`gate-and-act`](gate-and-act.nika.yaml) | jq extraction · CEL skip-gate · often zero model calls |
-| « do this for EVERY item » | [`fanout`](fanout.nika.yaml) | runtime collection · the full leash (`for_each.max_parallel` · `for_each.fail_fast` · retry) |
-| « only what changed since last run » / « survive bad input » | [`etl-state`](etl-state.nika.yaml) | state read→parse→diff→write · `on_error: on_codes:` quarantine |
-| « research / review / open-ended » | [`agent-loop`](agent-loop.nika.yaml) | plan-then-execute · default-deny tools · budgets · engine-owned typed result |
-| « anything irreversible (deploy · send · publish) » | [`human-gated-ship`](human-gated-ship.nika.yaml) | parallel gates · assert · `nika:prompt` GO · `after: {…: terminal}` record |
-| « understand a site (domain · theme · assets) from a URL » | [`website-brief`](website-brief.nika.yaml) | fetch `traverse:` crawl · one typed infer · explicit persist · zero exec |
-| « generate image/audio assets from a brief » | [`media-asset-pack`](media-asset-pack.nika.yaml) | `nika:image_generate` · `nika:jq` manifest · local/mock provider first |
-| « call a product API: upload a file and create from it » | [`api-upload-and-create`](api-upload-and-create.nika.yaml) | fetch `multipart:` (file + text parts) · masked secrets header · mode/jq extraction |
-| « read a system's state (docker · kubectl · gh), explain it, keep the report » | [`docker-report`](docker-report.nika.yaml) | argv-array exec (provable allowlist) · parallel reads · one artifact |
+The primary axis is the workflow **form**. A domain such as documents, media
+or operations is a secondary tag, because the same form composes across jobs.
+The machine source for both fields is `canon/templates/registry.yaml`.
+
+| Your intent sounds like… | Template | Primary form | Domain tags | Patterns it locks in |
+|---|---|---|---|---|
+| « take data, produce words, save them » | [`chain`](chain.nika.yaml) | `linear` | `content` | deterministic gather · one model job · explicit persist |
+| « watch X, act when Y » | [`gate-and-act`](gate-and-act.nika.yaml) | `conditional-gate` | `monitoring` | jq extraction · CEL skip-gate · often zero model calls |
+| « do this for EVERY item » | [`fanout`](fanout.nika.yaml) | `fanout` | `batch` | runtime collection · the full leash (`for_each.max_parallel` · `for_each.fail_fast` · retry) |
+| « only what changed since last run » / « survive bad input » | [`etl-state`](etl-state.nika.yaml) | `state-resume` | `etl` | state read→parse→diff→write · `on_error: on_codes:` quarantine |
+| « research / review / open-ended » | [`agent-loop`](agent-loop.nika.yaml) | `agent-loop` | `research` · `review` | plan-then-execute · default-deny tools · budgets · engine-owned typed result |
+| « anything irreversible (deploy · send · publish) » | [`human-gated-ship`](human-gated-ship.nika.yaml) | `human-gate` | `release` | parallel gates · assert · `nika:prompt` GO · `after: {…: terminal}` record |
+| « understand a site (domain · theme · assets) from a URL » | [`website-brief`](website-brief.nika.yaml) | `linear` | `website` | fetch `traverse:` crawl · one typed infer · explicit persist · zero exec |
+| « generate image/audio assets from a brief » | [`media-asset-pack`](media-asset-pack.nika.yaml) | `linear` | `media` | `nika:image_generate` · `nika:jq` manifest · local/mock provider first |
+| « call a product API: upload a file and create from it » | [`api-upload-and-create`](api-upload-and-create.nika.yaml) | `api-upload` | `product-api` · `upload` | fetch `multipart:` (file + text parts) · masked secrets header · mode/jq extraction |
+| « read a system's state (docker · kubectl · gh), explain it, keep the report » | [`docker-report`](docker-report.nika.yaml) | `parallel-fan-in` | `operations` · `report` | argv-array exec (provable allowlist) · parallel reads · one artifact |
+| « extract fields from a document and keep the evidence » | [`document-to-fields`](document-to-fields.nika.yaml) | `structured-extraction` | `documents` | trim · nonempty assertion · typed fields · exact source anchors |
+| « answer from a corpus, or say that the answer is unknown » | [`corpus-qa`](corpus-qa.nika.yaml) | `retrieval` | `knowledge` | conflicting-id refusal · idempotent sort/unique index · empty citations on unknown |
+| « classify facts and route them by a governed law » | [`classify-and-route`](classify-and-route.nika.yaml) | `decision-routing` | `operations` | typed facts · EvidenceSnapshot · `nika:decide` · fixture proof |
+| « critique and improve a draft for a fixed number of rounds » | [`evaluate-and-optimize`](evaluate-and-optimize.nika.yaml) | `bounded-loop` | `quality` | two unrolled revisions · score-only final evaluation · every infer capped |
 
 Composite jobs compose templates: a fanout whose merge feeds a
 human-gated-ship, an etl-state whose delta fans out. Start from the
@@ -110,6 +118,10 @@ When a hint tells you to remove something, run the file before you believe it.
 
 - Every template passes the same conformance gate as the examples —
   a template that drifts from the spec FAILS CI.
+- Every new form keeps its refusal beside it as `<id>.negative.yaml` and its
+  replay pin as `<id>.nika.yaml.golden.json`. The negative names the exact
+  diagnostic the wrong form must keep emitting; `nika test <id>.nika.yaml`
+  proves the typed outputs against the committed golden.
 - Templates ship in the [versioned pack](../examples/manifest.yaml)
   (sha256 per file) — the engine embeds them, so `nika new` works
   offline and version-locked.
