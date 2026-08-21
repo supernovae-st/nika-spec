@@ -56,10 +56,10 @@ The machine source for both fields is `canon/templates/registry.yaml`.
 | « generate image/audio assets from a brief » | [`media-asset-pack`](media-asset-pack.nika.yaml) | `linear` | `media` | `nika:image_generate` · `nika:jq` manifest · local/mock provider first |
 | « call a product API: upload a file and create from it » | [`api-upload-and-create`](api-upload-and-create.nika.yaml) | `api-upload` | `product-api` · `upload` | fetch `multipart:` (file + text parts) · masked secrets header · mode/jq extraction |
 | « read a system's state (docker · kubectl · gh), explain it, keep the report » | [`docker-report`](docker-report.nika.yaml) | `parallel-fan-in` | `operations` · `report` | argv-array exec (provable allowlist) · parallel reads · one artifact |
-| « extract fields from a document and keep the evidence » | [`document-to-fields`](document-to-fields.nika.yaml) | `structured-extraction` | `documents` | typed fields · exact source anchors · nonempty assertion |
-| « answer from a corpus, or say that the answer is unknown » | [`corpus-qa`](corpus-qa.nika.yaml) | `retrieval` | `knowledge` | idempotent sort/unique index · retrieval gate · empty citations on unknown |
+| « extract fields from a document and keep the evidence » | [`document-to-fields`](document-to-fields.nika.yaml) | `structured-extraction` | `documents` | trim · nonempty assertion · typed fields · exact source anchors |
+| « answer from a corpus, or say that the answer is unknown » | [`corpus-qa`](corpus-qa.nika.yaml) | `retrieval` | `knowledge` | conflicting-id refusal · idempotent sort/unique index · empty citations on unknown |
 | « classify facts and route them by a governed law » | [`classify-and-route`](classify-and-route.nika.yaml) | `decision-routing` | `operations` | typed facts · EvidenceSnapshot · `nika:decide` · fixture proof |
-| « critique and improve a draft for a fixed number of rounds » | [`evaluate-and-optimize`](evaluate-and-optimize.nika.yaml) | `bounded-loop` | `quality` | two unrolled rounds · every infer capped · no model-owned loop bound |
+| « critique and improve a draft for a fixed number of rounds » | [`evaluate-and-optimize`](evaluate-and-optimize.nika.yaml) | `bounded-loop` | `quality` | two unrolled revisions · score-only final evaluation · every infer capped |
 
 Composite jobs compose templates: a fanout whose merge feeds a
 human-gated-ship, an etl-state whose delta fans out. Start from the

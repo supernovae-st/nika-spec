@@ -66,11 +66,11 @@ templates:
     law_ids: []
     introduced_in: 0.113.0
     source_path: templates/corpus-qa.nika.yaml
-    source_digest: sha256:11569864668decf78c8c929d9014de46140b22dae6c4a82f8c6c4f1c1ebc5f20
+    source_digest: sha256:1838ae7cc787baedabebc934949a69ce1a827a05fbdc8087449ee3e3e9158e68
     category: retrieval
     tags: [knowledge]
-    notes: 'Sort-and-unique indexing is idempotent · an empty retrieval resolves to an explicit unknown answer with
-      zero citations before any model is allowed to speak.'
+    notes: 'Conflicting duplicate ids refuse before indexing, while identical duplicates keep sort-and-unique
+      idempotent · an empty retrieval resolves to an explicit unknown answer with zero citations.'
   - id: docker-report
     status: reserved
     owner: spec
@@ -89,11 +89,11 @@ templates:
     law_ids: []
     introduced_in: 0.113.0
     source_path: templates/document-to-fields.nika.yaml
-    source_digest: sha256:d5281049dc858f0d2331464b1856829fbd127a7dff623775476cec8411d4632c
+    source_digest: sha256:7f05592b930782fdefdab38a950ca288029a1bddcdd2e8965a7d65571c627b14
     category: structured-extraction
     tags: [documents]
-    notes: 'Typed field extraction keeps an exact source anchor beside every value · an empty or unanchored result
-      is refused by a deterministic assertion.'
+    notes: 'Whitespace is trimmed and refused before inference when empty · typed field extraction keeps an exact
+      source anchor beside every value · empty or unanchored results refuse deterministically.'
   - id: etl-state
     status: reserved
     owner: spec
@@ -112,11 +112,11 @@ templates:
     law_ids: []
     introduced_in: 0.113.0
     source_path: templates/evaluate-and-optimize.nika.yaml
-    source_digest: sha256:524c7d5ba630a196487f1d6289ace1aaf0d445e7777a8499c74b3cac3ce9a288
+    source_digest: sha256:9c89d2154d386acccdeb19429bdd5dbb01f2bbb2887e6d2bec7d816283c8c569
     category: bounded-loop
     tags: [quality]
-    notes: 'Two evaluate-and-optimize rounds are unrolled in the DAG · the bound lives outside the model and every
-      infer task carries an explicit token ceiling.'
+    notes: 'Two revision rounds are unrolled in the DAG, then a score-only evaluator measures optimize_2 · the bound
+      lives outside the model and every infer task carries an explicit token ceiling.'
   - id: fanout
     status: reserved
     owner: spec

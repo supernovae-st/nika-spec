@@ -3,8 +3,9 @@
 #
 # TEMPLATE · corpus-qa · canonicalize corpus → retrieve → answer or abstain.
 #
-# Indexing is deterministic and idempotent. An empty retrieval is a valid
-# answer with empty citations, never a fabricated model response.
+# Identical duplicates are idempotent, while one id carrying conflicting text
+# is refused before indexing. An empty retrieval is a valid answer with empty
+# citations, never a fabricated model response.
 #
 # Needs · nothing. Runs offline in an empty directory with mock/echo.
 # Run · nika run <file> --model mock/echo
@@ -23,7 +24,25 @@ permits:
   tools: ["nika:jq", "nika:assert"]
 
 tasks:
+  conflicting_ids:
+    invoke:
+      tool: nika:jq
+      args:
+        input: ${{ const.documents }}
+        expression: 'sort_by(.id) | group_by(.id) | map(select((map(.text) | unique | length) > 1) | .[0].id)'
+
+  duplicates_consistent:
+    with:
+      conflicting_ids: ${{ tasks.conflicting_ids.output }}
+    invoke:
+      tool: nika:assert
+      args:
+        condition: ${{ size(with.conflicting_ids) == 0 }}
+        message: "One corpus id names conflicting source text"
+
   index_once:
+    after:
+      duplicates_consistent: success
     invoke:
       tool: nika:jq
       args:
