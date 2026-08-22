@@ -15,6 +15,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- **`error_codes.count` names its scope.** The projected `count` plus two
+  `NIKA-BUILTIN-*` rows read as the whole builtin-code family (nika#1040).
+  A `scope:` sibling now says the count is the spec-normative floor;
+  per-builtin and per-provider codes resolve through `nika explain` and
+  are not enumerated here.
 - **CEL authoring truth.** The quick-reference table, agent briefing, and
   authoring eval prompt now teach the same closed callable set as the normative
   grammar: `size(x)` · `has(x)` · `x.size()` · `x.contains(s)` ·
