@@ -1,8 +1,10 @@
 # Templates · instantiable skeletons (the deterministic authoring path)
 
 > **Agents do not invent structure — they instantiate it.** Each template
-> here is a COMPLETE, VALID workflow with `# SLOT:` markers at every
-> decision point. The path from intent to a correct file is mechanical:
+> here is a complete scaffold with `<SLOT: …>` values at every decision
+> point. Those values make `nika check` refuse until the author fills them;
+> comments cannot carry that invariant because YAML discards comments. The
+> path from intent to a correct file is mechanical:
 > route → copy → fill slots → check → run → repair.
 >
 > Browse this pack as a register: <https://nika.sh/templates> (one page
@@ -11,22 +13,25 @@
 
 ## The guarantee
 
-Every template in this directory **runs green in an empty directory** —
-offline, with no API key, no fixture, and nothing installed. That is what
-makes a skeleton worth copying: you scaffold it, you run it, you watch it
-work, and only then do you point it at your own data.
+Every template in this directory **runs green in an empty directory once
+its named slots are filled** — offline, with no API key, no fixture, and
+nothing installed. An unfilled scaffold refuses at `nika check`; it never
+spends or writes output that could be mistaken for a result. That is what
+makes a skeleton worth copying: you scaffold it, fill the explicit holes,
+run it, watch it work, and only then point it at your own data.
 
 ```bash
 nika new --from chain my-first.nika.yaml   # scaffold
-nika check my-first.nika.yaml              # audit
+nika check my-first.nika.yaml              # names every slot still to fill
 nika run   my-first.nika.yaml --model mock/echo   # SEE IT WORK
 ```
 
 How each one holds that promise:
 
-- **`--model mock/echo`** — the offline seat. Deterministic, zero keys. The
-  `model:` line in each file is a SLOT naming a real local seat that was
-  measured, but no seat is needed to run the skeleton.
+- **`--model mock/echo`** — the offline seat. Deterministic, zero keys.
+  `nika new` replaces a template's model with a ready model seat when the
+  current binary can run it; `--model mock/echo` always keeps the rehearsal
+  available without requiring that seat.
 - **`on_error: recover:`** — where a template reads a file, calls an API or
   shells out, a literal recovery value stands in until you wire the real
   thing. Every one of those blocks says, in place, to delete it once the
@@ -77,7 +82,8 @@ nika new --from "watch a price and ping me" p.nika.yaml   # routes to the closes
 1. **Route** with the table above — one intent, one template.
 2. **Copy** · `nika new --from <name> <dest>.nika.yaml` · set `nika:` to the
    file's own kebab-case name.
-3. **Fill every `# SLOT:` line** · delete the slot comment once filled.
+3. **Fill every `<SLOT: …>` value** · the marker lives in the value because
+   comments are not part of the parsed workflow.
    Creativity belongs ONLY in prompts, jq expressions and paths —
    never in structure.
 4. **Check** · `nika check <file> --native-strict` · zero errors AND zero

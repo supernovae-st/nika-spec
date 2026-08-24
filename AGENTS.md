@@ -40,8 +40,10 @@ INTENT ──route──▶ TEMPLATE ──fill──▶ DRAFT ──check──
    skeleton (its routing table IS the list — never enumerate it here:
    a hand-typed count went stale the day the shelf grew). Composite
    jobs compose templates.
-2. **Instantiate** · copy the template · fill every `# SLOT:` line ·
-   creativity ONLY in prompts, jq and paths — never in structure.
+2. **Instantiate** · copy the template · fill every `<SLOT: …>` value ·
+   comments may explain other decisions, but only a value can make the
+   checker refuse an unfilled scaffold. Creativity ONLY in prompts, jq and
+   paths — never in structure.
 3. **Check** · `python conformance/runner.py validate <file>` (this
    repo's oracle) or `nika check` (engine). NEVER ship unchecked.
 4. **Repair from the error** · the codes are prescriptive ·
