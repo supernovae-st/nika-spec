@@ -1,0 +1,11 @@
+{
+  "access": "codex",
+  "harness_attestations": {
+    "codex": {
+      "single_turn": true,
+      "no_implicit_tools": true,
+      "structured_output": "json_schema",
+      "model_identity": "requested"
+    }
+  }
+}

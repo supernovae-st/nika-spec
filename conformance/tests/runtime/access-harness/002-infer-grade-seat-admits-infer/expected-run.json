@@ -1,0 +1,14 @@
+{
+  "admission": {
+    "accepted": true
+  },
+  "receipt": {
+    "harness_seat": "codex",
+    "requested_model": "openai/gpt-5.5",
+    "responding_model": null,
+    "tokens": null,
+    "cost_usd": null,
+    "budget": "subscription quota"
+  },
+  "note": "The boundary success proves the refusal is capability-specific. Requested identity is recorded; responding identity and numeric meters remain absent."
+}
