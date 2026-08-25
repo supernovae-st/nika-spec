@@ -1,0 +1,14 @@
+{
+  "admission": {
+    "accepted": false,
+    "error_code": "NIKA-1800",
+    "witness_contains": [
+      "claude-code",
+      "single_turn",
+      "no_implicit_tools",
+      "structured_output",
+      "model_identity"
+    ]
+  },
+  "note": "An ACP agent seat is not infer-grade by implication. The meet refuses before inference and names every unproven conjunct."
+}
