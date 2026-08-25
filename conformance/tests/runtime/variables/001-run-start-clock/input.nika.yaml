@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: rt-run-start-clock
+model: mock/echo
+run: { entropy: none, clock: virtual }
+permits: { tools: ["nika:jq"] }
+tasks:
+  clock:
+    invoke:
+      tool: "nika:jq"
+      args: { input: null, expression: "now" }
