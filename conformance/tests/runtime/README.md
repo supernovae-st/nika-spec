@@ -57,3 +57,28 @@ reported · never asserted).
 | `errors/` | retry honors transient-only (the non-transient half is `004-retry-never-on-non-transient` — attempts stays 1 under a declared retry · the TRANSIENT half needs a deterministic transient error and parks behind the HTTP mock, post-announce) + on_codes · on_error.skip preserves the error · recover substitutes BEFORE bindings · DAG-004-class await never deadlocks — **parked**: the engine's check refuses the await shape itself (the corpus's one divergent-by-design row, `errors/recover-task-ref-no-edge` · nika#291), so the runtime contract is unstageable by command until that lands |
 | `agent/` | budget exhaustion = NIKA-AGENT-001/002 with partial in error.details · tool errors feed back EXCEPT security_error (the feed-back half is `003-tool-error-feeds-back` — the final AGENT-001 IS the proof the loop survived the tool error · the security half — a refusal that must END the loop — stays unstageable with mock/echo, which cannot be steered to synthesize an out-of-boundary argument deterministically) · nika:done result: becomes .output |
 | `permits/` | NIKA-SEC-004 at the first out-of-boundary effect · permits:{} = pure compute |
+| `access-harness/` | an unattested agent seat refuses `infer:` with the failed infer-grade conjuncts; an attested one-shot seat admits the same task · `run.json.harness_attestations` is injected conformance evidence, never host discovery |
+
+### Infer-grade harness fixture extension
+
+An `access-harness` fixture adds these invocation fields:
+
+```json
+{
+  "access": "codex",
+  "harness_attestations": {
+    "codex": {
+      "single_turn": true,
+      "no_implicit_tools": true,
+      "structured_output": "json_schema",
+      "model_identity": "requested"
+    }
+  }
+}
+```
+
+The runner injects this declaration instead of discovering a host binary or
+reading an account store. `expected-run.json.admission` asserts the
+pre-inference meet: `accepted`, and on refusal the exact error code plus a
+`witness_contains` list. This keeps the fixture hermetic while the adapter's
+own repository proves its process wire with a scripted fake binary.

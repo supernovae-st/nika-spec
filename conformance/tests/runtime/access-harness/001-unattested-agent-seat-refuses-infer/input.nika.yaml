@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: unattested-agent-seat-refuses-infer
+model: anthropic/claude-sonnet-4-5
+tasks:
+  summarize:
+    infer:
+      prompt: "Summarize the supplied note in one sentence."

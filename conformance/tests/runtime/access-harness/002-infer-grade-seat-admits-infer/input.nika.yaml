@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: infer-grade-seat-admits-infer
+model: openai/gpt-5.5
+tasks:
+  classify:
+    infer:
+      prompt: "Classify the note."
+      schema:
+        type: object
+        required: [label]
+        properties:
+          label: { type: string }
+        additionalProperties: false
