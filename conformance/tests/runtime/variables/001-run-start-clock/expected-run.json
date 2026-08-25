@@ -1,0 +1,10 @@
+{
+ "workflow_state": "success",
+ "tasks": {
+  "clock": {
+   "status": "success",
+   "output": 0.01
+  }
+ },
+ "note": "now is rebound to the exact deterministic WorkflowStarted instant · 04 §an expression sees only its input · D-2026-08-11-N27"
+}
