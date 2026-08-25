@@ -134,6 +134,12 @@ numeric price in the Nika receipt or budget. Its budget lane is
 object as protocol-completeness evidence, but MUST NOT project its numeric
 meters into the Nika receipt.
 
+A non-executing preview that accepts an access pin MUST apply the same access
+admission meet as a live run and record the requested pin plus each requested
+model. The same invalid or unattested pin MUST refuse with the same access
+code. For an admitted subscription seat, the preview MUST name
+`subscription quota` and MUST NOT display a numeric USD or token meter.
+
 ---
 
 ## `exec:` · shell command
