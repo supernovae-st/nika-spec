@@ -46,8 +46,7 @@ tasks:
       # it speaks — on this exact prompt: 64 → "", 256 → "", 512 → "", 1024 →
       # "Bonjour.", 2048 → "Bonjour !". Under the threshold the run is GREEN and
       # the output is EMPTY, because the budget ran out mid-thought. Size the
-      # cap for the thinking, or pick a non-thinking model (llama3.2:3b) when
-      # you want a tight one.
+      # cap for the thinking, not just the answer.
       max_tokens: 2048
 
 # The return value. It does NOT appear on the live run — that surface shows
