@@ -27,7 +27,7 @@
 # silently rewrites.
 
 schema_version: 1
-last_updated: "2026-07-22"
+last_updated: "2026-08-26"
 verifier: timeline/verify.py
 
 evidence_classes:
@@ -298,6 +298,21 @@ entries:
     detail: "Release notes render from the changelog section: What · Install · Verify · Provenance. Verify carries SHA256SUMS · gh attestation · the SLSA intoto asset."
     component: engine
     evidence: { class: github-pr, repo: supernovae-st/nika, pr: 664 }
+
+  - id: release-0-115-0
+    date: "2026-08-26"
+    type: release
+    version: "0.115.0"
+    detail: >-
+      The stabilization arc: the access census (one read — the harness
+      seat in the first screen, the doctor fix and the refusal tail) ·
+      the false-greens arc (the plain-scalar guard · the thinking laws
+      at audit · MCP oracle parity) · the unwind outcome journaled ·
+      every shipped example run-gated in CI. The three proofs
+      (SHA256SUMS · gh attestation · the SLSA intoto asset) were
+      replayed on the published artifacts, not just produced.
+    component: engine
+    evidence: { class: github-release, repo: supernovae-st/nika, tag: v0.115.0 }
 
 gates:
   # The future · conditions, never dates. A gate flips when its
