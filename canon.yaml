@@ -61,7 +61,7 @@ counts:
   namespaces: 5
   builtins: 28
   providers: 17
-  extract_modes: 9
+  extract_modes: 10
   templates: 14
   error_namespaces: 24
   error_categories: 12
@@ -203,7 +203,7 @@ providers:
 # 9 modes for the nika:fetch builtin's mode: parameter (builtins-v0.1.md).
 # stdlib/extract-modes-v0.1.md is the prose home.
 extract_modes:
-  count: 9
+  count: 10
   reference: stdlib/extract-modes-v0.1.md
   items:
     - article
@@ -212,6 +212,7 @@ extract_modes:
     - links
     - markdown
     - metadata
+    - raw
     - selector
     - sitemap
     - text
@@ -433,7 +434,7 @@ pillars:
     - { order: 2, name: verbs,     semantic: "the 4 native execution models" }
     - { order: 3, name: dag,       semantic: "task composition + control flow (for_each · when)" }
     - { order: 4, name: variables, semantic: "scope-bound state threading + binding (CEL + jq)" }
-    - { order: 5, name: errors,    semantic: "the 15 error namespaces + handling contract" }
+    - { order: 5, name: errors,    semantic: "the 24 error namespaces + handling contract" }
 
 # ---------------------------------------------------------------- lifecycle enums
 # 4-state lifecycle taxonomies · studio-extended dimensions · public

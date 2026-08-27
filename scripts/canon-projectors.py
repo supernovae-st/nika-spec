@@ -131,6 +131,29 @@ def self_check(canon: dict) -> None:
         if counts.get(key) != actual:
             die(f"counts.{key}", counts.get(key), actual)
 
+    # The canon↔reference law (the #291 class · measured 2026-08-26: the
+    # stdlib doc's mode table carried `raw` while the canon items did not —
+    # count == len(items) held on both sides, so the intra-canon check
+    # passed on a canon that contradicted its own reference). The stdlib
+    # mode table is parsed and compared SET-equal to the canon items.
+    modes_doc = SPEC_ROOT / "stdlib" / "extract-modes-v0.1.md"
+    if modes_doc.is_file():
+        doc_modes = set()
+        for line in modes_doc.read_text(encoding="utf-8").splitlines():
+            m = re.match(r"\|\s*`([a-z_]+)`\s*\|", line)
+            if m:
+                doc_modes.add(m.group(1))
+        canon_modes = set(canon["extract_modes"]["items"])
+        if doc_modes and doc_modes != canon_modes:
+            print(
+                f"canon-projectors · canon↔reference drift · extract_modes "
+                f"doc-only: {sorted(doc_modes - canon_modes)} · "
+                f"canon-only: {sorted(canon_modes - doc_modes)} · "
+                f"one list must move (canon.yaml is the SSOT)",
+                file=sys.stderr,
+            )
+            sys.exit(2)
+
 
 MARKER_RE = re.compile(r"(<!-- canon:([a-z_]+) -->)([^<]*)(<!-- /canon -->)")
 
