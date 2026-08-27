@@ -77,7 +77,15 @@
   its own §concrete-codes table (and canon.yaml) uses 21 — `ASSERT · COMP ·
   LOCK · DECIDE · POLICY · PORT` have codes but no namespace-table row ·
   prose-internal lag, import untouched (canon.yaml is the import source) ·
-  prose fix owed at the flip cascade.
+  prose fix owed at the flip cascade · **CLOSED 2026-08-27 (#291)**: the
+  original members were fixed piecemeal (`POLICY` by whole-namespace
+  retirement · 05 §retired) while the class recurred with new members
+  (`AUTH · DEFAULT · DRIFT · VALUES` had codes but no row · `YAML · REG`
+  rows canon does not count) — the table now carries every canon
+  namespace and `scripts/canon-projectors.py` cross-checks table ↔ canon
+  in both directions on every gate run, `NIKA-YAML`/`NIKA-REG` the two
+  DECLARED ahead-of-canon rows (CF-05 · engine ADR-106 · canon
+  disposition still owed at C1) — a stale declaration is itself a red.
 - **CF-12** (the flip · `--emit-canon`) · the 2 SSOT-1 §27 seed rows
   `NIKA-AGENT-001` + `NIKA-AGENT-002` (byte-untouched at the import wave per
   the diagnostics `$comment`) are law-minted (LAW-OUTCOME-0403/0402 · causes

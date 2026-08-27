@@ -30,6 +30,15 @@ selftest upstream · deep_static/cross-ref/stdlib layers die through the
 fixture corpus (runner all IS their death surface, re-proven every gate
 run).
 
+Extended 2026-08-27 (#291 wave): the canon-projectors gate — its judge and
+selftest are one file (`--check`) and its judged surface is DATA, so the
+mutation IS the appended shadow: a duplicate top-level key at canon.yaml's
+EOF wins under yaml.safe_load exactly like a later def binds last. Three
+probes re-plant the original drifts (the uncounted `raw` mode · a canon
+namespace with no 05-errors table row · the « 15 error namespaces » prose
+fossil); each shadow keeps the upstream count==len law green ON PURPOSE, so
+a death proves the named cross-check and never the old law.
+
 Mutations run in a throwaway detached git worktree of HEAD — the working
 tree is never touched, and the worktree is removed on every exit path.
 Probes judge HEAD: commit (or at least stage nothing you fear) before
@@ -52,6 +61,42 @@ import tempfile
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+
+# The #291 canon-projectors shadows · DATA mutations (canon.yaml · a
+# duplicate top-level key appended at EOF wins under yaml.safe_load — the
+# YAML twin of the shadow def). Each shadow re-types the counts: block so
+# the count==len self-check stays GREEN and the death lands on the named
+# cross-check, never upstream.
+_CANON_COUNTS = (
+    "counts:\n  verbs: 4\n  namespaces: 5\n  builtins: 28\n  providers: 17\n"
+    "  extract_modes: {extract_modes}\n  templates: 14\n"
+    "  error_namespaces: {error_namespaces}\n  error_categories: 12\n"
+    "  error_codes: 103\n  pillars: 5\n  lifecycle_product: 4\n"
+    "  lifecycle_decision: 4\n  lifecycle_risk: 4\n  diamond_layers: 7\n"
+    "  steal_pattern_tiers: 4\n  severity: 4\n  mcp_tools: 9\n"
+    "  mcp_protocol_versions: 5\n"
+)
+_SHADOW_MODES_SANS_RAW = _CANON_COUNTS.format(extract_modes=9, error_namespaces=24) + (
+    "extract_modes:\n  count: 9\n  reference: stdlib/extract-modes-v0.1.md\n"
+    "  items: [article, feed, jq, links, markdown, metadata, selector, sitemap, text]\n"
+)
+_SHADOW_NS_SANS_AUTH = _CANON_COUNTS.format(extract_modes=10, error_namespaces=23) + (
+    "error_namespaces:\n  count: 23\n  reference: spec/05-errors.md\n"
+    "  items: [NIKA-AGENT, NIKA-ASSERT, NIKA-BUILTIN, NIKA-CANCEL, NIKA-COMP,\n"
+    "          NIKA-DAG, NIKA-DEFAULT, NIKA-EXEC, NIKA-IMPL, NIKA-INFER,\n"
+    "          NIKA-INVOKE, NIKA-LOCK, NIKA-MCP, NIKA-DECIDE, NIKA-DRIFT,\n"
+    "          NIKA-PARSE, NIKA-PORT, NIKA-PROVIDER, NIKA-SEC, NIKA-TIMEOUT,\n"
+    "          NIKA-TYPE, NIKA-VAR, NIKA-VALUES]\n"
+)
+_SHADOW_PILLAR_FOSSIL = (
+    "pillars:\n  count: 5\n  immutable: true\n  reference: spec/00-overview.md\n"
+    "  items:\n"
+    '    - { order: 1, name: envelope,  semantic: "the nine-key envelope" }\n'
+    '    - { order: 2, name: verbs,     semantic: "the 4 native execution models" }\n'
+    '    - { order: 3, name: dag,       semantic: "task composition + control flow" }\n'
+    '    - { order: 4, name: variables, semantic: "scope-bound state threading" }\n'
+    '    - { order: 5, name: errors,    semantic: "the 15 error namespaces + handling contract" }\n'
+)
 
 # (selftest invocation, judged file, permissive shadow appended at the
 # judge's EOF). Paths are repo-relative; a tuple invocation carries args
@@ -108,6 +153,12 @@ PROBES = [
      ("replace",
       '    diffs: list[str] = []\n    want_state = expected.get("workflow_state")\n',
       '    diffs: list[str] = []\n    return diffs\n    want_state = expected.get("workflow_state")\n')),
+    # The #291 canon-projectors ratchet · judge and selftest share one file
+    # and the judged surface is DATA (canon.yaml · YAML last-wins) — the
+    # shadow constants above. One probe per cross-check.
+    (("scripts/canon-projectors.py", "--check"), "canon.yaml", _SHADOW_MODES_SANS_RAW),
+    (("scripts/canon-projectors.py", "--check"), "canon.yaml", _SHADOW_NS_SANS_AUTH),
+    (("scripts/canon-projectors.py", "--check"), "canon.yaml", _SHADOW_PILLAR_FOSSIL),
 ]
 
 

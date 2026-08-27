@@ -603,7 +603,7 @@ a caller receives).
 - **[templates/](./templates/)**: writing your own? Instantiate a
   skeleton (6 valid, slot-marked) instead of starting blank, the
   deterministic path agents follow ([protocol](AGENTS.md))
-- **[stdlib/](./stdlib/)**: the <!-- canon:providers -->17<!-- /canon --> providers · <!-- canon:extract_modes -->9<!-- /canon --> extract modes · <!-- canon:builtins -->28<!-- /canon --> builtins
+- **[stdlib/](./stdlib/)**: the <!-- canon:providers -->17<!-- /canon --> providers · <!-- canon:extract_modes -->10<!-- /canon --> extract modes · <!-- canon:builtins -->28<!-- /canon --> builtins
 - **[examples/](./examples/)**: the numbered path + the jobs, all shipped and CI-gated (the count lives in [examples/manifest.yaml](./examples/manifest.yaml))
 - **[README.md](./README.md)**: why a language · repo layout · governance
 
@@ -782,7 +782,7 @@ outputs:                              # what the workflow returns · symmetric t
 | [16 projections](./16-projections.md) | The oracle surface · one canonical projection (graph_format:3) served byte-identical across CLI · LSP · MCP · the LSP semantic document (`semantic_document_format: 1`) wraps it with spans + one-word `reason` · the additive arc (holes · actions · capabilities over the frozen IR) |
 | [17 trace](./17-trace.md) | The run journal · NDJSON frames chained by sha256 (`trace_format: 2` · the prologue manifest · the closed kind vocabulary) · the REQUIRED permit-decision witness (NEP-0007 · granted and refused alike) · the differential check ⇔ run equivalence law · graved from an observed run |
 
-**Stdlib** (versioned independently · not a spec section) · [stdlib/](../stdlib/): **<!-- canon:providers -->17<!-- /canon --> providers · <!-- canon:extract_modes -->9<!-- /canon --> extract modes · <!-- canon:builtins -->28<!-- /canon --> builtins** (6 core · 5 file · 8 data · 2 network · 2 introspection · 4 media).
+**Stdlib** (versioned independently · not a spec section) · [stdlib/](../stdlib/): **<!-- canon:providers -->17<!-- /canon --> providers · <!-- canon:extract_modes -->10<!-- /canon --> extract modes · <!-- canon:builtins -->28<!-- /canon --> builtins** (6 core · 5 file · 8 data · 2 network · 2 introspection · 4 media).
 
 ---
 
@@ -4964,8 +4964,8 @@ binding of `${{ tasks.fetch_img.output }}` → another tool's `content:` arg ·
 or a file path for `infer.vision`). Bytes **cannot** be jq-extracted (jq is JSON-only)
 nor substituted into a string position: that is an error (`NIKA-VAR-007`) ·
 the engine never silently UTF-8-coerces a blob (it would corrupt the data).
-For `nika:fetch` and `exec` (no binary value channel · the 9 fetch modes are
-text/JSON · `raw` is text), binary is **file-mediated** · write to a path,
+For `nika:fetch` and `exec` (no binary value channel · every fetch mode is
+text/JSON · `raw` included), binary is **file-mediated** · write to a path,
 then read or reference the path. There is no `output_format` field · the
 value carries its own type.
 
@@ -5139,10 +5139,18 @@ Error codes follow the format `NIKA-<NAMESPACE>-<NNN>` where namespace is 2-9 up
 | `NIKA-ASSERT` | assertion obligations ([15-proof](./15-proof.md)) · ⚰️ the `assert:` ENVELOPE KEY was removed 2026-08-11 · the range stays RESERVED, unemitted, for the day a property returns as an addition | 001-099 |
 | `NIKA-LOCK` | `nika.lock` pin violations ([15-proof](./15-proof.md)) | 001-099 |
 | `NIKA-REG` | Registry client refusals (resolve · digest · advisory · [registry-v0.1](../registry/registry-v0.1.md) · allocated for the reference engine's `registry:` resolver — engine ADR-106) | 001-099 |
+| `NIKA-AUTH` | Authority · the `permits:` boundary contract (absent-block refusal · literal bounds · taint into a permitted argument · dead grants · lift discipline · [10-authority](./10-authority.md)) | 001-099 |
+| `NIKA-DEFAULT` | Declared defaults · a `default:` (or typed `const:`) value that violates its own declared type ([09-types](./09-types.md) · R3b) | 001-099 |
+| `NIKA-DRIFT` | Declared-but-unused drift · advisory check hints, never audit failures (the reverse of the hard used-but-undeclared surface) | 001-099 |
+| `NIKA-VALUES` | Value namespaces · the dead pre-flip `vars:`/`env:` forms + reads outside the three-authority family (`inputs` · `const` · `secrets` · [04 §values](./04-variables.md)) | 001-099 |
 
 This table allocates every namespace in use; the machine registry
 ([`canon/diagnostics/registry.yaml`](../canon/diagnostics/registry.yaml))
-carries the per-code rows. A v0.1-compliant engine MUST use these namespaces for the canonical categories. New error codes MAY be added in minor bumps (additive · never repurposed).
+carries the per-code rows. Two rows run **ahead of `canon.yaml`
+`error_namespaces`** — `NIKA-YAML` (kernel-ahead · CF-05) and `NIKA-REG`
+(engine ADR-106) — declared, never silent: `scripts/canon-projectors.py`
+cross-checks this table against the canon list in both directions on every
+gate run, with exactly those two as the declared skips. A v0.1-compliant engine MUST use these namespaces for the canonical categories. New error codes MAY be added in minor bumps (additive · never repurposed).
 
 ### Concrete v0.1 codes · the normative floor
 
@@ -5673,7 +5681,7 @@ Three reasons ·
 The stdlib has **independent versioning** ·
 
 - `stdlib/providers-v0.1.md`, the <!-- canon:providers -->17<!-- /canon --> canonical providers for v0.1
-- `stdlib/extract-modes-v0.1.md`, the <!-- canon:extract_modes -->9<!-- /canon --> canonical extract modes for v0.1
+- `stdlib/extract-modes-v0.1.md`, the <!-- canon:extract_modes -->10<!-- /canon --> canonical extract modes for v0.1
 - `stdlib/builtins-v0.1.md`, the <!-- canon:builtins -->28<!-- /canon --> canonical builtins for v0.1
 
 When the stdlib evolves to v0.2 · those files become `*-v0.2.md` and new versions are published. The core language contract (v1 · no version typed in the file) is unchanged.
@@ -5703,9 +5711,9 @@ The reference engine provides these elements behind strict quality gates. Other 
 
 Selected via a single `model: <provider>/<name>` field. Any other OpenAI-compatible local/remote server routes through the `openai` + `base_url` escape hatch (no new provider name). See [stdlib/providers-v0.1.md](../stdlib/providers-v0.1.md).
 
-### Extract modes (9)
+### Extract modes (10)
 
-`markdown` · `article` · `jq` · `text` · `selector` · `metadata` · `links` · `feed` · `sitemap`
+`markdown` · `article` · `jq` · `text` · `selector` · `metadata` · `links` · `feed` · `sitemap` · `raw`
 
 See [stdlib/extract-modes-v0.1.md](../stdlib/extract-modes-v0.1.md).
 
@@ -5816,7 +5824,7 @@ See [07-conformance.md](./07-conformance.md). In summary ·
 |---|---|
 | Core | None · only parse + DAG + variable + error · no execution needed |
 | Runtime | Must execute the 4 verbs · provider/tool implementations engine's choice |
-| Stdlib v0.1 | Must ship the <!-- canon:providers -->17<!-- /canon --> providers + <!-- canon:extract_modes -->9<!-- /canon --> extract modes + <!-- canon:builtins -->28<!-- /canon --> builtins |
+| Stdlib v0.1 | Must ship the <!-- canon:providers -->17<!-- /canon --> providers + <!-- canon:extract_modes -->10<!-- /canon --> extract modes + <!-- canon:builtins -->28<!-- /canon --> builtins |
 | Stdlib v0.1+media | RESERVED · enumerated when the media set publishes (stdlib v0.x · the 24 names are not yet normative) |
 
 A v0.1-compliant engine for a workflow author depends on which level they need.
@@ -5861,7 +5869,7 @@ Three nested levels · increasing scope ·
 |---|---|---|
 | **Core** | Parse + validate · DAG semantics · variable resolution · error structure | Linters · spec editors · static analyzers |
 | **Runtime** | Core + verb execution | Working engine (with own provider/tool impls) |
-| **Stdlib v0.1** | Runtime + the <!-- canon:providers -->17<!-- /canon --> providers + <!-- canon:extract_modes -->9<!-- /canon --> extract modes + <!-- canon:builtins -->28<!-- /canon --> builtins | Full reference-impl-equivalent engine |
+| **Stdlib v0.1** | Runtime + the <!-- canon:providers -->17<!-- /canon --> providers + <!-- canon:extract_modes -->10<!-- /canon --> extract modes + <!-- canon:builtins -->28<!-- /canon --> builtins | Full reference-impl-equivalent engine |
 
 A higher level **includes** the lower levels.
 
@@ -6090,7 +6098,7 @@ Runtime-compliant engines may bring **their own** provider implementations · to
 An engine claims « Stdlib v0.1-compliant » if it satisfies Runtime conformance PLUS ·
 
 1. **Ships all <!-- canon:providers -->17<!-- /canon --> canonical providers** (per [stdlib/providers-v0.1.md](../stdlib/providers-v0.1.md))
-2. **Ships all 9 canonical extract modes** (per [stdlib/extract-modes-v0.1.md](../stdlib/extract-modes-v0.1.md))
+2. **Ships all <!-- canon:extract_modes -->10<!-- /canon --> canonical extract modes** (per [stdlib/extract-modes-v0.1.md](../stdlib/extract-modes-v0.1.md))
 3. **Ships at least all <!-- canon:builtins -->28<!-- /canon --> canonical builtins** (core 6 + file 5 + data 9 + network 2 + introspection 2 + media 4 · the remaining deferred media builtins are optional · the byte-determinism clauses of `nika:image_fx` and `nika:chart` are part of the bar — an engine that cannot honor them is not conformant, no waiver)
 4. **Passes** all tests in `conformance/tests/stdlib/`
 
@@ -11418,7 +11426,7 @@ The reference engine implements `provider_options:` as best-effort pass-through.
 
 # Stdlib v0.1 · Extract modes
 
-> The canonical 9 extraction modes used with the `nika:fetch` builtin
+> The canonical <!-- canon:extract_modes -->10<!-- /canon --> extraction modes used with the `nika:fetch` builtin
 > (invoked via `invoke:` per D-2026-05-22-N18 · 4 verbs canonical · fetch
 > is an invoke-able tool, not a verb). Each mode transforms an HTTP
 > response into a useful representation for downstream processing (LLM
@@ -11426,7 +11434,13 @@ The reference engine implements `provider_options:` as best-effort pass-through.
 
 ---
 
-## The 9 canonical modes
+## The canonical modes
+
+This table IS the `mode:` enum — one list, one count (`canon.yaml`
+`extract_modes:` · cross-checked by `scripts/canon-projectors.py`). `raw`
+was long documented here as « an implicit » tenth mode while the canon
+counted 9; the tool's enum carried it all along (#291), so it is counted
+like the rest.
 
 | Mode | Output type | Use case |
 |---|---|---|
@@ -11439,12 +11453,7 @@ The reference engine implements `provider_options:` as best-effort pass-through.
 | `links` | array of strings | All `<a href>` outbound links |
 | `feed` | object (parsed feed) | RSS · Atom · JSON Feed |
 | `sitemap` | array of URLs | sitemap.xml · sitemap index |
-
-Plus an implicit ·
-
-| Mode | Output | Use case |
-|---|---|---|
-| `raw` | string (text · UTF-8) | Raw response body · no extraction · **text only** (a non-UTF-8 body is `NIKA-BUILTIN-FETCH-001` · binary is file-mediated per [04 §value rendering](../spec/04-variables.md)) |
+| `raw` | string (text · UTF-8) | Response body verbatim · no extraction · **text only** (a non-UTF-8 body is `NIKA-BUILTIN-FETCH-001` · binary is file-mediated per [04 §value rendering](../spec/04-variables.md)) |
 
 ---
 
@@ -11679,11 +11688,30 @@ invoke:
 
 ---
 
+### `raw` · the response body verbatim
+
+```yaml
+invoke:
+  tool: "nika:fetch"
+  args:
+    url: "https://example.com/robots.txt"
+    mode: raw
+```
+
+**Behavior** · no extraction — the body exactly as received, decoded as
+UTF-8 text. A non-UTF-8 body is `NIKA-BUILTIN-FETCH-001`; binary stays
+file-mediated per [04 §value rendering](../spec/04-variables.md).
+
+**Use case** · robots.txt · llms.txt · plain-text payloads · seeing what the
+extracting modes would have worked from.
+
+---
+
 ### `llm-txt` · RESERVED (not a v0.1 mode)
 
 A future mode parsing the `llms.txt` convention (LLM-friendly site
 descriptions). **NOT in the v0.1 canonical set**: `mode: llm-txt` is
-rejected today (the canon list of 9 is closed · the conformance oracle
+rejected today (the canon list is closed · the conformance oracle
 enforces it). Until it stabilizes (stdlib v0.2 candidate) · fetch with
 `mode: text` and parse with `nika:jq` / an `infer:` step.
 
@@ -11712,11 +11740,11 @@ Want raw bytes · no processing      raw
 
 New modes MAY enter stdlib v0.x. Mode-specific options (like `selector`, `jq`) are namespaced on the verb · forward-compat additive.
 
-The 9 canonical modes cover ~99% of real-world web fetch use cases. Niche extractions (PDF · Word · Excel · audio · video) belong in the **media builtins** (deferred to stdlib v0.x · invoked via `invoke:` not `fetch:`).
+The canonical modes cover ~99% of real-world web fetch use cases. Niche extractions (PDF · Word · Excel · audio · video) belong in the **media builtins** (deferred to stdlib v0.x · invoked via `invoke:` not `fetch:`).
 
 ---
 
-🦋 *<!-- canon:extract_modes -->9<!-- /canon --> modes · 1 verb · zero invention surface.*
+🦋 *<!-- canon:extract_modes -->10<!-- /canon --> modes · 1 verb · zero invention surface.*
 
 <!-- ═══ registry/registry-v0.1.md ═══ -->
 

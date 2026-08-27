@@ -31,7 +31,7 @@
 #                  prefix is not one of the canonical stdlib v0.1 providers
 #                  (canon.yaml `providers:` · the provider is the prefix)
 #   NIKA-BUILTIN   a literal `nika:fetch` `mode:` outside the canonical extract
-#                  modes (canon.yaml `extract_modes:` + the implicit `raw`) ·
+#                  modes (canon.yaml `extract_modes:` · `raw` counted since #291) ·
 #                  a `jq:` argument without `mode: jq` (builtins-v0.1.md) ·
 #                  the `nika:image_generate` static contracts (v0.1 reserved
 #                  options · closed enums · ranges · size grammar ·
@@ -122,15 +122,16 @@ def load_schema() -> Draft202012Validator:
 def load_canon() -> dict:
     """The stdlib v0.1 surface lists · from canon.yaml (the SSOT · never hardcode).
 
-    `raw` joins the extract-mode set as the documented implicit mode
-    (extract-modes-v0.1.md §«Plus an implicit») · not part of the canonical 9.
+    `raw` is a counted canonical mode since the #291 re-derivation — the
+    canon list and the tool's enum are one set, cross-checked by
+    scripts/canon-projectors.py.
     """
     c = yaml.safe_load(CANON_PATH.read_text())
     prov = c["providers"]["items"]
     return {
         "providers": set(prov["cloud"]) | set(prov["local"]) | set(prov["test"]),
         "builtins": set(c["builtins"]["items"]),
-        "extract_modes": set(c["extract_modes"]["items"]) | {"raw"},
+        "extract_modes": set(c["extract_modes"]["items"]),
     }
 
 
