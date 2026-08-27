@@ -100,8 +100,10 @@ nika new --from "watch a price and ping me" p.nika.yaml   # routes to the closes
      declared `required: true` input is supplied at launch ·
      `nika run <file> --var name=value` (repeatable); a `required: false`
      entry with a `default:` is the deployment's, never the caller's.
-   - `NIKA-SEC-004` → the boundary refused an effect at RUN. Grant the
-     exact thing it names — never widen to `**` to make a message go away.
+   - `NIKA-SEC-004` → the boundary refused an effect — at CHECK when the
+     miss is static (the report prints the exact fix · zero turns paid),
+     at RUN when the value is computed. Grant the exact thing it names —
+     never widen to `**` to make a message go away.
    - `NIKA-PROVIDER` → `model:` must be `<provider>/<name>` with a
      canonical prefix (`canon.yaml` providers).
 
