@@ -75,9 +75,9 @@ The reference engine provides these elements behind strict quality gates. Other 
 
 Selected via a single `model: <provider>/<name>` field. Any other OpenAI-compatible local/remote server routes through the `openai` + `base_url` escape hatch (no new provider name). See [stdlib/providers-v0.1.md](../stdlib/providers-v0.1.md).
 
-### Extract modes (9)
+### Extract modes (10)
 
-`markdown` · `article` · `jq` · `text` · `selector` · `metadata` · `links` · `feed` · `sitemap`
+`markdown` · `article` · `jq` · `text` · `selector` · `metadata` · `links` · `feed` · `sitemap` · `raw`
 
 See [stdlib/extract-modes-v0.1.md](../stdlib/extract-modes-v0.1.md).
 

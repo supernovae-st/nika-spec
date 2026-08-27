@@ -136,23 +136,144 @@ def self_check(canon: dict) -> None:
     # count == len(items) held on both sides, so the intra-canon check
     # passed on a canon that contradicted its own reference). The stdlib
     # mode table is parsed and compared SET-equal to the canon items.
+    # Fail-closed (adversarial-review hardening): a missing doc or a table
+    # yielding zero rows is rc=2, never a silent pass — a gate that skips
+    # on absence reads green forever.
     modes_doc = SPEC_ROOT / "stdlib" / "extract-modes-v0.1.md"
-    if modes_doc.is_file():
-        doc_modes = set()
-        for line in modes_doc.read_text(encoding="utf-8").splitlines():
-            m = re.match(r"\|\s*`([a-z_]+)`\s*\|", line)
-            if m:
-                doc_modes.add(m.group(1))
-        canon_modes = set(canon["extract_modes"]["items"])
-        if doc_modes and doc_modes != canon_modes:
-            print(
-                f"canon-projectors · canon↔reference drift · extract_modes "
-                f"doc-only: {sorted(doc_modes - canon_modes)} · "
-                f"canon-only: {sorted(canon_modes - doc_modes)} · "
-                f"one list must move (canon.yaml is the SSOT)",
-                file=sys.stderr,
-            )
-            sys.exit(2)
+    if not modes_doc.is_file():
+        print(
+            f"canon-projectors · {modes_doc.name} missing · the "
+            "canon↔reference cross-check refuses blind",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+    doc_modes = set()
+    for line in modes_doc.read_text(encoding="utf-8").splitlines():
+        m = re.match(r"\|\s*`([a-z_]+)`\s*\|", line)
+        if m:
+            doc_modes.add(m.group(1))
+    if not doc_modes:
+        print(
+            f"canon-projectors · {modes_doc.name} mode table has no rows · "
+            "refusing blind",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+    canon_modes = set(canon["extract_modes"]["items"])
+    if doc_modes != canon_modes:
+        print(
+            f"canon-projectors · canon↔reference drift · extract_modes "
+            f"doc-only: {sorted(doc_modes - canon_modes)} · "
+            f"canon-only: {sorted(canon_modes - doc_modes)} · "
+            f"one list must move (canon.yaml is the SSOT)",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+
+    # The same law, generalized to the class: the 05-errors « Error code
+    # namespaces » allocation table vs canon error_namespaces — both
+    # directions, fail-closed on a missing heading or an empty table. Two
+    # rows are DECLARED ahead of canon (the CF-05 pattern · named, cited,
+    # never silent) and a stale declaration is itself a red. The row regex
+    # normalizes `NIKA-BUILTIN-<B>` to NIKA-BUILTIN.
+    ns_ahead = {
+        "NIKA-YAML": "kernel-ahead · live registry rows · canon/EXCEPTIONS.md CF-05",
+        "NIKA-REG": "engine-ahead · reference-engine ADR-106 allocation",
+    }
+    ns_doc = SPEC_ROOT / "spec" / "05-errors.md"
+    ns_heading = "## Error code namespaces"
+    try:
+        ns_text = ns_doc.read_text(encoding="utf-8")
+    except OSError as e:
+        print(f"canon-projectors · {ns_doc} unreadable · {e}", file=sys.stderr)
+        sys.exit(2)
+    _, sep, tail = ns_text.partition(ns_heading)
+    if not sep:
+        print(
+            f"canon-projectors · {ns_doc.name} lost its {ns_heading!r} table · "
+            "the cross-check refuses blind",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+    ns_section = tail.split("\n### ", 1)[0].split("\n## ", 1)[0]
+    table_ns = set(re.findall(r"^\| `(NIKA-[A-Z]+)", ns_section, re.MULTILINE))
+    if not table_ns:
+        print(
+            f"canon-projectors · {ns_doc.name} namespace table has no rows · "
+            "refusing blind",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+    canon_ns = set(canon["error_namespaces"]["items"])
+    missing_rows = sorted(canon_ns - table_ns)
+    if missing_rows:
+        print(
+            f"canon-projectors · error_namespaces ≠ the {ns_doc.name} "
+            f"allocation table · canon-only (no table row): {missing_rows}",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+    undeclared = sorted(table_ns - canon_ns - set(ns_ahead))
+    if undeclared:
+        print(
+            f"canon-projectors · error_namespaces ≠ the {ns_doc.name} "
+            f"allocation table · table-only, undeclared: {undeclared} · "
+            "declare it (the CF-05 pattern) or count it in canon",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+    stale = sorted(set(ns_ahead) - (table_ns - canon_ns))
+    if stale:
+        print(
+            f"canon-projectors · declared table-ahead rows no longer ahead: "
+            f"{stale} · retire the declaration (a stale exception is drift)",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+
+    # The prose-count law (the « 15 error namespaces » fossil class): a
+    # literal count inside any canon prose VALUE naming a counted category
+    # must equal counts:. Digits only, by decision — « fifteen » in words
+    # would pass; word numbers widen the subset-reading false-positive
+    # class (« the four media builtins » counts a subset, not the
+    # category), declined until a word-number fossil is observed.
+    prose_re = re.compile(
+        r"\b(\d+)\s+(error namespaces?|error codes?|error categor(?:y|ies)|"
+        r"extract modes?|builtins?|providers?|templates?|pillars?)\b"
+    )
+    noun_keys = {
+        "error namespace": "error_namespaces",
+        "error code": "error_codes",
+        "error category": "error_categories",
+        "error categorie": "error_categories",
+        "extract mode": "extract_modes",
+        "builtin": "builtins",
+        "provider": "providers",
+        "template": "templates",
+        "pillar": "pillars",
+    }
+
+    def walk(node, path: str) -> None:
+        if isinstance(node, dict):
+            for k, v in node.items():
+                walk(v, f"{path}.{k}")
+        elif isinstance(node, list):
+            for i, v in enumerate(node):
+                walk(v, f"{path}[{i}]")
+        elif isinstance(node, str):
+            for pm in prose_re.finditer(node):
+                key = noun_keys[pm.group(2).rstrip("s")]
+                if counts.get(key) != int(pm.group(1)):
+                    print(
+                        f"canon-projectors · fossil count in prose · {path} "
+                        f"says « {pm.group(0)} » but counts.{key} is "
+                        f"{counts.get(key)} · cite the count key, never "
+                        "retype the number",
+                        file=sys.stderr,
+                    )
+                    sys.exit(2)
+
+    walk(canon, "canon")
 
 
 MARKER_RE = re.compile(r"(<!-- canon:([a-z_]+) -->)([^<]*)(<!-- /canon -->)")
