@@ -342,9 +342,12 @@ entries:
       It also closes the night gauntlet across sandbox teaching, pause input,
       explain verdicts and check repair. Built from engine commit
       `c4cdbeafb58fe3705beb1d1000a14a8d18efc973` with tree
-      `bce448527af33f2214107fbfacbd9bfd5e079554`; it supersedes the immutable
-      but unpublished `v0.116.1` tag, whose estate gate stopped every builder
-      before any release or asset existed.
+      `bce448527af33f2214107fbfacbd9bfd5e079554`; it supersedes the burned,
+      unpublished `v0.116.1` tag. Before tag protection, that tag moved from
+      candidate `5c6f48d649aa29c61cdf6b6fa1ffc822029eed8b` (release run
+      `33407821641`) to `d1756f3b7541aa599147b5403e991d24e4901ad9`
+      (release run `33407876642`); the estate gate stopped every builder for
+      both candidates before any release or asset existed.
     component: engine
     evidence: { class: github-release, repo: supernovae-st/nika, tag: v0.116.2 }
 
