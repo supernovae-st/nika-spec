@@ -27,7 +27,7 @@
 # silently rewrites.
 
 schema_version: 1
-last_updated: "2026-08-26"
+last_updated: "2026-08-31"
 verifier: timeline/verify.py
 
 evidence_classes:
@@ -313,6 +313,21 @@ entries:
       replayed on the published artifacts, not just produced.
     component: engine
     evidence: { class: github-release, repo: supernovae-st/nika, tag: v0.115.0 }
+
+  - id: release-0-116-0
+    date: "2026-08-31"
+    type: release
+    version: "0.116.0"
+    title: "0.116 · One SDK ships the resident HTTP authority"
+    detail: >-
+      The One SDK gains its durable resident HTTP authority: `nika serve`
+      persists job identity, immutable snapshots, receipts and ordered events,
+      with idempotent cancellation and replay, schedule CAS, typed trace
+      verification and the owning OpenAPI contract. Built from engine commit
+      `2574d23c6fc15a83aa3afb8a775859f981459f2e`; four native archives and the
+      WASM checker ship with SHA256SUMS, GitHub attestations and SLSA provenance.
+    component: engine
+    evidence: { class: github-release, repo: supernovae-st/nika, tag: v0.116.0 }
 
 gates:
   # The future · conditions, never dates. A gate flips when its
