@@ -329,6 +329,25 @@ entries:
     component: engine
     evidence: { class: github-release, repo: supernovae-st/nika, tag: v0.116.0 }
 
+  - id: release-0-116-2
+    date: "2026-08-31"
+    type: release
+    version: "0.116.2"
+    title: "0.116.2 · the One SDK train closes its gauntlet"
+    detail: >-
+      The patch train stabilizes relative permit identity under concurrent
+      ancestry changes, drains resident schedules before store shutdown,
+      returns typed 413 responses for oversized HTTP uploads, and removes
+      secret-bearing workflow material from panic and assertion diagnostics.
+      It also closes the night gauntlet across sandbox teaching, pause input,
+      explain verdicts and check repair. Built from engine commit
+      `c4cdbeafb58fe3705beb1d1000a14a8d18efc973` with tree
+      `bce448527af33f2214107fbfacbd9bfd5e079554`; it supersedes the immutable
+      but unpublished `v0.116.1` tag, whose estate gate stopped every builder
+      before any release or asset existed.
+    component: engine
+    evidence: { class: github-release, repo: supernovae-st/nika, tag: v0.116.2 }
+
 gates:
   # The future · conditions, never dates. A gate flips when its
   # conditions hold — the timeline gains a dated entry at that moment.
