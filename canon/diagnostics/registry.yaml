@@ -2082,6 +2082,37 @@ diagnostics:
       ruling: 194 exec: tasks across the shipped corpus, 1 refused, and that one
       is already a declared check-reject. law_ids empty until the freeze batch
       names the canon law · the engine emission is owed.'
+  - id: NIKA-SEC-016
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: SEC
+    plane: check
+    condition: 'the effect-safe retry law — a declared retry: (max_attempts > 1)
+      on a nika:fetch whose method replays side effects (POST · PUT · DELETE ·
+      PATCH) with no idempotency-key header: the failure may be ambiguous (the
+      server may have committed before the socket dropped or the error was
+      emitted), so the engine types the keyless call''s failures non-transient
+      and the declared retry is refused statically (an on_codes: retry would
+      blind-replay regardless of transient) · pair an idempotency-key header
+      (the receiver dedups the replay) or drop the retry: — GET/HEAD retry free
+      (issue #1371)'
+    outcome_class: failure
+    cause: security_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
+    span_required: true
+    teaching: 'pair an idempotency-key header (the receiver dedups the replay)
+      or drop the retry: — GET/HEAD retry is free (read-only methods replay
+      nothing; no key required) · pairing the key discharges the law.'
+    notes: 'gauntlet-born (2026-09-01 · engine issue #1371 · spec PR #298) ·
+      category: security_error · transient: false (registry-born · the
+      classification was inverted for effect safety: a post-commit socket drop
+      never retried while a post-commit 500 triple-charged — durable wire+effect
+      ledgers) · engine emission lands with supernovae-st/nika#1380 (check lane
+      + runtime predicate nika_types::net::retry_is_effect_safe).'
   - id: NIKA-TIMEOUT-001
     status: reserved
     owner: spec
