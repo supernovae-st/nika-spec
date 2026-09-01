@@ -2083,7 +2083,7 @@ diagnostics:
       is already a declared check-reject. law_ids empty until the freeze batch
       names the canon law · the engine emission is owed.'
   - id: NIKA-SEC-016
-    status: active
+    status: reserved
     owner: spec
     law_ids: []
     introduced_in: C2
