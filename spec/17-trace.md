@@ -205,7 +205,9 @@ the only party guaranteed to exist at reading time — carries the name.
 `incomplete` is **never** success and **never** silently equal to
 failure or to forgery: the chain still binds, so the journal is
 honestly what it is — a run whose end is unknown. Before it had a
-name, « no verdict » was routinely read as « fine ».
+name, « no verdict » was routinely read as « fine ». The verifier's
+exit says it too: `incomplete` exits on its own class (5), never on
+the ladder a finished walk climbs (0) and never as forgery (2).
 
 **3 · Judged ≠ booted is a refusal.** A check report stamped with the
 semantic hash of the workflow it judged must match the workflow the run

@@ -48,7 +48,8 @@ walks » ·
   killed or crashed between writes. Its own class on purpose — never
   success, never silently failure, never forgery. A dying process cannot
   attest its own death, so the classification is the READER's, and the
-  verify exit stays the tier ladder's.
+  verify exit is `incomplete`'s own class (5 · engine ADR-129 · 0.118):
+  never 0 (a walk that reached an end), never 2 (forged).
 - `forged` — the chain breaks (any byte edit, insertion, deletion,
   reorder).
 
@@ -61,8 +62,8 @@ look tampered with.
 verdict: a decode bound fired **before** the walk ran (15 §the verifier
 is a fortress · the 1 MiB line bound · the 256 MiB file bound), so the
 journal has no verdict at all. Refusal is total — never a truncate and
-continue — and it exits nonzero, where every walk verdict exits on the
-tier ladder.
+continue — and it exits nonzero, where every walk verdict that reached
+an end exits on the tier ladder and `incomplete` exits on its own class.
 
 A bound fixture costs its bound: `005` carries a 1 MiB line because
 that is the only way to cross a 1 MiB bound. One repeated byte packs to
