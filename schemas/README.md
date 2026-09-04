@@ -37,7 +37,7 @@ self-contained for editor use).
 ```
 schemas/
 ├── workflow.schema.json         ✅ the 9 envelope keys + tasks + 4 verbs ($defs) · 7 examples ⊨ · negative-control verified
-├── project.schema.json          ✅ the project file (`nika.yaml` · `ceiling` · `traces` · `arm:` beats) · EMITTED by the engine (`nika spec --schema --project` · 0.117.2+) · never hand-typed
+├── project.schema.json          ✅ the project file (`nika.yaml` · `ceiling` · `traces` · `arm:` beats) · EMITTED by the engine (`nika spec --schema --project` · 0.118+) · never hand-typed
 ├── verb-infer.schema.json       # infer: action shape
 ├── verb-exec.schema.json        # exec: action shape
 ├── verb-invoke.schema.json      # invoke: action shape
