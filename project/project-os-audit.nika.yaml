@@ -16,6 +16,8 @@ nika: project-os-audit
 
 permits:
   exec: ["python3"]
+  fs:
+    read: ["project/**", "timeline/**"]
 
 tasks:
   contract:
@@ -23,21 +25,21 @@ tasks:
     exec:
       command: ["python3", "project/verify.py", "--offline"]
       cwd: "."
-      capture: structured
+      capture: combined
 
   timeline:
     timeout: "1m"
     exec:
       command: ["python3", "timeline/verify.py", "--offline"]
       cwd: "."
-      capture: structured
+      capture: combined
 
   unit:
     timeout: "1m"
     exec:
       command: ["python3", "-m", "unittest", "discover", "-s", "project", "-t", ".", "-p", "test_*.py"]
       cwd: "."
-      capture: structured
+      capture: combined
 
 outputs:
   contract: ${{ tasks.contract.output }}
