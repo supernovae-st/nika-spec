@@ -13,7 +13,25 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **`schemas/project.schema.json`** · the project file's JSON Schema, mirrored
+  beside the workflow's · emitted by the reference engine
+  (`nika spec --schema --project`), never hand-typed (one-door wave 6.c).
+- **A `for_each` terminal names every item** (17 §the kind vocabulary · 03
+  §`for_each.fail_fast`) · the fan-out's terminal frame carries `items` ·
+  one row per item in input order with `index` · `item` · `status` (`ok` ·
+  `recovered` · `failed` · `never_started`) · `code` · `message` (reference
+  engine 0.118 · nika#1276 · nika#1397).
+- **The workflow terminal carries the run's summary** (17 §the kind
+  vocabulary) · `status` · `elapsed_ms` · the `tasks_*` tally beside the
+  cost fields (reference engine 0.118 · nika#1247).
+
 ### Changed
+
+- **`on_error:` precedes `fail_fast`** (03 §`for_each.fail_fast`) · a
+  task-level `recover` settles every failed item as recovered before the
+  batch's stop policy sees it · the two knobs answer different questions.
 
 - **`error_codes.count` names its scope.** The projected `count` plus two
   `NIKA-BUILTIN-*` rows read as the whole builtin-code family (nika#1040).
