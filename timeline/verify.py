@@ -18,10 +18,14 @@
 # a provable claim failed to resolve · exit 2 = harness error.
 
 import json
+from datetime import datetime
+import os
 import pathlib
 import re
 import subprocess
 import sys
+import urllib.error
+import urllib.parse
 import urllib.request
 
 try:
@@ -39,16 +43,39 @@ RECORDED = {"scorecard"}
 STABLE_ID = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
 
+def github_api_origin(url: str) -> bool:
+    parsed = urllib.parse.urlsplit(url)
+    return parsed.scheme == "https" and parsed.netloc == "api.github.com"
+
+
+class ApiRedirectHandler(urllib.request.HTTPRedirectHandler):
+    """An optional GitHub read token never follows a redirect off its origin."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        if req.has_header("Authorization") and not github_api_origin(newurl):
+            if fp is not None:
+                fp.close()
+            raise urllib.error.URLError("refused authenticated cross-origin redirect")
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+def open_url(url: str):
+    headers = dict(UA)
+    token = os.environ.get("GH_TOKEN")
+    if token and github_api_origin(url):
+        headers["Authorization"] = f"Bearer {token}"
+    req = urllib.request.Request(url, headers=headers)
+    return urllib.request.build_opener(ApiRedirectHandler()).open(req, timeout=30)
+
+
 def fetch_json(url: str):
-    req = urllib.request.Request(url, headers=UA)
-    with urllib.request.urlopen(req, timeout=30) as r:
+    with open_url(url) as r:
         return json.load(r)
 
 
 def http_ok(url: str) -> bool:
-    req = urllib.request.Request(url, headers=UA, method="GET")
     try:
-        with urllib.request.urlopen(req, timeout=30) as r:
+        with open_url(url) as r:
             return 200 <= r.status < 300
     except Exception:
         return False
@@ -94,8 +121,24 @@ def check(entry: dict, offline: bool) -> tuple[str, str]:
         repo, tag = ev.get("repo"), ev.get("tag")
         if not (repo and tag):
             return "BAD-SHAPE", "github-release needs repo+tag"
-        ok = http_ok(f"https://api.github.com/repos/{repo}/releases/tags/{tag}")
-        return ("PROVED", f"{repo}@{tag}") if ok else ("FAILED", f"release {tag} not on {repo}")
+        try:
+            release = fetch_json(f"https://api.github.com/repos/{repo}/releases/tags/{tag}")
+        except Exception as e:
+            return "FAILED", f"release {tag} unreachable on {repo}: {e}"
+        if not isinstance(release, dict) or release.get("tag_name") != tag:
+            return "FAILED", f"release response does not identify {repo}@{tag}"
+        if release.get("draft") is not False:
+            return "FAILED", f"release {tag} is not explicitly published"
+        published = release.get("published_at")
+        if not isinstance(published, str):
+            return "FAILED", f"release {tag} has no publication timestamp"
+        try:
+            datetime.strptime(published, "%Y-%m-%dT%H:%M:%SZ")
+        except ValueError:
+            return "FAILED", f"release {tag} has an invalid publication timestamp"
+        # Publication state only: the engine's release barrier owns checksums,
+        # exact asset census and attestations. Do not duplicate that authority.
+        return "PROVED", f"{repo}@{tag} · published {published} (state only)"
     if cls == "github-commit":
         repo, sha = ev.get("repo"), ev.get("sha")
         if not repo:
