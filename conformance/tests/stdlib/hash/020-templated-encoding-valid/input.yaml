@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: hash-020-templated-encoding-valid
+inputs:
+  encoding:
+    type: string
+    default: "hex"
+permits:
+  tools: ["nika:hash"]
+tasks:
+  digest:
+    invoke:
+      tool: nika:hash
+      args: {"content": "abc", "encoding": "${{ inputs.encoding }}"}
