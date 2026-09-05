@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: hash-022-templated-algo-with-invalid-encoding-refused
+inputs:
+  algo:
+    type: string
+    default: "sha256"
+permits:
+  tools: ["nika:hash"]
+tasks:
+  digest:
+    invoke:
+      tool: nika:hash
+      args: {"content": "abc", "algo": "${{ inputs.algo }}", "encoding": "rot13"}

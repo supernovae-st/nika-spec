@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: hash-014-algo-non-string-refused
+permits:
+  tools: ["nika:hash"]
+tasks:
+  digest:
+    invoke:
+      tool: nika:hash
+      args: {"content": "abc", "algo": 42}

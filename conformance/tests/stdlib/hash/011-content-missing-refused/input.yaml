@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: hash-011-content-missing-refused
+permits:
+  tools: ["nika:hash"]
+tasks:
+  digest:
+    invoke:
+      tool: nika:hash
+      args: {"algo": "sha256"}

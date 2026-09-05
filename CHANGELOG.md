@@ -29,6 +29,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- **Digest argument validation** (`nika:hash`) · `content` is required and
+  non-null; `algo` and `encoding` default only when absent and otherwise
+  require strings in their closed sets. Static invalid literals refuse even
+  beside a deferred template. Paired conformance fixtures cover the precision.
+
 - **`on_error:` precedes `fail_fast`** (03 §`for_each.fail_fast`) · a
   task-level `recover` settles every failed item as recovered before the
   batch's stop policy sees it · the two knobs answer different questions.

@@ -264,6 +264,13 @@ def _hash_op_errors(where: str, args: dict) -> list[dict]:
     for req in _HASH_REQUIRED[op]:
         if req not in args:
             err(f"op: {op} requires `{req}:` (builtins-v0.1.md §nika:hash)")
+    if op == "hash":
+        if "content" in args and args["content"] is None:
+            err("op: hash requires non-null `content:` (builtins-v0.1.md §nika:hash)")
+        for name in ("algo", "encoding"):
+            if name in args and not isinstance(args[name], str):
+                err(f"`{name}:` must be a string when present "
+                    "(builtins-v0.1.md §nika:hash)")
     for key, ops in _HASH_OP_ONLY.items():
         if key in args and op not in ops:
             err(f"`{key}:` belongs to op: {' · '.join(ops)} — not op: {op}")
