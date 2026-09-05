@@ -139,18 +139,20 @@ never executes the draft.
 new builtin → freeze the extract schema type → pin the glob
 (`exclude: "**/README.md"`) → then wire a paid model.
 
-**After valid, is there a better one-way?** A green check is legal,
-not best. Recurse on the file as an environment (Zhang/Kraska/Khattab
-2026 · arXiv:2512.24601): do not swallow it — inspect two examples,
-decompose (`for_each` / `invoke: { workflow: }`), verify with
-`nika:jq` not a second infer. Loop until `nika check --json` reports
-`paid_ready: true` (the paid-run family is empty; `.next` is the first
-repair and `.compiled` is the law-is-proven bit) AND
-`--native-strict` is clean, or every remaining *non-paid* hint has an
-in-file reason (CONVENTIONS §10). The engine hints `infer-as-law` when
-a prompt asks the model to assign a belt. A second infer whose schema
-is a language enum is language, not the law. The MCP `nika_check`
-oracle fails `infer-as-law` and `digit-string-enum` by default.
+**After valid, review the shape and judgment.** Inspect relevant examples
+when a construct is unfamiliar. Use `for_each` for collections and
+`invoke: { workflow: }` for child workflows; verify deterministic rules
+with known-answer fixtures and `nika:jq`, not a second infer.
+For an execution-ready handoff, require a clean `nika check --native-strict`
+and preserve the intended authority. Before paid inference, also require
+`paid_ready: true` and inspect the paid blockers. Use `.next` to locate a
+repair, then inspect the remaining findings and `.compiled`; these fields
+do not grant execution permission or establish that effects occurred.
+Explain any remaining non-blocking hint in the file (CONVENTIONS §10).
+The engine hints `infer-as-law` when a prompt asks the model to assign a
+belt. A second infer whose schema is a language enum is language, not the
+law. The MCP `nika_check` oracle fails `infer-as-law` and
+`digit-string-enum` by default.
 
 The judgment layer (after validity) is the 12 patterns ·
 docs `guides/patterns` — deterministic core · parallel by default ·
