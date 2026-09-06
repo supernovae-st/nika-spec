@@ -377,9 +377,18 @@ fragment-stripped dedup · per-page output is the fixed page digest
 `{url, status, title, description, headings ≤16, links ≤30, images ≤24,
 colors ≤20, text ≤4000}` · crawl output is `{url, page_count, pages[],
 assets: {images ≤40, colors ≤30}}` · `robots.txt` honored by default
-(RFC 9309 group semantics · `User-agent: *` `Disallow` prefixes · a
-missing/unreadable robots.txt is allow-all · a disallowed ROOT is a loud
-failure · disallowed descendants are silently skipped) · every hop rides
+(RFC 9309 group semantics · `User-agent: *` `Disallow` prefixes · the
+probe's outcome follows RFC 9309 §2.3.1: a 4xx is *unavailable* and
+allow-all · a 5xx or a transport failure is *unreachable* and a COMPLETE
+DISALLOW, refused loudly and transiently before a page is spent · rules
+are per origin, so a root that lands on another origin re-reads that
+origin's robots before any descendant is enqueued · a disallowed ROOT is
+a loud failure · disallowed descendants are silently skipped) · the page
+digest passes the same depth admission every HTML mode passes (a
+depth-bomb root is a loud failure · a depth-bomb descendant is an honest
+`{url, status, error}` entry) · discovery reads every link a page
+carries (the `links ≤30` facet is a preview, never the frontier's bound)
+· every hop rides
 the engine's SSRF defense · a failing descendant page becomes an honest
 `{url, status|error}` entry and the crawl continues · the effect
 certificate counts `max_pages` page requests (+1 robots probe unless
