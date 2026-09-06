@@ -8,6 +8,18 @@
 # add another turn, and every infer has its own token ceiling.
 #
 # Needs · nothing. Runs offline in an empty directory with mock/echo.
+#
+# CEILINGS · every infer is capped, and a cap is sized for the SEAT, not for
+#   the answer: a reasoning seat thinks inside `max_tokens`, so a cap that fits
+#   the visible answer alone starves it (the thinking trace eats the cap and
+#   the answer is blank · NIKA-INFER-004 at run). The capacity gate names the
+#   floor BEFORE any spend, but only for the seat it is asked about — this
+#   file's envelope seat is `mock/echo`, which checks clean with ANY cap.
+#   Measured on 0.118.7 across five real seats: `max_tokens: 200` on the three
+#   critique steps was refused at check for the three reasoning seats («too
+#   small for reasoning seat … at least 256»). Pin the seat when you check:
+#     nika check <file> --model <provider/model>
+#
 # Run · nika run <file> --model mock/echo
 nika: evaluate-and-optimize       # SLOT: kebab-case workflow id
 
@@ -26,7 +38,7 @@ permits: {}
 tasks:
   draft:
     infer:
-      max_tokens: 300
+      max_tokens: 300               # SLOT: the draft ceiling · sized for the SEAT (see CEILINGS)
       prompt: "Draft this deliverable: ${{ const.brief }}"
       schema:
         type: object
@@ -39,7 +51,7 @@ tasks:
     with:
       candidate: ${{ tasks.draft.output.text }}
     infer:
-      max_tokens: 200
+      max_tokens: 400               # SLOT: the critique ceiling · a reasoning seat's floor is 256 here (measured)
       prompt: |
         Critique this candidate against the brief. Name one concrete repair.
         Brief: ${{ const.brief }}
@@ -57,7 +69,7 @@ tasks:
       candidate: ${{ tasks.draft.output.text }}
       repair: ${{ tasks.evaluate_1.output.repair }}
     infer:
-      max_tokens: 300
+      max_tokens: 300               # SLOT: the revision ceiling · sized for the SEAT
       prompt: |
         Revise the candidate using the repair, without changing the brief.
         Candidate: ${{ with.candidate }}
@@ -73,7 +85,7 @@ tasks:
     with:
       candidate: ${{ tasks.optimize_1.output.text }}
     infer:
-      max_tokens: 200
+      max_tokens: 400               # SLOT: idem · the same floor applies
       prompt: |
         Critique this revision against the same brief. Name one final repair.
         Brief: ${{ const.brief }}
@@ -91,7 +103,7 @@ tasks:
       candidate: ${{ tasks.optimize_1.output.text }}
       repair: ${{ tasks.evaluate_2.output.repair }}
     infer:
-      max_tokens: 300
+      max_tokens: 300               # SLOT: the final revision ceiling · sized for the SEAT
       prompt: |
         Produce the final revision using the last repair.
         Candidate: ${{ with.candidate }}
@@ -107,7 +119,7 @@ tasks:
     with:
       candidate: ${{ tasks.optimize_2.output.text }}
     infer:
-      max_tokens: 200
+      max_tokens: 400               # SLOT: the score-only ceiling · the same floor applies
       prompt: |
         Score the final candidate against the brief. Evaluate the candidate
         exactly as written without proposing another revision.

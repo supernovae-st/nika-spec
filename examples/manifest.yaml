@@ -60,7 +60,7 @@ templates:
   - file: templates/etl-state.nika.yaml
     sha256_16: d7f6795d4124c091
   - file: templates/evaluate-and-optimize.nika.yaml
-    sha256_16: 08269eeb6d5174f1
+    sha256_16: fff18b32fdc7a56b
   - file: templates/fanout.nika.yaml
     sha256_16: fbc7bb02f0aacc81
   - file: templates/gate-and-act.nika.yaml
