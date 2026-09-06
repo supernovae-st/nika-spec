@@ -34,7 +34,11 @@ nika: fanout-template       # SLOT: kebab-case workflow id
 # a THINKING model: the ceilings below leave room for the think block, which
 # counts against `max_tokens` too.
 # `--model mock/echo` needs no seat and is the path this file guarantees.
-model: mock/echo   # `nika new` replaces this with the machine's ready model seat
+# `nika new` STAMPS this line: it rewrites `model:` with a seat this binary
+# can resolve, and whatever rides on the line is dropped — so the teaching
+# lives here, above it. Measured on 0.118.7: with no resolvable seat the
+# stamp leaves `mock/echo`, the offline path this file guarantees.
+model: mock/echo
 
 run:
   # A `timeout:` is a deadline, and a deadline needs a clock. Declaring it says

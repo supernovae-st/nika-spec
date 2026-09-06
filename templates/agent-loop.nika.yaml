@@ -30,7 +30,11 @@ nika: agent-loop-template       # SLOT: kebab-case workflow id
 # ceiling below. A reasoning seat (`ollama/qwen3.5:4b`) spends its whole
 # budget thinking and never emits JSON here — the guaranteed offline path is
 # `--model mock/echo`, which needs no seat at all.
-model: mock/echo   # `nika new` replaces this with the machine's ready model seat
+# `nika new` STAMPS this line: it rewrites `model:` with a seat this binary
+# can resolve, and whatever rides on the line is dropped — so the teaching
+# lives here, above it. Measured on 0.118.7: with no resolvable seat the
+# stamp leaves `mock/echo`, the offline path this file guarantees.
+model: mock/echo
 
 inputs:
   goal:
