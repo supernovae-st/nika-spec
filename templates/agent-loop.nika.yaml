@@ -113,6 +113,10 @@ tasks:
         # Closed on purpose (`check` hints `strictness` on an open object):
         # on 0.118.7 an extra key through `nika:done` is a verdict (above),
         # so every field the answer may carry is named HERE, not in the prompt.
+        # Measured on a real seat with the goal bound in: it computed the
+        # answer and died on one key it added beside `findings`. On 0.118.7
+        # the trade is yours — open the object (one `strictness` hint) or
+        # name the key here; the fix is the engine's repair, not the prompt.
         type: object
         additionalProperties: false
         required: [findings]

@@ -44,7 +44,7 @@ foundation:
     sha256_16: 37d15028add0d76f
 templates:
   - file: templates/agent-loop.nika.yaml
-    sha256_16: ee6f45568067a668
+    sha256_16: 22467577f2da92ac
   - file: templates/api-upload-and-create.nika.yaml
     sha256_16: 8eabba636cbba999
   - file: templates/chain.nika.yaml
