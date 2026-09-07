@@ -36,12 +36,15 @@ How each one holds that promise:
   shells out, a literal recovery value stands in until you wire the real
   thing. Every one of those blocks says, in place, to delete it once the
   source is real — a rehearsal value left in production hides failures.
-- **the two gated skeletons hold a real human decision.** `etl-state`
-  blocks (no `default:`): headless it PAUSES (exit 4 · durable, not an
-  error) and prints its own resume command. `human-gated-ship` fails
-  CLOSED instead — its `default: false` answers NO for an unattended run
-  (measured: rc=0, the act settles skipped) · delete that line and it
-  pauses like etl-state.
+- **the two gated skeletons hold a real human decision.** Both block (no
+  `default:`): headless they PAUSE (exit 4 · durable, not an error) and
+  print their own resume command. Fail-closed belongs to the INVOCATION,
+  never to the file — `nika run <file> --answer human=false` answers NO
+  unattended (measured: rc=0, the act settles skipped). A `default: false`
+  in the file looks the same and is not: a defaulted gate is not blocking,
+  so beside real gates (a private read) the lethal trifecta is complete and
+  the file is refused `NIKA-SEC-009` at check (measured on 0.118.7 ·
+  `human-gated-ship.negative.yaml` pins that refusal).
 
 ## Intent → template routing (deterministic)
 
@@ -56,7 +59,7 @@ The machine source for both fields is `canon/templates/registry.yaml`.
 | « do this for EVERY item » | [`fanout`](fanout.nika.yaml) | `fanout` | `batch` | runtime collection · the full leash (`for_each.max_parallel` · `for_each.fail_fast` · retry) |
 | « only what changed since last run » / « survive bad input » | [`etl-state`](etl-state.nika.yaml) | `state-resume` | `etl` | state read→parse→diff→write · `on_error: on_codes:` quarantine |
 | « research / review / open-ended » | [`agent-loop`](agent-loop.nika.yaml) | `agent-loop` | `research` · `review` | plan-then-execute · default-deny tools · budgets · engine-owned typed result |
-| « anything irreversible (deploy · send · publish) » | [`human-gated-ship`](human-gated-ship.nika.yaml) | `human-gate` | `release` | parallel gates · assert · `nika:prompt` GO · `after: {…: terminal}` record |
+| « anything irreversible (deploy · send · publish) » | [`human-gated-ship`](human-gated-ship.nika.yaml) | `human-gate` | `release` | parallel gates (`nika:grep` evidence · `exec:` command) · assert · a BLOCKING `nika:prompt` · `after: {…: terminal}` record |
 | « understand a site (domain · theme · assets) from a URL » | [`website-brief`](website-brief.nika.yaml) | `linear` | `website` | fetch `traverse:` crawl · one typed infer · explicit persist · zero exec |
 | « generate image/audio assets from a brief » | [`media-asset-pack`](media-asset-pack.nika.yaml) | `linear` | `media` | `nika:image_generate` · `nika:jq` manifest · local/mock provider first |
 | « call a product API: upload a file and create from it » | [`api-upload-and-create`](api-upload-and-create.nika.yaml) | `api-upload` | `product-api` · `upload` | fetch `multipart:` (file + text parts) · masked secrets header · mode/jq extraction |
@@ -87,7 +90,7 @@ nika new --from "watch a price and ping me" p.nika.yaml   # routes to the closes
    Creativity belongs ONLY in prompts, jq expressions and paths —
    never in structure.
 4. **Check** · `nika check <file> --native-strict` · zero errors AND zero
-   hints, unless a hint is one the file documents in place (two are).
+   hints, unless a hint is one the file documents in place (three are).
 5. **Run** · `nika run <file>`. **A file that has not been run is not
    finished** — `check` cannot see interpolated paths, so a permit that
    reads fine can still refuse mid-run.
@@ -107,18 +110,31 @@ nika new --from "watch a price and ping me" p.nika.yaml   # routes to the closes
    - `NIKA-PROVIDER` → `model:` must be `<provider>/<name>` with a
      canonical prefix (`canon.yaml` providers).
 
-## Two hints that are meant to stay
+## Three hints that are meant to stay
 
-Most hints are defects. Two, both in `etl-state`, are the checker
-over-approximating, and the template says so in place:
+Most hints are defects. Three, in the two gated skeletons, are named in
+place — two are the checker naming a real pause, one is the checker's limit:
 
-- **`etl-state`** carries `[headless-prompt]` and `[inputs]`. The blocking
-  gate is deliberate — adding the `default:` the hint suggests completes
-  the lethal trifecta and lights `NIKA-SEC-009`.
+- **`etl-state`** and **`human-gated-ship`** carry `[headless-prompt]`. The
+  blocking gate is deliberate — adding the `default:` the hint suggests
+  completes the lethal trifecta and lights `NIKA-SEC-009` (measured on
+  0.118.7 for both · the human-gated-ship negative pins it).
+- **`etl-state`** also carries `[inputs]` on its cursor file, and that hint
+  is wrong about the run: the `on_error: on_codes: [NIKA-BUILTIN-READ-001]`
+  recover carries the first run (measured). The checker names static
+  `nika:read` paths without modelling recovery — a checker limitation, and
+  the template says which of its two hints that is.
 - **`fanout`** and **`api-upload-and-create`** used to carry
   `[NIKA-DRIFT-001]` on an `fs.read` entry the detector could not model
   (a `nika:glob` walk · a `multipart:` file part). The detector learned
   both — measured on `nika-cli 0.107`, neither file prints a hint today.
+- **`fanout`** and **`media-asset-pack`** used to carry `[unproven-law]`.
+  `fanout` now proves its fan-in law on a const fixture (`prove` →
+  `law_holds`); `media-asset-pack` builds its manifest from the generator's
+  own record, which is not a law at all — measured on 0.118.7, neither
+  prints a hint. What `fanout` keeps is not a hint: `⚠ COST … 1 uncapped
+  task` is a runtime fan by construction, and the run's `--max-cost-usd` is
+  its cap (the template says so).
 
 When a hint tells you to remove something, run the file before you believe it.
 
