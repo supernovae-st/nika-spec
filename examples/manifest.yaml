@@ -62,13 +62,13 @@ templates:
   - file: templates/evaluate-and-optimize.nika.yaml
     sha256_16: fff18b32fdc7a56b
   - file: templates/fanout.nika.yaml
-    sha256_16: fbc7bb02f0aacc81
+    sha256_16: 25b3784599bd4491
   - file: templates/gate-and-act.nika.yaml
     sha256_16: 7e5da4d28a5d9cb0
   - file: templates/human-gated-ship.nika.yaml
     sha256_16: e6e88773342f90f3
   - file: templates/media-asset-pack.nika.yaml
-    sha256_16: ae6c6f751d0f235d
+    sha256_16: 3d133b951fc2b855
   - file: templates/website-brief.nika.yaml
     sha256_16: c62d5e2345c011cd
 showcase:
