@@ -503,14 +503,14 @@ diagnostics:
     introduced_in: C0
     namespace: PARSE
     plane: unclassified
-    condition: 'with:/extract: binding uses a reserved name (output · status · error · started_at · ended_at · duration_ms)'
+    condition: 'extract: binding uses a reserved name (output · status · error · started_at · ended_at · duration_ms)'
     outcome_class: failure
     cause: validation_error
     retryable: false
     terminal: true
     payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
     span_required: false
-    teaching: 'with:/output: binding uses a reserved name (output · status · error · started_at · ended_at · duration_ms)
+    teaching: 'extract: binding uses a reserved name (output · status · error · started_at · ended_at · duration_ms)
       · spec/05-errors.md (import-c0 · the teaching string mints at C1).'
     notes: 'import-c0 (canon-flip) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md
       verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping

@@ -2984,9 +2984,12 @@ when: ${{ inputs.env == 'production' }}
 when: ${{ with.coverage > 80 }}                       # the number arrived via with:
 when: ${{ size(with.findings) > 0 }}
 when: ${{ has(inputs.style) && inputs.style != 'none' }}
-when: ${{ item.kind == 'article' }}                   # for_each-local
 ```
 
+To process only articles, filter the collection before `for_each` (for example,
+`map(select(.kind == "article"))` in an `extract:` binding or `nika:jq` step).
+`when:` gates the whole task before expansion; `item` and `index` are not in
+scope there.
 
 ### `when:` shape rules · boolean-only · one rule, two enforcement times
 
@@ -3128,12 +3131,12 @@ for_each:
 
 - **Every expression in the task body is re-evaluated PER ITERATION** with
   `item`/`index` bound: `with:`, the verb fields (`prompt:` · `command:` ·
-  `args:` · …), `when:`, AND the `extract:` bindings. (A binding that does
+  `args:` · …), and the `extract:` bindings. (A binding that does
   not reference `item`/`index` evaluates to the same value every iteration —
   expressions are pure over settled state — so an engine MAY materialize it
-  once; the observable behavior is identical.) The only expression evaluated
-  strictly once is the `for_each:` collection itself (pre-fan-out surface ·
-  above).
+  once; the observable behavior is identical.) The `when:` gate and the
+  `for_each:` collection are evaluated once before expansion, without
+  `item`/`index` (pre-fan-out surfaces).
 - The task's output is the **array of per-iteration outputs**, in input
   order · referenced downstream as `${{ tasks.scrape_all.output }}`
   (an array) · `${{ tasks.scrape_all.output[0] }}` for one element.
@@ -4710,9 +4713,10 @@ section refuses** (D-2026-08-11-N26 · ambient reads and the wall clock): it is
 the single data extraction-and-transform language (`extract:` bindings + the
 `nika:jq` builtin). ⚠️ *Full-minus-a-prose-list is a floor, not a ceiling.* The
 ceiling is a named, versioned grammar — `jq-subset/0.1`, the sibling of
-[`cel-subset/0.1`](./03-dag.md) — which **does not exist yet**
-(D-2026-08-11-N31 creates it). Until it does, this sentence is the boundary,
-and a boundary written in prose is weaker than one written in EBNF.
+[`cel-subset/0.1`](./03-dag.md) — defined by the normative EBNF below
+(D-2026-08-11-N31). The grammar is written; enforcement of its bounded syntax
+remains the target described in the implementation-status note below. The
+portable floor does not replace that normative ceiling.
 
 ##### Formal grammar · jq v0.1 subset (normative · grammar version `jq-subset/0.1`)
 
@@ -4786,8 +4790,11 @@ arithmetic. Everything above is that set plus its obvious companions.
 
 > ### 🔴 The bounded-subset table is still a TARGET gate
 >
-> **Current in v0.115.** The engine embeds a full jaq and the bounded syntax
-> subset below is **not yet enforced**. A workflow whose only task is ·
+> **Reference-engine source status at `6ac427c5e62dc450d1d2393e3eec169e9566f6a3`.**
+> The engine embeds a full jaq and the bounded syntax subset below is
+> **not yet enforced**. The following check observation was recorded in
+> v0.115; it is historical evidence, not a new run at that source pin.
+> A workflow whose only task is ·
 >
 > ```yaml
 > invoke: { tool: "nika:jq", args: { input: "a LOC=120 b LOC=45",
@@ -4814,7 +4821,7 @@ arithmetic. Everything above is that set plus its obvious companions.
 >
 > The table stands as the **specification of the gate**, unchanged. What
 > changes is its status: it describes what `jq-subset/0.1` MUST refuse
-> when the gate ships, not what v0.115 refuses today. Until then the
+> when the gate ships, not a list of refusals delivered at that engine pin. Until then the
 > honest sentence is « the grammar is written, the gate is owed ».
 
 **What the grammar refuses BY CONSTRUCTION, and why ·**
@@ -5183,7 +5190,7 @@ these from this file alone.
 | `NIKA-PARSE-010` | `timeout:` violates the quoted Go-duration contract (positive · max 24h · descending units) | `validation_error` | false |
 | `NIKA-PARSE-011` | `retry:` block violates the spec shape (§retry below) | `validation_error` | false |
 | `NIKA-PARSE-012` | `on_error:` block violates the spec shape (fields mutually exclusive) | `validation_error` | false |
-| `NIKA-PARSE-013` | `with:`/`extract:` binding uses a reserved name (`output` · `status` · `error` · `started_at` · `ended_at` · `duration_ms`) | `validation_error` | false |
+| `NIKA-PARSE-013` | `extract:` binding uses a reserved name (`output` · `status` · `error` · `started_at` · `ended_at` · `duration_ms`) | `validation_error` | false |
 | `NIKA-PARSE-014` | `secrets:` entry is not a store reference — inline literals forbidden ([01 §secrets](./01-envelope.md)) | `validation_error` | false |
 | `NIKA-PARSE-017` | duplicate mapping key — no silent last-wins | `validation_error` | false |
 | `NIKA-PARSE-018` | missing required field in a verb body (`infer.prompt` · `exec.command` · `invoke.tool`) | `validation_error` | false |
@@ -10086,7 +10093,7 @@ Throws · `NIKA-BUILTIN-WAIT-001` on absolute timeout · `-002` if the timestamp
 
 ### `nika:read`
 ```yaml
-invoke: { tool: "nika:read", args: { path: "./config.yaml", encoding: utf-8 } }
+invoke: { tool: "nika:read", args: { path: "./config.yaml" } }
 ```
 Read a file · returns **string** content (text mode · the default).
 `binary: true` (explicit · no content sniffing) returns **opaque bytes**
@@ -10231,10 +10238,17 @@ invoke: { tool: "nika:date", args: { op: now } }
 Timestamp arithmetic · op-discriminated single builtin · timezone-aware (IANA · default UTC) · ISO 8601 out. `format:`/`parse` use the **strftime** field grammar (`%Y-%m-%d` · the one cross-language constant). Every op returns a string EXCEPT `diff` (integer · in `unit:`). Throws · `NIKA-BUILTIN-DATE-001` (unparseable input / unknown op / bad tz · `validation_error`).
 
 ### `nika:hash`
+
+> **Reference-engine availability at `6ac427c5e62dc450d1d2393e3eec169e9566f6a3`:**
+> digest calls accept `content`, `algo` and `encoding`. The `op` argument,
+> including explicit `op: hash`, and the `sign`/`verify` forms below are
+> **spec-ahead of this engine pin**. Their normative contract is retained;
+> these examples do not announce implementation availability.
+
 ```yaml
 invoke: { tool: "nika:hash", args: { algo: blake3, content: "${{ tasks.X.output }}", encoding: hex } }
 
-# op-discriminated · hash (default) | sign | verify
+# Normative op forms · spec-ahead at the engine pin named above
 invoke: { tool: "nika:hash", args: { op: sign,   content: "${{ with.manifest }}", key: "${{ secrets.release_key }}" } }
 invoke: { tool: "nika:hash", args: { op: verify, content: "${{ with.manifest }}", public_key: "${{ const.release_pub }}", signature: "${{ with.sig }}" } }
 ```
