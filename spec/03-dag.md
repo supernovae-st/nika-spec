@@ -571,9 +571,12 @@ when: ${{ inputs.env == 'production' }}
 when: ${{ with.coverage > 80 }}                       # the number arrived via with:
 when: ${{ size(with.findings) > 0 }}
 when: ${{ has(inputs.style) && inputs.style != 'none' }}
-when: ${{ item.kind == 'article' }}                   # for_each-local
 ```
 
+To process only articles, filter the collection before `for_each` (for example,
+`map(select(.kind == "article"))` in an `extract:` binding or `nika:jq` step).
+`when:` gates the whole task before expansion; `item` and `index` are not in
+scope there.
 
 ### `when:` shape rules · boolean-only · one rule, two enforcement times
 
@@ -715,12 +718,12 @@ for_each:
 
 - **Every expression in the task body is re-evaluated PER ITERATION** with
   `item`/`index` bound: `with:`, the verb fields (`prompt:` · `command:` ·
-  `args:` · …), `when:`, AND the `extract:` bindings. (A binding that does
+  `args:` · …), and the `extract:` bindings. (A binding that does
   not reference `item`/`index` evaluates to the same value every iteration —
   expressions are pure over settled state — so an engine MAY materialize it
-  once; the observable behavior is identical.) The only expression evaluated
-  strictly once is the `for_each:` collection itself (pre-fan-out surface ·
-  above).
+  once; the observable behavior is identical.) The `when:` gate and the
+  `for_each:` collection are evaluated once before expansion, without
+  `item`/`index` (pre-fan-out surfaces).
 - The task's output is the **array of per-iteration outputs**, in input
   order · referenced downstream as `${{ tasks.scrape_all.output }}`
   (an array) · `${{ tasks.scrape_all.output[0] }}` for one element.

@@ -140,7 +140,7 @@ Throws · `NIKA-BUILTIN-WAIT-001` on absolute timeout · `-002` if the timestamp
 
 ### `nika:read`
 ```yaml
-invoke: { tool: "nika:read", args: { path: "./config.yaml", encoding: utf-8 } }
+invoke: { tool: "nika:read", args: { path: "./config.yaml" } }
 ```
 Read a file · returns **string** content (text mode · the default).
 `binary: true` (explicit · no content sniffing) returns **opaque bytes**
@@ -285,10 +285,17 @@ invoke: { tool: "nika:date", args: { op: now } }
 Timestamp arithmetic · op-discriminated single builtin · timezone-aware (IANA · default UTC) · ISO 8601 out. `format:`/`parse` use the **strftime** field grammar (`%Y-%m-%d` · the one cross-language constant). Every op returns a string EXCEPT `diff` (integer · in `unit:`). Throws · `NIKA-BUILTIN-DATE-001` (unparseable input / unknown op / bad tz · `validation_error`).
 
 ### `nika:hash`
+
+> **Reference-engine availability at `6ac427c5e62dc450d1d2393e3eec169e9566f6a3`:**
+> digest calls accept `content`, `algo` and `encoding`. The `op` argument,
+> including explicit `op: hash`, and the `sign`/`verify` forms below are
+> **spec-ahead of this engine pin**. Their normative contract is retained;
+> these examples do not announce implementation availability.
+
 ```yaml
 invoke: { tool: "nika:hash", args: { algo: blake3, content: "${{ tasks.X.output }}", encoding: hex } }
 
-# op-discriminated · hash (default) | sign | verify
+# Normative op forms · spec-ahead at the engine pin named above
 invoke: { tool: "nika:hash", args: { op: sign,   content: "${{ with.manifest }}", key: "${{ secrets.release_key }}" } }
 invoke: { tool: "nika:hash", args: { op: verify, content: "${{ with.manifest }}", public_key: "${{ const.release_pub }}", signature: "${{ with.sig }}" } }
 ```
