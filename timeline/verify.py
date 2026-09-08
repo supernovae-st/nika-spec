@@ -212,7 +212,10 @@ def main(argv: list[str]) -> int:
     if failed:
         print(f"✗ {failed} provable claim(s) failed — the timeline never carries a broken proof", file=sys.stderr)
         return 1
-    print("✓ every provable claim holds · unprovable claims are labeled, never counted as proof")
+    if counts.get("SKIPPED-OFFLINE"):
+        print("✓ no local check failed · external claims remain unproved (offline)")
+    else:
+        print("✓ every provable claim holds · unprovable claims are labeled, never counted as proof")
     return 0
 
 

@@ -19,6 +19,8 @@ python3 timeline/verify.py --offline
 ```
 
 Offline mode labels external claims `SKIPPED-OFFLINE`, never `PROVED`.
+Its final summary also says those claims remain unproved; exit zero means
+no local check failed, not that skipped network proofs passed.
 The regression suite uses controlled API responses; the following live pass
 is still required to re-prove actual public records.
 

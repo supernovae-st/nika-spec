@@ -1,5 +1,6 @@
 """Publication-state proof is not an HTTP-success or artifact-integrity claim."""
 import copy
+from contextlib import redirect_stdout
 import importlib.util
 import io
 from pathlib import Path
@@ -52,6 +53,18 @@ class ReleaseEvidenceTests(unittest.TestCase):
     def test_offline_is_never_publication_proof(self):
         with patch.object(VERIFY, "fetch_json", side_effect=AssertionError("network forbidden")):
             self.assertEqual(VERIFY.check(self.entry, True), ("SKIPPED-OFFLINE", "github-release"))
+
+    def test_final_summary_does_not_promote_skipped_offline_claims(self):
+        doc = {"evidence_classes": {"github-release": "published state"},
+               "entries": [{"id": "released-engine", **self.entry}]}
+        for offline in [False, True]:
+            output = io.StringIO()
+            with self.subTest(offline=offline), redirect_stdout(output), \
+                 patch.object(VERIFY.yaml, "safe_load", return_value=doc), \
+                 patch.object(VERIFY, "fetch_json", return_value=self.published):
+                self.assertEqual(VERIFY.main(["--offline"] if offline else []), 0)
+            self.assertEqual("every provable claim holds" in output.getvalue(), not offline)
+            self.assertEqual("external claims remain unproved" in output.getvalue(), offline)
 
 
 class ApiAuthorityTests(unittest.TestCase):
