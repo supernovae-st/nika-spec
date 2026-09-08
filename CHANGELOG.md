@@ -13,6 +13,31 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed · September delivery follow-up (2026-09-08)
+
+- **Typed constants in variable fixtures** ([#313](https://github.com/supernovae-st/nika-spec/pull/313)).
+  Five declarations now use `value` instead of `default`, and the boolean
+  declaration uses `bool`. The positive fixture resolves scalar values again.
+  The negative `for_each` case still lacks exact-code runtime qualification;
+  [#159](https://github.com/supernovae-st/nika-spec/issues/159) remains open.
+- **Task gates and diagnostic guidance** ([#310](https://github.com/supernovae-st/nika-spec/pull/310)).
+  `when` gates the task before fan-out, without `item` or `index` in scope;
+  `NIKA-PARSE-013` names reserved `extract` bindings. Read examples drop an
+  unsupported argument, while jq subset enforcement and hash sign/verify
+  availability retain their explicit implementation limits.
+- **Fetch certificates account for both robots origins**
+  ([#311](https://github.com/supernovae-st/nika-spec/pull/311)). Documentation
+  includes original and destination-origin robots checks in the certificate
+  counters instead of describing only the document fetch.
+- **Source provenance and the research example**
+  ([#312](https://github.com/supernovae-st/nika-spec/pull/312)). Refresh source
+  provenance and the example manifest; keep the research task's token budget
+  below its default model context window.
+- **Offline timeline checks keep public proof absent**
+  ([#303](https://github.com/supernovae-st/nika-spec/pull/303)). The final summary
+  preserves skipped external claims as unproved; exit zero only means that
+  no local check failed.
+
 ### Added
 
 - **`schemas/project.schema.json`** · the project file's JSON Schema, mirrored
