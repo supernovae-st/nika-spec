@@ -10351,9 +10351,18 @@ carries (the `links ≤30` facet is a preview, never the frontier's bound)
 · every hop rides
 the engine's SSRF defense · a failing descendant page becomes an honest
 `{url, status|error}` entry and the crawl continues · the effect
-certificate counts `max_pages` page requests (+1 robots probe unless
-`respect_robots: false` is literal) — a bounded crawl is auditable
-before a request is spent. `crawl`/`http`/`website` are intentions, not
+certificate bounds logical GET calls per invocation: `max_pages` with
+literal `respect_robots: false`, otherwise `max_pages + 2` (the seed's
+robots, then at most one probe of the landed root's different origin).
+An unchanged origin needs only one robots probe, but a literal initial
+URL and the same-origin link filter do not exclude a root redirect;
+an unknown final origin therefore requires the two-probe bound. Dynamic
+page bounds use the valid runtime maximum 25, hence at most 27 logical
+GETs (25 with literal robots false); dynamic robots options reserve both
+probes. Invalid resolved options still refuse before any GET. These are
+logical calls, not a bound on physical transmissions, redirect hops or
+transport retries; aggregate saturation is not a proven global bound.
+`crawl`/`http`/`website` are intentions, not
 tools — they all route HERE (no `nika:crawl`).
 
 **Non-2xx is failure (normative)** · a non-2xx response throws
