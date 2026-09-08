@@ -1,18 +1,18 @@
-# Expected: exit 0 — typed vars: declarations (type + default) resolve.
-# W18: typed vars — string/number/boolean declarations
-# Tests: typed vars (string/number/boolean) accessible in CEL
+# Expected: exit 0 — typed const declarations (type + value) resolve.
+# W18: typed const — string/number/boolean declarations
+# Tests: typed const (string/number/boolean) accessible in CEL
 nika: w18-typed-vars
 
 const:
   username:
     type: string
-    default: "alice"
+    value: "alice"
   score:
     type: number
-    default: 99.5
+    value: 99.5
   enabled:
-    type: boolean
-    default: true
+    type: bool
+    value: true
 
 permits:
   fs:

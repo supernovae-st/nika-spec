@@ -9,7 +9,7 @@ nika: foreach-nonarray
 # for_each law this file exists to prove. The marker is written by /usr/bin/touch
 # so no shell is needed to observe "no iteration ran".
 const:
-  not_a_list: { type: integer, default: 42 }
+  not_a_list: { type: integer, value: 42 }
 permits:
   exec: ["/usr/bin/touch"]
 tasks:
