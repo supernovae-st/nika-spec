@@ -1,0 +1,41 @@
+# Public Estate verifier projection · generated tools/estate/ checkout.
+#
+# Least privilege: contents: read · SHA-pinned actions already used by this
+# repo · no event data reaches any shell · no Lab credential · stock
+# Python only (the checker, its tests and the projected selftest are
+# dependency-free). A missing, extra, symlink or digest-altered
+# projection fails this job.
+
+name: Estate projection
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  estate-projection:
+    name: projection check · tests · stock selftest
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Verify public projection
+        run: python3 scripts/check-estate-projection.py
+
+      - name: Projection tests
+        run: python3 scripts/test-estate-projection.py
+
+      - name: Stock selftest of the generated bundle
+        env:
+          NO_COLOR: '1'
+        run: python3 tools/estate/scripts/selftest.py
