@@ -4,7 +4,7 @@ nika: when-bare-ref-reject
 # relation/boolean operator) MUST be rejected at parse time NIKA-VAR-005.
 # `when: ${{ const.threshold }}` is a bare reference → check should FAIL with NIKA-VAR-005.
 const:
-  threshold: { type: integer, default: 5 }
+  threshold: { type: integer, value: 5 }
 tasks:
   t:
     when: ${{ const.threshold }}
