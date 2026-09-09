@@ -19,7 +19,7 @@ templates:
     law_ids: []
     introduced_in: C0
     source_path: templates/agent-loop.nika.yaml
-    source_digest: sha256:5ded8b7dbdc23065d47ed48f32e8072ac74765cdde30101b2b03d6b5a59992da
+    source_digest: sha256:c3c372370520147c69da2163731cfca9372e0009470a796720679f61de790a4d
     category: agent-loop
     tags: [research, review]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
@@ -31,7 +31,7 @@ templates:
     law_ids: []
     introduced_in: C0
     source_path: templates/api-upload-and-create.nika.yaml
-    source_digest: sha256:e823c5f3d2b8935c31eb69a87ec4367b11cef285a0198c164a213a6801e12f54
+    source_digest: sha256:1e06897b41686f7c51f97e70893bd16e09dba869df85378cb3c89913e1d20952
     category: api-upload
     tags: [product-api, upload]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
@@ -43,7 +43,7 @@ templates:
     law_ids: []
     introduced_in: C0
     source_path: templates/chain.nika.yaml
-    source_digest: sha256:68c26c13060fce2279634f0640ccacd054f65f04b00a583ae1b73568e494d624
+    source_digest: sha256:18d62ce8bff0edd76c0f6fcaf696fadfea564e4e027ef86a29fd26e5e7706ba1
     category: linear
     tags: [content]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
@@ -55,7 +55,7 @@ templates:
     law_ids: []
     introduced_in: 0.113.0
     source_path: templates/classify-and-route.nika.yaml
-    source_digest: sha256:b60a2a996cf0ff9d338660b67971af7eb7a13cba0fb33186b24eaf2f5d8a13e1
+    source_digest: sha256:daa53c96c8fffe4b48be144e42df560328def81c05e12388f4a6612ab61f6f17
     category: decision-routing
     tags: [operations]
     notes: 'Typed facts become an EvidenceSnapshot consumed by nika:decide · the model extracts evidence, while
@@ -66,7 +66,7 @@ templates:
     law_ids: []
     introduced_in: 0.113.0
     source_path: templates/corpus-qa.nika.yaml
-    source_digest: sha256:1838ae7cc787baedabebc934949a69ce1a827a05fbdc8087449ee3e3e9158e68
+    source_digest: sha256:cc199636ae1591848ca287cd91874cf93b9a12b0f2829e673d39ab48e55e810c
     category: retrieval
     tags: [knowledge]
     notes: 'Conflicting duplicate ids refuse before indexing, while identical duplicates keep sort-and-unique
@@ -77,7 +77,7 @@ templates:
     law_ids: []
     introduced_in: C0
     source_path: templates/docker-report.nika.yaml
-    source_digest: sha256:d90e7384122ba0f78e1b8a97d2c0cc8d506d8d151c5d468eedea580f1d8b6d12
+    source_digest: sha256:f2b84e14655b5051335fb60cf5f734f8a526387c03a9683b09c881cb2336e4b7
     category: parallel-fan-in
     tags: [operations, report]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
@@ -89,7 +89,7 @@ templates:
     law_ids: []
     introduced_in: 0.113.0
     source_path: templates/document-to-fields.nika.yaml
-    source_digest: sha256:7f05592b930782fdefdab38a950ca288029a1bddcdd2e8965a7d65571c627b14
+    source_digest: sha256:2e3126a0ca4a047175943a0dbdb61b3ddcedbbee675f0baccf836f23a4f6d3c7
     category: structured-extraction
     tags: [documents]
     notes: 'Whitespace is trimmed and refused before inference when empty · typed field extraction keeps an exact
@@ -100,7 +100,7 @@ templates:
     law_ids: []
     introduced_in: C0
     source_path: templates/etl-state.nika.yaml
-    source_digest: sha256:f58cc453b0441dfe99f12438620dfea0739b26128b9c38f3923588e55953419f
+    source_digest: sha256:64d090ea10a33ab224d16feea6b80bbfeb4e1c8396d514361ae0740399958136
     category: state-resume
     tags: [etl]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
@@ -112,7 +112,7 @@ templates:
     law_ids: []
     introduced_in: 0.113.0
     source_path: templates/evaluate-and-optimize.nika.yaml
-    source_digest: sha256:9c89d2154d386acccdeb19429bdd5dbb01f2bbb2887e6d2bec7d816283c8c569
+    source_digest: sha256:bfde6db334a81bca0718024c9b3417393b14db0b90269925e033f924e2046985
     category: bounded-loop
     tags: [quality]
     notes: 'Two revision rounds are unrolled in the DAG, then a score-only evaluator measures optimize_2 · the bound
@@ -123,7 +123,7 @@ templates:
     law_ids: []
     introduced_in: C0
     source_path: templates/fanout.nika.yaml
-    source_digest: sha256:8b5cbe300b478daaf00ee57100883f1e5c0212292bb6c9844ba6b045559c1de2
+    source_digest: sha256:5c6d04bcee3ee0754372dc88acc274b3ad06ffe46967651c48e6f6fbe4cd2683
     category: fanout
     tags: [batch]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
@@ -147,7 +147,7 @@ templates:
     law_ids: []
     introduced_in: C0
     source_path: templates/human-gated-ship.nika.yaml
-    source_digest: sha256:e7f233d8d6a016003fef360b80b9ffb4cc21cce19c733f465103b38adb3b6821
+    source_digest: sha256:e447e644d2e34327ab03f5fee8bed54fd0cfc2293e1379e3dcdb3a6b050bf65c
     category: human-gate
     tags: [release]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
@@ -159,7 +159,7 @@ templates:
     law_ids: []
     introduced_in: C0
     source_path: templates/media-asset-pack.nika.yaml
-    source_digest: sha256:565a0b8080a077435e47474798e4e33fe31ebeea39044455170c765435466a84
+    source_digest: sha256:dd4b20b39ef04c31ef6c406ddefef04a37b5cd6b196382e1fc4956888b9339a5
     category: linear
     tags: [media]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
@@ -171,7 +171,7 @@ templates:
     law_ids: []
     introduced_in: C0
     source_path: templates/website-brief.nika.yaml
-    source_digest: sha256:bb0fe02ead87623166cfdd57647346344959ccc622447a7651a2209c52f19d8a
+    source_digest: sha256:d5c172b5e4bd7fe69c69663d0b36b1dd5ba3b3429da7fed12e6501a93a9bd5c5
     category: linear
     tags: [website]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
