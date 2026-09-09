@@ -158,13 +158,13 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: scripts/estate.py is byte-identical to nika-estate at the pinned rev
+      - name: scripts/estate.py is byte-identical to the published spec projection
         run: |
           pin="$(grep -v '^#' ESTATE_PIN | head -1 | tr -d '[:space:]')"
-          url="https://raw.githubusercontent.com/supernovae-st/nika-estate/${pin}/scripts/estate.py"
+          url="https://raw.githubusercontent.com/supernovae-st/nika-spec/${pin}/tools/estate/scripts/estate.py"
           curl -fsSL "$url" -o /tmp/estate-canonical.py
           if ! cmp -s /tmp/estate-canonical.py scripts/estate.py; then
-            echo "::error file=scripts/estate.py::diverges from nika-estate@${pin} — the tool is shared: change it upstream, bump ESTATE_PIN, re-mirror"
+            echo "::error file=scripts/estate.py::diverges from nika-spec@${pin}:tools/estate/scripts/estate.py — bump ESTATE_PIN to an already-published spec rev, re-mirror"
             diff -u /tmp/estate-canonical.py scripts/estate.py | head -60
             exit 1
           fi
@@ -172,4 +172,6 @@ jobs:
             echo "::error file=scripts/estate.py::has a shebang but is not executable · cmp compares content and raw.githubusercontent serves no modes, so the mirror carries the bit itself"
             exit 1
           fi
-          echo "✓ scripts/estate.py is byte-identical to nika-estate@${pin} and executable"
+          echo "✓ scripts/estate.py is byte-identical to nika-spec@${pin}:tools/estate/scripts/estate.py and executable"
+      - name: Mirror equals the qualified in-tree projection (bytes and mode)
+        run: python3 scripts/test-estate-mirror.py

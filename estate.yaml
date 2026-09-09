@@ -18,11 +18,11 @@ classes:
   testimonial: "captured evidence — fixtures, corpora, traces, receipts: proves behavior; neither shipped source nor regenerable output"
   foreign: "pointer to a third-party sovereign source"
 summary:
-  classified_files: 1471
+  classified_files: 1472
   file_rows: 22
   pattern_rows: 29
   by_class:
-    authored: 1136
+    authored: 1137
     authored-pin: 1
     generated: 137
     pinned-copy: 4
@@ -50,11 +50,11 @@ files:
     - "https://www.contributor-covenant.org/version/2/1/code_of_conduct.html (CC-BY-4.0)"
 - path: "ESTATE_PIN"
   class: authored-pin
-  sha256: a0006989e73853bafed83e9eb8e9288e52211e83db69a40e69c927b079027a22
-  evidence: "its own header: 'Bump deliberately: edit this' · the rev the shared estate tool is mirrored from, and the INPUT the mirror gate compares against"
+  sha256: 63ca74320d70dfaf2add310f20ac502ba9accce1603195e84c8df1880f18792f
+  evidence: "its own header: 'Bump deliberately: edit this' · the already-published nika-spec rev the shared estate tool is mirrored from (path tools/estate/scripts/estate.py), and the INPUT the mirror gate compares against; names f14f6872 (PR #315) and records historical nika-estate 247deb86 as the upgrade from 74287c75"
 - path: "SSOT.md"
   class: authored
-  sha256: a8bd6df41d9ffb1e50817e6590f52138b2b4e0bb39a4f46098860048d1468889
+  sha256: 408868fe5e406cd508ec636e872d87adb539ff43dbab9f4088093e7c6ef2fdee
   evidence: "the map of where every fact lives — prose and judgments are authored, but it carries ONE generated island (the estate:map markers · §9): scripts/ssot-map-projector.py --write derives the gated-surfaces table from THIS manifest, and --check (exit 5 · conformance.yml 'Projection gates') refuses a hand edit inside the markers — the canon.yaml hybrid, inverted"
 - path: "VERSION"
   class: authored
@@ -154,14 +154,15 @@ files:
   note: "carries NO in-file generation marker (llms-full.txt does) — a generated surface that does not self-declare; only the --check gate reveals its provenance"
 - path: "scripts/estate.py"
   class: pinned-copy
-  sha256: fd4aa38f78cfacfa2e003c2d3e1b10e74b4d16d9cb9b11e87acc5a1449d2016e
-  evidence: "the shared estate tool, mirrored byte-for-byte from supernovae-st/nika-estate · editing it here is a lost gesture: change it upstream, bump ESTATE_PIN, re-mirror"
+  sha256: da4e737e27fb5a8d92bfc3d5e7e707f84825556d0c8c2c4af989bc10939123c1
+  evidence: "the shared estate tool, mirrored byte-for-byte from nika-spec@ESTATE_PIN:tools/estate/scripts/estate.py (historical nika-estate source 247deb86, upgrade from 74287c75) · editing it here is a lost gesture: bump ESTATE_PIN to an already-published spec rev, re-mirror"
   derivation:
-    tool: "curl the tool from nika-estate at the rev named in ESTATE_PIN"
-    gate: "the `mirror` job byte-compares scripts/estate.py against nika-estate@ESTATE_PIN and fails the run on any difference"
+    tool: "copy tools/estate/scripts/estate.py at the nika-spec rev named in ESTATE_PIN (curl in CI)"
+    gate: "conformance.yml job `mirror` byte-compares scripts/estate.py against nika-spec@ESTATE_PIN:tools/estate/scripts/estate.py and requires mode 100755; scripts/test-estate-mirror.py refuses byte or mode mismatch against the qualified projection"
     inputs:
     - "ESTATE_PIN"
-    - "supernovae-st/nika-estate@<ESTATE_PIN>:scripts/estate.py"
+    - "nika-spec@<ESTATE_PIN>:tools/estate/scripts/estate.py"
+    - "historical nika-estate@247deb86220035bed9b276606ce4a2957c5a8d57:scripts/estate.py"
 - path: "tools/estate/LICENSE"
   class: generated
   sha256: c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4
@@ -364,8 +365,8 @@ patterns:
   evidence: "workflow.schema.json's own $comment: 'INTERIM hand-derived schema · prose spec is the single source of truth · regenerate + diff against engine nika-schema at GA' — authored today, generated at GA; law.schema.json + registries.schema.json are the sealed R2 design-pack contracts (consumed as-is, byte-identical per PROOFS.md §P0)"
 - glob: "scripts/**"
   class: authored
-  match_count: 24
-  aggregate_sha256: cf58d3bbdd57fd412342f30fdad733523a309bf8ae03497e04128d5d5d45fd28
+  match_count: 25
+  aggregate_sha256: 5d665068f4a14cb8b82928ef014a0b2cae8d9ea82c73d04bc9cb7e103ce1befe
   evidence: "the compiler + projectors humans wrote (ssot-compiler · canon/showcase/llms/starters/authoring/design projectors · gen-gate-matrix · gen-type-corpus · check-md-refs) — the tools that WRITE the generated surfaces; estate.py excepted in files: (the self row)"
 - glob: "timeline/**"
   class: authored
@@ -390,12 +391,12 @@ patterns:
 - glob: ".github/**"
   class: authored
   match_count: 10
-  aggregate_sha256: cde874371d3e05d27017022c29667eb8faf9b99d39453f8c7f5569b668ca7e3e
+  aggregate_sha256: fd1393b7094fd60bef58e63f7cc485bc5fa06a258d1100a35e82ad7007b1843f
   evidence: "6 hand-written SHA-pinned workflows (conformance · timeline · board · codeql · reuse · scorecard) + dependabot config — ZERO in-repo bot lanes: board.yml writes to the org Projects board, timeline.yml verifies read-only, nothing here rewrites tracked files; requirements.txt excepted in files:"
 - glob: "*"
   class: authored
   match_count: 16
-  aggregate_sha256: 88f0b3aa8d73cd1c3bbec32e2e0876a18246e83b9447bef4c7267f80721d9088
+  aggregate_sha256: 8fb9a3ddb9b8f79bd196d56650a3aba39fb253f4329ae37f97444a50531a0a94
   evidence: "root prose + config (README · QUICKSTART · GLOSSARY · CONTRIBUTING · CHANGELOG hand-kept per Keep a Changelog · SECURITY · CITATION.cff · CONFORMANT_IMPLEMENTATIONS · PROOFS.md the receipts ledger · LICENSE · REUSE.toml · ruff.toml · .gitignore · .pre-commit-hooks.yaml · .bestpractices.json) — no generation markers; VERSION · llms*.txt · canon.yaml · CODE_OF_CONDUCT.md excepted in files:"
   note: "README · QUICKSTART · GLOSSARY · CONTRIBUTING · CHANGELOG carry the canon-projected count markers — tool-maintained blocks inside authored prose"
 - glob: "**"
