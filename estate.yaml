@@ -366,7 +366,7 @@ patterns:
 - glob: "scripts/**"
   class: authored
   match_count: 27
-  aggregate_sha256: 5afffc63a7fc666764483e9d69722dcdf4b458901fbc81e8e7988d0cf2441bd6
+  aggregate_sha256: c01d320ba7252fe2210e8a70f149c585f4d737ec874ab53cdd85aba8edb9c1c7
   evidence: "the compiler + projectors humans wrote (ssot-compiler · canon/showcase/llms/starters/authoring/design projectors · gen-gate-matrix · gen-type-corpus · check-md-refs) — the tools that WRITE the generated surfaces; estate.py excepted in files: (the self row)"
 - glob: "timeline/**"
   class: authored
