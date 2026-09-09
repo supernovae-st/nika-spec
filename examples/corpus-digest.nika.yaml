@@ -6,7 +6,7 @@
 # A pile of documents becomes one sourced brief — and no model window ever
 # holds two documents. A fast pass assigns each file a focus FROM ITS PATH
 # alone, every document is then read and carded in its own fresh window,
-# jq assembles and ranks the deck deterministically, and a thinking pass
+# jq assembles and ranks the deck deterministically, and a synthesis pass
 # answers the question from the cards. Context folding: the corpus lives
 # in the dataflow, each model call sees one slice, the synthesis sees only
 # projections. Window size stops scaling with corpus size.
@@ -217,19 +217,15 @@ tasks:
     when: ${{ size(with.deck) > 0 }}
     timeout: "12m"               # judgment gets patience · still bounded
     infer:
-      max_tokens: 8000           # the declared think budget (4000 below) + the brief · both count
+      max_tokens: 8000           # bounded synthesis on the default local seat
       prompt: |
         Question · ${{ with.question }}
         Deck of source cards · ${{ with.deck }}
         Answer the question from the cards alone. Cite the `path` of every
         card you lean on. Where cards disagree, say so — do not resolve a
         conflict the sources did not resolve.
-      thinking:
-        # A reasoning budget, honoured by seats that support extended
-        # thinking and ignored by the ones that do not — declaring it
-        # never fails a run.
-        enabled: true
-        budget_tokens: 4000
+      # Extended thinking requires a reasoning-capable seat in the catalog.
+      # The default local seat does not declare that capability.
 
 # Both the brief and the deck, so the fold is inspectable: the deck is
 # everything the synthesis was allowed to see. Read with `--output json`.
