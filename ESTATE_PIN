@@ -1,4 +1,7 @@
-# The nika-estate rev this repo's scripts/estate.py is mirrored from.
+# The nika-spec rev this repo's scripts/estate.py is mirrored from.
+# Public projection: nika-spec@<this rev>:tools/estate/scripts/estate.py
+# Historical nika-estate source: 247deb86220035bed9b276606ce4a2957c5a8d57
+# (explicit upgrade from 74287c75f3d52ee5cd328b6faaa5fb7eacf171f6).
 # Bump deliberately: edit this, re-mirror the tool, regenerate the manifest.
-# The mirror job in CI byte-compares against exactly this rev.
-74287c75f3d52ee5cd328b6faaa5fb7eacf171f6
+# The mirror job in CI byte-compares against exactly this already-published rev.
+f14f6872a0d9d3ba12c196810082336c963d2765

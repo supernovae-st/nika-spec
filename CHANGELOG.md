@@ -54,6 +54,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `ESTATE_PIN`, `scripts/estate.py` and existing conformance consumers are
   unchanged — they wait for the merged publication SHA.
 
+### Changed · spec Estate consumer (2026-09-09)
+
+- **`ESTATE_PIN` / `scripts/estate.py` / conformance mirror** · consume the
+  published public projection
+  `nika-spec@f14f6872a0d9d3ba12c196810082336c963d2765:tools/estate/scripts/estate.py`
+  ([#315](https://github.com/supernovae-st/nika-spec/pull/315)). Historical
+  nika-estate source remains `247deb86220035bed9b276606ce4a2957c5a8d57`;
+  this is the explicit upgrade from `74287c75f3d52ee5cd328b6faaa5fb7eacf171f6`.
+  The mirror is byte- and mode-identical to the qualified projection. CI
+  fetches that already-published spec path and no longer curls nika-estate.
+  `scripts/test-estate-mirror.py` refuses byte or mode mismatch. Lab remains
+  the projection producer; write authority is not switched.
+
 ### Added
 
 - **`schemas/project.schema.json`** · the project file's JSON Schema, mirrored

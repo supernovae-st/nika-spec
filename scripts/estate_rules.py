@@ -1,6 +1,8 @@
-# Per-repo estate rules. The tool is shared and lives in nika-estate;
-# these declarations are ours. FILES carries the per-file exceptions,
-# PATTERNS the ordered globs that cover everything else.
+# Per-repo estate rules. The shared tool is distributed from this repo's
+# public projection (tools/estate/scripts/estate.py at the nika-spec rev
+# named in ESTATE_PIN); historical nika-estate source remains 247deb86.
+# FILES carries the per-file exceptions, PATTERNS the ordered globs that
+# cover everything else.
 #
 # ROOT, SELF, RULES and CLASSES are injected by the tool into this
 # module namespace before it executes. They are therefore undefined as
@@ -8,25 +10,31 @@
 # placeholder assignment would satisfy the linter and then OVERWRITE the
 # injected value, which is worse than the warning.
 
-# Per-repo estate rules. The tool is shared and lives in nika-estate;
-# these declarations are ours. FILES are the per-file exceptions,
-# PATTERNS the ordered globs that cover the rest (first match wins).
+# Per-repo estate rules. The shared tool is distributed from this repo's
+# public projection (tools/estate/scripts/estate.py at the nika-spec rev
+# named in ESTATE_PIN); historical nika-estate source remains 247deb86.
+# FILES are the per-file exceptions, PATTERNS the ordered globs that
+# cover the rest (first match wins).
 
 FILES = [
     {
         "path": SELF,  # noqa: F821
         "class": "pinned-copy",
-        "evidence": "the shared estate tool, mirrored byte-for-byte from supernovae-st/nika-estate · editing it here is a lost gesture: change it upstream, bump ESTATE_PIN, re-mirror",
+        "evidence": "the shared estate tool, mirrored byte-for-byte from nika-spec@ESTATE_PIN:tools/estate/scripts/estate.py (historical nika-estate source 247deb86, upgrade from 74287c75) · editing it here is a lost gesture: bump ESTATE_PIN to an already-published spec rev, re-mirror",
         "derivation": {
-            "tool": "curl the tool from nika-estate at the rev named in ESTATE_PIN",
-            "gate": "the `mirror` job byte-compares scripts/estate.py against nika-estate@ESTATE_PIN and fails the run on any difference",
-            "inputs": ["ESTATE_PIN", "supernovae-st/nika-estate@<ESTATE_PIN>:scripts/estate.py"],
+            "tool": "copy tools/estate/scripts/estate.py at the nika-spec rev named in ESTATE_PIN (curl in CI)",
+            "gate": "conformance.yml job `mirror` byte-compares scripts/estate.py against nika-spec@ESTATE_PIN:tools/estate/scripts/estate.py and requires mode 100755; scripts/test-estate-mirror.py refuses byte or mode mismatch against the qualified projection",
+            "inputs": [
+                "ESTATE_PIN",
+                "nika-spec@<ESTATE_PIN>:tools/estate/scripts/estate.py",
+                "historical nika-estate@247deb86220035bed9b276606ce4a2957c5a8d57:scripts/estate.py",
+            ],
         },
     },
     {
         "path": "ESTATE_PIN",
         "class": "authored-pin",
-        "evidence": "its own header: 'Bump deliberately: edit this' \u00b7 the rev the shared estate tool is mirrored from, and the INPUT the mirror gate compares against",
+        "evidence": "its own header: 'Bump deliberately: edit this' · the already-published nika-spec rev the shared estate tool is mirrored from (path tools/estate/scripts/estate.py), and the INPUT the mirror gate compares against; names f14f6872 (PR #315) and records historical nika-estate 247deb86 as the upgrade from 74287c75",
     },
     {
         "path": "SSOT.md",

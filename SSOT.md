@@ -227,7 +227,7 @@ refused by `--check` (exit 5), the same contract every projection has.
 | `tools/estate/scripts/estate.py` | `python3 estate/public-verifier/emit.py --out` | `python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml` |
 | `tools/estate/scripts/selftest.py` | `python3 estate/public-verifier/emit.py --out` | `python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml` |
 
-Provenance floor: 1471 tracked files classified · authored 1136 · generated 137 · pinned-copy 4 · testimonial 193 (estate schema 2 · mode observation).
+Provenance floor: 1472 tracked files classified · authored 1137 · generated 137 · pinned-copy 4 · testimonial 193 (estate schema 2 · mode observation).
 
 <!-- /estate:map -->
 
