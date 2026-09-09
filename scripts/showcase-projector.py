@@ -541,7 +541,7 @@ def project_docs_page(page: Path, workflows: dict[str, str], templates: dict[str
             print(f"showcase-projector · {page.name} references unknown template {fname}",
                   file=sys.stderr)
             sys.exit(2)
-        return f"\n```yaml {fname}\n{templates[fname]}```\n"
+        return f"\n```yaml {fname} skeleton\n{templates[fname]}```\n"
 
     text, d1 = _replace_blocks(text, BEGIN, END, page.name, yaml_for)
     text, d2 = _replace_blocks(text, DAG_BEGIN, DAG_END, page.name, dag_for)

@@ -1,0 +1,27 @@
+name: Knowledge projection
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  projection:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.12'
+      - name: Fetch the content pin (it may predate a squash merge)
+        run: |
+          python3 - <<'PYTHON'
+          import json,re,subprocess
+          revision=json.load(open('reference/language-index.json'))['revision']
+          assert re.fullmatch('[a-f0-9]{40}',revision)
+          subprocess.run(['git','fetch','--no-tags','origin',revision],check=True)
+          PYTHON
+      - name: Schema and template knowledge has no drift
+        run: |
+          python3 scripts/knowledge-projector.py
+          python3 scripts/tests/test_knowledge_projector.py
