@@ -38,6 +38,35 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   preserves skipped external claims as unproved; exit zero only means that
   no local check failed.
 
+### Added · public Estate verifier projection (2026-09-09)
+
+- **`tools/estate/`** · seven-file generated projection of the Estate verifier
+  from pin `247deb86220035bed9b276606ce4a2957c5a8d57` / tree
+  `895a18cc0bfed9b0bb6dd66a4e7616cb09c0e039`, emitted by the accepted Lab
+  CLI (`estate/public-verifier/emit.py` on Lab main
+  `ba8755410d85582279e22121bd7a4be85c13be67`, Estate tree equal to
+  `8d771466dc384a48c46869b66bcefe76ec4ec46d`) and imported with git modes.
+  It is not a second editable implementation; write authority is not
+  switched. `scripts/check-estate-projection.py` reads `provenance.json`
+  and refuses missing, extra, symlink, or digest/mode drift without Lab
+  or network access and without authenticating a signature (none exists).
+  Dedicated least-privilege CI: `.github/workflows/estate-projection.yml`.
+  `ESTATE_PIN`, `scripts/estate.py` and existing conformance consumers are
+  unchanged — they wait for the merged publication SHA.
+
+### Changed · spec Estate consumer (2026-09-09)
+
+- **`ESTATE_PIN` / `scripts/estate.py` / conformance mirror** · consume the
+  published public projection
+  `nika-spec@f14f6872a0d9d3ba12c196810082336c963d2765:tools/estate/scripts/estate.py`
+  ([#315](https://github.com/supernovae-st/nika-spec/pull/315)). Historical
+  nika-estate source remains `247deb86220035bed9b276606ce4a2957c5a8d57`;
+  this is the explicit upgrade from `74287c75f3d52ee5cd328b6faaa5fb7eacf171f6`.
+  The mirror is byte- and mode-identical to the qualified projection. CI
+  fetches that already-published spec path and no longer curls nika-estate.
+  `scripts/test-estate-mirror.py` refuses byte or mode mismatch. Lab remains
+  the projection producer; write authority is not switched.
+
 ### Added
 
 - **`schemas/project.schema.json`** · the project file's JSON Schema, mirrored

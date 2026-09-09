@@ -219,8 +219,15 @@ refused by `--check` (exit 5), the same contract every projection has.
 | `examples/manifest.yaml` | `python3 scripts/showcase-projector.py --write` | `scripts/showcase-projector.py --check` |
 | `llms-full.txt` | `python3 scripts/llms-projector.py --write` | `scripts/llms-projector.py --check` |
 | `llms.txt` | `python3 scripts/llms-projector.py --write` | `scripts/llms-projector.py --check` |
+| `tools/estate/LICENSE` | `python3 estate/public-verifier/emit.py --out` | `python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml` |
+| `tools/estate/OPEN_DEFECTS.md` | `python3 estate/public-verifier/emit.py --out` | `python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml` |
+| `tools/estate/README.md` | `python3 estate/public-verifier/emit.py --out` | `python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml` |
+| `tools/estate/SCHEMA.md` | `python3 estate/public-verifier/emit.py --out` | `python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml` |
+| `tools/estate/provenance.json` | `python3 estate/public-verifier/emit.py --out` | `python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml` |
+| `tools/estate/scripts/estate.py` | `python3 estate/public-verifier/emit.py --out` | `python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml` |
+| `tools/estate/scripts/selftest.py` | `python3 estate/public-verifier/emit.py --out` | `python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml` |
 
-Provenance floor: 1461 tracked files classified · authored 1133 · generated 130 · pinned-copy 4 · testimonial 193 (estate schema 2 · mode observation).
+Provenance floor: 1472 tracked files classified · authored 1137 · generated 137 · pinned-copy 4 · testimonial 193 (estate schema 2 · mode observation).
 
 <!-- /estate:map -->
 

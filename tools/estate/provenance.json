@@ -1,0 +1,57 @@
+{
+  "schema": "nika-lab/estate-public-verifier/v1",
+  "kind": "generated-projection",
+  "editable_implementation": false,
+  "source_repository": "supernovae-st/nika-estate",
+  "source_commit": "247deb86220035bed9b276606ce4a2957c5a8d57",
+  "source_tree": "895a18cc0bfed9b0bb6dd66a4e7616cb09c0e039",
+  "license": "Apache-2.0",
+  "requires": [
+    "python3"
+  ],
+  "does_not_require": [
+    "nika-lab",
+    "nika-engine",
+    "nika-spec",
+    "nika-docs"
+  ],
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+      "mode": "100644"
+    },
+    {
+      "path": "SCHEMA.md",
+      "sha256": "162a360287fe44ddb946b55c5bcd07ae02a88d0b8b6f47863ee4e0745b622f4d",
+      "git_blob": "40ebc88b55abca0c7c0f0e7e15b9d685c7ed79a1",
+      "mode": "100644"
+    },
+    {
+      "path": "OPEN_DEFECTS.md",
+      "sha256": "27c0d884052fb6fe4568cd3b9a4069d812d729a1d0dd934ac523f22e260a6f06",
+      "git_blob": "a7421e7b3a85866898db5065b47841b9876caa4a",
+      "mode": "100644"
+    },
+    {
+      "path": "scripts/estate.py",
+      "sha256": "da4e737e27fb5a8d92bfc3d5e7e707f84825556d0c8c2c4af989bc10939123c1",
+      "git_blob": "9049f5f3c410bba15c7ac8bb850c453bdff1979d",
+      "mode": "100755"
+    },
+    {
+      "path": "scripts/selftest.py",
+      "sha256": "f9fc8995ac64eb49c2442c44cd957cc4e937c38efdf46465b82964e54b6f7559",
+      "git_blob": "efed0afea88c033ee074e2b73093601bd55ea9cb",
+      "mode": "100755"
+    }
+  ],
+  "generated": [
+    {
+      "path": "README.md",
+      "sha256": "1aba2e38e91b3034fc632f1db933f8bdbfdc036ed6fe71660b9223fce80fa983"
+    }
+  ],
+  "manifest": "provenance.json"
+}
