@@ -18,13 +18,13 @@ classes:
   testimonial: "captured evidence — fixtures, corpora, traces, receipts: proves behavior; neither shipped source nor regenerable output"
   foreign: "pointer to a third-party sovereign source"
 summary:
-  classified_files: 1461
-  file_rows: 15
+  classified_files: 1471
+  file_rows: 22
   pattern_rows: 29
   by_class:
-    authored: 1133
+    authored: 1136
     authored-pin: 1
-    generated: 130
+    generated: 137
     pinned-copy: 4
     testimonial: 193
     foreign: 0
@@ -54,7 +54,7 @@ files:
   evidence: "its own header: 'Bump deliberately: edit this' · the rev the shared estate tool is mirrored from, and the INPUT the mirror gate compares against"
 - path: "SSOT.md"
   class: authored
-  sha256: 4f2c81bee81feb1b95874193e776082c3b2d93b829145354f8966d3d9258ab41
+  sha256: a8bd6df41d9ffb1e50817e6590f52138b2b4e0bb39a4f46098860048d1468889
   evidence: "the map of where every fact lives — prose and judgments are authored, but it carries ONE generated island (the estate:map markers · §9): scripts/ssot-map-projector.py --write derives the gated-surfaces table from THIS manifest, and --check (exit 5 · conformance.yml 'Projection gates') refuses a hand edit inside the markers — the canon.yaml hybrid, inverted"
 - path: "VERSION"
   class: authored
@@ -162,6 +162,76 @@ files:
     inputs:
     - "ESTATE_PIN"
     - "supernovae-st/nika-estate@<ESTATE_PIN>:scripts/estate.py"
+- path: "tools/estate/LICENSE"
+  class: generated
+  sha256: c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4
+  evidence: "Apache-2.0 licence of the historical nika-estate pin, one of seven files the accepted Lab emitter writes; not an editable implementation"
+  derivation:
+    tool: "python3 estate/public-verifier/emit.py --out (Lab accepted emitter; import seven owned files with git modes — never hand-edit)"
+    gate: "python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml (check + tests + stock selftest; no Lab credential)"
+    inputs:
+    - "nika-lab estate/imported pin 247deb86220035bed9b276606ce4a2957c5a8d57 tree 895a18cc0bfed9b0bb6dd66a4e7616cb09c0e039"
+    - "nika-lab estate/public-verifier/emit.py on Lab main ba8755410d85582279e22121bd7a4be85c13be67 (Estate tree 8d771466dc384a48c46869b66bcefe76ec4ec46d)"
+- path: "tools/estate/OPEN_DEFECTS.md"
+  class: generated
+  sha256: 27c0d884052fb6fe4568cd3b9a4069d812d729a1d0dd934ac523f22e260a6f06
+  evidence: "documented classification defect of pin 247deb86, generated into the public projection; regenerate from Lab, never hand-edit"
+  derivation:
+    tool: "python3 estate/public-verifier/emit.py --out (Lab accepted emitter; import seven owned files with git modes — never hand-edit)"
+    gate: "python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml (check + tests + stock selftest; no Lab credential)"
+    inputs:
+    - "nika-lab estate/imported pin 247deb86220035bed9b276606ce4a2957c5a8d57 tree 895a18cc0bfed9b0bb6dd66a4e7616cb09c0e039"
+    - "nika-lab estate/public-verifier/emit.py on Lab main ba8755410d85582279e22121bd7a4be85c13be67 (Estate tree 8d771466dc384a48c46869b66bcefe76ec4ec46d)"
+- path: "tools/estate/README.md"
+  class: generated
+  sha256: 1aba2e38e91b3034fc632f1db933f8bdbfdc036ed6fe71660b9223fce80fa983
+  evidence: "emitter-generated README of the public projection (write authority not switched); its sha256 is declared in provenance.json generated[]; not a second editable implementation"
+  derivation:
+    tool: "python3 estate/public-verifier/emit.py --out (Lab accepted emitter; import seven owned files with git modes — never hand-edit)"
+    gate: "python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml (check + tests + stock selftest; no Lab credential)"
+    inputs:
+    - "nika-lab estate/imported pin 247deb86220035bed9b276606ce4a2957c5a8d57 tree 895a18cc0bfed9b0bb6dd66a4e7616cb09c0e039"
+    - "nika-lab estate/public-verifier/emit.py on Lab main ba8755410d85582279e22121bd7a4be85c13be67 (Estate tree 8d771466dc384a48c46869b66bcefe76ec4ec46d)"
+- path: "tools/estate/SCHEMA.md"
+  class: generated
+  sha256: 162a360287fe44ddb946b55c5bcd07ae02a88d0b8b6f47863ee4e0745b622f4d
+  evidence: "the estate law (SCHEMA.md) of pin 247deb86, generated into the public projection; regenerate from Lab, never hand-edit"
+  derivation:
+    tool: "python3 estate/public-verifier/emit.py --out (Lab accepted emitter; import seven owned files with git modes — never hand-edit)"
+    gate: "python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml (check + tests + stock selftest; no Lab credential)"
+    inputs:
+    - "nika-lab estate/imported pin 247deb86220035bed9b276606ce4a2957c5a8d57 tree 895a18cc0bfed9b0bb6dd66a4e7616cb09c0e039"
+    - "nika-lab estate/public-verifier/emit.py on Lab main ba8755410d85582279e22121bd7a4be85c13be67 (Estate tree 8d771466dc384a48c46869b66bcefe76ec4ec46d)"
+- path: "tools/estate/provenance.json"
+  class: generated
+  sha256: 144992cab21ce87c5661d56e9d6c7f809b83189ce8508450ee29d789eafaa5a2
+  evidence: "emitter-generated declaration of schema, pin, tree, per-file sha256/git blob/mode; a declaration, not a signature — the public checker reads it and does not regenerate from Lab"
+  derivation:
+    tool: "python3 estate/public-verifier/emit.py --out (Lab accepted emitter; import seven owned files with git modes — never hand-edit)"
+    gate: "python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml (check + tests + stock selftest; no Lab credential)"
+    inputs:
+    - "nika-lab estate/imported pin 247deb86220035bed9b276606ce4a2957c5a8d57 tree 895a18cc0bfed9b0bb6dd66a4e7616cb09c0e039"
+    - "nika-lab estate/public-verifier/emit.py on Lab main ba8755410d85582279e22121bd7a4be85c13be67 (Estate tree 8d771466dc384a48c46869b66bcefe76ec4ec46d)"
+- path: "tools/estate/scripts/estate.py"
+  class: generated
+  sha256: da4e737e27fb5a8d92bfc3d5e7e707f84825556d0c8c2c4af989bc10939123c1
+  evidence: "byte-identical estate tool of pin 247deb86 (mode 100755) generated into tools/estate/; not this repo's scripts/estate.py and not an editable second implementation"
+  derivation:
+    tool: "python3 estate/public-verifier/emit.py --out (Lab accepted emitter; import seven owned files with git modes — never hand-edit)"
+    gate: "python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml (check + tests + stock selftest; no Lab credential)"
+    inputs:
+    - "nika-lab estate/imported pin 247deb86220035bed9b276606ce4a2957c5a8d57 tree 895a18cc0bfed9b0bb6dd66a4e7616cb09c0e039"
+    - "nika-lab estate/public-verifier/emit.py on Lab main ba8755410d85582279e22121bd7a4be85c13be67 (Estate tree 8d771466dc384a48c46869b66bcefe76ec4ec46d)"
+- path: "tools/estate/scripts/selftest.py"
+  class: generated
+  sha256: f9fc8995ac64eb49c2442c44cd957cc4e937c38efdf46465b82964e54b6f7559
+  evidence: "byte-identical selftest battery of pin 247deb86 (mode 100755) generated into tools/estate/; stock interpreter only"
+  derivation:
+    tool: "python3 estate/public-verifier/emit.py --out (Lab accepted emitter; import seven owned files with git modes — never hand-edit)"
+    gate: "python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml (check + tests + stock selftest; no Lab credential)"
+    inputs:
+    - "nika-lab estate/imported pin 247deb86220035bed9b276606ce4a2957c5a8d57 tree 895a18cc0bfed9b0bb6dd66a4e7616cb09c0e039"
+    - "nika-lab estate/public-verifier/emit.py on Lab main ba8755410d85582279e22121bd7a4be85c13be67 (Estate tree 8d771466dc384a48c46869b66bcefe76ec4ec46d)"
 patterns:
 - glob: "canon/laws/**"
   class: authored
@@ -223,7 +293,7 @@ patterns:
 - glob: "conformance/**"
   class: authored
   match_count: 202
-  aggregate_sha256: 19fd5a3dd87dee23a4948b0067af7bb994a280d11939b0f4dde66079ae1adeea
+  aggregate_sha256: c872e37df86e78ee3ce28ed17939b742d9b742c4b31174c17f2b340dbfd6fee5
   evidence: "the 95-workflow corpus (envelope · variables · verbs · errors · dag · gates · types · yaml-profile · values · composition · decision-goldens frozen at authoring time and consumed by decision_core_selftest.py) + the Python cores/selftests/runner + README/FINDINGS/runner-protocol; type-corpus + coverage-matrix excepted in files:"
 - glob: "proofs/**"
   class: testimonial
@@ -294,13 +364,13 @@ patterns:
   evidence: "workflow.schema.json's own $comment: 'INTERIM hand-derived schema · prose spec is the single source of truth · regenerate + diff against engine nika-schema at GA' — authored today, generated at GA; law.schema.json + registries.schema.json are the sealed R2 design-pack contracts (consumed as-is, byte-identical per PROOFS.md §P0)"
 - glob: "scripts/**"
   class: authored
-  match_count: 22
-  aggregate_sha256: 77b21003b528997ed93160cbb0b2efa696733f5efc345e812069d2e92f18654f
+  match_count: 24
+  aggregate_sha256: cf58d3bbdd57fd412342f30fdad733523a309bf8ae03497e04128d5d5d45fd28
   evidence: "the compiler + projectors humans wrote (ssot-compiler · canon/showcase/llms/starters/authoring/design projectors · gen-gate-matrix · gen-type-corpus · check-md-refs) — the tools that WRITE the generated surfaces; estate.py excepted in files: (the self row)"
 - glob: "timeline/**"
   class: authored
   match_count: 4
-  aggregate_sha256: dbc39fe60139e86c917b2dc75c1ded403b8125a3a4cf1f518fa0d5ac80ef62b3
+  aggregate_sha256: 35e286615818ac6d53e2fcb14e14a8f899b23cc02f4a413a6172cb50988002c3
   evidence: "timeline.yaml (the SSOT — 'every provable claim … re-proven against its source of truth' per timeline.yml) + verify.py + project-board.py (writes OUTWARD to the org Projects board, never into this tree)"
 - glob: "registry/**"
   class: authored
@@ -319,13 +389,13 @@ patterns:
     - "the SPDX license-list canonical texts"
 - glob: ".github/**"
   class: authored
-  match_count: 9
-  aggregate_sha256: f9410e2c9a44eadd0aa5f70ab245a97083d35a26a3436c02a69e284e55f8c96f
+  match_count: 10
+  aggregate_sha256: cde874371d3e05d27017022c29667eb8faf9b99d39453f8c7f5569b668ca7e3e
   evidence: "6 hand-written SHA-pinned workflows (conformance · timeline · board · codeql · reuse · scorecard) + dependabot config — ZERO in-repo bot lanes: board.yml writes to the org Projects board, timeline.yml verifies read-only, nothing here rewrites tracked files; requirements.txt excepted in files:"
 - glob: "*"
   class: authored
   match_count: 16
-  aggregate_sha256: 4c437d05b3e6727ae27cb184514005f93bb75b1ecfba3b29114a3f9469cb71bc
+  aggregate_sha256: 88f0b3aa8d73cd1c3bbec32e2e0876a18246e83b9447bef4c7267f80721d9088
   evidence: "root prose + config (README · QUICKSTART · GLOSSARY · CONTRIBUTING · CHANGELOG hand-kept per Keep a Changelog · SECURITY · CITATION.cff · CONFORMANT_IMPLEMENTATIONS · PROOFS.md the receipts ledger · LICENSE · REUSE.toml · ruff.toml · .gitignore · .pre-commit-hooks.yaml · .bestpractices.json) — no generation markers; VERSION · llms*.txt · canon.yaml · CODE_OF_CONDUCT.md excepted in files:"
   note: "README · QUICKSTART · GLOSSARY · CONTRIBUTING · CHANGELOG carry the canon-projected count markers — tool-maintained blocks inside authored prose"
 - glob: "**"

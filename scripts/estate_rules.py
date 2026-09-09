@@ -154,6 +154,97 @@ FILES = [
             "inputs": ["https://www.contributor-covenant.org/version/2/1/code_of_conduct.html (CC-BY-4.0)"],
         },
     },
+    {
+        "path": "tools/estate/LICENSE",
+        "class": "generated",
+        "evidence": "Apache-2.0 licence of the historical nika-estate pin, one of seven files the accepted Lab emitter writes; not an editable implementation",
+        "derivation": {
+            "tool": "python3 estate/public-verifier/emit.py --out (Lab accepted emitter; import seven owned files with git modes — never hand-edit)",
+            "gate": "python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml (check + tests + stock selftest; no Lab credential)",
+            "inputs": [
+                "nika-lab estate/imported pin 247deb86220035bed9b276606ce4a2957c5a8d57 tree 895a18cc0bfed9b0bb6dd66a4e7616cb09c0e039",
+                "nika-lab estate/public-verifier/emit.py on Lab main ba8755410d85582279e22121bd7a4be85c13be67 (Estate tree 8d771466dc384a48c46869b66bcefe76ec4ec46d)",
+            ],
+        },
+    },
+    {
+        "path": "tools/estate/OPEN_DEFECTS.md",
+        "class": "generated",
+        "evidence": "documented classification defect of pin 247deb86, generated into the public projection; regenerate from Lab, never hand-edit",
+        "derivation": {
+            "tool": "python3 estate/public-verifier/emit.py --out (Lab accepted emitter; import seven owned files with git modes — never hand-edit)",
+            "gate": "python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml (check + tests + stock selftest; no Lab credential)",
+            "inputs": [
+                "nika-lab estate/imported pin 247deb86220035bed9b276606ce4a2957c5a8d57 tree 895a18cc0bfed9b0bb6dd66a4e7616cb09c0e039",
+                "nika-lab estate/public-verifier/emit.py on Lab main ba8755410d85582279e22121bd7a4be85c13be67 (Estate tree 8d771466dc384a48c46869b66bcefe76ec4ec46d)",
+            ],
+        },
+    },
+    {
+        "path": "tools/estate/README.md",
+        "class": "generated",
+        "evidence": "emitter-generated README of the public projection (write authority not switched); its sha256 is declared in provenance.json generated[]; not a second editable implementation",
+        "derivation": {
+            "tool": "python3 estate/public-verifier/emit.py --out (Lab accepted emitter; import seven owned files with git modes — never hand-edit)",
+            "gate": "python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml (check + tests + stock selftest; no Lab credential)",
+            "inputs": [
+                "nika-lab estate/imported pin 247deb86220035bed9b276606ce4a2957c5a8d57 tree 895a18cc0bfed9b0bb6dd66a4e7616cb09c0e039",
+                "nika-lab estate/public-verifier/emit.py on Lab main ba8755410d85582279e22121bd7a4be85c13be67 (Estate tree 8d771466dc384a48c46869b66bcefe76ec4ec46d)",
+            ],
+        },
+    },
+    {
+        "path": "tools/estate/SCHEMA.md",
+        "class": "generated",
+        "evidence": "the estate law (SCHEMA.md) of pin 247deb86, generated into the public projection; regenerate from Lab, never hand-edit",
+        "derivation": {
+            "tool": "python3 estate/public-verifier/emit.py --out (Lab accepted emitter; import seven owned files with git modes — never hand-edit)",
+            "gate": "python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml (check + tests + stock selftest; no Lab credential)",
+            "inputs": [
+                "nika-lab estate/imported pin 247deb86220035bed9b276606ce4a2957c5a8d57 tree 895a18cc0bfed9b0bb6dd66a4e7616cb09c0e039",
+                "nika-lab estate/public-verifier/emit.py on Lab main ba8755410d85582279e22121bd7a4be85c13be67 (Estate tree 8d771466dc384a48c46869b66bcefe76ec4ec46d)",
+            ],
+        },
+    },
+    {
+        "path": "tools/estate/provenance.json",
+        "class": "generated",
+        "evidence": "emitter-generated declaration of schema, pin, tree, per-file sha256/git blob/mode; a declaration, not a signature — the public checker reads it and does not regenerate from Lab",
+        "derivation": {
+            "tool": "python3 estate/public-verifier/emit.py --out (Lab accepted emitter; import seven owned files with git modes — never hand-edit)",
+            "gate": "python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml (check + tests + stock selftest; no Lab credential)",
+            "inputs": [
+                "nika-lab estate/imported pin 247deb86220035bed9b276606ce4a2957c5a8d57 tree 895a18cc0bfed9b0bb6dd66a4e7616cb09c0e039",
+                "nika-lab estate/public-verifier/emit.py on Lab main ba8755410d85582279e22121bd7a4be85c13be67 (Estate tree 8d771466dc384a48c46869b66bcefe76ec4ec46d)",
+            ],
+        },
+    },
+    {
+        "path": "tools/estate/scripts/estate.py",
+        "class": "generated",
+        "evidence": "byte-identical estate tool of pin 247deb86 (mode 100755) generated into tools/estate/; not this repo's scripts/estate.py and not an editable second implementation",
+        "derivation": {
+            "tool": "python3 estate/public-verifier/emit.py --out (Lab accepted emitter; import seven owned files with git modes — never hand-edit)",
+            "gate": "python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml (check + tests + stock selftest; no Lab credential)",
+            "inputs": [
+                "nika-lab estate/imported pin 247deb86220035bed9b276606ce4a2957c5a8d57 tree 895a18cc0bfed9b0bb6dd66a4e7616cb09c0e039",
+                "nika-lab estate/public-verifier/emit.py on Lab main ba8755410d85582279e22121bd7a4be85c13be67 (Estate tree 8d771466dc384a48c46869b66bcefe76ec4ec46d)",
+            ],
+        },
+    },
+    {
+        "path": "tools/estate/scripts/selftest.py",
+        "class": "generated",
+        "evidence": "byte-identical selftest battery of pin 247deb86 (mode 100755) generated into tools/estate/; stock interpreter only",
+        "derivation": {
+            "tool": "python3 estate/public-verifier/emit.py --out (Lab accepted emitter; import seven owned files with git modes — never hand-edit)",
+            "gate": "python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml (check + tests + stock selftest; no Lab credential)",
+            "inputs": [
+                "nika-lab estate/imported pin 247deb86220035bed9b276606ce4a2957c5a8d57 tree 895a18cc0bfed9b0bb6dd66a4e7616cb09c0e039",
+                "nika-lab estate/public-verifier/emit.py on Lab main ba8755410d85582279e22121bd7a4be85c13be67 (Estate tree 8d771466dc384a48c46869b66bcefe76ec4ec46d)",
+            ],
+        },
+    },
 ]
 
 # ── patterns: ordered glob rows — FIRST-MATCH-WINS ──────────────────────────
