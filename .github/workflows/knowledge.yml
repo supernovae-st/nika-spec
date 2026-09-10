@@ -21,6 +21,12 @@ jobs:
           assert re.fullmatch('[a-f0-9]{40}',revision)
           subprocess.run(['git','fetch','--no-tags','origin',revision],check=True)
           PYTHON
+      - name: Install registry parser
+        run: pip install pyyaml
+      - name: Template registry matches its sources
+        run: |
+          python3 scripts/template-registry.py
+          python3 scripts/tests/test_template_registry.py
       - name: Schema and template knowledge has no drift
         run: |
           python3 scripts/knowledge-projector.py
