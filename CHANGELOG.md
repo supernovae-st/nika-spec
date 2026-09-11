@@ -13,6 +13,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added · template refusal completeness (2026-09-11)
+
+- **Nine remaining skeletons keep a refusal witness.** `chain`, `fanout`,
+  `gate-and-act`, `agent-loop`, `api-upload-and-create`, `docker-report`,
+  `etl-state`, `media-asset-pack` and `website-brief` now ship
+  `<id>.negative.yaml` beside the scaffold. The reference oracle asserts
+  invalidity; the native engine asserts the `# Expected` diagnostic.
+
 ### Fixed · September delivery follow-up (2026-09-08)
 
 - **Typed constants in variable fixtures** ([#313](https://github.com/supernovae-st/nika-spec/pull/313)).
