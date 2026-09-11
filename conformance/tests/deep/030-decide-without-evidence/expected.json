@@ -1,0 +1,9 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-BUILTIN-001"
+    }
+  ],
+  "note": "nika:decide requires both bundle and evidence arguments; content is judged at runtime."
+}

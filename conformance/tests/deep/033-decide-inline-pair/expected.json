@@ -1,0 +1,5 @@
+{
+  "valid": true,
+  "errors": [],
+  "note": "nika:decide requires both bundle and evidence arguments; content is judged at runtime."
+}

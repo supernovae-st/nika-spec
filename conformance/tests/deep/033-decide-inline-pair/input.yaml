@@ -1,0 +1,91 @@
+# SPDX-License-Identifier: Apache-2.0
+# Law: stdlib/builtins-v0.1.md §nika:decide — bundle + EvidenceSnapshot.
+nika: decide-inline-pair
+permits:
+  tools:
+  - nika:decide
+tasks:
+  decide:
+    invoke:
+      tool: nika:decide
+      args:
+        bundle:
+          decision_bundle_format: 1
+          manifest:
+            id: incident-route
+            version: 1.0.0
+            owner: example-org
+            license: Apache-2.0
+            valid_until: '2028-01-01T00:00:00Z'
+          evidence_schema:
+            urgency:
+              type: integer
+              required: true
+              sources:
+              - classifier
+              integrity: observed
+          transforms:
+            urgency_step:
+              kind: bucket
+              min: 0
+              max: 1
+              edges:
+              - 1
+              values:
+              - 0
+              - 10000
+          rules:
+            dimensions:
+              incident_priority:
+                terms:
+                - evidence: urgency
+                  transform: urgency_step
+                  weight_bp: 10000
+                  monotonicity: increases
+            thresholds:
+            - dimension: incident_priority
+              recommend_gte_bp: 5000
+          governance:
+            never_automatic:
+            - recommend
+            override:
+              append_only: true
+              reason_required: true
+            appeal: ask the incident commander
+            human_required_triggers:
+            - conflict_on_required
+          fixtures:
+          - name: urgent
+            class: positive
+            evidence:
+              urgency: 1
+          - name: routine
+            class: negative
+            evidence:
+              urgency: 0
+          - name: edge
+            class: ambiguous
+            evidence:
+              urgency: 0
+          - name: conflict
+            class: contradictory
+            evidence:
+              urgency: 1
+          - name: probe
+            class: adversarial
+            evidence:
+              urgency: 1
+        evidence:
+          t: '2027-01-01T00:00:00Z'
+          evidence:
+          - key: urgency
+            value: 1
+            source: classifier
+            observed_at: '2027-01-01T00:00:00Z'
+            digest: fixture-urgency
+            confidentiality: internal
+            integrity: observed
+            quality:
+              freshness: fresh
+              completeness: complete
+              independence_group: classifier
