@@ -16,10 +16,15 @@
 # scalar `workflow:` carries no prose). Their ids are NOT reused.
 
 import sys
+import contextlib
+import io
 from pathlib import Path
+import tempfile
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from runner import corpus_contract_errors  # noqa: E402
+import runner  # noqa: E402
 
 SPEC_ROOT = Path(__file__).resolve().parent.parent
 
@@ -92,9 +97,34 @@ for f in sorted((SPEC_ROOT / "examples").glob("*.nika.yaml")) + sorted(
 if swept < 40:
     failures.append(f"live sweep saw only {swept} files — the corpus moved out from under the gate")
 
+# The all command must not silently stop checking the template shelf when
+# its directory disappears. Stub only unrelated fixture suites: real
+# corpus validation proves both the missing shelf and the restored one.
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    for relative in ("examples", "examples/snippets"):
+        directory = root / relative
+        directory.mkdir(parents=True, exist_ok=True)
+        (directory / "specimen.nika.yaml").write_text(CLEAN_JOB)
+    witness = root / runner.WITNESS_RED[0]
+    witness.parent.mkdir(parents=True)
+    witness.write_bytes((SPEC_ROOT / runner.WITNESS_RED[0]).read_bytes())
+    with patch.object(runner, "SPEC_ROOT", root), patch.object(runner, "run_fixtures", return_value=0):
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            missing_rc = runner.main(["runner.py", "all"])
+        if missing_rc != 1 or "no *.nika.yaml found" not in output.getvalue():
+            failures.append("all accepted a missing template shelf")
+        (root / "templates").mkdir()
+        (root / "templates/specimen.nika.yaml").write_text(CLEAN_JOB)
+        with contextlib.redirect_stdout(io.StringIO()):
+            restored_rc = runner.main(["runner.py", "all"])
+        if restored_rc != 0:
+            failures.append("all refused the restored valid template shelf")
+
 if failures:
     print("corpus_contract_selftest FAIL")
     for f in failures:
         print(f"  ✗ {f}")
     sys.exit(1)
-print(f"corpus_contract_selftest PASS · 3 laws × both ways · {swept} shipped files green")
+print(f"corpus_contract_selftest PASS · 3 laws × both ways · mandatory template shelf · {swept} shipped files green")

@@ -1419,9 +1419,10 @@ def main(argv: list[str]) -> int:
         print("\n== examples/snippets (the website's registered yamls · same gate) ==")
         rc |= run_examples(SPEC_ROOT / "examples" / "snippets", validator, canon)
         templates = SPEC_ROOT / "templates"
-        if templates.is_dir():
-            print("\n== templates (instantiable skeletons · must stay valid) ==")
-            rc |= run_examples(templates, validator, canon)
+        # Like snippets, the shipped skeleton shelf is mandatory. Missing
+        # sources must fail the empty-corpus floor, never retire this gate.
+        print("\n== templates (instantiable skeletons · must stay valid) ==")
+        rc |= run_examples(templates, validator, canon)
         return rc
     print(__doc__)
     return 2
