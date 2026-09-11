@@ -1357,6 +1357,28 @@ def run_examples(examples_dir: pathlib.Path, validator: Draft202012Validator,
     return 1 if bad else 0
 
 
+def run_template_refusals(templates_dir: pathlib.Path, validator: Draft202012Validator,
+                         canon: dict | None = None) -> int:
+    """Every adjacent negative must be rejected by the reference oracle.
+
+    These witnesses name native-engine codes in their headers. This gate
+    checks invalidity only: the oracle can refuse at an earlier layer or
+    report a namespace instead of the engine's exact diagnostic code.
+    """
+    corpus = sorted(templates_dir.glob("*.negative.yaml"))
+    if not corpus:
+        print(f"FAIL  {templates_dir} · no *.negative.yaml found — the refusal gate is blind")
+        return 1
+    bad = 0
+    for path in corpus:
+        verdict = validate_text(path.read_text(), validator, canon, base_dir=path.parent)
+        ok = verdict["valid"] is False
+        print(f"{'PASS' if ok else 'FAIL'}  {path.name} · expected invalid")
+        if not ok:
+            bad += 1
+    return 1 if bad else 0
+
+
 def main(argv: list[str]) -> int:
     engine_cmd = None
     if "--engine" in argv:
@@ -1423,6 +1445,8 @@ def main(argv: list[str]) -> int:
         # sources must fail the empty-corpus floor, never retire this gate.
         print("\n== templates (instantiable skeletons · must stay valid) ==")
         rc |= run_examples(templates, validator, canon)
+        print("\n== template refusals (negative skeletons · must stay invalid) ==")
+        rc |= run_template_refusals(templates, validator, canon)
         return rc
     print(__doc__)
     return 2

@@ -117,14 +117,28 @@ with tempfile.TemporaryDirectory() as tmp:
             failures.append("all accepted a missing template shelf")
         (root / "templates").mkdir()
         (root / "templates/specimen.nika.yaml").write_text(CLEAN_JOB)
+        negative = root / "templates/specimen.negative.yaml"
+        negative.write_text("nika: specimen-negative\ntasks: {}\n")
         with contextlib.redirect_stdout(io.StringIO()):
             restored_rc = runner.main(["runner.py", "all"])
         if restored_rc != 0:
             failures.append("all refused the restored valid template shelf")
+        negative.write_text(CLEAN_JOB)
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            accepted_rc = runner.main(["runner.py", "all"])
+        if accepted_rc != 1 or "FAIL  specimen.negative.yaml" not in output.getvalue():
+            failures.append("all accepted a negative template that became valid")
+        negative.unlink()
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            absent_rc = runner.main(["runner.py", "all"])
+        if absent_rc != 1 or "no *.negative.yaml found" not in output.getvalue():
+            failures.append("all accepted an empty negative-template corpus")
 
 if failures:
     print("corpus_contract_selftest FAIL")
     for f in failures:
         print(f"  ✗ {f}")
     sys.exit(1)
-print(f"corpus_contract_selftest PASS · 3 laws × both ways · mandatory template shelf · {swept} shipped files green")
+print(f"corpus_contract_selftest PASS · 3 laws × both ways · mandatory template shelf and refusals · {swept} shipped files green")
