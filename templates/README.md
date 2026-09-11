@@ -143,8 +143,12 @@ When a hint tells you to remove something, run the file before you believe it.
 - Every template passes the same conformance gate as the examples —
   a template that drifts from the spec FAILS CI.
 - Every new form keeps its refusal beside it as `<id>.negative.yaml` and its
-  replay pin as `<id>.nika.yaml.golden.json`. The negative names the exact
-  diagnostic the wrong form must keep emitting; `nika test <id>.nika.yaml`
+  replay pin as `<id>.nika.yaml.golden.json`. `conformance/runner.py all`
+  requires every adjacent negative to remain invalid, and fails if the
+  negative corpus is empty. Its reference oracle may report a namespace or
+  refuse at an earlier validation layer. The negative's `# Expected` header
+  names the exact diagnostic to assert against the native engine;
+  `nika test <id>.nika.yaml`
   proves the typed outputs against the committed golden.
 - Templates ship in the [versioned pack](../examples/manifest.yaml)
   (sha256 per file) — the engine embeds them, so `nika new` works

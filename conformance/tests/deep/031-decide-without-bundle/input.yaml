@@ -1,0 +1,25 @@
+# SPDX-License-Identifier: Apache-2.0
+# Law: stdlib/builtins-v0.1.md §nika:decide — bundle + EvidenceSnapshot.
+nika: decide-without-bundle
+permits:
+  tools:
+  - nika:decide
+tasks:
+  decide:
+    invoke:
+      tool: nika:decide
+      args:
+        evidence:
+          t: '2027-01-01T00:00:00Z'
+          evidence:
+          - key: urgency
+            value: 1
+            source: classifier
+            observed_at: '2027-01-01T00:00:00Z'
+            digest: fixture-urgency
+            confidentiality: internal
+            integrity: observed
+            quality:
+              freshness: fresh
+              completeness: complete
+              independence_group: classifier

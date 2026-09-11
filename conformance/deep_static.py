@@ -1475,6 +1475,16 @@ def deep_static_errors(doc: dict, base_dir=None) -> list[dict]:
             continue
         tool = inv.get("tool")
         args = inv.get("args")
+        if tool == "nika:decide":
+            # The snapshot is the `evidence:` argument, beside `bundle:`.
+            # Presence is static; bundle and evidence content are judged by
+            # the decision evaluator at run (stdlib/builtins-v0.1.md).
+            for required in ("bundle", "evidence"):
+                if not isinstance(args, dict) or required not in args:
+                    errs.append({"code": "NIKA-BUILTIN-001", "namespace": "NIKA-BUILTIN",
+                                 "category": "validation_error",
+                                 "detail": f"task '{tid}' · nika:decide requires `{required}:` "
+                                           "(builtins-v0.1.md · Decision Bundle + EvidenceSnapshot)"})
         if tool == "nika:write" and isinstance(args, dict) and "content" not in args:
             errs.append({"namespace": "NIKA-BUILTIN", "category": "validation_error",
                          "detail": f"task '{tid}' · nika:write requires a content: arg "

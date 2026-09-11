@@ -124,6 +124,13 @@ Runner subcommands · `validate <file>` (one verdict JSON) · `run <dir>`
 (the CI gate · core + stdlib + deep + examples + showcase + templates ·
 exit non-zero on any failure).
 
+The template corpus includes adjacent `templates/*.negative.yaml` witnesses.
+`all` asserts that each is invalid under the reference oracle and fails if
+none are found. Their `# Expected` headers describe native-engine diagnostic
+codes; this oracle gate does not assert those codes, because the reference
+oracle can report a namespace or reject at an earlier validation layer.
+Exact diagnostic assertions belong to the native engine's template tests.
+
 ## Pass criteria (per fixture)
 
 1. Parse + statically validate `input.yaml`.
