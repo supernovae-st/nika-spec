@@ -46,7 +46,7 @@ For standard maturity or engine conformance work, select the relevant contract:
 2. Spec sections live in `spec/01-*.md` … — additive evolution,
    breaking changes need an engine-side MINOR + changelog entry.
 3. Examples in `examples/*.nika.yaml` must stay valid against the spec.
-4. Commit trailer: `Co-Authored-By: Nika 🦋 <nika@supernovae.studio>`.
+4. Sign off every commit with `git commit --signoff`; `Signed-off-by` must match the commit author identity (DCO). Also include `Co-Authored-By: Nika 🦋 <nika@supernovae.studio>`.
 
 ## Completion
 
