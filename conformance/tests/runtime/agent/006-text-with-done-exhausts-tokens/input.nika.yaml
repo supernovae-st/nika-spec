@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+# 02-verbs: explicit completion and bounded text-only continuation.
+nika: rt-agent-text-with-done-exhausts-tokens
+model: mock/text
+permits: {}
+tasks:
+  work:
+    agent:
+      prompt: "I will do the work."
+      tools: ["nika:done"]
+      max_turns: 10
+      max_tokens_total: 1

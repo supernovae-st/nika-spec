@@ -38,7 +38,7 @@ tests/runtime/<area>/<NNN-name>/
 }
 ```
 
-Determinism rules · `mock/echo` only — its output is
+Determinism rules · offline `mock` profiles — `mock/echo` output is
 `mock(echo) · <prompt>` (the marker is PART of the contract: synthetic
 output never masquerades as real content, and the spec's own examples
 teach the same format — retuned 2026-07-30 from the aspirational
@@ -47,6 +47,13 @@ teach the same format — retuned 2026-07-30 from the aspirational
 schema → shaped defaults · no network (fetch fixtures use the engine's
 HTTP mock · post-announce) · no wall-clock asserts (durations are
 reported · never asserted).
+
+`mock/text` is the text-only probe for agent completion. It uses the same
+echo and schema-shaped response rules, with the `mock(text) · ` marker for
+unstructured text, but MUST emit no tool calls even when tools are offered
+or requested. It lets a fixture exercise a model that keeps answering in
+prose: a granted completion sentinel must lead to a budget failure instead
+of a false success. `mock/echo` keeps its existing tool-call behavior.
 
 ## The areas (one per execution contract)
 
