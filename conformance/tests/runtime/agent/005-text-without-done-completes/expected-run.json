@@ -1,0 +1,10 @@
+{
+  "workflow_state": "success",
+  "tasks": {
+    "work": {
+      "status": "success",
+      "output": "mock(text) \u00b7 I will do the work."
+    }
+  },
+  "note": "02-verbs termination: text alone completes only without a granted nika:done."
+}
