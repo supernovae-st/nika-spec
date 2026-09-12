@@ -19,7 +19,7 @@ templates:
     law_ids: []
     introduced_in: C0
     source_path: templates/agent-loop.nika.yaml
-    source_digest: sha256:c3c372370520147c69da2163731cfca9372e0009470a796720679f61de790a4d
+    source_digest: sha256:e31f0bd9c0ef27fad76fa3d35927e3ed81da65b8f3f6fd785a09916faa141acf
     category: agent-loop
     tags: [research, review]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
