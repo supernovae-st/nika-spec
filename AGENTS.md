@@ -51,3 +51,10 @@ For standard maturity or engine conformance work, select the relevant contract:
 ## Completion
 
 Finish the authorized change through relevant validation and requested publication. Keep normative behavior changes paired with their conformance fixtures as specified in `CONTRIBUTING.md`. This entry refactor does not change a language law. Preserve concurrent edits and separate pre-existing failures from failures introduced here. Shared instructions work across model choices; client capability and measured behavior remain separate qualification concerns.
+
+## Public audience
+
+This repository publishes language contracts and public implementation guidance.
+Keep internal workspaces, developer services, private plans and operational
+identities in their private owners. Source provenance must cite the public
+contract without disclosing the private systems that consume it.

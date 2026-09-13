@@ -1,5 +1,5 @@
 {
-  "schema": "nika-lab/estate-public-verifier/v1",
+  "schema": "nika-estate/public-verifier/v1",
   "kind": "generated-projection",
   "editable_implementation": false,
   "source_repository": "supernovae-st/nika-estate",
@@ -10,7 +10,6 @@
     "python3"
   ],
   "does_not_require": [
-    "nika-lab",
     "nika-engine",
     "nika-spec",
     "nika-docs"
@@ -50,7 +49,7 @@
   "generated": [
     {
       "path": "README.md",
-      "sha256": "1aba2e38e91b3034fc632f1db933f8bdbfdc036ed6fe71660b9223fce80fa983"
+      "sha256": "9aae8cd2636fdac1011ab054491c704efb987d9160348eb61e01b1a09dd1167c"
     }
   ],
   "manifest": "provenance.json"
