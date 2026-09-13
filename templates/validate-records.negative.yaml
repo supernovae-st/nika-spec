@@ -9,15 +9,7 @@ const:
     amount: 10
   - id: b
     amount: 20
-permits:
-  tools:
-  - nika:assert
-  - nika:jq
-  - nika:validate
-  - nika:read
-  fs:
-    read:
-    - ./allowed.json
+permits: {}
 tasks:
   validate:
     invoke:

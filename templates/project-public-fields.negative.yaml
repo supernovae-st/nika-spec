@@ -12,15 +12,7 @@ const:
     severity: 2
     email: private@example.invalid
     internal_note: internal-only-fixture
-permits:
-  tools:
-  - nika:assert
-  - nika:jq
-  - nika:validate
-  - nika:read
-  fs:
-    read:
-    - ./allowed.json
+permits: {}
 tasks:
   validate:
     invoke:
