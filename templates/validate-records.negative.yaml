@@ -1,0 +1,61 @@
+# SPDX-License-Identifier: Apache-2.0
+# COUNTEREXAMPLE · The validation builtin requires explicit tool authority.
+# Expected · NIKA-SEC-004.
+nika: validate-records
+const:
+  batch: daily-orders
+  records:
+  - id: a
+    amount: 10
+  - id: b
+    amount: 20
+permits:
+  tools:
+  - nika:assert
+  - nika:jq
+tasks:
+  validate:
+    invoke:
+      tool: nika:validate
+      args:
+        data: ${{ const.records }}
+        format: json
+        schema:
+          type: array
+          maxItems: 8
+          items:
+            type: object
+            additionalProperties: false
+            required:
+            - id
+            - amount
+            properties:
+              id:
+                type: string
+                minLength: 1
+                maxLength: 64
+              amount:
+                type: integer
+                minimum: 0
+                maximum: 1000000
+  admit:
+    with:
+      valid: ${{ tasks.validate.output.valid }}
+    invoke:
+      tool: nika:assert
+      args:
+        condition: ${{ with.valid }}
+        message: Input violates the declared shape or size bound
+  report:
+    after:
+      admit: success
+    invoke:
+      tool: nika:jq
+      args:
+        input:
+          batch: ${{ const.batch }}
+          records: ${{ const.records }}
+        expression: '{batch, count: (.records | length), total: ([.records[].amount]
+          | add // 0)}'
+outputs:
+  report: ${{ tasks.report.output }}

@@ -70,6 +70,8 @@ COVERAGE_BEGIN = "{/* showcase:coverage-begin */}"
 COVERAGE_END = "{/* showcase:coverage-end */}"
 TEMPLATE_BEGIN = re.compile(r"\{/\* template:begin ([a-z0-9-]+\.nika\.yaml) \*/\}")
 TEMPLATE_END = "{/* template:end */}"
+TEMPLATE_INDEX_BEGIN = "{/* template-index:begin */}"
+TEMPLATE_INDEX_END = "{/* template-index:end */}"
 
 def _mermaid_classes() -> str:
     """Verb classDefs from design/tokens.yaml — the shared visual vocabulary
@@ -548,8 +550,17 @@ def project_docs_page(page: Path, workflows: dict[str, str], templates: dict[str
     text, d4 = _replace_blocks(text, TEMPLATE_BEGIN, TEMPLATE_END, page.name, template_yaml_for)
     cov_re = re.compile(re.escape(COVERAGE_BEGIN))
     text, d3 = _replace_blocks(text, cov_re, COVERAGE_END, page.name,
-                               lambda _k: render_coverage(workflows))
-    dirty = d1 or d2 or d3 or d4
+                               lambda _k: render_coverage({k: v for k, v in workflows.items() if not IS_LESSON.match(k)}))
+    def template_index(_key):
+        lines = ["", "| Source template | Copyable skeleton |", "|---|---|"]
+        for fname in sorted(templates):
+            name = fname.removesuffix(".nika.yaml")
+            lines.append(f"| `{name}` | [{name}](#{name}) |")
+        return "\n".join(lines) + "\n"
+
+    text, d5 = _replace_blocks(text, re.compile(re.escape(TEMPLATE_INDEX_BEGIN)),
+                              TEMPLATE_INDEX_END, page.name, template_index)
+    dirty = d1 or d2 or d3 or d4 or d5
     if dirty and write:
         page.write_text(text)
     return not dirty
@@ -639,6 +650,9 @@ def main() -> int:
         return 2
     write = mode == "--write"
     workflows = load_showcase()
+    # Lessons are copyable docs sources too. Keep the jobs-only inventory for
+    # website cards, while resolving all lesson markers through the same door.
+    docs_workflows = {f.name: lean(f.read_text()) for f in sorted(JOBS_DIR.glob("*.nika.yaml"))}
     templates = {}
     tdir = SPEC_ROOT / "templates"
     if tdir.is_dir():
@@ -669,7 +683,7 @@ def main() -> int:
         managed_pages += sorted(guides_dir.glob("*.mdx"))
     if pages_dir.is_dir():
         for page in managed_pages:
-            in_sync = project_docs_page(page, workflows, templates, write)
+            in_sync = project_docs_page(page, docs_workflows, templates, write)
             if in_sync:
                 continue
             if write:
@@ -696,6 +710,16 @@ def main() -> int:
             else:
                 print(msg, file=sys.stderr)
                 rc = 1
+
+    # A catalog entry without a copyable body is an authoring dead end.
+    if guides_dir.is_dir():
+        referenced_templates = set()
+        for page in managed_pages:
+            referenced_templates.update(TEMPLATE_BEGIN.findall(page.read_text()))
+        missing = sorted(set(templates) - referenced_templates)
+        if missing:
+            print("showcase-projector · templates with NO docs block: " + ", ".join(missing), file=sys.stderr)
+            rc = 1
 
     # TARGET 1b · docs counts snippet (next to _canon.mdx)
     snippets_dir = docs_root / "snippets"

@@ -177,3 +177,83 @@ templates:
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
       inventory) · source verified on disk · digest = real sha256 of the source bytes at import · routing intent
       per templates/README.md.'
+  - id: bounded-batch
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: 0.120.0-dev
+    source_path: templates/bounded-batch.nika.yaml
+    source_digest: sha256:5333556fdb46fd16bd6e48f9a267d470558f6e663e2510df6322066eb75833d2
+    category: bounded-batch
+    tags: [authoring, bounded]
+    notes: 'admit a finite batch before starting model calls'
+  - id: validate-records
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: 0.120.0-dev
+    source_path: templates/validate-records.nika.yaml
+    source_digest: sha256:fa9c9f0ea60b2d73b45d14ea5f55053b70ff01eadf70f11ab5aab6f53cb41d2c
+    category: validate-records
+    tags: [authoring, bounded]
+    notes: 'reject malformed records before producing totals'
+  - id: snapshot-diff
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: 0.120.0-dev
+    source_path: templates/snapshot-diff.nika.yaml
+    source_digest: sha256:ec5772c13742e1ce2a8555663ce1d6832a17f35aa52c679b91b1750f81b86837
+    category: snapshot-diff
+    tags: [authoring, bounded]
+    notes: 'compare two snapshots without model judgment'
+  - id: deduplicate-records
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: 0.120.0-dev
+    source_path: templates/deduplicate-records.nika.yaml
+    source_digest: sha256:268f72d69e07053f22042ff69e34071092c9c349be060fed7811763bf083c073
+    category: deduplicate-records
+    tags: [authoring, bounded]
+    notes: 'collapse identical duplicates and refuse conflicts'
+  - id: project-public-fields
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: 0.120.0-dev
+    source_path: templates/project-public-fields.nika.yaml
+    source_digest: sha256:c4bc776cf730f13543c0379eec178ebf90dfb465c51b1d356ed6628c0f4fc614
+    category: project-public-fields
+    tags: [authoring, bounded]
+    notes: 'select allowed fields before sending data to a model'
+  - id: parallel-review
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: 0.120.0-dev
+    source_path: templates/parallel-review.nika.yaml
+    source_digest: sha256:d02b45349edb57fe66b0692584c822f5bab0a7620c0d5d6ec445d96d332f43db
+    category: parallel-review
+    tags: [authoring, bounded]
+    notes: 'collect independent reviews with a deterministic conjunction'
+  - id: recover-optional-file
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: 0.120.0-dev
+    source_path: templates/recover-optional-file.nika.yaml
+    source_digest: sha256:923ed35265aadfbf46cb6be76e86655d0cc03c37950128d3c05664e665c467de
+    category: recover-optional-file
+    tags: [authoring, bounded]
+    notes: 'recover a missing optional file without hiding other failures'
+  - id: aggregate-by-key
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: 0.120.0-dev
+    source_path: templates/aggregate-by-key.nika.yaml
+    source_digest: sha256:a7a34d9415e3187ff32607d79272da49e790500f1998593730c5047dc8a111fd
+    category: aggregate-by-key
+    tags: [authoring, bounded]
+    notes: 'group validated integer amounts with exact totals'
