@@ -3,7 +3,7 @@
 
 The checker is exercised through its CLI on temporary copies. The stock
 selftest of the real committed bundle is also required to pass. Nothing
-here reaches Lab, the network, or private paths.
+here reaches the network or private paths.
 
     python3 scripts/test-estate-projection.py
 """
@@ -177,7 +177,7 @@ class EstateProjectionTests(unittest.TestCase):
     def test_checker_has_no_lab_or_network_surface(self):
         text = CHECK.read_text()
         self.assertNotIn("estate/imported", text)
-        self.assertNotIn("nika-lab-migration", text)
+        self.assertNotIn("private-workspace", text)
         self.assertNotIn("urllib", text)
         self.assertNotIn("requests", text)
         self.assertNotIn("socket", text)

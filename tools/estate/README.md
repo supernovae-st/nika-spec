@@ -5,7 +5,7 @@ It is not a second editable implementation.
 
 Source pin: `247deb86220035bed9b276606ce4a2957c5a8d57` (`supernovae-st/nika-estate`).
 Source tree: `895a18cc0bfed9b0bb6dd66a4e7616cb09c0e039`.
-Imported into nika-lab at `estate/imported/`. Write authority is not switched.
+The source implementation retains its original ownership and license.
 
 Run with a stock interpreter:
 
@@ -14,8 +14,8 @@ Run with a stock interpreter:
 License: Apache-2.0 (see LICENSE).
 Documented defect: OPEN_DEFECTS.md — classification can still read unstaged evidence.
 
-This bundle does not require nika-lab, the Nika engine, nika-spec, or nika-docs.
-Regenerate it from the Lab import; do not edit estate.py here.
+This bundle runs with Python alone; it needs no application services.
+Keep the implementation identical to its declared source pin.
 `provenance.json` lists every file with its sha256, git blob id and mode;
-`emit.py --check <this directory>` in the Lab re-emits and byte-compares it.
+The consuming repository verifies inventory, source hashes and file modes.
 

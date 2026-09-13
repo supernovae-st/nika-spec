@@ -6,7 +6,7 @@ exact inventory, safe relative paths, sha256, git blob id and git file
 mode. Missing, extra or symlink entries are refused. An altered digest
 or mode is drift.
 
-This checker does not regenerate the projection from Lab, does not
+This checker does not regenerate the projection, does not
 reach the network or any private path, and does not authenticate a
 signature — none exists; provenance.json is a declaration.
 
@@ -31,10 +31,10 @@ from pathlib import Path
 SPEC_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_ROOT = SPEC_ROOT / "tools" / "estate"
 
-PROJECTION_SCHEMA = "nika-lab/estate-public-verifier/v1"
+PROJECTION_SCHEMA = "nika-estate/public-verifier/v1"
 SOURCE_REPOSITORY = "supernovae-st/nika-estate"
 # Historical Estate pin this generated projection carries. Declared here
-# so a swapped-in foreign projection is refused; not a Lab regeneration.
+# so a swapped-in foreign projection is refused; not source regeneration.
 EXPECTED_SOURCE_COMMIT = "247deb86220035bed9b276606ce4a2957c5a8d57"
 EXPECTED_SOURCE_TREE = "895a18cc0bfed9b0bb6dd66a4e7616cb09c0e039"
 
@@ -208,8 +208,7 @@ def _load_manifest(path: Path) -> dict:
     if payload["requires"] != ["python3"]:
         raise CheckError(3, f"requires mismatch: {payload['requires']!r}")
     if payload["does_not_require"] != [
-        "nika-lab",
-        "nika-engine",
+            "nika-engine",
         "nika-spec",
         "nika-docs",
     ]:
