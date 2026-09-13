@@ -11,6 +11,22 @@
 > per skeleton, sha256-pinned copies) · machine catalog:
 > <https://nika.sh/templates/catalog.json>.
 
+## Filled lessons and bounds
+
+[INDEX.md](INDEX.md) is the complete generated authoring index. The filled
+lessons are generated from their skeletons using [rehearsals.yaml](rehearsals.yaml):
+edit the template logic once, then run `python3 scripts/template-rehearsals.py --write`.
+The same lesson enters the native pack and the managed documentation blocks.
+The CI check rejects projection drift, and each lesson keeps its template's
+independently specified golden output.
+
+The boundary cases in [rehearsal-cases.json](rehearsal-cases.json) exercise empty,
+exact-limit and oversized inputs, invalid fields, conflicting duplicates,
+incorrect decision rules and narrow recovery. The engine's
+`scripts/authoring-gauntlet.py` executes these cases with mock inference and
+asserts that refused inputs never start the protected downstream tasks.
+
+
 ## The guarantee
 
 Every template in this directory **runs green in an empty directory once
@@ -159,4 +175,4 @@ When a hint tells you to remove something, run the file before you believe it.
 - The contract every file in this corpus honours:
   [`../examples/CONVENTIONS.md`](../examples/CONVENTIONS.md).
 
-🦋 *Structure is instantiated, never invented · the slots are the only freedom.*
+A skeleton supplies a tested starting shape; adapt it to the actual job and recheck its contracts.

@@ -27,6 +27,10 @@ jobs:
         run: |
           python3 scripts/template-registry.py
           python3 scripts/tests/test_template_registry.py
+      - name: Filled lessons and authoring index share template sources
+        run: |
+          python3 scripts/template-rehearsals.py --check
+          python3 scripts/tests/test_template_rehearsals.py
       - name: Schema and template knowledge has no drift
         run: |
           python3 scripts/knowledge-projector.py

@@ -324,6 +324,22 @@ non-trivial is built at all.
 
 ---
 
+## Generated authoring rehearsals
+
+The additive filled lesson corpus is sourced from `templates/*.nika.yaml` and
+`templates/rehearsals.yaml`. Run `python3 scripts/template-rehearsals.py --write`
+to project the matching numbered lessons, golden copies, `templates/INDEX.md`
+and `templates/rehearsals.tsv`. The knowledge CI job runs `--check` and projector
+self-tests. The engine uses the TSV to connect native scaffolding and MCP
+`nika_template` with the filled example from the same source. Docs YAML and
+the complete template catalog are projected by `showcase-projector.py`.
+
+The recorded cases in `templates/rehearsal-cases.json` are an execution test
+contract consumed by the engine's `scripts/authoring-gauntlet.py`. They specify
+expected typed outputs or downstream tasks that must not start after refusal.
+These examples use existing language constructs; they introduce no new limit
+keyword and do not make an unknown static estimate into a proved ceiling.
+
 ## §11 · The next cut · lessons and templates teach the SAME shapes
 
 Found while measuring the learning path with the construct index, 2026-07-29.
