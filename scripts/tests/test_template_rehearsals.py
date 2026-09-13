@@ -69,6 +69,24 @@ class RehearsalTests(unittest.TestCase):
         out = rehearsals.render(self.root)
         self.assertIn("max_parallel: 1", out[self.root / "examples/18-bounded-batch.nika.yaml"])
 
+    def test_docs_project_a_lesson_without_inventing_a_standalone_page(self):
+        module_spec = importlib.util.spec_from_file_location("showcase", ROOT / "scripts/showcase-projector.py")
+        showcase = importlib.util.module_from_spec(module_spec)
+        module_spec.loader.exec_module(showcase)
+        page = self.root / "lesson.mdx"
+        page.write_text("{/* showcase:begin 18-bounded-batch.nika.yaml */}\n{/* showcase:end */}\n"
+                        "{/* showcase:coverage-begin */}\n{/* showcase:coverage-end */}\n"
+                        "{/* template-index:begin */}\n{/* template-index:end */}\n")
+        lesson = (ROOT / "examples/18-bounded-batch.nika.yaml").read_text()
+        template = (ROOT / "templates/bounded-batch.nika.yaml").read_text()
+        workflows = {"18-bounded-batch.nika.yaml": showcase.lean(lesson)}
+        templates = {"bounded-batch.nika.yaml": showcase.lean(template)}
+        self.assertFalse(showcase.project_docs_page(page, workflows, templates, True))
+        self.assertTrue(showcase.project_docs_page(page, workflows, templates, False))
+        self.assertIn(showcase.lean(lesson), page.read_text())
+        self.assertIn("[bounded-batch](#bounded-batch)", page.read_text())
+        self.assertNotIn("/examples/18-bounded-batch", page.read_text())
+
 
 if __name__ == "__main__":
     unittest.main()

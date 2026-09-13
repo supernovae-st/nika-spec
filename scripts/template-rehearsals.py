@@ -81,11 +81,10 @@ def render(root: Path) -> dict[Path, str]:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=["--write", "--check"], nargs="?", default="--check")
-    # Preserve the projector convention without argparse treating mode as a flag.
-    mode = sys.argv[1] if len(sys.argv) == 2 else "--check"
-    if mode not in ("--write", "--check"):
-        parser.error("expected --write or --check")
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument("--write", action="store_true")
+    modes.add_argument("--check", action="store_true")
+    mode = "--write" if parser.parse_args().write else "--check"
     try:
         outputs = render(ROOT)
     except (ValueError, KeyError, OSError, StopIteration) as exc:
