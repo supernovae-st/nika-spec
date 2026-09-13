@@ -2,14 +2,17 @@
   "schemaVersion": 1,
   "kind": "spec-language-knowledge",
   "owner": "supernovae-st/nika-spec",
-  "revision": "f5af82f7e03728426d1a6c3c996e5e4b6abec1f3",
+  "revision": "e22a7db1c9c56f6feff33da217ef8fceefc8349e",
   "inputs": {
     "schemas/workflow.schema.json": "0979b0350eaa78b1ed38eb87dfae82d96ac5f552ca290cf594f2605c9b15de0b",
     "templates/agent-loop.nika.yaml": "e31f0bd9c0ef27fad76fa3d35927e3ed81da65b8f3f6fd785a09916faa141acf",
+    "templates/aggregate-by-key.nika.yaml": "a7a34d9415e3187ff32607d79272da49e790500f1998593730c5047dc8a111fd",
     "templates/api-upload-and-create.nika.yaml": "1e06897b41686f7c51f97e70893bd16e09dba869df85378cb3c89913e1d20952",
+    "templates/bounded-batch.nika.yaml": "5333556fdb46fd16bd6e48f9a267d470558f6e663e2510df6322066eb75833d2",
     "templates/chain.nika.yaml": "18d62ce8bff0edd76c0f6fcaf696fadfea564e4e027ef86a29fd26e5e7706ba1",
     "templates/classify-and-route.nika.yaml": "daa53c96c8fffe4b48be144e42df560328def81c05e12388f4a6612ab61f6f17",
     "templates/corpus-qa.nika.yaml": "cc199636ae1591848ca287cd91874cf93b9a12b0f2829e673d39ab48e55e810c",
+    "templates/deduplicate-records.nika.yaml": "268f72d69e07053f22042ff69e34071092c9c349be060fed7811763bf083c073",
     "templates/docker-report.nika.yaml": "f2b84e14655b5051335fb60cf5f734f8a526387c03a9683b09c881cb2336e4b7",
     "templates/document-to-fields.nika.yaml": "2e3126a0ca4a047175943a0dbdb61b3ddcedbbee675f0baccf836f23a4f6d3c7",
     "templates/etl-state.nika.yaml": "64d090ea10a33ab224d16feea6b80bbfeb4e1c8396d514361ae0740399958136",
@@ -18,6 +21,11 @@
     "templates/gate-and-act.nika.yaml": "4870c70f7a6198f86b1da8587e7e1345bbece86ce07446d74e16866cbe514610",
     "templates/human-gated-ship.nika.yaml": "e447e644d2e34327ab03f5fee8bed54fd0cfc2293e1379e3dcdb3a6b050bf65c",
     "templates/media-asset-pack.nika.yaml": "dd4b20b39ef04c31ef6c406ddefef04a37b5cd6b196382e1fc4956888b9339a5",
+    "templates/parallel-review.nika.yaml": "d02b45349edb57fe66b0692584c822f5bab0a7620c0d5d6ec445d96d332f43db",
+    "templates/project-public-fields.nika.yaml": "c4bc776cf730f13543c0379eec178ebf90dfb465c51b1d356ed6628c0f4fc614",
+    "templates/recover-optional-file.nika.yaml": "923ed35265aadfbf46cb6be76e86655d0cc03c37950128d3c05664e665c467de",
+    "templates/snapshot-diff.nika.yaml": "ec5772c13742e1ce2a8555663ce1d6832a17f35aa52c679b91b1750f81b86837",
+    "templates/validate-records.nika.yaml": "fa9c9f0ea60b2d73b45d14ea5f55053b70ff01eadf70f11ab5aab6f53cb41d2c",
     "templates/website-brief.nika.yaml": "d5c172b5e4bd7fe69c69663d0b36b1dd5ba3b3429da7fed12e6501a93a9bd5c5"
   },
   "words": [
@@ -94,11 +102,35 @@
       ],
       "examples": [
         {
+          "path": "templates/aggregate-by-key.nika.yaml",
+          "line": 60,
+          "startLine": 57,
+          "endLine": 66,
+          "excerpt": "        condition: ${{ with.valid }}\n        message: Input violates the declared shape or size bound\n  aggregate:\n    after:\n      admit: success\n    invoke:\n      tool: nika:jq\n      args:\n        input:\n          currency: ${{ const.currency }}",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/bounded-batch.nika.yaml",
+          "line": 46,
+          "startLine": 43,
+          "endLine": 52,
+          "excerpt": "        condition: ${{ with.valid }}\n        message: Input violates the declared shape or size bound\n  process:\n    after:\n      admit: success\n    for_each:\n      items: ${{ const.items }}\n      max_parallel: 2\n      fail_fast: true\n    timeout: 30s",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/corpus-qa.nika.yaml",
           "line": 49,
           "startLine": 46,
           "endLine": 55,
           "excerpt": "        message: \"One corpus id names conflicting source text\"\n\n  index_once:\n    after:\n      duplicates_consistent: success\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ const.documents }}\n        expression: \"sort_by(.id) | unique_by(.id)\"",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/deduplicate-records.nika.yaml",
+          "line": 59,
+          "startLine": 56,
+          "endLine": 65,
+          "excerpt": "        condition: ${{ with.valid }}\n        message: Input violates the declared shape or size bound\n  consistent:\n    after:\n      admit: success\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ const.records }}\n        expression: group_by(.id) | all(.[]; (map(.amount) | unique | length) == 1)",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -131,6 +163,46 @@
           "startLine": 129,
           "endLine": 138,
           "excerpt": "        message: \"A gate is RED: refusing to proceed\"   # SLOT\n\n  human:\n    after:\n      gates: success              # state, no data · no question until the board is green\n    invoke:\n      # NO `default:` — on purpose (THE TRADE above). At a terminal this ASKS;\n      # headless it PAUSES (exit 4 · durable, not a failure) and prints its own\n      # resume line. A `default: false` would answer NO unattended AND disarm\n      # the gate: measured on 0.118.7, this file is then refused NIKA-SEC-009",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 71,
+          "startLine": 68,
+          "endLine": 77,
+          "excerpt": "        condition: ${{ with.valid }}\n        message: Input violates the declared shape or size bound\n  clarity:\n    after:\n      admit: success\n      law_holds: success\n    timeout: 30s\n    infer:\n      prompt: 'Review clarity and missing explanations. Document: ${{ const.document }}'\n      max_tokens: 2048",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/project-public-fields.nika.yaml",
+          "line": 67,
+          "startLine": 64,
+          "endLine": 73,
+          "excerpt": "        condition: ${{ with.valid }}\n        message: Input violates the declared shape or size bound\n  public:\n    after:\n      admit: success\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ const.record }}\n        expression: '{topic, severity}'",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 60,
+          "startLine": 57,
+          "endLine": 66,
+          "excerpt": "        condition: ${{ with.valid }}\n        message: Content must be nonempty and at most 4000 characters\n  result:\n    after:\n      admit: success\n    with:\n      content: ${{ tasks.read.output }}\n    invoke:\n      tool: nika:jq\n      args:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/snapshot-diff.nika.yaml",
+          "line": 16,
+          "startLine": 13,
+          "endLine": 22,
+          "excerpt": "  before:\n  - alpha\n  - beta\n  after:\n  - beta\n  - gamma\npermits:\n  tools:\n  - nika:assert\n  - nika:jq",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/validate-records.nika.yaml",
+          "line": 57,
+          "startLine": 54,
+          "endLine": 63,
+          "excerpt": "        condition: ${{ with.valid }}\n        message: Input violates the declared shape or size bound\n  report:\n    after:\n      admit: success\n    invoke:\n      tool: nika:jq\n      args:\n        input:\n          batch: ${{ const.batch }}",
           "matchKind": "literal-key-occurrence"
         }
       ]
@@ -205,11 +277,27 @@
           "matchKind": "literal-key-occurrence"
         },
         {
+          "path": "templates/aggregate-by-key.nika.yaml",
+          "line": 29,
+          "startLine": 26,
+          "endLine": 35,
+          "excerpt": "  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data: ${{ const.records }}\n        format: json\n        schema:\n          type: array\n          maxItems: 8\n          items:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/api-upload-and-create.nika.yaml",
           "line": 71,
           "startLine": 68,
           "endLine": 77,
           "excerpt": "  create:\n    invoke:\n      tool: \"nika:fetch\"\n      args:\n        url: \"${{ const.api_base }}/items\"   # SLOT: the create endpoint\n        method: POST\n        headers:\n          x-api-key: \"${{ secrets.API_KEY }}\"  # SLOT: the auth header name\n        multipart:\n          # Exactly one of `path:` (file) or `value:` (text) per part — a part",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/bounded-batch.nika.yaml",
+          "line": 27,
+          "startLine": 24,
+          "endLine": 33,
+          "excerpt": "  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data: ${{ const.items }}\n        format: json\n        schema:\n          type: array\n          maxItems: 8\n          items:",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -234,6 +322,14 @@
           "startLine": 32,
           "endLine": 41,
           "excerpt": "  conflicting_ids:\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ const.documents }}\n        expression: 'sort_by(.id) | group_by(.id) | map(select((map(.text) | unique | length) > 1) | .[0].id)'\n\n  duplicates_consistent:\n    with:\n      conflicting_ids: ${{ tasks.conflicting_ids.output }}",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/deduplicate-records.nika.yaml",
+          "line": 29,
+          "startLine": 26,
+          "endLine": 35,
+          "excerpt": "  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data: ${{ const.records }}\n        format: json\n        schema:\n          type: array\n          maxItems: 8\n          items:",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -290,6 +386,46 @@
           "startLine": 71,
           "endLine": 80,
           "excerpt": "      brief_image_prompt: ${{ tasks.brief.output.image_prompt }}\n    invoke:\n      tool: \"nika:image_generate\"\n      args:\n        provider: mock              # SLOT: local | openai | gemini | xai (local/mock first)\n        prompt: \"${{ with.brief_image_prompt }}\"\n        output_dir: \"${{ const.out_dir }}\"\n        filename_prefix: \"asset\"    # SLOT: filename stem\n    on_error:\n      # Golden rehearsal · the image tool is an EFFECT, refused under",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 55,
+          "startLine": 52,
+          "endLine": 61,
+          "excerpt": "  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data: ${{ const.document }}\n        format: json\n        schema:\n          type: string\n          minLength: 1\n          maxLength: 4000",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/project-public-fields.nika.yaml",
+          "line": 30,
+          "startLine": 27,
+          "endLine": 36,
+          "excerpt": "  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data: ${{ const.record }}\n        format: json\n        schema:\n          type: object\n          additionalProperties: false\n          required:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 28,
+          "startLine": 25,
+          "endLine": 34,
+          "excerpt": "  read:\n    invoke:\n      tool: nika:read\n      args:\n        path: ./optional.txt\n    timeout: 5s\n    retry:\n      max_attempts: 2\n      backoff_strategy: exponential\n      jitter: false",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/snapshot-diff.nika.yaml",
+          "line": 28,
+          "startLine": 25,
+          "endLine": 34,
+          "excerpt": "  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data:\n          before: ${{ const.before }}\n          after: ${{ const.after }}\n        format: json\n        schema:\n          type: object",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/validate-records.nika.yaml",
+          "line": 27,
+          "startLine": 24,
+          "endLine": 33,
+          "excerpt": "  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data: ${{ const.records }}\n        format: json\n        schema:\n          type: array\n          maxItems: 8\n          items:",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -411,6 +547,14 @@
           "endLine": 130,
           "excerpt": "    timeout: \"60s\"                  # SLOT: per-iteration bound\n    retry:\n      max_attempts: 3\n      backoff_strategy: exponential\n      jitter: true\n    on_error:\n      recover: null                 # a failed item yields null at its index · the batch lives\n    infer:                          # SLOT: the per-item job (any verb)\n      max_tokens: 2000              # SLOT: the per-ITEM ceiling · think + answer · multiply by the fan width\n      # The marker below is a VALUE, not a comment. The parser drops",
           "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 33,
+          "startLine": 30,
+          "endLine": 39,
+          "excerpt": "    timeout: 5s\n    retry:\n      max_attempts: 2\n      backoff_strategy: exponential\n      jitter: false\n    on_error:\n      on_codes:\n      - NIKA-BUILTIN-READ-001\n      recover: ${{ const.fallback }}\n  validate:",
+          "matchKind": "literal-key-occurrence"
         }
       ]
     },
@@ -518,11 +662,43 @@
       ],
       "examples": [
         {
+          "path": "templates/bounded-batch.nika.yaml",
+          "line": 13,
+          "startLine": 10,
+          "endLine": 19,
+          "excerpt": "nika: bounded-batch\nmodel: ollama/qwen3.5:4b\nrun:\n  clock: system\nconst:\n  brief: '<SLOT: the per-item instruction>'\n  items:\n  - first note\n  - second note\npermits:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/fanout.nika.yaml",
           "line": 61,
           "startLine": 58,
           "endLine": 67,
           "excerpt": "  # A `timeout:` is a deadline, and a deadline needs a clock. Declaring it says\n  # out loud which one: `system` is the ambient wall clock (the honest default);\n  # `virtual` drives a simulated clock for deterministic tests.\n  clock: system\n\nconst:\n  collection_source: \"./items\"      # SLOT: where the collection comes from\n  # Known answers for the fan-in law — computed by hand, never by a model.\n  # `prove` feeds them through the SAME jq `survivors` uses; a drift between\n  # the two is a red assert, not a quietly wrong report.",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 13,
+          "startLine": 10,
+          "endLine": 19,
+          "excerpt": "nika: parallel-review\nmodel: ollama/qwen3.5:4b\nrun:\n  clock: system\nconst:\n  document: '<SLOT: the document to review>'\n  law: '{ready: (.clarity.ready and .accuracy.ready), reviews: [.clarity, .accuracy]}'\n  cases:\n  - clarity:\n      ready: false",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/project-public-fields.nika.yaml",
+          "line": 13,
+          "startLine": 10,
+          "endLine": 19,
+          "excerpt": "nika: project-public-fields\nmodel: ollama/qwen3.5:4b\nrun:\n  clock: system\nconst:\n  instruction: '<SLOT: the public summary instruction>'\n  record:\n    topic: queue latency\n    severity: 2\n    email: private@example.invalid",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 12,
+          "startLine": 9,
+          "endLine": 18,
+          "excerpt": "# Run · nika run <file> --model mock/echo\nnika: recover-optional-file\nrun:\n  clock: system\nconst:\n  fallback: '<SLOT: the explicit fallback content>'\npermits:\n  tools:\n  - nika:assert\n  - nika:jq",
           "matchKind": "literal-key-occurrence"
         }
       ]
@@ -633,11 +809,27 @@
       ],
       "examples": [
         {
+          "path": "templates/aggregate-by-key.nika.yaml",
+          "line": 11,
+          "startLine": 8,
+          "endLine": 17,
+          "excerpt": "# Needs · fill the SLOT; no services or credentials for mock rehearsal.\n# Run · nika run <file> --model mock/echo\nnika: aggregate-by-key\nconst:\n  currency: '<SLOT: the currency code>'\n  records:\n  - region: north\n    amount: 10\n  - region: south\n    amount: 20",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/api-upload-and-create.nika.yaml",
           "line": 39,
           "startLine": 36,
           "endLine": 45,
           "excerpt": "# Run · nika run <file>          # offline rehearsal · no key exported\nnika: api-upload-and-create-template       # SLOT: kebab-case workflow id\n\nconst:\n  api_base: \"https://api.example.com\"     # SLOT: the product API base\n  asset_path: \"./out/assets/asset-1.png\"  # SLOT: the file to upload\n\nsecrets:\n  API_KEY:\n    source: env",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/bounded-batch.nika.yaml",
+          "line": 14,
+          "startLine": 11,
+          "endLine": 20,
+          "excerpt": "model: ollama/qwen3.5:4b\nrun:\n  clock: system\nconst:\n  brief: '<SLOT: the per-item instruction>'\n  items:\n  - first note\n  - second note\npermits:\n  tools:",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -662,6 +854,14 @@
           "startLine": 18,
           "endLine": 27,
           "excerpt": "# Measured on 0.118.7: with no resolvable seat the stamp leaves `mock/echo`.\nmodel: mock/echo\n\nconst:\n  query: \"<SLOT: the question to answer from the corpus>\"\n  documents:                         # SLOT: replace with retrieved source chunks\n    - { id: handbook, text: \"Support hours are 09:00 to 17:00 UTC.\" }\n    - { id: security, text: \"Security incidents are reported within one hour.\" }\n    - { id: handbook, text: \"Support hours are 09:00 to 17:00 UTC.\" }\n",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/deduplicate-records.nika.yaml",
+          "line": 11,
+          "startLine": 8,
+          "endLine": 17,
+          "excerpt": "# Needs · fill the SLOT; no services or credentials for mock rehearsal.\n# Run · nika run <file> --model mock/echo\nnika: deduplicate-records\nconst:\n  dataset: '<SLOT: the dataset label>'\n  records:\n  - id: a\n    amount: 10\n  - id: a\n    amount: 10",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -718,6 +918,46 @@
           "startLine": 32,
           "endLine": 41,
           "excerpt": "# stamp leaves `mock/echo`, the offline path this file guarantees.\nmodel: mock/echo\n\nconst:\n  subject: \"<SLOT: what the asset is about>\"\n  out_dir: \"./out/assets\"           # SLOT: where assets land\n\npermits:                            # the blast radius · default-deny once present\n  tools: [\"nika:image_generate\", \"nika:jq\", \"nika:write\"]\n  fs:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 14,
+          "startLine": 11,
+          "endLine": 20,
+          "excerpt": "model: ollama/qwen3.5:4b\nrun:\n  clock: system\nconst:\n  document: '<SLOT: the document to review>'\n  law: '{ready: (.clarity.ready and .accuracy.ready), reviews: [.clarity, .accuracy]}'\n  cases:\n  - clarity:\n      ready: false\n      reason: fixture",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/project-public-fields.nika.yaml",
+          "line": 14,
+          "startLine": 11,
+          "endLine": 20,
+          "excerpt": "model: ollama/qwen3.5:4b\nrun:\n  clock: system\nconst:\n  instruction: '<SLOT: the public summary instruction>'\n  record:\n    topic: queue latency\n    severity: 2\n    email: private@example.invalid\n    internal_note: internal-only-fixture",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 13,
+          "startLine": 10,
+          "endLine": 19,
+          "excerpt": "nika: recover-optional-file\nrun:\n  clock: system\nconst:\n  fallback: '<SLOT: the explicit fallback content>'\npermits:\n  tools:\n  - nika:assert\n  - nika:jq\n  - nika:read",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/snapshot-diff.nika.yaml",
+          "line": 11,
+          "startLine": 8,
+          "endLine": 17,
+          "excerpt": "# Needs · fill the SLOT; no services or credentials for mock rehearsal.\n# Run · nika run <file> --model mock/echo\nnika: snapshot-diff\nconst:\n  resource: '<SLOT: the resource being compared>'\n  before:\n  - alpha\n  - beta\n  after:\n  - beta",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/validate-records.nika.yaml",
+          "line": 11,
+          "startLine": 8,
+          "endLine": 17,
+          "excerpt": "# Needs · fill the SLOT; no services or credentials for mock rehearsal.\n# Run · nika run <file> --model mock/echo\nnika: validate-records\nconst:\n  batch: '<SLOT: the batch label>'\n  records:\n  - id: a\n    amount: 10\n  - id: b\n    amount: 20",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -1052,7 +1292,16 @@
           ]
         }
       ],
-      "examples": []
+      "examples": [
+        {
+          "path": "templates/aggregate-by-key.nika.yaml",
+          "line": 44,
+          "startLine": 41,
+          "endLine": 50,
+          "excerpt": "            properties:\n              region:\n                type: string\n                enum:\n                - north\n                - south\n              amount:\n                type: integer\n                minimum: 0\n                maximum: 1000000",
+          "matchKind": "literal-key-occurrence"
+        }
+      ]
     },
     {
       "id": "language:word:env",
@@ -1269,11 +1518,27 @@
       ],
       "examples": [
         {
+          "path": "templates/bounded-batch.nika.yaml",
+          "line": 51,
+          "startLine": 48,
+          "endLine": 57,
+          "excerpt": "    for_each:\n      items: ${{ const.items }}\n      max_parallel: 2\n      fail_fast: true\n    timeout: 30s\n    infer:\n      prompt: '${{ const.brief }}\n\n        Item: ${{ item }}'\n      max_tokens: 2048",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/fanout.nika.yaml",
           "line": 104,
           "startLine": 101,
           "endLine": 110,
           "excerpt": "    for_each:\n      items: ${{ with.discover }}\n      max_parallel: 8\n      fail_fast: false\n    on_error:\n      recover: null                 # an unreadable item yields null · the batch lives\n    invoke:\n      tool: \"nika:read\"\n      args: { path: \"${{ item }}\" }\n",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 129,
+          "startLine": 126,
+          "endLine": 135,
+          "excerpt": "    for_each:\n      items: ${{ const.cases }}\n      max_parallel: 1\n      fail_fast: true\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ item }}\n        expression: . as $case | (${{ const.law }}) | .ready == $case.expected\n  law_holds:",
           "matchKind": "literal-key-occurrence"
         }
       ]
@@ -1333,11 +1598,27 @@
       ],
       "examples": [
         {
+          "path": "templates/bounded-batch.nika.yaml",
+          "line": 48,
+          "startLine": 45,
+          "endLine": 54,
+          "excerpt": "  process:\n    after:\n      admit: success\n    for_each:\n      items: ${{ const.items }}\n      max_parallel: 2\n      fail_fast: true\n    timeout: 30s\n    infer:\n      prompt: '${{ const.brief }}",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/fanout.nika.yaml",
           "line": 101,
           "startLine": 98,
           "endLine": 107,
           "excerpt": "  read:\n    with:\n      discover: ${{ tasks.discover.output }}\n    for_each:\n      items: ${{ with.discover }}\n      max_parallel: 8\n      fail_fast: false\n    on_error:\n      recover: null                 # an unreadable item yields null · the batch lives\n    invoke:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 126,
+          "startLine": 123,
+          "endLine": 132,
+          "excerpt": "    after:\n      law_holds: success\n  prove:\n    for_each:\n      items: ${{ const.cases }}\n      max_parallel: 1\n      fail_fast: true\n    invoke:\n      tool: nika:jq\n      args:",
           "matchKind": "literal-key-occurrence"
         }
       ]
@@ -1454,6 +1735,14 @@
           "startLine": 38,
           "endLine": 47,
           "excerpt": "\npermits:                            # the blast radius · default-deny once present\n  tools: [\"nika:image_generate\", \"nika:jq\", \"nika:write\"]\n  fs:\n    write:\n      # Two entries, and both earn their place: `check` judges the `output_dir:`\n      # ARGUMENT (`./out/assets`), while the RUN gates every FINAL file path under\n      # it — the asset, its provenance manifest, and manifest.json. Grant only the\n      # directory and the file sails through check, then dies at run on the first\n      # asset. `*` is one segment and never crosses `/`, which is all this needs:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 21,
+          "startLine": 18,
+          "endLine": 27,
+          "excerpt": "  - nika:jq\n  - nika:read\n  - nika:validate\n  fs:\n    read:\n    - ./optional.txt\ntasks:\n  read:\n    invoke:\n      tool: nika:read",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -1628,6 +1917,14 @@
           "matchKind": "literal-key-occurrence"
         },
         {
+          "path": "templates/bounded-batch.nika.yaml",
+          "line": 53,
+          "startLine": 50,
+          "endLine": 59,
+          "excerpt": "      max_parallel: 2\n      fail_fast: true\n    timeout: 30s\n    infer:\n      prompt: '${{ const.brief }}\n\n        Item: ${{ item }}'\n      max_tokens: 2048\n      schema:\n        type: object",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/chain.nika.yaml",
           "line": 65,
           "startLine": 62,
@@ -1689,6 +1986,22 @@
           "startLine": 51,
           "endLine": 60,
           "excerpt": "\ntasks:\n  brief:\n    infer:\n      max_tokens: 600\n      # SLOT: the creative direction · style · constraints. Keep slot markers\n      # out of the block below — it is prompt TEXT, not YAML, so a stray\n      # comment line is sent to the model verbatim.\n      prompt: |\n        Write one vivid, concrete image prompt for: ${{ const.subject }}.",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 75,
+          "startLine": 72,
+          "endLine": 81,
+          "excerpt": "      admit: success\n      law_holds: success\n    timeout: 30s\n    infer:\n      prompt: 'Review clarity and missing explanations. Document: ${{ const.document }}'\n      max_tokens: 2048\n      schema:\n        type: object\n        additionalProperties: false\n        required:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/project-public-fields.nika.yaml",
+          "line": 78,
+          "startLine": 75,
+          "endLine": 84,
+          "excerpt": "    with:\n      public: ${{ tasks.public.output }}\n    timeout: 30s\n    infer:\n      prompt: '${{ const.instruction }}\n\n        Allowed fields only: ${{ with.public }}'\n      max_tokens: 2048\n      schema:\n        type: object",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -1835,11 +2148,27 @@
           "matchKind": "literal-key-occurrence"
         },
         {
+          "path": "templates/aggregate-by-key.nika.yaml",
+          "line": 27,
+          "startLine": 24,
+          "endLine": 33,
+          "excerpt": "  - nika:validate\ntasks:\n  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data: ${{ const.records }}\n        format: json\n        schema:\n          type: array",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/api-upload-and-create.nika.yaml",
           "line": 69,
           "startLine": 66,
           "endLine": 75,
           "excerpt": "\ntasks:\n  create:\n    invoke:\n      tool: \"nika:fetch\"\n      args:\n        url: \"${{ const.api_base }}/items\"   # SLOT: the create endpoint\n        method: POST\n        headers:\n          x-api-key: \"${{ secrets.API_KEY }}\"  # SLOT: the auth header name",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/bounded-batch.nika.yaml",
+          "line": 25,
+          "startLine": 22,
+          "endLine": 31,
+          "excerpt": "  - nika:validate\ntasks:\n  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data: ${{ const.items }}\n        format: json\n        schema:\n          type: array",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -1864,6 +2193,14 @@
           "startLine": 30,
           "endLine": 39,
           "excerpt": "\ntasks:\n  conflicting_ids:\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ const.documents }}\n        expression: 'sort_by(.id) | group_by(.id) | map(select((map(.text) | unique | length) > 1) | .[0].id)'\n\n  duplicates_consistent:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/deduplicate-records.nika.yaml",
+          "line": 27,
+          "startLine": 24,
+          "endLine": 33,
+          "excerpt": "  - nika:validate\ntasks:\n  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data: ${{ const.records }}\n        format: json\n        schema:\n          type: array",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -1923,6 +2260,46 @@
           "matchKind": "literal-key-occurrence"
         },
         {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 53,
+          "startLine": 50,
+          "endLine": 59,
+          "excerpt": "  - nika:validate\ntasks:\n  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data: ${{ const.document }}\n        format: json\n        schema:\n          type: string",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/project-public-fields.nika.yaml",
+          "line": 28,
+          "startLine": 25,
+          "endLine": 34,
+          "excerpt": "  - nika:validate\ntasks:\n  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data: ${{ const.record }}\n        format: json\n        schema:\n          type: object",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 26,
+          "startLine": 23,
+          "endLine": 32,
+          "excerpt": "    - ./optional.txt\ntasks:\n  read:\n    invoke:\n      tool: nika:read\n      args:\n        path: ./optional.txt\n    timeout: 5s\n    retry:\n      max_attempts: 2",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/snapshot-diff.nika.yaml",
+          "line": 26,
+          "startLine": 23,
+          "endLine": 32,
+          "excerpt": "  - nika:validate\ntasks:\n  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data:\n          before: ${{ const.before }}\n          after: ${{ const.after }}\n        format: json",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/validate-records.nika.yaml",
+          "line": 25,
+          "startLine": 22,
+          "endLine": 31,
+          "excerpt": "  - nika:validate\ntasks:\n  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data: ${{ const.records }}\n        format: json\n        schema:\n          type: array",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/website-brief.nika.yaml",
           "line": 51,
           "startLine": 48,
@@ -1964,6 +2341,30 @@
           "matchKind": "literal-key-occurrence"
         },
         {
+          "path": "templates/aggregate-by-key.nika.yaml",
+          "line": 35,
+          "startLine": 32,
+          "endLine": 41,
+          "excerpt": "        schema:\n          type: array\n          maxItems: 8\n          items:\n            type: object\n            additionalProperties: false\n            required:\n            - region\n            - amount\n            properties:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/bounded-batch.nika.yaml",
+          "line": 16,
+          "startLine": 13,
+          "endLine": 22,
+          "excerpt": "  clock: system\nconst:\n  brief: '<SLOT: the per-item instruction>'\n  items:\n  - first note\n  - second note\npermits:\n  tools:\n  - nika:assert\n  - nika:validate",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/deduplicate-records.nika.yaml",
+          "line": 35,
+          "startLine": 32,
+          "endLine": 41,
+          "excerpt": "        schema:\n          type: array\n          maxItems: 8\n          items:\n            type: object\n            additionalProperties: false\n            required:\n            - id\n            - amount\n            properties:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/document-to-fields.nika.yaml",
           "line": 74,
           "startLine": 71,
@@ -1977,6 +2378,30 @@
           "startLine": 99,
           "endLine": 108,
           "excerpt": "    with:\n      discover: ${{ tasks.discover.output }}\n    for_each:\n      items: ${{ with.discover }}\n      max_parallel: 8\n      fail_fast: false\n    on_error:\n      recover: null                 # an unreadable item yields null · the batch lives\n    invoke:\n      tool: \"nika:read\"",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 127,
+          "startLine": 124,
+          "endLine": 133,
+          "excerpt": "      law_holds: success\n  prove:\n    for_each:\n      items: ${{ const.cases }}\n      max_parallel: 1\n      fail_fast: true\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ item }}",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/snapshot-diff.nika.yaml",
+          "line": 43,
+          "startLine": 40,
+          "endLine": 49,
+          "excerpt": "            before:\n              type: array\n              maxItems: 8\n              items:\n                type: string\n                minLength: 1\n                maxLength: 4000\n            after:\n              type: array\n              maxItems: 8",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/validate-records.nika.yaml",
+          "line": 33,
+          "startLine": 30,
+          "endLine": 39,
+          "excerpt": "        schema:\n          type: array\n          maxItems: 8\n          items:\n            type: object\n            additionalProperties: false\n            required:\n            - id\n            - amount\n            properties:",
           "matchKind": "literal-key-occurrence"
         }
       ]
@@ -2010,6 +2435,14 @@
           "startLine": 122,
           "endLine": 131,
           "excerpt": "    retry:\n      max_attempts: 3\n      backoff_strategy: exponential\n      jitter: true\n    on_error:\n      recover: null                 # a failed item yields null at its index · the batch lives\n    infer:                          # SLOT: the per-item job (any verb)\n      max_tokens: 2000              # SLOT: the per-ITEM ceiling · think + answer · multiply by the fan width\n      # The marker below is a VALUE, not a comment. The parser drops\n      # comments, so a `# SLOT:` line could never make `check` refuse —",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 34,
+          "startLine": 31,
+          "endLine": 40,
+          "excerpt": "    retry:\n      max_attempts: 2\n      backoff_strategy: exponential\n      jitter: false\n    on_error:\n      on_codes:\n      - NIKA-BUILTIN-READ-001\n      recover: ${{ const.fallback }}\n  validate:\n    with:",
           "matchKind": "literal-key-occurrence"
         }
       ]
@@ -2093,7 +2526,16 @@
           "siblings": []
         }
       ],
-      "examples": []
+      "examples": [
+        {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 16,
+          "startLine": 13,
+          "endLine": 22,
+          "excerpt": "  clock: system\nconst:\n  document: '<SLOT: the document to review>'\n  law: '{ready: (.clarity.ready and .accuracy.ready), reviews: [.clarity, .accuracy]}'\n  cases:\n  - clarity:\n      ready: false\n      reason: fixture\n    accuracy:\n      ready: false",
+          "matchKind": "literal-key-occurrence"
+        }
+      ]
     },
     {
       "id": "language:word:lift",
@@ -2276,6 +2718,14 @@
           "endLine": 129,
           "excerpt": "      fail_fast: false\n    timeout: \"60s\"                  # SLOT: per-iteration bound\n    retry:\n      max_attempts: 3\n      backoff_strategy: exponential\n      jitter: true\n    on_error:\n      recover: null                 # a failed item yields null at its index · the batch lives\n    infer:                          # SLOT: the per-item job (any verb)\n      max_tokens: 2000              # SLOT: the per-ITEM ceiling · think + answer · multiply by the fan width",
           "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 32,
+          "startLine": 29,
+          "endLine": 38,
+          "excerpt": "        path: ./optional.txt\n    timeout: 5s\n    retry:\n      max_attempts: 2\n      backoff_strategy: exponential\n      jitter: false\n    on_error:\n      on_codes:\n      - NIKA-BUILTIN-READ-001\n      recover: ${{ const.fallback }}",
+          "matchKind": "literal-key-occurrence"
         }
       ]
     },
@@ -2322,11 +2772,27 @@
       ],
       "examples": [
         {
+          "path": "templates/bounded-batch.nika.yaml",
+          "line": 50,
+          "startLine": 47,
+          "endLine": 56,
+          "excerpt": "      admit: success\n    for_each:\n      items: ${{ const.items }}\n      max_parallel: 2\n      fail_fast: true\n    timeout: 30s\n    infer:\n      prompt: '${{ const.brief }}\n\n        Item: ${{ item }}'",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/fanout.nika.yaml",
           "line": 103,
           "startLine": 100,
           "endLine": 109,
           "excerpt": "      discover: ${{ tasks.discover.output }}\n    for_each:\n      items: ${{ with.discover }}\n      max_parallel: 8\n      fail_fast: false\n    on_error:\n      recover: null                 # an unreadable item yields null · the batch lives\n    invoke:\n      tool: \"nika:read\"\n      args: { path: \"${{ item }}\" }",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 128,
+          "startLine": 125,
+          "endLine": 134,
+          "excerpt": "  prove:\n    for_each:\n      items: ${{ const.cases }}\n      max_parallel: 1\n      fail_fast: true\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ item }}\n        expression: . as $case | (${{ const.law }}) | .ready == $case.expected",
           "matchKind": "literal-key-occurrence"
         }
       ]
@@ -2364,6 +2830,14 @@
           "startLine": 61,
           "endLine": 70,
           "excerpt": "      # it emits the first brace, and a ceiling that cuts it off mid-thought\n      # fails NIKA-INFER-002 (\"no JSON value found · the reply was cut off at\n      # the token limit\"). Measured — 400 starves qwen3.5:4b on this prompt.\n      max_tokens: 2000\n      schema:\n        type: object\n        additionalProperties: false\n        required: [steps]\n        properties:\n          steps: { type: array, items: { type: string } }",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/bounded-batch.nika.yaml",
+          "line": 57,
+          "startLine": 54,
+          "endLine": 63,
+          "excerpt": "      prompt: '${{ const.brief }}\n\n        Item: ${{ item }}'\n      max_tokens: 2048\n      schema:\n        type: object\n        additionalProperties: false\n        required:\n        - summary\n        properties:",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -2428,6 +2902,22 @@
           "startLine": 52,
           "endLine": 61,
           "excerpt": "tasks:\n  brief:\n    infer:\n      max_tokens: 600\n      # SLOT: the creative direction · style · constraints. Keep slot markers\n      # out of the block below — it is prompt TEXT, not YAML, so a stray\n      # comment line is sent to the model verbatim.\n      prompt: |\n        Write one vivid, concrete image prompt for: ${{ const.subject }}.\n        No text in the image · no watermark · a calm central zone.",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 77,
+          "startLine": 74,
+          "endLine": 83,
+          "excerpt": "    timeout: 30s\n    infer:\n      prompt: 'Review clarity and missing explanations. Document: ${{ const.document }}'\n      max_tokens: 2048\n      schema:\n        type: object\n        additionalProperties: false\n        required:\n        - ready\n        - reason",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/project-public-fields.nika.yaml",
+          "line": 82,
+          "startLine": 79,
+          "endLine": 88,
+          "excerpt": "      prompt: '${{ const.instruction }}\n\n        Allowed fields only: ${{ with.public }}'\n      max_tokens: 2048\n      schema:\n        type: object\n        additionalProperties: false\n        required:\n        - summary\n        properties:",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -2647,6 +3137,14 @@
           "matchKind": "literal-key-occurrence"
         },
         {
+          "path": "templates/bounded-batch.nika.yaml",
+          "line": 11,
+          "startLine": 8,
+          "endLine": 17,
+          "excerpt": "# Needs · fill the SLOT; no services or credentials for mock rehearsal.\n# Run · nika run <file> --model mock/echo\nnika: bounded-batch\nmodel: ollama/qwen3.5:4b\nrun:\n  clock: system\nconst:\n  brief: '<SLOT: the per-item instruction>'\n  items:\n  - first note",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/chain.nika.yaml",
           "line": 30,
           "startLine": 27,
@@ -2708,6 +3206,22 @@
           "startLine": 30,
           "endLine": 39,
           "excerpt": "# can resolve, and whatever rides on the line is dropped — so the teaching\n# lives here, above it. Measured on 0.118.7: with no resolvable seat the\n# stamp leaves `mock/echo`, the offline path this file guarantees.\nmodel: mock/echo\n\nconst:\n  subject: \"<SLOT: what the asset is about>\"\n  out_dir: \"./out/assets\"           # SLOT: where assets land\n\npermits:                            # the blast radius · default-deny once present",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 11,
+          "startLine": 8,
+          "endLine": 17,
+          "excerpt": "# Needs · fill the SLOT; no services or credentials for mock rehearsal.\n# Run · nika run <file> --model mock/echo\nnika: parallel-review\nmodel: ollama/qwen3.5:4b\nrun:\n  clock: system\nconst:\n  document: '<SLOT: the document to review>'\n  law: '{ready: (.clarity.ready and .accuracy.ready), reviews: [.clarity, .accuracy]}'\n  cases:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/project-public-fields.nika.yaml",
+          "line": 11,
+          "startLine": 8,
+          "endLine": 17,
+          "excerpt": "# Needs · fill the SLOT; no services or credentials for mock rehearsal.\n# Run · nika run <file> --model mock/echo\nnika: project-public-fields\nmodel: ollama/qwen3.5:4b\nrun:\n  clock: system\nconst:\n  instruction: '<SLOT: the public summary instruction>'\n  record:\n    topic: queue latency",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -2828,11 +3342,27 @@
           "matchKind": "literal-key-occurrence"
         },
         {
+          "path": "templates/aggregate-by-key.nika.yaml",
+          "line": 10,
+          "startLine": 7,
+          "endLine": 16,
+          "excerpt": "# Demonstrates · explicit input admission, narrow permits and typed results.\n# Needs · fill the SLOT; no services or credentials for mock rehearsal.\n# Run · nika run <file> --model mock/echo\nnika: aggregate-by-key\nconst:\n  currency: '<SLOT: the currency code>'\n  records:\n  - region: north\n    amount: 10\n  - region: south",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/api-upload-and-create.nika.yaml",
           "line": 37,
           "startLine": 34,
           "endLine": 43,
           "excerpt": "#   is: the block only forgives the not-configured case).\n#\n# Run · nika run <file>          # offline rehearsal · no key exported\nnika: api-upload-and-create-template       # SLOT: kebab-case workflow id\n\nconst:\n  api_base: \"https://api.example.com\"     # SLOT: the product API base\n  asset_path: \"./out/assets/asset-1.png\"  # SLOT: the file to upload\n\nsecrets:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/bounded-batch.nika.yaml",
+          "line": 10,
+          "startLine": 7,
+          "endLine": 16,
+          "excerpt": "# Demonstrates · explicit input admission, narrow permits and typed results.\n# Needs · fill the SLOT; no services or credentials for mock rehearsal.\n# Run · nika run <file> --model mock/echo\nnika: bounded-batch\nmodel: ollama/qwen3.5:4b\nrun:\n  clock: system\nconst:\n  brief: '<SLOT: the per-item instruction>'\n  items:",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -2857,6 +3387,14 @@
           "startLine": 9,
           "endLine": 18,
           "excerpt": "#\n# Needs · nothing. Runs offline in an empty directory with mock/echo.\n# Run · nika run <file> --model mock/echo\nnika: corpus-qa       # SLOT: kebab-case workflow id\n\n# SLOT: the seat this file runs on — a local one first (`ollama/…`), a hosted\n# one when the job needs it. `nika new` STAMPS this line: it rewrites `model:`\n# with a seat this binary can resolve, and whatever rides on the line is\n# dropped — a marker THERE never reaches the reader, so it lives here.\n# Measured on 0.118.7: with no resolvable seat the stamp leaves `mock/echo`.",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/deduplicate-records.nika.yaml",
+          "line": 10,
+          "startLine": 7,
+          "endLine": 16,
+          "excerpt": "# Demonstrates · explicit input admission, narrow permits and typed results.\n# Needs · fill the SLOT; no services or credentials for mock rehearsal.\n# Run · nika run <file> --model mock/echo\nnika: deduplicate-records\nconst:\n  dataset: '<SLOT: the dataset label>'\n  records:\n  - id: a\n    amount: 10\n  - id: a",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -2921,6 +3459,46 @@
           "startLine": 22,
           "endLine": 31,
           "excerpt": "# Needs · nothing. Scaffolds and runs green in an empty directory.\n#\n# Run · nika run <file> --model mock/echo    # offline rehearsal · assets land in ./out/assets\nnika: media-asset-pack-template       # SLOT: kebab-case workflow id\n\n# SLOT: provider/model · local · zero key. Measured seat — `ollama/qwen2.5:14b`\n# holds the small schema below. `--model mock/echo` needs no seat at all.\n# `nika new` STAMPS this line: it rewrites `model:` with a seat this binary\n# can resolve, and whatever rides on the line is dropped — so the teaching\n# lives here, above it. Measured on 0.118.7: with no resolvable seat the",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 10,
+          "startLine": 7,
+          "endLine": 16,
+          "excerpt": "# Demonstrates · explicit input admission, narrow permits and typed results.\n# Needs · fill the SLOT; no services or credentials for mock rehearsal.\n# Run · nika run <file> --model mock/echo\nnika: parallel-review\nmodel: ollama/qwen3.5:4b\nrun:\n  clock: system\nconst:\n  document: '<SLOT: the document to review>'\n  law: '{ready: (.clarity.ready and .accuracy.ready), reviews: [.clarity, .accuracy]}'",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/project-public-fields.nika.yaml",
+          "line": 10,
+          "startLine": 7,
+          "endLine": 16,
+          "excerpt": "# Demonstrates · explicit input admission, narrow permits and typed results.\n# Needs · fill the SLOT; no services or credentials for mock rehearsal.\n# Run · nika run <file> --model mock/echo\nnika: project-public-fields\nmodel: ollama/qwen3.5:4b\nrun:\n  clock: system\nconst:\n  instruction: '<SLOT: the public summary instruction>'\n  record:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 10,
+          "startLine": 7,
+          "endLine": 16,
+          "excerpt": "# Demonstrates · explicit input admission, narrow permits and typed results.\n# Needs · fill the SLOT; no services or credentials for mock rehearsal.\n# Run · nika run <file> --model mock/echo\nnika: recover-optional-file\nrun:\n  clock: system\nconst:\n  fallback: '<SLOT: the explicit fallback content>'\npermits:\n  tools:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/snapshot-diff.nika.yaml",
+          "line": 10,
+          "startLine": 7,
+          "endLine": 16,
+          "excerpt": "# Demonstrates · explicit input admission, narrow permits and typed results.\n# Needs · fill the SLOT; no services or credentials for mock rehearsal.\n# Run · nika run <file> --model mock/echo\nnika: snapshot-diff\nconst:\n  resource: '<SLOT: the resource being compared>'\n  before:\n  - alpha\n  - beta\n  after:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/validate-records.nika.yaml",
+          "line": 10,
+          "startLine": 7,
+          "endLine": 16,
+          "excerpt": "# Demonstrates · explicit input admission, narrow permits and typed results.\n# Needs · fill the SLOT; no services or credentials for mock rehearsal.\n# Run · nika run <file> --model mock/echo\nnika: validate-records\nconst:\n  batch: '<SLOT: the batch label>'\n  records:\n  - id: a\n    amount: 10\n  - id: b",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -3073,6 +3651,14 @@
           "endLine": 111,
           "excerpt": "      # the scaffold green the moment it is scaffolded. `on_codes:` keeps that\n      # narrow — a permission refusal still fails loudly. DELETE this block once\n      # the evidence exists: a ship gate must fail CLOSED on missing evidence.\n      on_codes: [NIKA-BUILTIN-GREP-001]\n      recover: [{ path: \"REHEARSAL\", line: 0, match: \"REHEARSAL\" }]\n\n  check_b:\n    # A COMMAND gate · a test suite, a CLI probe · argv form, never a shell.\n    exec:\n      command: [\"echo\", \"ok\"]        # SLOT: gate 2 · the program must be in permits.exec",
           "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 36,
+          "startLine": 33,
+          "endLine": 42,
+          "excerpt": "      backoff_strategy: exponential\n      jitter: false\n    on_error:\n      on_codes:\n      - NIKA-BUILTIN-READ-001\n      recover: ${{ const.fallback }}\n  validate:\n    with:\n      content: ${{ tasks.read.output }}\n    invoke:",
+          "matchKind": "literal-key-occurrence"
         }
       ]
     },
@@ -3172,6 +3758,14 @@
           "matchKind": "literal-key-occurrence"
         },
         {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 35,
+          "startLine": 32,
+          "endLine": 41,
+          "excerpt": "      max_attempts: 2\n      backoff_strategy: exponential\n      jitter: false\n    on_error:\n      on_codes:\n      - NIKA-BUILTIN-READ-001\n      recover: ${{ const.fallback }}\n  validate:\n    with:\n      content: ${{ tasks.read.output }}",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/website-brief.nika.yaml",
           "line": 56,
           "startLine": 53,
@@ -3260,11 +3854,27 @@
           "matchKind": "literal-key-occurrence"
         },
         {
+          "path": "templates/aggregate-by-key.nika.yaml",
+          "line": 70,
+          "startLine": 67,
+          "endLine": 71,
+          "excerpt": "          records: ${{ const.records }}\n        expression: '{currency, groups: (.records | group_by(.region) | map({region: .[0].region, count:\n          length, total: (map(.amount) | add)})), total: ([.records[].amount] | add // 0)}'\noutputs:\n  report: ${{ tasks.aggregate.output }}",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/api-upload-and-create.nika.yaml",
           "line": 98,
           "startLine": 95,
           "endLine": 99,
           "excerpt": "      on_codes: [NIKA-VAR-001]\n      recover: { id: \"rehearsal-0001\", url: \"https://app.example.com/items/rehearsal-0001\" }\n\noutputs:\n  result: ${{ tasks.create.output }}   # SLOT: the callable contract",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/bounded-batch.nika.yaml",
+          "line": 68,
+          "startLine": 65,
+          "endLine": 69,
+          "excerpt": "            type: string\n            minLength: 1\n            maxLength: 4000\noutputs:\n  results: '${{ tasks.process.output == null ? [] : tasks.process.output }}'",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -3289,6 +3899,14 @@
           "startLine": 119,
           "endLine": 123,
           "excerpt": "        input: { hits: \"${{ with.hits }}\", answer: \"${{ with.answer }}\" }\n        expression: 'if (.hits | length) == 0 then {known: false, answer: \"I do not know from this corpus.\", citations: []} else {known: true, answer: .answer.answer, citations: .answer.citations} end'\n\noutputs:\n  result: ${{ tasks.finalize.output }}",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/deduplicate-records.nika.yaml",
+          "line": 84,
+          "startLine": 81,
+          "endLine": 85,
+          "excerpt": "          dataset: ${{ const.dataset }}\n          records: ${{ const.records }}\n        expression: '{dataset, records: (.records | unique_by(.id))}'\noutputs:\n  result: ${{ tasks.deduplicate.output }}",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -3353,6 +3971,46 @@
           "startLine": 118,
           "endLine": 122,
           "excerpt": "      # fires on a successful real write. Delete once wired.\n      recover: \"REHEARSAL · write refused under nika test — the real run lands the manifest\"\n\noutputs:\n  manifest: ${{ tasks.manifest.output }}  # SLOT: the callable contract",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 143,
+          "startLine": 140,
+          "endLine": 144,
+          "excerpt": "      args:\n        condition: ${{ with.cases == [true, true, true, true] }}\n        message: All four conjunction truth-table cases must pass\noutputs:\n  verdict: ${{ tasks.verdict.output }}",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/project-public-fields.nika.yaml",
+          "line": 93,
+          "startLine": 90,
+          "endLine": 95,
+          "excerpt": "            type: string\n            minLength: 1\n            maxLength: 4000\noutputs:\n  public: ${{ tasks.public.output }}\n  summary: ${{ tasks.summarize.output.summary }}",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 69,
+          "startLine": 66,
+          "endLine": 70,
+          "excerpt": "      args:\n        input: ${{ with.content }}\n        expression: .\noutputs:\n  content: ${{ tasks.result.output }}",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/snapshot-diff.nika.yaml",
+          "line": 74,
+          "startLine": 71,
+          "endLine": 75,
+          "excerpt": "          after: ${{ const.after }}\n        expression: '{resource, added: ((.after - .before) | unique), removed: ((.before - .after) | unique),\n          kept: ([.after[] as $id | select(.before | index($id)) | $id] | unique)}'\noutputs:\n  diff: ${{ tasks.diff.output }}",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/validate-records.nika.yaml",
+          "line": 66,
+          "startLine": 63,
+          "endLine": 67,
+          "excerpt": "          batch: ${{ const.batch }}\n          records: ${{ const.records }}\n        expression: '{batch, count: (.records | length), total: ([.records[].amount] | add // 0)}'\noutputs:\n  report: ${{ tasks.report.output }}",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -3436,6 +4094,14 @@
           "startLine": 107,
           "endLine": 116,
           "excerpt": "    invoke:\n      tool: \"nika:write\"\n      args:\n        path: \"${{ const.out_dir }}/manifest.json\"\n        create_dirs: true\n        # `.json` path → `content:` is ONE interpolation of a value the engine\n        # serializes. `nika:jq` above BUILT that value; hand-typing braces\n        # around an interpolation emits unquoted fields and breaks the artifact.\n        content: \"${{ with.manifest }}\"\n    on_error:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 29,
+          "startLine": 26,
+          "endLine": 35,
+          "excerpt": "    invoke:\n      tool: nika:read\n      args:\n        path: ./optional.txt\n    timeout: 5s\n    retry:\n      max_attempts: 2\n      backoff_strategy: exponential\n      jitter: false\n    on_error:",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -3582,11 +4248,27 @@
           "matchKind": "literal-key-occurrence"
         },
         {
+          "path": "templates/aggregate-by-key.nika.yaml",
+          "line": 20,
+          "startLine": 17,
+          "endLine": 26,
+          "excerpt": "    amount: 20\n  - region: north\n    amount: 5\npermits:\n  tools:\n  - nika:assert\n  - nika:jq\n  - nika:validate\ntasks:\n  validate:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/api-upload-and-create.nika.yaml",
           "line": 51,
           "startLine": 48,
           "endLine": 57,
           "excerpt": "      - to: \"nika:fetch\"            # the send · default-deny otherwise\n      - to: \"outputs\"               # the return value derives from the authed response\n\npermits:                            # the blast radius · default-deny once present\n  tools: [\"nika:fetch\"]\n  # `egress:` above sanctions the FLOW (this secret may ride a fetch); it does\n  # NOT grant the capability to reach anyone. The host is the separate, required\n  # half — an unlisted host is refused at RUN, mid-flight, with the bytes\n  # already on the wire.\n  net: { http: [\"api.example.com\"] }   # SLOT: the host from const.api_base",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/bounded-batch.nika.yaml",
+          "line": 19,
+          "startLine": 16,
+          "endLine": 25,
+          "excerpt": "  items:\n  - first note\n  - second note\npermits:\n  tools:\n  - nika:assert\n  - nika:validate\ntasks:\n  validate:\n    invoke:",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -3611,6 +4293,14 @@
           "startLine": 25,
           "endLine": 34,
           "excerpt": "    - { id: security, text: \"Security incidents are reported within one hour.\" }\n    - { id: handbook, text: \"Support hours are 09:00 to 17:00 UTC.\" }\n\npermits:\n  tools: [\"nika:jq\", \"nika:assert\"]\n\ntasks:\n  conflicting_ids:\n    invoke:\n      tool: nika:jq",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/deduplicate-records.nika.yaml",
+          "line": 20,
+          "startLine": 17,
+          "endLine": 26,
+          "excerpt": "    amount: 10\n  - id: b\n    amount: 20\npermits:\n  tools:\n  - nika:assert\n  - nika:jq\n  - nika:validate\ntasks:\n  validate:",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -3678,6 +4368,46 @@
           "matchKind": "literal-key-occurrence"
         },
         {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 46,
+          "startLine": 43,
+          "endLine": 52,
+          "excerpt": "      ready: true\n      reason: fixture\n    expected: true\npermits:\n  tools:\n  - nika:assert\n  - nika:jq\n  - nika:validate\ntasks:\n  validate:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/project-public-fields.nika.yaml",
+          "line": 21,
+          "startLine": 18,
+          "endLine": 27,
+          "excerpt": "    severity: 2\n    email: private@example.invalid\n    internal_note: internal-only-fixture\npermits:\n  tools:\n  - nika:assert\n  - nika:jq\n  - nika:validate\ntasks:\n  validate:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 15,
+          "startLine": 12,
+          "endLine": 21,
+          "excerpt": "  clock: system\nconst:\n  fallback: '<SLOT: the explicit fallback content>'\npermits:\n  tools:\n  - nika:assert\n  - nika:jq\n  - nika:read\n  - nika:validate\n  fs:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/snapshot-diff.nika.yaml",
+          "line": 19,
+          "startLine": 16,
+          "endLine": 25,
+          "excerpt": "  after:\n  - beta\n  - gamma\npermits:\n  tools:\n  - nika:assert\n  - nika:jq\n  - nika:validate\ntasks:\n  validate:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/validate-records.nika.yaml",
+          "line": 18,
+          "startLine": 15,
+          "endLine": 24,
+          "excerpt": "    amount: 10\n  - id: b\n    amount: 20\npermits:\n  tools:\n  - nika:assert\n  - nika:jq\n  - nika:validate\ntasks:\n  validate:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/website-brief.nika.yaml",
           "line": 41,
           "startLine": 38,
@@ -3735,6 +4465,14 @@
           "startLine": 55,
           "endLine": 64,
           "excerpt": "tasks:\n  plan:\n    infer:\n      prompt: \"Break '${{ inputs.goal }}' into at most 4 concrete steps.\"   # SLOT\n      # SLOT: the spend ceiling for the planning call. Size it for the SEAT,\n      # not for the answer: a reasoning model spends tokens thinking before\n      # it emits the first brace, and a ceiling that cuts it off mid-thought\n      # fails NIKA-INFER-002 (\"no JSON value found · the reply was cut off at\n      # the token limit\"). Measured — 400 starves qwen3.5:4b on this prompt.\n      max_tokens: 2000",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/bounded-batch.nika.yaml",
+          "line": 54,
+          "startLine": 51,
+          "endLine": 60,
+          "excerpt": "      fail_fast: true\n    timeout: 30s\n    infer:\n      prompt: '${{ const.brief }}\n\n        Item: ${{ item }}'\n      max_tokens: 2048\n      schema:\n        type: object\n        additionalProperties: false",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -3799,6 +4537,22 @@
           "startLine": 56,
           "endLine": 65,
           "excerpt": "      # SLOT: the creative direction · style · constraints. Keep slot markers\n      # out of the block below — it is prompt TEXT, not YAML, so a stray\n      # comment line is sent to the model verbatim.\n      prompt: |\n        Write one vivid, concrete image prompt for: ${{ const.subject }}.\n        No text in the image · no watermark · a calm central zone.\n      schema:\n        type: object\n        additionalProperties: false\n        properties:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 76,
+          "startLine": 73,
+          "endLine": 82,
+          "excerpt": "      law_holds: success\n    timeout: 30s\n    infer:\n      prompt: 'Review clarity and missing explanations. Document: ${{ const.document }}'\n      max_tokens: 2048\n      schema:\n        type: object\n        additionalProperties: false\n        required:\n        - ready",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/project-public-fields.nika.yaml",
+          "line": 79,
+          "startLine": 76,
+          "endLine": 85,
+          "excerpt": "      public: ${{ tasks.public.output }}\n    timeout: 30s\n    infer:\n      prompt: '${{ const.instruction }}\n\n        Allowed fields only: ${{ with.public }}'\n      max_tokens: 2048\n      schema:\n        type: object\n        additionalProperties: false",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -3870,6 +4624,14 @@
           "startLine": 71,
           "endLine": 80,
           "excerpt": "    # its FILES at run: `./release` alone checks green and then returns NO\n    # MATCH for a pattern that is there (the files stay unreadable, the walk\n    # reports nothing) — a gate that reads RED with no error to tell you why.\n    read: [\"./release\", \"./release/*\"]   # SLOT: keep in step with const.evidence_dir\n\nsecrets:\n  webhook:\n    source: env\n    key: TEAM_WEBHOOK_URL           # SLOT: where the record lands\n    egress:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 22,
+          "startLine": 19,
+          "endLine": 28,
+          "excerpt": "  - nika:read\n  - nika:validate\n  fs:\n    read:\n    - ./optional.txt\ntasks:\n  read:\n    invoke:\n      tool: nika:read\n      args:",
           "matchKind": "literal-key-occurrence"
         }
       ]
@@ -3958,6 +4720,14 @@
           "matchKind": "literal-key-occurrence"
         },
         {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 38,
+          "startLine": 35,
+          "endLine": 44,
+          "excerpt": "    on_error:\n      on_codes:\n      - NIKA-BUILTIN-READ-001\n      recover: ${{ const.fallback }}\n  validate:\n    with:\n      content: ${{ tasks.read.output }}\n    invoke:\n      tool: nika:validate\n      args:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/website-brief.nika.yaml",
           "line": 59,
           "startLine": 56,
@@ -3997,6 +4767,22 @@
           "matchKind": "literal-key-occurrence"
         },
         {
+          "path": "templates/aggregate-by-key.nika.yaml",
+          "line": 38,
+          "startLine": 35,
+          "endLine": 44,
+          "excerpt": "          items:\n            type: object\n            additionalProperties: false\n            required:\n            - region\n            - amount\n            properties:\n              region:\n                type: string\n                enum:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/bounded-batch.nika.yaml",
+          "line": 61,
+          "startLine": 58,
+          "endLine": 67,
+          "excerpt": "      schema:\n        type: object\n        additionalProperties: false\n        required:\n        - summary\n        properties:\n          summary:\n            type: string\n            minLength: 1\n            maxLength: 4000",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/classify-and-route.nika.yaml",
           "line": 33,
           "startLine": 30,
@@ -4010,6 +4796,14 @@
           "startLine": 104,
           "endLine": 113,
           "excerpt": "      schema:\n        type: object\n        additionalProperties: false\n        required: [answer, citations]\n        properties:\n          answer: { type: string, minLength: 1 }\n          citations: { type: array, minItems: 1, items: { type: string } }\n\n  finalize:\n    with:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/deduplicate-records.nika.yaml",
+          "line": 38,
+          "startLine": 35,
+          "endLine": 44,
+          "excerpt": "          items:\n            type: object\n            additionalProperties: false\n            required:\n            - id\n            - amount\n            properties:\n              id:\n                type: string\n                minLength: 1",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -4034,6 +4828,38 @@
           "startLine": 64,
           "endLine": 73,
           "excerpt": "        additionalProperties: false\n        properties:\n          image_prompt: { type: string }\n        required: [image_prompt]\n\n  render:\n    with:\n      brief_image_prompt: ${{ tasks.brief.output.image_prompt }}\n    invoke:\n      tool: \"nika:image_generate\"",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 81,
+          "startLine": 78,
+          "endLine": 87,
+          "excerpt": "      schema:\n        type: object\n        additionalProperties: false\n        required:\n        - ready\n        - reason\n        properties:\n          ready:\n            type: boolean\n          reason:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/project-public-fields.nika.yaml",
+          "line": 36,
+          "startLine": 33,
+          "endLine": 42,
+          "excerpt": "        schema:\n          type: object\n          additionalProperties: false\n          required:\n          - topic\n          - severity\n          - email\n          - internal_note\n          properties:\n            topic:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/snapshot-diff.nika.yaml",
+          "line": 36,
+          "startLine": 33,
+          "endLine": 42,
+          "excerpt": "        schema:\n          type: object\n          additionalProperties: false\n          required:\n          - before\n          - after\n          properties:\n            before:\n              type: array\n              maxItems: 8",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/validate-records.nika.yaml",
+          "line": 36,
+          "startLine": 33,
+          "endLine": 42,
+          "excerpt": "          items:\n            type: object\n            additionalProperties: false\n            required:\n            - id\n            - amount\n            properties:\n              id:\n                type: string\n                minLength: 1",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -4084,6 +4910,14 @@
           "startLine": 119,
           "endLine": 128,
           "excerpt": "      max_parallel: 4                 # SLOT: the polite ceiling\n      fail_fast: false\n    timeout: \"60s\"                  # SLOT: per-iteration bound\n    retry:\n      max_attempts: 3\n      backoff_strategy: exponential\n      jitter: true\n    on_error:\n      recover: null                 # a failed item yields null at its index · the batch lives\n    infer:                          # SLOT: the per-item job (any verb)",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 31,
+          "startLine": 28,
+          "endLine": 37,
+          "excerpt": "      args:\n        path: ./optional.txt\n    timeout: 5s\n    retry:\n      max_attempts: 2\n      backoff_strategy: exponential\n      jitter: false\n    on_error:\n      on_codes:\n      - NIKA-BUILTIN-READ-001",
           "matchKind": "literal-key-occurrence"
         }
       ]
@@ -4183,11 +5017,43 @@
       ],
       "examples": [
         {
+          "path": "templates/bounded-batch.nika.yaml",
+          "line": 12,
+          "startLine": 9,
+          "endLine": 18,
+          "excerpt": "# Run · nika run <file> --model mock/echo\nnika: bounded-batch\nmodel: ollama/qwen3.5:4b\nrun:\n  clock: system\nconst:\n  brief: '<SLOT: the per-item instruction>'\n  items:\n  - first note\n  - second note",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/fanout.nika.yaml",
           "line": 57,
           "startLine": 54,
           "endLine": 63,
           "excerpt": "# stamp leaves `mock/echo`, the offline path this file guarantees.\nmodel: mock/echo\n\nrun:\n  # A `timeout:` is a deadline, and a deadline needs a clock. Declaring it says\n  # out loud which one: `system` is the ambient wall clock (the honest default);\n  # `virtual` drives a simulated clock for deterministic tests.\n  clock: system\n\nconst:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 12,
+          "startLine": 9,
+          "endLine": 18,
+          "excerpt": "# Run · nika run <file> --model mock/echo\nnika: parallel-review\nmodel: ollama/qwen3.5:4b\nrun:\n  clock: system\nconst:\n  document: '<SLOT: the document to review>'\n  law: '{ready: (.clarity.ready and .accuracy.ready), reviews: [.clarity, .accuracy]}'\n  cases:\n  - clarity:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/project-public-fields.nika.yaml",
+          "line": 12,
+          "startLine": 9,
+          "endLine": 18,
+          "excerpt": "# Run · nika run <file> --model mock/echo\nnika: project-public-fields\nmodel: ollama/qwen3.5:4b\nrun:\n  clock: system\nconst:\n  instruction: '<SLOT: the public summary instruction>'\n  record:\n    topic: queue latency\n    severity: 2",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 11,
+          "startLine": 8,
+          "endLine": 17,
+          "excerpt": "# Needs · fill the SLOT; no services or credentials for mock rehearsal.\n# Run · nika run <file> --model mock/echo\nnika: recover-optional-file\nrun:\n  clock: system\nconst:\n  fallback: '<SLOT: the explicit fallback content>'\npermits:\n  tools:\n  - nika:assert",
           "matchKind": "literal-key-occurrence"
         }
       ]
@@ -4245,6 +5111,22 @@
           "matchKind": "literal-key-occurrence"
         },
         {
+          "path": "templates/aggregate-by-key.nika.yaml",
+          "line": 32,
+          "startLine": 29,
+          "endLine": 38,
+          "excerpt": "      args:\n        data: ${{ const.records }}\n        format: json\n        schema:\n          type: array\n          maxItems: 8\n          items:\n            type: object\n            additionalProperties: false\n            required:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/bounded-batch.nika.yaml",
+          "line": 30,
+          "startLine": 27,
+          "endLine": 36,
+          "excerpt": "      args:\n        data: ${{ const.items }}\n        format: json\n        schema:\n          type: array\n          maxItems: 8\n          items:\n            type: string\n            minLength: 1\n            maxLength: 4000",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/classify-and-route.nika.yaml",
           "line": 85,
           "startLine": 82,
@@ -4258,6 +5140,14 @@
           "startLine": 101,
           "endLine": 110,
           "excerpt": "        Answer from these passages only and cite their ids.\n        Question: ${{ const.query }}\n        Passages: ${{ with.hits }}\n      schema:\n        type: object\n        additionalProperties: false\n        required: [answer, citations]\n        properties:\n          answer: { type: string, minLength: 1 }\n          citations: { type: array, minItems: 1, items: { type: string } }",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/deduplicate-records.nika.yaml",
+          "line": 32,
+          "startLine": 29,
+          "endLine": 38,
+          "excerpt": "      args:\n        data: ${{ const.records }}\n        format: json\n        schema:\n          type: array\n          maxItems: 8\n          items:\n            type: object\n            additionalProperties: false\n            required:",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -4282,6 +5172,46 @@
           "startLine": 59,
           "endLine": 68,
           "excerpt": "      prompt: |\n        Write one vivid, concrete image prompt for: ${{ const.subject }}.\n        No text in the image · no watermark · a calm central zone.\n      schema:\n        type: object\n        additionalProperties: false\n        properties:\n          image_prompt: { type: string }\n        required: [image_prompt]\n",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 58,
+          "startLine": 55,
+          "endLine": 64,
+          "excerpt": "      args:\n        data: ${{ const.document }}\n        format: json\n        schema:\n          type: string\n          minLength: 1\n          maxLength: 4000\n  admit:\n    with:\n      valid: ${{ tasks.validate.output.valid }}",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/project-public-fields.nika.yaml",
+          "line": 33,
+          "startLine": 30,
+          "endLine": 39,
+          "excerpt": "      args:\n        data: ${{ const.record }}\n        format: json\n        schema:\n          type: object\n          additionalProperties: false\n          required:\n          - topic\n          - severity\n          - email",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 47,
+          "startLine": 44,
+          "endLine": 53,
+          "excerpt": "      args:\n        data: ${{ with.content }}\n        format: json\n        schema:\n          type: string\n          minLength: 1\n          maxLength: 4000\n  admit:\n    with:\n      valid: ${{ tasks.validate.output.valid }}",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/snapshot-diff.nika.yaml",
+          "line": 33,
+          "startLine": 30,
+          "endLine": 39,
+          "excerpt": "          before: ${{ const.before }}\n          after: ${{ const.after }}\n        format: json\n        schema:\n          type: object\n          additionalProperties: false\n          required:\n          - before\n          - after\n          properties:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/validate-records.nika.yaml",
+          "line": 30,
+          "startLine": 27,
+          "endLine": 36,
+          "excerpt": "      args:\n        data: ${{ const.records }}\n        format: json\n        schema:\n          type: array\n          maxItems: 8\n          items:\n            type: object\n            additionalProperties: false\n            required:",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -4784,11 +5714,27 @@
           "matchKind": "literal-key-occurrence"
         },
         {
+          "path": "templates/aggregate-by-key.nika.yaml",
+          "line": 25,
+          "startLine": 22,
+          "endLine": 31,
+          "excerpt": "  - nika:assert\n  - nika:jq\n  - nika:validate\ntasks:\n  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data: ${{ const.records }}\n        format: json",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/api-upload-and-create.nika.yaml",
           "line": 67,
           "startLine": 64,
           "endLine": 73,
           "excerpt": "    # false hint is closed.\n    read: [\"./out/assets/asset-1.png\"]   # SLOT: keep in step with const.asset_path\n\ntasks:\n  create:\n    invoke:\n      tool: \"nika:fetch\"\n      args:\n        url: \"${{ const.api_base }}/items\"   # SLOT: the create endpoint\n        method: POST",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/bounded-batch.nika.yaml",
+          "line": 23,
+          "startLine": 20,
+          "endLine": 29,
+          "excerpt": "  tools:\n  - nika:assert\n  - nika:validate\ntasks:\n  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data: ${{ const.items }}\n        format: json",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -4813,6 +5759,14 @@
           "startLine": 28,
           "endLine": 37,
           "excerpt": "permits:\n  tools: [\"nika:jq\", \"nika:assert\"]\n\ntasks:\n  conflicting_ids:\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ const.documents }}\n        expression: 'sort_by(.id) | group_by(.id) | map(select((map(.text) | unique | length) > 1) | .[0].id)'",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/deduplicate-records.nika.yaml",
+          "line": 25,
+          "startLine": 22,
+          "endLine": 31,
+          "excerpt": "  - nika:assert\n  - nika:jq\n  - nika:validate\ntasks:\n  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data: ${{ const.records }}\n        format: json",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -4877,6 +5831,46 @@
           "startLine": 49,
           "endLine": 58,
           "excerpt": "      - \"./out/assets\"              # SLOT: keep in step with const.out_dir\n      - \"./out/assets/*\"            # SLOT: idem · the files that land inside it\n\ntasks:\n  brief:\n    infer:\n      max_tokens: 600\n      # SLOT: the creative direction · style · constraints. Keep slot markers\n      # out of the block below — it is prompt TEXT, not YAML, so a stray\n      # comment line is sent to the model verbatim.",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 51,
+          "startLine": 48,
+          "endLine": 57,
+          "excerpt": "  - nika:assert\n  - nika:jq\n  - nika:validate\ntasks:\n  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data: ${{ const.document }}\n        format: json",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/project-public-fields.nika.yaml",
+          "line": 26,
+          "startLine": 23,
+          "endLine": 32,
+          "excerpt": "  - nika:assert\n  - nika:jq\n  - nika:validate\ntasks:\n  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data: ${{ const.record }}\n        format: json",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 24,
+          "startLine": 21,
+          "endLine": 30,
+          "excerpt": "  fs:\n    read:\n    - ./optional.txt\ntasks:\n  read:\n    invoke:\n      tool: nika:read\n      args:\n        path: ./optional.txt\n    timeout: 5s",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/snapshot-diff.nika.yaml",
+          "line": 24,
+          "startLine": 21,
+          "endLine": 30,
+          "excerpt": "  - nika:assert\n  - nika:jq\n  - nika:validate\ntasks:\n  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data:\n          before: ${{ const.before }}",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/validate-records.nika.yaml",
+          "line": 23,
+          "startLine": 20,
+          "endLine": 29,
+          "excerpt": "  - nika:assert\n  - nika:jq\n  - nika:validate\ntasks:\n  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data: ${{ const.records }}\n        format: json",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -5009,11 +6003,43 @@
       ],
       "examples": [
         {
+          "path": "templates/bounded-batch.nika.yaml",
+          "line": 52,
+          "startLine": 49,
+          "endLine": 58,
+          "excerpt": "      items: ${{ const.items }}\n      max_parallel: 2\n      fail_fast: true\n    timeout: 30s\n    infer:\n      prompt: '${{ const.brief }}\n\n        Item: ${{ item }}'\n      max_tokens: 2048\n      schema:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/fanout.nika.yaml",
           "line": 121,
           "startLine": 118,
           "endLine": 127,
           "excerpt": "      items: \"${{ with.read == null ? [] : with.read }}\"\n      max_parallel: 4                 # SLOT: the polite ceiling\n      fail_fast: false\n    timeout: \"60s\"                  # SLOT: per-iteration bound\n    retry:\n      max_attempts: 3\n      backoff_strategy: exponential\n      jitter: true\n    on_error:\n      recover: null                 # a failed item yields null at its index · the batch lives",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 74,
+          "startLine": 71,
+          "endLine": 80,
+          "excerpt": "    after:\n      admit: success\n      law_holds: success\n    timeout: 30s\n    infer:\n      prompt: 'Review clarity and missing explanations. Document: ${{ const.document }}'\n      max_tokens: 2048\n      schema:\n        type: object\n        additionalProperties: false",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/project-public-fields.nika.yaml",
+          "line": 77,
+          "startLine": 74,
+          "endLine": 83,
+          "excerpt": "  summarize:\n    with:\n      public: ${{ tasks.public.output }}\n    timeout: 30s\n    infer:\n      prompt: '${{ const.instruction }}\n\n        Allowed fields only: ${{ with.public }}'\n      max_tokens: 2048\n      schema:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 30,
+          "startLine": 27,
+          "endLine": 36,
+          "excerpt": "      tool: nika:read\n      args:\n        path: ./optional.txt\n    timeout: 5s\n    retry:\n      max_attempts: 2\n      backoff_strategy: exponential\n      jitter: false\n    on_error:\n      on_codes:",
           "matchKind": "literal-key-occurrence"
         }
       ]
@@ -5108,11 +6134,27 @@
           "matchKind": "literal-key-occurrence"
         },
         {
+          "path": "templates/aggregate-by-key.nika.yaml",
+          "line": 28,
+          "startLine": 25,
+          "endLine": 34,
+          "excerpt": "tasks:\n  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data: ${{ const.records }}\n        format: json\n        schema:\n          type: array\n          maxItems: 8",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/api-upload-and-create.nika.yaml",
           "line": 70,
           "startLine": 67,
           "endLine": 76,
           "excerpt": "tasks:\n  create:\n    invoke:\n      tool: \"nika:fetch\"\n      args:\n        url: \"${{ const.api_base }}/items\"   # SLOT: the create endpoint\n        method: POST\n        headers:\n          x-api-key: \"${{ secrets.API_KEY }}\"  # SLOT: the auth header name\n        multipart:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/bounded-batch.nika.yaml",
+          "line": 26,
+          "startLine": 23,
+          "endLine": 32,
+          "excerpt": "tasks:\n  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data: ${{ const.items }}\n        format: json\n        schema:\n          type: array\n          maxItems: 8",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -5137,6 +6179,14 @@
           "startLine": 31,
           "endLine": 40,
           "excerpt": "tasks:\n  conflicting_ids:\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ const.documents }}\n        expression: 'sort_by(.id) | group_by(.id) | map(select((map(.text) | unique | length) > 1) | .[0].id)'\n\n  duplicates_consistent:\n    with:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/deduplicate-records.nika.yaml",
+          "line": 28,
+          "startLine": 25,
+          "endLine": 34,
+          "excerpt": "tasks:\n  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data: ${{ const.records }}\n        format: json\n        schema:\n          type: array\n          maxItems: 8",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -5193,6 +6243,46 @@
           "startLine": 70,
           "endLine": 79,
           "excerpt": "    with:\n      brief_image_prompt: ${{ tasks.brief.output.image_prompt }}\n    invoke:\n      tool: \"nika:image_generate\"\n      args:\n        provider: mock              # SLOT: local | openai | gemini | xai (local/mock first)\n        prompt: \"${{ with.brief_image_prompt }}\"\n        output_dir: \"${{ const.out_dir }}\"\n        filename_prefix: \"asset\"    # SLOT: filename stem\n    on_error:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 54,
+          "startLine": 51,
+          "endLine": 60,
+          "excerpt": "tasks:\n  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data: ${{ const.document }}\n        format: json\n        schema:\n          type: string\n          minLength: 1",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/project-public-fields.nika.yaml",
+          "line": 29,
+          "startLine": 26,
+          "endLine": 35,
+          "excerpt": "tasks:\n  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data: ${{ const.record }}\n        format: json\n        schema:\n          type: object\n          additionalProperties: false",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 27,
+          "startLine": 24,
+          "endLine": 33,
+          "excerpt": "tasks:\n  read:\n    invoke:\n      tool: nika:read\n      args:\n        path: ./optional.txt\n    timeout: 5s\n    retry:\n      max_attempts: 2\n      backoff_strategy: exponential",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/snapshot-diff.nika.yaml",
+          "line": 27,
+          "startLine": 24,
+          "endLine": 33,
+          "excerpt": "tasks:\n  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data:\n          before: ${{ const.before }}\n          after: ${{ const.after }}\n        format: json\n        schema:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/validate-records.nika.yaml",
+          "line": 26,
+          "startLine": 23,
+          "endLine": 32,
+          "excerpt": "tasks:\n  validate:\n    invoke:\n      tool: nika:validate\n      args:\n        data: ${{ const.records }}\n        format: json\n        schema:\n          type: array\n          maxItems: 8",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -5261,11 +6351,27 @@
           "matchKind": "literal-key-occurrence"
         },
         {
+          "path": "templates/aggregate-by-key.nika.yaml",
+          "line": 21,
+          "startLine": 18,
+          "endLine": 27,
+          "excerpt": "  - region: north\n    amount: 5\npermits:\n  tools:\n  - nika:assert\n  - nika:jq\n  - nika:validate\ntasks:\n  validate:\n    invoke:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/api-upload-and-create.nika.yaml",
           "line": 52,
           "startLine": 49,
           "endLine": 58,
           "excerpt": "      - to: \"outputs\"               # the return value derives from the authed response\n\npermits:                            # the blast radius · default-deny once present\n  tools: [\"nika:fetch\"]\n  # `egress:` above sanctions the FLOW (this secret may ride a fetch); it does\n  # NOT grant the capability to reach anyone. The host is the separate, required\n  # half — an unlisted host is refused at RUN, mid-flight, with the bytes\n  # already on the wire.\n  net: { http: [\"api.example.com\"] }   # SLOT: the host from const.api_base\n  fs:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/bounded-batch.nika.yaml",
+          "line": 20,
+          "startLine": 17,
+          "endLine": 26,
+          "excerpt": "  - first note\n  - second note\npermits:\n  tools:\n  - nika:assert\n  - nika:validate\ntasks:\n  validate:\n    invoke:\n      tool: nika:validate",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -5290,6 +6396,14 @@
           "startLine": 26,
           "endLine": 35,
           "excerpt": "    - { id: handbook, text: \"Support hours are 09:00 to 17:00 UTC.\" }\n\npermits:\n  tools: [\"nika:jq\", \"nika:assert\"]\n\ntasks:\n  conflicting_ids:\n    invoke:\n      tool: nika:jq\n      args:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/deduplicate-records.nika.yaml",
+          "line": 21,
+          "startLine": 18,
+          "endLine": 27,
+          "excerpt": "  - id: b\n    amount: 20\npermits:\n  tools:\n  - nika:assert\n  - nika:jq\n  - nika:validate\ntasks:\n  validate:\n    invoke:",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -5346,6 +6460,46 @@
           "startLine": 37,
           "endLine": 46,
           "excerpt": "  out_dir: \"./out/assets\"           # SLOT: where assets land\n\npermits:                            # the blast radius · default-deny once present\n  tools: [\"nika:image_generate\", \"nika:jq\", \"nika:write\"]\n  fs:\n    write:\n      # Two entries, and both earn their place: `check` judges the `output_dir:`\n      # ARGUMENT (`./out/assets`), while the RUN gates every FINAL file path under\n      # it — the asset, its provenance manifest, and manifest.json. Grant only the\n      # directory and the file sails through check, then dies at run on the first",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 47,
+          "startLine": 44,
+          "endLine": 53,
+          "excerpt": "      reason: fixture\n    expected: true\npermits:\n  tools:\n  - nika:assert\n  - nika:jq\n  - nika:validate\ntasks:\n  validate:\n    invoke:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/project-public-fields.nika.yaml",
+          "line": 22,
+          "startLine": 19,
+          "endLine": 28,
+          "excerpt": "    email: private@example.invalid\n    internal_note: internal-only-fixture\npermits:\n  tools:\n  - nika:assert\n  - nika:jq\n  - nika:validate\ntasks:\n  validate:\n    invoke:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 16,
+          "startLine": 13,
+          "endLine": 22,
+          "excerpt": "const:\n  fallback: '<SLOT: the explicit fallback content>'\npermits:\n  tools:\n  - nika:assert\n  - nika:jq\n  - nika:read\n  - nika:validate\n  fs:\n    read:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/snapshot-diff.nika.yaml",
+          "line": 20,
+          "startLine": 17,
+          "endLine": 26,
+          "excerpt": "  - beta\n  - gamma\npermits:\n  tools:\n  - nika:assert\n  - nika:jq\n  - nika:validate\ntasks:\n  validate:\n    invoke:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/validate-records.nika.yaml",
+          "line": 19,
+          "startLine": 16,
+          "endLine": 25,
+          "excerpt": "  - id: b\n    amount: 20\npermits:\n  tools:\n  - nika:assert\n  - nika:jq\n  - nika:validate\ntasks:\n  validate:\n    invoke:",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -5412,6 +6566,22 @@
           "matchKind": "literal-key-occurrence"
         },
         {
+          "path": "templates/aggregate-by-key.nika.yaml",
+          "line": 33,
+          "startLine": 30,
+          "endLine": 39,
+          "excerpt": "        data: ${{ const.records }}\n        format: json\n        schema:\n          type: array\n          maxItems: 8\n          items:\n            type: object\n            additionalProperties: false\n            required:\n            - region",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/bounded-batch.nika.yaml",
+          "line": 31,
+          "startLine": 28,
+          "endLine": 37,
+          "excerpt": "        data: ${{ const.items }}\n        format: json\n        schema:\n          type: array\n          maxItems: 8\n          items:\n            type: string\n            minLength: 1\n            maxLength: 4000\n  admit:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/classify-and-route.nika.yaml",
           "line": 32,
           "startLine": 29,
@@ -5425,6 +6595,14 @@
           "startLine": 102,
           "endLine": 111,
           "excerpt": "        Question: ${{ const.query }}\n        Passages: ${{ with.hits }}\n      schema:\n        type: object\n        additionalProperties: false\n        required: [answer, citations]\n        properties:\n          answer: { type: string, minLength: 1 }\n          citations: { type: array, minItems: 1, items: { type: string } }\n",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/deduplicate-records.nika.yaml",
+          "line": 33,
+          "startLine": 30,
+          "endLine": 39,
+          "excerpt": "        data: ${{ const.records }}\n        format: json\n        schema:\n          type: array\n          maxItems: 8\n          items:\n            type: object\n            additionalProperties: false\n            required:\n            - id",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -5449,6 +6627,46 @@
           "startLine": 60,
           "endLine": 69,
           "excerpt": "        Write one vivid, concrete image prompt for: ${{ const.subject }}.\n        No text in the image · no watermark · a calm central zone.\n      schema:\n        type: object\n        additionalProperties: false\n        properties:\n          image_prompt: { type: string }\n        required: [image_prompt]\n\n  render:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 59,
+          "startLine": 56,
+          "endLine": 65,
+          "excerpt": "        data: ${{ const.document }}\n        format: json\n        schema:\n          type: string\n          minLength: 1\n          maxLength: 4000\n  admit:\n    with:\n      valid: ${{ tasks.validate.output.valid }}\n    invoke:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/project-public-fields.nika.yaml",
+          "line": 34,
+          "startLine": 31,
+          "endLine": 40,
+          "excerpt": "        data: ${{ const.record }}\n        format: json\n        schema:\n          type: object\n          additionalProperties: false\n          required:\n          - topic\n          - severity\n          - email\n          - internal_note",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 48,
+          "startLine": 45,
+          "endLine": 54,
+          "excerpt": "        data: ${{ with.content }}\n        format: json\n        schema:\n          type: string\n          minLength: 1\n          maxLength: 4000\n  admit:\n    with:\n      valid: ${{ tasks.validate.output.valid }}\n    invoke:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/snapshot-diff.nika.yaml",
+          "line": 34,
+          "startLine": 31,
+          "endLine": 40,
+          "excerpt": "          after: ${{ const.after }}\n        format: json\n        schema:\n          type: object\n          additionalProperties: false\n          required:\n          - before\n          - after\n          properties:\n            before:",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/validate-records.nika.yaml",
+          "line": 31,
+          "startLine": 28,
+          "endLine": 37,
+          "excerpt": "        data: ${{ const.records }}\n        format: json\n        schema:\n          type: array\n          maxItems: 8\n          items:\n            type: object\n            additionalProperties: false\n            required:\n            - id",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -5786,6 +7004,22 @@
           "matchKind": "literal-key-occurrence"
         },
         {
+          "path": "templates/aggregate-by-key.nika.yaml",
+          "line": 52,
+          "startLine": 49,
+          "endLine": 58,
+          "excerpt": "                minimum: 0\n                maximum: 1000000\n  admit:\n    with:\n      valid: ${{ tasks.validate.output.valid }}\n    invoke:\n      tool: nika:assert\n      args:\n        condition: ${{ with.valid }}\n        message: Input violates the declared shape or size bound",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/bounded-batch.nika.yaml",
+          "line": 38,
+          "startLine": 35,
+          "endLine": 44,
+          "excerpt": "            minLength: 1\n            maxLength: 4000\n  admit:\n    with:\n      valid: ${{ tasks.validate.output.valid }}\n    invoke:\n      tool: nika:assert\n      args:\n        condition: ${{ with.valid }}\n        message: Input violates the declared shape or size bound",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
           "path": "templates/chain.nika.yaml",
           "line": 63,
           "startLine": 60,
@@ -5807,6 +7041,14 @@
           "startLine": 37,
           "endLine": 46,
           "excerpt": "        expression: 'sort_by(.id) | group_by(.id) | map(select((map(.text) | unique | length) > 1) | .[0].id)'\n\n  duplicates_consistent:\n    with:\n      conflicting_ids: ${{ tasks.conflicting_ids.output }}\n    invoke:\n      tool: nika:assert\n      args:\n        condition: ${{ size(with.conflicting_ids) == 0 }}\n        message: \"One corpus id names conflicting source text\"",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/deduplicate-records.nika.yaml",
+          "line": 51,
+          "startLine": 48,
+          "endLine": 57,
+          "excerpt": "                minimum: 0\n                maximum: 1000000\n  admit:\n    with:\n      valid: ${{ tasks.validate.output.valid }}\n    invoke:\n      tool: nika:assert\n      args:\n        condition: ${{ with.valid }}\n        message: Input violates the declared shape or size bound",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -5871,6 +7113,46 @@
           "startLine": 67,
           "endLine": 76,
           "excerpt": "        required: [image_prompt]\n\n  render:\n    with:\n      brief_image_prompt: ${{ tasks.brief.output.image_prompt }}\n    invoke:\n      tool: \"nika:image_generate\"\n      args:\n        provider: mock              # SLOT: local | openai | gemini | xai (local/mock first)\n        prompt: \"${{ with.brief_image_prompt }}\"",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/parallel-review.nika.yaml",
+          "line": 63,
+          "startLine": 60,
+          "endLine": 69,
+          "excerpt": "          minLength: 1\n          maxLength: 4000\n  admit:\n    with:\n      valid: ${{ tasks.validate.output.valid }}\n    invoke:\n      tool: nika:assert\n      args:\n        condition: ${{ with.valid }}\n        message: Input violates the declared shape or size bound",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/project-public-fields.nika.yaml",
+          "line": 59,
+          "startLine": 56,
+          "endLine": 65,
+          "excerpt": "              minLength: 1\n              maxLength: 4000\n  admit:\n    with:\n      valid: ${{ tasks.validate.output.valid }}\n    invoke:\n      tool: nika:assert\n      args:\n        condition: ${{ with.valid }}\n        message: Input violates the declared shape or size bound",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/recover-optional-file.nika.yaml",
+          "line": 40,
+          "startLine": 37,
+          "endLine": 46,
+          "excerpt": "      - NIKA-BUILTIN-READ-001\n      recover: ${{ const.fallback }}\n  validate:\n    with:\n      content: ${{ tasks.read.output }}\n    invoke:\n      tool: nika:validate\n      args:\n        data: ${{ with.content }}\n        format: json",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/snapshot-diff.nika.yaml",
+          "line": 55,
+          "startLine": 52,
+          "endLine": 61,
+          "excerpt": "                minLength: 1\n                maxLength: 4000\n  admit:\n    with:\n      valid: ${{ tasks.validate.output.valid }}\n    invoke:\n      tool: nika:assert\n      args:\n        condition: ${{ with.valid }}\n        message: Input violates the declared shape or size bound",
+          "matchKind": "literal-key-occurrence"
+        },
+        {
+          "path": "templates/validate-records.nika.yaml",
+          "line": 49,
+          "startLine": 46,
+          "endLine": 55,
+          "excerpt": "                minimum: 0\n                maximum: 1000000\n  admit:\n    with:\n      valid: ${{ tasks.validate.output.valid }}\n    invoke:\n      tool: nika:assert\n      args:\n        condition: ${{ with.valid }}\n        message: Input violates the declared shape or size bound",
           "matchKind": "literal-key-occurrence"
         },
         {
