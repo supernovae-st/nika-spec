@@ -54,7 +54,7 @@ files:
   evidence: "its own header: 'Bump deliberately: edit this' · the already-published nika-spec rev the shared estate tool is mirrored from (path tools/estate/scripts/estate.py), and the INPUT the mirror gate compares against; names f14f6872 (PR #315) and records historical nika-estate 247deb86 as the upgrade from 74287c75"
 - path: "SSOT.md"
   class: authored
-  sha256: 6b257d719b9567dd8d632a28c63d9c8852eb45d60900457418e827f9092fd82e
+  sha256: ae0fa76f51c59d342ceb446cb06d36b1efe480e51d4233e95c546b2386098c7f
   evidence: "the map of where every fact lives — prose and judgments are authored, but it carries ONE generated island (the estate:map markers · §9): scripts/ssot-map-projector.py --write derives the gated-surfaces table from THIS manifest, and --check (exit 5 · conformance.yml 'Projection gates') refuses a hand edit inside the markers — the canon.yaml hybrid, inverted"
 - path: "VERSION"
   class: authored
