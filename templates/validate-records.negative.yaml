@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-# COUNTEREXAMPLE · The validation builtin requires explicit tool authority.
+# COUNTEREXAMPLE · the source read is outside the declared file boundary.
 # Expected · NIKA-SEC-004.
 nika: validate-records
 const:
@@ -13,6 +13,11 @@ permits:
   tools:
   - nika:assert
   - nika:jq
+  - nika:validate
+  - nika:read
+  fs:
+    read:
+    - ./allowed.json
 tasks:
   validate:
     invoke:
@@ -57,5 +62,10 @@ tasks:
           records: ${{ const.records }}
         expression: '{batch, count: (.records | length), total: ([.records[].amount]
           | add // 0)}'
+  read_source:
+    invoke:
+      tool: nika:read
+      args:
+        path: ./private.json
 outputs:
   report: ${{ tasks.report.output }}

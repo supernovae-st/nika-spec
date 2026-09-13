@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-# COUNTEREXAMPLE · The projection and validation tools need explicit authority.
+# COUNTEREXAMPLE · the source read is outside the declared file boundary.
 # Expected · NIKA-SEC-004.
 nika: project-public-fields
 model: ollama/qwen3.5:4b
@@ -12,7 +12,15 @@ const:
     severity: 2
     email: private@example.invalid
     internal_note: internal-only-fixture
-permits: {}
+permits:
+  tools:
+  - nika:assert
+  - nika:jq
+  - nika:validate
+  - nika:read
+  fs:
+    read:
+    - ./allowed.json
 tasks:
   validate:
     invoke:
@@ -80,6 +88,11 @@ tasks:
             type: string
             minLength: 1
             maxLength: 4000
+  read_source:
+    invoke:
+      tool: nika:read
+      args:
+        path: ./private.json
 outputs:
   public: ${{ tasks.public.output }}
   summary: ${{ tasks.summarize.output.summary }}
