@@ -1,0 +1,8 @@
+{
+  "verdict": "clean",
+  "cost_replay": "replayed",
+  "items": {
+    "fan": null
+  },
+  "note": "Derived from 008 by removing the first item page and recomputing the unkeyed chain. The physical walk is internally consistent and reaches the lifecycle terminal, but the reader MUST NOT expose a complete item table. This fixture tests projection completeness, not authenticity against coherent rewriting; there is no signature."
+}

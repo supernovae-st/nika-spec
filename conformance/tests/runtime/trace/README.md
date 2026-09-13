@@ -12,12 +12,12 @@ verdict).
 
 ```
 tests/runtime/trace/<NNN-name>/
-├── golden.nika.yaml        the workflow the journal ran (001 only)
+├── golden.nika.yaml        the workflow the journal ran (when supplied)
 ├── trace.ndjson            the journal under verification
 └── expected-verify.json    { "verdict": …, "cost_replay"?: …, "note": … }
 ```
 
-`verdict` is the WALK's (below). Two optional fields assert what the
+`verdict` is the WALK's (below). Optional fields assert what the
 walk does not ·
 
 - **`cost_replay`** — the independent budget-meaning leg (15 §the
@@ -35,6 +35,13 @@ walk does not ·
   under `absent` is the law holding, not a gap.
 
 Absent fields mean the fixture makes no claim there.
+
+`items` optionally maps task ids to the complete expected item arrays, or
+`null` when no complete table may be projected. Fixture `008` is a real
+native fan-out with paged evidence; `009` removes its first page and
+recomputes the unkeyed chain. Both walks are internally consistent, but
+only `008` permits a complete item projection. This is a semantic
+completeness check, not an authenticity claim against coherent rewriting.
 
 Verdict law · four classes, and the first three all mean « the chain
 walks » ·
