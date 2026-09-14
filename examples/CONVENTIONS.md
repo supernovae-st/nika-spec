@@ -333,9 +333,12 @@ in one sentence, on the `Needs ·` line. Not "requires setup" — the effect:
 
 ```
 # Needs · a git repo (the digest reads YOUR yesterday's commits).
-# Needs · ollama running with the three seats pulled (qwen2.5:14b · llama3.2:3b
-#   · qwen2.5:0.5b) — per-task `model:` seats ARE the bench, so the CLI
-#   --model override deliberately doesn't touch them.
+# Needs · REAL SEATS — ollama running with the three contenders pulled
+#   (qwen2.5:14b · llama3.2:3b · qwen2.5:0.5b). There is NO offline
+#   rehearsal for this file: per-task `model:` seats ARE the bench, the CLI
+#   --model override deliberately doesn't touch them, and no envelope
+#   `model:` stands in for a mock (model-bench — the shelf cannot claim a
+#   mock preview the pins refuse).
 # Needs · a REAL sitemap URL (--var competitor_sitemap=https://…/sitemap.xml
 #   — the placeholder domain resolves nowhere).
 ```

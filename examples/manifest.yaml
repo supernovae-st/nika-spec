@@ -162,8 +162,8 @@ showcase:
     sha256_16: faf2632973595843
   - file: examples/model-bench.nika.yaml
     name: model-bench
-    constructs: [local_model, outputs, with]
-    sha256_16: caab575b93161167
+    constructs: [outputs, with]
+    sha256_16: a1f9cd16b0b7886b
   - file: examples/og-images.nika.yaml
     name: og-images
     constructs: [outputs]
