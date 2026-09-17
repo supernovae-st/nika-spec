@@ -1,0 +1,60 @@
+{
+  "note": "Expected assembler laws. Not executed against nika until engine tests exist.",
+  "fixtures": [
+    {
+      "id": "C-TYPE",
+      "law": "TYPE_COMPATIBILITY",
+      "a": "lookup-enrich.output",
+      "b": "facts-to-draft.input",
+      "expect": "compose"
+    },
+    {
+      "id": "C-TYPE-FAIL",
+      "law": "TYPE_COMPATIBILITY",
+      "a": "aggregate.output",
+      "b": "fetch.input",
+      "expect": "refuse"
+    },
+    {
+      "id": "C-EFFECT-ORDER",
+      "law": "EFFECT_ORDER",
+      "bad": "SEND before HUMAN_APPROVE",
+      "expect": "refuse"
+    },
+    {
+      "id": "C-HUMAN",
+      "law": "HUMAN_DOMINANCE",
+      "expect": "all paths to refund/send/publish cross gate"
+    },
+    {
+      "id": "C-AUTH",
+      "law": "AUTHORITY_MONOTONICITY",
+      "expect": "may request never grant"
+    },
+    {
+      "id": "C-CUSTODY",
+      "law": "CUSTODY_HONESTY",
+      "expect": "no silent local\u2192cloud"
+    },
+    {
+      "id": "C-POLICY",
+      "law": "POLICY_PRESERVATION",
+      "expect": "no invented refund cap"
+    },
+    {
+      "id": "C-UNKNOWN",
+      "law": "UNKNOWN_PRESERVATION",
+      "expect": "unknown stays unknown"
+    },
+    {
+      "id": "C-BOUND",
+      "law": "BOUNDEDNESS",
+      "expect": "batch/loop/agent bounds survive"
+    },
+    {
+      "id": "C-PROOF",
+      "law": "PROOF_OBSERVABILITY",
+      "expect": "logical decisions remain"
+    }
+  ]
+}

@@ -63,6 +63,17 @@ def main() -> int:
             indent=2,
         )
     )
+    # extra inventories
+    for extra in ("skeleton-audit.json","patterns.json","goldens.json","wave1-decisions.json"):
+        fp = ROOT / extra
+        assert fp.exists(), extra
+        json.loads(fp.read_text())
+    audit = json.loads((ROOT / "skeleton-audit.json").read_text())
+    assert audit["skeleton_count"] == 22, audit["skeleton_count"]
+    g = json.loads((ROOT / "goldens.json").read_text())
+    assert len(g["positive"]) >= 24
+    assert len(g["negative"]) >= 15
+    assert len(g["edits"]) >= 10
     return 0
 
 

@@ -1,0 +1,63 @@
+{
+  "cases": [
+    {
+      "id": "E01",
+      "change": "Use Teams instead of Slack",
+      "expect": "binding/tool only",
+      "churn": "low"
+    },
+    {
+      "id": "E02",
+      "change": "Ask me before sending enterprise customers",
+      "expect": "human gate on path"
+    },
+    {
+      "id": "E03",
+      "change": "Refund cap \u20ac100 \u2192 \u20ac250",
+      "expect": "policy only; identity changes; old approval invalid"
+    },
+    {
+      "id": "E04",
+      "change": "Keep everything local",
+      "expect": "seat/custody or INCOMPLETE"
+    },
+    {
+      "id": "E05",
+      "change": "Also store the report in Notion",
+      "expect": "one new effect + requested authority"
+    },
+    {
+      "id": "E06",
+      "change": "Remove automatic publishing",
+      "expect": "effect removed, generation remains"
+    },
+    {
+      "id": "E07",
+      "change": "Make classification deterministic using these rules",
+      "expect": "replace cognition with policy"
+    },
+    {
+      "id": "E08",
+      "change": "Only use an agent when customer type is unknown",
+      "expect": "agent rare branch"
+    },
+    {
+      "id": "E09",
+      "change": "Process 100 records in bounded batches",
+      "expect": "bounded-batch not unbounded"
+    },
+    {
+      "id": "E10",
+      "change": "Use a cheaper model for drafting",
+      "expect": "seat delta unless custody differs"
+    }
+  ],
+  "metrics": [
+    "REQUESTED_CHANGE_COVERAGE",
+    "UNREQUESTED_SEMANTIC_CHURN",
+    "TASK_ID_STABILITY",
+    "POLICY_PRESERVATION",
+    "AUTHORITY_DELTA_ACCURACY",
+    "CUSTODY_DELTA_ACCURACY"
+  ]
+}

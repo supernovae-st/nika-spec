@@ -1,0 +1,53 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# PROPOSED · NOT IN canon/templates/registry.yaml
+# lookup-and-enrich · identifier → read directory → typed facts.
+# Provider-neutral: the "CRM" is a JSON file. Bindings pick HubSpot later.
+# PATTERN P01. Compiler must not copy this per SaaS.
+#
+#   [read_dir] ──▶ [pick] ──▶ [facts]
+#   nika:read       jq         validate
+nika: lookup-and-enrich-proposed
+model: mock/echo
+inputs:
+  customer_id:
+    type: string
+    required: true
+    default: "CUST-1"
+const:
+  directory_path: "./fixtures/customers.json"  # SLOT: binding, not structure
+permits:
+  tools: ["nika:read", "nika:jq", "nika:validate", "nika:assert"]
+  fs: { read: ["./fixtures/customers.json"] }
+tasks:
+  read_dir:
+    invoke:
+      tool: nika:read
+      args: { path: "${{ const.directory_path }}" }
+    on_error:
+      # Rehearsal only. Delete when the directory is real. Recovered bytes
+      # are NOT a successful CRM lookup in Proof.
+      recover: '{"CUST-1":{"name":"Ada","tier":"standard"}}'
+  pick:
+    with:
+      dir: ${{ tasks.read_dir.output }}
+      id: ${{ inputs.customer_id }}
+    invoke:
+      tool: nika:jq
+      args:
+        input: ${{ with.dir }}
+        filter: ".[\"${{ with.id }}\"]"
+  facts:
+    with: { row: ${{ tasks.pick.output }} }
+    invoke:
+      tool: nika:validate
+      args:
+        data: ${{ with.row }}
+        format: json
+        schema:
+          type: object
+          required: [name, tier]
+          properties:
+            name: { type: string }
+            tier: { type: string }

@@ -1,0 +1,125 @@
+{
+  "kind": "private_compiler_pattern_contracts",
+  "not_yaml_keys": true,
+  "authority": "NONE \u2014 Check remains membrane",
+  "patterns": [
+    {
+      "id": "lookup-enrich",
+      "semantic_role": "LOOKUP",
+      "input_family": "identifier_or_record",
+      "output_family": "typed_enriched_record",
+      "effects": [
+        "external_read"
+      ],
+      "authority_requirements": [
+        "tool_for_lookup"
+      ],
+      "human_gate_requirement": false,
+      "intelligence_capability": null,
+      "derived_from": [],
+      "unlocks": [
+        "B03",
+        "C02",
+        "C03",
+        "F10"
+      ],
+      "cannot_grant": [
+        "permits",
+        "connections",
+        "credentials"
+      ],
+      "status": "MISSING_IN_CANON"
+    },
+    {
+      "id": "facts-to-draft",
+      "semantic_role": "DRAFT",
+      "input_family": "typed_facts",
+      "output_family": "{facts, generated}",
+      "effects": [],
+      "authority_requirements": [],
+      "human_gate_requirement": false,
+      "intelligence_capability": "FreeGenerate",
+      "derived_from": [
+        "chain (partial)"
+      ],
+      "status": "MISSING_PRESERVE_FACTS"
+    },
+    {
+      "id": "classify-route",
+      "semantic_role": "CLASSIFY+ROUTE",
+      "input_family": "record",
+      "output_family": "route+record",
+      "effects": [],
+      "derived_from": [
+        "templates/classify-and-route.nika.yaml"
+      ],
+      "status": "COVERED",
+      "law": "selected class is not authority"
+    },
+    {
+      "id": "validate",
+      "semantic_role": "VALIDATE",
+      "derived_from": [
+        "templates/validate-records.nika.yaml"
+      ],
+      "status": "COVERED",
+      "effects": []
+    },
+    {
+      "id": "aggregate",
+      "semantic_role": "AGGREGATE",
+      "derived_from": [
+        "templates/aggregate-by-key.nika.yaml"
+      ],
+      "status": "COVERED",
+      "effects": [],
+      "law": "exact arithmetic in code not Jev"
+    },
+    {
+      "id": "diff",
+      "semantic_role": "DIFF",
+      "derived_from": [
+        "templates/snapshot-diff.nika.yaml"
+      ],
+      "status": "COVERED",
+      "effects": []
+    },
+    {
+      "id": "human-approve-effect",
+      "semantic_role": "HUMAN_APPROVE",
+      "derived_from": [
+        "templates/human-gated-ship.nika.yaml"
+      ],
+      "status": "COVERED",
+      "human_gate_requirement": true,
+      "law": "HUMAN DOMINANCE every path to effect"
+    },
+    {
+      "id": "bounded-batch",
+      "semantic_role": "BATCH",
+      "derived_from": [
+        "templates/bounded-batch.nika.yaml"
+      ],
+      "status": "COVERED"
+    },
+    {
+      "id": "agent-explore",
+      "semantic_role": "AGENT_FALLBACK",
+      "derived_from": [
+        "templates/agent-loop.nika.yaml"
+      ],
+      "status": "OPEN_WORLD_WHOLE_WORKFLOW",
+      "note": "need exceptional-branch contract P05"
+    },
+    {
+      "id": "fetch-summarize-persist",
+      "semantic_role": "FETCH+GENERATE",
+      "derived_from": [
+        "templates/website-brief.nika.yaml"
+      ],
+      "status": "COVERED",
+      "hot": "HOT-A",
+      "structure_vs_data": "site_url and net host currently const/permits not inputs:"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# PROPOSED · NOT IN registry
+# facts-to-draft · typed facts stay exact; generated prose is a sibling field.
+# P02 / P08. chain is NOT a substitute: chain persists only the model text.
+nika: facts-to-draft-proposed
+model: mock/echo
+const:
+  facts:
+    customer: "Ada"
+    issue: "cannot login"
+    last_error: "timeout"
+permits:
+  tools: ["nika:jq"]
+tasks:
+  draft:
+    infer:
+      max_tokens: 400
+      prompt: |
+        Draft a support reply from these FACTS. Do not invent a refund,
+        a credit, or a promise not in the facts.
+        facts: ${{ const.facts }}
+      schema:
+        type: object
+        additionalProperties: false
+        required: [body]
+        properties:
+          body: { type: string }
+  pack:
+    with:
+      facts: ${{ const.facts }}
+      generated: ${{ tasks.draft.output.body }}
+    invoke:
+      tool: nika:jq
+      args:
+        input:
+          facts: ${{ with.facts }}
+          generated: ${{ with.generated }}
+        filter: "{facts: .facts, generated: .generated}"
+# Proof must show facts == source facts. Generated must not overwrite them.
