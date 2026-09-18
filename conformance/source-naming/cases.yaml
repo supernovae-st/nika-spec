@@ -117,6 +117,61 @@ cases:
     kind: not-program
     project_arm_valid: false
     note: HTTP URI is not a program path
+  - name: "A1+.-://foo.nika"
+    kind: not-program
+    project_arm_valid: false
+    note: RFC3986 schemes allow ASCII letters, digits and +.- after the first letter
+  - name: "1a://foo.nika"
+    kind: program
+    project_arm_valid: false
+    stem: foo
+    note: a scheme must start with an ASCII letter
+  - name: "+a://foo.nika"
+    kind: program
+    project_arm_valid: false
+    stem: foo
+  - name: "://foo.nika"
+    kind: program
+    project_arm_valid: false
+    stem: foo
+  - name: "a_b://foo.nika"
+    kind: program
+    project_arm_valid: false
+    stem: foo
+    note: underscore is not a scheme character
+  - name: "\u0345://foo.nika"
+    kind: program
+    project_arm_valid: false
+    stem: foo
+    note: Unicode Alphabetic properties do not define ASCII URI schemes
+  - name: "\u2160://foo.nika"
+    kind: program
+    project_arm_valid: false
+    stem: foo
+  - name: "a\u0345://foo.nika"
+    kind: program
+    project_arm_valid: false
+    stem: foo
+  - name: "a\u2160://foo.nika"
+    kind: program
+    project_arm_valid: false
+    stem: foo
+    note: Unicode alphanumeric characters are not scheme characters
+  - name: "\u00e9://foo.nika"
+    kind: program
+    project_arm_valid: false
+    stem: foo
+    note: a Unicode letter cannot start a URI scheme
+  - name: "workflows/r\u00e9ponse.nika"
+    kind: program
+    project_arm_valid: true
+    stem: "r\u00e9ponse"
+    note: the ASCII restriction applies only to the URI scheme, not filenames
+  - name: 'C:\workflows\réponse.nika'
+    kind: program
+    project_arm_valid: false
+    stem: réponse
+    note: native drive paths retain Unicode filename support
   - name: 'workflows\support.v2.nika'
     kind: program
     project_arm_valid: false
