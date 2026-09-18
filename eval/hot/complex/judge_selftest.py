@@ -165,6 +165,170 @@ class TheJudgeCanFail(unittest.TestCase):
         self.assertEqual(params["allowed"], ["secrets.webhook.key", "permits.net.http[[]0[]]"])
         self.assertEqual(params["required"], params["allowed"])
 
+    # ── a path is an identity, never a string that two nodes can share ───────
+
+    def test_a_key_that_looks_like_a_nested_path_does_not_hide_the_nested_change(self):
+        changes = judge.semantic_changes
+        base = {"a": {"b": 1}, "a.b": 2}
+        self.assertEqual(changes(base, {"a": {"b": 9}, "a.b": 2}), {"a.b"})
+        self.assertEqual(changes(base, {"a": {"b": 1}, "a.b": 9}), {'["a.b"]'})
+        self.assertEqual(changes(base, {"a": {"b": 9}, "a.b": 9}), {"a.b", '["a.b"]'})
+        # The defect depended on which entry was written last; the fix may not.
+        self.assertEqual(changes({"a.b": 2, "a": {"b": 1}}, {"a.b": 2, "a": {"b": 9}}), {"a.b"})
+
+    def test_a_key_that_looks_like_an_index_does_not_hide_the_element_change(self):
+        changes = judge.semantic_changes
+        base = {"v": [1], "v[0]": 2}
+        self.assertEqual(changes(base, {"v": [9], "v[0]": 2}), {"v[0]"})
+        self.assertEqual(changes(base, {"v": [1], "v[0]": 9}), {'["v[0]"]'})
+        self.assertEqual(changes({"v[0]": 2, "v": [1]}, {"v[0]": 2, "v": [9]}), {"v[0]"})
+        # A sequence index, the string "0" and the integer 0 are three different places.
+        self.assertEqual(changes({"v": {"0": 1}}, {"v": {"0": 9}}), {'v["0"]'})
+        self.assertEqual(changes({"v": {0: 1}}, {"v": {0: 9}}), {"v[<int> 0]"})
+        self.assertEqual(changes({"v": {0: 1, "0": 1}}, {"v": {0: 1, "0": 9}}), {'v["0"]'})
+
+    def test_a_non_string_key_is_not_its_string_lookalike(self):
+        changes = judge.semantic_changes
+        for key, lookalike, rendered, rendered_lookalike in (
+                (1, "1", "[<int> 1]", '["1"]'), (0, "0", "[<int> 0]", '["0"]'), (-1, "-1", "[<int> -1]", '["-1"]'),
+                (True, "true", "[<bool> true]", "true"), (False, "false", "[<bool> false]", "false"),
+                (None, "null", "[<null>]", "null"), (1.5, "1.5", "[<float> 1.5]", '["1.5"]')):
+            with self.subTest(key=key):
+                base = {key: "x", lookalike: "y"}
+                self.assertEqual(changes(base, {key: "CHANGED", lookalike: "y"}), {rendered})
+                self.assertEqual(changes(base, {key: "x", lookalike: "CHANGED"}), {rendered_lookalike})
+        # Python calls the keys 1 and True equal. YAML does not, and neither does a path.
+        self.assertEqual(changes({1: "x"}, {True: "x"}), {"[<int> 1]", "[<bool> true]"})
+        self.assertEqual(changes({1: "x"}, {1.0: "x"}), {"[<int> 1]", "[<float> 1.0]"})
+
+    def test_an_empty_key_and_punctuation_keys_have_their_own_identity(self):
+        changes = judge.semantic_changes
+        self.assertEqual(changes({"": 1}, {"": 2}), {'[""]'})
+        self.assertEqual(changes({"": {"": 1}}, {"": {"": 2}}), {'[""][""]'})
+        self.assertEqual(changes({"a": {"": 1}, "a.": 2}, {"a": {"": 9}, "a.": 2}), {'a[""]'})
+        self.assertEqual(changes({"a": {"": 1}, "a.": 2}, {"a": {"": 1}, "a.": 9}), {'["a."]'})
+        self.assertEqual(changes({".": 1, "": {"": 1}}, {".": 1, "": {"": 9}}), {'[""][""]'})
+        for key, rendered in (("]", '["]"]'), ("[", '["["]'), ('"', '["\\""]'), ("\\", '["\\\\"]'),
+                              ('a"]', '["a\\"]"]'), (" ", '[" "]'), ("a b", '["a b"]'), ("é", '["é"]'),
+                              ("0abc", '["0abc"]'), ("a-b", '["a-b"]')):
+            with self.subTest(key=key):
+                self.assertEqual(changes({"p": {key: 1}}, {"p": {key: 2}}), {"p" + rendered})
+
+    def test_mixed_nesting_reports_each_change_under_its_own_path(self):
+        changes = judge.semantic_changes
+        base = {"a.b": {"c": [{"d.e": 1}]}, "a": {"b": {"c": [{"d": {"e": 1}}]}}}
+        flat = {"a.b": {"c": [{"d.e": 9}]}, "a": {"b": {"c": [{"d": {"e": 1}}]}}}
+        nested = {"a.b": {"c": [{"d.e": 1}]}, "a": {"b": {"c": [{"d": {"e": 9}}]}}}
+        self.assertEqual(changes(base, flat), {'["a.b"].c[0]["d.e"]'})
+        self.assertEqual(changes(base, nested), {"a.b.c[0].d.e"})
+        self.assertEqual(changes(flat, nested), {'["a.b"].c[0]["d.e"]', "a.b.c[0].d.e"})
+
+    def test_no_two_places_share_a_rendered_path(self):
+        keys = ["a", "b", "a.b", "b.c", "a.b.c", "a[0]", "[0]", "0", 0, "", ".", "..", "]", "[", '"', "\\", 'a"]',
+                "a\\", True, "true", None, "null", 1, "1", 1.5, "1.5", "<int> 1", "[<int> 1]", '["a"]', " ", "a b",
+                "é", -1, "-1", "c", "b.c[0]"]
+        seen = {}
+        for parent in keys:
+            for child in keys:
+                for shape, document in (("mapping", lambda v: {parent: {child: v}}),
+                                        ("sequence", lambda v: {parent: [{child: v}]})):
+                    paths = judge.semantic_changes(document(1), document(2))
+                    self.assertEqual(len(paths), 1, (parent, child, shape, paths))
+                    (path,) = paths
+                    place = (repr(parent), repr(child), shape)
+                    self.assertNotIn(path, seen, f"{place} and {seen.get(path)} both render as {path!r}")
+                    seen[path] = place
+        self.assertEqual(len(seen), 2 * len(keys) ** 2)
+
+    def test_no_change_is_reported_exactly_when_two_documents_are_typed_equal(self):
+        """A property, not a list of cases: an independent recursive oracle decides equality, and
+        `semantic_changes` must be empty for exactly those pairs. Seeded, so a failure reproduces."""
+        import copy
+        import random
+        rng = random.Random(20260918)
+        keys = ["a", "b", "a.b", "b.a", "a[0]", "[0]", "0", 0, "", ".", "]", "[", '"', "\\", True, "true", None,
+                "null", 1, "1", 1.5, "1.5", "a.b.a", "<int> 0"]
+        leaves = [0, 1, True, False, None, "", "0", "1", 1.0, 0.0, "a.b", "true", [], {}]
+
+        def document(depth):
+            roll = rng.random()
+            if depth == 0 or roll < 0.3:
+                return copy.deepcopy(rng.choice(leaves))
+            if roll < 0.7:
+                return {key: document(depth - 1) for key in rng.sample(keys, rng.randint(0, 4))}
+            return [document(depth - 1) for _ in range(rng.randint(0, 3))]
+
+        def places(value, path=()):
+            yield path
+            children = value.items() if isinstance(value, dict) else enumerate(value) if isinstance(value, list) else ()
+            for step, child in children:
+                yield from places(child, path + (step,))
+
+        def replaced(value, path, new):
+            if not path:
+                return new
+            value = copy.copy(value)
+            value[path[0]] = replaced(value[path[0]], path[1:], new)
+            return value
+
+        def typed_equal(a, b):
+            if type(a) is not type(b):
+                return False
+            if isinstance(a, dict):
+                left = {(type(k).__name__, k): v for k, v in a.items()}
+                right = {(type(k).__name__, k): v for k, v in b.items()}
+                return left.keys() == right.keys() and all(typed_equal(left[k], right[k]) for k in left)
+            if isinstance(a, list):
+                return len(a) == len(b) and all(map(typed_equal, a, b))
+            return a == b
+
+        equal = unequal = 0
+        for _ in range(4000):
+            first = document(3)
+            if rng.random() < 0.25:
+                second = copy.deepcopy(first)
+            else:  # the same document with ONE place replaced: the pairs a last-wins index gets wrong
+                second = replaced(first, rng.choice(list(places(first))), document(1))
+            same = typed_equal(first, second)
+            equal, unequal = equal + same, unequal + (not same)
+            self.assertEqual(judge.semantic_changes(first, second) == set(), same, (first, second))
+        self.assertGreater(min(equal, unequal), 500, "the generator must produce both kinds of pair")
+
+    def test_a_collision_is_refused_loudly_and_never_overwritten(self):
+        real = judge.render
+        judge.render = lambda path: "one-name-for-everything"
+        try:
+            with self.red("render as"):
+                judge.semantic_changes({"a": 1, "b": 2}, {"a": 1, "b": 3})
+        finally:
+            judge.render = real
+        twice = (("key", "str", "a"),)
+        with self.red("yielded twice"):
+            judge.index_nodes([(twice, ("int", 1)), (twice, ("int", 2))])
+
+    def test_simple_paths_render_exactly_as_before(self):
+        import yaml
+        base = yaml.safe_load((self.root / "workflows/x06/base.nika.yaml").read_text(encoding="utf-8"))
+        edit = yaml.safe_load((self.root / "workflows/x06/edit-reference.nika.yaml").read_text(encoding="utf-8"))
+        self.assertEqual(judge.semantic_changes(base, edit), {"secrets.webhook.key", "permits.net.http[0]"})
+
+    def test_the_edit_assertion_sees_a_policy_change_hidden_behind_a_lookalike_key(self):
+        import copy
+        import yaml
+        base = {"nika": "lookalike", "const": {"limits": {"refund_eur": 100}, "limits.refund_eur": 100},
+                "tasks": {"rule": {"invoke": {"tool": "nika:jq", "args": {"input": 1, "expression": "."}}}}}
+        (self.root / "workflows/x06/lookalike-base.nika.yaml").write_text(yaml.safe_dump(base), encoding="utf-8")
+        params = {"base": "workflows/x06/lookalike-base.nika.yaml", "allowed": ["const.note"], "required": [],
+                  "_root": self.root}
+        raised = copy.deepcopy(base)
+        raised["const"]["limits"]["refund_eur"] = 250
+        self.assertEqual(judge.ASSERTIONS["edit_locality"](raised, params),
+                         ["unrequested change at `const.limits.refund_eur`"])
+        lookalike = copy.deepcopy(base)
+        lookalike["const"]["limits.refund_eur"] = 250
+        self.assertEqual(judge.ASSERTIONS["edit_locality"](lookalike, params),
+                         ['unrequested change at `const["limits.refund_eur"]`'])
+
     # ── the manifest cannot claim more than it shows ─────────────────────────
 
     def test_a_near_miss_that_stops_declaring_its_violation_is_caught(self):

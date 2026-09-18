@@ -70,7 +70,17 @@ refused, because nothing would show that the assertion can fail.
 | `inputs_contract` · `outputs_contract` | What may nobody guess, and is the loss visible in the result? |
 | `recover_narrow` · `fanout_isolated` | Which failures may read as absence, and can one item sink the batch? |
 | `branches_exclusive_total` | For every class in the closed set, how many branches open? |
-| `edit_locality` | Did the edit change what was asked, all of it, and nothing else? Judged on typed parsed nodes (`byte_equality` is `false`): an empty mapping or sequence that appears or disappears is a change, and so is `true` → `1` or `1` → `1.0`, which Python would call equal. Comments, key order and quoting are not nodes. |
+| `edit_locality` | Did the edit change what was asked, all of it, and nothing else? Judged on typed parsed nodes (`byte_equality` is `false`): an empty mapping or sequence that appears or disappears is a change, and so is `true` → `1` or `1` → `1.0`, which Python would call equal. Comments, key order and quoting are not nodes. A node's place is a tuple of typed components, never a joined string, so `{"a": {"b": 1}, "a.b": 2}` has two places and a change to either is seen. |
+
+Paths in `allowed`, `required` and in a violation are one injective spelling of
+that tuple. A plain key and an index read as they always did
+(`tasks.notify.retry` · `permits.net.http[0]`); any other string key is a JSON
+string in brackets (`["a.b"]` · `a[""]` · `v["0"]`); a key that is not a string
+says its type (`v[<int> 0]` · `[<bool> true]` · `[<null>]`). The patterns are
+`fnmatch` globs, so a literal `[` is written `[[]`. A place that arrives twice,
+or two places that would share a spelling, is refused: last-wins is how a change
+gets lost. Documents are compared after YAML parsing, so keys a Python mapping
+cannot hold apart (`1`, `1.0`, `true`) are already merged by the parser.
 
 The `when:` reader is the decidable fragment only (boolean literals, `==`,
 `!=`, `!`, `&&`, `||`, parentheses), evaluated three-valued. An expression

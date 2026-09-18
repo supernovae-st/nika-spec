@@ -539,31 +539,86 @@ def a_branches_exclusive_total(doc, params):
     return problems
 
 
-def flatten(value, prefix=""):
-    """Every node of a parsed document, typed.
+SIMPLE_KEY = re.compile(r"[A-Za-z_][A-Za-z0-9_]*\Z")
 
-    A container is an entry of its own, so adding or removing an EMPTY mapping
-    or sequence is a change and not nothing. A leaf carries its YAML type, so
-    `true` is not `1`, `false` is not `0`, `1` is not `1.0` and null is not "":
-    Python would call each of those pairs equal or falsy-alike, YAML does not.
+
+def flatten(value, path: tuple = ()):
+    """Every node of a parsed document, typed, under a STRUCTURAL path.
+
+    A path is a tuple of typed components and never a string: `("key", type, key)`
+    for a mapping entry, `("index", i)` for a sequence element. Two different
+    places can therefore never share a path, whatever their keys contain. Joined
+    strings could: `{"a": {"b": 1}, "a.b": 2}` has two places that both spell
+    `a.b`, a last-wins dictionary kept one, and a change to the other was lost.
+    The key's type is part of its component, so the integer `1`, the string
+    `"1"` and `true` are three places although Python calls two of them equal.
+
+    A container is a node of its own, so adding or removing an EMPTY mapping or
+    sequence is a change and not nothing. A leaf carries its YAML type, so
+    `true` is not `1`, `false` is not `0`, `1` is not `1.0` and null is not "".
     """
     if isinstance(value, dict):
-        yield prefix, ("<mapping>",)
+        yield path, ("<mapping>",)
         for key, item in value.items():
-            segment = key if isinstance(key, str) else f"<{type(key).__name__}>{key}"
-            yield from flatten(item, f"{prefix}.{segment}" if prefix else segment)
+            yield from flatten(item, path + (("key", type(key).__name__, key),))
     elif isinstance(value, list):
-        yield prefix, ("<sequence>",)
+        yield path, ("<sequence>",)
         for index, item in enumerate(value):
-            yield from flatten(item, f"{prefix}[{index}]")
+            yield from flatten(item, path + (("index", index),))
     else:
-        yield prefix, (type(value).__name__, value)
+        yield path, (type(value).__name__, value if value == value else "nan")  # NaN is not even equal to itself
+
+
+def key_literal(key) -> str:
+    if isinstance(key, bool):
+        return "true" if key else "false"
+    if isinstance(key, (int, float)):
+        return repr(key)
+    return json.dumps(repr(key), ensure_ascii=False)
+
+
+def render(path: tuple) -> str:
+    """The one spelling of a structural path; injective, so a pattern or a message names one place only.
+
+    `tasks.notify.retry` · `permits.net.http[0]`   a plain key and an index read as they always did
+    `["a.b"]` · `a[""]` · `v["0"]`                 any other string key is a JSON string in brackets
+    `v[<int> 0]` · `[<bool> true]` · `[<null>]`    a key that is not a string says its type
+    The character after `[` tells the three bracket forms apart: `"`, `<` or a digit.
+    """
+    text = ""
+    for component in path:
+        if component[0] == "index":
+            text += f"[{component[1]}]"
+        elif component[1] == "str" and SIMPLE_KEY.match(component[2]):
+            text += f".{component[2]}" if text else component[2]
+        elif component[1] == "str":
+            text += f"[{json.dumps(component[2], ensure_ascii=False)}]"
+        elif component[2] is None:
+            text += "[<null>]"
+        else:
+            text += f"[<{component[1]}> {key_literal(component[2])}]"
+    return text
+
+
+def index_nodes(entries) -> dict:
+    """path → typed node. A path that arrives twice is refused: last-wins is how a change gets lost."""
+    nodes: dict = {}
+    for path, node in entries:
+        require(path not in nodes, f"path {render(path)!r} was yielded twice; refusing to keep only the last node")
+        nodes[path] = node
+    return nodes
 
 
 def semantic_changes(base, candidate) -> set[str]:
-    """Paths whose typed node differs. Formatting, key order, comments and quoting style are not nodes."""
-    before, after = dict(flatten(base)), dict(flatten(candidate))
-    return {path for path in before.keys() | after.keys() if before.get(path, UNKNOWN) != after.get(path, UNKNOWN)}
+    """Rendered paths whose typed node differs. Formatting, key order, comments and quoting style are not nodes."""
+    before, after = index_nodes(flatten(base)), index_nodes(flatten(candidate))
+    names: dict = {}
+    for path in before.keys() | after.keys():
+        name = render(path)
+        require(names.setdefault(name, path) == path,
+                f"two different nodes render as {name!r}; refusing to report an ambiguous path")
+    return {render(path) for path in before.keys() | after.keys()
+            if before.get(path, UNKNOWN) != after.get(path, UNKNOWN)}
 
 
 def a_edit_locality(doc, params):
