@@ -37,17 +37,28 @@ makes a skeleton worth copying: you scaffold it, fill the explicit holes,
 run it, watch it work, and only then point it at your own data.
 
 ```bash
-nika new --from chain my-first.nika   # scaffold
-nika check my-first.nika              # names every slot still to fill
+nika compile --list                          # exact skeleton names
+nika compile chain --json                    # preview only · no write
+nika compile chain my-first.nika \
+  --answer 'tasks.think.infer.prompt="Summarize the gathered text in five bullets."'
+nika check my-first.nika
 nika run   my-first.nika --model mock/echo   # SEE IT WORK
 ```
+
+`nika compile` writes only a **Ready** candidate to an **explicit**
+`*.nika` destination (`DEST` or `--output`). Omit the destination to
+preview. An incomplete result includes `questions` and the candidate; it
+does not write. Existing destinations require `--force`. Unsupported
+words stay incomplete — there is no closest-skeleton substitute and no
+`nika new` verb.
 
 How each one holds that promise:
 
 - **`--model mock/echo`** — the offline seat. Deterministic, zero keys.
-  `nika new` replaces a template's model with a ready model seat when the
-  current binary can run it; `--model mock/echo` always keeps the rehearsal
-  available without requiring that seat.
+  Compile does not pick a paid provider or access from ambient
+  credentials; skeletons keep their authored `model: mock/echo`. Choose
+  provider and access explicitly for a real run; `--model mock/echo`
+  always keeps the rehearsal available.
 - **`on_error: recover:`** — where a template reads a file, calls an API or
   shells out, a literal recovery value stands in until you wire the real
   thing. Every one of those blocks says, in place, to delete it once the
@@ -89,18 +100,23 @@ Composite jobs compose templates: a fanout whose merge feeds a
 human-gated-ship, an etl-state whose delta fans out. Start from the
 template matching the OUTER shape.
 
-Not sure? Ask the router in plain words:
+Not sure? List exact names; do not send arbitrary natural language to
+Compile — unsupported intent stays incomplete.
 
 ```bash
-nika new --from '?'                                  # list the set
-nika new --from "watch a price and ping me" p.nika   # routes to the closest skeleton
+nika compile --list                 # the set
+nika compile chain --json           # preview · status + questions
 ```
 
 ## The instantiation protocol (agents · follow exactly)
 
 1. **Route** with the table above — one intent, one template.
-2. **Copy** · `nika new --from <name> <dest>.nika` · set `nika:` to the
-   file's own kebab-case name.
+2. **Compile** · `nika compile <name> --json` until `status` is `ready`
+   (answer every mandatory question with repeatable
+   `--answer KEY=JSON_LITERAL`). Then write with an explicit destination:
+   `nika compile <name> <dest>.nika` plus the same `--answer` flags.
+   Compile sets `nika:` from the destination stem. Preview (`written: null`)
+   is the default when `DEST` / `--output` is omitted.
 3. **Fill every `<SLOT: …>` value** · the marker lives in the value because
    comments are not part of the parsed workflow.
    Creativity belongs ONLY in prompts, jq expressions and paths —
@@ -167,7 +183,7 @@ When a hint tells you to remove something, run the file before you believe it.
   `nika test <id>.nika`
   proves the typed outputs against the committed golden.
 - Templates ship in the [versioned pack](../examples/manifest.yaml)
-  (sha256 per file) — the engine embeds them, so `nika new` works
+  (sha256 per file) — the engine embeds them, so `nika compile` works
   offline and version-locked.
 - The [12 patterns](https://docs.nika.sh/guides/patterns) are the WHY
   behind every locked choice here; the
