@@ -2,16 +2,19 @@
 # SPDX-License-Identifier: Apache-2.0
 """Table-driven selftest for the lexical source-name owner.
 
-Proves the 01 §File naming matrix and the on-disk positive fixtures.
+Proves the 01 §File naming matrix, the project schema's arm[].workflow
+references, and the on-disk positive fixtures.
 Does no filesystem I/O inside classify_basename / logical_stem.
 Exit 0 green · 1 red.
 """
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
 import yaml
+from jsonschema import Draft202012Validator
 
 HERE = Path(__file__).resolve().parent
 from source_naming import (  # noqa: E402
@@ -47,6 +50,36 @@ for row in cases:
         law(f"stem {name!r} → {stem}", logical_stem(base) == stem)
     elif "/" not in name and not name.endswith("/") and "://" not in name:
         law(f"no stem for {name!r}", logical_stem(name) is None)
+
+# The full project schema must apply the same lexical naming contract to
+# workflow references. Filesystem existence and owned-relative admission
+# remain the engine's job, as they do for classify_path above.
+project_schema = json.loads((HERE.parent / "schemas" / "project.schema.json").read_text())
+Draft202012Validator.check_schema(project_schema)
+project_validator = Draft202012Validator(project_schema)
+
+for row in cases:
+    project = {
+        "nika": "schema-test",
+        "arm": [{"workflow": row["name"], "cadence": "0 9 * * *"}],
+    }
+    errors = list(project_validator.iter_errors(project))
+    valid = row["kind"] == KIND_PROGRAM
+    law(f"project arm workflow {row['name']!r} valid={valid}", (not errors) == valid)
+    if not valid:
+        law(f"project refusal targets workflow name {row['name']!r}",
+            len(errors) == 1 and list(errors[0].absolute_path) == ["arm", 0, "workflow"]
+            and errors[0].validator == "pattern")
+
+law("nika.yaml remains a valid project configuration without beats",
+    project_validator.is_valid({"nika": "schema-test", "traces": {"keep": "30d"}}))
+for data_path in ("nika.yaml", "data.yaml", "data.yml"):
+    law(f"project inputs preserve YAML data path {data_path!r}",
+        project_validator.is_valid({
+            "nika": "schema-test",
+            "arm": [{"workflow": "workflows/nightly.nika", "cadence": "0 9 * * *",
+                     "inputs": {"source": data_path}}],
+        }))
 
 law("canonical suffix is lowercase .nika", CANONICAL_SUFFIX == ".nika")
 law("program_filename keeps extra dots", program_filename("support.v2") == "support.v2.nika")

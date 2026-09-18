@@ -87,4 +87,24 @@ cases:
   - name: "https://example.com/foo.nika"
     kind: not-program
     note: HTTP URI is not a program path
-
+  - name: 'workflows\support.v2.nika'
+    kind: program
+    stem: support.v2
+    note: lexical path classification accepts either separator
+  - name: workflows/.nika
+    kind: not-program
+    note: a parent directory does not supply the empty basename stem
+  - name: 'workflows\.nika'
+    kind: not-program
+  - name: 'foo.nika\'
+    kind: not-program
+    note: backslash trailing separator is also a directory form
+  - name: "foo.nika\n"
+    kind: not-program
+    note: a trailing newline is not an end-of-string match
+  - name: "foo\n.nika"
+    kind: not-program
+    note: embedded controls are not program filename characters
+  - name: "work\u0000flows/foo.nika"
+    kind: not-program
+    note: controls in a parent component also make the path invalid
