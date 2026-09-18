@@ -1,0 +1,14 @@
+{
+  "workflow": "root.nika.yaml",
+  "inputs": {
+    "ticket": "@env:SERVER_SECRET",
+    "count": 42,
+    "tags": [
+      "é",
+      "東京"
+    ],
+    "record": {
+      "name": "🦋"
+    }
+  }
+}

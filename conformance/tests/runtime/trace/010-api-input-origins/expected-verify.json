@@ -1,0 +1,16 @@
+{
+  "verdict": "clean",
+  "prologue": {
+    "present": [
+      "inputs"
+    ],
+    "input_origins": {
+      "count": "api-caller",
+      "record": "api-caller",
+      "region": "file",
+      "tags": "api-caller",
+      "ticket": "api-caller"
+    }
+  },
+  "note": "04 typed workflow inputs: real journal from authenticated Serve POST /v1/jobs through ResidentExecutionBackend (development engine 0.120.0-dev, implementation of supernovae-st/nika#1642 based on main 48ef9ac0475c69a5ae094b49a7363d2192011bdd). The caller supplied four literal values; region came from the workflow default. API attribution never claims a human, environment read, identity or grant. The recorded spec_pin is preserved verbatim and is not a new qualification claim. The engine production regression also asserts typed outputs, literal @env/expression/Unicode values, durable binding and refusal before job creation."
+}
