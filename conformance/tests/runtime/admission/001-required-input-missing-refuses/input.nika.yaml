@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: Apache-2.0
+# A required input with neither default nor caller value is a LAUNCH-plane
+# refusal (NIKA-1708): admission judges before the prologue — zero task
+# events, zero spend, zero inference (05 §Error code namespaces exception).
+nika: required-input-missing-refuses
+inputs:
+  ticket:
+    type: string
+    required: true
+tasks:
+  echo:
+    invoke:
+      tool: nika:jq
+      args:
+        input: "${{ inputs.ticket }}"
+        expression: "."
+outputs:
+  out: ${{ tasks.echo.output }}

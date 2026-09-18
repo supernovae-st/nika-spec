@@ -1,0 +1,10 @@
+{
+  "admission": {
+    "accepted": false,
+    "error_code": "NIKA-1708",
+    "witness_contains": [
+      "ticket"
+    ]
+  },
+  "note": "Pre-admission refusal: the run is judged before any task exists — zero workflow_started/task events, zero spend, and nothing can retry or catch it (the launch plane keeps on_codes grammar unchanged). The witness names the missing input. Lawful siblings: 002 (supplied) and 003 (default/optional)."
+}

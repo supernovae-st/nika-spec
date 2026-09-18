@@ -1,0 +1,10 @@
+{
+  "workflow_state": "success",
+  "tasks": {
+    "echo": {
+      "status": "success",
+      "output_contains": "from-file"
+    }
+  },
+  "note": "The declared default fills the required input (origin file) and the optional input stays absent — admission must not refuse what the file lawfully satisfies."
+}

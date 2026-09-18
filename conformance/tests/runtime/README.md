@@ -65,6 +65,7 @@ of a false success. `mock/echo` keeps its existing tool-call behavior.
 | `agent/` | budget exhaustion = NIKA-AGENT-001/002 with partial in error.details · tool errors feed back EXCEPT security_error (the feed-back half is `003-tool-error-feeds-back` — the final AGENT-001 IS the proof the loop survived the tool error · the security half — a refusal that must END the loop — stays unstageable with mock/echo, which cannot be steered to synthesize an out-of-boundary argument deterministically) · nika:done result: becomes .output |
 | `permits/` | NIKA-SEC-004 at the first out-of-boundary effect · permits:{} = pure compute |
 | `variables/` | jq clock forms bind to the immutable `WorkflowStarted` instant, never an ambient host clock |
+| `admission/` | a `required: true` input with no `default:` and no caller value refuses with `NIKA-1708` before any task event (001 · the launch plane of [05 §Error code namespaces](../../../spec/05-errors.md) — the refusal is an admission verdict, so no task exists to retry or catch it) · a supplied value (002) and a declared default beside an absent optional input (003) succeed · Check stays source-only (core/variables/016) |
 | `access-harness/` | an unattested agent seat refuses `infer:` with the failed infer-grade conjuncts; an attested one-shot seat admits the same task · `run.json.harness_attestations` is injected conformance evidence, never host discovery |
 
 ### Infer-grade harness fixture extension
