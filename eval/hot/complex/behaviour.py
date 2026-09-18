@@ -254,7 +254,10 @@ def gap(engine: Engine, corpus: dict, row: dict, door: dict, root: Path) -> bool
         problems, _ = rehearse(engine, root / probe["candidate"], case, {})
         return not problems
     if probe["kind"] == "compile_door":
-        return door[probe["case"]]["first_line"] == probe["expect_first_line"]
+        # Read the expected header FROM the base: a licence tag typed into this corpus would be read by
+        # licence scanners as the corpus file's own tag.
+        header = (root / probe["expect_first_line_of"]).read_text(encoding="utf-8").splitlines()[0]
+        return door[probe["case"]]["first_line"] == header
     raise JudgeError(f"{row['id']}: unknown reproduce kind")
 
 

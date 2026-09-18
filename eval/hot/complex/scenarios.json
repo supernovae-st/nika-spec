@@ -2491,12 +2491,12 @@
       "title": "A conservative edit drops every comment, the licence header included",
       "owner": "nika#1671 · nika#1663",
       "law": "product contract PC08; the edit law is semantic, so this is a product question and not a conformance failure",
-      "expected": "the SPDX header of the base is still the first line of the edited file",
+      "expected": "the first line of the base, its licence header, is still the first line of the edited file",
       "observed": "the candidate is re-serialised: keys sorted, comments removed, flow style expanded",
       "reproduce": {
         "kind": "compile_door",
         "case": "X06-C2",
-        "expect_first_line": "# SPDX-License-Identifier: Apache-2.0"
+        "expect_first_line_of": "workflows/x06/base.nika.yaml"
       },
       "baseline": "expected_fail"
     }

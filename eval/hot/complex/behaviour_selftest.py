@@ -4,7 +4,8 @@
 
     NIKA_BIN=/path/to/nika python3 -O eval/hot/complex/behaviour_selftest.py
 
-Needs an engine, so it is an offline proof and not a CI step. Skips when `NIKA_BIN` is unset.
+The rehearsal controls need an engine, so they are an offline proof and not a CI step; they skip, visibly,
+when `NIKA_BIN` is unset. The comparison behind the licence-header gap needs none and always runs.
 """
 import json
 import os
@@ -112,6 +113,20 @@ class TheRehearsalCanFail(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertTrue(any("declared runnable, and it declares ['exec'] authority" in f for f in summary["failures"]),
                         summary["failures"])
+
+
+class TheHeaderGapIsJudgedAgainstTheBase(unittest.TestCase):
+    """No engine needed: the comparison itself must be able to say both yes and no."""
+
+    def test_the_gap_closes_only_when_the_edited_file_keeps_the_first_line_of_the_base(self):
+        import behaviour
+        corpus = judge.load()
+        row = next(g for g in corpus["retained_gaps"] if g["id"] == "KG03")
+        header = (judge.ROOT / row["reproduce"]["expect_first_line_of"]).read_text(encoding="utf-8").splitlines()[0]
+        self.assertTrue(header.startswith("#"), "the base opens with its licence header")
+        self.assertTrue(behaviour.gap(None, corpus, row, {"X06-C2": {"first_line": header}}, judge.ROOT))
+        self.assertFalse(behaviour.gap(None, corpus, row, {"X06-C2": {"first_line": "const:"}}, judge.ROOT))
+        self.assertFalse(behaviour.gap(None, corpus, row, {"X06-C2": {"first_line": None}}, judge.ROOT))
 
 
 if __name__ == "__main__":
