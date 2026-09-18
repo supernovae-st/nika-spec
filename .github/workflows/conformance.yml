@@ -73,6 +73,16 @@ jobs:
           python eval/hot/validate.py
           python -O eval/hot/validate_selftest.py
 
+      # Composed authoring goldens · every candidate must be red for exactly
+      # the assertions its row declares and green for the rest, and the
+      # selftest proves each assertion can fail (a neutered one is caught in
+      # both directions). Static meaning only: the behaviour rehearsal needs
+      # an engine and runs outside this gate. Fixed commands · repo files only.
+      - name: Composed authoring goldens · semantic judge + its negative controls
+        run: |
+          python eval/hot/complex/judge.py
+          python -O eval/hot/complex/judge_selftest.py
+
       - name: YAML duplicate-key gate (selftest + sweep)
         run: |
           python scripts/check-yaml-dup-keys.py --selftest

@@ -41,6 +41,7 @@ False HOT is worse than a safe WARM/COLD miss. Template count is not a KPI.
 | `proposed-skeletons/` | teaching YAML **not** in the registry |
 | `validate.py` / `validate_selftest.py` | fail-closed integrity gate and mutation tests |
 | `rehearsal.py` | explicit-engine, offline mock wiring proof; no classifier/HOT score |
+| [`complex/`](complex/README.md) | composed authoring goldens: reference workflows, near-misses that pass check, a semantic judge with negative controls, an offline behaviour rehearsal; promotes nothing |
 
 ## Wave-1 skeleton decisions (see `wave1-decisions.json`)
 
@@ -73,6 +74,18 @@ mock models and local fixture reads. It proves exact fact preservation, literal
 lookup (including quotes and backslashes), missing-data refusal, and the actual
 known/unknown branch behavior. Its deterministic classifier substitution tests
 wiring, not classification quality. Engine version is included in the result.
+
+`G01`–`G24`, `N01`–`N15` and `E01`–`E10` state what a compiled candidate
+should mean; they carry no workflow and no judge. [`complex/`](complex/README.md)
+is where twelve of those meanings become executable: a candidate is accepted or
+rejected mechanically, and every assertion is shown to reject a plausible
+incorrect workflow. It judges candidates, not the compiler that produced them.
+
+```sh
+python3 eval/hot/complex/judge.py
+python3 -O eval/hot/complex/judge_selftest.py
+python3 eval/hot/complex/behaviour.py --engine /path/to/nika
+```
 
 The corpus has no frozen TRAIN/DEV/HELDOUT split yet. Paraphrases and negative
 cases are design seeds, not held-out measurements. No latency, HOT coverage,

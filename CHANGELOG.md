@@ -13,6 +13,30 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added · composed authoring goldens (2026-09-18)
+
+- **Twelve scenario families under [`eval/hot/complex/`](eval/hot/complex/README.md).**
+  Each composes admitted laws into one request (fan-out, merge and approval ·
+  partial failure · multi-source provenance · a bounded repair loop · missing,
+  empty and null inputs · edit locality · connector grants · hostile content ·
+  reject-all selection · exclusive branches · approval that shows its facts ·
+  stale evidence identity) and ships a reference workflow beside the
+  near-misses that read well and are wrong. Most near-misses are valid and
+  `--native-strict` clean, which is why they exist.
+- **A semantic judge with negative controls.** `judge.py` reads fourteen
+  structure-agnostic properties from the derived graph and requires every
+  candidate to be red for exactly the assertions its row declares.
+  `judge_selftest.py` neuters each assertion in both directions and corrupts
+  the manifest; all of it must go red. Both run in the static gate.
+- **An offline behaviour rehearsal.** `behaviour.py --engine <nika>` judges
+  outputs and effects (tasks started, files written, exit and refusal codes)
+  under `mock/echo` with an empty environment. It needs an engine and stays
+  outside the gate; its receipt names the build.
+- **No language change and no conformance claim.** Eight product contracts are
+  declared `UNQUALIFIED_PRODUCT_CONTRACT` with no proof attached, and three
+  retained gaps stay red until an engine shows the expected behaviour. Nothing
+  here promotes a HOT family.
+
 ### Added · template refusal completeness (2026-09-11)
 
 - **Nine remaining skeletons keep a refusal witness.** `chain`, `fanout`,
