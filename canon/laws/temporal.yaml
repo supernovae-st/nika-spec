@@ -209,7 +209,7 @@ laws:
       composition: min
     diagnostics: []
     fixtures:
-      - conformance/verbs/timeout-basic.nika.yaml
+      - conformance/verbs/timeout-basic.nika
       - to-mint-c1/conformance/temporal/timeout-attempt-scope
     projections: ["prose:03-dag", "schema", "cli:check", "lsp", "docs"]
     implementation_surfaces:
@@ -1045,7 +1045,7 @@ laws:
       composition: min
     diagnostics: []
     fixtures:
-      - conformance/errors/timeout-recovered.nika.yaml
+      - conformance/errors/timeout-recovered.nika
       - to-mint-c1/conformance/temporal/recovery
     projections: ["prose:03-dag", "prose:05-errors", "cli:check", "receipt"]
     implementation_surfaces:
@@ -1517,8 +1517,8 @@ laws:
       constraint: legal_pairs_closed
     diagnostics: ["NIKA-TIMEOUT-001"]
     fixtures:
-      - conformance/verbs/timeout-basic.nika.yaml
-      - conformance/errors/timeout-never-retryable.nika.yaml
+      - conformance/verbs/timeout-basic.nika
+      - conformance/errors/timeout-never-retryable.nika
     projections: ["prose:13-outcomes", "cli:run", "receipt", "sdk"]
     implementation_surfaces:
       - engine:nika

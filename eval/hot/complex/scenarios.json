@@ -21,7 +21,7 @@
       "laws": [
         "spec/10-authority.md · the affirmative-consent law (NEP-0020): false triggers exactly zero effects",
         "stdlib/builtins-v0.1.md · nika:prompt: a refusal is a value, never an error",
-        "templates/human-gated-ship.nika.yaml · a defaulted gate is not blocking"
+        "templates/human-gated-ship.nika · a defaulted gate is not blocking"
       ],
       "intent": "Digest every source in parallel, merge the digests into one status report, show me the report and which sources are missing, and publish it to ./out/report.md only if I say yes.",
       "facts": {
@@ -86,7 +86,7 @@
       ],
       "candidates": [
         {
-          "file": "workflows/x01/reference.nika.yaml",
+          "file": "workflows/x01/reference.nika",
           "role": "reference",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -95,7 +95,7 @@
           "behaviour": true
         },
         {
-          "file": "workflows/x01/variant-closed-by-after-success.nika.yaml",
+          "file": "workflows/x01/variant-closed-by-after-success.nika",
           "role": "variant",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -108,7 +108,7 @@
           }
         },
         {
-          "file": "workflows/x01/near-miss-defaulted-gate.nika.yaml",
+          "file": "workflows/x01/near-miss-defaulted-gate.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -123,7 +123,7 @@
           ]
         },
         {
-          "file": "workflows/x01/near-miss-effect-outside-gate.nika.yaml",
+          "file": "workflows/x01/near-miss-effect-outside-gate.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -140,7 +140,7 @@
           ]
         },
         {
-          "file": "workflows/x01/near-miss-gated-through-data-edge.nika.yaml",
+          "file": "workflows/x01/near-miss-gated-through-data-edge.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -159,7 +159,7 @@
           ]
         },
         {
-          "file": "workflows/x01/refused-ordering-only-gate.nika.yaml",
+          "file": "workflows/x01/refused-ordering-only-gate.nika",
           "role": "refused",
           "provenance": "hand-authored",
           "spec_oracle": "NIKA-SEC-014",
@@ -251,7 +251,7 @@
       "laws": [
         "spec/03-dag.md · for_each · fail_fast · on_error.recover",
         "stdlib/builtins-v0.1.md · nika:read: -001 not found · -003 not UTF-8",
-        "templates/recover-optional-file.nika.yaml · only not-found recovers"
+        "templates/recover-optional-file.nika · only not-found recovers"
       ],
       "intent": "Convert every invoice amount to cents and total them. One malformed record must not stop the others. Never give me a total that leaves a record out: return ok_ids, failed_ids, complete and total_cents. Overrides in ./fixtures/overrides.json are optional.",
       "facts": {
@@ -331,7 +331,7 @@
       ],
       "candidates": [
         {
-          "file": "workflows/x02/reference.nika.yaml",
+          "file": "workflows/x02/reference.nika",
           "role": "reference",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -340,7 +340,7 @@
           "behaviour": true
         },
         {
-          "file": "workflows/x02/near-miss-silent-survivors.nika.yaml",
+          "file": "workflows/x02/near-miss-silent-survivors.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -355,7 +355,7 @@
           ]
         },
         {
-          "file": "workflows/x02/near-miss-constant-complete.nika.yaml",
+          "file": "workflows/x02/near-miss-constant-complete.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -368,7 +368,7 @@
           ]
         },
         {
-          "file": "workflows/x02/near-miss-catch-all-recover.nika.yaml",
+          "file": "workflows/x02/near-miss-catch-all-recover.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -383,7 +383,7 @@
           ]
         },
         {
-          "file": "workflows/x02/near-miss-fail-fast.nika.yaml",
+          "file": "workflows/x02/near-miss-fail-fast.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -440,8 +440,8 @@
       "owner": "nika#1663",
       "laws": [
         "templates/AUTHORING.md · Extract facts, then the law",
-        "templates/document-to-fields.nika.yaml · every value carries its exact source anchor",
-        "templates/corpus-qa.nika.yaml · one id with conflicting text is refused, never merged"
+        "templates/document-to-fields.nika · every value carries its exact source anchor",
+        "templates/corpus-qa.nika · one id with conflicting text is refused, never merged"
       ],
       "intent": "From the CRM record and the signed agreement, extract the contract facts. Each value must name its source and quote the fragment that contains it. If the sources disagree, tell me both values.",
       "facts": {
@@ -486,7 +486,7 @@
       ],
       "candidates": [
         {
-          "file": "workflows/x03/reference.nika.yaml",
+          "file": "workflows/x03/reference.nika",
           "role": "reference",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -495,7 +495,7 @@
           "behaviour": true
         },
         {
-          "file": "workflows/x03/near-miss-anchor-anywhere.nika.yaml",
+          "file": "workflows/x03/near-miss-anchor-anywhere.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -508,7 +508,7 @@
           ]
         },
         {
-          "file": "workflows/x03/near-miss-first-source-wins.nika.yaml",
+          "file": "workflows/x03/near-miss-first-source-wins.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -521,7 +521,7 @@
           ]
         },
         {
-          "file": "workflows/x03/near-miss-model-resolves-conflict.nika.yaml",
+          "file": "workflows/x03/near-miss-model-resolves-conflict.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -656,7 +656,7 @@
       "status": "STATIC_AND_BEHAVIOUR",
       "owner": "nika#1663",
       "laws": [
-        "templates/evaluate-and-optimize.nika.yaml · the bound is structural, every infer is capped",
+        "templates/evaluate-and-optimize.nika · the bound is structural, every infer is capped",
         "templates/AUTHORING.md · scoring and publish/abstain is jq or decide, never a second infer"
       ],
       "intent": "Draft the customer explanation, critique and repair it twice, score the final text, and accept it only at 80 or more. If it is not accepted, say so and withhold the text.",
@@ -713,7 +713,7 @@
       ],
       "candidates": [
         {
-          "file": "workflows/x04/reference.nika.yaml",
+          "file": "workflows/x04/reference.nika",
           "role": "reference",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -722,7 +722,7 @@
           "behaviour": true
         },
         {
-          "file": "workflows/x04/near-miss-loop-end-is-success.nika.yaml",
+          "file": "workflows/x04/near-miss-loop-end-is-success.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -735,7 +735,7 @@
           ]
         },
         {
-          "file": "workflows/x04/near-miss-model-is-the-judge.nika.yaml",
+          "file": "workflows/x04/near-miss-model-is-the-judge.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -752,7 +752,7 @@
           ]
         },
         {
-          "file": "workflows/x04/near-miss-open-ended-agent.nika.yaml",
+          "file": "workflows/x04/near-miss-open-ended-agent.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -902,7 +902,7 @@
       ],
       "candidates": [
         {
-          "file": "workflows/x05/reference.nika.yaml",
+          "file": "workflows/x05/reference.nika",
           "role": "reference",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -911,7 +911,7 @@
           "behaviour": true
         },
         {
-          "file": "workflows/x05/near-miss-required-with-default.nika.yaml",
+          "file": "workflows/x05/near-miss-required-with-default.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -926,7 +926,7 @@
           ]
         },
         {
-          "file": "workflows/x05/near-miss-required-means-present.nika.yaml",
+          "file": "workflows/x05/near-miss-required-means-present.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -939,7 +939,7 @@
           ]
         },
         {
-          "file": "workflows/x05/near-miss-null-coalesced.nika.yaml",
+          "file": "workflows/x05/near-miss-null-coalesced.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -1053,7 +1053,7 @@
       ],
       "intent": "Use Teams instead of Slack.",
       "facts": {
-        "base": "workflows/x06/base.nika.yaml (accepted)",
+        "base": "workflows/x06/base.nika (accepted)",
         "teams_host": "teams.webhook.test",
         "teams_secret_key": "TEAMS_WEBHOOK_URL",
         "refund_limit_eur": "100, not mentioned by the request"
@@ -1091,7 +1091,7 @@
           "id": "edit_locality",
           "kind": "edit_locality",
           "params": {
-            "base": "workflows/x06/base.nika.yaml",
+            "base": "workflows/x06/base.nika",
             "allowed": [
               "secrets.webhook.key",
               "permits.net.http[[]0[]]"
@@ -1106,7 +1106,7 @@
       ],
       "candidates": [
         {
-          "file": "workflows/x06/edit-reference.nika.yaml",
+          "file": "workflows/x06/edit-reference.nika",
           "role": "reference",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -1114,7 +1114,7 @@
           "violates": []
         },
         {
-          "file": "workflows/x06/near-miss-also-raises-limit.nika.yaml",
+          "file": "workflows/x06/near-miss-also-raises-limit.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -1125,7 +1125,7 @@
           "plausible_because": "the file is valid and the requested change did happen"
         },
         {
-          "file": "workflows/x06/near-miss-regenerated.nika.yaml",
+          "file": "workflows/x06/near-miss-regenerated.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -1136,7 +1136,7 @@
           "plausible_because": "behaviour is preserved and the new names read better"
         },
         {
-          "file": "workflows/x06/near-miss-keeps-old-grant.nika.yaml",
+          "file": "workflows/x06/near-miss-keeps-old-grant.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -1153,18 +1153,18 @@
           "id": "X06-C1",
           "title": "creating onto an existing workflow refuses and leaves its bytes alone",
           "existing": {
-            "mine.nika.yaml": "workflows/x06/base.nika.yaml"
+            "mine.nika": "workflows/x06/base.nika"
           },
           "argv": [
             "compile",
             "chain",
-            "mine.nika.yaml",
+            "mine.nika",
             "--json"
           ],
           "expect": {
             "exit": 2,
             "unchanged": [
-              "mine.nika.yaml"
+              "mine.nika"
             ],
             "written": null
           }
@@ -1173,26 +1173,26 @@
           "id": "X06-C2",
           "title": "a conservative edit of one constant changes one leaf",
           "existing": {
-            "mine.nika.yaml": "workflows/x06/base.nika.yaml"
+            "mine.nika": "workflows/x06/base.nika"
           },
           "argv": [
             "compile",
             "--base",
-            "mine.nika.yaml",
+            "mine.nika",
             "--change",
             "Set const.refund_limit_eur to 250",
             "--output",
-            "edited.nika.yaml",
+            "edited.nika",
             "--json"
           ],
           "expect": {
             "exit": 0,
             "unchanged": [
-              "mine.nika.yaml"
+              "mine.nika"
             ],
             "semantic_changes": {
-              "base": "mine.nika.yaml",
-              "candidate": "edited.nika.yaml",
+              "base": "mine.nika",
+              "candidate": "edited.nika",
               "equals": [
                 "const.refund_limit_eur"
               ]
@@ -1203,26 +1203,26 @@
           "id": "X06-C3",
           "title": "a change the door does not support stays incomplete and writes nothing",
           "existing": {
-            "mine.nika.yaml": "workflows/x06/base.nika.yaml"
+            "mine.nika": "workflows/x06/base.nika"
           },
           "argv": [
             "compile",
             "--base",
-            "mine.nika.yaml",
+            "mine.nika",
             "--change",
             "Use Teams instead of Slack",
             "--output",
-            "teams.nika.yaml",
+            "teams.nika",
             "--json"
           ],
           "expect": {
             "exit": 2,
             "status": "incomplete",
             "unchanged": [
-              "mine.nika.yaml"
+              "mine.nika"
             ],
             "absent": [
-              "teams.nika.yaml"
+              "teams.nika"
             ]
           }
         },
@@ -1233,7 +1233,7 @@
           "argv": [
             "compile",
             "Automatically refund good customers",
-            "refund.nika.yaml",
+            "refund.nika",
             "--json"
           ],
           "expect": {
@@ -1241,7 +1241,7 @@
             "status": "incomplete",
             "candidate": null,
             "absent": [
-              "refund.nika.yaml"
+              "refund.nika"
             ]
           }
         }
@@ -1320,7 +1320,7 @@
       ],
       "candidates": [
         {
-          "file": "workflows/x07/reference.nika.yaml",
+          "file": "workflows/x07/reference.nika",
           "role": "reference",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -1328,7 +1328,7 @@
           "violates": []
         },
         {
-          "file": "workflows/x07/near-miss-wildcard-grants.nika.yaml",
+          "file": "workflows/x07/near-miss-wildcard-grants.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -1339,7 +1339,7 @@
           "plausible_because": "it is how a refusal gets fixed in a hurry, and it checks clean"
         },
         {
-          "file": "workflows/x07/near-miss-send-dropped.nika.yaml",
+          "file": "workflows/x07/near-miss-send-dropped.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -1351,7 +1351,7 @@
           "plausible_because": "it asks for less authority and checks clean"
         },
         {
-          "file": "workflows/x07/refused-no-host-grant.nika.yaml",
+          "file": "workflows/x07/refused-no-host-grant.nika",
           "role": "refused",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -1359,7 +1359,7 @@
           "violates": []
         },
         {
-          "file": "workflows/x07/refused-secret-without-door.nika.yaml",
+          "file": "workflows/x07/refused-secret-without-door.nika",
           "role": "refused",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -1367,7 +1367,7 @@
           "violates": []
         },
         {
-          "file": "workflows/x07/refused-no-permits-block.nika.yaml",
+          "file": "workflows/x07/refused-no-permits-block.nika",
           "role": "refused",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -1434,7 +1434,7 @@
       ],
       "candidates": [
         {
-          "file": "workflows/x08/reference.nika.yaml",
+          "file": "workflows/x08/reference.nika",
           "role": "reference",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -1443,7 +1443,7 @@
           "behaviour": true
         },
         {
-          "file": "workflows/x08/variant-route-then-save.nika.yaml",
+          "file": "workflows/x08/variant-route-then-save.nika",
           "role": "variant",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -1452,7 +1452,7 @@
           "behaviour": true
         },
         {
-          "file": "workflows/x08/near-miss-destination-from-data.nika.yaml",
+          "file": "workflows/x08/near-miss-destination-from-data.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -1467,7 +1467,7 @@
           ]
         },
         {
-          "file": "workflows/x08/near-miss-shell-from-data.nika.yaml",
+          "file": "workflows/x08/near-miss-shell-from-data.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -1594,7 +1594,7 @@
       ],
       "candidates": [
         {
-          "file": "workflows/x09/reference.nika.yaml",
+          "file": "workflows/x09/reference.nika",
           "role": "reference",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -1603,7 +1603,7 @@
           "behaviour": true
         },
         {
-          "file": "workflows/x09/near-miss-cheapest-anyway.nika.yaml",
+          "file": "workflows/x09/near-miss-cheapest-anyway.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -1618,7 +1618,7 @@
           ]
         },
         {
-          "file": "workflows/x09/near-miss-relax-when-empty.nika.yaml",
+          "file": "workflows/x09/near-miss-relax-when-empty.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -1631,7 +1631,7 @@
           ]
         },
         {
-          "file": "workflows/x09/near-miss-model-picks.nika.yaml",
+          "file": "workflows/x09/near-miss-model-picks.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -1790,7 +1790,7 @@
       ],
       "candidates": [
         {
-          "file": "workflows/x10/reference.nika.yaml",
+          "file": "workflows/x10/reference.nika",
           "role": "reference",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -1799,7 +1799,7 @@
           "behaviour": true
         },
         {
-          "file": "workflows/x10/near-miss-overlapping-branches.nika.yaml",
+          "file": "workflows/x10/near-miss-overlapping-branches.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -1814,7 +1814,7 @@
           ]
         },
         {
-          "file": "workflows/x10/near-miss-no-fallback.nika.yaml",
+          "file": "workflows/x10/near-miss-no-fallback.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -1959,7 +1959,7 @@
       ],
       "candidates": [
         {
-          "file": "workflows/x11/reference.nika.yaml",
+          "file": "workflows/x11/reference.nika",
           "role": "reference",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -1968,7 +1968,7 @@
           "behaviour": true
         },
         {
-          "file": "workflows/x11/near-miss-generic-question.nika.yaml",
+          "file": "workflows/x11/near-miss-generic-question.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -1983,7 +1983,7 @@
           ]
         },
         {
-          "file": "workflows/x11/near-miss-amount-not-shown.nika.yaml",
+          "file": "workflows/x11/near-miss-amount-not-shown.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -2154,7 +2154,7 @@
       ],
       "candidates": [
         {
-          "file": "workflows/x12/reference.nika.yaml",
+          "file": "workflows/x12/reference.nika",
           "role": "reference",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -2163,7 +2163,7 @@
           "behaviour": true
         },
         {
-          "file": "workflows/x12/near-miss-threshold-not-in-identity.nika.yaml",
+          "file": "workflows/x12/near-miss-threshold-not-in-identity.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -2176,7 +2176,7 @@
           ]
         },
         {
-          "file": "workflows/x12/near-miss-order-insensitive.nika.yaml",
+          "file": "workflows/x12/near-miss-order-insensitive.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -2189,7 +2189,7 @@
           ]
         },
         {
-          "file": "workflows/x12/near-miss-score-overrides-facts.nika.yaml",
+          "file": "workflows/x12/near-miss-score-overrides-facts.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -2202,7 +2202,7 @@
           ]
         },
         {
-          "file": "workflows/x12/near-miss-model-decides-reuse.nika.yaml",
+          "file": "workflows/x12/near-miss-model-decides-reuse.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -2374,7 +2374,7 @@
       ],
       "candidates": [
         {
-          "file": "workflows/x13/reference.nika.yaml",
+          "file": "workflows/x13/reference.nika",
           "role": "reference",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -2386,7 +2386,7 @@
           ]
         },
         {
-          "file": "workflows/x13/variant-closed-by-a-success-edge-on-the-stage.nika.yaml",
+          "file": "workflows/x13/variant-closed-by-a-success-edge-on-the-stage.nika",
           "role": "variant",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -2398,7 +2398,7 @@
           ]
         },
         {
-          "file": "workflows/x13/refused-certain-skip-core.nika.yaml",
+          "file": "workflows/x13/refused-certain-skip-core.nika",
           "role": "refused",
           "provenance": "hand-authored",
           "spec_oracle": "NIKA-SEC-014",
@@ -2419,7 +2419,7 @@
           "repairs": "KG01 sub-case · the certain core: every step before the verb is total, so the skip is proven"
         },
         {
-          "file": "workflows/x13/refused-certain-skip-fan-out-stage.nika.yaml",
+          "file": "workflows/x13/refused-certain-skip-fan-out-stage.nika",
           "role": "refused",
           "provenance": "hand-authored",
           "spec_oracle": "NIKA-SEC-014",
@@ -2440,7 +2440,7 @@
           "repairs": "KG01 sub-case · the skipped stage is a fan-out: when: is read once, before it"
         },
         {
-          "file": "workflows/x13/near-miss-laundered-through-a-step-that-ran.nika.yaml",
+          "file": "workflows/x13/near-miss-laundered-through-a-step-that-ran.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -2458,7 +2458,7 @@
           ]
         },
         {
-          "file": "workflows/x13/near-miss-stage-also-reads-a-step-that-ran.nika.yaml",
+          "file": "workflows/x13/near-miss-stage-also-reads-a-step-that-ran.nika",
           "role": "near_miss",
           "provenance": "hand-authored",
           "spec_oracle": "valid",
@@ -2677,35 +2677,35 @@
       "title": "A route closed only by a skippable data edge fires on no",
       "owner": "nika#1636 · nika#1663 · spec/10-authority.md · the affirmative-consent law",
       "law": "every route from the gate to an egress-capable task must be closed; false triggers exactly zero effects",
-      "expected": "check refuses workflows/x01/near-miss-gated-through-data-edge.nika.yaml with NIKA-SEC-014",
+      "expected": "check refuses workflows/x01/near-miss-gated-through-data-edge.nika with NIKA-SEC-014",
       "observed": "the witness is still ADMITTED: the reference oracle says valid and the engine says valid with a `consent` advisory, because the stage also reads a step that merely ran, so its skip is not certain and nothing may refuse it; at run, a refusal still skips the stage, the write still receives null across `with:` and still writes `Report: null`. Only the CERTAIN sub-cases are repaired (X13), not this golden",
       "remains": "a write that reads a gated stage still fires on no when the skip of that stage is not provable",
       "reproduce": {
         "kind": "engine_check",
-        "file": "workflows/x01/near-miss-gated-through-data-edge.nika.yaml",
+        "file": "workflows/x01/near-miss-gated-through-data-edge.nika",
         "expect_code": "NIKA-SEC-014",
         "sha256": "06061df4751c2a3f95669f25072c1ccc0bec4aafd9e44e6814badd0d4f5791b0"
       },
       "repaired_subcases": [
-        "workflows/x13/refused-certain-skip-core.nika.yaml",
-        "workflows/x13/refused-certain-skip-fan-out-stage.nika.yaml"
+        "workflows/x13/refused-certain-skip-core.nika",
+        "workflows/x13/refused-certain-skip-fan-out-stage.nika"
       ],
       "facts": [
         {
           "kind": "engine_check",
-          "file": "workflows/x01/near-miss-gated-through-data-edge.nika.yaml",
+          "file": "workflows/x01/near-miss-gated-through-data-edge.nika",
           "verdict": "valid",
           "says": "the engine still admits the original witness"
         },
         {
           "kind": "engine_hint",
-          "file": "workflows/x01/near-miss-gated-through-data-edge.nika.yaml",
+          "file": "workflows/x01/near-miss-gated-through-data-edge.nika",
           "hint": "consent",
           "says": "the engine warns about the original witness with a consent advisory"
         },
         {
           "kind": "behaviour_rejects",
-          "candidate": "workflows/x01/near-miss-gated-through-data-edge.nika.yaml",
+          "candidate": "workflows/x01/near-miss-gated-through-data-edge.nika",
           "case": "X01-B1",
           "because": [
             "files: expected exactly {}, observed {'out/report.md': 'Report: null'}",
@@ -2725,7 +2725,7 @@
       "observed": "the resumed run accepts the answer and writes the changed amount",
       "reproduce": {
         "kind": "behaviour",
-        "candidate": "workflows/x11/near-miss-generic-question.nika.yaml",
+        "candidate": "workflows/x11/near-miss-generic-question.nika",
         "case": "X11-B1"
       },
       "baseline": "expected_fail"
@@ -2740,7 +2740,7 @@
       "reproduce": {
         "kind": "compile_door",
         "case": "X06-C2",
-        "expect_first_line_of": "workflows/x06/base.nika.yaml"
+        "expect_first_line_of": "workflows/x06/base.nika"
       },
       "baseline": "expected_fail"
     }

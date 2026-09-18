@@ -28,14 +28,14 @@ Show
 Type "# every law is machine-checkable · a fixture declares its intent up front"
 Enter
 Sleep 700ms
-Type "head -3 envelope/trifecta-realized-flow-ungated.nika.yaml"
+Type "head -3 envelope/trifecta-realized-flow-ungated.nika"
 Enter
 Sleep 2000ms
 
 Type "# the exam: the lethal trifecta, ungated — the engine must REFUSE"
 Enter
 Sleep 700ms
-Type "nika check envelope/trifecta-realized-flow-ungated.nika.yaml"
+Type "nika check envelope/trifecta-realized-flow-ungated.nika"
 Enter
 Sleep 4200ms
 
@@ -44,7 +44,7 @@ Enter
 Type "# the twin: same three permits, a blocking human gate dominates — must PASS"
 Enter
 Sleep 700ms
-Type "nika check envelope/trifecta-human-gate-dominates.nika.yaml"
+Type "nika check envelope/trifecta-human-gate-dominates.nika"
 Enter
 Sleep 4200ms
 Sleep 1400ms

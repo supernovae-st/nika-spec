@@ -15,7 +15,7 @@ correct, and the variants show tolerance for the rebuilds that were tried, not
 for every rebuild.
 
     python3 eval/hot/complex/judge.py                      # the corpus judges itself
-    python3 eval/hot/complex/judge.py --scenario X01 --candidate my.nika.yaml
+    python3 eval/hot/complex/judge.py --scenario X01 --candidate my.nika
         exit 0 accepted · 1 rejected on meaning · 2 refused as static-invalid, and then NOT judged
 
 Every candidate, the corpus's own and an ad hoc one, is admitted by the

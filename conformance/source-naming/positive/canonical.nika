@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# Positive filename fixture · canonical lowercase .nika suffix.
+# Content is a valid envelope; the filename law is the point of this file.
+
+nika: canonical-suffix
+
+model: mock/echo
+permits: {}
+
+tasks:
+  ping:
+    infer:
+      prompt: "ok"
+      max_tokens: 8
+
+outputs:
+  ping: ${{ tasks.ping.output }}

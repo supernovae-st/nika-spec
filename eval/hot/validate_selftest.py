@@ -58,19 +58,19 @@ class InventoryGate(unittest.TestCase):
             validate.validate(self.root)
 
     def test_invalid_proposed_workflow(self):
-        path = self.root / "proposed-skeletons/facts-to-draft.nika.yaml"
+        path = self.root / "proposed-skeletons/facts-to-draft.nika"
         path.write_text(path.read_text().replace("expression:", "filter:"))
         with self.assertRaisesRegex(validate.CorpusError, "static conformance failed"):
             validate.validate(self.root)
 
     def test_unconditional_agent_is_rejected(self):
-        path = self.root / "proposed-skeletons/known-path-agent-fallback.nika.yaml"
+        path = self.root / "proposed-skeletons/known-path-agent-fallback.nika"
         path.write_text(path.read_text().replace('    when: ${{ with.classification.class == "unknown" }}\n', ""))
         with self.assertRaisesRegex(validate.CorpusError, "exceptional-branch gate drift"):
             validate.validate(self.root)
 
     def test_inverted_agent_gate_is_rejected(self):
-        path = self.root / "proposed-skeletons/known-path-agent-fallback.nika.yaml"
+        path = self.root / "proposed-skeletons/known-path-agent-fallback.nika"
         path.write_text(path.read_text().replace('class == "unknown"', 'class != "unknown"'))
         with self.assertRaisesRegex(validate.CorpusError, "exceptional-branch gate drift"):
             validate.validate(self.root)

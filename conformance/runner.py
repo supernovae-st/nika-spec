@@ -45,7 +45,7 @@
 # proves the fixture suite is self-consistent and is CI-runnable today.
 #
 # Usage ·
-#   python conformance/runner.py validate <workflow.nika.yaml>
+#   python conformance/runner.py validate <workflow.nika>
 #   python conformance/runner.py run <fixtures-dir>      # default · tests/core
 #   python conformance/runner.py examples <dir>          # assert all are valid
 #   python conformance/runner.py all                     # core + stdlib + deep + examples (the CI gate)
@@ -1253,7 +1253,7 @@ def run_fixtures(fixtures_dir: pathlib.Path, validator: Draft202012Validator,
 # fail with exactly this code — a green here means the trifecta lane
 # broke, any OTHER code means a new defect hides behind the expected one.
 DELIBERATE_RED: dict[str, str] = {}
-WITNESS_RED = ("conformance/envelope/trifecta-realized-flow-ungated.nika.yaml",
+WITNESS_RED = ("conformance/envelope/trifecta-realized-flow-ungated.nika",
                "NIKA-SEC-009")
 
 # The corpus contract — the MECHANICAL slice of examples/CONVENTIONS.md
@@ -1307,12 +1307,12 @@ def run_examples(examples_dir: pathlib.Path, validator: Draft202012Validator,
     The named deliberate-red witnesses invert the assertion (they must
     fail with exactly their expected code)."""
     bad = 0
-    corpus = sorted(examples_dir.glob("*.nika.yaml"))
+    corpus = sorted(examples_dir.glob("*.nika"))
     # An empty harvest asserts nothing and reads as clean — a moved or
     # renamed corpus directory would retire this gate silently while it
     # kept reporting green. Blind is RED, not a pass.
     if not corpus:
-        print(f"FAIL  {examples_dir} · no *.nika.yaml found — the corpus moved, this gate is blind")
+        print(f"FAIL  {examples_dir} · no *.nika found — the corpus moved, this gate is blind")
         return 1
     for f in corpus:
         v = validate_text(f.read_text(), validator, canon)

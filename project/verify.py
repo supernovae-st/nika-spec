@@ -224,7 +224,7 @@ def offline_findings(
     guardian = automation.get("ui_guardian", {})
     if guardian.get("skill") != "nika-project-os-ui":
         findings.append("UI guardian must use nika-project-os-ui")
-    if guardian.get("preflight") != "project/project-os-audit.nika.yaml":
+    if guardian.get("preflight") != "project/project-os-audit.nika":
         findings.append("UI guardian must use the canonical Nika preflight")
     if set(guardian.get("repairs", [])) != {"views", "insights"}:
         findings.append("UI guardian may repair only views and insights")

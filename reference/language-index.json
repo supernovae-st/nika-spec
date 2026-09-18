@@ -2,31 +2,31 @@
   "schemaVersion": 1,
   "kind": "spec-language-knowledge",
   "owner": "supernovae-st/nika-spec",
-  "revision": "923e5936e2132fa27ad8c917b2af088d6fa08c85",
+  "revision": "60696338ef08adb25df6cca23cb47f0a39eb785a",
   "inputs": {
-    "schemas/workflow.schema.json": "0979b0350eaa78b1ed38eb87dfae82d96ac5f552ca290cf594f2605c9b15de0b",
-    "templates/agent-loop.nika.yaml": "4bac2151575df3fc3342ea19cdadf5b5e416eeaaa528bc3ec5f012acfb98da8e",
-    "templates/aggregate-by-key.nika.yaml": "a7a34d9415e3187ff32607d79272da49e790500f1998593730c5047dc8a111fd",
-    "templates/api-upload-and-create.nika.yaml": "1e06897b41686f7c51f97e70893bd16e09dba869df85378cb3c89913e1d20952",
-    "templates/bounded-batch.nika.yaml": "5333556fdb46fd16bd6e48f9a267d470558f6e663e2510df6322066eb75833d2",
-    "templates/chain.nika.yaml": "c09adee68ad5548be7f3de4ea3d749293fb8312d8fd32d42f181a21307bce520",
-    "templates/classify-and-route.nika.yaml": "4528338b033f53a849ca0c7fa7f0151792442ace3789f890b3ef230beb3d737c",
-    "templates/corpus-qa.nika.yaml": "0c219f7765a1df77ae6af91281129f82a1e677496e348bbb2d0a34e5141cce72",
-    "templates/deduplicate-records.nika.yaml": "268f72d69e07053f22042ff69e34071092c9c349be060fed7811763bf083c073",
-    "templates/docker-report.nika.yaml": "6e2a3211a39b960cc170efe70964a5e0b50bf99eeba78752cae27acadb64e9c6",
-    "templates/document-to-fields.nika.yaml": "a3916e19ae3dc85f95413690768e25fbdc7e0cc01dabf823891b5b619d98f837",
-    "templates/etl-state.nika.yaml": "64d090ea10a33ab224d16feea6b80bbfeb4e1c8396d514361ae0740399958136",
-    "templates/evaluate-and-optimize.nika.yaml": "6abb970d905444b07d0df63e6330f7eb6d0a6c636cc49a0f19c5d9d817552513",
-    "templates/fanout.nika.yaml": "e45da5bcc8080771eb279b8a347715f5ba50bb428bb7b9493167a909c21729db",
-    "templates/gate-and-act.nika.yaml": "4870c70f7a6198f86b1da8587e7e1345bbece86ce07446d74e16866cbe514610",
-    "templates/human-gated-ship.nika.yaml": "e447e644d2e34327ab03f5fee8bed54fd0cfc2293e1379e3dcdb3a6b050bf65c",
-    "templates/media-asset-pack.nika.yaml": "9358b5a04ba81ec9b3c3b9c7195f3f87e1777274d1721ce4428cffb0c901d519",
-    "templates/parallel-review.nika.yaml": "d02b45349edb57fe66b0692584c822f5bab0a7620c0d5d6ec445d96d332f43db",
-    "templates/project-public-fields.nika.yaml": "c4bc776cf730f13543c0379eec178ebf90dfb465c51b1d356ed6628c0f4fc614",
-    "templates/recover-optional-file.nika.yaml": "923ed35265aadfbf46cb6be76e86655d0cc03c37950128d3c05664e665c467de",
-    "templates/snapshot-diff.nika.yaml": "ec5772c13742e1ce2a8555663ce1d6832a17f35aa52c679b91b1750f81b86837",
-    "templates/validate-records.nika.yaml": "fa9c9f0ea60b2d73b45d14ea5f55053b70ff01eadf70f11ab5aab6f53cb41d2c",
-    "templates/website-brief.nika.yaml": "52ff867ab56ab2aef8c3a86a69cccaab0c68681bdf96dec53bf2f8cdc37d4bac"
+    "schemas/workflow.schema.json": "e9f01b4b6adbd04590a518eb4548ece221f080fe4da20bb1f07c25b5483402f8",
+    "templates/agent-loop.nika": "4bac2151575df3fc3342ea19cdadf5b5e416eeaaa528bc3ec5f012acfb98da8e",
+    "templates/aggregate-by-key.nika": "a7a34d9415e3187ff32607d79272da49e790500f1998593730c5047dc8a111fd",
+    "templates/api-upload-and-create.nika": "1e06897b41686f7c51f97e70893bd16e09dba869df85378cb3c89913e1d20952",
+    "templates/bounded-batch.nika": "5333556fdb46fd16bd6e48f9a267d470558f6e663e2510df6322066eb75833d2",
+    "templates/chain.nika": "c09adee68ad5548be7f3de4ea3d749293fb8312d8fd32d42f181a21307bce520",
+    "templates/classify-and-route.nika": "4528338b033f53a849ca0c7fa7f0151792442ace3789f890b3ef230beb3d737c",
+    "templates/corpus-qa.nika": "0c219f7765a1df77ae6af91281129f82a1e677496e348bbb2d0a34e5141cce72",
+    "templates/deduplicate-records.nika": "268f72d69e07053f22042ff69e34071092c9c349be060fed7811763bf083c073",
+    "templates/docker-report.nika": "6e2a3211a39b960cc170efe70964a5e0b50bf99eeba78752cae27acadb64e9c6",
+    "templates/document-to-fields.nika": "a3916e19ae3dc85f95413690768e25fbdc7e0cc01dabf823891b5b619d98f837",
+    "templates/etl-state.nika": "64d090ea10a33ab224d16feea6b80bbfeb4e1c8396d514361ae0740399958136",
+    "templates/evaluate-and-optimize.nika": "6abb970d905444b07d0df63e6330f7eb6d0a6c636cc49a0f19c5d9d817552513",
+    "templates/fanout.nika": "e45da5bcc8080771eb279b8a347715f5ba50bb428bb7b9493167a909c21729db",
+    "templates/gate-and-act.nika": "4870c70f7a6198f86b1da8587e7e1345bbece86ce07446d74e16866cbe514610",
+    "templates/human-gated-ship.nika": "e447e644d2e34327ab03f5fee8bed54fd0cfc2293e1379e3dcdb3a6b050bf65c",
+    "templates/media-asset-pack.nika": "9358b5a04ba81ec9b3c3b9c7195f3f87e1777274d1721ce4428cffb0c901d519",
+    "templates/parallel-review.nika": "d02b45349edb57fe66b0692584c822f5bab0a7620c0d5d6ec445d96d332f43db",
+    "templates/project-public-fields.nika": "c4bc776cf730f13543c0379eec178ebf90dfb465c51b1d356ed6628c0f4fc614",
+    "templates/recover-optional-file.nika": "923ed35265aadfbf46cb6be76e86655d0cc03c37950128d3c05664e665c467de",
+    "templates/snapshot-diff.nika": "ec5772c13742e1ce2a8555663ce1d6832a17f35aa52c679b91b1750f81b86837",
+    "templates/validate-records.nika": "fa9c9f0ea60b2d73b45d14ea5f55053b70ff01eadf70f11ab5aab6f53cb41d2c",
+    "templates/website-brief.nika": "52ff867ab56ab2aef8c3a86a69cccaab0c68681bdf96dec53bf2f8cdc37d4bac"
   },
   "words": [
     {
@@ -102,7 +102,7 @@
       ],
       "examples": [
         {
-          "path": "templates/aggregate-by-key.nika.yaml",
+          "path": "templates/aggregate-by-key.nika",
           "line": 60,
           "startLine": 57,
           "endLine": 66,
@@ -110,7 +110,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/bounded-batch.nika.yaml",
+          "path": "templates/bounded-batch.nika",
           "line": 46,
           "startLine": 43,
           "endLine": 52,
@@ -118,7 +118,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/corpus-qa.nika.yaml",
+          "path": "templates/corpus-qa.nika",
           "line": 47,
           "startLine": 44,
           "endLine": 53,
@@ -126,7 +126,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/deduplicate-records.nika.yaml",
+          "path": "templates/deduplicate-records.nika",
           "line": 59,
           "startLine": 56,
           "endLine": 65,
@@ -134,7 +134,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/document-to-fields.nika.yaml",
+          "path": "templates/document-to-fields.nika",
           "line": 55,
           "startLine": 52,
           "endLine": 61,
@@ -142,7 +142,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/etl-state.nika.yaml",
+          "path": "templates/etl-state.nika",
           "line": 120,
           "startLine": 117,
           "endLine": 126,
@@ -150,7 +150,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 155,
           "startLine": 152,
           "endLine": 161,
@@ -158,7 +158,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 132,
           "startLine": 129,
           "endLine": 138,
@@ -166,7 +166,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 71,
           "startLine": 68,
           "endLine": 77,
@@ -174,7 +174,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/project-public-fields.nika.yaml",
+          "path": "templates/project-public-fields.nika",
           "line": 67,
           "startLine": 64,
           "endLine": 73,
@@ -182,7 +182,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 60,
           "startLine": 57,
           "endLine": 66,
@@ -190,7 +190,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/snapshot-diff.nika.yaml",
+          "path": "templates/snapshot-diff.nika",
           "line": 16,
           "startLine": 13,
           "endLine": 22,
@@ -198,7 +198,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/validate-records.nika.yaml",
+          "path": "templates/validate-records.nika",
           "line": 57,
           "startLine": 54,
           "endLine": 63,
@@ -239,7 +239,7 @@
       ],
       "examples": [
         {
-          "path": "templates/agent-loop.nika.yaml",
+          "path": "templates/agent-loop.nika",
           "line": 75,
           "startLine": 72,
           "endLine": 81,
@@ -269,7 +269,7 @@
       ],
       "examples": [
         {
-          "path": "templates/agent-loop.nika.yaml",
+          "path": "templates/agent-loop.nika",
           "line": 125,
           "startLine": 122,
           "endLine": 131,
@@ -277,7 +277,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/aggregate-by-key.nika.yaml",
+          "path": "templates/aggregate-by-key.nika",
           "line": 29,
           "startLine": 26,
           "endLine": 35,
@@ -285,7 +285,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/api-upload-and-create.nika.yaml",
+          "path": "templates/api-upload-and-create.nika",
           "line": 71,
           "startLine": 68,
           "endLine": 77,
@@ -293,7 +293,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/bounded-batch.nika.yaml",
+          "path": "templates/bounded-batch.nika",
           "line": 27,
           "startLine": 24,
           "endLine": 33,
@@ -301,7 +301,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/chain.nika.yaml",
+          "path": "templates/chain.nika",
           "line": 48,
           "startLine": 45,
           "endLine": 54,
@@ -309,7 +309,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/classify-and-route.nika.yaml",
+          "path": "templates/classify-and-route.nika",
           "line": 95,
           "startLine": 92,
           "endLine": 101,
@@ -317,7 +317,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/corpus-qa.nika.yaml",
+          "path": "templates/corpus-qa.nika",
           "line": 33,
           "startLine": 30,
           "endLine": 39,
@@ -325,7 +325,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/deduplicate-records.nika.yaml",
+          "path": "templates/deduplicate-records.nika",
           "line": 29,
           "startLine": 26,
           "endLine": 35,
@@ -333,7 +333,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/docker-report.nika.yaml",
+          "path": "templates/docker-report.nika",
           "line": 89,
           "startLine": 86,
           "endLine": 95,
@@ -341,7 +341,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/document-to-fields.nika.yaml",
+          "path": "templates/document-to-fields.nika",
           "line": 39,
           "startLine": 36,
           "endLine": 45,
@@ -349,7 +349,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/etl-state.nika.yaml",
+          "path": "templates/etl-state.nika",
           "line": 73,
           "startLine": 70,
           "endLine": 79,
@@ -357,7 +357,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 84,
           "startLine": 81,
           "endLine": 90,
@@ -365,7 +365,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/gate-and-act.nika.yaml",
+          "path": "templates/gate-and-act.nika",
           "line": 54,
           "startLine": 51,
           "endLine": 60,
@@ -373,7 +373,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 96,
           "startLine": 93,
           "endLine": 102,
@@ -381,7 +381,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/media-asset-pack.nika.yaml",
+          "path": "templates/media-asset-pack.nika",
           "line": 71,
           "startLine": 68,
           "endLine": 77,
@@ -389,7 +389,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 55,
           "startLine": 52,
           "endLine": 61,
@@ -397,7 +397,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/project-public-fields.nika.yaml",
+          "path": "templates/project-public-fields.nika",
           "line": 30,
           "startLine": 27,
           "endLine": 36,
@@ -405,7 +405,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 28,
           "startLine": 25,
           "endLine": 34,
@@ -413,7 +413,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/snapshot-diff.nika.yaml",
+          "path": "templates/snapshot-diff.nika",
           "line": 28,
           "startLine": 25,
           "endLine": 34,
@@ -421,7 +421,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/validate-records.nika.yaml",
+          "path": "templates/validate-records.nika",
           "line": 27,
           "startLine": 24,
           "endLine": 33,
@@ -429,7 +429,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/website-brief.nika.yaml",
+          "path": "templates/website-brief.nika",
           "line": 49,
           "startLine": 46,
           "endLine": 55,
@@ -541,7 +541,7 @@
       ],
       "examples": [
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 119,
           "startLine": 116,
           "endLine": 125,
@@ -549,7 +549,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 33,
           "startLine": 30,
           "endLine": 39,
@@ -630,7 +630,7 @@
       ],
       "examples": [
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 112,
           "startLine": 109,
           "endLine": 118,
@@ -662,7 +662,7 @@
       ],
       "examples": [
         {
-          "path": "templates/bounded-batch.nika.yaml",
+          "path": "templates/bounded-batch.nika",
           "line": 13,
           "startLine": 10,
           "endLine": 19,
@@ -670,7 +670,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 56,
           "startLine": 53,
           "endLine": 62,
@@ -678,7 +678,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 13,
           "startLine": 10,
           "endLine": 19,
@@ -686,7 +686,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/project-public-fields.nika.yaml",
+          "path": "templates/project-public-fields.nika",
           "line": 13,
           "startLine": 10,
           "endLine": 19,
@@ -694,7 +694,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 12,
           "startLine": 9,
           "endLine": 18,
@@ -732,7 +732,7 @@
       ],
       "examples": [
         {
-          "path": "templates/docker-report.nika.yaml",
+          "path": "templates/docker-report.nika",
           "line": 51,
           "startLine": 48,
           "endLine": 57,
@@ -740,7 +740,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 111,
           "startLine": 108,
           "endLine": 117,
@@ -809,7 +809,7 @@
       ],
       "examples": [
         {
-          "path": "templates/aggregate-by-key.nika.yaml",
+          "path": "templates/aggregate-by-key.nika",
           "line": 11,
           "startLine": 8,
           "endLine": 17,
@@ -817,7 +817,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/api-upload-and-create.nika.yaml",
+          "path": "templates/api-upload-and-create.nika",
           "line": 39,
           "startLine": 36,
           "endLine": 45,
@@ -825,7 +825,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/bounded-batch.nika.yaml",
+          "path": "templates/bounded-batch.nika",
           "line": 14,
           "startLine": 11,
           "endLine": 20,
@@ -833,7 +833,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/chain.nika.yaml",
+          "path": "templates/chain.nika",
           "line": 31,
           "startLine": 28,
           "endLine": 37,
@@ -841,7 +841,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/classify-and-route.nika.yaml",
+          "path": "templates/classify-and-route.nika",
           "line": 18,
           "startLine": 15,
           "endLine": 24,
@@ -849,7 +849,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/corpus-qa.nika.yaml",
+          "path": "templates/corpus-qa.nika",
           "line": 19,
           "startLine": 16,
           "endLine": 25,
@@ -857,7 +857,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/deduplicate-records.nika.yaml",
+          "path": "templates/deduplicate-records.nika",
           "line": 11,
           "startLine": 8,
           "endLine": 17,
@@ -865,7 +865,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/document-to-fields.nika.yaml",
+          "path": "templates/document-to-fields.nika",
           "line": 19,
           "startLine": 16,
           "endLine": 25,
@@ -873,7 +873,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/etl-state.nika.yaml",
+          "path": "templates/etl-state.nika",
           "line": 50,
           "startLine": 47,
           "endLine": 56,
@@ -881,7 +881,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/evaluate-and-optimize.nika.yaml",
+          "path": "templates/evaluate-and-optimize.nika",
           "line": 31,
           "startLine": 28,
           "endLine": 37,
@@ -889,7 +889,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 58,
           "startLine": 55,
           "endLine": 64,
@@ -897,7 +897,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/gate-and-act.nika.yaml",
+          "path": "templates/gate-and-act.nika",
           "line": 28,
           "startLine": 25,
           "endLine": 34,
@@ -905,7 +905,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 56,
           "startLine": 53,
           "endLine": 62,
@@ -913,7 +913,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/media-asset-pack.nika.yaml",
+          "path": "templates/media-asset-pack.nika",
           "line": 32,
           "startLine": 29,
           "endLine": 38,
@@ -921,7 +921,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 14,
           "startLine": 11,
           "endLine": 20,
@@ -929,7 +929,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/project-public-fields.nika.yaml",
+          "path": "templates/project-public-fields.nika",
           "line": 14,
           "startLine": 11,
           "endLine": 20,
@@ -937,7 +937,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 13,
           "startLine": 10,
           "endLine": 19,
@@ -945,7 +945,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/snapshot-diff.nika.yaml",
+          "path": "templates/snapshot-diff.nika",
           "line": 11,
           "startLine": 8,
           "endLine": 17,
@@ -953,7 +953,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/validate-records.nika.yaml",
+          "path": "templates/validate-records.nika",
           "line": 11,
           "startLine": 8,
           "endLine": 17,
@@ -961,7 +961,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/website-brief.nika.yaml",
+          "path": "templates/website-brief.nika",
           "line": 33,
           "startLine": 30,
           "endLine": 39,
@@ -1047,7 +1047,7 @@
       ],
       "examples": [
         {
-          "path": "templates/agent-loop.nika.yaml",
+          "path": "templates/agent-loop.nika",
           "line": 41,
           "startLine": 38,
           "endLine": 47,
@@ -1104,7 +1104,7 @@
       ],
       "examples": [
         {
-          "path": "templates/agent-loop.nika.yaml",
+          "path": "templates/agent-loop.nika",
           "line": 42,
           "startLine": 39,
           "endLine": 48,
@@ -1112,7 +1112,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/docker-report.nika.yaml",
+          "path": "templates/docker-report.nika",
           "line": 102,
           "startLine": 99,
           "endLine": 102,
@@ -1120,7 +1120,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/etl-state.nika.yaml",
+          "path": "templates/etl-state.nika",
           "line": 149,
           "startLine": 146,
           "endLine": 149,
@@ -1178,7 +1178,7 @@
       ],
       "examples": [
         {
-          "path": "templates/api-upload-and-create.nika.yaml",
+          "path": "templates/api-upload-and-create.nika",
           "line": 47,
           "startLine": 44,
           "endLine": 53,
@@ -1186,7 +1186,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/gate-and-act.nika.yaml",
+          "path": "templates/gate-and-act.nika",
           "line": 46,
           "startLine": 43,
           "endLine": 52,
@@ -1194,7 +1194,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 80,
           "startLine": 77,
           "endLine": 86,
@@ -1294,7 +1294,7 @@
       ],
       "examples": [
         {
-          "path": "templates/aggregate-by-key.nika.yaml",
+          "path": "templates/aggregate-by-key.nika",
           "line": 44,
           "startLine": 41,
           "endLine": 50,
@@ -1414,7 +1414,7 @@
       ],
       "examples": [
         {
-          "path": "templates/docker-report.nika.yaml",
+          "path": "templates/docker-report.nika",
           "line": 35,
           "startLine": 32,
           "endLine": 41,
@@ -1422,7 +1422,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 61,
           "startLine": 58,
           "endLine": 67,
@@ -1480,7 +1480,7 @@
       ],
       "examples": [
         {
-          "path": "templates/document-to-fields.nika.yaml",
+          "path": "templates/document-to-fields.nika",
           "line": 52,
           "startLine": 49,
           "endLine": 58,
@@ -1488,7 +1488,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/gate-and-act.nika.yaml",
+          "path": "templates/gate-and-act.nika",
           "line": 58,
           "startLine": 55,
           "endLine": 64,
@@ -1518,7 +1518,7 @@
       ],
       "examples": [
         {
-          "path": "templates/bounded-batch.nika.yaml",
+          "path": "templates/bounded-batch.nika",
           "line": 51,
           "startLine": 48,
           "endLine": 57,
@@ -1526,7 +1526,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 99,
           "startLine": 96,
           "endLine": 105,
@@ -1534,7 +1534,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 129,
           "startLine": 126,
           "endLine": 135,
@@ -1598,7 +1598,7 @@
       ],
       "examples": [
         {
-          "path": "templates/bounded-batch.nika.yaml",
+          "path": "templates/bounded-batch.nika",
           "line": 48,
           "startLine": 45,
           "endLine": 54,
@@ -1606,7 +1606,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 96,
           "startLine": 93,
           "endLine": 102,
@@ -1614,7 +1614,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 126,
           "startLine": 123,
           "endLine": 132,
@@ -1682,7 +1682,7 @@
       ],
       "examples": [
         {
-          "path": "templates/api-upload-and-create.nika.yaml",
+          "path": "templates/api-upload-and-create.nika",
           "line": 58,
           "startLine": 55,
           "endLine": 64,
@@ -1690,7 +1690,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/chain.nika.yaml",
+          "path": "templates/chain.nika",
           "line": 40,
           "startLine": 37,
           "endLine": 46,
@@ -1698,7 +1698,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/docker-report.nika.yaml",
+          "path": "templates/docker-report.nika",
           "line": 39,
           "startLine": 36,
           "endLine": 45,
@@ -1706,7 +1706,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/etl-state.nika.yaml",
+          "path": "templates/etl-state.nika",
           "line": 57,
           "startLine": 54,
           "endLine": 63,
@@ -1714,7 +1714,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 67,
           "startLine": 64,
           "endLine": 73,
@@ -1722,7 +1722,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 68,
           "startLine": 65,
           "endLine": 74,
@@ -1730,7 +1730,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/media-asset-pack.nika.yaml",
+          "path": "templates/media-asset-pack.nika",
           "line": 38,
           "startLine": 35,
           "endLine": 44,
@@ -1738,7 +1738,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 21,
           "startLine": 18,
           "endLine": 27,
@@ -1746,7 +1746,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/website-brief.nika.yaml",
+          "path": "templates/website-brief.nika",
           "line": 42,
           "startLine": 39,
           "endLine": 48,
@@ -1831,7 +1831,7 @@
       ],
       "examples": [
         {
-          "path": "templates/gate-and-act.nika.yaml",
+          "path": "templates/gate-and-act.nika",
           "line": 48,
           "startLine": 45,
           "endLine": 54,
@@ -1839,7 +1839,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 82,
           "startLine": 79,
           "endLine": 88,
@@ -1868,7 +1868,7 @@
       ],
       "examples": [
         {
-          "path": "templates/gate-and-act.nika.yaml",
+          "path": "templates/gate-and-act.nika",
           "line": 35,
           "startLine": 32,
           "endLine": 41,
@@ -1909,7 +1909,7 @@
       ],
       "examples": [
         {
-          "path": "templates/agent-loop.nika.yaml",
+          "path": "templates/agent-loop.nika",
           "line": 51,
           "startLine": 48,
           "endLine": 57,
@@ -1917,7 +1917,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/bounded-batch.nika.yaml",
+          "path": "templates/bounded-batch.nika",
           "line": 53,
           "startLine": 50,
           "endLine": 59,
@@ -1925,7 +1925,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/chain.nika.yaml",
+          "path": "templates/chain.nika",
           "line": 64,
           "startLine": 61,
           "endLine": 70,
@@ -1933,7 +1933,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/classify-and-route.nika.yaml",
+          "path": "templates/classify-and-route.nika",
           "line": 76,
           "startLine": 73,
           "endLine": 82,
@@ -1941,7 +1941,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/corpus-qa.nika.yaml",
+          "path": "templates/corpus-qa.nika",
           "line": 96,
           "startLine": 93,
           "endLine": 102,
@@ -1949,7 +1949,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/docker-report.nika.yaml",
+          "path": "templates/docker-report.nika",
           "line": 68,
           "startLine": 65,
           "endLine": 74,
@@ -1957,7 +1957,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/document-to-fields.nika.yaml",
+          "path": "templates/document-to-fields.nika",
           "line": 57,
           "startLine": 54,
           "endLine": 63,
@@ -1965,7 +1965,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/evaluate-and-optimize.nika.yaml",
+          "path": "templates/evaluate-and-optimize.nika",
           "line": 38,
           "startLine": 35,
           "endLine": 44,
@@ -1973,7 +1973,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 123,
           "startLine": 120,
           "endLine": 129,
@@ -1981,7 +1981,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/media-asset-pack.nika.yaml",
+          "path": "templates/media-asset-pack.nika",
           "line": 51,
           "startLine": 48,
           "endLine": 57,
@@ -1989,7 +1989,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 75,
           "startLine": 72,
           "endLine": 81,
@@ -1997,7 +1997,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/project-public-fields.nika.yaml",
+          "path": "templates/project-public-fields.nika",
           "line": 78,
           "startLine": 75,
           "endLine": 84,
@@ -2005,7 +2005,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/website-brief.nika.yaml",
+          "path": "templates/website-brief.nika",
           "line": 60,
           "startLine": 57,
           "endLine": 66,
@@ -2064,7 +2064,7 @@
       ],
       "examples": [
         {
-          "path": "templates/agent-loop.nika.yaml",
+          "path": "templates/agent-loop.nika",
           "line": 34,
           "startLine": 31,
           "endLine": 40,
@@ -2140,7 +2140,7 @@
       ],
       "examples": [
         {
-          "path": "templates/agent-loop.nika.yaml",
+          "path": "templates/agent-loop.nika",
           "line": 123,
           "startLine": 120,
           "endLine": 129,
@@ -2148,7 +2148,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/aggregate-by-key.nika.yaml",
+          "path": "templates/aggregate-by-key.nika",
           "line": 27,
           "startLine": 24,
           "endLine": 33,
@@ -2156,7 +2156,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/api-upload-and-create.nika.yaml",
+          "path": "templates/api-upload-and-create.nika",
           "line": 69,
           "startLine": 66,
           "endLine": 75,
@@ -2164,7 +2164,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/bounded-batch.nika.yaml",
+          "path": "templates/bounded-batch.nika",
           "line": 25,
           "startLine": 22,
           "endLine": 31,
@@ -2172,7 +2172,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/chain.nika.yaml",
+          "path": "templates/chain.nika",
           "line": 46,
           "startLine": 43,
           "endLine": 52,
@@ -2180,7 +2180,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/classify-and-route.nika.yaml",
+          "path": "templates/classify-and-route.nika",
           "line": 93,
           "startLine": 90,
           "endLine": 99,
@@ -2188,7 +2188,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/corpus-qa.nika.yaml",
+          "path": "templates/corpus-qa.nika",
           "line": 31,
           "startLine": 28,
           "endLine": 37,
@@ -2196,7 +2196,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/deduplicate-records.nika.yaml",
+          "path": "templates/deduplicate-records.nika",
           "line": 27,
           "startLine": 24,
           "endLine": 33,
@@ -2204,7 +2204,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/docker-report.nika.yaml",
+          "path": "templates/docker-report.nika",
           "line": 87,
           "startLine": 84,
           "endLine": 93,
@@ -2212,7 +2212,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/document-to-fields.nika.yaml",
+          "path": "templates/document-to-fields.nika",
           "line": 37,
           "startLine": 34,
           "endLine": 43,
@@ -2220,7 +2220,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/etl-state.nika.yaml",
+          "path": "templates/etl-state.nika",
           "line": 71,
           "startLine": 68,
           "endLine": 77,
@@ -2228,7 +2228,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 82,
           "startLine": 79,
           "endLine": 88,
@@ -2236,7 +2236,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/gate-and-act.nika.yaml",
+          "path": "templates/gate-and-act.nika",
           "line": 52,
           "startLine": 49,
           "endLine": 58,
@@ -2244,7 +2244,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 94,
           "startLine": 91,
           "endLine": 100,
@@ -2252,7 +2252,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/media-asset-pack.nika.yaml",
+          "path": "templates/media-asset-pack.nika",
           "line": 69,
           "startLine": 66,
           "endLine": 75,
@@ -2260,7 +2260,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 53,
           "startLine": 50,
           "endLine": 59,
@@ -2268,7 +2268,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/project-public-fields.nika.yaml",
+          "path": "templates/project-public-fields.nika",
           "line": 28,
           "startLine": 25,
           "endLine": 34,
@@ -2276,7 +2276,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 26,
           "startLine": 23,
           "endLine": 32,
@@ -2284,7 +2284,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/snapshot-diff.nika.yaml",
+          "path": "templates/snapshot-diff.nika",
           "line": 26,
           "startLine": 23,
           "endLine": 32,
@@ -2292,7 +2292,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/validate-records.nika.yaml",
+          "path": "templates/validate-records.nika",
           "line": 25,
           "startLine": 22,
           "endLine": 31,
@@ -2300,7 +2300,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/website-brief.nika.yaml",
+          "path": "templates/website-brief.nika",
           "line": 47,
           "startLine": 44,
           "endLine": 53,
@@ -2333,7 +2333,7 @@
       ],
       "examples": [
         {
-          "path": "templates/agent-loop.nika.yaml",
+          "path": "templates/agent-loop.nika",
           "line": 111,
           "startLine": 108,
           "endLine": 117,
@@ -2341,7 +2341,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/aggregate-by-key.nika.yaml",
+          "path": "templates/aggregate-by-key.nika",
           "line": 35,
           "startLine": 32,
           "endLine": 41,
@@ -2349,7 +2349,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/bounded-batch.nika.yaml",
+          "path": "templates/bounded-batch.nika",
           "line": 16,
           "startLine": 13,
           "endLine": 22,
@@ -2357,7 +2357,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/deduplicate-records.nika.yaml",
+          "path": "templates/deduplicate-records.nika",
           "line": 35,
           "startLine": 32,
           "endLine": 41,
@@ -2365,7 +2365,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/document-to-fields.nika.yaml",
+          "path": "templates/document-to-fields.nika",
           "line": 72,
           "startLine": 69,
           "endLine": 78,
@@ -2373,7 +2373,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 97,
           "startLine": 94,
           "endLine": 103,
@@ -2381,7 +2381,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 127,
           "startLine": 124,
           "endLine": 133,
@@ -2389,7 +2389,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/snapshot-diff.nika.yaml",
+          "path": "templates/snapshot-diff.nika",
           "line": 43,
           "startLine": 40,
           "endLine": 49,
@@ -2397,7 +2397,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/validate-records.nika.yaml",
+          "path": "templates/validate-records.nika",
           "line": 33,
           "startLine": 30,
           "endLine": 39,
@@ -2430,7 +2430,7 @@
       ],
       "examples": [
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 120,
           "startLine": 117,
           "endLine": 126,
@@ -2438,7 +2438,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 34,
           "startLine": 31,
           "endLine": 40,
@@ -2469,7 +2469,7 @@
       ],
       "examples": [
         {
-          "path": "templates/api-upload-and-create.nika.yaml",
+          "path": "templates/api-upload-and-create.nika",
           "line": 46,
           "startLine": 43,
           "endLine": 52,
@@ -2477,7 +2477,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/gate-and-act.nika.yaml",
+          "path": "templates/gate-and-act.nika",
           "line": 45,
           "startLine": 42,
           "endLine": 51,
@@ -2485,7 +2485,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 79,
           "startLine": 76,
           "endLine": 85,
@@ -2528,7 +2528,7 @@
       ],
       "examples": [
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 16,
           "startLine": 13,
           "endLine": 22,
@@ -2678,7 +2678,7 @@
       ],
       "examples": [
         {
-          "path": "templates/classify-and-route.nika.yaml",
+          "path": "templates/classify-and-route.nika",
           "line": 38,
           "startLine": 35,
           "endLine": 44,
@@ -2712,7 +2712,7 @@
       ],
       "examples": [
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 118,
           "startLine": 115,
           "endLine": 124,
@@ -2720,7 +2720,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 32,
           "startLine": 29,
           "endLine": 38,
@@ -2772,7 +2772,7 @@
       ],
       "examples": [
         {
-          "path": "templates/bounded-batch.nika.yaml",
+          "path": "templates/bounded-batch.nika",
           "line": 50,
           "startLine": 47,
           "endLine": 56,
@@ -2780,7 +2780,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 98,
           "startLine": 95,
           "endLine": 104,
@@ -2788,7 +2788,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 128,
           "startLine": 125,
           "endLine": 134,
@@ -2825,7 +2825,7 @@
       ],
       "examples": [
         {
-          "path": "templates/agent-loop.nika.yaml",
+          "path": "templates/agent-loop.nika",
           "line": 58,
           "startLine": 55,
           "endLine": 64,
@@ -2833,7 +2833,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/bounded-batch.nika.yaml",
+          "path": "templates/bounded-batch.nika",
           "line": 57,
           "startLine": 54,
           "endLine": 63,
@@ -2841,7 +2841,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/chain.nika.yaml",
+          "path": "templates/chain.nika",
           "line": 65,
           "startLine": 62,
           "endLine": 71,
@@ -2849,7 +2849,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/classify-and-route.nika.yaml",
+          "path": "templates/classify-and-route.nika",
           "line": 77,
           "startLine": 74,
           "endLine": 83,
@@ -2857,7 +2857,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/corpus-qa.nika.yaml",
+          "path": "templates/corpus-qa.nika",
           "line": 97,
           "startLine": 94,
           "endLine": 103,
@@ -2865,7 +2865,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/docker-report.nika.yaml",
+          "path": "templates/docker-report.nika",
           "line": 69,
           "startLine": 66,
           "endLine": 75,
@@ -2873,7 +2873,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/document-to-fields.nika.yaml",
+          "path": "templates/document-to-fields.nika",
           "line": 58,
           "startLine": 55,
           "endLine": 64,
@@ -2881,7 +2881,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/evaluate-and-optimize.nika.yaml",
+          "path": "templates/evaluate-and-optimize.nika",
           "line": 39,
           "startLine": 36,
           "endLine": 45,
@@ -2889,7 +2889,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 124,
           "startLine": 121,
           "endLine": 130,
@@ -2897,7 +2897,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/media-asset-pack.nika.yaml",
+          "path": "templates/media-asset-pack.nika",
           "line": 52,
           "startLine": 49,
           "endLine": 58,
@@ -2905,7 +2905,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 77,
           "startLine": 74,
           "endLine": 83,
@@ -2913,7 +2913,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/project-public-fields.nika.yaml",
+          "path": "templates/project-public-fields.nika",
           "line": 82,
           "startLine": 79,
           "endLine": 88,
@@ -2921,7 +2921,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/website-brief.nika.yaml",
+          "path": "templates/website-brief.nika",
           "line": 61,
           "startLine": 58,
           "endLine": 67,
@@ -2960,7 +2960,7 @@
       ],
       "examples": [
         {
-          "path": "templates/agent-loop.nika.yaml",
+          "path": "templates/agent-loop.nika",
           "line": 99,
           "startLine": 96,
           "endLine": 105,
@@ -2998,7 +2998,7 @@
       ],
       "examples": [
         {
-          "path": "templates/agent-loop.nika.yaml",
+          "path": "templates/agent-loop.nika",
           "line": 98,
           "startLine": 95,
           "endLine": 104,
@@ -3037,7 +3037,7 @@
       ],
       "examples": [
         {
-          "path": "templates/classify-and-route.nika.yaml",
+          "path": "templates/classify-and-route.nika",
           "line": 37,
           "startLine": 34,
           "endLine": 43,
@@ -3129,7 +3129,7 @@
       ],
       "examples": [
         {
-          "path": "templates/agent-loop.nika.yaml",
+          "path": "templates/agent-loop.nika",
           "line": 32,
           "startLine": 29,
           "endLine": 38,
@@ -3137,7 +3137,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/bounded-batch.nika.yaml",
+          "path": "templates/bounded-batch.nika",
           "line": 11,
           "startLine": 8,
           "endLine": 17,
@@ -3145,7 +3145,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/chain.nika.yaml",
+          "path": "templates/chain.nika",
           "line": 29,
           "startLine": 26,
           "endLine": 35,
@@ -3153,7 +3153,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/classify-and-route.nika.yaml",
+          "path": "templates/classify-and-route.nika",
           "line": 16,
           "startLine": 13,
           "endLine": 22,
@@ -3161,7 +3161,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/corpus-qa.nika.yaml",
+          "path": "templates/corpus-qa.nika",
           "line": 17,
           "startLine": 14,
           "endLine": 23,
@@ -3169,7 +3169,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/docker-report.nika.yaml",
+          "path": "templates/docker-report.nika",
           "line": 32,
           "startLine": 29,
           "endLine": 38,
@@ -3177,7 +3177,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/document-to-fields.nika.yaml",
+          "path": "templates/document-to-fields.nika",
           "line": 17,
           "startLine": 14,
           "endLine": 23,
@@ -3185,7 +3185,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/evaluate-and-optimize.nika.yaml",
+          "path": "templates/evaluate-and-optimize.nika",
           "line": 29,
           "startLine": 26,
           "endLine": 35,
@@ -3193,7 +3193,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 50,
           "startLine": 47,
           "endLine": 56,
@@ -3201,7 +3201,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/media-asset-pack.nika.yaml",
+          "path": "templates/media-asset-pack.nika",
           "line": 30,
           "startLine": 27,
           "endLine": 36,
@@ -3209,7 +3209,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 11,
           "startLine": 8,
           "endLine": 17,
@@ -3217,7 +3217,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/project-public-fields.nika.yaml",
+          "path": "templates/project-public-fields.nika",
           "line": 11,
           "startLine": 8,
           "endLine": 17,
@@ -3225,7 +3225,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/website-brief.nika.yaml",
+          "path": "templates/website-brief.nika",
           "line": 31,
           "startLine": 28,
           "endLine": 37,
@@ -3265,7 +3265,7 @@
       ],
       "examples": [
         {
-          "path": "templates/api-upload-and-create.nika.yaml",
+          "path": "templates/api-upload-and-create.nika",
           "line": 57,
           "startLine": 54,
           "endLine": 63,
@@ -3273,7 +3273,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/etl-state.nika.yaml",
+          "path": "templates/etl-state.nika",
           "line": 56,
           "startLine": 53,
           "endLine": 62,
@@ -3281,7 +3281,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/gate-and-act.nika.yaml",
+          "path": "templates/gate-and-act.nika",
           "line": 34,
           "startLine": 31,
           "endLine": 40,
@@ -3289,7 +3289,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 67,
           "startLine": 64,
           "endLine": 73,
@@ -3297,7 +3297,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/website-brief.nika.yaml",
+          "path": "templates/website-brief.nika",
           "line": 39,
           "startLine": 36,
           "endLine": 45,
@@ -3318,7 +3318,7 @@
           "declaration": {
             "type": "string",
             "pattern": "^[a-z][a-z0-9-]*$",
-            "description": "The file's NAME · kebab-case · and the mark that says « this is a nika file ». One word, one meaning across both document types: `nika.yaml` carries the PROJECT name, a `*.nika.yaml` carries the WORKFLOW name. The document TYPE is read from `tasks:` — present means workflow, absent means project — so it survives a blob, a paste or an HTTP body where the filename does not travel. This key held the literal `v1` until the envelope nuke; it carried zero bits as a version (there is no `nika: v2` — ever) and now carries the file's most necessary field instead."
+            "description": "The file's NAME · kebab-case · and the mark that says « this is a nika file ». One word, one meaning across both document types: `nika.yaml` carries the PROJECT name, a `*.nika` carries the WORKFLOW name. The document TYPE is read from `tasks:` — present means workflow, absent means project — so it survives a blob, a paste or an HTTP body where the filename does not travel. This key held the literal `v1` until the envelope nuke; it carried zero bits as a version (there is no `nika: v2` — ever) and now carries the file's most necessary field instead."
           },
           "siblings": [
             "const",
@@ -3334,7 +3334,7 @@
       ],
       "examples": [
         {
-          "path": "templates/agent-loop.nika.yaml",
+          "path": "templates/agent-loop.nika",
           "line": 27,
           "startLine": 24,
           "endLine": 33,
@@ -3342,7 +3342,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/aggregate-by-key.nika.yaml",
+          "path": "templates/aggregate-by-key.nika",
           "line": 10,
           "startLine": 7,
           "endLine": 16,
@@ -3350,7 +3350,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/api-upload-and-create.nika.yaml",
+          "path": "templates/api-upload-and-create.nika",
           "line": 37,
           "startLine": 34,
           "endLine": 43,
@@ -3358,7 +3358,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/bounded-batch.nika.yaml",
+          "path": "templates/bounded-batch.nika",
           "line": 10,
           "startLine": 7,
           "endLine": 16,
@@ -3366,7 +3366,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/chain.nika.yaml",
+          "path": "templates/chain.nika",
           "line": 24,
           "startLine": 21,
           "endLine": 30,
@@ -3374,7 +3374,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/classify-and-route.nika.yaml",
+          "path": "templates/classify-and-route.nika",
           "line": 11,
           "startLine": 8,
           "endLine": 17,
@@ -3382,7 +3382,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/corpus-qa.nika.yaml",
+          "path": "templates/corpus-qa.nika",
           "line": 12,
           "startLine": 9,
           "endLine": 18,
@@ -3390,7 +3390,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/deduplicate-records.nika.yaml",
+          "path": "templates/deduplicate-records.nika",
           "line": 10,
           "startLine": 7,
           "endLine": 16,
@@ -3398,7 +3398,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/docker-report.nika.yaml",
+          "path": "templates/docker-report.nika",
           "line": 27,
           "startLine": 24,
           "endLine": 33,
@@ -3406,7 +3406,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/document-to-fields.nika.yaml",
+          "path": "templates/document-to-fields.nika",
           "line": 12,
           "startLine": 9,
           "endLine": 18,
@@ -3414,7 +3414,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/etl-state.nika.yaml",
+          "path": "templates/etl-state.nika",
           "line": 48,
           "startLine": 45,
           "endLine": 54,
@@ -3422,7 +3422,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/evaluate-and-optimize.nika.yaml",
+          "path": "templates/evaluate-and-optimize.nika",
           "line": 24,
           "startLine": 21,
           "endLine": 30,
@@ -3430,7 +3430,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 45,
           "startLine": 42,
           "endLine": 51,
@@ -3438,7 +3438,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/gate-and-act.nika.yaml",
+          "path": "templates/gate-and-act.nika",
           "line": 26,
           "startLine": 23,
           "endLine": 32,
@@ -3446,7 +3446,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 54,
           "startLine": 51,
           "endLine": 60,
@@ -3454,7 +3454,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/media-asset-pack.nika.yaml",
+          "path": "templates/media-asset-pack.nika",
           "line": 25,
           "startLine": 22,
           "endLine": 31,
@@ -3462,7 +3462,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 10,
           "startLine": 7,
           "endLine": 16,
@@ -3470,7 +3470,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/project-public-fields.nika.yaml",
+          "path": "templates/project-public-fields.nika",
           "line": 10,
           "startLine": 7,
           "endLine": 16,
@@ -3478,7 +3478,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 10,
           "startLine": 7,
           "endLine": 16,
@@ -3486,7 +3486,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/snapshot-diff.nika.yaml",
+          "path": "templates/snapshot-diff.nika",
           "line": 10,
           "startLine": 7,
           "endLine": 16,
@@ -3494,7 +3494,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/validate-records.nika.yaml",
+          "path": "templates/validate-records.nika",
           "line": 10,
           "startLine": 7,
           "endLine": 16,
@@ -3502,7 +3502,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/website-brief.nika.yaml",
+          "path": "templates/website-brief.nika",
           "line": 26,
           "startLine": 23,
           "endLine": 32,
@@ -3621,7 +3621,7 @@
       ],
       "examples": [
         {
-          "path": "templates/api-upload-and-create.nika.yaml",
+          "path": "templates/api-upload-and-create.nika",
           "line": 95,
           "startLine": 92,
           "endLine": 99,
@@ -3629,7 +3629,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/chain.nika.yaml",
+          "path": "templates/chain.nika",
           "line": 58,
           "startLine": 55,
           "endLine": 64,
@@ -3637,7 +3637,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/etl-state.nika.yaml",
+          "path": "templates/etl-state.nika",
           "line": 81,
           "startLine": 78,
           "endLine": 87,
@@ -3645,7 +3645,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 105,
           "startLine": 102,
           "endLine": 111,
@@ -3653,7 +3653,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 36,
           "startLine": 33,
           "endLine": 42,
@@ -3694,7 +3694,7 @@
       ],
       "examples": [
         {
-          "path": "templates/api-upload-and-create.nika.yaml",
+          "path": "templates/api-upload-and-create.nika",
           "line": 83,
           "startLine": 80,
           "endLine": 89,
@@ -3702,7 +3702,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/chain.nika.yaml",
+          "path": "templates/chain.nika",
           "line": 49,
           "startLine": 46,
           "endLine": 55,
@@ -3710,7 +3710,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/docker-report.nika.yaml",
+          "path": "templates/docker-report.nika",
           "line": 52,
           "startLine": 49,
           "endLine": 58,
@@ -3718,7 +3718,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/etl-state.nika.yaml",
+          "path": "templates/etl-state.nika",
           "line": 80,
           "startLine": 77,
           "endLine": 86,
@@ -3726,7 +3726,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 100,
           "startLine": 97,
           "endLine": 106,
@@ -3734,7 +3734,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/gate-and-act.nika.yaml",
+          "path": "templates/gate-and-act.nika",
           "line": 60,
           "startLine": 57,
           "endLine": 66,
@@ -3742,7 +3742,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 99,
           "startLine": 96,
           "endLine": 105,
@@ -3750,7 +3750,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/media-asset-pack.nika.yaml",
+          "path": "templates/media-asset-pack.nika",
           "line": 76,
           "startLine": 73,
           "endLine": 82,
@@ -3758,7 +3758,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 35,
           "startLine": 32,
           "endLine": 41,
@@ -3766,7 +3766,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/website-brief.nika.yaml",
+          "path": "templates/website-brief.nika",
           "line": 52,
           "startLine": 49,
           "endLine": 58,
@@ -3846,7 +3846,7 @@
       ],
       "examples": [
         {
-          "path": "templates/agent-loop.nika.yaml",
+          "path": "templates/agent-loop.nika",
           "line": 129,
           "startLine": 126,
           "endLine": 132,
@@ -3854,7 +3854,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/aggregate-by-key.nika.yaml",
+          "path": "templates/aggregate-by-key.nika",
           "line": 70,
           "startLine": 67,
           "endLine": 71,
@@ -3862,7 +3862,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/api-upload-and-create.nika.yaml",
+          "path": "templates/api-upload-and-create.nika",
           "line": 98,
           "startLine": 95,
           "endLine": 99,
@@ -3870,7 +3870,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/bounded-batch.nika.yaml",
+          "path": "templates/bounded-batch.nika",
           "line": 68,
           "startLine": 65,
           "endLine": 69,
@@ -3878,7 +3878,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/chain.nika.yaml",
+          "path": "templates/chain.nika",
           "line": 91,
           "startLine": 88,
           "endLine": 92,
@@ -3886,7 +3886,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/classify-and-route.nika.yaml",
+          "path": "templates/classify-and-route.nika",
           "line": 133,
           "startLine": 130,
           "endLine": 135,
@@ -3894,7 +3894,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/corpus-qa.nika.yaml",
+          "path": "templates/corpus-qa.nika",
           "line": 120,
           "startLine": 117,
           "endLine": 121,
@@ -3902,7 +3902,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/deduplicate-records.nika.yaml",
+          "path": "templates/deduplicate-records.nika",
           "line": 84,
           "startLine": 81,
           "endLine": 85,
@@ -3910,7 +3910,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/docker-report.nika.yaml",
+          "path": "templates/docker-report.nika",
           "line": 99,
           "startLine": 96,
           "endLine": 102,
@@ -3918,7 +3918,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/document-to-fields.nika.yaml",
+          "path": "templates/document-to-fields.nika",
           "line": 100,
           "startLine": 97,
           "endLine": 101,
@@ -3926,7 +3926,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/etl-state.nika.yaml",
+          "path": "templates/etl-state.nika",
           "line": 146,
           "startLine": 143,
           "endLine": 149,
@@ -3934,7 +3934,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/evaluate-and-optimize.nika.yaml",
+          "path": "templates/evaluate-and-optimize.nika",
           "line": 134,
           "startLine": 131,
           "endLine": 136,
@@ -3942,7 +3942,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 177,
           "startLine": 174,
           "endLine": 178,
@@ -3950,7 +3950,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/gate-and-act.nika.yaml",
+          "path": "templates/gate-and-act.nika",
           "line": 78,
           "startLine": 75,
           "endLine": 79,
@@ -3958,7 +3958,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 174,
           "startLine": 171,
           "endLine": 175,
@@ -3966,7 +3966,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/media-asset-pack.nika.yaml",
+          "path": "templates/media-asset-pack.nika",
           "line": 118,
           "startLine": 115,
           "endLine": 119,
@@ -3974,7 +3974,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 143,
           "startLine": 140,
           "endLine": 144,
@@ -3982,7 +3982,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/project-public-fields.nika.yaml",
+          "path": "templates/project-public-fields.nika",
           "line": 93,
           "startLine": 90,
           "endLine": 95,
@@ -3990,7 +3990,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 69,
           "startLine": 66,
           "endLine": 70,
@@ -3998,7 +3998,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/snapshot-diff.nika.yaml",
+          "path": "templates/snapshot-diff.nika",
           "line": 74,
           "startLine": 71,
           "endLine": 75,
@@ -4006,7 +4006,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/validate-records.nika.yaml",
+          "path": "templates/validate-records.nika",
           "line": 66,
           "startLine": 63,
           "endLine": 67,
@@ -4014,7 +4014,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/website-brief.nika.yaml",
+          "path": "templates/website-brief.nika",
           "line": 100,
           "startLine": 97,
           "endLine": 101,
@@ -4057,7 +4057,7 @@
       ],
       "examples": [
         {
-          "path": "templates/chain.nika.yaml",
+          "path": "templates/chain.nika",
           "line": 81,
           "startLine": 78,
           "endLine": 87,
@@ -4065,7 +4065,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/docker-report.nika.yaml",
+          "path": "templates/docker-report.nika",
           "line": 90,
           "startLine": 87,
           "endLine": 96,
@@ -4073,7 +4073,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/etl-state.nika.yaml",
+          "path": "templates/etl-state.nika",
           "line": 140,
           "startLine": 137,
           "endLine": 146,
@@ -4081,7 +4081,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 98,
           "startLine": 95,
           "endLine": 104,
@@ -4089,7 +4089,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/media-asset-pack.nika.yaml",
+          "path": "templates/media-asset-pack.nika",
           "line": 107,
           "startLine": 104,
           "endLine": 113,
@@ -4097,7 +4097,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 29,
           "startLine": 26,
           "endLine": 35,
@@ -4105,7 +4105,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/website-brief.nika.yaml",
+          "path": "templates/website-brief.nika",
           "line": 87,
           "startLine": 84,
           "endLine": 93,
@@ -4135,7 +4135,7 @@
       ],
       "examples": [
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 97,
           "startLine": 94,
           "endLine": 103,
@@ -4240,7 +4240,7 @@
       ],
       "examples": [
         {
-          "path": "templates/agent-loop.nika.yaml",
+          "path": "templates/agent-loop.nika",
           "line": 44,
           "startLine": 41,
           "endLine": 50,
@@ -4248,7 +4248,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/aggregate-by-key.nika.yaml",
+          "path": "templates/aggregate-by-key.nika",
           "line": 20,
           "startLine": 17,
           "endLine": 26,
@@ -4256,7 +4256,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/api-upload-and-create.nika.yaml",
+          "path": "templates/api-upload-and-create.nika",
           "line": 51,
           "startLine": 48,
           "endLine": 57,
@@ -4264,7 +4264,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/bounded-batch.nika.yaml",
+          "path": "templates/bounded-batch.nika",
           "line": 19,
           "startLine": 16,
           "endLine": 25,
@@ -4272,7 +4272,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/chain.nika.yaml",
+          "path": "templates/chain.nika",
           "line": 35,
           "startLine": 32,
           "endLine": 41,
@@ -4280,7 +4280,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/classify-and-route.nika.yaml",
+          "path": "templates/classify-and-route.nika",
           "line": 71,
           "startLine": 68,
           "endLine": 77,
@@ -4288,7 +4288,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/corpus-qa.nika.yaml",
+          "path": "templates/corpus-qa.nika",
           "line": 26,
           "startLine": 23,
           "endLine": 32,
@@ -4296,7 +4296,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/deduplicate-records.nika.yaml",
+          "path": "templates/deduplicate-records.nika",
           "line": 20,
           "startLine": 17,
           "endLine": 26,
@@ -4304,7 +4304,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/docker-report.nika.yaml",
+          "path": "templates/docker-report.nika",
           "line": 34,
           "startLine": 31,
           "endLine": 40,
@@ -4312,7 +4312,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/document-to-fields.nika.yaml",
+          "path": "templates/document-to-fields.nika",
           "line": 32,
           "startLine": 29,
           "endLine": 38,
@@ -4320,7 +4320,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/etl-state.nika.yaml",
+          "path": "templates/etl-state.nika",
           "line": 54,
           "startLine": 51,
           "endLine": 60,
@@ -4328,7 +4328,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/evaluate-and-optimize.nika.yaml",
+          "path": "templates/evaluate-and-optimize.nika",
           "line": 34,
           "startLine": 31,
           "endLine": 40,
@@ -4336,7 +4336,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 65,
           "startLine": 62,
           "endLine": 71,
@@ -4344,7 +4344,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/gate-and-act.nika.yaml",
+          "path": "templates/gate-and-act.nika",
           "line": 32,
           "startLine": 29,
           "endLine": 38,
@@ -4352,7 +4352,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 60,
           "startLine": 57,
           "endLine": 66,
@@ -4360,7 +4360,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/media-asset-pack.nika.yaml",
+          "path": "templates/media-asset-pack.nika",
           "line": 36,
           "startLine": 33,
           "endLine": 42,
@@ -4368,7 +4368,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 46,
           "startLine": 43,
           "endLine": 52,
@@ -4376,7 +4376,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/project-public-fields.nika.yaml",
+          "path": "templates/project-public-fields.nika",
           "line": 21,
           "startLine": 18,
           "endLine": 27,
@@ -4384,7 +4384,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 15,
           "startLine": 12,
           "endLine": 21,
@@ -4392,7 +4392,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/snapshot-diff.nika.yaml",
+          "path": "templates/snapshot-diff.nika",
           "line": 19,
           "startLine": 16,
           "endLine": 25,
@@ -4400,7 +4400,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/validate-records.nika.yaml",
+          "path": "templates/validate-records.nika",
           "line": 18,
           "startLine": 15,
           "endLine": 24,
@@ -4408,7 +4408,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/website-brief.nika.yaml",
+          "path": "templates/website-brief.nika",
           "line": 37,
           "startLine": 34,
           "endLine": 43,
@@ -4460,7 +4460,7 @@
       ],
       "examples": [
         {
-          "path": "templates/agent-loop.nika.yaml",
+          "path": "templates/agent-loop.nika",
           "line": 52,
           "startLine": 49,
           "endLine": 58,
@@ -4468,7 +4468,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/bounded-batch.nika.yaml",
+          "path": "templates/bounded-batch.nika",
           "line": 54,
           "startLine": 51,
           "endLine": 60,
@@ -4476,7 +4476,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/chain.nika.yaml",
+          "path": "templates/chain.nika",
           "line": 70,
           "startLine": 67,
           "endLine": 76,
@@ -4484,7 +4484,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/classify-and-route.nika.yaml",
+          "path": "templates/classify-and-route.nika",
           "line": 78,
           "startLine": 75,
           "endLine": 84,
@@ -4492,7 +4492,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/corpus-qa.nika.yaml",
+          "path": "templates/corpus-qa.nika",
           "line": 98,
           "startLine": 95,
           "endLine": 104,
@@ -4500,7 +4500,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/docker-report.nika.yaml",
+          "path": "templates/docker-report.nika",
           "line": 73,
           "startLine": 70,
           "endLine": 79,
@@ -4508,7 +4508,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/document-to-fields.nika.yaml",
+          "path": "templates/document-to-fields.nika",
           "line": 59,
           "startLine": 56,
           "endLine": 65,
@@ -4516,7 +4516,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/evaluate-and-optimize.nika.yaml",
+          "path": "templates/evaluate-and-optimize.nika",
           "line": 40,
           "startLine": 37,
           "endLine": 46,
@@ -4524,7 +4524,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 129,
           "startLine": 126,
           "endLine": 135,
@@ -4532,7 +4532,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/media-asset-pack.nika.yaml",
+          "path": "templates/media-asset-pack.nika",
           "line": 56,
           "startLine": 53,
           "endLine": 62,
@@ -4540,7 +4540,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 76,
           "startLine": 73,
           "endLine": 82,
@@ -4548,7 +4548,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/project-public-fields.nika.yaml",
+          "path": "templates/project-public-fields.nika",
           "line": 79,
           "startLine": 76,
           "endLine": 85,
@@ -4556,7 +4556,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/website-brief.nika.yaml",
+          "path": "templates/website-brief.nika",
           "line": 65,
           "startLine": 62,
           "endLine": 71,
@@ -4587,7 +4587,7 @@
       ],
       "examples": [
         {
-          "path": "templates/api-upload-and-create.nika.yaml",
+          "path": "templates/api-upload-and-create.nika",
           "line": 65,
           "startLine": 62,
           "endLine": 71,
@@ -4595,7 +4595,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/chain.nika.yaml",
+          "path": "templates/chain.nika",
           "line": 41,
           "startLine": 38,
           "endLine": 47,
@@ -4603,7 +4603,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/etl-state.nika.yaml",
+          "path": "templates/etl-state.nika",
           "line": 58,
           "startLine": 55,
           "endLine": 64,
@@ -4611,7 +4611,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 78,
           "startLine": 75,
           "endLine": 84,
@@ -4619,7 +4619,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 74,
           "startLine": 71,
           "endLine": 80,
@@ -4627,7 +4627,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 22,
           "startLine": 19,
           "endLine": 28,
@@ -4656,7 +4656,7 @@
       ],
       "examples": [
         {
-          "path": "templates/api-upload-and-create.nika.yaml",
+          "path": "templates/api-upload-and-create.nika",
           "line": 96,
           "startLine": 93,
           "endLine": 99,
@@ -4664,7 +4664,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/chain.nika.yaml",
+          "path": "templates/chain.nika",
           "line": 59,
           "startLine": 56,
           "endLine": 65,
@@ -4672,7 +4672,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/docker-report.nika.yaml",
+          "path": "templates/docker-report.nika",
           "line": 56,
           "startLine": 53,
           "endLine": 62,
@@ -4680,7 +4680,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/etl-state.nika.yaml",
+          "path": "templates/etl-state.nika",
           "line": 82,
           "startLine": 79,
           "endLine": 88,
@@ -4688,7 +4688,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 101,
           "startLine": 98,
           "endLine": 107,
@@ -4696,7 +4696,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/gate-and-act.nika.yaml",
+          "path": "templates/gate-and-act.nika",
           "line": 63,
           "startLine": 60,
           "endLine": 69,
@@ -4704,7 +4704,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 106,
           "startLine": 103,
           "endLine": 112,
@@ -4712,7 +4712,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/media-asset-pack.nika.yaml",
+          "path": "templates/media-asset-pack.nika",
           "line": 83,
           "startLine": 80,
           "endLine": 89,
@@ -4720,7 +4720,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 38,
           "startLine": 35,
           "endLine": 44,
@@ -4728,7 +4728,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/website-brief.nika.yaml",
+          "path": "templates/website-brief.nika",
           "line": 55,
           "startLine": 52,
           "endLine": 61,
@@ -4759,7 +4759,7 @@
       ],
       "examples": [
         {
-          "path": "templates/agent-loop.nika.yaml",
+          "path": "templates/agent-loop.nika",
           "line": 37,
           "startLine": 34,
           "endLine": 43,
@@ -4767,7 +4767,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/aggregate-by-key.nika.yaml",
+          "path": "templates/aggregate-by-key.nika",
           "line": 38,
           "startLine": 35,
           "endLine": 44,
@@ -4775,7 +4775,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/bounded-batch.nika.yaml",
+          "path": "templates/bounded-batch.nika",
           "line": 61,
           "startLine": 58,
           "endLine": 67,
@@ -4783,7 +4783,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/classify-and-route.nika.yaml",
+          "path": "templates/classify-and-route.nika",
           "line": 31,
           "startLine": 28,
           "endLine": 37,
@@ -4791,7 +4791,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/corpus-qa.nika.yaml",
+          "path": "templates/corpus-qa.nika",
           "line": 105,
           "startLine": 102,
           "endLine": 111,
@@ -4799,7 +4799,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/deduplicate-records.nika.yaml",
+          "path": "templates/deduplicate-records.nika",
           "line": 38,
           "startLine": 35,
           "endLine": 44,
@@ -4807,7 +4807,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/document-to-fields.nika.yaml",
+          "path": "templates/document-to-fields.nika",
           "line": 67,
           "startLine": 64,
           "endLine": 73,
@@ -4815,7 +4815,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/evaluate-and-optimize.nika.yaml",
+          "path": "templates/evaluate-and-optimize.nika",
           "line": 44,
           "startLine": 41,
           "endLine": 50,
@@ -4823,7 +4823,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/media-asset-pack.nika.yaml",
+          "path": "templates/media-asset-pack.nika",
           "line": 64,
           "startLine": 61,
           "endLine": 70,
@@ -4831,7 +4831,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 81,
           "startLine": 78,
           "endLine": 87,
@@ -4839,7 +4839,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/project-public-fields.nika.yaml",
+          "path": "templates/project-public-fields.nika",
           "line": 36,
           "startLine": 33,
           "endLine": 42,
@@ -4847,7 +4847,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/snapshot-diff.nika.yaml",
+          "path": "templates/snapshot-diff.nika",
           "line": 36,
           "startLine": 33,
           "endLine": 42,
@@ -4855,7 +4855,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/validate-records.nika.yaml",
+          "path": "templates/validate-records.nika",
           "line": 36,
           "startLine": 33,
           "endLine": 42,
@@ -4863,7 +4863,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/website-brief.nika.yaml",
+          "path": "templates/website-brief.nika",
           "line": 79,
           "startLine": 76,
           "endLine": 85,
@@ -4905,7 +4905,7 @@
       ],
       "examples": [
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 117,
           "startLine": 114,
           "endLine": 123,
@@ -4913,7 +4913,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 31,
           "startLine": 28,
           "endLine": 37,
@@ -5017,7 +5017,7 @@
       ],
       "examples": [
         {
-          "path": "templates/bounded-batch.nika.yaml",
+          "path": "templates/bounded-batch.nika",
           "line": 12,
           "startLine": 9,
           "endLine": 18,
@@ -5025,7 +5025,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 52,
           "startLine": 49,
           "endLine": 58,
@@ -5033,7 +5033,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 12,
           "startLine": 9,
           "endLine": 18,
@@ -5041,7 +5041,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/project-public-fields.nika.yaml",
+          "path": "templates/project-public-fields.nika",
           "line": 12,
           "startLine": 9,
           "endLine": 18,
@@ -5049,7 +5049,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 11,
           "startLine": 8,
           "endLine": 17,
@@ -5103,7 +5103,7 @@
       ],
       "examples": [
         {
-          "path": "templates/agent-loop.nika.yaml",
+          "path": "templates/agent-loop.nika",
           "line": 59,
           "startLine": 56,
           "endLine": 65,
@@ -5111,7 +5111,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/aggregate-by-key.nika.yaml",
+          "path": "templates/aggregate-by-key.nika",
           "line": 32,
           "startLine": 29,
           "endLine": 38,
@@ -5119,7 +5119,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/bounded-batch.nika.yaml",
+          "path": "templates/bounded-batch.nika",
           "line": 30,
           "startLine": 27,
           "endLine": 36,
@@ -5127,7 +5127,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/classify-and-route.nika.yaml",
+          "path": "templates/classify-and-route.nika",
           "line": 83,
           "startLine": 80,
           "endLine": 89,
@@ -5135,7 +5135,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/corpus-qa.nika.yaml",
+          "path": "templates/corpus-qa.nika",
           "line": 102,
           "startLine": 99,
           "endLine": 108,
@@ -5143,7 +5143,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/deduplicate-records.nika.yaml",
+          "path": "templates/deduplicate-records.nika",
           "line": 32,
           "startLine": 29,
           "endLine": 38,
@@ -5151,7 +5151,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/document-to-fields.nika.yaml",
+          "path": "templates/document-to-fields.nika",
           "line": 64,
           "startLine": 61,
           "endLine": 70,
@@ -5159,7 +5159,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/evaluate-and-optimize.nika.yaml",
+          "path": "templates/evaluate-and-optimize.nika",
           "line": 41,
           "startLine": 38,
           "endLine": 47,
@@ -5167,7 +5167,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/media-asset-pack.nika.yaml",
+          "path": "templates/media-asset-pack.nika",
           "line": 59,
           "startLine": 56,
           "endLine": 65,
@@ -5175,7 +5175,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 58,
           "startLine": 55,
           "endLine": 64,
@@ -5183,7 +5183,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/project-public-fields.nika.yaml",
+          "path": "templates/project-public-fields.nika",
           "line": 33,
           "startLine": 30,
           "endLine": 39,
@@ -5191,7 +5191,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 47,
           "startLine": 44,
           "endLine": 53,
@@ -5199,7 +5199,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/snapshot-diff.nika.yaml",
+          "path": "templates/snapshot-diff.nika",
           "line": 33,
           "startLine": 30,
           "endLine": 39,
@@ -5207,7 +5207,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/validate-records.nika.yaml",
+          "path": "templates/validate-records.nika",
           "line": 30,
           "startLine": 27,
           "endLine": 36,
@@ -5215,7 +5215,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/website-brief.nika.yaml",
+          "path": "templates/website-brief.nika",
           "line": 70,
           "startLine": 67,
           "endLine": 76,
@@ -5339,7 +5339,7 @@
       ],
       "examples": [
         {
-          "path": "templates/api-upload-and-create.nika.yaml",
+          "path": "templates/api-upload-and-create.nika",
           "line": 43,
           "startLine": 40,
           "endLine": 49,
@@ -5347,7 +5347,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/gate-and-act.nika.yaml",
+          "path": "templates/gate-and-act.nika",
           "line": 42,
           "startLine": 39,
           "endLine": 48,
@@ -5355,7 +5355,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 76,
           "startLine": 73,
           "endLine": 82,
@@ -5511,7 +5511,7 @@
       ],
       "examples": [
         {
-          "path": "templates/api-upload-and-create.nika.yaml",
+          "path": "templates/api-upload-and-create.nika",
           "line": 45,
           "startLine": 42,
           "endLine": 51,
@@ -5519,7 +5519,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/chain.nika.yaml",
+          "path": "templates/chain.nika",
           "line": 32,
           "startLine": 29,
           "endLine": 38,
@@ -5527,7 +5527,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/classify-and-route.nika.yaml",
+          "path": "templates/classify-and-route.nika",
           "line": 64,
           "startLine": 61,
           "endLine": 70,
@@ -5535,7 +5535,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/gate-and-act.nika.yaml",
+          "path": "templates/gate-and-act.nika",
           "line": 44,
           "startLine": 41,
           "endLine": 50,
@@ -5543,7 +5543,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 78,
           "startLine": 75,
           "endLine": 84,
@@ -5663,7 +5663,7 @@
       ],
       "examples": [
         {
-          "path": "templates/agent-loop.nika.yaml",
+          "path": "templates/agent-loop.nika",
           "line": 83,
           "startLine": 80,
           "endLine": 89,
@@ -5706,7 +5706,7 @@
       ],
       "examples": [
         {
-          "path": "templates/agent-loop.nika.yaml",
+          "path": "templates/agent-loop.nika",
           "line": 49,
           "startLine": 46,
           "endLine": 55,
@@ -5714,7 +5714,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/aggregate-by-key.nika.yaml",
+          "path": "templates/aggregate-by-key.nika",
           "line": 25,
           "startLine": 22,
           "endLine": 31,
@@ -5722,7 +5722,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/api-upload-and-create.nika.yaml",
+          "path": "templates/api-upload-and-create.nika",
           "line": 67,
           "startLine": 64,
           "endLine": 73,
@@ -5730,7 +5730,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/bounded-batch.nika.yaml",
+          "path": "templates/bounded-batch.nika",
           "line": 23,
           "startLine": 20,
           "endLine": 29,
@@ -5738,7 +5738,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/chain.nika.yaml",
+          "path": "templates/chain.nika",
           "line": 44,
           "startLine": 41,
           "endLine": 50,
@@ -5746,7 +5746,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/classify-and-route.nika.yaml",
+          "path": "templates/classify-and-route.nika",
           "line": 74,
           "startLine": 71,
           "endLine": 80,
@@ -5754,7 +5754,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/corpus-qa.nika.yaml",
+          "path": "templates/corpus-qa.nika",
           "line": 29,
           "startLine": 26,
           "endLine": 35,
@@ -5762,7 +5762,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/deduplicate-records.nika.yaml",
+          "path": "templates/deduplicate-records.nika",
           "line": 25,
           "startLine": 22,
           "endLine": 31,
@@ -5770,7 +5770,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/docker-report.nika.yaml",
+          "path": "templates/docker-report.nika",
           "line": 43,
           "startLine": 40,
           "endLine": 49,
@@ -5778,7 +5778,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/document-to-fields.nika.yaml",
+          "path": "templates/document-to-fields.nika",
           "line": 35,
           "startLine": 32,
           "endLine": 41,
@@ -5786,7 +5786,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/etl-state.nika.yaml",
+          "path": "templates/etl-state.nika",
           "line": 61,
           "startLine": 58,
           "endLine": 67,
@@ -5794,7 +5794,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/evaluate-and-optimize.nika.yaml",
+          "path": "templates/evaluate-and-optimize.nika",
           "line": 36,
           "startLine": 33,
           "endLine": 42,
@@ -5802,7 +5802,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 80,
           "startLine": 77,
           "endLine": 86,
@@ -5810,7 +5810,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/gate-and-act.nika.yaml",
+          "path": "templates/gate-and-act.nika",
           "line": 50,
           "startLine": 47,
           "endLine": 56,
@@ -5818,7 +5818,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 84,
           "startLine": 81,
           "endLine": 90,
@@ -5826,7 +5826,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/media-asset-pack.nika.yaml",
+          "path": "templates/media-asset-pack.nika",
           "line": 49,
           "startLine": 46,
           "endLine": 55,
@@ -5834,7 +5834,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 51,
           "startLine": 48,
           "endLine": 57,
@@ -5842,7 +5842,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/project-public-fields.nika.yaml",
+          "path": "templates/project-public-fields.nika",
           "line": 26,
           "startLine": 23,
           "endLine": 32,
@@ -5850,7 +5850,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 24,
           "startLine": 21,
           "endLine": 30,
@@ -5858,7 +5858,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/snapshot-diff.nika.yaml",
+          "path": "templates/snapshot-diff.nika",
           "line": 24,
           "startLine": 21,
           "endLine": 30,
@@ -5866,7 +5866,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/validate-records.nika.yaml",
+          "path": "templates/validate-records.nika",
           "line": 23,
           "startLine": 20,
           "endLine": 29,
@@ -5874,7 +5874,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/website-brief.nika.yaml",
+          "path": "templates/website-brief.nika",
           "line": 45,
           "startLine": 42,
           "endLine": 51,
@@ -6003,7 +6003,7 @@
       ],
       "examples": [
         {
-          "path": "templates/bounded-batch.nika.yaml",
+          "path": "templates/bounded-batch.nika",
           "line": 52,
           "startLine": 49,
           "endLine": 58,
@@ -6011,7 +6011,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 116,
           "startLine": 113,
           "endLine": 122,
@@ -6019,7 +6019,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 74,
           "startLine": 71,
           "endLine": 80,
@@ -6027,7 +6027,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/project-public-fields.nika.yaml",
+          "path": "templates/project-public-fields.nika",
           "line": 77,
           "startLine": 74,
           "endLine": 83,
@@ -6035,7 +6035,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 30,
           "startLine": 27,
           "endLine": 36,
@@ -6126,7 +6126,7 @@
       ],
       "examples": [
         {
-          "path": "templates/agent-loop.nika.yaml",
+          "path": "templates/agent-loop.nika",
           "line": 124,
           "startLine": 121,
           "endLine": 130,
@@ -6134,7 +6134,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/aggregate-by-key.nika.yaml",
+          "path": "templates/aggregate-by-key.nika",
           "line": 28,
           "startLine": 25,
           "endLine": 34,
@@ -6142,7 +6142,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/api-upload-and-create.nika.yaml",
+          "path": "templates/api-upload-and-create.nika",
           "line": 70,
           "startLine": 67,
           "endLine": 76,
@@ -6150,7 +6150,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/bounded-batch.nika.yaml",
+          "path": "templates/bounded-batch.nika",
           "line": 26,
           "startLine": 23,
           "endLine": 32,
@@ -6158,7 +6158,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/chain.nika.yaml",
+          "path": "templates/chain.nika",
           "line": 47,
           "startLine": 44,
           "endLine": 53,
@@ -6166,7 +6166,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/classify-and-route.nika.yaml",
+          "path": "templates/classify-and-route.nika",
           "line": 94,
           "startLine": 91,
           "endLine": 100,
@@ -6174,7 +6174,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/corpus-qa.nika.yaml",
+          "path": "templates/corpus-qa.nika",
           "line": 32,
           "startLine": 29,
           "endLine": 38,
@@ -6182,7 +6182,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/deduplicate-records.nika.yaml",
+          "path": "templates/deduplicate-records.nika",
           "line": 28,
           "startLine": 25,
           "endLine": 34,
@@ -6190,7 +6190,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/docker-report.nika.yaml",
+          "path": "templates/docker-report.nika",
           "line": 88,
           "startLine": 85,
           "endLine": 94,
@@ -6198,7 +6198,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/document-to-fields.nika.yaml",
+          "path": "templates/document-to-fields.nika",
           "line": 38,
           "startLine": 35,
           "endLine": 44,
@@ -6206,7 +6206,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/etl-state.nika.yaml",
+          "path": "templates/etl-state.nika",
           "line": 72,
           "startLine": 69,
           "endLine": 78,
@@ -6214,7 +6214,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 83,
           "startLine": 80,
           "endLine": 89,
@@ -6222,7 +6222,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/gate-and-act.nika.yaml",
+          "path": "templates/gate-and-act.nika",
           "line": 53,
           "startLine": 50,
           "endLine": 59,
@@ -6230,7 +6230,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 95,
           "startLine": 92,
           "endLine": 101,
@@ -6238,7 +6238,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/media-asset-pack.nika.yaml",
+          "path": "templates/media-asset-pack.nika",
           "line": 70,
           "startLine": 67,
           "endLine": 76,
@@ -6246,7 +6246,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 54,
           "startLine": 51,
           "endLine": 60,
@@ -6254,7 +6254,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/project-public-fields.nika.yaml",
+          "path": "templates/project-public-fields.nika",
           "line": 29,
           "startLine": 26,
           "endLine": 35,
@@ -6262,7 +6262,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 27,
           "startLine": 24,
           "endLine": 33,
@@ -6270,7 +6270,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/snapshot-diff.nika.yaml",
+          "path": "templates/snapshot-diff.nika",
           "line": 27,
           "startLine": 24,
           "endLine": 33,
@@ -6278,7 +6278,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/validate-records.nika.yaml",
+          "path": "templates/validate-records.nika",
           "line": 26,
           "startLine": 23,
           "endLine": 32,
@@ -6286,7 +6286,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/website-brief.nika.yaml",
+          "path": "templates/website-brief.nika",
           "line": 48,
           "startLine": 45,
           "endLine": 54,
@@ -6343,7 +6343,7 @@
       ],
       "examples": [
         {
-          "path": "templates/agent-loop.nika.yaml",
+          "path": "templates/agent-loop.nika",
           "line": 47,
           "startLine": 44,
           "endLine": 53,
@@ -6351,7 +6351,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/aggregate-by-key.nika.yaml",
+          "path": "templates/aggregate-by-key.nika",
           "line": 21,
           "startLine": 18,
           "endLine": 27,
@@ -6359,7 +6359,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/api-upload-and-create.nika.yaml",
+          "path": "templates/api-upload-and-create.nika",
           "line": 52,
           "startLine": 49,
           "endLine": 58,
@@ -6367,7 +6367,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/bounded-batch.nika.yaml",
+          "path": "templates/bounded-batch.nika",
           "line": 20,
           "startLine": 17,
           "endLine": 26,
@@ -6375,7 +6375,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/chain.nika.yaml",
+          "path": "templates/chain.nika",
           "line": 36,
           "startLine": 33,
           "endLine": 42,
@@ -6383,7 +6383,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/classify-and-route.nika.yaml",
+          "path": "templates/classify-and-route.nika",
           "line": 72,
           "startLine": 69,
           "endLine": 78,
@@ -6391,7 +6391,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/corpus-qa.nika.yaml",
+          "path": "templates/corpus-qa.nika",
           "line": 27,
           "startLine": 24,
           "endLine": 33,
@@ -6399,7 +6399,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/deduplicate-records.nika.yaml",
+          "path": "templates/deduplicate-records.nika",
           "line": 21,
           "startLine": 18,
           "endLine": 27,
@@ -6407,7 +6407,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/docker-report.nika.yaml",
+          "path": "templates/docker-report.nika",
           "line": 37,
           "startLine": 34,
           "endLine": 43,
@@ -6415,7 +6415,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/document-to-fields.nika.yaml",
+          "path": "templates/document-to-fields.nika",
           "line": 33,
           "startLine": 30,
           "endLine": 39,
@@ -6423,7 +6423,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/etl-state.nika.yaml",
+          "path": "templates/etl-state.nika",
           "line": 55,
           "startLine": 52,
           "endLine": 61,
@@ -6431,7 +6431,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 66,
           "startLine": 63,
           "endLine": 72,
@@ -6439,7 +6439,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/gate-and-act.nika.yaml",
+          "path": "templates/gate-and-act.nika",
           "line": 33,
           "startLine": 30,
           "endLine": 39,
@@ -6447,7 +6447,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 62,
           "startLine": 59,
           "endLine": 68,
@@ -6455,7 +6455,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/media-asset-pack.nika.yaml",
+          "path": "templates/media-asset-pack.nika",
           "line": 37,
           "startLine": 34,
           "endLine": 43,
@@ -6463,7 +6463,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 47,
           "startLine": 44,
           "endLine": 53,
@@ -6471,7 +6471,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/project-public-fields.nika.yaml",
+          "path": "templates/project-public-fields.nika",
           "line": 22,
           "startLine": 19,
           "endLine": 28,
@@ -6479,7 +6479,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 16,
           "startLine": 13,
           "endLine": 22,
@@ -6487,7 +6487,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/snapshot-diff.nika.yaml",
+          "path": "templates/snapshot-diff.nika",
           "line": 20,
           "startLine": 17,
           "endLine": 26,
@@ -6495,7 +6495,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/validate-records.nika.yaml",
+          "path": "templates/validate-records.nika",
           "line": 19,
           "startLine": 16,
           "endLine": 25,
@@ -6503,7 +6503,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/website-brief.nika.yaml",
+          "path": "templates/website-brief.nika",
           "line": 38,
           "startLine": 35,
           "endLine": 44,
@@ -6558,7 +6558,7 @@
       ],
       "examples": [
         {
-          "path": "templates/agent-loop.nika.yaml",
+          "path": "templates/agent-loop.nika",
           "line": 36,
           "startLine": 33,
           "endLine": 42,
@@ -6566,7 +6566,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/aggregate-by-key.nika.yaml",
+          "path": "templates/aggregate-by-key.nika",
           "line": 33,
           "startLine": 30,
           "endLine": 39,
@@ -6574,7 +6574,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/bounded-batch.nika.yaml",
+          "path": "templates/bounded-batch.nika",
           "line": 31,
           "startLine": 28,
           "endLine": 37,
@@ -6582,7 +6582,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/classify-and-route.nika.yaml",
+          "path": "templates/classify-and-route.nika",
           "line": 30,
           "startLine": 27,
           "endLine": 36,
@@ -6590,7 +6590,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/corpus-qa.nika.yaml",
+          "path": "templates/corpus-qa.nika",
           "line": 103,
           "startLine": 100,
           "endLine": 109,
@@ -6598,7 +6598,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/deduplicate-records.nika.yaml",
+          "path": "templates/deduplicate-records.nika",
           "line": 33,
           "startLine": 30,
           "endLine": 39,
@@ -6606,7 +6606,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/document-to-fields.nika.yaml",
+          "path": "templates/document-to-fields.nika",
           "line": 65,
           "startLine": 62,
           "endLine": 71,
@@ -6614,7 +6614,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/evaluate-and-optimize.nika.yaml",
+          "path": "templates/evaluate-and-optimize.nika",
           "line": 42,
           "startLine": 39,
           "endLine": 48,
@@ -6622,7 +6622,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/media-asset-pack.nika.yaml",
+          "path": "templates/media-asset-pack.nika",
           "line": 60,
           "startLine": 57,
           "endLine": 66,
@@ -6630,7 +6630,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 59,
           "startLine": 56,
           "endLine": 65,
@@ -6638,7 +6638,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/project-public-fields.nika.yaml",
+          "path": "templates/project-public-fields.nika",
           "line": 34,
           "startLine": 31,
           "endLine": 40,
@@ -6646,7 +6646,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 48,
           "startLine": 45,
           "endLine": 54,
@@ -6654,7 +6654,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/snapshot-diff.nika.yaml",
+          "path": "templates/snapshot-diff.nika",
           "line": 34,
           "startLine": 31,
           "endLine": 40,
@@ -6662,7 +6662,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/validate-records.nika.yaml",
+          "path": "templates/validate-records.nika",
           "line": 31,
           "startLine": 28,
           "endLine": 37,
@@ -6670,7 +6670,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/website-brief.nika.yaml",
+          "path": "templates/website-brief.nika",
           "line": 71,
           "startLine": 68,
           "endLine": 77,
@@ -6729,7 +6729,7 @@
       ],
       "examples": [
         {
-          "path": "templates/api-upload-and-create.nika.yaml",
+          "path": "templates/api-upload-and-create.nika",
           "line": 72,
           "startLine": 69,
           "endLine": 78,
@@ -6737,7 +6737,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/etl-state.nika.yaml",
+          "path": "templates/etl-state.nika",
           "line": 106,
           "startLine": 103,
           "endLine": 112,
@@ -6745,7 +6745,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/gate-and-act.nika.yaml",
+          "path": "templates/gate-and-act.nika",
           "line": 55,
           "startLine": 52,
           "endLine": 61,
@@ -6753,7 +6753,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/website-brief.nika.yaml",
+          "path": "templates/website-brief.nika",
           "line": 50,
           "startLine": 47,
           "endLine": 56,
@@ -6794,7 +6794,7 @@
       ],
       "examples": [
         {
-          "path": "templates/agent-loop.nika.yaml",
+          "path": "templates/agent-loop.nika",
           "line": 131,
           "startLine": 128,
           "endLine": 132,
@@ -6802,7 +6802,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/classify-and-route.nika.yaml",
+          "path": "templates/classify-and-route.nika",
           "line": 63,
           "startLine": 60,
           "endLine": 69,
@@ -6810,7 +6810,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/docker-report.nika.yaml",
+          "path": "templates/docker-report.nika",
           "line": 101,
           "startLine": 98,
           "endLine": 102,
@@ -6818,7 +6818,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/document-to-fields.nika.yaml",
+          "path": "templates/document-to-fields.nika",
           "line": 78,
           "startLine": 75,
           "endLine": 84,
@@ -6826,7 +6826,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/etl-state.nika.yaml",
+          "path": "templates/etl-state.nika",
           "line": 148,
           "startLine": 145,
           "endLine": 149,
@@ -6834,7 +6834,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/gate-and-act.nika.yaml",
+          "path": "templates/gate-and-act.nika",
           "line": 59,
           "startLine": 56,
           "endLine": 65,
@@ -6930,7 +6930,7 @@
       ],
       "examples": [
         {
-          "path": "templates/corpus-qa.nika.yaml",
+          "path": "templates/corpus-qa.nika",
           "line": 95,
           "startLine": 92,
           "endLine": 101,
@@ -6938,7 +6938,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/etl-state.nika.yaml",
+          "path": "templates/etl-state.nika",
           "line": 102,
           "startLine": 99,
           "endLine": 108,
@@ -6946,7 +6946,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/gate-and-act.nika.yaml",
+          "path": "templates/gate-and-act.nika",
           "line": 69,
           "startLine": 66,
           "endLine": 75,
@@ -6954,7 +6954,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 147,
           "startLine": 144,
           "endLine": 153,
@@ -6996,7 +6996,7 @@
       ],
       "examples": [
         {
-          "path": "templates/agent-loop.nika.yaml",
+          "path": "templates/agent-loop.nika",
           "line": 67,
           "startLine": 64,
           "endLine": 73,
@@ -7004,7 +7004,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/aggregate-by-key.nika.yaml",
+          "path": "templates/aggregate-by-key.nika",
           "line": 52,
           "startLine": 49,
           "endLine": 58,
@@ -7012,7 +7012,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/bounded-batch.nika.yaml",
+          "path": "templates/bounded-batch.nika",
           "line": 38,
           "startLine": 35,
           "endLine": 44,
@@ -7020,7 +7020,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/chain.nika.yaml",
+          "path": "templates/chain.nika",
           "line": 62,
           "startLine": 59,
           "endLine": 68,
@@ -7028,7 +7028,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/classify-and-route.nika.yaml",
+          "path": "templates/classify-and-route.nika",
           "line": 91,
           "startLine": 88,
           "endLine": 97,
@@ -7036,7 +7036,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/corpus-qa.nika.yaml",
+          "path": "templates/corpus-qa.nika",
           "line": 38,
           "startLine": 35,
           "endLine": 44,
@@ -7044,7 +7044,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/deduplicate-records.nika.yaml",
+          "path": "templates/deduplicate-records.nika",
           "line": 51,
           "startLine": 48,
           "endLine": 57,
@@ -7052,7 +7052,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/docker-report.nika.yaml",
+          "path": "templates/docker-report.nika",
           "line": 65,
           "startLine": 62,
           "endLine": 71,
@@ -7060,7 +7060,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/document-to-fields.nika.yaml",
+          "path": "templates/document-to-fields.nika",
           "line": 44,
           "startLine": 41,
           "endLine": 50,
@@ -7068,7 +7068,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/etl-state.nika.yaml",
+          "path": "templates/etl-state.nika",
           "line": 86,
           "startLine": 83,
           "endLine": 92,
@@ -7076,7 +7076,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/evaluate-and-optimize.nika.yaml",
+          "path": "templates/evaluate-and-optimize.nika",
           "line": 49,
           "startLine": 46,
           "endLine": 55,
@@ -7084,7 +7084,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/fanout.nika.yaml",
+          "path": "templates/fanout.nika",
           "line": 94,
           "startLine": 91,
           "endLine": 100,
@@ -7092,7 +7092,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/gate-and-act.nika.yaml",
+          "path": "templates/gate-and-act.nika",
           "line": 66,
           "startLine": 63,
           "endLine": 72,
@@ -7100,7 +7100,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/human-gated-ship.nika.yaml",
+          "path": "templates/human-gated-ship.nika",
           "line": 123,
           "startLine": 120,
           "endLine": 129,
@@ -7108,7 +7108,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/media-asset-pack.nika.yaml",
+          "path": "templates/media-asset-pack.nika",
           "line": 67,
           "startLine": 64,
           "endLine": 73,
@@ -7116,7 +7116,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/parallel-review.nika.yaml",
+          "path": "templates/parallel-review.nika",
           "line": 63,
           "startLine": 60,
           "endLine": 69,
@@ -7124,7 +7124,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/project-public-fields.nika.yaml",
+          "path": "templates/project-public-fields.nika",
           "line": 59,
           "startLine": 56,
           "endLine": 65,
@@ -7132,7 +7132,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/recover-optional-file.nika.yaml",
+          "path": "templates/recover-optional-file.nika",
           "line": 40,
           "startLine": 37,
           "endLine": 46,
@@ -7140,7 +7140,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/snapshot-diff.nika.yaml",
+          "path": "templates/snapshot-diff.nika",
           "line": 55,
           "startLine": 52,
           "endLine": 61,
@@ -7148,7 +7148,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/validate-records.nika.yaml",
+          "path": "templates/validate-records.nika",
           "line": 49,
           "startLine": 46,
           "endLine": 55,
@@ -7156,7 +7156,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/website-brief.nika.yaml",
+          "path": "templates/website-brief.nika",
           "line": 58,
           "startLine": 55,
           "endLine": 64,
@@ -7208,7 +7208,7 @@
       ],
       "examples": [
         {
-          "path": "templates/chain.nika.yaml",
+          "path": "templates/chain.nika",
           "line": 42,
           "startLine": 39,
           "endLine": 48,
@@ -7216,7 +7216,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/docker-report.nika.yaml",
+          "path": "templates/docker-report.nika",
           "line": 40,
           "startLine": 37,
           "endLine": 46,
@@ -7224,7 +7224,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/etl-state.nika.yaml",
+          "path": "templates/etl-state.nika",
           "line": 59,
           "startLine": 56,
           "endLine": 65,
@@ -7232,7 +7232,7 @@
           "matchKind": "literal-key-occurrence"
         },
         {
-          "path": "templates/media-asset-pack.nika.yaml",
+          "path": "templates/media-asset-pack.nika",
           "line": 39,
           "startLine": 36,
           "endLine": 45,

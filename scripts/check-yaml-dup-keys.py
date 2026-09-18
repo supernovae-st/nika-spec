@@ -8,7 +8,7 @@
 # Surface-C threshold: discipline graduates to a gate.
 #
 # Scope · every tracked *.yml / *.yaml EXCEPT
-#   *.nika.yaml           the engine parser refuses duplicates itself
+#   *.nika           the engine parser refuses duplicates itself
 #                         (NIKA-PARSE-017 · proven by mutation 2026-07-29)
 #   conformance/tests/**  the torture corpus is deliberately malformed;
 #                         its validity belongs to the harness
@@ -84,7 +84,7 @@ def tracked_yaml() -> list[pathlib.Path]:
     ).stdout.splitlines()
     keep: list[pathlib.Path] = []
     for rel in rels:
-        if rel.endswith(".nika.yaml") or rel.startswith("conformance/tests/"):
+        if rel.endswith(".nika") or rel.startswith("conformance/tests/"):
             continue
         keep.append(SPEC_ROOT / rel)
     return keep

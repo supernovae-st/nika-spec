@@ -19,7 +19,7 @@
 # (la liste spec = 6 noms · l'engine en reservait 7 · la divergence .cause du ruling) ·
 # le champ task output: vit en 03-dag:67 · la paire enseignee vit en 01-envelope:501
 # « **`outputs:` (envelope · plural) ≠ `output:` (task · singular).** » · la fixture negative
-# conformance/variables/typed-outputs-mismatch.nika.yaml EXISTE (577 bytes · le negative
+# conformance/variables/typed-outputs-mismatch.nika EXISTE (577 bytes · le negative
 # witness cite par le receipt F3).
 
 laws_document_format: 1
@@ -279,7 +279,7 @@ laws:
       - conformance:variables-suite
     introduced_in: C0
     proof_obligations:
-      - "Receipt §Hard-reject verbatim : « `from:` = live REQUIRED `nika:convert` arg (stdlib/builtins-v0.1.md:232 · website corpus `convert.nika.yaml:12`) + claimed by the F1 candidate (const:148) · one word, three senses in one authoring surface (R8 law 10). » Le refus de from: a la declaration outputs est evidence, jamais esthetique."
+      - "Receipt §Hard-reject verbatim : « `from:` = live REQUIRED `nika:convert` arg (stdlib/builtins-v0.1.md:232 · website corpus `convert.nika:12`) + claimed by the F1 candidate (const:148) · one word, three senses in one authoring surface (R8 law 10). » Le refus de from: a la declaration outputs est evidence, jamais esthetique."
       - "Receipt §DECISION verbatim : « `from:` reservation: **attributed to NOBODY** (couple F1+F3) · tool-args-only forever. » La reservation negative est gravee au registre anti-collision."
       - "R8 point 6 verbatim : « Une famille qui ne gagne pas son tournament garde sa forme actuelle, mais sa sémantique et ses tests sont durcis dans cette même fenêtre. » Le durcissement = la loi de derivation de type (LAW-TYPE-0221/0222), shippe dans la MEME fenetre."
     closure_gates:
@@ -347,7 +347,7 @@ laws:
       - conformance:variables-suite
     introduced_in: C0
     proof_obligations:
-      - "Receipt §Migration row verbatim : « derive D from the `value:` expression via the Type Core; `type:` ≡ D → DROP (equivalence proven, receipt records derived=declared); `type:` ≠ D → STOP dual-truth finding (negative witness `conformance/variables/typed-outputs-mismatch.nika.yaml`); non-derivable → `type:` stays REQUIRED. » Le codemod outputs-type-derive-v1 est equivalence-or-stop et depend du leg R3b (sequence apres lui dans LA cascade atomique unique, R8 point 14)."
+      - "Receipt §Migration row verbatim : « derive D from the `value:` expression via the Type Core; `type:` ≡ D → DROP (equivalence proven, receipt records derived=declared); `type:` ≠ D → STOP dual-truth finding (negative witness `conformance/variables/typed-outputs-mismatch.nika`); non-derivable → `type:` stays REQUIRED. » Le codemod outputs-type-derive-v1 est equivalence-or-stop et depend du leg R3b (sequence apres lui dans LA cascade atomique unique, R8 point 14)."
       - "La derivation est deterministe : meme expression value + meme Type Core = meme type de contrat, sur toutes les surfaces (checker · reference · MCP)."
     closure_gates:
       - non-derivable-requires-written-type
@@ -361,7 +361,7 @@ laws:
     title: "Un type ecrit egal au derive est un WARN de redondance, un type ecrit divergent est une ERROR"
     prose_projection:
       chapters: ["01-envelope", "09-types"]
-      text: "Receipt f3-outputs-form-receipt.json (candidates reinforced-value-derived · notes, ligne 49) verbatim : « written type == derived -> WARN redundant; written type != derived -> ERROR (existing negative witness conformance/variables/typed-outputs-mismatch.nika.yaml) ». Receipt md §Migration row verbatim : « `type:` ≠ D → STOP dual-truth finding ». R8 point 11 verbatim : « aucune deuxième vérité entre expression source et contrat exporté. » Quand un type est ecrit ET derivable : l'egalite au derive vaut WARN (redeclaration a eviter, R8 point 11 « éviter »), la divergence vaut ERROR (une deuxieme verite, refusee au check)."
+      text: "Receipt f3-outputs-form-receipt.json (candidates reinforced-value-derived · notes, ligne 49) verbatim : « written type == derived -> WARN redundant; written type != derived -> ERROR (existing negative witness conformance/variables/typed-outputs-mismatch.nika) ». Receipt md §Migration row verbatim : « `type:` ≠ D → STOP dual-truth finding ». R8 point 11 verbatim : « aucune deuxième vérité entre expression source et contrat exporté. » Quand un type est ecrit ET derivable : l'egalite au derive vaut WARN (redeclaration a eviter, R8 point 11 « éviter »), la divergence vaut ERROR (une deuxieme verite, refusee au check)."
     inputs:
       - registry: ir
         id: output_written_type
@@ -400,7 +400,7 @@ laws:
     fixtures:
       - to-mint-c1/conformance/outputs/warn/written-type-equals-derived
     negative_fixtures:
-      - conformance/variables/typed-outputs-mismatch.nika.yaml
+      - conformance/variables/typed-outputs-mismatch.nika
     projections: ["prose:01-envelope", "prose:09-types", "schema", "cli:check", "lsp", "mcp", "sdk"]
     implementation_surfaces:
       - engine:nika-schema
@@ -411,7 +411,7 @@ laws:
       - conformance:variables-suite
     introduced_in: C0
     proof_obligations:
-      - "Le negative witness EXISTE deja au pin : conformance/variables/typed-outputs-mismatch.nika.yaml (cite verbatim par le receipt F3) refuse sur la divergence ecrit/derive; la branche WARN recoit sa fixture a C1."
+      - "Le negative witness EXISTE deja au pin : conformance/variables/typed-outputs-mismatch.nika (cite verbatim par le receipt F3) refuse sur la divergence ecrit/derive; la branche WARN recoit sa fixture a C1."
       - "NIKA-OUT-005 (WARN redondance) et NIKA-OUT-004 (ERROR dual-truth) sont deux codes distincts : jamais un meme code pour deux severites (SSOT-2 B.16 un code = une condition normative exacte)."
     closure_gates:
       - dual-truth-zero

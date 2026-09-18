@@ -1,0 +1,3 @@
+# Display mitigation: GitHub Linguist has no Nika language entry.
+# This maps program source to YAML highlighting without changing Nika semantics.
+*.nika linguist-language=YAML

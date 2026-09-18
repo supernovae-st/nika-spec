@@ -7,8 +7,8 @@ It is an observed development-engine journal, not a hand-constructed chain.
 The source bytes and journal are preserved exactly; the recorded `spec_pin`
 is the build’s prior pin, not a claim of qualification at this amendment.
 
-`request.json` records the by-name POST body. Serve `golden.nika.yaml` as
-`root.nika.yaml` in an isolated workflow directory, authenticate to the
+`request.json` records the by-name POST body. Serve `golden.nika` as
+`root.nika` in an isolated workflow directory, authenticate to the
 listener and submit this body to `POST /v1/jobs` with a fresh idempotency
 key. No provider, signing key or secret is needed. The expected output
 retains the literal `@env:SERVER_SECRET`; it does not read an environment

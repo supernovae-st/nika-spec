@@ -53,7 +53,7 @@ spec = "nika/v1"                # the language contract the artifact targets
 [source]
 repo = "acme/workflows"         # ^owner/name$ · owner MUST equal publisher
 rev = "<40-hex commit>"         # full commit · tags and branches are FORBIDDEN
-path = "flows/meeting-actions.nika.yaml"   # repo-relative · no traversal
+path = "flows/meeting-actions.nika"   # repo-relative · no traversal
 
 [integrity]
 sha256 = "<64-hex>"             # of the exact bytes at repo@rev:path
@@ -65,7 +65,7 @@ conformance = "pass"
 [signature]                     # OPTIONAL · reserved (v0.2)
 scheme = "minisign"
 pubkey = "RW..."
-sig = "flows/meeting-actions.nika.yaml.minisig"   # sidecar in the SOURCE repo
+sig = "flows/meeting-actions.nika.minisig"   # sidecar in the SOURCE repo
 ```
 
 Constraints a conformant registry MUST enforce (each maps to a documented

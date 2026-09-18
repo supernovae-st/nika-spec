@@ -9,9 +9,9 @@ the 22-file registry grew.
 
 | File | Decision | Why not canon tonight |
 |---|---|---|
-| `lookup-and-enrich.nika.yaml` | PATTERN + proposed | Needs canon admission; lookup is a local JSON fixture, not HubSpot |
-| `facts-to-draft.nika.yaml` | PATTERN + proposed | Fact-preservation law; chain does not keep `facts` as output |
-| `known-path-agent-fallback.nika.yaml` | PATTERN + proposed | agent-loop is whole-workflow EXPLORE; this is the exceptional branch |
+| `lookup-and-enrich.nika` | PATTERN + proposed | Needs canon admission; lookup is a local JSON fixture, not HubSpot |
+| `facts-to-draft.nika` | PATTERN + proposed | Fact-preservation law; chain does not keep `facts` as output |
+| `known-path-agent-fallback.nika` | PATTERN + proposed | agent-loop is whole-workflow EXPLORE; this is the exceptional branch |
 
 `approve-and-apply` and `notify-effect` are **not** here: factor
 `human-gated-ship` and `gate-and-act`.

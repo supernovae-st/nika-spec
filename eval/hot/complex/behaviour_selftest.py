@@ -68,11 +68,11 @@ class TheRehearsalCanFail(unittest.TestCase):
 
     def test_a_reference_that_stops_withholding_the_total_is_rejected(self):
         self.only("X02")
-        self.rewrite("workflows/x02/reference.nika.yaml", "(if .complete then ([$r.results[] | .cents] | add) else null end)",
+        self.rewrite("workflows/x02/reference.nika", "(if .complete then ([$r.results[] | .cents] | add) else null end)",
                      "([$r.results[] | select(. != null) | .cents] | add)")
         code, summary = self.rehearse()
         self.assertEqual(code, 1)
-        self.assertTrue(any("reference.nika.yaml: a correct candidate is rejected by ['X02-B1']" in f
+        self.assertTrue(any("reference.nika: a correct candidate is rejected by ['X02-B1']" in f
                             for f in summary["failures"]), summary["failures"])
 
     def test_a_near_miss_that_is_no_longer_declared_rejected_is_caught(self):
@@ -88,7 +88,7 @@ class TheRehearsalCanFail(unittest.TestCase):
         self.manifest(lambda d: d["scenarios"][0]["behaviour"][0]["expect"]["outputs_exact"].update(selected="quote-b"))
         code, summary = self.rehearse()
         self.assertEqual(code, 1)
-        self.assertTrue(any("reference.nika.yaml: a correct candidate is rejected" in f for f in summary["failures"]))
+        self.assertTrue(any("reference.nika: a correct candidate is rejected" in f for f in summary["failures"]))
 
     def test_an_engine_check_verdict_that_drifts_is_caught(self):
         self.only("X07")
@@ -101,16 +101,16 @@ class TheRehearsalCanFail(unittest.TestCase):
         self.only("X01")
         # Point the retained gap at a file the engine DOES refuse: the expected behaviour is then observed.
         self.manifest(lambda d: d["retained_gaps"][0]["reproduce"].update(
-            file="workflows/x01/refused-ordering-only-gate.nika.yaml"))
+            file="workflows/x01/refused-ordering-only-gate.nika"))
         code, summary = self.rehearse()
         self.assertEqual(code, 1)
         self.assertTrue(any("KG01: the expected behaviour is now observed" in f for f in summary["failures"]))
 
     # ── a refusal is proven by running it, a warning by reading it, a gap by its facts ──
 
-    CORE = "workflows/x13/refused-certain-skip-core.nika.yaml"
-    CONDITIONAL = "workflows/x13/near-miss-stage-also-reads-a-step-that-ran.nika.yaml"
-    WITNESS = "workflows/x01/near-miss-gated-through-data-edge.nika.yaml"
+    CORE = "workflows/x13/refused-certain-skip-core.nika"
+    CONDITIONAL = "workflows/x13/near-miss-stage-also-reads-a-step-that-ran.nika"
+    WITNESS = "workflows/x01/near-miss-gated-through-data-edge.nika"
 
     def row(self, data, file):
         return next(c for s in data["scenarios"] for c in s["candidates"] if c["file"] == file)
@@ -139,7 +139,7 @@ class TheRehearsalCanFail(unittest.TestCase):
         shutil.copy(self.root / self.CONDITIONAL, self.root / self.CORE)
         code, summary = self.rehearse()
         self.assertEqual(code, 1)
-        name = "X13/refused-certain-skip-core.nika.yaml"
+        name = "X13/refused-certain-skip-core.nika"
         for wanted in (f"{name}: engine check expected NIKA-SEC-014, observed valid",
                        f"{name}: run as written: exit: expected 2, observed 0",
                        f"{name}: run as written: files: expected exactly {{}}, "
@@ -152,18 +152,18 @@ class TheRehearsalCanFail(unittest.TestCase):
         self.rewrite(self.CORE, "  publish:\n    with:\n", "  publish:\n    after:\n      stage: success\n    with:\n")
         code, summary = self.rehearse()
         self.assertEqual(code, 1)
-        self.assertTrue(any("refused-certain-skip-core.nika.yaml: run as written: tasks started: expected [], "
+        self.assertTrue(any("refused-certain-skip-core.nika: run as written: tasks started: expected [], "
                             "observed ['human']" in f for f in summary["failures"]), summary["failures"])
-        self.assertFalse(any("refused-certain-skip-core.nika.yaml: run as written: files" in f
+        self.assertFalse(any("refused-certain-skip-core.nika: run as written: files" in f
                              for f in summary["failures"]), "a closed route writes nothing")
 
     def test_a_near_miss_the_engine_says_nothing_about_is_caught(self):
         self.only("X13")
-        self.manifest(lambda d: self.row(d, "workflows/x13/reference.nika.yaml").update(
+        self.manifest(lambda d: self.row(d, "workflows/x13/reference.nika").update(
             engine_hints_exclude=[], engine_hints_include=["consent"]))
         code, summary = self.rehearse()
         self.assertEqual(code, 1)
-        self.assertTrue(any("reference.nika.yaml: the engine gives no `consent` advisory" in f
+        self.assertTrue(any("reference.nika: the engine gives no `consent` advisory" in f
                             for f in summary["failures"]), summary["failures"])
 
     def test_a_warning_on_a_closed_route_is_caught(self):
@@ -172,7 +172,7 @@ class TheRehearsalCanFail(unittest.TestCase):
                                                                     engine_hints_exclude=["consent"]))
         code, summary = self.rehearse()
         self.assertEqual(code, 1)
-        self.assertTrue(any("near-miss-stage-also-reads-a-step-that-ran.nika.yaml: the engine gives a `consent` "
+        self.assertTrue(any("near-miss-stage-also-reads-a-step-that-ran.nika: the engine gives a `consent` "
                             "advisory on a candidate whose route is closed" in f for f in summary["failures"]),
                         summary["failures"])
 
@@ -191,7 +191,7 @@ class TheRehearsalCanFail(unittest.TestCase):
         """The correct reference is where a fact about the witness is false: the run must say which fact."""
         self.only("X01")
         self.manifest(lambda d: next(f for f in d["retained_gaps"][0]["facts"] if f["kind"] == kind).update(
-            {key: "workflows/x01/reference.nika.yaml"}))
+            {key: "workflows/x01/reference.nika"}))
         code, summary = self.rehearse()
         self.assertEqual(code, 1)
         return summary["failures"]

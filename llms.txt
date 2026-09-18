@@ -5,7 +5,7 @@
 > stdlib (28 builtins · 17 providers), and a conformance suite. Apache-2.0
 > spec · AGPL-3.0 reference engine in Rust (single static binary).
 
-Workflow files are `*.nika.yaml`. The JSON Schema gives any editor
+Workflow files are `*.nika`. The JSON Schema gives any editor
 autocomplete + validation via a `yaml-language-server` modeline:
 `https://raw.githubusercontent.com/supernovae-st/nika-spec/main/schemas/workflow.schema.json`
 

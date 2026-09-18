@@ -7,7 +7,7 @@
 # LAW-GRAPH-03xx + LAW-OUTCOME-03xx.
 #
 # FINDING-REC-01 (SSOT-1 §29 · dual-truth spec vs engine, empirique au pin) : la
-# fixture LIVE conformance/errors/recover-task-ref-no-edge.nika.yaml se déclare
+# fixture LIVE conformance/errors/recover-task-ref-no-edge.nika se déclare
 # elle-même « ENGINE-vs-SPEC DIVERGENCE » (header verbatim : « Expected: NIKA-VAR-001
 # at RUN — BUT this encodes an ENGINE-vs-SPEC DIVERGENCE. ... Per spec, this workflow
 # SHOULD recover with 99 ... The engine renders immediately against the records
@@ -86,8 +86,8 @@ laws:
       property: acyclic
     diagnostics: ["NIKA-DAG-004"]
     fixtures:
-      - conformance/errors/recover-task-ref-with-edge.nika.yaml
-      - conformance/errors/on-error-recover-literal.nika.yaml
+      - conformance/errors/recover-task-ref-with-edge.nika
+      - conformance/errors/on-error-recover-literal.nika
     negative_fixtures:
       - to-mint-c1/conformance/recovery/invalid/union-cycle-reject
     projections: ["prose:03-dag", "prose:05-errors", "schema", "cli:check", "lsp", "mcp", "sdk"]
@@ -155,10 +155,10 @@ laws:
       property: reflexive_transitive_downstream
     diagnostics: ["NIKA-DAG-004"]
     fixtures:
-      - conformance/errors/on-error-recover-downstream.nika.yaml
-      - conformance/errors/recover-task-ref-with-edge.nika.yaml
+      - conformance/errors/on-error-recover-downstream.nika
+      - conformance/errors/recover-task-ref-with-edge.nika
     negative_fixtures:
-      - conformance/dag/recover-ref-downstream-reject.nika.yaml
+      - conformance/dag/recover-ref-downstream-reject.nika
       - to-mint-c1/conformance/recovery/invalid/self-recover-reject
       - to-mint-c1/conformance/recovery/invalid/mutual-recover-reject
     projections: ["prose:03-dag", "prose:05-errors", "cli:check", "lsp", "sdk"]
@@ -222,8 +222,8 @@ laws:
       property: reachability
     diagnostics: []
     fixtures:
-      - conformance/errors/retry-exhausted-then-recover.nika.yaml
-      - conformance/errors/timeout-recovered.nika.yaml
+      - conformance/errors/retry-exhausted-then-recover.nika
+      - conformance/errors/timeout-recovered.nika
       - conformance/tests/core/errors/008-on-error-on-codes-recover
       - to-mint-c1/conformance/recovery/valid/await-pending-source-resolves
     projections: ["prose:05-errors", "cli:run", "sdk"]
@@ -233,7 +233,7 @@ laws:
       - conformance:recovery-suite
     introduced_in: C0
     proof_obligations:
-      - "FINDING-REC-01, évidence header verbatim de conformance/errors/recover-task-ref-no-edge.nika.yaml : « Expected: NIKA-VAR-001 at RUN — BUT this encodes an ENGINE-vs-SPEC DIVERGENCE. » (l'engine rend VAR-001 immédiatement contre le snapshot au lieu d'attendre; per spec le workflow SHOULD recover with 99). Sous cette loi, ce workflow récupère : la fixture to-mint await-pending-source-resolves en est la forme conforme, la fixture divergente est requalifiée dans la cascade P-C, jamais silencieusement ici."
+      - "FINDING-REC-01, évidence header verbatim de conformance/errors/recover-task-ref-no-edge.nika : « Expected: NIKA-VAR-001 at RUN — BUT this encodes an ENGINE-vs-SPEC DIVERGENCE. » (l'engine rend VAR-001 immédiatement contre le snapshot au lieu d'attendre; per spec le workflow SHOULD recover with 99). Sous cette loi, ce workflow récupère : la fixture to-mint await-pending-source-resolves en est la forme conforme, la fixture divergente est requalifiée dans la cascade P-C, jamais silencieusement ici."
       - "L'await est borné par le budget global restant (LAW-OUTCOME-0302 · B-17 points 26-27) : attendre n'est jamais un droit d'excéder la deadline."
     closure_gates:
       - await-terminal-implemented

@@ -89,7 +89,7 @@ spec/templates/         ★ EDIT HERE
        ▼
 engine/crates/nika-pack/pack/     ⚠️ MIRROR · edits here are overwritten
        │
-       ├──▶ `nika new <t>`            what a BEGINNER receives
+       ├──▶ `nika compile <slug> <file>.nika`  Ready + explicit dest · beginner
        ├──▶ `nika_examples <s>` (MCP) what an AGENT reads
        └──▶ nika-onboard 62/62        the gate that refuses a broken scaffold
 ```
@@ -145,7 +145,7 @@ Every fenced YAML block in a doc, a README, a test fixture or a source comment
 teaches something. The count is a MEASUREMENT — run it, never quote it:
 
 ```
-git grep -l 'nika: v1' -- ':!*.nika.yaml' | wc -l        # per repo, tracked files · the 2026-07-29 probe
+git grep -l 'nika: v1' -- ':!*.nika' | wc -l        # per repo, tracked files · the 2026-07-29 probe
 ```
 
 (That probe counted the then-live marker; since the envelope nuke a `nika: v1`
@@ -227,7 +227,7 @@ refused by `--check` (exit 5), the same contract every projection has.
 | `tools/estate/scripts/estate.py` | `Import the declared public source files and generated provenance with their recorded file modes` | `python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml` |
 | `tools/estate/scripts/selftest.py` | `Import the declared public source files and generated provenance with their recorded file modes` | `python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml` |
 
-Provenance floor: 1557 tracked files classified · authored 1222 · generated 137 · pinned-copy 4 · testimonial 193 (estate schema 2 · mode observation).
+Provenance floor: 1668 tracked files classified · authored 1333 · generated 137 · pinned-copy 4 · testimonial 193 (estate schema 2 · mode observation).
 
 <!-- /estate:map -->
 
@@ -266,7 +266,7 @@ they came back worse.
 > record what was measured on 2026-07-29 — the count columns belong to that
 > spelling and re-labelling them would put a new name on an old number.
 > **Path note (post-count)** · the live lesson that settled the `declassify:`
-> zero-coverage row is now [`examples/11-lift-the-door.nika.yaml`](examples/11-lift-the-door.nika.yaml)
+> zero-coverage row is now [`examples/11-lift-the-door.nika`](examples/11-lift-the-door.nika)
 > (`lift:` · the field `declassify:` is dead). The table below keeps the
 > 2026-07-29 filename.
 
@@ -326,7 +326,7 @@ non-trivial is built at all.
 
 ## Generated authoring rehearsals
 
-The additive filled lesson corpus is sourced from `templates/*.nika.yaml` and
+The additive filled lesson corpus is sourced from `templates/*.nika` and
 `templates/rehearsals.yaml`. Run `python3 scripts/template-rehearsals.py --write`
 to project the matching numbered lessons, golden copies, `templates/INDEX.md`
 and `templates/rehearsals.tsv`. The knowledge CI job runs `--check` and projector

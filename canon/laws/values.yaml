@@ -10,7 +10,7 @@
 # avant C1 · SSOT-2 B.21 exige un diagnostic canonique par rejet normatif expose.
 #
 # Fixtures: la famille 4-autorites est NEUVE, aucune fixture E-split n'existe (mesure) ·
-# to-mint-c1. La fixture actuelle conformance/variables/typed-vars-declarations.nika.yaml
+# to-mint-c1. La fixture actuelle conformance/variables/typed-vars-declarations.nika
 # vit au monde `vars:` d'avant-cascade: elle MIGRE a P-C, elle n'est pas reclassee ici.
 #
 # FINDING (SSOT-1 §29, remonte au retour structure): R3a clot par « B-9 se résout dans le

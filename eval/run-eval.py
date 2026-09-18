@@ -52,7 +52,7 @@ sys.path.insert(0, str(SPEC_ROOT / "conformance"))
 import yaml  # noqa: E402
 from runner import load_canon, load_schema, validate_workflow  # noqa: E402
 
-TEMPLATES = {p.stem.replace(".nika", ""): p for p in (SPEC_ROOT / "templates").glob("*.nika.yaml")}
+TEMPLATES = {p.stem.replace(".nika", ""): p for p in (SPEC_ROOT / "templates").glob("*.nika")}
 
 PROTOCOL_SYSTEM = """You author Nika workflows by the deterministic protocol. Structure is
 instantiated, never invented.

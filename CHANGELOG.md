@@ -51,6 +51,37 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   leave no file, so an engine that still admits it fails by the file it
   leaves. Advisory hints are expected per candidate, and a gap's recorded
   facts fail the rehearsal when they stop holding.
+||||||| ad639fe
+### Changed · pack version `0.2.0-draft` (2026-09-18)
+
+- **`VERSION` is `0.2.0-draft`.** The pack contract (`examples/manifest.yaml`
+  `pack_version`) tracks this file. Registry first-party entries mint
+  `MAJOR.MINOR.PATCH` from it (`0.1.0-draft` → `0.1.0` would overwrite
+  already-published immutable `0.1.0` rows). The `.nika` program-filename
+  hard cut is a pre-1.0 breaking pack identity; language family remains
+  v1 (`nika:` is the name, there is no `nika: v2`). Historical
+  `[0.1.0-draft]` changelog and frozen proofs stay as written.
+
+### Changed · canonical program filename is `.nika` (2026-09-18)
+
+- **File naming law** (01 §File naming · nika#1684) — lowercase
+  `<name>.nika` with a nonempty stem is the only canonical on-disk
+  program filename. Project configuration remains `nika.yaml`. Runtime
+  state remains `.nika/`. Retired `.nika.yaml` / `.nika.yml` are refused
+  as live program paths (no matcher alias, no silent fallback, no
+  content-sniffing of `foo.yaml`). Off-disk source (stdin · HTTP · pack
+  blob) stays filename-independent; `tasks:` remains the type
+  discriminant. Media type `application/vnd.nika+yaml` is unchanged.
+  Owner sources, templates, examples, active conformance programs and
+  generators move in this revision. Historical receipts and frozen
+  provenance keep their original path strings.
+- **File naming clarifications** (01 §File naming · nika-spec#340 review) —
+  off-disk identity is the `nika:` mark plus the `tasks:` type
+  discriminant, not “the first line”. The program suffix `.nika` and the
+  runtime directory `.nika/` share a spelling and are distinct roles,
+  not a claim that the names never collide. `nika init` remains a MUST
+  emitter of `<name>.nika`. A `nika.yaml` that carries `tasks:` is
+  refused at that pathname rather than coerced into a workflow.
 
 ### Added · composed authoring goldens (2026-09-18)
 

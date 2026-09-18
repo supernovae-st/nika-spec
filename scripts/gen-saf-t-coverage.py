@@ -4,7 +4,7 @@
 hand-edited (F-P10 · a SAF-T technique in-scope without a fixture, a
 bench, or an explicit out-of-scope row is a coverage FAIL).
 
-Each `saf-tNNNN-*.nika.yaml` fixture declares its tag by name; this
+Each `saf-tNNNN-*.nika` fixture declares its tag by name; this
 walks the directory and emits one row per tag: tag · gate · fixture.
 The gate exits 1 when an in-scope tag (the registry the file itself
 carries) has zero rows.
@@ -37,11 +37,11 @@ IN_SCOPE: list[tuple[str, str]] = [
 def render() -> tuple[str, int]:
     """The regenerated TSV body + the count of in-scope tags without a row."""
     rows: dict[str, str] = {}
-    for fixture in sorted(REDTEAM.glob("saf-t*-*.nika.yaml")):
+    for fixture in sorted(REDTEAM.glob("saf-t*-*.nika")):
         m = re.match(r"(saf-t\d+)", fixture.name, re.IGNORECASE)
         if m is None:
             continue
-        rows[m.group(1).upper()] = fixture.name.removesuffix(".nika.yaml")
+        rows[m.group(1).upper()] = fixture.name.removesuffix(".nika")
     lines = ["tag\tgate\tfixture_or_out_of_scope"]
     missing = 0
     for tag, gate in IN_SCOPE:

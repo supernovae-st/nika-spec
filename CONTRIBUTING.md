@@ -60,7 +60,7 @@ the tooling ships with tests in the same PR.
 - One concept, one word — see [GLOSSARY.md](./GLOSSARY.md); qualify
   ambiguous terms at first mention (« MCP oracle » · « conformance
   oracle » · « human gate »).
-- Workflow files are named `<name>.nika.yaml`
+- Workflow files are named `<name>.nika`
   ([01 §File naming](./spec/01-envelope.md#file-naming-normative)).
 
 ## Developer Certificate of Origin

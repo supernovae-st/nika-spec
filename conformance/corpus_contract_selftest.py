@@ -38,7 +38,7 @@ HEAD = (
 CLEAN_JOB = HEAD + """#
 # showcase · T1 specimen · selftest
 #
-# Run · nika run specimen.nika.yaml
+# Run · nika run specimen.nika
 
 nika: specimen
 permits:
@@ -56,7 +56,7 @@ tasks:
 failures: list[str] = []
 
 
-def expect(name: str, text: str, *, flags: str | None, fname: str = "specimen.nika.yaml"):
+def expect(name: str, text: str, *, flags: str | None, fname: str = "specimen.nika"):
     """flags=None asserts silence; otherwise the code must appear."""
     errs = corpus_contract_errors(Path(fname), text)
     if flags is None:
@@ -73,7 +73,7 @@ expect("clean job", CLEAN_JOB, flags=None)
 expect("C1 missing SPDX", CLEAN_JOB.replace(HEAD, "# not the header\n"), flags="C1")
 
 # C2 · a `# Run ·` line exists.
-expect("C2 no Run line", CLEAN_JOB.replace("# Run · nika run specimen.nika.yaml\n", ""), flags="C2")
+expect("C2 no Run line", CLEAN_JOB.replace("# Run · nika run specimen.nika\n", ""), flags="C2")
 
 # C5 · permits categories hold the §2 order (exec · tools · net · fs).
 expect(
@@ -87,8 +87,8 @@ expect(
 
 # The live sweep — the shipped corpus passes its own gate, every file.
 swept = 0
-for f in sorted((SPEC_ROOT / "examples").glob("*.nika.yaml")) + sorted(
-    (SPEC_ROOT / "templates").glob("*.nika.yaml")
+for f in sorted((SPEC_ROOT / "examples").glob("*.nika")) + sorted(
+    (SPEC_ROOT / "templates").glob("*.nika")
 ):
     errs = corpus_contract_errors(f, f.read_text())
     if errs:
@@ -105,7 +105,7 @@ with tempfile.TemporaryDirectory() as tmp:
     for relative in ("examples", "examples/snippets"):
         directory = root / relative
         directory.mkdir(parents=True, exist_ok=True)
-        (directory / "specimen.nika.yaml").write_text(CLEAN_JOB)
+        (directory / "specimen.nika").write_text(CLEAN_JOB)
     witness = root / runner.WITNESS_RED[0]
     witness.parent.mkdir(parents=True)
     witness.write_bytes((SPEC_ROOT / runner.WITNESS_RED[0]).read_bytes())
@@ -113,10 +113,10 @@ with tempfile.TemporaryDirectory() as tmp:
         output = io.StringIO()
         with contextlib.redirect_stdout(output):
             missing_rc = runner.main(["runner.py", "all"])
-        if missing_rc != 1 or "no *.nika.yaml found" not in output.getvalue():
+        if missing_rc != 1 or "no *.nika found" not in output.getvalue():
             failures.append("all accepted a missing template shelf")
         (root / "templates").mkdir()
-        (root / "templates/specimen.nika.yaml").write_text(CLEAN_JOB)
+        (root / "templates/specimen.nika").write_text(CLEAN_JOB)
         negative = root / "templates/specimen.negative.yaml"
         negative.write_text("nika: specimen-negative\ntasks: {}\n")
         with contextlib.redirect_stdout(io.StringIO()):

@@ -1,0 +1,2218 @@
+{
+  "issue": "https://github.com/supernovae-st/nika/issues/1684",
+  "note": "Rename-only sources keep exact bytes. Child-reference and filename-comment rewrites are recorded after the content pass.",
+  "moves": [
+    {
+      "old": "examples/18-bounded-batch.nika.yaml.golden.json",
+      "new": "examples/18-bounded-batch.nika.golden.json",
+      "old_sha256": "9db0a557d16e484b7ea0301b4ca81e9ba809376d202f1fa666cf71c5a957b451",
+      "new_sha256_after_mv": "9db0a557d16e484b7ea0301b4ca81e9ba809376d202f1fa666cf71c5a957b451",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/19-validate-records.nika.yaml.golden.json",
+      "new": "examples/19-validate-records.nika.golden.json",
+      "old_sha256": "6176f494ccfe1c399c81061904a2c9dc48049305724b34665fc029b24d1adc50",
+      "new_sha256_after_mv": "6176f494ccfe1c399c81061904a2c9dc48049305724b34665fc029b24d1adc50",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/20-snapshot-diff.nika.yaml.golden.json",
+      "new": "examples/20-snapshot-diff.nika.golden.json",
+      "old_sha256": "9976087acfadf88ab35231a159332c93d80b41a8176ced471a1203a020d760ea",
+      "new_sha256_after_mv": "9976087acfadf88ab35231a159332c93d80b41a8176ced471a1203a020d760ea",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/21-deduplicate-records.nika.yaml.golden.json",
+      "new": "examples/21-deduplicate-records.nika.golden.json",
+      "old_sha256": "1a0e4c1eb2fbb7b87bafc1f6b3c1d61be57fe472d34bc3ba8491197ab6d1c2cd",
+      "new_sha256_after_mv": "1a0e4c1eb2fbb7b87bafc1f6b3c1d61be57fe472d34bc3ba8491197ab6d1c2cd",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/22-project-public-fields.nika.yaml.golden.json",
+      "new": "examples/22-project-public-fields.nika.golden.json",
+      "old_sha256": "b99f70b4b6ee79cb3cd811926bddd188adcd54da113e9865e92ae7c703055d86",
+      "new_sha256_after_mv": "b99f70b4b6ee79cb3cd811926bddd188adcd54da113e9865e92ae7c703055d86",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/23-parallel-review.nika.yaml.golden.json",
+      "new": "examples/23-parallel-review.nika.golden.json",
+      "old_sha256": "37273788eea1a8624babac8ca33fcf787e9a25596755d32bd1f42dfe3a024bf0",
+      "new_sha256_after_mv": "37273788eea1a8624babac8ca33fcf787e9a25596755d32bd1f42dfe3a024bf0",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/24-recover-optional-file.nika.yaml.golden.json",
+      "new": "examples/24-recover-optional-file.nika.golden.json",
+      "old_sha256": "a5d47c18a68c540e1277cda2d1c2cb5fffc9b0393acdf64b8ecca070639dc95b",
+      "new_sha256_after_mv": "a5d47c18a68c540e1277cda2d1c2cb5fffc9b0393acdf64b8ecca070639dc95b",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/25-aggregate-by-key.nika.yaml.golden.json",
+      "new": "examples/25-aggregate-by-key.nika.golden.json",
+      "old_sha256": "ad345c160148c0d59632fd99b46ee4923bfa60abfa568e04671ee99dfb85178f",
+      "new_sha256_after_mv": "ad345c160148c0d59632fd99b46ee4923bfa60abfa568e04671ee99dfb85178f",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/agent-loop.nika.yaml.golden.json",
+      "new": "templates/agent-loop.nika.golden.json",
+      "old_sha256": "d438e03b175206b4ddbb0f1c5c89467ebe2b10085a771e1e07c784e060fa8fe7",
+      "new_sha256_after_mv": "d438e03b175206b4ddbb0f1c5c89467ebe2b10085a771e1e07c784e060fa8fe7",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/aggregate-by-key.nika.yaml.golden.json",
+      "new": "templates/aggregate-by-key.nika.golden.json",
+      "old_sha256": "ad345c160148c0d59632fd99b46ee4923bfa60abfa568e04671ee99dfb85178f",
+      "new_sha256_after_mv": "ad345c160148c0d59632fd99b46ee4923bfa60abfa568e04671ee99dfb85178f",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/api-upload-and-create.nika.yaml.golden.json",
+      "new": "templates/api-upload-and-create.nika.golden.json",
+      "old_sha256": "fce31abe8e7e4e36e8842a083516d4e18d8da91487473a06449471d46ea8f1b1",
+      "new_sha256_after_mv": "fce31abe8e7e4e36e8842a083516d4e18d8da91487473a06449471d46ea8f1b1",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/bounded-batch.nika.yaml.golden.json",
+      "new": "templates/bounded-batch.nika.golden.json",
+      "old_sha256": "9db0a557d16e484b7ea0301b4ca81e9ba809376d202f1fa666cf71c5a957b451",
+      "new_sha256_after_mv": "9db0a557d16e484b7ea0301b4ca81e9ba809376d202f1fa666cf71c5a957b451",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/chain.nika.yaml.golden.json",
+      "new": "templates/chain.nika.golden.json",
+      "old_sha256": "42a0fe5e630e7663a45ea4b9d73c49e58a2fbd98b4223ea6865ab679b7dbd2d3",
+      "new_sha256_after_mv": "42a0fe5e630e7663a45ea4b9d73c49e58a2fbd98b4223ea6865ab679b7dbd2d3",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/classify-and-route.nika.yaml.golden.json",
+      "new": "templates/classify-and-route.nika.golden.json",
+      "old_sha256": "a243309d3146b534592f39457070b911d5f5552b775692338256ccd5b11220fc",
+      "new_sha256_after_mv": "a243309d3146b534592f39457070b911d5f5552b775692338256ccd5b11220fc",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/corpus-qa.nika.yaml.golden.json",
+      "new": "templates/corpus-qa.nika.golden.json",
+      "old_sha256": "fa866c8f04000ebc45a410b38fce3a99adb5994c6944420b1eb891f300ca1d69",
+      "new_sha256_after_mv": "fa866c8f04000ebc45a410b38fce3a99adb5994c6944420b1eb891f300ca1d69",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/deduplicate-records.nika.yaml.golden.json",
+      "new": "templates/deduplicate-records.nika.golden.json",
+      "old_sha256": "1a0e4c1eb2fbb7b87bafc1f6b3c1d61be57fe472d34bc3ba8491197ab6d1c2cd",
+      "new_sha256_after_mv": "1a0e4c1eb2fbb7b87bafc1f6b3c1d61be57fe472d34bc3ba8491197ab6d1c2cd",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/docker-report.nika.yaml.golden.json",
+      "new": "templates/docker-report.nika.golden.json",
+      "old_sha256": "3aa54e84da86237e99f6bfc47a098c98e794634a27e26ee8c5ddbf00e1d4c94a",
+      "new_sha256_after_mv": "3aa54e84da86237e99f6bfc47a098c98e794634a27e26ee8c5ddbf00e1d4c94a",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/document-to-fields.nika.yaml.golden.json",
+      "new": "templates/document-to-fields.nika.golden.json",
+      "old_sha256": "dcbff36cd712b78105312c56820307576cbf58326278fbf1975efd009d944f76",
+      "new_sha256_after_mv": "dcbff36cd712b78105312c56820307576cbf58326278fbf1975efd009d944f76",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/etl-state.nika.yaml.golden.json",
+      "new": "templates/etl-state.nika.golden.json",
+      "old_sha256": "cbbf283ea47db175f1c2baf72cdf78eb20da925bf46a524ae164785dd96a5d71",
+      "new_sha256_after_mv": "cbbf283ea47db175f1c2baf72cdf78eb20da925bf46a524ae164785dd96a5d71",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/evaluate-and-optimize.nika.yaml.golden.json",
+      "new": "templates/evaluate-and-optimize.nika.golden.json",
+      "old_sha256": "fb12bae9885d1df9c47b558f0215b097f1e2b4343bc32a43ddd7dc6171c833d5",
+      "new_sha256_after_mv": "fb12bae9885d1df9c47b558f0215b097f1e2b4343bc32a43ddd7dc6171c833d5",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/fanout.nika.yaml.golden.json",
+      "new": "templates/fanout.nika.golden.json",
+      "old_sha256": "38cdea1d26dce7a635509f735850ce1e96dd341dcbd84526be954e45c7149986",
+      "new_sha256_after_mv": "38cdea1d26dce7a635509f735850ce1e96dd341dcbd84526be954e45c7149986",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/gate-and-act.nika.yaml.golden.json",
+      "new": "templates/gate-and-act.nika.golden.json",
+      "old_sha256": "4c7433d86dcfac84280ccbf1704e4fb540e511085a4fd0bd45f28b85e3400163",
+      "new_sha256_after_mv": "4c7433d86dcfac84280ccbf1704e4fb540e511085a4fd0bd45f28b85e3400163",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/human-gated-ship.nika.yaml.golden.json",
+      "new": "templates/human-gated-ship.nika.golden.json",
+      "old_sha256": "c0406c816444385de3da09c93fd48a9a63098e9fca6fa62c0cf62fcf067ca4a4",
+      "new_sha256_after_mv": "c0406c816444385de3da09c93fd48a9a63098e9fca6fa62c0cf62fcf067ca4a4",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/media-asset-pack.nika.yaml.golden.json",
+      "new": "templates/media-asset-pack.nika.golden.json",
+      "old_sha256": "650a47eb6884a6e23cd030ab7611ace3c178df09e34e22ba98849744eee28ce5",
+      "new_sha256_after_mv": "650a47eb6884a6e23cd030ab7611ace3c178df09e34e22ba98849744eee28ce5",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/parallel-review.nika.yaml.golden.json",
+      "new": "templates/parallel-review.nika.golden.json",
+      "old_sha256": "37273788eea1a8624babac8ca33fcf787e9a25596755d32bd1f42dfe3a024bf0",
+      "new_sha256_after_mv": "37273788eea1a8624babac8ca33fcf787e9a25596755d32bd1f42dfe3a024bf0",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/project-public-fields.nika.yaml.golden.json",
+      "new": "templates/project-public-fields.nika.golden.json",
+      "old_sha256": "b99f70b4b6ee79cb3cd811926bddd188adcd54da113e9865e92ae7c703055d86",
+      "new_sha256_after_mv": "b99f70b4b6ee79cb3cd811926bddd188adcd54da113e9865e92ae7c703055d86",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/recover-optional-file.nika.yaml.golden.json",
+      "new": "templates/recover-optional-file.nika.golden.json",
+      "old_sha256": "a5d47c18a68c540e1277cda2d1c2cb5fffc9b0393acdf64b8ecca070639dc95b",
+      "new_sha256_after_mv": "a5d47c18a68c540e1277cda2d1c2cb5fffc9b0393acdf64b8ecca070639dc95b",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/snapshot-diff.nika.yaml.golden.json",
+      "new": "templates/snapshot-diff.nika.golden.json",
+      "old_sha256": "9976087acfadf88ab35231a159332c93d80b41a8176ced471a1203a020d760ea",
+      "new_sha256_after_mv": "9976087acfadf88ab35231a159332c93d80b41a8176ced471a1203a020d760ea",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/validate-records.nika.yaml.golden.json",
+      "new": "templates/validate-records.nika.golden.json",
+      "old_sha256": "6176f494ccfe1c399c81061904a2c9dc48049305724b34665fc029b24d1adc50",
+      "new_sha256_after_mv": "6176f494ccfe1c399c81061904a2c9dc48049305724b34665fc029b24d1adc50",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/website-brief.nika.yaml.golden.json",
+      "new": "templates/website-brief.nika.golden.json",
+      "old_sha256": "467ea4f214d5bbbe90079ae168d04408924cee9bef5e42baf0ba84b11384cf11",
+      "new_sha256_after_mv": "467ea4f214d5bbbe90079ae168d04408924cee9bef5e42baf0ba84b11384cf11",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/composition/child-static-echo.nika.yaml",
+      "new": "conformance/composition/child-static-echo.nika",
+      "old_sha256": "ba26ac5e2a96be38d1357e8571b16fe4967a367c0f827529f3aca2c45af60c50",
+      "new_sha256_after_mv": "ba26ac5e2a96be38d1357e8571b16fe4967a367c0f827529f3aca2c45af60c50",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/composition/parent-child-acyclic.nika.yaml",
+      "new": "conformance/composition/parent-child-acyclic.nika",
+      "old_sha256": "b519755ba69ff844ccfc2151c54ca8a065892404843510f10672edb19e30eb42",
+      "new_sha256_after_mv": "b519755ba69ff844ccfc2151c54ca8a065892404843510f10672edb19e30eb42",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/composition/self-launch-cycle.nika.yaml",
+      "new": "conformance/composition/self-launch-cycle.nika",
+      "old_sha256": "b391c479ea362f935726dbba666adee55889afdd5978608a5e1c6b4ba16a77fa",
+      "new_sha256_after_mv": "b391c479ea362f935726dbba666adee55889afdd5978608a5e1c6b4ba16a77fa",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/dag/body-ref-outside-boundary-reject.nika.yaml",
+      "new": "conformance/dag/body-ref-outside-boundary-reject.nika",
+      "old_sha256": "e1add16d7d73bec2e8e3e6107b5b51fa8d864c42a24b49cb3dfc35b85fa3c09e",
+      "new_sha256_after_mv": "e1add16d7d73bec2e8e3e6107b5b51fa8d864c42a24b49cb3dfc35b85fa3c09e",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/dag/cycle-reject.nika.yaml",
+      "new": "conformance/dag/cycle-reject.nika",
+      "old_sha256": "bee012539f0f8f04d5054176b76ed5b4b1c2901c5aec672018bfe2106d50d3ac",
+      "new_sha256_after_mv": "bee012539f0f8f04d5054176b76ed5b4b1c2901c5aec672018bfe2106d50d3ac",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/dag/diamond-topology.nika.yaml",
+      "new": "conformance/dag/diamond-topology.nika",
+      "old_sha256": "48e36e41cd1f63f70974d876d4334d66a26fd1da2126fe7aa9c4efda561f1976",
+      "new_sha256_after_mv": "48e36e41cd1f63f70974d876d4334d66a26fd1da2126fe7aa9c4efda561f1976",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/dag/failure-cancels-downstream.nika.yaml",
+      "new": "conformance/dag/failure-cancels-downstream.nika",
+      "old_sha256": "9764c6dff4bca9a28c1147736a8be82188db73b1226dfc02d4e3de0cdc8d2823",
+      "new_sha256_after_mv": "9764c6dff4bca9a28c1147736a8be82188db73b1226dfc02d4e3de0cdc8d2823",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/dag/failure-drains-inflight.nika.yaml",
+      "new": "conformance/dag/failure-drains-inflight.nika",
+      "old_sha256": "4d8eeb5dfd143c22e91a11ba462c80d03f60c69a47fc2a9af412121c110e8d3a",
+      "new_sha256_after_mv": "4d8eeb5dfd143c22e91a11ba462c80d03f60c69a47fc2a9af412121c110e8d3a",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/dag/foreach-empty-skips.nika.yaml",
+      "new": "conformance/dag/foreach-empty-skips.nika",
+      "old_sha256": "2c7ca55232ee091c5fcfcaa37b9a1a79321de8b821b5b092efb6fb88362b85a5",
+      "new_sha256_after_mv": "2c7ca55232ee091c5fcfcaa37b9a1a79321de8b821b5b092efb6fb88362b85a5",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/dag/foreach-fail-fast-false.nika.yaml",
+      "new": "conformance/dag/foreach-fail-fast-false.nika",
+      "old_sha256": "b19895b84c13fd52eaefbdca44b4474a53c82afcae2ef06428449d6fcfee9ec3",
+      "new_sha256_after_mv": "b19895b84c13fd52eaefbdca44b4474a53c82afcae2ef06428449d6fcfee9ec3",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/dag/foreach-fail-fast-true.nika.yaml",
+      "new": "conformance/dag/foreach-fail-fast-true.nika",
+      "old_sha256": "4d498861df2ac8ba091733619b00419ecc34ef3702bf74253d969b97de9b8782",
+      "new_sha256_after_mv": "4d498861df2ac8ba091733619b00419ecc34ef3702bf74253d969b97de9b8782",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/dag/foreach-item-index-bindings.nika.yaml",
+      "new": "conformance/dag/foreach-item-index-bindings.nika",
+      "old_sha256": "006e8cb04dcd89a28f721a7d44b8a9c3496c02e6add6e22f38912c46e1a22c64",
+      "new_sha256_after_mv": "006e8cb04dcd89a28f721a7d44b8a9c3496c02e6add6e22f38912c46e1a22c64",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/dag/foreach-over-upstream-output.nika.yaml",
+      "new": "conformance/dag/foreach-over-upstream-output.nika",
+      "old_sha256": "68f4243b045a0ba3e39a71ab1aba3812a241ca2ba018f7a17cd4e039e39b616e",
+      "new_sha256_after_mv": "68f4243b045a0ba3e39a71ab1aba3812a241ca2ba018f7a17cd4e039e39b616e",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/dag/recover-ref-downstream-reject.nika.yaml",
+      "new": "conformance/dag/recover-ref-downstream-reject.nika",
+      "old_sha256": "b62db613a538948190af7d732a3293f81872fd3ec4c098f82e514ccb1a9463e2",
+      "new_sha256_after_mv": "b62db613a538948190af7d732a3293f81872fd3ec4c098f82e514ccb1a9463e2",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/dag/undeclared-dep-reject.nika.yaml",
+      "new": "conformance/dag/undeclared-dep-reject.nika",
+      "old_sha256": "547d8c16067926911345884ae6e3b52887d34350aa349f526a12adef7ad2ba3d",
+      "new_sha256_after_mv": "547d8c16067926911345884ae6e3b52887d34350aa349f526a12adef7ad2ba3d",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/dag/when-false-skips.nika.yaml",
+      "new": "conformance/dag/when-false-skips.nika",
+      "old_sha256": "8bd6cb0afaedf39c055af6862d490234ca7e3a40f549fed4823d35468d364f88",
+      "new_sha256_after_mv": "8bd6cb0afaedf39c055af6862d490234ca7e3a40f549fed4823d35468d364f88",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/dag/when-has-null-semantics.nika.yaml",
+      "new": "conformance/dag/when-has-null-semantics.nika",
+      "old_sha256": "faefa154caf421c2706ecc0973764739f925dda66a9494b9486e1cd33204407b",
+      "new_sha256_after_mv": "faefa154caf421c2706ecc0973764739f925dda66a9494b9486e1cd33204407b",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/minimal-valid-workflow.nika.yaml",
+      "new": "conformance/envelope/minimal-valid-workflow.nika",
+      "old_sha256": "f44aad338e858ec46f2a2b1c3d8daa291e6d0e680b810d891617736f395d4bce",
+      "new_sha256_after_mv": "f44aad338e858ec46f2a2b1c3d8daa291e6d0e680b810d891617736f395d4bce",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/outputs-contract.nika.yaml",
+      "new": "conformance/envelope/outputs-contract.nika",
+      "old_sha256": "fe4250cc20f91c87c340bb2058f2d1ab6298e0fa655250dff11dcaeddd5b5517",
+      "new_sha256_after_mv": "fe4250cc20f91c87c340bb2058f2d1ab6298e0fa655250dff11dcaeddd5b5517",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/parse-bad-nika-id.nika.yaml",
+      "new": "conformance/envelope/parse-bad-nika-id.nika",
+      "old_sha256": "775a21a25925c9841ef615abfe772bd0b726de8f2630eb7577b831c5dc4c768a",
+      "new_sha256_after_mv": "775a21a25925c9841ef615abfe772bd0b726de8f2630eb7577b831c5dc4c768a",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/parse-bad-task-id.nika.yaml",
+      "new": "conformance/envelope/parse-bad-task-id.nika",
+      "old_sha256": "945955ef7ce134e777f3eb7223444bd5368fa508d9ef60b2f93b0f3e7c505ab4",
+      "new_sha256_after_mv": "945955ef7ce134e777f3eb7223444bd5368fa508d9ef60b2f93b0f3e7c505ab4",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/parse-duplicate-task-id.nika.yaml",
+      "new": "conformance/envelope/parse-duplicate-task-id.nika",
+      "old_sha256": "0663a9d93d9d62027504a34372cd4392f26ab4179a306628e510cdff40b0b3d0",
+      "new_sha256_after_mv": "0663a9d93d9d62027504a34372cd4392f26ab4179a306628e510cdff40b0b3d0",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/parse-inline-secret-forbidden.nika.yaml",
+      "new": "conformance/envelope/parse-inline-secret-forbidden.nika",
+      "old_sha256": "4c8659a51697aba892022e9583658b50d424924618bac890fa401a835814cc09",
+      "new_sha256_after_mv": "4c8659a51697aba892022e9583658b50d424924618bac890fa401a835814cc09",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/parse-missing-nika-key.nika.yaml",
+      "new": "conformance/envelope/parse-missing-nika-key.nika",
+      "old_sha256": "909fd3f6fa2d9924ce84b2989561662066aa093f1c5a5e74e1bc46b61f0c611f",
+      "new_sha256_after_mv": "909fd3f6fa2d9924ce84b2989561662066aa093f1c5a5e74e1bc46b61f0c611f",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/parse-reserved-binding-name.nika.yaml",
+      "new": "conformance/envelope/parse-reserved-binding-name.nika",
+      "old_sha256": "7a12b6ea5210b75ecd7b078bb63039203ab842f36d5fbd5a2d544451904d0ed0",
+      "new_sha256_after_mv": "7a12b6ea5210b75ecd7b078bb63039203ab842f36d5fbd5a2d544451904d0ed0",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/parse-task-no-verb.nika.yaml",
+      "new": "conformance/envelope/parse-task-no-verb.nika",
+      "old_sha256": "ce08098b23230b818849b14afd191ce9ef2ed7bab56e81a284e1840a033f1dcf",
+      "new_sha256_after_mv": "ce08098b23230b818849b14afd191ce9ef2ed7bab56e81a284e1840a033f1dcf",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/parse-unknown-field.nika.yaml",
+      "new": "conformance/envelope/parse-unknown-field.nika",
+      "old_sha256": "eb8eb9d12d47fd26d7b1d098678cf0869886042c3e252b5bbb95808a8f2c2916",
+      "new_sha256_after_mv": "eb8eb9d12d47fd26d7b1d098678cf0869886042c3e252b5bbb95808a8f2c2916",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/parse-yaml-syntax-reject.nika.yaml",
+      "new": "conformance/envelope/parse-yaml-syntax-reject.nika",
+      "old_sha256": "db0a049c547cfad4154f0aa7f407136e81ac8123b56e95227b1ba971e6b73e25",
+      "new_sha256_after_mv": "db0a049c547cfad4154f0aa7f407136e81ac8123b56e95227b1ba971e6b73e25",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/permits-agent-tool-outside-whitelist.nika.yaml",
+      "new": "conformance/envelope/permits-agent-tool-outside-whitelist.nika",
+      "old_sha256": "50b51503ec7ba6a2e7a04ac6d877f3c89e43a0b734949e16df9416cdbc966964",
+      "new_sha256_after_mv": "50b51503ec7ba6a2e7a04ac6d877f3c89e43a0b734949e16df9416cdbc966964",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/permits-empty-default-deny.nika.yaml",
+      "new": "conformance/envelope/permits-empty-default-deny.nika",
+      "old_sha256": "89a72e5bb43e09b71474316b7d4fc03814c0141a40d4ef5e6f3c42c445359db4",
+      "new_sha256_after_mv": "89a72e5bb43e09b71474316b7d4fc03814c0141a40d4ef5e6f3c42c445359db4",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/permits-exec-absent.nika.yaml",
+      "new": "conformance/envelope/permits-exec-absent.nika",
+      "old_sha256": "178263dae557e9c1fc78599b1944c91173cfc0eccf8d531da8e3245bcb59d4de",
+      "new_sha256_after_mv": "178263dae557e9c1fc78599b1944c91173cfc0eccf8d531da8e3245bcb59d4de",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/permits-fs-read-escape.nika.yaml",
+      "new": "conformance/envelope/permits-fs-read-escape.nika",
+      "old_sha256": "fb7dc06b441ecda40bb98aff41c8be93d987c86430a6da9a2a6c1688d226a415",
+      "new_sha256_after_mv": "fb7dc06b441ecda40bb98aff41c8be93d987c86430a6da9a2a6c1688d226a415",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/permits-fs-write-escape-absolute.nika.yaml",
+      "new": "conformance/envelope/permits-fs-write-escape-absolute.nika",
+      "old_sha256": "6d9662b83828363c3d3bf247ef896262b2d3c82777e616dd015e80ffea7c0db2",
+      "new_sha256_after_mv": "6d9662b83828363c3d3bf247ef896262b2d3c82777e616dd015e80ffea7c0db2",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/permits-net-absent.nika.yaml",
+      "new": "conformance/envelope/permits-net-absent.nika",
+      "old_sha256": "813acf46bd4b00ff91a08fc0480f2e5f9e1043980151abe65ac1b634dcc305c9",
+      "new_sha256_after_mv": "813acf46bd4b00ff91a08fc0480f2e5f9e1043980151abe65ac1b634dcc305c9",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/permits-tool-not-listed.nika.yaml",
+      "new": "conformance/envelope/permits-tool-not-listed.nika",
+      "old_sha256": "e8d461fcd8806c23b30b2f0f58a7fc7454f95f0fb387ceb086a7e3fb568e4fbe",
+      "new_sha256_after_mv": "e8d461fcd8806c23b30b2f0f58a7fc7454f95f0fb387ceb086a7e3fb568e4fbe",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/sec-exec-array-form-blocklist.nika.yaml",
+      "new": "conformance/envelope/sec-exec-array-form-blocklist.nika",
+      "old_sha256": "ed69d938149d78becd97f69c3d6d0ab8a7adde3500f72ea9aec916c035ab155d",
+      "new_sha256_after_mv": "ed69d938149d78becd97f69c3d6d0ab8a7adde3500f72ea9aec916c035ab155d",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/sec-exec-blocklist-rm-rf.nika.yaml",
+      "new": "conformance/envelope/sec-exec-blocklist-rm-rf.nika",
+      "old_sha256": "787bdd3b2b350a7f6d41a2e7990cf0debcce1ae70d649b7994baf1ed2b45171b",
+      "new_sha256_after_mv": "787bdd3b2b350a7f6d41a2e7990cf0debcce1ae70d649b7994baf1ed2b45171b",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/sec-ssrf-localhost-blocked.nika.yaml",
+      "new": "conformance/envelope/sec-ssrf-localhost-blocked.nika",
+      "old_sha256": "288fcc3e24be7eca384603feb5cdaa7ed153ba92029c00ed6ee6e9423bb1ce6f",
+      "new_sha256_after_mv": "288fcc3e24be7eca384603feb5cdaa7ed153ba92029c00ed6ee6e9423bb1ce6f",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/sec-ssrf-metadata-blocked.nika.yaml",
+      "new": "conformance/envelope/sec-ssrf-metadata-blocked.nika",
+      "old_sha256": "3dd5f057d4df14019ee4ba4ae539f38f6e805c39d2d58f325399cf482bac00fa",
+      "new_sha256_after_mv": "3dd5f057d4df14019ee4ba4ae539f38f6e805c39d2d58f325399cf482bac00fa",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/sec-ssrf-private-range-blocked.nika.yaml",
+      "new": "conformance/envelope/sec-ssrf-private-range-blocked.nika",
+      "old_sha256": "c91e96ebe7a583c167771e88452e3d679063923e1eea48c42a5dde35155c6356",
+      "new_sha256_after_mv": "c91e96ebe7a583c167771e88452e3d679063923e1eea48c42a5dde35155c6356",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/secrets-infer-egress-sanctioned.nika.yaml",
+      "new": "conformance/envelope/secrets-infer-egress-sanctioned.nika",
+      "old_sha256": "50f808eeba215b0cc0b0ace4d5d5b9374f5b5f763fd2081cdf32694d93b85d3a",
+      "new_sha256_after_mv": "50f808eeba215b0cc0b0ace4d5d5b9374f5b5f763fd2081cdf32694d93b85d3a",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/secrets-launder-concat.nika.yaml",
+      "new": "conformance/envelope/secrets-launder-concat.nika",
+      "old_sha256": "507657a7919e269542d4e8b82793dff75d9752d16e24cf642ace3cf00ce830ba",
+      "new_sha256_after_mv": "507657a7919e269542d4e8b82793dff75d9752d16e24cf642ace3cf00ce830ba",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/secrets-leak-exec-sink.nika.yaml",
+      "new": "conformance/envelope/secrets-leak-exec-sink.nika",
+      "old_sha256": "24101b0ca491a233b462e33ceb6b137c1e3a1665a228a630da1036acd9486b32",
+      "new_sha256_after_mv": "24101b0ca491a233b462e33ceb6b137c1e3a1665a228a630da1036acd9486b32",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/secrets-leak-infer-prompt.nika.yaml",
+      "new": "conformance/envelope/secrets-leak-infer-prompt.nika",
+      "old_sha256": "8a8d2cfc57e74db6915bcfc2a702563d06f16517d3b1412542724bea79901aa2",
+      "new_sha256_after_mv": "8a8d2cfc57e74db6915bcfc2a702563d06f16517d3b1412542724bea79901aa2",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/secrets-leak-outputs-boundary.nika.yaml",
+      "new": "conformance/envelope/secrets-leak-outputs-boundary.nika",
+      "old_sha256": "9936c44075028a3e0bcdc92ced087eeaa01a98a9b5f1a25addb54bd0f5f49141",
+      "new_sha256_after_mv": "9936c44075028a3e0bcdc92ced087eeaa01a98a9b5f1a25addb54bd0f5f49141",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/secrets-outputs-egress-sanctioned.nika.yaml",
+      "new": "conformance/envelope/secrets-outputs-egress-sanctioned.nika",
+      "old_sha256": "520c3b2c994426887caadb1c72fd4de9ab5d4e727dcdf90a9e7db75f6a273def",
+      "new_sha256_after_mv": "520c3b2c994426887caadb1c72fd4de9ab5d4e727dcdf90a9e7db75f6a273def",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/secrets-two-sinks-one-sanctioned.nika.yaml",
+      "new": "conformance/envelope/secrets-two-sinks-one-sanctioned.nika",
+      "old_sha256": "4c924a39d5b015b4a842142fc092bfa9bc2d45dd2d4a2d4bf86392bbda7672f9",
+      "new_sha256_after_mv": "4c924a39d5b015b4a842142fc092bfa9bc2d45dd2d4a2d4bf86392bbda7672f9",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/trifecta-human-gate-dominates.nika.yaml",
+      "new": "conformance/envelope/trifecta-human-gate-dominates.nika",
+      "old_sha256": "40eb3d256464b5d333f14ee021647fa7ddeb32e299c7094ac5bc898e1f5a766f",
+      "new_sha256_after_mv": "40eb3d256464b5d333f14ee021647fa7ddeb32e299c7094ac5bc898e1f5a766f",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/envelope/trifecta-realized-flow-ungated.nika.yaml",
+      "new": "conformance/envelope/trifecta-realized-flow-ungated.nika",
+      "old_sha256": "682b8d10f04b2a3c164ffc5be80ab44650b7f25a0dc7065a05b416212edb9584",
+      "new_sha256_after_mv": "682b8d10f04b2a3c164ffc5be80ab44650b7f25a0dc7065a05b416212edb9584",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/errors/error-field-canonical-code.nika.yaml",
+      "new": "conformance/errors/error-field-canonical-code.nika",
+      "old_sha256": "b3d0bd6a86ba7db472c3427b00dcb24f628830f78426c5a3fe52aef1898aaf15",
+      "new_sha256_after_mv": "b3d0bd6a86ba7db472c3427b00dcb24f628830f78426c5a3fe52aef1898aaf15",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/errors/foreach-recover-null-alignment.nika.yaml",
+      "new": "conformance/errors/foreach-recover-null-alignment.nika",
+      "old_sha256": "d794f9537b4ef80539eef800f66ecf27c9a2367ed58df75f7ea1e110859be1bb",
+      "new_sha256_after_mv": "d794f9537b4ef80539eef800f66ecf27c9a2367ed58df75f7ea1e110859be1bb",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/errors/on-error-default-fails.nika.yaml",
+      "new": "conformance/errors/on-error-default-fails.nika",
+      "old_sha256": "6423ad04ad78c8e0306f18840d35eabe5d71b406cea0ce13b0d94ddd505b92f4",
+      "new_sha256_after_mv": "6423ad04ad78c8e0306f18840d35eabe5d71b406cea0ce13b0d94ddd505b92f4",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/errors/on-error-on-codes-matched.nika.yaml",
+      "new": "conformance/errors/on-error-on-codes-matched.nika",
+      "old_sha256": "898eacc6f5787d35fd0f3ec143b76c33235512a2eff073f07d3abd3078dd6e5b",
+      "new_sha256_after_mv": "898eacc6f5787d35fd0f3ec143b76c33235512a2eff073f07d3abd3078dd6e5b",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/errors/on-error-on-codes-unmatched.nika.yaml",
+      "new": "conformance/errors/on-error-on-codes-unmatched.nika",
+      "old_sha256": "e6e996875426d7770abda37c01f89e13339c1880d6335362b8b3c0a6b76b3ba5",
+      "new_sha256_after_mv": "e6e996875426d7770abda37c01f89e13339c1880d6335362b8b3c0a6b76b3ba5",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/errors/on-error-recover-downstream.nika.yaml",
+      "new": "conformance/errors/on-error-recover-downstream.nika",
+      "old_sha256": "f9458287a88b24b4e195d23452c950816a845f1948fbb543d9f830bb5dfc11f9",
+      "new_sha256_after_mv": "f9458287a88b24b4e195d23452c950816a845f1948fbb543d9f830bb5dfc11f9",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/errors/on-error-recover-literal.nika.yaml",
+      "new": "conformance/errors/on-error-recover-literal.nika",
+      "old_sha256": "942000a3167c888991c7212cf656db685028f23d7cc82141b17dca2fc4318175",
+      "new_sha256_after_mv": "942000a3167c888991c7212cf656db685028f23d7cc82141b17dca2fc4318175",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/errors/on-error-skip-status.nika.yaml",
+      "new": "conformance/errors/on-error-skip-status.nika",
+      "old_sha256": "455c28ba51c324e5324ab98b04859f0ed96a73ee1ad7ca6192ea83f4af661395",
+      "new_sha256_after_mv": "455c28ba51c324e5324ab98b04859f0ed96a73ee1ad7ca6192ea83f4af661395",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/errors/on-finally-both-paths.nika.yaml",
+      "new": "conformance/errors/on-finally-both-paths.nika",
+      "old_sha256": "6118d7437f1c66cf5876e8fc3dda29d5643a5a484eba503c102686194ea7200c",
+      "new_sha256_after_mv": "6118d7437f1c66cf5876e8fc3dda29d5643a5a484eba503c102686194ea7200c",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/errors/recover-task-ref-no-edge.nika.yaml",
+      "new": "conformance/errors/recover-task-ref-no-edge.nika",
+      "old_sha256": "808e28c741bb9775209b7ca9b076a37f0dd14010e4b6f21ddeb3b457f2b27b7d",
+      "new_sha256_after_mv": "808e28c741bb9775209b7ca9b076a37f0dd14010e4b6f21ddeb3b457f2b27b7d",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/errors/recover-task-ref-with-edge.nika.yaml",
+      "new": "conformance/errors/recover-task-ref-with-edge.nika",
+      "old_sha256": "27b8db2ad8311a8ab5ffefdd86abba9c6856934fe0da421c575b457def6d712a",
+      "new_sha256_after_mv": "27b8db2ad8311a8ab5ffefdd86abba9c6856934fe0da421c575b457def6d712a",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/errors/retry-exhausted-then-recover.nika.yaml",
+      "new": "conformance/errors/retry-exhausted-then-recover.nika",
+      "old_sha256": "c6931554cd5d7b5e3584b1d6894ff0c0313b3991a133c8e5b16af9ee1816bb71",
+      "new_sha256_after_mv": "c6931554cd5d7b5e3584b1d6894ff0c0313b3991a133c8e5b16af9ee1816bb71",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/errors/retry-non-transient-single-attempt.nika.yaml",
+      "new": "conformance/errors/retry-non-transient-single-attempt.nika",
+      "old_sha256": "2bfae3b2af48d0e79014655f406565c859ecded2dd3240f83bd57722ae16da69",
+      "new_sha256_after_mv": "2bfae3b2af48d0e79014655f406565c859ecded2dd3240f83bd57722ae16da69",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/errors/retry-on-codes-forces.nika.yaml",
+      "new": "conformance/errors/retry-on-codes-forces.nika",
+      "old_sha256": "16cd21f641b31fa7b6c1aaf6a8151358755cc1d6374258ba5edbfab4b9203712",
+      "new_sha256_after_mv": "16cd21f641b31fa7b6c1aaf6a8151358755cc1d6374258ba5edbfab4b9203712",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/errors/retry-on-codes-unmatched.nika.yaml",
+      "new": "conformance/errors/retry-on-codes-unmatched.nika",
+      "old_sha256": "030303736b57f78c991aba422670c2eab5ab02274a6e6fc53751c2c628939f60",
+      "new_sha256_after_mv": "030303736b57f78c991aba422670c2eab5ab02274a6e6fc53751c2c628939f60",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/errors/timeout-never-retryable.nika.yaml",
+      "new": "conformance/errors/timeout-never-retryable.nika",
+      "old_sha256": "f41a8f02e28838f848e679e3eaca7d30379fec7a20c8e800c9d41eab11d02499",
+      "new_sha256_after_mv": "f41a8f02e28838f848e679e3eaca7d30379fec7a20c8e800c9d41eab11d02499",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/errors/timeout-recovered.nika.yaml",
+      "new": "conformance/errors/timeout-recovered.nika",
+      "old_sha256": "15508e3334e8a90650315fb632e4cee838b9866699c04f97db7b7f01c1efc4a0",
+      "new_sha256_after_mv": "15508e3334e8a90650315fb632e4cee838b9866699c04f97db7b7f01c1efc4a0",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/redteam/saf-t1001-untrusted-host-escape.nika.yaml",
+      "new": "conformance/redteam/saf-t1001-untrusted-host-escape.nika",
+      "old_sha256": "4c84f0d686472337045cdc8e61a9673520b98d8b597808c4e59a1ecd4c426364",
+      "new_sha256_after_mv": "4c84f0d686472337045cdc8e61a9673520b98d8b597808c4e59a1ecd4c426364",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/redteam/saf-t2004-fetch-pickle-no-door.nika.yaml",
+      "new": "conformance/redteam/saf-t2004-fetch-pickle-no-door.nika",
+      "old_sha256": "5f19397ded23057d8f02ac18f8bff444639fa5527c95bbddb936790270b88360",
+      "new_sha256_after_mv": "5f19397ded23057d8f02ac18f8bff444639fa5527c95bbddb936790270b88360",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/redteam/saf-t3009-encoded-extension-refused.nika.yaml",
+      "new": "conformance/redteam/saf-t3009-encoded-extension-refused.nika",
+      "old_sha256": "6f5eecc87fa1268b2cf13bdaefae98103dcf2b31740beb944583b151d8ce1d16",
+      "new_sha256_after_mv": "6f5eecc87fa1268b2cf13bdaefae98103dcf2b31740beb944583b151d8ce1d16",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/core/authority/006-child-absent-under-permitted-parent/child.nika.yaml",
+      "new": "conformance/tests/core/authority/006-child-absent-under-permitted-parent/child.nika",
+      "old_sha256": "19007e7c9fb08532b450cf978a44ed836928b69451e41cfa41b1737116e4bd19",
+      "new_sha256_after_mv": "19007e7c9fb08532b450cf978a44ed836928b69451e41cfa41b1737116e4bd19",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/deep/composition/003-two-file-cycle/b.nika.yaml",
+      "new": "conformance/tests/deep/composition/003-two-file-cycle/b.nika",
+      "old_sha256": "daf71c113d62c95a56e59aeeae0718b4e10f581e7bae845e616e1173f3ec513e",
+      "new_sha256_after_mv": "daf71c113d62c95a56e59aeeae0718b4e10f581e7bae845e616e1173f3ec513e",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/deep/composition/005-missing-required-input/child.nika.yaml",
+      "new": "conformance/tests/deep/composition/005-missing-required-input/child.nika",
+      "old_sha256": "2c2553ea03c93556e176db3fb27ea6415042fc0ec71ee78acb888dcee03c15cd",
+      "new_sha256_after_mv": "2c2553ea03c93556e176db3fb27ea6415042fc0ec71ee78acb888dcee03c15cd",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/deep/composition/006-arg-type-misfit/child.nika.yaml",
+      "new": "conformance/tests/deep/composition/006-arg-type-misfit/child.nika",
+      "old_sha256": "2c2553ea03c93556e176db3fb27ea6415042fc0ec71ee78acb888dcee03c15cd",
+      "new_sha256_after_mv": "2c2553ea03c93556e176db3fb27ea6415042fc0ec71ee78acb888dcee03c15cd",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/deep/composition/007-outputs-vs-returns/child.nika.yaml",
+      "new": "conformance/tests/deep/composition/007-outputs-vs-returns/child.nika",
+      "old_sha256": "c28c1129711413037cd85670208f974794e4977087951d6f9766a9380ef26f18",
+      "new_sha256_after_mv": "c28c1129711413037cd85670208f974794e4977087951d6f9766a9380ef26f18",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/deep/composition/008-effect-containment/child.nika.yaml",
+      "new": "conformance/tests/deep/composition/008-effect-containment/child.nika",
+      "old_sha256": "8f64930dab9489c2131bcecc4e29f6d1d0c22adf2dc8d9d1fe160cc27e4e7226",
+      "new_sha256_after_mv": "8f64930dab9489c2131bcecc4e29f6d1d0c22adf2dc8d9d1fe160cc27e4e7226",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/deep/composition/009-valid-composition/child.nika.yaml",
+      "new": "conformance/tests/deep/composition/009-valid-composition/child.nika",
+      "old_sha256": "d961fe47dee0e766b0c4c1868c11317e7127efb69f57554f5cf19a57cef59c0e",
+      "new_sha256_after_mv": "d961fe47dee0e766b0c4c1868c11317e7127efb69f57554f5cf19a57cef59c0e",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/access-harness/001-unattested-agent-seat-refuses-infer/input.nika.yaml",
+      "new": "conformance/tests/runtime/access-harness/001-unattested-agent-seat-refuses-infer/input.nika",
+      "old_sha256": "93473b7bc63eff0b30edbe1ebb8a1e2fa1f5afd13e3ad8d5ac96721c22cf7e6d",
+      "new_sha256_after_mv": "93473b7bc63eff0b30edbe1ebb8a1e2fa1f5afd13e3ad8d5ac96721c22cf7e6d",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/access-harness/002-infer-grade-seat-admits-infer/input.nika.yaml",
+      "new": "conformance/tests/runtime/access-harness/002-infer-grade-seat-admits-infer/input.nika",
+      "old_sha256": "a59829f2373a5aecb6a186f465a5a0e6c140022de918e338332c5f4f8d3365c7",
+      "new_sha256_after_mv": "a59829f2373a5aecb6a186f465a5a0e6c140022de918e338332c5f4f8d3365c7",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/agent/001-budget-exhaustion-fails/input.nika.yaml",
+      "new": "conformance/tests/runtime/agent/001-budget-exhaustion-fails/input.nika",
+      "old_sha256": "bc173f6ee7eb4a6695a5c0c885b367de8c926d513fb11506c48ddf8e4d39bd1a",
+      "new_sha256_after_mv": "bc173f6ee7eb4a6695a5c0c885b367de8c926d513fb11506c48ddf8e4d39bd1a",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/agent/002-done-result-becomes-output/input.nika.yaml",
+      "new": "conformance/tests/runtime/agent/002-done-result-becomes-output/input.nika",
+      "old_sha256": "2fbd3a671de10876307cea62d826ebe2e2e9a960c688cea60ecb4043ffeb9d27",
+      "new_sha256_after_mv": "2fbd3a671de10876307cea62d826ebe2e2e9a960c688cea60ecb4043ffeb9d27",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/agent/003-tool-error-feeds-back/input.nika.yaml",
+      "new": "conformance/tests/runtime/agent/003-tool-error-feeds-back/input.nika",
+      "old_sha256": "ce1fb30964e23a50519777c74ed237e739693fc10a6841c91b85ff249ad8555a",
+      "new_sha256_after_mv": "ce1fb30964e23a50519777c74ed237e739693fc10a6841c91b85ff249ad8555a",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/agent/004-text-with-done-exhausts-turns/input.nika.yaml",
+      "new": "conformance/tests/runtime/agent/004-text-with-done-exhausts-turns/input.nika",
+      "old_sha256": "a571600574a228ffadc8d60db0c9029503a1879e42c59349cbfc600f30d29c6c",
+      "new_sha256_after_mv": "a571600574a228ffadc8d60db0c9029503a1879e42c59349cbfc600f30d29c6c",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/agent/005-text-without-done-completes/input.nika.yaml",
+      "new": "conformance/tests/runtime/agent/005-text-without-done-completes/input.nika",
+      "old_sha256": "8b0ccaed420797fd4863e1d64a99c25b701e3c6a5b0fc7aeaa889ce52ff49f70",
+      "new_sha256_after_mv": "8b0ccaed420797fd4863e1d64a99c25b701e3c6a5b0fc7aeaa889ce52ff49f70",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/agent/006-text-with-done-exhausts-tokens/input.nika.yaml",
+      "new": "conformance/tests/runtime/agent/006-text-with-done-exhausts-tokens/input.nika",
+      "old_sha256": "26c0466cf8fe977cb48f2fd19f22fa30568e63d8efac1c967c63fe366f86a0f9",
+      "new_sha256_after_mv": "26c0466cf8fe977cb48f2fd19f22fa30568e63d8efac1c967c63fe366f86a0f9",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/errors/001-skip-preserves-error/input.nika.yaml",
+      "new": "conformance/tests/runtime/errors/001-skip-preserves-error/input.nika",
+      "old_sha256": "f0f8cdbb0af88fbb5aad82f93bad5307401cd150fd745059b5783cc462ec524f",
+      "new_sha256_after_mv": "f0f8cdbb0af88fbb5aad82f93bad5307401cd150fd745059b5783cc462ec524f",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/errors/002-on-codes-filter-falls-through/input.nika.yaml",
+      "new": "conformance/tests/runtime/errors/002-on-codes-filter-falls-through/input.nika",
+      "old_sha256": "f7258950d40de9207fc94032d3a9d563bfbba361d859120f63952936548c2855",
+      "new_sha256_after_mv": "f7258950d40de9207fc94032d3a9d563bfbba361d859120f63952936548c2855",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/errors/003-recover-feeds-bindings/input.nika.yaml",
+      "new": "conformance/tests/runtime/errors/003-recover-feeds-bindings/input.nika",
+      "old_sha256": "63bb5f020619198216daea674ca439535ca464b3972d13941f68e7955e40f1c1",
+      "new_sha256_after_mv": "63bb5f020619198216daea674ca439535ca464b3972d13941f68e7955e40f1c1",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/errors/004-retry-never-on-non-transient/input.nika.yaml",
+      "new": "conformance/tests/runtime/errors/004-retry-never-on-non-transient/input.nika",
+      "old_sha256": "3b22d203985e4a14effa08e453bc706e00d0f31f65bf204b19112726215a71d5",
+      "new_sha256_after_mv": "3b22d203985e4a14effa08e453bc706e00d0f31f65bf204b19112726215a71d5",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/for-each/001-null-placeholder/input.nika.yaml",
+      "new": "conformance/tests/runtime/for-each/001-null-placeholder/input.nika",
+      "old_sha256": "62b6e62880a3571fac7fc3a2cab9f652c307c1df12607054959d575623de36d4",
+      "new_sha256_after_mv": "62b6e62880a3571fac7fc3a2cab9f652c307c1df12607054959d575623de36d4",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/for-each/002-empty-collection-skips/input.nika.yaml",
+      "new": "conformance/tests/runtime/for-each/002-empty-collection-skips/input.nika",
+      "old_sha256": "def69c77e2af10ea17d671e3a45acf11f4a11dafc5a3c8c368acf42fd0fafd92",
+      "new_sha256_after_mv": "def69c77e2af10ea17d671e3a45acf11f4a11dafc5a3c8c368acf42fd0fafd92",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/for-each/003-non-array-is-var-006/input.nika.yaml",
+      "new": "conformance/tests/runtime/for-each/003-non-array-is-var-006/input.nika",
+      "old_sha256": "cfdd901a03dfa0de76b1a7bfb0e5c3c7f27bb0390f9eafd38c9b507d80e29447",
+      "new_sha256_after_mv": "cfdd901a03dfa0de76b1a7bfb0e5c3c7f27bb0390f9eafd38c9b507d80e29447",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/for-each/004-per-iteration-timeout/input.nika.yaml",
+      "new": "conformance/tests/runtime/for-each/004-per-iteration-timeout/input.nika",
+      "old_sha256": "aa97f56430de87c97d78719dd0771e0e7135ed12ffcd9d677944b8c9e74103a7",
+      "new_sha256_after_mv": "aa97f56430de87c97d78719dd0771e0e7135ed12ffcd9d677944b8c9e74103a7",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/001-always-pattern/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/001-always-pattern/input.nika",
+      "old_sha256": "1ed361ffb21bf59ed90c353e6ce70f6c0842b3cddb2efe73f3b0ac29d1c4cdab",
+      "new_sha256_after_mv": "1ed361ffb21bf59ed90c353e6ce70f6c0842b3cddb2efe73f3b0ac29d1c4cdab",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/010-success-x-with-value/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/010-success-x-with-value/input.nika",
+      "old_sha256": "6641ef00ef163505e887f2e96011a01d67af09bc1bd530356c62cbea35f0e8f7",
+      "new_sha256_after_mv": "6641ef00ef163505e887f2e96011a01d67af09bc1bd530356c62cbea35f0e8f7",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/011-failure-x-with-value/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/011-failure-x-with-value/input.nika",
+      "old_sha256": "e412d6df17ef0a1b33686b5e62ca7c01540790a219887cdeb7b2eb3c8d5b4503",
+      "new_sha256_after_mv": "e412d6df17ef0a1b33686b5e62ca7c01540790a219887cdeb7b2eb3c8d5b4503",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/012-skipped-x-with-value/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/012-skipped-x-with-value/input.nika",
+      "old_sha256": "407db10ba864b9b8eee25485bdfc3e6feff3ec1e5442454a7f348c8da4e04f67",
+      "new_sha256_after_mv": "407db10ba864b9b8eee25485bdfc3e6feff3ec1e5442454a7f348c8da4e04f67",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/013-cancelled-x-with-value/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/013-cancelled-x-with-value/input.nika",
+      "old_sha256": "2b91bc7f02b65cdaa6980f894221d7410213aef1cd76908d7fa0a8a877ec7406",
+      "new_sha256_after_mv": "2b91bc7f02b65cdaa6980f894221d7410213aef1cd76908d7fa0a8a877ec7406",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/014-success-x-with-status/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/014-success-x-with-status/input.nika",
+      "old_sha256": "25848b724b2c67f87df336cfb60ba07ca436823475c24f73db8d7a4d32e06ed3",
+      "new_sha256_after_mv": "25848b724b2c67f87df336cfb60ba07ca436823475c24f73db8d7a4d32e06ed3",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/015-failure-x-with-status/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/015-failure-x-with-status/input.nika",
+      "old_sha256": "bd125facbf1570257bd9faca136619b26175b7aba04a3f6e4dd58301acde890f",
+      "new_sha256_after_mv": "bd125facbf1570257bd9faca136619b26175b7aba04a3f6e4dd58301acde890f",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/016-skipped-x-with-status/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/016-skipped-x-with-status/input.nika",
+      "old_sha256": "05058f3f110a7368fab6930fc15927e8fa71741527fd198f02af2323f013d425",
+      "new_sha256_after_mv": "05058f3f110a7368fab6930fc15927e8fa71741527fd198f02af2323f013d425",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/017-cancelled-x-with-status/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/017-cancelled-x-with-status/input.nika",
+      "old_sha256": "ca9309aec58b06b7e4b17deabe731f4de6212d6e184f897cc0cf643bc68555d1",
+      "new_sha256_after_mv": "ca9309aec58b06b7e4b17deabe731f4de6212d6e184f897cc0cf643bc68555d1",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/018-success-x-with-error/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/018-success-x-with-error/input.nika",
+      "old_sha256": "8b485a6d48f270d77496fba28893037f2b9b70f421fb4a16e48f2d89c0d4b840",
+      "new_sha256_after_mv": "8b485a6d48f270d77496fba28893037f2b9b70f421fb4a16e48f2d89c0d4b840",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/019-failure-x-with-error/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/019-failure-x-with-error/input.nika",
+      "old_sha256": "ff213fb8476997fa9f6f2ff062082ae73f718e7f2bb6f632c204932d7ed2e7e1",
+      "new_sha256_after_mv": "ff213fb8476997fa9f6f2ff062082ae73f718e7f2bb6f632c204932d7ed2e7e1",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/020-skipped-x-with-error/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/020-skipped-x-with-error/input.nika",
+      "old_sha256": "388462b00656011137c11df2ce0ecfa884f60af1012be93d4b4e80714c2f245a",
+      "new_sha256_after_mv": "388462b00656011137c11df2ce0ecfa884f60af1012be93d4b4e80714c2f245a",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/021-cancelled-x-with-error/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/021-cancelled-x-with-error/input.nika",
+      "old_sha256": "7805c94798ecd9058c0e8a4e8be85a4614e0a2b0a06bc6a34e4d25f543ee792d",
+      "new_sha256_after_mv": "7805c94798ecd9058c0e8a4e8be85a4614e0a2b0a06bc6a34e4d25f543ee792d",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/022-success-x-after-success/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/022-success-x-after-success/input.nika",
+      "old_sha256": "316903977712100ae25e2b8297b1f25b039377c83f6c7036f44f11fb4729b734",
+      "new_sha256_after_mv": "316903977712100ae25e2b8297b1f25b039377c83f6c7036f44f11fb4729b734",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/023-failure-x-after-success/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/023-failure-x-after-success/input.nika",
+      "old_sha256": "3f67d8141cd32440af7057e5113fec718b6f86842eda3b4f9d387666f321dd14",
+      "new_sha256_after_mv": "3f67d8141cd32440af7057e5113fec718b6f86842eda3b4f9d387666f321dd14",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/024-cancelled-x-after-success/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/024-cancelled-x-after-success/input.nika",
+      "old_sha256": "0ab53cb68054e252aeb8f1124a3b35e658b4dc38569503fbe990bdf22fe39e11",
+      "new_sha256_after_mv": "0ab53cb68054e252aeb8f1124a3b35e658b4dc38569503fbe990bdf22fe39e11",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/025-success-x-after-failure/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/025-success-x-after-failure/input.nika",
+      "old_sha256": "8be7a3f0a7f1aa0599cae5c4988c7e25c8f3401cd284ef945b94aea8d021f749",
+      "new_sha256_after_mv": "8be7a3f0a7f1aa0599cae5c4988c7e25c8f3401cd284ef945b94aea8d021f749",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/026-failure-x-after-failure/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/026-failure-x-after-failure/input.nika",
+      "old_sha256": "520c79b50fec421643e0e7f9c4b010a1f4696f24fbd5e5f34ee01a10bf65081d",
+      "new_sha256_after_mv": "520c79b50fec421643e0e7f9c4b010a1f4696f24fbd5e5f34ee01a10bf65081d",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/027-cancelled-x-after-failure/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/027-cancelled-x-after-failure/input.nika",
+      "old_sha256": "961c0ba19fe313e02e47f05b24cdf67816e6398ae02b23dde5d69113d0b50293",
+      "new_sha256_after_mv": "961c0ba19fe313e02e47f05b24cdf67816e6398ae02b23dde5d69113d0b50293",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/028-skipped-x-after-skipped/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/028-skipped-x-after-skipped/input.nika",
+      "old_sha256": "3020f69469653972286c9e9e0629dc9159488b8f2098c3985639cce822920691",
+      "new_sha256_after_mv": "3020f69469653972286c9e9e0629dc9159488b8f2098c3985639cce822920691",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/029-success-x-after-terminal/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/029-success-x-after-terminal/input.nika",
+      "old_sha256": "035388ef66a85b969d5de01a111f8bf5aca12d847be1f1525cf68a716d25c595",
+      "new_sha256_after_mv": "035388ef66a85b969d5de01a111f8bf5aca12d847be1f1525cf68a716d25c595",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/030-failure-x-after-terminal/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/030-failure-x-after-terminal/input.nika",
+      "old_sha256": "9e33bd5c156f4b2d6c87c003a8f6071c9f91a4a96385e26fc3b4c18b1e1f9c70",
+      "new_sha256_after_mv": "9e33bd5c156f4b2d6c87c003a8f6071c9f91a4a96385e26fc3b4c18b1e1f9c70",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/031-skipped-x-after-terminal/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/031-skipped-x-after-terminal/input.nika",
+      "old_sha256": "8ea9a938e986c04447155581962cb76083b8c76a9790c1b298ca4a2bf4c0fd2b",
+      "new_sha256_after_mv": "8ea9a938e986c04447155581962cb76083b8c76a9790c1b298ca4a2bf4c0fd2b",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/032-cancelled-x-after-terminal/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/032-cancelled-x-after-terminal/input.nika",
+      "old_sha256": "f71d68063cd8400b12d9b21e652c48a576c7e5e7bc5629fbfe2580b88aacb9c4",
+      "new_sha256_after_mv": "f71d68063cd8400b12d9b21e652c48a576c7e5e7bc5629fbfe2580b88aacb9c4",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/033-success-x-when-true/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/033-success-x-when-true/input.nika",
+      "old_sha256": "c76d745f9e17c5043141eed124f75b3e94cf9b5ac74a5c42e5e9329bce5f37c8",
+      "new_sha256_after_mv": "c76d745f9e17c5043141eed124f75b3e94cf9b5ac74a5c42e5e9329bce5f37c8",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/034-failure-x-when-true/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/034-failure-x-when-true/input.nika",
+      "old_sha256": "9598aa668eed03f68eb8b7cb710289f5d1ea4aeecc81e611f25f0cdba4d22b8a",
+      "new_sha256_after_mv": "9598aa668eed03f68eb8b7cb710289f5d1ea4aeecc81e611f25f0cdba4d22b8a",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/035-skipped-x-when-true/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/035-skipped-x-when-true/input.nika",
+      "old_sha256": "68b8b4bec7ee92ea1ff8c8a4208f619c802611dcb025088a1d0c19cc1b2f3275",
+      "new_sha256_after_mv": "68b8b4bec7ee92ea1ff8c8a4208f619c802611dcb025088a1d0c19cc1b2f3275",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/036-cancelled-x-when-true/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/036-cancelled-x-when-true/input.nika",
+      "old_sha256": "d0ed6679c562d96a8f0f26389d1a13e783586066d3b75a3515d9b2865bfea0d0",
+      "new_sha256_after_mv": "d0ed6679c562d96a8f0f26389d1a13e783586066d3b75a3515d9b2865bfea0d0",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/037-success-x-when-false/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/037-success-x-when-false/input.nika",
+      "old_sha256": "659c78e9325bc81fedfacf44bee89f227ca7191a9374814df139515619cafa8d",
+      "new_sha256_after_mv": "659c78e9325bc81fedfacf44bee89f227ca7191a9374814df139515619cafa8d",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/038-failure-x-when-false/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/038-failure-x-when-false/input.nika",
+      "old_sha256": "a02a44a85d7924340b2cde319006b6d810e96fa6c1405cc87e228ca9b963195b",
+      "new_sha256_after_mv": "a02a44a85d7924340b2cde319006b6d810e96fa6c1405cc87e228ca9b963195b",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/039-skipped-x-when-false/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/039-skipped-x-when-false/input.nika",
+      "old_sha256": "0dbd38cd140cd3d94e97979921dbd2b73dad10bf185ac6d37a241d9a815196f8",
+      "new_sha256_after_mv": "0dbd38cd140cd3d94e97979921dbd2b73dad10bf185ac6d37a241d9a815196f8",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/040-cancelled-x-when-false/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/040-cancelled-x-when-false/input.nika",
+      "old_sha256": "7eac139a980b3f3cf8d7c93f5cfbd99cce46d234fdf0e6d9a620b1373c1342d1",
+      "new_sha256_after_mv": "7eac139a980b3f3cf8d7c93f5cfbd99cce46d234fdf0e6d9a620b1373c1342d1",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/041-success-x-no-edge/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/041-success-x-no-edge/input.nika",
+      "old_sha256": "90b30e5de3aceb918c40e484ca2b7edcfdf3627e810b3c37d980ed84dd62ebdf",
+      "new_sha256_after_mv": "90b30e5de3aceb918c40e484ca2b7edcfdf3627e810b3c37d980ed84dd62ebdf",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/042-failure-x-no-edge/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/042-failure-x-no-edge/input.nika",
+      "old_sha256": "4f9912439777bcc7c688f12c7d5656546b95b28074bb44e977cd1e26253b4df9",
+      "new_sha256_after_mv": "4f9912439777bcc7c688f12c7d5656546b95b28074bb44e977cd1e26253b4df9",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/043-skipped-x-no-edge/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/043-skipped-x-no-edge/input.nika",
+      "old_sha256": "00e9c4152b9dc6e9864c20c3e798c04c36787b14af9b441b6f48cf0e3506680a",
+      "new_sha256_after_mv": "00e9c4152b9dc6e9864c20c3e798c04c36787b14af9b441b6f48cf0e3506680a",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/gates/044-cancelled-x-no-edge/input.nika.yaml",
+      "new": "conformance/tests/runtime/gates/044-cancelled-x-no-edge/input.nika",
+      "old_sha256": "2b0cd9c085e8406c1988ef5d52b9bab03b92aff521cf0460158bdb4b83b83bea",
+      "new_sha256_after_mv": "2b0cd9c085e8406c1988ef5d52b9bab03b92aff521cf0460158bdb4b83b83bea",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/permits/001-runtime-boundary-hit/input.nika.yaml",
+      "new": "conformance/tests/runtime/permits/001-runtime-boundary-hit/input.nika",
+      "old_sha256": "fe3abab893e577f76e04d34271b58dcb6404cea9db1630a5e16c8ac74a5105d0",
+      "new_sha256_after_mv": "fe3abab893e577f76e04d34271b58dcb6404cea9db1630a5e16c8ac74a5105d0",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/permits/002-empty-permits-pure-compute/input.nika.yaml",
+      "new": "conformance/tests/runtime/permits/002-empty-permits-pure-compute/input.nika",
+      "old_sha256": "c4d466b48a184e155e775658d99403eaef2bd440da9c31b1217ef6e09c9a1822",
+      "new_sha256_after_mv": "c4d466b48a184e155e775658d99403eaef2bd440da9c31b1217ef6e09c9a1822",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/permits/003-dynamic-host-runtime-refusal/input.nika.yaml",
+      "new": "conformance/tests/runtime/permits/003-dynamic-host-runtime-refusal/input.nika",
+      "old_sha256": "f27bdca86869df4d5af63ae216a867a26e70577f098e080d72dfde2c550948b6",
+      "new_sha256_after_mv": "f27bdca86869df4d5af63ae216a867a26e70577f098e080d72dfde2c550948b6",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/permits/004-untrusted-arg-runtime-regate/input.nika.yaml",
+      "new": "conformance/tests/runtime/permits/004-untrusted-arg-runtime-regate/input.nika",
+      "old_sha256": "f35b7babd0e1962d303f42bf5815d9a3c03000d680e11527b200f6b99610e01f",
+      "new_sha256_after_mv": "f35b7babd0e1962d303f42bf5815d9a3c03000d680e11527b200f6b99610e01f",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/permits/005-undeclared-env-empty-at-spawn/input.nika.yaml",
+      "new": "conformance/tests/runtime/permits/005-undeclared-env-empty-at-spawn/input.nika",
+      "old_sha256": "3270524285e9c28a2c3d01cc6f2feea0d0ecb924d839d884aa9f8a9bbce19744",
+      "new_sha256_after_mv": "3270524285e9c28a2c3d01cc6f2feea0d0ecb924d839d884aa9f8a9bbce19744",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/permits/006-env-passthrough-reaches-child/input.nika.yaml",
+      "new": "conformance/tests/runtime/permits/006-env-passthrough-reaches-child/input.nika",
+      "old_sha256": "62f30d77a08278dd3e26bcf35a4a056dbdfceb3c035c09968052cf15f4390322",
+      "new_sha256_after_mv": "62f30d77a08278dd3e26bcf35a4a056dbdfceb3c035c09968052cf15f4390322",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/permits/007-fetch-code-bearing-runtime-refusal/input.nika.yaml",
+      "new": "conformance/tests/runtime/permits/007-fetch-code-bearing-runtime-refusal/input.nika",
+      "old_sha256": "4345d5d000be9426715ea28baba9af8e42eb6fba01cc08fca13db4846f7caca9",
+      "new_sha256_after_mv": "4345d5d000be9426715ea28baba9af8e42eb6fba01cc08fca13db4846f7caca9",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/resume/001-cross-version-refused/golden.nika.yaml",
+      "new": "conformance/tests/runtime/resume/001-cross-version-refused/golden.nika",
+      "old_sha256": "0d79a8588dd3d83c61614490c15dab0a6ce90ce4afb2c5e2c208c4c959e7f6e9",
+      "new_sha256_after_mv": "0d79a8588dd3d83c61614490c15dab0a6ce90ce4afb2c5e2c208c4c959e7f6e9",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/trace/001-golden-chained-journal/golden.nika.yaml",
+      "new": "conformance/tests/runtime/trace/001-golden-chained-journal/golden.nika",
+      "old_sha256": "6c874750151d8c1d62ba6766627855aa927830008432f79a96a03872398aa652",
+      "new_sha256_after_mv": "6c874750151d8c1d62ba6766627855aa927830008432f79a96a03872398aa652",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/trace/007-boot-manifest-and-known-pin/golden.nika.yaml",
+      "new": "conformance/tests/runtime/trace/007-boot-manifest-and-known-pin/golden.nika",
+      "old_sha256": "c187c1584f037fe617000354df8b1d7a99278e67b68435991f6d9feeca10edf9",
+      "new_sha256_after_mv": "c187c1584f037fe617000354df8b1d7a99278e67b68435991f6d9feeca10edf9",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/trace/008-paged-item-evidence/golden.nika.yaml",
+      "new": "conformance/tests/runtime/trace/008-paged-item-evidence/golden.nika",
+      "old_sha256": "9959e2d0e6ff3372711589882dcce48e3419365503f4080f23a40ea87705d8d3",
+      "new_sha256_after_mv": "9959e2d0e6ff3372711589882dcce48e3419365503f4080f23a40ea87705d8d3",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/trace/010-api-input-origins/golden.nika.yaml",
+      "new": "conformance/tests/runtime/trace/010-api-input-origins/golden.nika",
+      "old_sha256": "dcde7e7527e5419d6d61e5a79c1bc5a6e1bfb1202f51f1cfc44ad2f969eceba8",
+      "new_sha256_after_mv": "dcde7e7527e5419d6d61e5a79c1bc5a6e1bfb1202f51f1cfc44ad2f969eceba8",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/runtime/variables/001-run-start-clock/input.nika.yaml",
+      "new": "conformance/tests/runtime/variables/001-run-start-clock/input.nika",
+      "old_sha256": "a8eb4a2df214f0304b7313c6c6a7b0e32fd9cd8655fb80d31d3cb61072cc794f",
+      "new_sha256_after_mv": "a8eb4a2df214f0304b7313c6c6a7b0e32fd9cd8655fb80d31d3cb61072cc794f",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/stdlib/behavioral/001-jq-transform/input.nika.yaml",
+      "new": "conformance/tests/stdlib/behavioral/001-jq-transform/input.nika",
+      "old_sha256": "e65877dd21612e99a3d42b13651d484b34633517d2289a9a23996538a5ef6d8c",
+      "new_sha256_after_mv": "e65877dd21612e99a3d42b13651d484b34633517d2289a9a23996538a5ef6d8c",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/stdlib/behavioral/002-write-read-roundtrip/input.nika.yaml",
+      "new": "conformance/tests/stdlib/behavioral/002-write-read-roundtrip/input.nika",
+      "old_sha256": "95e1281824d5b018791c7f70e83226c5d3e4ca36b95a841be2ea8c383a28d7fa",
+      "new_sha256_after_mv": "95e1281824d5b018791c7f70e83226c5d3e4ca36b95a841be2ea8c383a28d7fa",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/stdlib/behavioral/003-convert-json-to-csv/input.nika.yaml",
+      "new": "conformance/tests/stdlib/behavioral/003-convert-json-to-csv/input.nika",
+      "old_sha256": "e3b8dd2ede9dda20b0827cb89e69c5077c42f51f2f7db89f28f45a17df757252",
+      "new_sha256_after_mv": "e3b8dd2ede9dda20b0827cb89e69c5077c42f51f2f7db89f28f45a17df757252",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/stdlib/behavioral/004-assert-holds/input.nika.yaml",
+      "new": "conformance/tests/stdlib/behavioral/004-assert-holds/input.nika",
+      "old_sha256": "a7ed582666b2e7b89b41bc66b08809d00315bddb5846a2fdbfeca7315b6988e1",
+      "new_sha256_after_mv": "a7ed582666b2e7b89b41bc66b08809d00315bddb5846a2fdbfeca7315b6988e1",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/tests/stdlib/behavioral/005-assert-fires/input.nika.yaml",
+      "new": "conformance/tests/stdlib/behavioral/005-assert-fires/input.nika",
+      "old_sha256": "b43cb812d916422835ef85e7594f6ba49805a1a0fca8f949a02a9d188539d291",
+      "new_sha256_after_mv": "b43cb812d916422835ef85e7594f6ba49805a1a0fca8f949a02a9d188539d291",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/variables/arithmetic-rejected.nika.yaml",
+      "new": "conformance/variables/arithmetic-rejected.nika",
+      "old_sha256": "fbc9114f5c132bf65bab5a066803db0858f24cc7a2385b34b70c2610396b5efe",
+      "new_sha256_after_mv": "fbc9114f5c132bf65bab5a066803db0858f24cc7a2385b34b70c2610396b5efe",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/variables/binding-bad-syntax-error.nika.yaml",
+      "new": "conformance/variables/binding-bad-syntax-error.nika",
+      "old_sha256": "e1cefdd8b3099a7d3fdd852fd6702b2d5295a731e36d885f43663613933ab5f0",
+      "new_sha256_after_mv": "e1cefdd8b3099a7d3fdd852fd6702b2d5295a731e36d885f43663613933ab5f0",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/variables/binding-stream-error.nika.yaml",
+      "new": "conformance/variables/binding-stream-error.nika",
+      "old_sha256": "b051b7fd2461e47e307fc26b2c42b11ad974f522d1f55491ce39c1cf69aaef99",
+      "new_sha256_after_mv": "b051b7fd2461e47e307fc26b2c42b11ad974f522d1f55491ce39c1cf69aaef99",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/variables/cross-type-compare-error.nika.yaml",
+      "new": "conformance/variables/cross-type-compare-error.nika",
+      "old_sha256": "0387e69b88b92a542189a869df4ca570baae7b9f0522d0c9f6e68cf13450c649",
+      "new_sha256_after_mv": "0387e69b88b92a542189a869df4ca570baae7b9f0522d0c9f6e68cf13450c649",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/variables/foreach-non-array-either.nika.yaml",
+      "new": "conformance/variables/foreach-non-array-either.nika",
+      "old_sha256": "0daa7ee4f20c12e26c89bc5628fa3850f12797e495c47fbb611a9ab93579d343",
+      "new_sha256_after_mv": "0daa7ee4f20c12e26c89bc5628fa3850f12797e495c47fbb611a9ab93579d343",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/variables/foreach-non-array-run.nika.yaml",
+      "new": "conformance/variables/foreach-non-array-run.nika",
+      "old_sha256": "f8d3e8e813575fcbdbf7feb825069202673ddc3c1105edeb299a66fb4c3b7201",
+      "new_sha256_after_mv": "f8d3e8e813575fcbdbf7feb825069202673ddc3c1105edeb299a66fb4c3b7201",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/variables/jq-expression-static-reject.nika.yaml",
+      "new": "conformance/variables/jq-expression-static-reject.nika",
+      "old_sha256": "6d7f73783e6466ffb7235a4bea8373b791a0f5f2af3f7b84c751ceb306d19f66",
+      "new_sha256_after_mv": "6d7f73783e6466ffb7235a4bea8373b791a0f5f2af3f7b84c751ceb306d19f66",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/variables/missing-task-ref-reject.nika.yaml",
+      "new": "conformance/variables/missing-task-ref-reject.nika",
+      "old_sha256": "a0a214611b150f3bc97515ad63073cbe7bce5f03ef0c937df14e209fd5e475ac",
+      "new_sha256_after_mv": "a0a214611b150f3bc97515ad63073cbe7bce5f03ef0c937df14e209fd5e475ac",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/variables/null-membership-compare.nika.yaml",
+      "new": "conformance/variables/null-membership-compare.nika",
+      "old_sha256": "726b908f47b8d5b1a7799c1563a398853ea382d0c91f0369e9b2fc810bbc2f74",
+      "new_sha256_after_mv": "726b908f47b8d5b1a7799c1563a398853ea382d0c91f0369e9b2fc810bbc2f74",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/variables/number-continuum.nika.yaml",
+      "new": "conformance/variables/number-continuum.nika",
+      "old_sha256": "0148766d6ea912793bfc7b5e81e417c05b4ff1d9bdb48d9c5be1f4e4e44602e3",
+      "new_sha256_after_mv": "0148766d6ea912793bfc7b5e81e417c05b4ff1d9bdb48d9c5be1f4e4e44602e3",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/variables/static-type-error-reject.nika.yaml",
+      "new": "conformance/variables/static-type-error-reject.nika",
+      "old_sha256": "91dd480c42646cbbb0c770e5d92b2446560670de7e3d492d3721fefd03df7533",
+      "new_sha256_after_mv": "91dd480c42646cbbb0c770e5d92b2446560670de7e3d492d3721fefd03df7533",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/variables/string-method-type-mismatch.nika.yaml",
+      "new": "conformance/variables/string-method-type-mismatch.nika",
+      "old_sha256": "8421d82670dbae8946758433ec64c83672a81e104263b90bbda6c635960e44a3",
+      "new_sha256_after_mv": "8421d82670dbae8946758433ec64c83672a81e104263b90bbda6c635960e44a3",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/variables/typed-outputs-mismatch.nika.yaml",
+      "new": "conformance/variables/typed-outputs-mismatch.nika",
+      "old_sha256": "8c88c70f2adf2b55ec0a01121c56b2e5460f635d8f3b901a5ba866b91c35865e",
+      "new_sha256_after_mv": "8c88c70f2adf2b55ec0a01121c56b2e5460f635d8f3b901a5ba866b91c35865e",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/variables/typed-vars-declarations.nika.yaml",
+      "new": "conformance/variables/typed-vars-declarations.nika",
+      "old_sha256": "fa8f708fae6e189163073af6d96b960635a2a4f26aa264dda56d91a1ceb67611",
+      "new_sha256_after_mv": "fa8f708fae6e189163073af6d96b960635a2a4f26aa264dda56d91a1ceb67611",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/variables/unclosed-island-reject.nika.yaml",
+      "new": "conformance/variables/unclosed-island-reject.nika",
+      "old_sha256": "beabbe60150fbb7c1becaccb7567e1b61e8f945ef01278f9a97493311cd0eefa",
+      "new_sha256_after_mv": "beabbe60150fbb7c1becaccb7567e1b61e8f945ef01278f9a97493311cd0eefa",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/variables/unknown-function-reject.nika.yaml",
+      "new": "conformance/variables/unknown-function-reject.nika",
+      "old_sha256": "e8517a62aeba978e51f5504dba7901773da7319a4ee76a82f2eea87aff189e19",
+      "new_sha256_after_mv": "e8517a62aeba978e51f5504dba7901773da7319a4ee76a82f2eea87aff189e19",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/variables/unresolved-ref-reject.nika.yaml",
+      "new": "conformance/variables/unresolved-ref-reject.nika",
+      "old_sha256": "b89579d4133b8548fc78761d57e4e0e4a6e789b3d92a5204f2b3ed06e2016abd",
+      "new_sha256_after_mv": "b89579d4133b8548fc78761d57e4e0e4a6e789b3d92a5204f2b3ed06e2016abd",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/variables/when-bare-ref-reject.nika.yaml",
+      "new": "conformance/variables/when-bare-ref-reject.nika",
+      "old_sha256": "6c2e4f94d72007d85c46f7ef640309e31420839c5e13d8ad365cccbc1d5b0824",
+      "new_sha256_after_mv": "6c2e4f94d72007d85c46f7ef640309e31420839c5e13d8ad365cccbc1d5b0824",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/variables/when-string-literal-reject.nika.yaml",
+      "new": "conformance/variables/when-string-literal-reject.nika",
+      "old_sha256": "a084121d0a686a88a892bdc9af5149dd3586f9259c182eb376cb7e203e4ceba0",
+      "new_sha256_after_mv": "a084121d0a686a88a892bdc9af5149dd3586f9259c182eb376cb7e203e4ceba0",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/verbs/agent-injection-contained.nika.yaml",
+      "new": "conformance/verbs/agent-injection-contained.nika",
+      "old_sha256": "174ddf1404d0b7ee31ea355d47b93adcbf31463fdffc2656493ecfa6a9af9fd2",
+      "new_sha256_after_mv": "174ddf1404d0b7ee31ea355d47b93adcbf31463fdffc2656493ecfa6a9af9fd2",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/verbs/agent-pure-conversation.nika.yaml",
+      "new": "conformance/verbs/agent-pure-conversation.nika",
+      "old_sha256": "901e2555f82fbc17f1a95f9e08ea25c5cb359c22244129d83b1e98bc7ab9ba7a",
+      "new_sha256_after_mv": "901e2555f82fbc17f1a95f9e08ea25c5cb359c22244129d83b1e98bc7ab9ba7a",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/verbs/builtin-assert-fail.nika.yaml",
+      "new": "conformance/verbs/builtin-assert-fail.nika",
+      "old_sha256": "053a808e192c0bae5eb5d5c938437a4313abcab6d0397514820aad09f50a4544",
+      "new_sha256_after_mv": "053a808e192c0bae5eb5d5c938437a4313abcab6d0397514820aad09f50a4544",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/verbs/builtin-assert-positive.nika.yaml",
+      "new": "conformance/verbs/builtin-assert-positive.nika",
+      "old_sha256": "f53fe5c6cf59ed2b728b2d3d530f721acf5a1d53efbbb8f89240f43c2910429d",
+      "new_sha256_after_mv": "f53fe5c6cf59ed2b728b2d3d530f721acf5a1d53efbbb8f89240f43c2910429d",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/verbs/builtin-extract-inline.nika.yaml",
+      "new": "conformance/verbs/builtin-extract-inline.nika",
+      "old_sha256": "0f84e0e8642ae282647d8e9e242eabea82b25d5956a1af5761dcd61063d66cb8",
+      "new_sha256_after_mv": "0f84e0e8642ae282647d8e9e242eabea82b25d5956a1af5761dcd61063d66cb8",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/verbs/builtin-jq-runtime-error.nika.yaml",
+      "new": "conformance/verbs/builtin-jq-runtime-error.nika",
+      "old_sha256": "5de6dd69615fd95df3868565532490de94e2271772c586c5c1ee657c1fd8c095",
+      "new_sha256_after_mv": "5de6dd69615fd95df3868565532490de94e2271772c586c5c1ee657c1fd8c095",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/verbs/builtin-json-diff.nika.yaml",
+      "new": "conformance/verbs/builtin-json-diff.nika",
+      "old_sha256": "325e41cf53cdda6b6fff8b041dcc9db3e0cd07917ee0c1b58ba303154cd88a4f",
+      "new_sha256_after_mv": "325e41cf53cdda6b6fff8b041dcc9db3e0cd07917ee0c1b58ba303154cd88a4f",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/verbs/builtin-validate-bad-schema.nika.yaml",
+      "new": "conformance/verbs/builtin-validate-bad-schema.nika",
+      "old_sha256": "2825fd67153b77b301ff68f5aa21bfaf353191013a466e2046a1d11fac4de4a6",
+      "new_sha256_after_mv": "2825fd67153b77b301ff68f5aa21bfaf353191013a466e2046a1d11fac4de4a6",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/verbs/builtin-validate-errors-array.nika.yaml",
+      "new": "conformance/verbs/builtin-validate-errors-array.nika",
+      "old_sha256": "e87f3dae199fc1286f05aca8f742a4053705367cb54fe6ce53468f81b533605b",
+      "new_sha256_after_mv": "e87f3dae199fc1286f05aca8f742a4053705367cb54fe6ce53468f81b533605b",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/verbs/builtin-validate-positive.nika.yaml",
+      "new": "conformance/verbs/builtin-validate-positive.nika",
+      "old_sha256": "4222119a4344e9452ab0a99e021c2c469450ac2eede3de9df3780b52000a805e",
+      "new_sha256_after_mv": "4222119a4344e9452ab0a99e021c2c469450ac2eede3de9df3780b52000a805e",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/verbs/builtin-write-runtime-gap.nika.yaml",
+      "new": "conformance/verbs/builtin-write-runtime-gap.nika",
+      "old_sha256": "0de86093d9f3256f17a1c3566d99008dab19bf2fab6478ab8b597f991be35d5a",
+      "new_sha256_after_mv": "0de86093d9f3256f17a1c3566d99008dab19bf2fab6478ab8b597f991be35d5a",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/verbs/exec-capture-convert-chain.nika.yaml",
+      "new": "conformance/verbs/exec-capture-convert-chain.nika",
+      "old_sha256": "0fd490087a561fe03e1f1c7b81aed24d87189764a42207ddfff3e0874357fc48",
+      "new_sha256_after_mv": "0fd490087a561fe03e1f1c7b81aed24d87189764a42207ddfff3e0874357fc48",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/verbs/exec-nonzero-exit.nika.yaml",
+      "new": "conformance/verbs/exec-nonzero-exit.nika",
+      "old_sha256": "430d88fb188f382b5a56afce12a08b4127602b5f3b993e527fb3716924a714a7",
+      "new_sha256_after_mv": "430d88fb188f382b5a56afce12a08b4127602b5f3b993e527fb3716924a714a7",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/verbs/exec-spawn-fail.nika.yaml",
+      "new": "conformance/verbs/exec-spawn-fail.nika",
+      "old_sha256": "819ff60e5095eebf44c013c23c22834a89012a76aedcd86bc754343e6c28516a",
+      "new_sha256_after_mv": "819ff60e5095eebf44c013c23c22834a89012a76aedcd86bc754343e6c28516a",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/verbs/invoke-unknown-tool-reject.nika.yaml",
+      "new": "conformance/verbs/invoke-unknown-tool-reject.nika",
+      "old_sha256": "e86e5e3612ea46f43f75c74c4748e3f6d03cf4a3ba58dd454e5827b751a07f4a",
+      "new_sha256_after_mv": "e86e5e3612ea46f43f75c74c4748e3f6d03cf4a3ba58dd454e5827b751a07f4a",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/verbs/timeout-basic.nika.yaml",
+      "new": "conformance/verbs/timeout-basic.nika",
+      "old_sha256": "e98038591a8e6336d99ea0a2242ebbc2dde71016a215e50f17bd5a2923246a97",
+      "new_sha256_after_mv": "e98038591a8e6336d99ea0a2242ebbc2dde71016a215e50f17bd5a2923246a97",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/verbs/timeout-per-iteration.nika.yaml",
+      "new": "conformance/verbs/timeout-per-iteration.nika",
+      "old_sha256": "9abbbb02e7d6237322511e192eac633f868d9ce20542abf20828309b4ef89f11",
+      "new_sha256_after_mv": "9abbbb02e7d6237322511e192eac633f868d9ce20542abf20828309b4ef89f11",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/yaml-profile/invalid/alias-ref.nika.yaml",
+      "new": "conformance/yaml-profile/invalid/alias-ref.nika",
+      "old_sha256": "2d3833bc8d95506b91bcd05a09afe608c9ab1a40527530668ff82c1fdbe6864b",
+      "new_sha256_after_mv": "2d3833bc8d95506b91bcd05a09afe608c9ab1a40527530668ff82c1fdbe6864b",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/yaml-profile/invalid/anchor-unreferenced.nika.yaml",
+      "new": "conformance/yaml-profile/invalid/anchor-unreferenced.nika",
+      "old_sha256": "ba2156655a0509d720375a76750374c885f77af8561124e9f47b22e4d7ca763f",
+      "new_sha256_after_mv": "ba2156655a0509d720375a76750374c885f77af8561124e9f47b22e4d7ca763f",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/yaml-profile/invalid/bom.nika.yaml",
+      "new": "conformance/yaml-profile/invalid/bom.nika",
+      "old_sha256": "96196ed797f40bbe91a7e4839a1cbdbf3332be104cc545ecf3acf9c5f95570b1",
+      "new_sha256_after_mv": "96196ed797f40bbe91a7e4839a1cbdbf3332be104cc545ecf3acf9c5f95570b1",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/yaml-profile/invalid/custom-tag.nika.yaml",
+      "new": "conformance/yaml-profile/invalid/custom-tag.nika",
+      "old_sha256": "375e6c004a39d7d94c7868bc97a3ac1e3fd4c8b1abd8f54de2c9f89574a7feec",
+      "new_sha256_after_mv": "375e6c004a39d7d94c7868bc97a3ac1e3fd4c8b1abd8f54de2c9f89574a7feec",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/yaml-profile/invalid/depth-over-cap.nika.yaml",
+      "new": "conformance/yaml-profile/invalid/depth-over-cap.nika",
+      "old_sha256": "26828bce5250b75753d5ac111540b35b580bdb1c709b86df5547ec55a837373c",
+      "new_sha256_after_mv": "26828bce5250b75753d5ac111540b35b580bdb1c709b86df5547ec55a837373c",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/yaml-profile/invalid/document-over-cap.nika.yaml",
+      "new": "conformance/yaml-profile/invalid/document-over-cap.nika",
+      "old_sha256": "039053ae8b80a5f83b2ff2186d77b6a260c41a5292507edd331d44c0e847ccaa",
+      "new_sha256_after_mv": "039053ae8b80a5f83b2ff2186d77b6a260c41a5292507edd331d44c0e847ccaa",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/yaml-profile/invalid/dup-key.nika.yaml",
+      "new": "conformance/yaml-profile/invalid/dup-key.nika",
+      "old_sha256": "a2d7374fe7f6e2d675a15fd4d9b1a4a3ee00e90d5c58655f7c256db97d7ab720",
+      "new_sha256_after_mv": "a2d7374fe7f6e2d675a15fd4d9b1a4a3ee00e90d5c58655f7c256db97d7ab720",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/yaml-profile/invalid/infinity-scalar.nika.yaml",
+      "new": "conformance/yaml-profile/invalid/infinity-scalar.nika",
+      "old_sha256": "073d25245cc25365c8023cac273b3309be82e334a8b92787e326df76fa13986a",
+      "new_sha256_after_mv": "073d25245cc25365c8023cac273b3309be82e334a8b92787e326df76fa13986a",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/yaml-profile/invalid/merge-key.nika.yaml",
+      "new": "conformance/yaml-profile/invalid/merge-key.nika",
+      "old_sha256": "275ce8170932174648ea908fe184b18f2c936095edd5545b5931150596b52ce6",
+      "new_sha256_after_mv": "275ce8170932174648ea908fe184b18f2c936095edd5545b5931150596b52ce6",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/yaml-profile/invalid/nan-scalar.nika.yaml",
+      "new": "conformance/yaml-profile/invalid/nan-scalar.nika",
+      "old_sha256": "b54f9f5fd6d19ceb6ad6c40986fb5e364c699552cff23dbf38e04753939daf7c",
+      "new_sha256_after_mv": "b54f9f5fd6d19ceb6ad6c40986fb5e364c699552cff23dbf38e04753939daf7c",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/yaml-profile/invalid/non-nfc.nika.yaml",
+      "new": "conformance/yaml-profile/invalid/non-nfc.nika",
+      "old_sha256": "369c34e951be32bd6e993060d502dc804e6c54c4d9c00bd5704aa6dadbd935e7",
+      "new_sha256_after_mv": "369c34e951be32bd6e993060d502dc804e6c54c4d9c00bd5704aa6dadbd935e7",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/yaml-profile/invalid/non-string-key.nika.yaml",
+      "new": "conformance/yaml-profile/invalid/non-string-key.nika",
+      "old_sha256": "924bc8ebd5f5c67fe152b1661fb4a2de7b8d23a6d3684324ac8c87e7bc7da047",
+      "new_sha256_after_mv": "924bc8ebd5f5c67fe152b1661fb4a2de7b8d23a6d3684324ac8c87e7bc7da047",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/yaml-profile/invalid/scalar-over-cap.nika.yaml",
+      "new": "conformance/yaml-profile/invalid/scalar-over-cap.nika",
+      "old_sha256": "885124218f2b500a6c7ee98acf4d51775d471755a5a1a67ecab7de5dec73d8cd",
+      "new_sha256_after_mv": "885124218f2b500a6c7ee98acf4d51775d471755a5a1a67ecab7de5dec73d8cd",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/yaml-profile/valid/clean-minimal.nika.yaml",
+      "new": "conformance/yaml-profile/valid/clean-minimal.nika",
+      "old_sha256": "63bd9936b237e1b89a0380724f67a67aa2a18131f042bbf84965d6ebea2582c8",
+      "new_sha256_after_mv": "63bd9936b237e1b89a0380724f67a67aa2a18131f042bbf84965d6ebea2582c8",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/yaml-profile/valid/depth-at-cap.nika.yaml",
+      "new": "conformance/yaml-profile/valid/depth-at-cap.nika",
+      "old_sha256": "3cce32f1773cae24a17943212bcc9732142b6e342b47e1dfb35c5d6cefa67544",
+      "new_sha256_after_mv": "3cce32f1773cae24a17943212bcc9732142b6e342b47e1dfb35c5d6cefa67544",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/yaml-profile/valid/scalar-at-cap.nika.yaml",
+      "new": "conformance/yaml-profile/valid/scalar-at-cap.nika",
+      "old_sha256": "744d9b6918d6dcf0375b9870adec65f4ffa0a29fd3c7fe4763cc7384099050b8",
+      "new_sha256_after_mv": "744d9b6918d6dcf0375b9870adec65f4ffa0a29fd3c7fe4763cc7384099050b8",
+      "reason": "rename-only"
+    },
+    {
+      "old": "conformance/yaml-profile/valid/unicode-nfc.nika.yaml",
+      "new": "conformance/yaml-profile/valid/unicode-nfc.nika",
+      "old_sha256": "1223c943f6965ab4fa51634e690fc82afc882f76fe5e509a2cce2125e5f22482",
+      "new_sha256_after_mv": "1223c943f6965ab4fa51634e690fc82afc882f76fe5e509a2cce2125e5f22482",
+      "reason": "rename-only"
+    },
+    {
+      "old": "eval/hot/proposed-skeletons/facts-to-draft.nika.yaml",
+      "new": "eval/hot/proposed-skeletons/facts-to-draft.nika",
+      "old_sha256": "ea820dde83e39c772de126d434a459711e2cd25865c307ed01a9b80ebce368e1",
+      "new_sha256_after_mv": "ea820dde83e39c772de126d434a459711e2cd25865c307ed01a9b80ebce368e1",
+      "reason": "rename-only"
+    },
+    {
+      "old": "eval/hot/proposed-skeletons/known-path-agent-fallback.nika.yaml",
+      "new": "eval/hot/proposed-skeletons/known-path-agent-fallback.nika",
+      "old_sha256": "560f0b59a2858411280fe146c31c6f4769fb0b563ef93bfcab0286da0426b7bc",
+      "new_sha256_after_mv": "560f0b59a2858411280fe146c31c6f4769fb0b563ef93bfcab0286da0426b7bc",
+      "reason": "rename-only"
+    },
+    {
+      "old": "eval/hot/proposed-skeletons/lookup-and-enrich.nika.yaml",
+      "new": "eval/hot/proposed-skeletons/lookup-and-enrich.nika",
+      "old_sha256": "071b978543f6ea946b86d160ca5492ea78374ae9fa7fdda484fae63f80c21070",
+      "new_sha256_after_mv": "071b978543f6ea946b86d160ca5492ea78374ae9fa7fdda484fae63f80c21070",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/01-hello.nika.yaml",
+      "new": "examples/01-hello.nika",
+      "old_sha256": "c109b357359d859b58e0c929ff489218bc519dc399de5fcdc04b3e4c192af618",
+      "new_sha256_after_mv": "c109b357359d859b58e0c929ff489218bc519dc399de5fcdc04b3e4c192af618",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/02-parallel-fanout.nika.yaml",
+      "new": "examples/02-parallel-fanout.nika",
+      "old_sha256": "885b71595ae4b97ef6df2ba43526db2dd7ebbc0279ea3e20d6981751f3d04eb4",
+      "new_sha256_after_mv": "885b71595ae4b97ef6df2ba43526db2dd7ebbc0279ea3e20d6981751f3d04eb4",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/03-exec-pipeline.nika.yaml",
+      "new": "examples/03-exec-pipeline.nika",
+      "old_sha256": "bf487675dd6a6f5e499f425d7e42c0435634f936b105aa8628d836e2d1272e8f",
+      "new_sha256_after_mv": "bf487675dd6a6f5e499f425d7e42c0435634f936b105aa8628d836e2d1272e8f",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/04-schema-retry.nika.yaml",
+      "new": "examples/04-schema-retry.nika",
+      "old_sha256": "217f6d6ebcf044baa375805b32e9d4ab0d8e13ee0d2ec06198c79c3d20930eb9",
+      "new_sha256_after_mv": "217f6d6ebcf044baa375805b32e9d4ab0d8e13ee0d2ec06198c79c3d20930eb9",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/05-fetch-chain.nika.yaml",
+      "new": "examples/05-fetch-chain.nika",
+      "old_sha256": "92c6c45e73aec5163d66f2dbd55da3c58534ec165d70bbec4a9b0d828ba143de",
+      "new_sha256_after_mv": "92c6c45e73aec5163d66f2dbd55da3c58534ec165d70bbec4a9b0d828ba143de",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/06-code-review.nika.yaml",
+      "new": "examples/06-code-review.nika",
+      "old_sha256": "2b6fecb37ce9665cf8acc0cbc1ef5b6874fe84d0023f5dfffcb2562296bb828a",
+      "new_sha256_after_mv": "2b6fecb37ce9665cf8acc0cbc1ef5b6874fe84d0023f5dfffcb2562296bb828a",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/07-for-each-locales.nika.yaml",
+      "new": "examples/07-for-each-locales.nika",
+      "old_sha256": "19ef54fefad22b6fddbe582b12fa5f96b277ceba2ca97bcd929f415a8c0f02e0",
+      "new_sha256_after_mv": "19ef54fefad22b6fddbe582b12fa5f96b277ceba2ca97bcd929f415a8c0f02e0",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/08-config-values.nika.yaml",
+      "new": "examples/08-config-values.nika",
+      "old_sha256": "63c926dbbf788e7f63017ae971122287a7747d66ba031690d43182fed21d6943",
+      "new_sha256_after_mv": "63c926dbbf788e7f63017ae971122287a7747d66ba031690d43182fed21d6943",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/09-returns-typed-door.nika.yaml",
+      "new": "examples/09-returns-typed-door.nika",
+      "old_sha256": "c52689ffe8350ca3d14d9e053c6d00f9d5931121ec766f1c7da8d70759e42bd2",
+      "new_sha256_after_mv": "c52689ffe8350ca3d14d9e053c6d00f9d5931121ec766f1c7da8d70759e42bd2",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/10-compose-child.nika.yaml",
+      "new": "examples/10-compose-child.nika",
+      "old_sha256": "07a98491ec2cfe607bd994c5977283a7f0e61d2d8a9df51aef0a1083d05c8870",
+      "new_sha256_after_mv": "07a98491ec2cfe607bd994c5977283a7f0e61d2d8a9df51aef0a1083d05c8870",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/10-compose-pipeline.nika.yaml",
+      "new": "examples/10-compose-pipeline.nika",
+      "old_sha256": "abf58573dfd3689ea92aa0679404e74f25983a2b5a5b9ead4ab09d9a68670459",
+      "new_sha256_after_mv": "abf58573dfd3689ea92aa0679404e74f25983a2b5a5b9ead4ab09d9a68670459",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/11-lift-the-door.nika.yaml",
+      "new": "examples/11-lift-the-door.nika",
+      "old_sha256": "9fb89ddcccc501c97a5e3ab044bbab76fe4da9b81a2bd20466e5d29cf8233d75",
+      "new_sha256_after_mv": "9fb89ddcccc501c97a5e3ab044bbab76fe4da9b81a2bd20466e5d29cf8233d75",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/12-failure-routing.nika.yaml",
+      "new": "examples/12-failure-routing.nika",
+      "old_sha256": "8e19aed549838bd3c637f858f60753be1f608f49a06e243e6851df1fad60271c",
+      "new_sha256_after_mv": "8e19aed549838bd3c637f858f60753be1f608f49a06e243e6851df1fad60271c",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/13-extract-then-law.nika.yaml",
+      "new": "examples/13-extract-then-law.nika",
+      "old_sha256": "91452e2f3f649cd546b4bdc27ec7c8fad564a7aabb614380d17b9a0ca3ca74dd",
+      "new_sha256_after_mv": "91452e2f3f649cd546b4bdc27ec7c8fad564a7aabb614380d17b9a0ca3ca74dd",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/14-decide-publish.nika.yaml",
+      "new": "examples/14-decide-publish.nika",
+      "old_sha256": "19853dafb17ebee1841f23658cfa3448423713255083ab61f7a7611d5185f59e",
+      "new_sha256_after_mv": "19853dafb17ebee1841f23658cfa3448423713255083ab61f7a7611d5185f59e",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/15-compose-self-check.nika.yaml",
+      "new": "examples/15-compose-self-check.nika",
+      "old_sha256": "fa740e4214bfb6be15ab9e8779ed889ee4f54e65a17554914d4be5aacb129c85",
+      "new_sha256_after_mv": "fa740e4214bfb6be15ab9e8779ed889ee4f54e65a17554914d4be5aacb129c85",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/16-inspect-self.nika.yaml",
+      "new": "examples/16-inspect-self.nika",
+      "old_sha256": "248c5f72db4ea11e6308ec3843ab65901f033caba23cfef911207bf02661128a",
+      "new_sha256_after_mv": "248c5f72db4ea11e6308ec3843ab65901f033caba23cfef911207bf02661128a",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/17-tts-self.nika.yaml",
+      "new": "examples/17-tts-self.nika",
+      "old_sha256": "f85a87e3ac57e03d622068efa116b05fd21f6d6a9c1d1121b74c029f68b78bd0",
+      "new_sha256_after_mv": "f85a87e3ac57e03d622068efa116b05fd21f6d6a9c1d1121b74c029f68b78bd0",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/18-bounded-batch.nika.yaml",
+      "new": "examples/18-bounded-batch.nika",
+      "old_sha256": "b6efc20d5b7cdb88f195aaa3a3695e68a6c89e4817addc8f9116b3dfd22f190e",
+      "new_sha256_after_mv": "b6efc20d5b7cdb88f195aaa3a3695e68a6c89e4817addc8f9116b3dfd22f190e",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/19-validate-records.nika.yaml",
+      "new": "examples/19-validate-records.nika",
+      "old_sha256": "78e3abff3f34ecd9be2c00d6e200adaa16ecc014b53952ae0ea0086110fac635",
+      "new_sha256_after_mv": "78e3abff3f34ecd9be2c00d6e200adaa16ecc014b53952ae0ea0086110fac635",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/20-snapshot-diff.nika.yaml",
+      "new": "examples/20-snapshot-diff.nika",
+      "old_sha256": "8b8a93594855b077623ce30d00a10a1cc0b80d0747c3d49c7c6177a1fd565c07",
+      "new_sha256_after_mv": "8b8a93594855b077623ce30d00a10a1cc0b80d0747c3d49c7c6177a1fd565c07",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/21-deduplicate-records.nika.yaml",
+      "new": "examples/21-deduplicate-records.nika",
+      "old_sha256": "1f2a0038b5537ca1fd889aa11345742280375ecfaa7c4cfb0297b00349b8de49",
+      "new_sha256_after_mv": "1f2a0038b5537ca1fd889aa11345742280375ecfaa7c4cfb0297b00349b8de49",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/22-project-public-fields.nika.yaml",
+      "new": "examples/22-project-public-fields.nika",
+      "old_sha256": "27cba264f633d82e136e447c9117c55c565fd94bb60d114935a7567d2e55201e",
+      "new_sha256_after_mv": "27cba264f633d82e136e447c9117c55c565fd94bb60d114935a7567d2e55201e",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/23-parallel-review.nika.yaml",
+      "new": "examples/23-parallel-review.nika",
+      "old_sha256": "45e36e86dcaf851b9c525459a5b4b6c5aebe684d96db1848ddc63853b0d214e3",
+      "new_sha256_after_mv": "45e36e86dcaf851b9c525459a5b4b6c5aebe684d96db1848ddc63853b0d214e3",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/24-recover-optional-file.nika.yaml",
+      "new": "examples/24-recover-optional-file.nika",
+      "old_sha256": "d8588965a5d97be4800d36fabaa0f6d5403cf136ac9486d6cbaab24b317a474b",
+      "new_sha256_after_mv": "d8588965a5d97be4800d36fabaa0f6d5403cf136ac9486d6cbaab24b317a474b",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/25-aggregate-by-key.nika.yaml",
+      "new": "examples/25-aggregate-by-key.nika",
+      "old_sha256": "07309025c7f3b54ab2127d76b6d92ec2117df0851b7f5809f9e0aad66aef845e",
+      "new_sha256_after_mv": "07309025c7f3b54ab2127d76b6d92ec2117df0851b7f5809f9e0aad66aef845e",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/bookmark-triage.nika.yaml",
+      "new": "examples/bookmark-triage.nika",
+      "old_sha256": "226bd81a0707766c2684cccf5bec9341f3cf56a80733d0b9ef84b79f23920151",
+      "new_sha256_after_mv": "226bd81a0707766c2684cccf5bec9341f3cf56a80733d0b9ef84b79f23920151",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/ceo-monday-brief.nika.yaml",
+      "new": "examples/ceo-monday-brief.nika",
+      "old_sha256": "ac684725e7198bc48d19a017224c3728ca8e54b04b069cb2f0fb345c47db9c56",
+      "new_sha256_after_mv": "ac684725e7198bc48d19a017224c3728ca8e54b04b069cb2f0fb345c47db9c56",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/competitor-radar.nika.yaml",
+      "new": "examples/competitor-radar.nika",
+      "old_sha256": "e72057f374e8ecb591fa698f814ecee93b47ee92341dd5633af7aed94dcf1e71",
+      "new_sha256_after_mv": "e72057f374e8ecb591fa698f814ecee93b47ee92341dd5633af7aed94dcf1e71",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/config-drift-sentinel.nika.yaml",
+      "new": "examples/config-drift-sentinel.nika",
+      "old_sha256": "095e12c322bd4d1b0e8e635888c22f88ab1a4e379a2961a47cd36fbf2a2a7309",
+      "new_sha256_after_mv": "095e12c322bd4d1b0e8e635888c22f88ab1a4e379a2961a47cd36fbf2a2a7309",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/contract-guard.nika.yaml",
+      "new": "examples/contract-guard.nika",
+      "old_sha256": "1db1cbfc5807773b0d4aeaa35790191f6cc29b7d303cc7c2be0f275411ce1923",
+      "new_sha256_after_mv": "1db1cbfc5807773b0d4aeaa35790191f6cc29b7d303cc7c2be0f275411ce1923",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/corpus-digest.nika.yaml",
+      "new": "examples/corpus-digest.nika",
+      "old_sha256": "dec2f719d407707ef5c980627684db63e636a86274a9aa97586a7bdc3ffa5929",
+      "new_sha256_after_mv": "dec2f719d407707ef5c980627684db63e636a86274a9aa97586a7bdc3ffa5929",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/csv-chart-report.nika.yaml",
+      "new": "examples/csv-chart-report.nika",
+      "old_sha256": "a071016eb1eaf893a95fcb538c3b7ec1c60f5945e14c90d529becf59f511e164",
+      "new_sha256_after_mv": "a071016eb1eaf893a95fcb538c3b7ec1c60f5945e14c90d529becf59f511e164",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/deep-research-brief.nika.yaml",
+      "new": "examples/deep-research-brief.nika",
+      "old_sha256": "1d6c1f37238c5b4ee466a4986cb530c7202dbccc6c91928733e44bcb24e0565a",
+      "new_sha256_after_mv": "1d6c1f37238c5b4ee466a4986cb530c7202dbccc6c91928733e44bcb24e0565a",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/etl-quarantine.nika.yaml",
+      "new": "examples/etl-quarantine.nika",
+      "old_sha256": "3eb1ffc9a3cc79f304177487c46769bc58ffb4d95f06bab4a8479006dbdf62f7",
+      "new_sha256_after_mv": "3eb1ffc9a3cc79f304177487c46769bc58ffb4d95f06bab4a8479006dbdf62f7",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/image-fx-batch.nika.yaml",
+      "new": "examples/image-fx-batch.nika",
+      "old_sha256": "37861548ed3e4393921140c01723c5ab9a0051753badb96427e3de3ff4436c00",
+      "new_sha256_after_mv": "37861548ed3e4393921140c01723c5ab9a0051753badb96427e3de3ff4436c00",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/incident-war-room.nika.yaml",
+      "new": "examples/incident-war-room.nika",
+      "old_sha256": "58518a7aafb89a51e052f49f4401fa45a48b5c07c221fb80552b1807118c04bc",
+      "new_sha256_after_mv": "58518a7aafb89a51e052f49f4401fa45a48b5c07c221fb80552b1807118c04bc",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/invoice-chaser.nika.yaml",
+      "new": "examples/invoice-chaser.nika",
+      "old_sha256": "332bb17e40e10f61a1e55ea45a82b21ee481001aca1d10bcf1323d57d9e3d476",
+      "new_sha256_after_mv": "332bb17e40e10f61a1e55ea45a82b21ee481001aca1d10bcf1323d57d9e3d476",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/localization-factory.nika.yaml",
+      "new": "examples/localization-factory.nika",
+      "old_sha256": "beb3bc65ae8a1be962c9b9bbbb8c01c21ced3fc4c4692d0c90117ead62b38967",
+      "new_sha256_after_mv": "beb3bc65ae8a1be962c9b9bbbb8c01c21ced3fc4c4692d0c90117ead62b38967",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/meeting-actions.nika.yaml",
+      "new": "examples/meeting-actions.nika",
+      "old_sha256": "3a847596bc287ae497a704018ad474efbd38d1b4d56c33624745625e7872a986",
+      "new_sha256_after_mv": "3a847596bc287ae497a704018ad474efbd38d1b4d56c33624745625e7872a986",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/model-bench.nika.yaml",
+      "new": "examples/model-bench.nika",
+      "old_sha256": "78ca55f6ff9b1c04194586f71d1a4ba42986e80b1fe6b901ac7001f00e1c0fdf",
+      "new_sha256_after_mv": "78ca55f6ff9b1c04194586f71d1a4ba42986e80b1fe6b901ac7001f00e1c0fdf",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/og-images.nika.yaml",
+      "new": "examples/og-images.nika",
+      "old_sha256": "1bbe0dc2b0256d5fcc2cc58bab4c04c306ebbbc7be044a934fd86a3339ffa083",
+      "new_sha256_after_mv": "1bbe0dc2b0256d5fcc2cc58bab4c04c306ebbbc7be044a934fd86a3339ffa083",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/pr-review-fanout.nika.yaml",
+      "new": "examples/pr-review-fanout.nika",
+      "old_sha256": "8ec509c965339c94b193a80ee75c1094f7cb40fba1f3ea3dbe1e7bf832183dca",
+      "new_sha256_after_mv": "8ec509c965339c94b193a80ee75c1094f7cb40fba1f3ea3dbe1e7bf832183dca",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/price-watch.nika.yaml",
+      "new": "examples/price-watch.nika",
+      "old_sha256": "80ce322bbeaab66db0f2c7525e01a7cfe1fae6d0de7469da2e820fe39499bbee",
+      "new_sha256_after_mv": "80ce322bbeaab66db0f2c7525e01a7cfe1fae6d0de7469da2e820fe39499bbee",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/release-notes.nika.yaml",
+      "new": "examples/release-notes.nika",
+      "old_sha256": "9f7b4afc22a561d0336b935c826e7ab3deebc809fad3312a4be75145d81e8fd2",
+      "new_sha256_after_mv": "9f7b4afc22a561d0336b935c826e7ab3deebc809fad3312a4be75145d81e8fd2",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/release-radar.nika.yaml",
+      "new": "examples/release-radar.nika",
+      "old_sha256": "f47aa711ccf5c46b794c80ae894953d4beb8a83ffb529c313b2ce2c89c6c4251",
+      "new_sha256_after_mv": "f47aa711ccf5c46b794c80ae894953d4beb8a83ffb529c313b2ce2c89c6c4251",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/release-train.nika.yaml",
+      "new": "examples/release-train.nika",
+      "old_sha256": "112bcfbe8c91c648b83cec668525d81436e7d9053a260c122ccb7fc0c43d0200",
+      "new_sha256_after_mv": "112bcfbe8c91c648b83cec668525d81436e7d9053a260c122ccb7fc0c43d0200",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/resume-screener.nika.yaml",
+      "new": "examples/resume-screener.nika",
+      "old_sha256": "241b2892994472ec070bd23504a9e04d1223a1994854465f8aa3436b2bbec62b",
+      "new_sha256_after_mv": "241b2892994472ec070bd23504a9e04d1223a1994854465f8aa3436b2bbec62b",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/seo-content-brief.nika.yaml",
+      "new": "examples/seo-content-brief.nika",
+      "old_sha256": "61fc6c412a2dbfa3ead128c96675c702d7f4bcdf3716b10a1e4724477cd89731",
+      "new_sha256_after_mv": "61fc6c412a2dbfa3ead128c96675c702d7f4bcdf3716b10a1e4724477cd89731",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/snippets/delegate.nika.yaml",
+      "new": "examples/snippets/delegate.nika",
+      "old_sha256": "9af0ac3970436f4c06fe2528801eef3787e12f83ea447e14f449c251d22dbb3e",
+      "new_sha256_after_mv": "9af0ac3970436f4c06fe2528801eef3787e12f83ea447e14f449c251d22dbb3e",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/snippets/hello-ai.nika.yaml",
+      "new": "examples/snippets/hello-ai.nika",
+      "old_sha256": "a277b6b3bad943b7f6047d4fd2670a6fcd734e9428383af9a6d940f55b31fa60",
+      "new_sha256_after_mv": "a277b6b3bad943b7f6047d4fd2670a6fcd734e9428383af9a6d940f55b31fa60",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/snippets/hello.nika.yaml",
+      "new": "examples/snippets/hello.nika",
+      "old_sha256": "93d3f62c72542c7b2fa8ac10693a3984ea96a23e68caa404d2fa636e4e614095",
+      "new_sha256_after_mv": "93d3f62c72542c7b2fa8ac10693a3984ea96a23e68caa404d2fa636e4e614095",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/snippets/not-found.nika.yaml",
+      "new": "examples/snippets/not-found.nika",
+      "old_sha256": "311b04d0df221cdfa9a4344ad54353e4c9303093f47b38c7f9e8303b484606ea",
+      "new_sha256_after_mv": "311b04d0df221cdfa9a4344ad54353e4c9303093f47b38c7f9e8303b484606ea",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/snippets/run.nika.yaml",
+      "new": "examples/snippets/run.nika",
+      "old_sha256": "37e02f827cd7063b375ea581ff7426c18c28d6e5926a0d3a7ef22a64af073d51",
+      "new_sha256_after_mv": "37e02f827cd7063b375ea581ff7426c18c28d6e5926a0d3a7ef22a64af073d51",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/snippets/think.nika.yaml",
+      "new": "examples/snippets/think.nika",
+      "old_sha256": "12ee7298f060951d26b4b046b7b090c1ff309048bcc9fbaffdbacded668d7feb",
+      "new_sha256_after_mv": "12ee7298f060951d26b4b046b7b090c1ff309048bcc9fbaffdbacded668d7feb",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/snippets/use-a-tool.nika.yaml",
+      "new": "examples/snippets/use-a-tool.nika",
+      "old_sha256": "aaef973f55a59ba5c0ef94fbbe7c231deb51e18541c665f29a7f274581b3cee1",
+      "new_sha256_after_mv": "aaef973f55a59ba5c0ef94fbbe7c231deb51e18541c665f29a7f274581b3cee1",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/snippets/weekly-radar.nika.yaml",
+      "new": "examples/snippets/weekly-radar.nika",
+      "old_sha256": "16495311976b773b83841c12b26d2e8038b0e615dc2ed44aa1f8242d41117dc6",
+      "new_sha256_after_mv": "16495311976b773b83841c12b26d2e8038b0e615dc2ed44aa1f8242d41117dc6",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/social-repurpose.nika.yaml",
+      "new": "examples/social-repurpose.nika",
+      "old_sha256": "2d5986f6e727b0039c4eb069df730370eb564a18861f546f858121cc5b386d3b",
+      "new_sha256_after_mv": "2d5986f6e727b0039c4eb069df730370eb564a18861f546f858121cc5b386d3b",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/standup-digest.nika.yaml",
+      "new": "examples/standup-digest.nika",
+      "old_sha256": "0a3d15cb3ad25ca8c7dd40ff7582ba355d60fbef431493b8fb172578e1e94f6d",
+      "new_sha256_after_mv": "0a3d15cb3ad25ca8c7dd40ff7582ba355d60fbef431493b8fb172578e1e94f6d",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/support-triage.nika.yaml",
+      "new": "examples/support-triage.nika",
+      "old_sha256": "9ce635fb98376eaafc277afa4a4f1c174f5761697bc12a439d29ee786a11f25e",
+      "new_sha256_after_mv": "9ce635fb98376eaafc277afa4a4f1c174f5761697bc12a439d29ee786a11f25e",
+      "reason": "rename-only"
+    },
+    {
+      "old": "examples/transcript-shownotes.nika.yaml",
+      "new": "examples/transcript-shownotes.nika",
+      "old_sha256": "34809856b8c01f03fbd30bdcb427c965de5cf0bd888e012670a8071ed8a8f7e9",
+      "new_sha256_after_mv": "34809856b8c01f03fbd30bdcb427c965de5cf0bd888e012670a8071ed8a8f7e9",
+      "reason": "rename-only"
+    },
+    {
+      "old": "project/project-os-audit.nika.yaml",
+      "new": "project/project-os-audit.nika",
+      "old_sha256": "b122c8bfd95f6ca33e1ebbc17697c0549043f8395a32e1668082ba17d6469c3f",
+      "new_sha256_after_mv": "b122c8bfd95f6ca33e1ebbc17697c0549043f8395a32e1668082ba17d6469c3f",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/agent-loop.nika.yaml",
+      "new": "templates/agent-loop.nika",
+      "old_sha256": "4bac2151575df3fc3342ea19cdadf5b5e416eeaaa528bc3ec5f012acfb98da8e",
+      "new_sha256_after_mv": "4bac2151575df3fc3342ea19cdadf5b5e416eeaaa528bc3ec5f012acfb98da8e",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/aggregate-by-key.nika.yaml",
+      "new": "templates/aggregate-by-key.nika",
+      "old_sha256": "a7a34d9415e3187ff32607d79272da49e790500f1998593730c5047dc8a111fd",
+      "new_sha256_after_mv": "a7a34d9415e3187ff32607d79272da49e790500f1998593730c5047dc8a111fd",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/api-upload-and-create.nika.yaml",
+      "new": "templates/api-upload-and-create.nika",
+      "old_sha256": "1e06897b41686f7c51f97e70893bd16e09dba869df85378cb3c89913e1d20952",
+      "new_sha256_after_mv": "1e06897b41686f7c51f97e70893bd16e09dba869df85378cb3c89913e1d20952",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/bounded-batch.nika.yaml",
+      "new": "templates/bounded-batch.nika",
+      "old_sha256": "5333556fdb46fd16bd6e48f9a267d470558f6e663e2510df6322066eb75833d2",
+      "new_sha256_after_mv": "5333556fdb46fd16bd6e48f9a267d470558f6e663e2510df6322066eb75833d2",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/chain.nika.yaml",
+      "new": "templates/chain.nika",
+      "old_sha256": "c09adee68ad5548be7f3de4ea3d749293fb8312d8fd32d42f181a21307bce520",
+      "new_sha256_after_mv": "c09adee68ad5548be7f3de4ea3d749293fb8312d8fd32d42f181a21307bce520",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/classify-and-route.nika.yaml",
+      "new": "templates/classify-and-route.nika",
+      "old_sha256": "4528338b033f53a849ca0c7fa7f0151792442ace3789f890b3ef230beb3d737c",
+      "new_sha256_after_mv": "4528338b033f53a849ca0c7fa7f0151792442ace3789f890b3ef230beb3d737c",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/corpus-qa.nika.yaml",
+      "new": "templates/corpus-qa.nika",
+      "old_sha256": "0c219f7765a1df77ae6af91281129f82a1e677496e348bbb2d0a34e5141cce72",
+      "new_sha256_after_mv": "0c219f7765a1df77ae6af91281129f82a1e677496e348bbb2d0a34e5141cce72",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/deduplicate-records.nika.yaml",
+      "new": "templates/deduplicate-records.nika",
+      "old_sha256": "268f72d69e07053f22042ff69e34071092c9c349be060fed7811763bf083c073",
+      "new_sha256_after_mv": "268f72d69e07053f22042ff69e34071092c9c349be060fed7811763bf083c073",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/docker-report.nika.yaml",
+      "new": "templates/docker-report.nika",
+      "old_sha256": "6e2a3211a39b960cc170efe70964a5e0b50bf99eeba78752cae27acadb64e9c6",
+      "new_sha256_after_mv": "6e2a3211a39b960cc170efe70964a5e0b50bf99eeba78752cae27acadb64e9c6",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/document-to-fields.nika.yaml",
+      "new": "templates/document-to-fields.nika",
+      "old_sha256": "a3916e19ae3dc85f95413690768e25fbdc7e0cc01dabf823891b5b619d98f837",
+      "new_sha256_after_mv": "a3916e19ae3dc85f95413690768e25fbdc7e0cc01dabf823891b5b619d98f837",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/etl-state.nika.yaml",
+      "new": "templates/etl-state.nika",
+      "old_sha256": "64d090ea10a33ab224d16feea6b80bbfeb4e1c8396d514361ae0740399958136",
+      "new_sha256_after_mv": "64d090ea10a33ab224d16feea6b80bbfeb4e1c8396d514361ae0740399958136",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/evaluate-and-optimize.nika.yaml",
+      "new": "templates/evaluate-and-optimize.nika",
+      "old_sha256": "6abb970d905444b07d0df63e6330f7eb6d0a6c636cc49a0f19c5d9d817552513",
+      "new_sha256_after_mv": "6abb970d905444b07d0df63e6330f7eb6d0a6c636cc49a0f19c5d9d817552513",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/fanout.nika.yaml",
+      "new": "templates/fanout.nika",
+      "old_sha256": "e45da5bcc8080771eb279b8a347715f5ba50bb428bb7b9493167a909c21729db",
+      "new_sha256_after_mv": "e45da5bcc8080771eb279b8a347715f5ba50bb428bb7b9493167a909c21729db",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/gate-and-act.nika.yaml",
+      "new": "templates/gate-and-act.nika",
+      "old_sha256": "4870c70f7a6198f86b1da8587e7e1345bbece86ce07446d74e16866cbe514610",
+      "new_sha256_after_mv": "4870c70f7a6198f86b1da8587e7e1345bbece86ce07446d74e16866cbe514610",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/human-gated-ship.nika.yaml",
+      "new": "templates/human-gated-ship.nika",
+      "old_sha256": "e447e644d2e34327ab03f5fee8bed54fd0cfc2293e1379e3dcdb3a6b050bf65c",
+      "new_sha256_after_mv": "e447e644d2e34327ab03f5fee8bed54fd0cfc2293e1379e3dcdb3a6b050bf65c",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/media-asset-pack.nika.yaml",
+      "new": "templates/media-asset-pack.nika",
+      "old_sha256": "9358b5a04ba81ec9b3c3b9c7195f3f87e1777274d1721ce4428cffb0c901d519",
+      "new_sha256_after_mv": "9358b5a04ba81ec9b3c3b9c7195f3f87e1777274d1721ce4428cffb0c901d519",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/parallel-review.nika.yaml",
+      "new": "templates/parallel-review.nika",
+      "old_sha256": "d02b45349edb57fe66b0692584c822f5bab0a7620c0d5d6ec445d96d332f43db",
+      "new_sha256_after_mv": "d02b45349edb57fe66b0692584c822f5bab0a7620c0d5d6ec445d96d332f43db",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/project-public-fields.nika.yaml",
+      "new": "templates/project-public-fields.nika",
+      "old_sha256": "c4bc776cf730f13543c0379eec178ebf90dfb465c51b1d356ed6628c0f4fc614",
+      "new_sha256_after_mv": "c4bc776cf730f13543c0379eec178ebf90dfb465c51b1d356ed6628c0f4fc614",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/recover-optional-file.nika.yaml",
+      "new": "templates/recover-optional-file.nika",
+      "old_sha256": "923ed35265aadfbf46cb6be76e86655d0cc03c37950128d3c05664e665c467de",
+      "new_sha256_after_mv": "923ed35265aadfbf46cb6be76e86655d0cc03c37950128d3c05664e665c467de",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/snapshot-diff.nika.yaml",
+      "new": "templates/snapshot-diff.nika",
+      "old_sha256": "ec5772c13742e1ce2a8555663ce1d6832a17f35aa52c679b91b1750f81b86837",
+      "new_sha256_after_mv": "ec5772c13742e1ce2a8555663ce1d6832a17f35aa52c679b91b1750f81b86837",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/validate-records.nika.yaml",
+      "new": "templates/validate-records.nika",
+      "old_sha256": "fa9c9f0ea60b2d73b45d14ea5f55053b70ff01eadf70f11ab5aab6f53cb41d2c",
+      "new_sha256_after_mv": "fa9c9f0ea60b2d73b45d14ea5f55053b70ff01eadf70f11ab5aab6f53cb41d2c",
+      "reason": "rename-only"
+    },
+    {
+      "old": "templates/website-brief.nika.yaml",
+      "new": "templates/website-brief.nika",
+      "old_sha256": "52ff867ab56ab2aef8c3a86a69cccaab0c68681bdf96dec53bf2f8cdc37d4bac",
+      "new_sha256_after_mv": "52ff867ab56ab2aef8c3a86a69cccaab0c68681bdf96dec53bf2f8cdc37d4bac",
+      "reason": "rename-only"
+    }
+  ]
+}

@@ -187,7 +187,7 @@ def rehearse(engine: Engine, candidate: Path, case: dict, rename: dict) -> tuple
         for relative, payload in case.get("binary_files", {}).items():
             (directory / relative).write_bytes(bytes.fromhex(payload))
         source = yaml.safe_dump(with_stubs(doc, stubs), sort_keys=False, allow_unicode=True)
-        workflow = directory / "candidate.nika.yaml"
+        workflow = directory / "candidate.nika"
         trace = None
         for index, step in enumerate(steps):
             for old, new in step.get("mutate", []):
@@ -220,9 +220,9 @@ def refused_run(engine: Engine, candidate: Path, spec: dict) -> tuple[list[str],
     require(reason is None, f"{candidate.name}: refusing to execute, {reason}")
     with tempfile.TemporaryDirectory(prefix="complex-refused-") as temp:
         directory = Path(temp).resolve()
-        shutil.copy(candidate, directory / "candidate.nika.yaml")  # the original bytes, never a re-serialisation
+        shutil.copy(candidate, directory / "candidate.nika")  # the original bytes, never a re-serialisation
         before = {p for p in directory.rglob("*") if p.is_file()}
-        argv = ["run", "candidate.nika.yaml", "--json", "--no-trace-file"]
+        argv = ["run", "candidate.nika", "--json", "--no-trace-file"]
         for task, value in spec.get("answers", {}).items():
             argv += ["--answer", f"{task}={json.dumps(value)}"]
         seen = observe(engine.call(argv, directory), directory, before)

@@ -327,7 +327,7 @@ def render_ts(tokens: dict) -> str:
         " *  currentColor. cost = credit-card interim (bespoke SVG is owed). */",
         f"export const NIKA_FEATURE_CODICON = {{ {fmap} }} as const",
         "",
-        "/** the semantic ROLE a .nika.yaml key carries — MEANING, not syntax.",
+        "/** the semantic ROLE a .nika key carries — MEANING, not syntax.",
         " *  A generic highlighter colours by syntax class because it does not",
         " *  know the language; nika is a closed contract, so `command` reads as",
         " *  exec's because it cannot live anywhere else. Membership is DERIVED",

@@ -46,7 +46,7 @@ done
 export FAKE_API_KEY_FOR_TEST="${FAKE_API_KEY_FOR_TEST:-conformance-dummy-secret}"
 
 pass=0; drift=0; bug=0; dvg=0
-for wf in "$HERE"/*/*.nika.yaml; do
+for wf in "$HERE"/*/*.nika; do
   rel="${wf#"$HERE"/}"
   header="$(head -30 "$wf" | grep '^#' || true)"
   expected="$(printf '%s\n' "$header" | grep -i '# *Expected:' | head -1 || true)"

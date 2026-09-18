@@ -45,7 +45,7 @@ For standard maturity or engine conformance work, select the relevant contract:
 1. Change the owning `canon/` registry and regenerate the hub/prose with the compiler/projectors in `SSOT.md`; preserve its explicitly authored ledger sections.
 2. Spec sections live in `spec/01-*.md` … — additive evolution,
    breaking changes need an engine-side MINOR + changelog entry.
-3. Examples in `examples/*.nika.yaml` must stay valid against the spec.
+3. Examples in `examples/*.nika` must stay valid against the spec.
 4. Sign off every commit with `git commit --signoff`; `Signed-off-by` must match the commit author identity (DCO). Also include `Co-Authored-By: Nika 🦋 <nika@supernovae.studio>`.
 
 ## Completion

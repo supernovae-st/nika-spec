@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """The reference YAML-profile judge (RULINGS R11 · LAW-GRAMMAR-0101..0111).
 
-Judges a `.nika.yaml` SOURCE at the byte + event level — never through a
+Judges a `.nika` SOURCE at the byte + event level — never through a
 composing load. R11 point 6: no engine may expand anchors silently; the
 refusal happens BEFORE any construction, so nothing here ever resolves
 an alias or merges a key. R11 point 4: every refusal is a dedicated,
@@ -244,7 +244,7 @@ def judge_file(path: Path) -> list[dict]:
 
 def main(argv: list[str]) -> int:
     if len(argv) < 2:
-        print("usage: yaml_profile_core.py <file.nika.yaml> [...]", file=sys.stderr)
+        print("usage: yaml_profile_core.py <file.nika> [...]", file=sys.stderr)
         return 2
     refused = False
     for name in argv[1:]:

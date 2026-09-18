@@ -19,7 +19,7 @@
 | **Sigstore / cosign** | release signatures | ⏳ engine release train · keyless `cosign sign-blob --bundle <tarball>.sigstore.json` per release asset (id-token: write) | engine-lane brief |
 | **SBOM** | dependency transparency | ⏳ engine release train (cargo-auditable / cargo-cyclonedx) · N/A for this repo (no built artifacts) | engine-lane brief |
 | **IANA media type** | `application/vnd.nika+yaml` | ⏳ post-1.0 gesture · vendor tree · RFC 6838 §5.6 template · submit at iana.org/form/media-types | [01 §File naming](../spec/01-envelope.md#file-naming-normative) |
-| **SchemaStore** | editor validation everywhere | ✅ live (« Nika workflow » · `*.nika.yaml` + `*.nika.yml` matchers) | schemastore catalog |
+| **SchemaStore** | editor validation everywhere | ✅ live (« Nika workflow » · `*.nika` + `*.nika` matchers) | schemastore catalog |
 | **GitHub Linguist** | language recognition | ⛔ honestly gated · needs ~2000 in-the-wild files/year (forks excluded) · not claimable today | adoption trigger |
 | **tree-sitter grammar** | native editor grammars (Zed · Neovim) | ⏳ demand-gated · self-servable (publish grammar + nvim-treesitter `lua/parsers.lua` PR · quality bar, no usage threshold) | editor-demand trigger |
 | **BCP 14** | normative language | ✅ [07 §Notation](../spec/07-conformance.md#notation) | — |

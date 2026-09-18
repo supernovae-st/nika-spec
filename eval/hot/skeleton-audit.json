@@ -1,12 +1,12 @@
 {
   "date": "2026-09-18",
   "skeleton_count": 22,
-  "note": "Derived from templates/*.nika.yaml on this branch. Motifs private. Not a second registry.",
+  "note": "Derived from templates/*.nika on this branch. Motifs private. Not a second registry.",
   "skeletons": [
     {
       "id": "agent-loop",
       "category": "agent-loop",
-      "source": "templates/agent-loop.nika.yaml",
+      "source": "templates/agent-loop.nika",
       "classification": "OPEN_WORLD",
       "semantic_role": "deliberate EXPLORE; not HOT default",
       "nika_id_in_file": "agent-loop-template",
@@ -43,9 +43,9 @@
         "GENERATE",
         "READ"
       ],
-      "positive_fixture": "templates/agent-loop.nika.yaml",
+      "positive_fixture": "templates/agent-loop.nika",
       "negative_fixture": "templates/agent-loop.negative.yaml",
-      "golden": "templates/agent-loop.nika.yaml.golden.json",
+      "golden": "templates/agent-loop.nika.golden.json",
       "stdlib_quality_notes": "deliberate EXPLORE; not HOT default",
       "sha256_file": "sha256:4bac2151575df3fc3342ea19cdadf5b5e416eeaaa528bc3ec5f012acfb98da8e",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
@@ -53,7 +53,7 @@
     {
       "id": "aggregate-by-key",
       "category": "aggregate-by-key",
-      "source": "templates/aggregate-by-key.nika.yaml",
+      "source": "templates/aggregate-by-key.nika",
       "classification": "PATTERN_SIZED",
       "semantic_role": "exact arithmetic; no model",
       "nika_id_in_file": "aggregate-by-key",
@@ -89,9 +89,9 @@
         "AGGREGATE",
         "VALIDATE"
       ],
-      "positive_fixture": "templates/aggregate-by-key.nika.yaml",
+      "positive_fixture": "templates/aggregate-by-key.nika",
       "negative_fixture": "templates/aggregate-by-key.negative.yaml",
-      "golden": "templates/aggregate-by-key.nika.yaml.golden.json",
+      "golden": "templates/aggregate-by-key.nika.golden.json",
       "stdlib_quality_notes": "exact arithmetic; no model",
       "sha256_file": "sha256:a7a34d9415e3187ff32607d79272da49e790500f1998593730c5047dc8a111fd",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
@@ -99,7 +99,7 @@
     {
       "id": "api-upload-and-create",
       "category": "api-upload",
-      "source": "templates/api-upload-and-create.nika.yaml",
+      "source": "templates/api-upload-and-create.nika",
       "classification": "COMPLETE_WORKFLOW",
       "semantic_role": "effect order upload\u2192create; recover rehearsal",
       "nika_id_in_file": "api-upload-and-create-template",
@@ -131,9 +131,9 @@
         "FETCH",
         "UPLOAD"
       ],
-      "positive_fixture": "templates/api-upload-and-create.nika.yaml",
+      "positive_fixture": "templates/api-upload-and-create.nika",
       "negative_fixture": "templates/api-upload-and-create.negative.yaml",
-      "golden": "templates/api-upload-and-create.nika.yaml.golden.json",
+      "golden": "templates/api-upload-and-create.nika.golden.json",
       "stdlib_quality_notes": "effect order upload\u2192create; recover rehearsal",
       "sha256_file": "sha256:1e06897b41686f7c51f97e70893bd16e09dba869df85378cb3c89913e1d20952",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
@@ -141,7 +141,7 @@
     {
       "id": "bounded-batch",
       "category": "bounded-batch",
-      "source": "templates/bounded-batch.nika.yaml",
+      "source": "templates/bounded-batch.nika",
       "classification": "PATTERN_SIZED",
       "semantic_role": "boundedness law",
       "nika_id_in_file": "bounded-batch",
@@ -178,9 +178,9 @@
         "GENERATE",
         "VALIDATE"
       ],
-      "positive_fixture": "templates/bounded-batch.nika.yaml",
+      "positive_fixture": "templates/bounded-batch.nika",
       "negative_fixture": "templates/bounded-batch.negative.yaml",
-      "golden": "templates/bounded-batch.nika.yaml.golden.json",
+      "golden": "templates/bounded-batch.nika.golden.json",
       "stdlib_quality_notes": "boundedness law",
       "sha256_file": "sha256:5333556fdb46fd16bd6e48f9a267d470558f6e663e2510df6322066eb75833d2",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
@@ -188,7 +188,7 @@
     {
       "id": "chain",
       "category": "linear",
-      "source": "templates/chain.nika.yaml",
+      "source": "templates/chain.nika",
       "classification": "TOO_GENERIC",
       "semantic_role": "dangerous over-broad HOT; read\u2192LLM\u2192write",
       "nika_id_in_file": "chain-template",
@@ -225,9 +225,9 @@
         "GENERATE",
         "READ"
       ],
-      "positive_fixture": "templates/chain.nika.yaml",
+      "positive_fixture": "templates/chain.nika",
       "negative_fixture": "templates/chain.negative.yaml",
-      "golden": "templates/chain.nika.yaml.golden.json",
+      "golden": "templates/chain.nika.golden.json",
       "stdlib_quality_notes": "dangerous over-broad HOT; read\u2192LLM\u2192write",
       "sha256_file": "sha256:c09adee68ad5548be7f3de4ea3d749293fb8312d8fd32d42f181a21307bce520",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
@@ -235,7 +235,7 @@
     {
       "id": "classify-and-route",
       "category": "decision-routing",
-      "source": "templates/classify-and-route.nika.yaml",
+      "source": "templates/classify-and-route.nika",
       "classification": "COMPLETE_WORKFLOW",
       "semantic_role": "decision motif + nika:decide; class \u2260 authority",
       "nika_id_in_file": "classify-and-route",
@@ -276,9 +276,9 @@
         "GENERATE",
         "ROUTE"
       ],
-      "positive_fixture": "templates/classify-and-route.nika.yaml",
+      "positive_fixture": "templates/classify-and-route.nika",
       "negative_fixture": "templates/classify-and-route.negative.yaml",
-      "golden": "templates/classify-and-route.nika.yaml.golden.json",
+      "golden": "templates/classify-and-route.nika.golden.json",
       "stdlib_quality_notes": "decision motif + nika:decide; class \u2260 authority",
       "sha256_file": "sha256:4528338b033f53a849ca0c7fa7f0151792442ace3789f890b3ef230beb3d737c",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
@@ -286,7 +286,7 @@
     {
       "id": "corpus-qa",
       "category": "retrieval",
-      "source": "templates/corpus-qa.nika.yaml",
+      "source": "templates/corpus-qa.nika",
       "classification": "COMPLETE_WORKFLOW",
       "semantic_role": "retrieve \u2192 answer/unknown",
       "nika_id_in_file": "corpus-qa",
@@ -325,9 +325,9 @@
         "GENERATE",
         "SEARCH"
       ],
-      "positive_fixture": "templates/corpus-qa.nika.yaml",
+      "positive_fixture": "templates/corpus-qa.nika",
       "negative_fixture": "templates/corpus-qa.negative.yaml",
-      "golden": "templates/corpus-qa.nika.yaml.golden.json",
+      "golden": "templates/corpus-qa.nika.golden.json",
       "stdlib_quality_notes": "retrieve \u2192 answer/unknown",
       "sha256_file": "sha256:0c219f7765a1df77ae6af91281129f82a1e677496e348bbb2d0a34e5141cce72",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
@@ -335,7 +335,7 @@
     {
       "id": "deduplicate-records",
       "category": "deduplicate-records",
-      "source": "templates/deduplicate-records.nika.yaml",
+      "source": "templates/deduplicate-records.nika",
       "classification": "PATTERN_SIZED",
       "semantic_role": "PATTERN_SIZED",
       "nika_id_in_file": "deduplicate-records",
@@ -373,9 +373,9 @@
         "DEDUP",
         "VALIDATE"
       ],
-      "positive_fixture": "templates/deduplicate-records.nika.yaml",
+      "positive_fixture": "templates/deduplicate-records.nika",
       "negative_fixture": "templates/deduplicate-records.negative.yaml",
-      "golden": "templates/deduplicate-records.nika.yaml.golden.json",
+      "golden": "templates/deduplicate-records.nika.golden.json",
       "stdlib_quality_notes": "",
       "sha256_file": "sha256:268f72d69e07053f22042ff69e34071092c9c349be060fed7811763bf083c073",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
@@ -383,7 +383,7 @@
     {
       "id": "docker-report",
       "category": "parallel-fan-in",
-      "source": "templates/docker-report.nika.yaml",
+      "source": "templates/docker-report.nika",
       "classification": "COMPLETE_WORKFLOW",
       "semantic_role": "ops-specific complete; fan-in exec",
       "nika_id_in_file": "docker-report-template",
@@ -417,9 +417,9 @@
         "CREATE",
         "GENERATE"
       ],
-      "positive_fixture": "templates/docker-report.nika.yaml",
+      "positive_fixture": "templates/docker-report.nika",
       "negative_fixture": "templates/docker-report.negative.yaml",
-      "golden": "templates/docker-report.nika.yaml.golden.json",
+      "golden": "templates/docker-report.nika.golden.json",
       "stdlib_quality_notes": "ops-specific complete; fan-in exec",
       "sha256_file": "sha256:6e2a3211a39b960cc170efe70964a5e0b50bf99eeba78752cae27acadb64e9c6",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
@@ -427,7 +427,7 @@
     {
       "id": "document-to-fields",
       "category": "structured-extraction",
-      "source": "templates/document-to-fields.nika.yaml",
+      "source": "templates/document-to-fields.nika",
       "classification": "COMPLETE_WORKFLOW",
       "semantic_role": "extract + anchors; no effect",
       "nika_id_in_file": "document-to-fields",
@@ -465,9 +465,9 @@
         "GENERATE",
         "READ"
       ],
-      "positive_fixture": "templates/document-to-fields.nika.yaml",
+      "positive_fixture": "templates/document-to-fields.nika",
       "negative_fixture": "templates/document-to-fields.negative.yaml",
-      "golden": "templates/document-to-fields.nika.yaml.golden.json",
+      "golden": "templates/document-to-fields.nika.golden.json",
       "stdlib_quality_notes": "extract + anchors; no effect",
       "sha256_file": "sha256:a3916e19ae3dc85f95413690768e25fbdc7e0cc01dabf823891b5b619d98f837",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
@@ -475,7 +475,7 @@
     {
       "id": "etl-state",
       "category": "state-resume",
-      "source": "templates/etl-state.nika.yaml",
+      "source": "templates/etl-state.nika",
       "classification": "COMPLETE_WORKFLOW",
       "semantic_role": "resume + human approve in file",
       "nika_id_in_file": "etl-state-template",
@@ -520,9 +520,9 @@
         "READ",
         "RESUME"
       ],
-      "positive_fixture": "templates/etl-state.nika.yaml",
+      "positive_fixture": "templates/etl-state.nika",
       "negative_fixture": "templates/etl-state.negative.yaml",
-      "golden": "templates/etl-state.nika.yaml.golden.json",
+      "golden": "templates/etl-state.nika.golden.json",
       "stdlib_quality_notes": "resume + human approve in file",
       "sha256_file": "sha256:64d090ea10a33ab224d16feea6b80bbfeb4e1c8396d514361ae0740399958136",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
@@ -530,7 +530,7 @@
     {
       "id": "evaluate-and-optimize",
       "category": "bounded-loop",
-      "source": "templates/evaluate-and-optimize.nika.yaml",
+      "source": "templates/evaluate-and-optimize.nika",
       "classification": "COMPLETE_WORKFLOW",
       "semantic_role": "bounded revise rounds",
       "nika_id_in_file": "evaluate-and-optimize",
@@ -562,9 +562,9 @@
         "GENERATE",
         "VERIFY"
       ],
-      "positive_fixture": "templates/evaluate-and-optimize.nika.yaml",
+      "positive_fixture": "templates/evaluate-and-optimize.nika",
       "negative_fixture": "templates/evaluate-and-optimize.negative.yaml",
-      "golden": "templates/evaluate-and-optimize.nika.yaml.golden.json",
+      "golden": "templates/evaluate-and-optimize.nika.golden.json",
       "stdlib_quality_notes": "bounded revise rounds",
       "sha256_file": "sha256:6abb970d905444b07d0df63e6330f7eb6d0a6c636cc49a0f19c5d9d817552513",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
@@ -572,7 +572,7 @@
     {
       "id": "fanout",
       "category": "fanout",
-      "source": "templates/fanout.nika.yaml",
+      "source": "templates/fanout.nika",
       "classification": "PRIMITIVE_COMPOSITION",
       "semantic_role": "bounded collection",
       "nika_id_in_file": "fanout-template",
@@ -614,9 +614,9 @@
         "GENERATE",
         "READ"
       ],
-      "positive_fixture": "templates/fanout.nika.yaml",
+      "positive_fixture": "templates/fanout.nika",
       "negative_fixture": "templates/fanout.negative.yaml",
-      "golden": "templates/fanout.nika.yaml.golden.json",
+      "golden": "templates/fanout.nika.golden.json",
       "stdlib_quality_notes": "bounded collection",
       "sha256_file": "sha256:e45da5bcc8080771eb279b8a347715f5ba50bb428bb7b9493167a909c21729db",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
@@ -624,7 +624,7 @@
     {
       "id": "gate-and-act",
       "category": "conditional-gate",
-      "source": "templates/gate-and-act.nika.yaml",
+      "source": "templates/gate-and-act.nika",
       "classification": "PRIMITIVE_COMPOSITION",
       "semantic_role": "condition \u2192 effect; notify/publish motif",
       "nika_id_in_file": "gate-and-act-template",
@@ -659,9 +659,9 @@
         "GATE",
         "NOTIFY"
       ],
-      "positive_fixture": "templates/gate-and-act.nika.yaml",
+      "positive_fixture": "templates/gate-and-act.nika",
       "negative_fixture": "templates/gate-and-act.negative.yaml",
-      "golden": "templates/gate-and-act.nika.yaml.golden.json",
+      "golden": "templates/gate-and-act.nika.golden.json",
       "stdlib_quality_notes": "condition \u2192 effect; notify/publish motif",
       "sha256_file": "sha256:4870c70f7a6198f86b1da8587e7e1345bbece86ce07446d74e16866cbe514610",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
@@ -669,7 +669,7 @@
     {
       "id": "human-gated-ship",
       "category": "human-gate",
-      "source": "templates/human-gated-ship.nika.yaml",
+      "source": "templates/human-gated-ship.nika",
       "classification": "COMPLETE_WORKFLOW",
       "semantic_role": "approval-before-effect; FACTOR P04 from this, do not clone",
       "nika_id_in_file": "human-gated-ship-template",
@@ -709,9 +709,9 @@
         "GATE",
         "HUMAN_APPROVE"
       ],
-      "positive_fixture": "templates/human-gated-ship.nika.yaml",
+      "positive_fixture": "templates/human-gated-ship.nika",
       "negative_fixture": "templates/human-gated-ship.negative.yaml",
-      "golden": "templates/human-gated-ship.nika.yaml.golden.json",
+      "golden": "templates/human-gated-ship.nika.golden.json",
       "stdlib_quality_notes": "approval-before-effect; FACTOR P04 from this, do not clone",
       "sha256_file": "sha256:e447e644d2e34327ab03f5fee8bed54fd0cfc2293e1379e3dcdb3a6b050bf65c",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
@@ -719,7 +719,7 @@
     {
       "id": "media-asset-pack",
       "category": "linear",
-      "source": "templates/media-asset-pack.nika.yaml",
+      "source": "templates/media-asset-pack.nika",
       "classification": "COMPLETE_WORKFLOW",
       "semantic_role": "generation pack; not per-SaaS clone",
       "nika_id_in_file": "media-asset-pack-template",
@@ -755,9 +755,9 @@
         "CREATE",
         "GENERATE"
       ],
-      "positive_fixture": "templates/media-asset-pack.nika.yaml",
+      "positive_fixture": "templates/media-asset-pack.nika",
       "negative_fixture": "templates/media-asset-pack.negative.yaml",
-      "golden": "templates/media-asset-pack.nika.yaml.golden.json",
+      "golden": "templates/media-asset-pack.nika.golden.json",
       "stdlib_quality_notes": "generation pack; not per-SaaS clone",
       "sha256_file": "sha256:9358b5a04ba81ec9b3c3b9c7195f3f87e1777274d1721ce4428cffb0c901d519",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
@@ -765,7 +765,7 @@
     {
       "id": "parallel-review",
       "category": "parallel-review",
-      "source": "templates/parallel-review.nika.yaml",
+      "source": "templates/parallel-review.nika",
       "classification": "PATTERN_SIZED",
       "semantic_role": "conjunction not vibe-majority",
       "nika_id_in_file": "parallel-review",
@@ -809,9 +809,9 @@
         "VALIDATE",
         "VERIFY"
       ],
-      "positive_fixture": "templates/parallel-review.nika.yaml",
+      "positive_fixture": "templates/parallel-review.nika",
       "negative_fixture": "templates/parallel-review.negative.yaml",
-      "golden": "templates/parallel-review.nika.yaml.golden.json",
+      "golden": "templates/parallel-review.nika.golden.json",
       "stdlib_quality_notes": "conjunction not vibe-majority",
       "sha256_file": "sha256:d02b45349edb57fe66b0692584c822f5bab0a7620c0d5d6ec445d96d332f43db",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
@@ -819,7 +819,7 @@
     {
       "id": "project-public-fields",
       "category": "project-public-fields",
-      "source": "templates/project-public-fields.nika.yaml",
+      "source": "templates/project-public-fields.nika",
       "classification": "PATTERN_SIZED",
       "semantic_role": "redact then optional infer",
       "nika_id_in_file": "project-public-fields",
@@ -858,9 +858,9 @@
         "PROJECT",
         "VALIDATE"
       ],
-      "positive_fixture": "templates/project-public-fields.nika.yaml",
+      "positive_fixture": "templates/project-public-fields.nika",
       "negative_fixture": "templates/project-public-fields.negative.yaml",
-      "golden": "templates/project-public-fields.nika.yaml.golden.json",
+      "golden": "templates/project-public-fields.nika.golden.json",
       "stdlib_quality_notes": "redact then optional infer",
       "sha256_file": "sha256:c4bc776cf730f13543c0379eec178ebf90dfb465c51b1d356ed6628c0f4fc614",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
@@ -868,7 +868,7 @@
     {
       "id": "recover-optional-file",
       "category": "recover-optional-file",
-      "source": "templates/recover-optional-file.nika.yaml",
+      "source": "templates/recover-optional-file.nika",
       "classification": "PATTERN_SIZED",
       "semantic_role": "recovery; rehearsal recover must not look like success effect",
       "nika_id_in_file": "recover-optional-file",
@@ -907,9 +907,9 @@
         "RECOVER",
         "VALIDATE"
       ],
-      "positive_fixture": "templates/recover-optional-file.nika.yaml",
+      "positive_fixture": "templates/recover-optional-file.nika",
       "negative_fixture": "templates/recover-optional-file.negative.yaml",
-      "golden": "templates/recover-optional-file.nika.yaml.golden.json",
+      "golden": "templates/recover-optional-file.nika.golden.json",
       "stdlib_quality_notes": "recovery; rehearsal recover must not look like success effect",
       "sha256_file": "sha256:923ed35265aadfbf46cb6be76e86655d0cc03c37950128d3c05664e665c467de",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
@@ -917,7 +917,7 @@
     {
       "id": "snapshot-diff",
       "category": "snapshot-diff",
-      "source": "templates/snapshot-diff.nika.yaml",
+      "source": "templates/snapshot-diff.nika",
       "classification": "PATTERN_SIZED",
       "semantic_role": "compare only; no proposal mutations",
       "nika_id_in_file": "snapshot-diff",
@@ -955,9 +955,9 @@
         "DIFF",
         "VALIDATE"
       ],
-      "positive_fixture": "templates/snapshot-diff.nika.yaml",
+      "positive_fixture": "templates/snapshot-diff.nika",
       "negative_fixture": "templates/snapshot-diff.negative.yaml",
-      "golden": "templates/snapshot-diff.nika.yaml.golden.json",
+      "golden": "templates/snapshot-diff.nika.golden.json",
       "stdlib_quality_notes": "compare only; no proposal mutations",
       "sha256_file": "sha256:ec5772c13742e1ce2a8555663ce1d6832a17f35aa52c679b91b1750f81b86837",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
@@ -965,7 +965,7 @@
     {
       "id": "validate-records",
       "category": "validate-records",
-      "source": "templates/validate-records.nika.yaml",
+      "source": "templates/validate-records.nika",
       "classification": "PATTERN_SIZED",
       "semantic_role": "deterministic admit",
       "nika_id_in_file": "validate-records",
@@ -1000,9 +1000,9 @@
       "contained_motifs": [
         "VALIDATE"
       ],
-      "positive_fixture": "templates/validate-records.nika.yaml",
+      "positive_fixture": "templates/validate-records.nika",
       "negative_fixture": "templates/validate-records.negative.yaml",
-      "golden": "templates/validate-records.nika.yaml.golden.json",
+      "golden": "templates/validate-records.nika.golden.json",
       "stdlib_quality_notes": "deterministic admit",
       "sha256_file": "sha256:fa9c9f0ea60b2d73b45d14ea5f55053b70ff01eadf70f11ab5aab6f53cb41d2c",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
@@ -1010,7 +1010,7 @@
     {
       "id": "website-brief",
       "category": "linear",
-      "source": "templates/website-brief.nika.yaml",
+      "source": "templates/website-brief.nika",
       "classification": "COMPLETE_WORKFLOW",
       "semantic_role": "HOT-A candidate; URL/host baked in const+permits \u2014 structure vs data gap",
       "nika_id_in_file": "website-brief-template",
@@ -1045,9 +1045,9 @@
         "FETCH",
         "GENERATE"
       ],
-      "positive_fixture": "templates/website-brief.nika.yaml",
+      "positive_fixture": "templates/website-brief.nika",
       "negative_fixture": "templates/website-brief.negative.yaml",
-      "golden": "templates/website-brief.nika.yaml.golden.json",
+      "golden": "templates/website-brief.nika.golden.json",
       "stdlib_quality_notes": "HOT-A candidate; URL/host baked in const+permits \u2014 structure vs data gap",
       "sha256_file": "sha256:52ff867ab56ab2aef8c3a86a69cccaab0c68681bdf96dec53bf2f8cdc37d4bac",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"

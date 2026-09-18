@@ -20,7 +20,7 @@ python3 conformance/runner.py run conformance/tests/core --tier t0
 
 ## What you build (the T0 subset)
 
-1. **Parse + envelope** — read a `.nika.yaml`, validate the structure
+1. **Parse + envelope** — read a `.nika`, validate the structure
    (fixtures `core/envelope/001-008`).
 2. **The permits law** — an absent `permits:` block means ZERO
    authority (default-deny · fixtures `core/authority/001-006`).
