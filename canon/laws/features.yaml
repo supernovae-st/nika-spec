@@ -72,9 +72,9 @@ laws:
         id: nika_mark_and_name
     diagnostics: []
     fixtures:
-      - conformance/envelope/minimal-valid-workflow.nika.yaml
+      - conformance/envelope/minimal-valid-workflow.nika
     negative_fixtures:
-      - conformance/envelope/parse-bad-version.nika.yaml
+      - conformance/envelope/parse-bad-version.nika
     projections: ["prose:01-envelope", "schema", "cli:check", "lsp", "mcp", "sdk"]
     implementation_surfaces:
       - engine:nika-schema
@@ -128,9 +128,9 @@ laws:
           cardinality: forbidden
     diagnostics: ["NIKA-PARSE-005"]
     fixtures:
-      - conformance/envelope/minimal-valid-workflow.nika.yaml
+      - conformance/envelope/minimal-valid-workflow.nika
     negative_fixtures:
-      - conformance/envelope/parse-unknown-field.nika.yaml
+      - conformance/envelope/parse-unknown-field.nika
       - to-mint-c1/conformance/features/invalid/requires-features-key
     projections: ["prose:01-envelope", "schema", "cli:check", "lsp", "mcp", "sdk"]
     implementation_surfaces:
@@ -142,7 +142,7 @@ laws:
       - conformance:features-suite
     introduced_in: C0
     proof_obligations:
-      - "NIKA-PARSE-005 est le code réel du refus unknown-field en mode strict (fixture réelle conformance/envelope/parse-unknown-field.nika.yaml : « INTENT: NIKA-PARSE-005 (unknown field in strict mode) ») : requires_features en est une instance, jamais une clé connue."
+      - "NIKA-PARSE-005 est le code réel du refus unknown-field en mode strict (fixture réelle conformance/envelope/parse-unknown-field.nika : « INTENT: NIKA-PARSE-005 (unknown field in strict mode) ») : requires_features en est une instance, jamais une clé connue."
       - "R7 point 17 verbatim : « Aucun second système de vérité. » Un champ manuel serait une seconde vérité contre l'inférence IR de LAW-SURFACE-0511."
     closure_gates:
       - fixture-parity

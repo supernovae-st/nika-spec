@@ -68,11 +68,11 @@ class TheRehearsalCanFail(unittest.TestCase):
 
     def test_a_reference_that_stops_withholding_the_total_is_rejected(self):
         self.only("X02")
-        self.rewrite("workflows/x02/reference.nika.yaml", "(if .complete then ([$r.results[] | .cents] | add) else null end)",
+        self.rewrite("workflows/x02/reference.nika", "(if .complete then ([$r.results[] | .cents] | add) else null end)",
                      "([$r.results[] | select(. != null) | .cents] | add)")
         code, summary = self.rehearse()
         self.assertEqual(code, 1)
-        self.assertTrue(any("reference.nika.yaml: a correct candidate is rejected by ['X02-B1']" in f
+        self.assertTrue(any("reference.nika: a correct candidate is rejected by ['X02-B1']" in f
                             for f in summary["failures"]), summary["failures"])
 
     def test_a_near_miss_that_is_no_longer_declared_rejected_is_caught(self):
@@ -88,7 +88,7 @@ class TheRehearsalCanFail(unittest.TestCase):
         self.manifest(lambda d: d["scenarios"][0]["behaviour"][0]["expect"]["outputs_exact"].update(selected="quote-b"))
         code, summary = self.rehearse()
         self.assertEqual(code, 1)
-        self.assertTrue(any("reference.nika.yaml: a correct candidate is rejected" in f for f in summary["failures"]))
+        self.assertTrue(any("reference.nika: a correct candidate is rejected" in f for f in summary["failures"]))
 
     def test_an_engine_check_verdict_that_drifts_is_caught(self):
         self.only("X07")
@@ -101,7 +101,7 @@ class TheRehearsalCanFail(unittest.TestCase):
         self.only("X01")
         # Point the retained gap at a file the engine DOES refuse: the expected behaviour is then observed.
         self.manifest(lambda d: d["retained_gaps"][0]["reproduce"].update(
-            file="workflows/x01/refused-ordering-only-gate.nika.yaml"))
+            file="workflows/x01/refused-ordering-only-gate.nika"))
         code, summary = self.rehearse()
         self.assertEqual(code, 1)
         self.assertTrue(any("KG01: the expected behaviour is now observed" in f for f in summary["failures"]))

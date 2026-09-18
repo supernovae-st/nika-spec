@@ -184,7 +184,7 @@ zero task events, zero spend, zero inference (the launch plane ·
 [05 §Error code namespaces](./05-errors.md)). An omitted *optional* input,
 and a required input satisfied by its declared `default:`, are lawful;
 Check stays source-only and never requires runtime values. To supply or override an input ·
-`nika run flow.nika.yaml --var topic="CEL subsets in 2026"` (repeatable ·
+`nika run flow.nika --var topic="CEL subsets in 2026"` (repeatable ·
 engine CLI concern). A `--var` value overrides the declared default and
 satisfies a `required: true` input · an undeclared key is refused before the
 run. See [01-envelope.md](./01-envelope.md#inputs--optional--typed-workflow-inputs)

@@ -5,14 +5,14 @@ engine and land with the reference engine's vertical slice
 ([07 §suite status](../../../spec/07-conformance.md#suite-status--v01-honest)).
 Until then this directory carries the CONTRACT (shapes · no inputs the
 static runner would pick up — `runner.py all` globs `input.yaml`, these
-fixtures use `input.nika.yaml` + `run.json` precisely so the static gate
+fixtures use `input.nika` + `run.json` precisely so the static gate
 ignores them).
 
 ## Fixture shape (behavioral)
 
 ```
 tests/runtime/<area>/<NNN-name>/
-├── input.nika.yaml     the workflow · model: mock/echo (deterministic)
+├── input.nika     the workflow · model: mock/echo (deterministic)
 ├── run.json            invocation · {"vars": {...}, "inputs": {...}, "env": {...}}
 │                       (vars + inputs both thread through `--var` — the
 │                        flag sets a workflow `inputs:` value · env

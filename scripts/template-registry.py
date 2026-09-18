@@ -21,7 +21,7 @@ def project(root=ROOT):
             raise ValueError("Duplicate template identity or source: " + identity)
         seen.add(identity)
         sources.add(source)
-        if source != "templates/" + identity + ".nika.yaml" or not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", identity):
+        if source != "templates/" + identity + ".nika" or not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", identity):
             raise ValueError("Invalid template source: " + source)
         file = root / source
         if file.is_symlink():
@@ -29,7 +29,7 @@ def project(root=ROOT):
         actual = "sha256:" + hashlib.sha256(file.read_bytes()).hexdigest()
         if actual != row["source_digest"]:
             changes.append((identity, row["source_digest"], actual))
-    files = {file.relative_to(root).as_posix() for file in (root / "templates").glob("*.nika.yaml")}
+    files = {file.relative_to(root).as_posix() for file in (root / "templates").glob("*.nika")}
     if sources != files:
         raise ValueError("Template inventory differs from sources: " + str(sorted(sources ^ files)))
     for identity, old, new in changes:

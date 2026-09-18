@@ -11,13 +11,13 @@
 # Requires the `nika` binary on PATH (https://nika.sh/install).
 - id: nika-check
   name: nika check (validate Nika workflows)
-  description: Validate .nika.yaml workflows against the Nika v1 language (schema + DAG + bindings).
+  description: Validate .nika workflows against the Nika v1 language (schema + DAG + bindings).
   entry: nika check
   language: system
-  files: '\.nika\.ya?ml$'
+  files: '\.nika$'
 - id: nika-check-strict
   name: nika check --strict (warnings fail too)
-  description: Strict validation of .nika.yaml workflows (errors AND warnings fail the commit).
+  description: Strict validation of .nika workflows (errors AND warnings fail the commit).
   entry: nika check --strict
   language: system
-  files: '\.nika\.ya?ml$'
+  files: '\.nika$'

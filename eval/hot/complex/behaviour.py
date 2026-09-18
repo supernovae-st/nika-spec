@@ -180,7 +180,7 @@ def rehearse(engine: Engine, candidate: Path, case: dict, rename: dict) -> tuple
         for relative, payload in case.get("binary_files", {}).items():
             (directory / relative).write_bytes(bytes.fromhex(payload))
         source = yaml.safe_dump(with_stubs(doc, stubs), sort_keys=False, allow_unicode=True)
-        workflow = directory / "candidate.nika.yaml"
+        workflow = directory / "candidate.nika"
         trace = None
         for index, step in enumerate(steps):
             for old, new in step.get("mutate", []):

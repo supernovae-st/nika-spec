@@ -24,8 +24,8 @@ RUN_RE = re.compile(r"^#\s*Run(?:\s*·| ·)?\s.*?\bnika\s+(?:run|check)\s+(\S+)"
 def main() -> int:
     dead: list[str] = []
     files = sorted(
-        list((SPEC_ROOT / "examples").glob("*.nika.yaml"))
-        + list((SPEC_ROOT / "templates").glob("*.nika.yaml"))
+        list((SPEC_ROOT / "examples").glob("*.nika"))
+        + list((SPEC_ROOT / "templates").glob("*.nika"))
     )
     for f in files:
         for target in RUN_RE.findall(f.read_text()):

@@ -4,6 +4,6 @@ permits:
 tasks:
   call:
     invoke:
-      workflow: "./child.nika.yaml"
+      workflow: "./child.nika"
       args: { url: "https://example.com" }
     returns: { object: { report: string } }

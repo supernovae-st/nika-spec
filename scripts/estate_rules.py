@@ -118,7 +118,7 @@ FILES = [
         "derivation": {
             "tool": "python3 scripts/showcase-projector.py --write",
             "gate": ".github/workflows/conformance.yml step 'Projection gates' → scripts/showcase-projector.py --check",
-            "inputs": ["VERSION", "examples/*.nika.yaml"],
+            "inputs": ["VERSION", "examples/*.nika"],
         },
         "note": "the engine vendors this manifest into its pack (crates/nika-pack) — downstream it is pinned-copy, here it is the generated original",
     },
@@ -150,7 +150,7 @@ FILES = [
     {
         "path": "VERSION",
         "class": "authored",
-        "evidence": "hand-set at the v0.1.0-draft spec commit — no lane advances it; the derivations' INPUT (showcase-projector.py reads it as pack_version)",
+        "evidence": "hand-set pack version (currently 0.2.0-draft) — no lane advances it; the derivations' INPUT (showcase-projector.py reads it as pack_version)",
     },
     {
         "path": "CODE_OF_CONDUCT.md",
@@ -339,7 +339,7 @@ PATTERNS = [
     {
         "glob": "templates/**",
         "class": "authored",
-        "evidence": "the canonical template originals + adjacent refusal/golden proofs + README — each row in canon/templates/registry.yaml carries 'source_digest is the real sha256 of templates/<id>.nika.yaml · gate: ssot-compiler --check-canon' (the registry digests these, nothing writes them)",
+        "evidence": "the canonical template originals + adjacent refusal/golden proofs + README — each row in canon/templates/registry.yaml carries 'source_digest is the real sha256 of templates/<id>.nika · gate: ssot-compiler --check-canon' (the registry digests these, nothing writes them)",
     },
     {
         "glob": "spec/**",

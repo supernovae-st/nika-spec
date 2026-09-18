@@ -18,7 +18,7 @@ surface:
     exposure: authorable
     notes: 'La clé d''enveloppe nika porte la MARQUE (« ceci est un fichier nika ») ET le NOM du fichier,
       en kebab-case. Un mot, un sens, dans les deux types de document : nika.yaml porte le nom du PROJET,
-      un *.nika.yaml porte le nom du WORKFLOW. Le TYPE se lit sur tasks: (présent = workflow · absent =
+      un *.nika porte le nom du WORKFLOW. Le TYPE se lit sur tasks: (présent = workflow · absent =
       projet · couverture 100%) — jamais sur le nom de fichier, qui ne voyage pas dans un blob, un paste
       ou un corps HTTP. Le slot de VERSION est mort à l''envelope nuke (2026-08-12) et c''est SANS PERTE :
       la spec verrouillait déjà « there is no nika: v2 — ever » et les cassures profondes vivent DANS v1

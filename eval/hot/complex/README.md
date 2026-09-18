@@ -44,7 +44,7 @@ python3 eval/hot/complex/judge.py                  # static · CI · no engine, 
 python3 -O eval/hot/complex/judge_selftest.py      # the judge can fail · CI
 python3 eval/hot/complex/behaviour.py --engine /path/to/nika [--receipt receipt.json]
 NIKA_BIN=/path/to/nika python3 -O eval/hot/complex/behaviour_selftest.py   # the rehearsal can fail
-python3 eval/hot/complex/judge.py --scenario X01 --candidate my.nika.yaml  # exit 0 accepted · 1 rejected · 2 static-invalid
+python3 eval/hot/complex/judge.py --scenario X01 --candidate my.nika  # exit 0 accepted · 1 rejected · 2 static-invalid
 ```
 
 **`judge.py` reads declared properties from the derived graph.** Each
@@ -104,7 +104,7 @@ cost, behaviour outside the listed cases, or anything under `product_contracts`.
 ## Judging somebody else's candidate
 
 ```sh
-python3 eval/hot/complex/judge.py --scenario X01 --candidate my.nika.yaml
+python3 eval/hot/complex/judge.py --scenario X01 --candidate my.nika
 ```
 
 | Exit | Meaning | Report |

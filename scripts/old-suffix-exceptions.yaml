@@ -1,0 +1,190 @@
+# SPDX-License-Identifier: Apache-2.0
+# Exact-path old-suffix exceptions for scripts/check-old-suffix.py.
+# Frozen rows pin the whole-file digest. Other rows pin hit count and
+# the sha256 of the matching lines (joined with newline). Directory
+# prefixes and whole-chapter substring allowances are refused.
+exceptions:
+  - path: conformance/tests/runtime/registry/001-cache-hit-admits-at-default-floor/record.meta.json
+    category: frozen
+    digest: sha256:1f9bd1ba56d98b37a8eff9540162141ec525d9ed9967bffef0e7b26216a5327a
+    reason: "Provenance path is pinned to historical rev 699ebb08; whole-file digest is the receipt."
+    owner: spec
+  - path: conformance/tests/runtime/registry/002-cache-below-raised-floor-refused/record.meta.json
+    category: frozen
+    digest: sha256:1f9bd1ba56d98b37a8eff9540162141ec525d9ed9967bffef0e7b26216a5327a
+    reason: "Provenance path is pinned to the same historical rev; whole-file digest is the receipt."
+    owner: spec
+  - path: conformance/source-naming/rename-manifest.json
+    category: frozen
+    digest: sha256:4e6c6c126efc7a1ebb24c9fb18c74a67e21d478d424ce1cbb10d32a4373e4a94
+    reason: "Old-path to new-path rename receipt for #1684; immutable evidence, not a live program source."
+    owner: spec
+  - path: proofs/c1-yaml-profile/fixtures-refusals.out
+    category: frozen
+    digest: sha256:162d4219eb0d08eda8599f87005c4b9000918d081963c835f195dfcffa4df0d6
+    reason: "Sealed proof or mutation-kill receipt; bytes must stay authentic."
+    owner: spec
+  - path: proofs/c1-yaml-profile/mutation.out
+    category: frozen
+    digest: sha256:01ac9ae3a19c24fd18acc5e92f6b1d9540db444644edd98982b88ee44fd9c705
+    reason: "Sealed proof or mutation-kill receipt; bytes must stay authentic."
+    owner: spec
+  - path: proofs/laws-index.run1.json
+    category: frozen
+    digest: sha256:ea382f4b2b5201bf7c9f56c20e2a0b506bc6de10313bb1625762d00b09d07419
+    reason: "Sealed proof or mutation-kill receipt; bytes must stay authentic."
+    owner: spec
+  - path: proofs/laws-index.run2.json
+    category: frozen
+    digest: sha256:ea382f4b2b5201bf7c9f56c20e2a0b506bc6de10313bb1625762d00b09d07419
+    reason: "Sealed proof or mutation-kill receipt; bytes must stay authentic."
+    owner: spec
+  - path: proofs/mutation-kill/broken-law.yaml
+    category: frozen
+    digest: sha256:e62e7ddb1c5c18c85ed5198f88cb3e69fbd8213e9a0e96fc9e5a03cf6b6dcd3d
+    reason: "Sealed proof or mutation-kill receipt; bytes must stay authentic."
+    owner: spec
+  - path: proofs/mutation-kill/k1-root/canon/conformance.yaml
+    category: frozen
+    digest: sha256:2fcf085c2f9aa3871fc1e9398c798651a857ebdb737b5ce3843f37f4181b4202
+    reason: "Sealed proof or mutation-kill receipt; bytes must stay authentic."
+    owner: spec
+  - path: proofs/mutation-kill/k1-root/canon/laws/yaml-profile.yaml
+    category: frozen
+    digest: sha256:e62e7ddb1c5c18c85ed5198f88cb3e69fbd8213e9a0e96fc9e5a03cf6b6dcd3d
+    reason: "Sealed proof or mutation-kill receipt; bytes must stay authentic."
+    owner: spec
+  - path: proofs/mutation-kill/k1-root/canon/migrations.yaml
+    category: frozen
+    digest: sha256:f174c60d908d04d6ec235576d46d99b20d9dfdb409b7ac4f650e518073d1391d
+    reason: "Sealed proof or mutation-kill receipt; bytes must stay authentic."
+    owner: spec
+  - path: proofs/mutation-kill/k1-root/canon/snippets/registry.yaml
+    category: frozen
+    digest: sha256:48e4de76ea3b99a1f19c23d8e1e0eb273bbeb844b5f491510a9b36107320e378
+    reason: "Sealed proof or mutation-kill receipt; bytes must stay authentic."
+    owner: spec
+  - path: proofs/mutation-kill/k1-root/canon/templates/registry.yaml
+    category: frozen
+    digest: sha256:28e6e43d9ec56c2af4e657ef47c7090ea4094af2cd87b5a5c662b1d21062a836
+    reason: "Sealed proof or mutation-kill receipt; bytes must stay authentic."
+    owner: spec
+  - path: proofs/mutation-kill/k2-root/canon/conformance.yaml
+    category: frozen
+    digest: sha256:2fcf085c2f9aa3871fc1e9398c798651a857ebdb737b5ce3843f37f4181b4202
+    reason: "Sealed proof or mutation-kill receipt; bytes must stay authentic."
+    owner: spec
+  - path: proofs/mutation-kill/k2-root/canon/laws/yaml-profile.yaml
+    category: frozen
+    digest: sha256:0185ac2eaa1b9c0c02d23cf10e7366f2d7384391aa2ebd54e90b560d7d859579
+    reason: "Sealed proof or mutation-kill receipt; bytes must stay authentic."
+    owner: spec
+  - path: proofs/mutation-kill/k2-root/canon/migrations.yaml
+    category: frozen
+    digest: sha256:f174c60d908d04d6ec235576d46d99b20d9dfdb409b7ac4f650e518073d1391d
+    reason: "Sealed proof or mutation-kill receipt; bytes must stay authentic."
+    owner: spec
+  - path: proofs/mutation-kill/k2-root/canon/snippets/registry.yaml
+    category: frozen
+    digest: sha256:48e4de76ea3b99a1f19c23d8e1e0eb273bbeb844b5f491510a9b36107320e378
+    reason: "Sealed proof or mutation-kill receipt; bytes must stay authentic."
+    owner: spec
+  - path: proofs/mutation-kill/k2-root/canon/templates/registry.yaml
+    category: frozen
+    digest: sha256:28e6e43d9ec56c2af4e657ef47c7090ea4094af2cd87b5a5c662b1d21062a836
+    reason: "Sealed proof or mutation-kill receipt; bytes must stay authentic."
+    owner: spec
+  - path: proofs/mutation-kill/k3-root/canon/conformance.yaml
+    category: frozen
+    digest: sha256:2fcf085c2f9aa3871fc1e9398c798651a857ebdb737b5ce3843f37f4181b4202
+    reason: "Sealed proof or mutation-kill receipt; bytes must stay authentic."
+    owner: spec
+  - path: proofs/mutation-kill/k3-root/canon/laws/yaml-profile.yaml
+    category: frozen
+    digest: sha256:5ff4bb062d8d2e6cfc9430b7339a1789616f6cb92a8a62ccb196178972e20547
+    reason: "Sealed proof or mutation-kill receipt; bytes must stay authentic."
+    owner: spec
+  - path: proofs/mutation-kill/k3-root/canon/migrations.yaml
+    category: frozen
+    digest: sha256:f174c60d908d04d6ec235576d46d99b20d9dfdb409b7ac4f650e518073d1391d
+    reason: "Sealed proof or mutation-kill receipt; bytes must stay authentic."
+    owner: spec
+  - path: proofs/mutation-kill/k3-root/canon/snippets/registry.yaml
+    category: frozen
+    digest: sha256:48e4de76ea3b99a1f19c23d8e1e0eb273bbeb844b5f491510a9b36107320e378
+    reason: "Sealed proof or mutation-kill receipt; bytes must stay authentic."
+    owner: spec
+  - path: proofs/mutation-kill/k3-root/canon/templates/registry.yaml
+    category: frozen
+    digest: sha256:28e6e43d9ec56c2af4e657ef47c7090ea4094af2cd87b5a5c662b1d21062a836
+    reason: "Sealed proof or mutation-kill receipt; bytes must stay authentic."
+    owner: spec
+  - path: proofs/mutation-kill/laws-index.pristine.json
+    category: frozen
+    digest: sha256:ea382f4b2b5201bf7c9f56c20e2a0b506bc6de10313bb1625762d00b09d07419
+    reason: "Sealed proof or mutation-kill receipt; bytes must stay authentic."
+    owner: spec
+  - path: proofs/pc-light/census-predicates-after.txt
+    category: frozen
+    digest: sha256:669b52d84e157ccd963a20f07d7983f510ab9087182ba85f05cc8df8fb114946
+    reason: "Sealed proof or mutation-kill receipt; bytes must stay authentic."
+    owner: spec
+  - path: proofs/pc-light/census-predicates-before.txt
+    category: frozen
+    digest: sha256:efd1c7395a513fb148e66268868fd7fe555463459b171238e7098f6eade086e4
+    reason: "Sealed proof or mutation-kill receipt; bytes must stay authentic."
+    owner: spec
+  - path: CHANGELOG.md
+    category: historical
+    count: 4
+    lines_sha256: sha256:18f109305f0cc373a24e2c3fd9df07dc71f54187ba465fc7354a0cf34659b13e
+    reason: "Records the superseded 2026-07 law and the 2026-09-18 hard cut by naming the old suffixes."
+    owner: spec
+  - path: GLOSSARY.md
+    category: negative
+    count: 1
+    lines_sha256: sha256:847c3ca3ea247c575ad5571aef229a308dde0f9389be02f042d1608357f509ec
+    reason: "Glossary names the retired suffixes as not live program paths."
+    owner: spec
+  - path: spec/01-envelope.md
+    category: negative
+    count: 2
+    lines_sha256: sha256:6e55f7d1bffc84422398a1b85529a217284dc21594046aab9f404e533787b742
+    reason: "The naming law names the retired suffixes it refuses."
+    owner: spec
+  - path: conformance/composition_core.py
+    category: negative
+    count: 1
+    lines_sha256: sha256:ef72fe4cb156f7b6dd1f50cf367e483d27f2864db4fd67753e24d1aca535366e
+    reason: "Composition owner names retired suffixes in the COMP-001 diagnostic."
+    owner: spec
+  - path: conformance/composition_core_selftest.py
+    category: negative
+    count: 7
+    lines_sha256: sha256:5e9bbdde52ddcbef2687b5a0a828c56ebde8e057d3e47072937d6685625a88a3
+    reason: "Negative composition tests refuse retired suffixes even with valid bytes."
+    owner: spec
+  - path: conformance/source_naming.py
+    category: negative
+    count: 2
+    lines_sha256: sha256:6e993193edd8ed4ae72c3d1247fed6a228f821003c2173719a368b4b46322e06
+    reason: "Lexical owner declares retired suffixes as data, not live paths."
+    owner: spec
+  - path: conformance/source-naming/cases.yaml
+    category: negative
+    count: 5
+    lines_sha256: sha256:ff8f5b0dba13bdbdb6de2036098f6c7d39c9f1faa3fc915750ad77cadde33fb1
+    reason: "Declarative negative filename fixtures."
+    owner: spec
+  - path: llms-full.txt
+    category: negative
+    count: 3
+    lines_sha256: sha256:a604c6b21c36be16f5849adfbb7fc3a71eb95ba3648d6e3f6d272ee7d0b0065f
+    reason: "Projection of spec/01-envelope.md and GLOSSARY.md, which name the retired suffixes they refuse."
+    owner: spec
+  - path: scripts/check-old-suffix.py
+    category: ratchet
+    count: 15
+    lines_sha256: sha256:f8f1f52ed70f60137b2364ddf191a8f8f8cf2ec299d32cab88a0148fe5ad42f8
+    reason: "The scanner's own forbidden-pattern data."
+    owner: spec

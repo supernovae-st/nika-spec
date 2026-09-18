@@ -33,7 +33,7 @@ TERMINAL_KINDS = {
 
 
 def run_engine(binary: str, text: str) -> dict[str, dict]:
-    with tempfile.NamedTemporaryFile("w", suffix=".nika.yaml", delete=False) as f:
+    with tempfile.NamedTemporaryFile("w", suffix=".nika", delete=False) as f:
         f.write(text)
         path = f.name
     proc = subprocess.run(

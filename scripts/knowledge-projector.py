@@ -20,7 +20,7 @@ def digest(raw):
 def build(root=ROOT):
     files = [
         root / "schemas/workflow.schema.json",
-        *sorted((root / "templates").glob("*.nika.yaml")),
+        *sorted((root / "templates").glob("*.nika")),
     ]
     inputs = {
         path.relative_to(root).as_posix(): digest(path.read_bytes()) for path in files

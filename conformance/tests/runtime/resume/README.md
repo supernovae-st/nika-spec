@@ -11,7 +11,7 @@ tier (no `input.yaml`); the executable proof is
 ```
 tests/runtime/resume/<NNN-name>/
 ├── trace.ndjson           the journal being resumed (records its engine)
-├── golden.nika.yaml       the workflow it ran (001 only)
+├── golden.nika       the workflow it ran (001 only)
 └── expected-resume.json   { "resume_compat": …|null, "verdict": …, "exit": …, "note": … }
 ```
 

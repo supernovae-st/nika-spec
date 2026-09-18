@@ -16,9 +16,9 @@ class RegistryTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         (self.root / "canon/templates").mkdir(parents=True)
         (self.root / "templates").mkdir()
-        (self.root / "templates/example.nika.yaml").write_text("nika: example\n")
+        (self.root / "templates/example.nika").write_text("nika: example\n")
         self.path = self.root / "canon/templates/registry.yaml"
-        self.path.write_text("# Preserve this comment\ntemplates:\n  - id: example\n    source_path: templates/example.nika.yaml\n    source_digest: sha256:old\n    notes: keep\n")
+        self.path.write_text("# Preserve this comment\ntemplates:\n  - id: example\n    source_path: templates/example.nika\n    source_digest: sha256:old\n    notes: keep\n")
     def test_detects_and_repairs_hash_without_changing_metadata(self):
         result, changes = registry.project(self.root)
         self.assertEqual(len(changes), 1)
@@ -28,7 +28,7 @@ class RegistryTests(unittest.TestCase):
         self.path.write_text(result)
         self.assertEqual(registry.project(self.root)[1], [])
     def test_new_unregistered_template_refused(self):
-        (self.root / "templates/unknown.nika.yaml").write_text("nika: unknown")
+        (self.root / "templates/unknown.nika").write_text("nika: unknown")
         with self.assertRaisesRegex(ValueError, "inventory"):
             registry.project(self.root)
     def test_duplicate_refused(self):
@@ -36,12 +36,12 @@ class RegistryTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Duplicate"):
             registry.project(self.root)
     def test_escaped_path_refused(self):
-        self.path.write_text(self.path.read_text().replace("templates/example.nika.yaml", "../outside"))
+        self.path.write_text(self.path.read_text().replace("templates/example.nika", "../outside"))
         with self.assertRaisesRegex(ValueError, "Invalid template"):
             registry.project(self.root)
     def test_missing_file_refused_before_write(self):
         before = self.path.read_bytes()
-        (self.root / "templates/example.nika.yaml").unlink()
+        (self.root / "templates/example.nika").unlink()
         with self.assertRaises(FileNotFoundError):
             registry.project(self.root)
         self.assertEqual(self.path.read_bytes(), before)

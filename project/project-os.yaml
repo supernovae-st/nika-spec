@@ -283,7 +283,7 @@ automation:
     - built_in_workflows
   ui_guardian:
     skill: nika-project-os-ui
-    preflight: project/project-os-audit.nika.yaml
+    preflight: project/project-os-audit.nika
     cadence: daily
     repairs: [views, insights]
     observes: [built_in_workflows]

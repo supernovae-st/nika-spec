@@ -8,7 +8,7 @@ the slice landed releases ago, and nobody had measured the tier by
 command. This differential drives every fixture through the PUBLIC
 surfaces (the binary boundary · never linkage):
 
-- the RUN door · `nika run <input.nika.yaml> --json` (+ `--var k=v` from
+- the RUN door · `nika run <input.nika> --json` (+ `--var k=v` from
   run.json `vars`, its `env` overlaid on the subprocess) — the NDJSON
   event stream projects onto expected-run.json: `workflow_state` from the
   terminal workflow_* event · per-task status from the task_* outcome
@@ -106,7 +106,7 @@ def judge_run(engine: str, d: pathlib.Path) -> list[str]:
     """Differences between the projected run and expected-run.json."""
     expected = json.loads((d / "expected-run.json").read_text())
     run = json.loads((d / "run.json").read_text()) if (d / "run.json").exists() else {}
-    cmd = [engine, "run", str(d / "input.nika.yaml"), "--json"]
+    cmd = [engine, "run", str(d / "input.nika"), "--json"]
     # run.json carries the launch invocation: `vars` and `inputs` both land
     # on --var (the flag sets a workflow `inputs:` value) · `env` overlays
     # the subprocess. (The inputs key was authored ahead of the README —

@@ -12,7 +12,7 @@ conformance:
   - LAW-GRAMMAR-0102
   - LAW-CONF-0102
   introduced_in: C0
-  path: research/pre1-gate/probes/anchors.nika.yaml
+  path: research/pre1-gate/probes/anchors.nika
   polarity: negative
   expected:
     surface: check
@@ -79,7 +79,7 @@ conformance:
   notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
     no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
     silently widened.
-  path: to-mint-c1/guarantee.nika.yaml
+  path: to-mint-c1/guarantee.nika
   polarity: negative
   expected:
     surface: check
@@ -94,7 +94,7 @@ conformance:
   notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · the row is MINTED by its citing laws (§12
     no-orphan) · its full shape fills at the consuming law's implementation window (C1+) · reserved, never
     silently widened.
-  path: to-mint-c1/temporal.nika.yaml
+  path: to-mint-c1/temporal.nika
   polarity: negative
   expected:
     surface: check
@@ -106,7 +106,7 @@ conformance:
   law_ids:
   - LAW-GUAR-0416
   introduced_in: C0
-  path: to-mint-c1/guarantee-composition-suite.nika.yaml
+  path: to-mint-c1/guarantee-composition-suite.nika
   polarity: positive
   expected:
     surface: check
@@ -123,7 +123,7 @@ conformance:
   introduced_in: C0
   notes: Seeded at the SSOT-1 §27 import wave (2026-07-17) · minted by its citing laws (§12 no-orphan)
     · shape fills at C1.
-  path: to-mint-c1/temporal-suite.nika.yaml
+  path: to-mint-c1/temporal-suite.nika
   polarity: positive
   expected:
     surface: check

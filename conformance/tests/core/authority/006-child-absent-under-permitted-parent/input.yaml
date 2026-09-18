@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-# parent carries its boundary · the invoked child (./child.nika.yaml) carries
+# parent carries its boundary · the invoked child (./child.nika) carries
 # NONE and runs `exec: { command: ["echo", "hi"] }`
 nika: t-parent-permitted
 permits:
@@ -7,4 +7,4 @@ permits:
 tasks:
   call:
     invoke:
-      workflow: ./child.nika.yaml
+      workflow: ./child.nika

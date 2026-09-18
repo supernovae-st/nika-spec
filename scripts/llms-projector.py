@@ -84,7 +84,7 @@ def build_llms_txt(c: dict) -> str:
 > stdlib ({c["builtins"]} builtins · {c["providers"]} providers), and a conformance suite. Apache-2.0
 > spec · AGPL-3.0 reference engine in Rust (single static binary).
 
-Workflow files are `*.nika.yaml`. The JSON Schema gives any editor
+Workflow files are `*.nika`. The JSON Schema gives any editor
 autocomplete + validation via a `yaml-language-server` modeline:
 `{RAW}/schemas/workflow.schema.json`
 

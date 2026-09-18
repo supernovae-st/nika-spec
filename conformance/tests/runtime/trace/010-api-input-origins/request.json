@@ -1,5 +1,5 @@
 {
-  "workflow": "root.nika.yaml",
+  "workflow": "root.nika",
   "inputs": {
     "ticket": "@env:SERVER_SECRET",
     "count": 42,

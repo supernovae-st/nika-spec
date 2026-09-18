@@ -12,7 +12,7 @@ verdict).
 
 ```
 tests/runtime/trace/<NNN-name>/
-├── golden.nika.yaml        the workflow the journal ran (when supplied)
+├── golden.nika        the workflow the journal ran (when supplied)
 ├── trace.ndjson            the journal under verification
 └── expected-verify.json    { "verdict": …, "cost_replay"?: …, "note": … }
 ```
@@ -81,5 +81,5 @@ an end exits on the tier ladder and `incomplete` exits on its own class.
 
 A bound fixture costs its bound: `005` carries a 1 MiB line because
 that is the only way to cross a 1 MiB bound. One repeated byte packs to
-about 1.7 KiB, the same trade `yaml-profile/invalid/document-over-cap.nika.yaml`
+about 1.7 KiB, the same trade `yaml-profile/invalid/document-over-cap.nika`
 already makes on the authoring side.

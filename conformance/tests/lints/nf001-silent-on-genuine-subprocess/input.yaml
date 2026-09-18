@@ -6,4 +6,4 @@ tasks:
   nested:
     after:
       test: success
-    exec: { command: ["nika", "run", "subroutine.nika.yaml"] }
+    exec: { command: ["nika", "run", "subroutine.nika"] }

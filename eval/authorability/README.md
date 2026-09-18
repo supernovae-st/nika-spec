@@ -21,7 +21,7 @@ from day 1 so anyone can reproduce or extend it.
 1. **Input** · a model gets the docs bundle (`llms.txt` index or the
    full `llms-full.txt`) + one task intent from `tasks.jsonl` — zero
    few-shot Nika examples beyond what the docs carry.
-2. **Generate** · the model writes a complete `*.nika.yaml`.
+2. **Generate** · the model writes a complete `*.nika`.
 3. **Judge L1 (mechanical · no LLM)** · `nika check` — parse + static
    ladder (types · schema satisfiability · DAG · budget floor).
 4. **Judge L2 (structural)** · the fixture's `expect` block: required

@@ -477,7 +477,7 @@ inputs:
 tasks:
   research:
     invoke:
-      workflow: ./research.nika.yaml   # composable child · static literal (§10.1)
+      workflow: ./research.nika   # composable child · static literal (§10.1)
       args: { query: ${{ inputs.topic }} }
     returns: ResearchReport      # checked against the child's outputs contract
 
@@ -926,7 +926,7 @@ tasks:
   research:
     op: invoke
     params:
-      workflow: ./research.nika.yaml   # composable child · static literal (§10.1)
+      workflow: ./research.nika   # composable child · static literal (§10.1)
       args: { query: ${{ inputs.topic }} }
     returns: ResearchReport       # child permits must fit inside the parent's ·
                                   # child costs sum into the parent's limits
@@ -1313,7 +1313,7 @@ flow:
   then:
     - research:
         invoke:
-          workflow: ./research.nika.yaml             # composable child · static literal (§10.1)
+          workflow: ./research.nika             # composable child · static literal (§10.1)
           args: { query: ${{ inputs.topic }} }       # parent value -> child inputs authority
         returns: ResearchReport      # checked against the child's outputs: contract
 
@@ -1497,7 +1497,7 @@ invoke:
 
 ```yaml
 invoke:
-  workflow: ./flows/risk-review.nika.yaml   # composable child · static literal
+  workflow: ./flows/risk-review.nika   # composable child · static literal
   args: { diff: "…" }
 ```
 

@@ -2,7 +2,7 @@
 # generate.py · the authorability bench runner (local-first baseline)
 # License · Apache-2.0 (part of the Nika spec)
 #
-# Protocol (README): docs-bundle + intent → model writes a *.nika.yaml →
+# Protocol (README): docs-bundle + intent → model writes a *.nika →
 # L1 judge = `nika check` (parse + static ladder) · L2 judge = the task's
 # expect-block (verbs · DAG bounds · constructs) · pass^k over k gens.
 #
@@ -24,9 +24,9 @@ SPEC_ROOT = ROOT.parent.parent
 ARMS = {
     # The graduated in-context arms (Text2DSL-class · the DELTA between
     # arms is the measurable value of docs-in-context).
-    "index": ["llms.txt", "templates/chain.nika.yaml"],
+    "index": ["llms.txt", "templates/chain.nika"],
     "chapters": ["llms.txt", "spec/02-verbs.md", "spec/04-variables.md",
-                 "stdlib/builtins-v0.1.md", "templates/chain.nika.yaml"],
+                 "stdlib/builtins-v0.1.md", "templates/chain.nika"],
 }
 
 def docs_bundle(arm: str) -> str:
@@ -37,7 +37,7 @@ def docs_bundle(arm: str) -> str:
             parts.append(f"\n=== {rel} ===\n" + p.read_text(encoding="utf-8"))
     return "".join(parts)
 
-PROMPT = """You are writing a Nika workflow file (*.nika.yaml).
+PROMPT = """You are writing a Nika workflow file (*.nika).
 
 Nika docs (authoritative · follow them exactly):
 {docs}
@@ -127,7 +127,7 @@ def main() -> int:
                 verdicts.append({"gen": gen_id, "l1": False, "l2": False, "err": "no yaml fence"})
                 print(f"✖ {gen_id} · no yaml block", flush=True)
                 continue
-            p = out / f"{gen_id}.nika.yaml"
+            p = out / f"{gen_id}.nika"
             p.write_text(yml, encoding="utf-8")
             ok1, detail = judge_l1(p)
             ok2, fails = judge_l2(yml, t.get("expect", {}))

@@ -3,12 +3,12 @@
 Non-blocking observations recorded while proving the corpus green. Neither is
 asserted BY the corpus (headers were chosen so both engine behaviors conform);
 both deserve an upstream look. The one asserted divergence stays
-`errors/recover-task-ref-no-edge.nika.yaml` (spec 05 §recover await ·
+`errors/recover-task-ref-no-edge.nika` (spec 05 §recover await ·
 supernovae-st/nika#291 · verdict DIVERGENT by design).
 
 ## F-1 · Unknown tool: check refuses without the spec wire code
 
-`verbs/invoke-unknown-tool-reject.nika.yaml` — spec 05 §errors: `NIKA-INVOKE-001 |
+`verbs/invoke-unknown-tool-reject.nika` — spec 05 §errors: `NIKA-INVOKE-001 |
 unknown tool (unresolvable nika:/mcp: id) | validation_error`. `nika check` (0.97.0)
 refuses correctly but reports only the TOOLS gate verdict
 (`✖ TOOLS \`nika:nonexistent_builtin_xyzzy\` … is not a canonical builtin`) — the

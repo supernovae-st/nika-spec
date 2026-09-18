@@ -69,7 +69,7 @@ class TheJudgeCanFail(unittest.TestCase):
     # ── a correct candidate that is weakened stops being accepted ────────────
 
     def test_a_defaulted_gate_in_the_reference_is_rejected(self):
-        self.rewrite("workflows/x01/reference.nika.yaml", 'Report: ${{ with.report }}"\n',
+        self.rewrite("workflows/x01/reference.nika", 'Report: ${{ with.report }}"\n',
                      'Report: ${{ with.report }}"\n        default: true\n')
         with self.red("x01/reference.*gate_blocking"):
             judge.validate(self.root)
@@ -77,7 +77,7 @@ class TheJudgeCanFail(unittest.TestCase):
     def consent_verdict(self, condition):
         """This judge's own reading, independent of the reference oracle that refuses the same files first."""
         import yaml
-        text = (self.root / "workflows/x01/reference.nika.yaml").read_text(encoding="utf-8")
+        text = (self.root / "workflows/x01/reference.nika").read_text(encoding="utf-8")
         self.assertEqual(text.count("when: ${{ with.go == true }}"), 1)
         doc = yaml.safe_load(text.replace("when: ${{ with.go == true }}", f"when: {condition}"))
         assertions = self.scenario(judge.load(self.root), "X01")["assertions"]
@@ -93,18 +93,18 @@ class TheJudgeCanFail(unittest.TestCase):
                 self.assertTrue(self.consent_verdict(open_on_refusal), "a refusal must close the write")
 
     def test_the_reference_oracle_and_this_judge_agree_on_an_inverted_condition(self):
-        self.rewrite("workflows/x11/reference.nika.yaml", "when: ${{ with.go == true }}", "when: ${{ with.go == false }}")
+        self.rewrite("workflows/x11/reference.nika", "when: ${{ with.go == true }}", "when: ${{ with.go == false }}")
         with self.red("x11/reference.*NIKA-SEC-014"):
             judge.validate(self.root)
 
     def test_a_destination_read_from_the_ticket_is_rejected(self):
-        self.rewrite("workflows/x08/reference.nika.yaml", '        path: "${{ const.reply_path }}"',
+        self.rewrite("workflows/x08/reference.nika", '        path: "${{ const.reply_path }}"',
                      '        path: "./out/${{ inputs.ticket }}"')
         with self.red("x08/reference.*control_positions_trusted"):
             judge.validate(self.root)
 
     def test_an_unrequested_policy_change_in_the_edit_is_rejected(self):
-        self.rewrite("workflows/x06/edit-reference.nika.yaml", "  refund_limit_eur: 100", "  refund_limit_eur: 101")
+        self.rewrite("workflows/x06/edit-reference.nika", "  refund_limit_eur: 100", "  refund_limit_eur: 101")
         with self.red("x06/edit-reference.*edit_locality"):
             judge.validate(self.root)
 
@@ -113,7 +113,7 @@ class TheJudgeCanFail(unittest.TestCase):
             self.scenario(data, "X10")["assertions"][0]["params"]["domain"].append("fraud")
         self.manifest(widen)
         judge.validate(self.root)  # the negated fallback is total, so a new class still lands
-        self.rewrite("workflows/x10/reference.nika.yaml", 'when: ${{ with.c.class != "billing" && with.c.class != "login" }}',
+        self.rewrite("workflows/x10/reference.nika", 'when: ${{ with.c.class != "billing" && with.c.class != "login" }}',
                      'when: ${{ with.c.class == "security" || with.c.class == "unknown" }}')
         with self.red("x10/reference.*branches_exclusive_total"):
             judge.validate(self.root)
@@ -146,7 +146,7 @@ class TheJudgeCanFail(unittest.TestCase):
     def edited(self, mutate):
         """The X06 assertion applied to the reference edit after an in-memory mutation: no oracle is involved."""
         import yaml
-        doc = yaml.safe_load((self.root / "workflows/x06/edit-reference.nika.yaml").read_text(encoding="utf-8"))
+        doc = yaml.safe_load((self.root / "workflows/x06/edit-reference.nika").read_text(encoding="utf-8"))
         mutate(doc)
         assertion = self.scenario(judge.load(self.root), "X06")["assertions"]
         return judge.judge(doc, assertion, self.root)["edit_locality"]
@@ -310,8 +310,8 @@ class TheJudgeCanFail(unittest.TestCase):
 
     def test_simple_paths_render_exactly_as_before(self):
         import yaml
-        base = yaml.safe_load((self.root / "workflows/x06/base.nika.yaml").read_text(encoding="utf-8"))
-        edit = yaml.safe_load((self.root / "workflows/x06/edit-reference.nika.yaml").read_text(encoding="utf-8"))
+        base = yaml.safe_load((self.root / "workflows/x06/base.nika").read_text(encoding="utf-8"))
+        edit = yaml.safe_load((self.root / "workflows/x06/edit-reference.nika").read_text(encoding="utf-8"))
         self.assertEqual(judge.semantic_changes(base, edit), {"secrets.webhook.key", "permits.net.http[0]"})
 
     def test_the_edit_assertion_sees_a_policy_change_hidden_behind_a_lookalike_key(self):
@@ -319,8 +319,8 @@ class TheJudgeCanFail(unittest.TestCase):
         import yaml
         base = {"nika": "lookalike", "const": {"limits": {"refund_eur": 100}, "limits.refund_eur": 100},
                 "tasks": {"rule": {"invoke": {"tool": "nika:jq", "args": {"input": 1, "expression": "."}}}}}
-        (self.root / "workflows/x06/lookalike-base.nika.yaml").write_text(yaml.safe_dump(base), encoding="utf-8")
-        params = {"base": "workflows/x06/lookalike-base.nika.yaml", "allowed": ["const.note"], "required": [],
+        (self.root / "workflows/x06/lookalike-base.nika").write_text(yaml.safe_dump(base), encoding="utf-8")
+        params = {"base": "workflows/x06/lookalike-base.nika", "allowed": ["const.note"], "required": [],
                   "_root": self.root}
         raised = copy.deepcopy(base)
         raised["const"]["limits"]["refund_eur"] = 250
@@ -333,7 +333,7 @@ class TheJudgeCanFail(unittest.TestCase):
 
     # ── an ad hoc candidate is admitted by the reference oracle before it is judged ──
 
-    REFERENCE = "workflows/x01/reference.nika.yaml"
+    REFERENCE = "workflows/x01/reference.nika"
     GOOD_WHEN = "    when: ${{ with.go == true }}\n"
 
     def cli(self, candidate, scenario="X01"):
@@ -374,7 +374,7 @@ class TheJudgeCanFail(unittest.TestCase):
         self.assertEqual((status, report), (0, {"scenario": "X01", "accepted": True, "violations": {}}))
 
     def test_cli_still_rejects_an_ordinary_semantic_near_miss(self):
-        status, report, _ = self.cli(self.root / "workflows/x01/near-miss-gated-through-data-edge.nika.yaml")
+        status, report, _ = self.cli(self.root / "workflows/x01/near-miss-gated-through-data-edge.nika")
         self.assertEqual(status, 1)
         self.assertIs(report["accepted"], False)
         self.assertEqual(list(report["violations"]), ["effects_gated"])
@@ -388,12 +388,12 @@ class TheJudgeCanFail(unittest.TestCase):
         good_last = text.replace(self.GOOD_WHEN, "    when: true\n" + self.GOOD_WHEN)
         self.assertTrue(self.passes_every_assertion_when_parsed_last_wins(good_last),
                         "the trap: parsed last-wins, this candidate satisfies every assertion")
-        self.assert_refused_as_static_invalid(self.cli(self.candidate("duplicate-good-last.nika.yaml", good_last)),
+        self.assert_refused_as_static_invalid(self.cli(self.candidate("duplicate-good-last.nika", good_last)),
                                               "NIKA-PARSE-017")
         # The other order used to be rejected on meaning, by parser luck. It is the same defect.
         good_first = text.replace(self.GOOD_WHEN, self.GOOD_WHEN + "    when: true\n")
         self.assertFalse(self.passes_every_assertion_when_parsed_last_wins(good_first))
-        self.assert_refused_as_static_invalid(self.cli(self.candidate("duplicate-good-first.nika.yaml", good_first)),
+        self.assert_refused_as_static_invalid(self.cli(self.candidate("duplicate-good-first.nika", good_first)),
                                               "NIKA-PARSE-017")
 
     def test_cli_refuses_a_duplicate_top_level_block_that_hides_a_wider_boundary(self):
@@ -402,7 +402,7 @@ class TheJudgeCanFail(unittest.TestCase):
         self.assertEqual(text.count("\npermits:\n"), 1)
         hidden = text.replace("\npermits:\n", "\n" + wide + "permits:\n", 1)
         self.assertTrue(self.passes_every_assertion_when_parsed_last_wins(hidden))
-        self.assert_refused_as_static_invalid(self.cli(self.candidate("duplicate-permits.nika.yaml", hidden)),
+        self.assert_refused_as_static_invalid(self.cli(self.candidate("duplicate-permits.nika", hidden)),
                                               "NIKA-PARSE-017")
 
     def test_cli_refuses_a_malformed_schema_although_every_assertion_passes(self):
@@ -410,19 +410,19 @@ class TheJudgeCanFail(unittest.TestCase):
         self.assertEqual(text.count("        type: object\n"), 1)
         malformed = text.replace("        type: object\n", "        type: objectt\n")
         self.assertTrue(self.passes_every_assertion_when_parsed_last_wins(malformed))
-        self.assert_refused_as_static_invalid(self.cli(self.candidate("malformed-schema.nika.yaml", malformed)), "NIKA-")
+        self.assert_refused_as_static_invalid(self.cli(self.candidate("malformed-schema.nika", malformed)), "NIKA-")
 
     def test_cli_refuses_an_unknown_envelope_key_although_every_assertion_passes(self):
         unknown = self.reference_text() + "\npolicy:\n  refunds: allowed\n"
         self.assertTrue(self.passes_every_assertion_when_parsed_last_wins(unknown))
-        self.assert_refused_as_static_invalid(self.cli(self.candidate("unknown-key.nika.yaml", unknown)), "NIKA-PARSE")
+        self.assert_refused_as_static_invalid(self.cli(self.candidate("unknown-key.nika", unknown)), "NIKA-PARSE")
 
     def test_cli_refuses_text_that_is_not_yaml_with_a_verdict_not_a_crash(self):
-        outcome = self.cli(self.candidate("not-yaml.nika.yaml", "nika: broken\ntasks: [\n"))
+        outcome = self.cli(self.candidate("not-yaml.nika", "nika: broken\ntasks: [\n"))
         self.assert_refused_as_static_invalid(outcome, "NIKA-PARSE-001")
 
     def test_cli_refuses_a_corpus_candidate_the_reference_oracle_refuses(self):
-        outcome = self.cli(self.root / "workflows/x01/refused-ordering-only-gate.nika.yaml")
+        outcome = self.cli(self.root / "workflows/x01/refused-ordering-only-gate.nika")
         self.assert_refused_as_static_invalid(outcome, "NIKA-SEC-014")
 
     def test_the_source_is_read_once_and_the_oracle_and_the_parser_see_those_bytes(self):
@@ -432,7 +432,7 @@ class TheJudgeCanFail(unittest.TestCase):
             """A file that says one thing on the first read and another afterwards."""
 
             def __init__(self, first, later):
-                self.first, self.later, self.reads, self.parent, self.name = first, later, 0, folder, "candidate.nika.yaml"
+                self.first, self.later, self.reads, self.parent, self.name = first, later, 0, folder, "candidate.nika"
 
             def read_bytes(self):
                 self.reads += 1
@@ -443,7 +443,7 @@ class TheJudgeCanFail(unittest.TestCase):
 
         valid = self.reference_text()
         duplicate = valid.replace(self.GOOD_WHEN, "    when: true\n" + self.GOOD_WHEN)
-        near_miss = (folder / "near-miss-gated-through-data-edge.nika.yaml").read_text(encoding="utf-8")
+        near_miss = (folder / "near-miss-gated-through-data-edge.nika").read_text(encoding="utf-8")
 
         refused_first = RewrittenWhileJudged(duplicate, valid)
         status, report = judge.judge_candidate("X01", refused_first, self.root)
@@ -469,7 +469,7 @@ class TheJudgeCanFail(unittest.TestCase):
 
     def test_the_corpus_and_the_command_admit_through_the_same_door(self):
         import yaml
-        path = self.root / "workflows/x01/refused-ordering-only-gate.nika.yaml"
+        path = self.root / "workflows/x01/refused-ordering-only-gate.nika"
         text, verdict = judge.admit(path)
         self.assertEqual(text, path.read_text(encoding="utf-8"))
         self.assertEqual([error["code"] for error in verdict["errors"]], ["NIKA-SEC-014"])
@@ -534,9 +534,9 @@ class TheJudgeCanFail(unittest.TestCase):
             judge.validate(self.root)
 
     def test_a_refused_candidate_that_becomes_valid_is_caught(self):
-        self.rewrite("workflows/x01/refused-ordering-only-gate.nika.yaml", "    after:\n      human: success\n    with:\n",
+        self.rewrite("workflows/x01/refused-ordering-only-gate.nika", "    after:\n      human: success\n    with:\n",
                      "    with:\n      go: ${{ tasks.human.output }}\n")
-        self.rewrite("workflows/x01/refused-ordering-only-gate.nika.yaml",
+        self.rewrite("workflows/x01/refused-ordering-only-gate.nika",
                      "      report: ${{ tasks.merge.output.report }}\n    invoke:\n      tool: \"nika:write\"",
                      "      report: ${{ tasks.merge.output.report }}\n    when: ${{ with.go == true }}\n    invoke:\n      tool: \"nika:write\"")
         with self.red("must refuse with NIKA-SEC-014"):

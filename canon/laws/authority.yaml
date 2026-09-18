@@ -239,11 +239,11 @@ laws:
     fixtures:
       - conformance/tests/runtime/permits/002-empty-permits-pure-compute
     negative_fixtures:
-      - conformance/envelope/permits-net-absent.nika.yaml
-      - conformance/envelope/permits-exec-absent.nika.yaml
-      - conformance/envelope/permits-tool-not-listed.nika.yaml
-      - conformance/envelope/permits-fs-read-escape.nika.yaml
-      - conformance/envelope/permits-fs-write-escape-absolute.nika.yaml
+      - conformance/envelope/permits-net-absent.nika
+      - conformance/envelope/permits-exec-absent.nika
+      - conformance/envelope/permits-tool-not-listed.nika
+      - conformance/envelope/permits-fs-read-escape.nika
+      - conformance/envelope/permits-fs-write-escape-absolute.nika
     projections: ["prose:10-authority", "schema", "cli:check", "lsp", "mcp", "sdk"]
     implementation_surfaces:
       - engine:nika-engine
@@ -913,7 +913,7 @@ laws:
       pipeline_stage: permits_check
     diagnostics: []
     fixtures:
-      - conformance/envelope/permits-empty-default-deny.nika.yaml
+      - conformance/envelope/permits-empty-default-deny.nika
     projections: ["prose:10-authority", "prose:01-envelope", "schema", "cli:check", "sdk"]
     implementation_surfaces:
       - engine:nika-engine
@@ -1290,7 +1290,7 @@ laws:
       pipeline_stage: infer
     diagnostics: ["NIKA-SEC-008"]
     fixtures:
-      - conformance/envelope/secrets-infer-egress-sanctioned.nika.yaml
+      - conformance/envelope/secrets-infer-egress-sanctioned.nika
     negative_fixtures:
       - to-mint-c1/conformance/secrets/invalid/missing-source
     projections: ["prose:01-envelope", "schema", "cli:check", "lsp", "sdk"]
@@ -1348,7 +1348,7 @@ laws:
       pipeline_stage: infer
     diagnostics: ["NIKA-PARSE-005"]
     fixtures:
-      - conformance/envelope/secrets-infer-egress-sanctioned.nika.yaml
+      - conformance/envelope/secrets-infer-egress-sanctioned.nika
     negative_fixtures:
       - to-mint-c1/conformance/secrets/invalid/from-as-envelope-keyword
     projections: ["prose:01-envelope", "schema", "cli:check", "docs"]
@@ -1410,12 +1410,12 @@ laws:
       pipeline_stage: effective
     diagnostics: ["NIKA-SEC-006", "NIKA-SEC-007"]
     fixtures:
-      - conformance/envelope/secrets-infer-egress-sanctioned.nika.yaml
+      - conformance/envelope/secrets-infer-egress-sanctioned.nika
     negative_fixtures:
-      - conformance/envelope/secrets-leak-infer-prompt.nika.yaml
-      - conformance/envelope/secrets-leak-exec-sink.nika.yaml
-      - conformance/envelope/secrets-launder-concat.nika.yaml
-      - conformance/envelope/secrets-two-sinks-one-sanctioned.nika.yaml
+      - conformance/envelope/secrets-leak-infer-prompt.nika
+      - conformance/envelope/secrets-leak-exec-sink.nika
+      - conformance/envelope/secrets-launder-concat.nika
+      - conformance/envelope/secrets-two-sinks-one-sanctioned.nika
     projections: ["prose:01-envelope", "prose:10-authority", "schema", "cli:check", "sdk"]
     implementation_surfaces:
       - engine:nika-engine

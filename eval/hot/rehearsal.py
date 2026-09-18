@@ -35,7 +35,7 @@ def local_only(doc):
 
 def run(engine, directory, doc, *, variables=(), events=False):
     local_only(doc)
-    path = directory / "case.nika.yaml"
+    path = directory / "case.nika"
     path.write_text(yaml.safe_dump(doc, sort_keys=False, allow_unicode=True))
     checked = subprocess.run([engine, "check", "--json", "--native-strict", str(path)],
                              cwd=directory, capture_output=True, text=True, timeout=20)
@@ -54,7 +54,7 @@ def main():
     engine = shutil.which(args.engine)
     require(engine is not None, "engine unavailable; rehearsal was not executed")
     source = ROOT / "proposed-skeletons"
-    docs = {p.stem.removesuffix(".nika"): yaml.safe_load(p.read_text()) for p in source.glob("*.nika.yaml")}
+    docs = {p.stem.removesuffix(".nika"): yaml.safe_load(p.read_text()) for p in source.glob("*.nika")}
     checks = []
     with tempfile.TemporaryDirectory(prefix="nika-hot-rehearsal-") as temp:
         directory = Path(temp)

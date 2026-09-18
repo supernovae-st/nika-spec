@@ -118,7 +118,7 @@ def validate(root: Path = ROOT) -> dict:
         require(row["sha256_file"] == digest, f"{row['id']}: stale source digest")
 
     proposed = root / "proposed-skeletons"
-    files = sorted(proposed.glob("*.nika.yaml"))
+    files = sorted(proposed.glob("*.nika"))
     require(bool(files), "proposed-skeletons: empty")
     for path in files:
         result = subprocess.run([sys.executable, str(REPO / "conformance/runner.py"), "validate", str(path)],
@@ -127,7 +127,7 @@ def validate(root: Path = ROOT) -> dict:
 
     # These are this candidate's declared branch laws, not a second CEL engine.
     # rehearsal.py verifies both cases against the actual Nika runtime.
-    fallback = yaml.safe_load((proposed / "known-path-agent-fallback.nika.yaml").read_text())
+    fallback = yaml.safe_load((proposed / "known-path-agent-fallback.nika").read_text())
     for task, op in (("known", "!="), ("investigate", "==")):
         branch = fallback["tasks"][task]
         require(branch.get("with", {}).get("classification") == "${{ tasks.classify.output }}",

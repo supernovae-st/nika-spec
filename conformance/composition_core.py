@@ -29,6 +29,7 @@ import re
 
 import yaml
 
+from source_naming import KIND_PROGRAM, classify_path
 from type_core import assignable, parse_type
 
 EXPR = re.compile(r"(?<!\\)\$\{\{")
@@ -103,6 +104,8 @@ def _declared_grants(doc: dict) -> set[str]:
 def _load_child(base_dir, target: str):
     """(child_doc, resolved_path) or (None, None) when unreadable."""
     if base_dir is None:
+        return None, None
+    if classify_path(target) != KIND_PROGRAM:
         return None, None
     path = (base_dir / target).resolve()
     if not path.is_file():
@@ -232,6 +235,13 @@ def composition_errors(doc: dict, base_dir=None) -> list[dict]:
                 errs.append(_err("NIKA-COMP-001",
                                  f"{where} · registry target must be pinned "
                                  "registry:owner/name@version (spec 14)"))
+            continue
+        if classify_path(target) != KIND_PROGRAM:
+            errs.append(_err("NIKA-COMP-001",
+                             f"{where} · workflow: target {target!r} is not a "
+                             "canonical program path (spec 01 §File naming · "
+                             "retired .nika.yaml/.nika.yml, project nika.yaml, "
+                             "and lookalikes are not live program files)"))
             continue
         child, cpath = _load_child(base_dir, target)
         if base_dir is not None and cpath is None:

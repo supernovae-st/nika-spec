@@ -121,8 +121,8 @@ law("the unicode contract declares refuse-BOM + require-NFC",
 FIXTURES = Path(__file__).parent / "yaml-profile"
 EXPECTED = re.compile(r"#\s*Expected:\s*(NIKA-[A-Z]+-\d{3}) at CHECK\.")
 
-invalid = sorted((FIXTURES / "invalid").glob("*.nika.yaml"))
-valid = sorted((FIXTURES / "valid").glob("*.nika.yaml"))
+invalid = sorted((FIXTURES / "invalid").glob("*.nika"))
+valid = sorted((FIXTURES / "valid").glob("*.nika"))
 law("at least 11 negative fixtures exist (one per profile condition)", len(invalid) >= 11)
 law("at least 3 positive fixtures exist", len(valid) >= 3)
 
@@ -153,11 +153,11 @@ def _max_scalar(p: Path) -> int:
 
 
 law("valid/depth-at-cap sits EXACTLY at 64 levels",
-    _max_depth(FIXTURES / "valid" / "depth-at-cap.nika.yaml") == DEPTH_CAP)
+    _max_depth(FIXTURES / "valid" / "depth-at-cap.nika") == DEPTH_CAP)
 law("valid/scalar-at-cap carries EXACTLY a 65 536-byte scalar",
-    _max_scalar(FIXTURES / "valid" / "scalar-at-cap.nika.yaml") == SCALAR_CAP)
+    _max_scalar(FIXTURES / "valid" / "scalar-at-cap.nika") == SCALAR_CAP)
 law("invalid/document-over-cap is EXACTLY cap+1 bytes (the minimal illegal document)",
-    (FIXTURES / "invalid" / "document-over-cap.nika.yaml").stat().st_size == DOCUMENT_CAP + 1)
+    (FIXTURES / "invalid" / "document-over-cap.nika").stat().st_size == DOCUMENT_CAP + 1)
 
 bad = [n for n, ok in CHECKS if not ok]
 print(f"yaml-profile-core selftest · {len(CHECKS) - len(bad)}/{len(CHECKS)} laws hold")

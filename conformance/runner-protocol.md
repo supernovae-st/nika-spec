@@ -78,7 +78,7 @@ conformance/tests/stdlib/    stdlib static surface · provider prefixes · extra
 (`tests/runtime/` carries the behavioral contract — fixture shape ·
 run.json invocation · expected-run.json assertions · determinism rules ·
 see [tests/runtime/README.md](tests/runtime/README.md). They use
-`input.nika.yaml`, NOT `input.yaml`, so the static `all` gate ignores
+`input.nika`, NOT `input.yaml`, so the static `all` gate ignores
 them by construction. **First measured by command 2026-07-30 — and
 fully green**:
 [`scripts/runtime-differential.py`](../scripts/runtime-differential.py)

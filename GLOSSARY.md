@@ -110,7 +110,7 @@ the claim.
 ## `nika:` · the mark and the name
 
 One key, one spelling, two referents resolved by the document it opens: in
-`nika.yaml` it carries the **project** name, in a `*.nika.yaml` it carries the
+`nika.yaml` it carries the **project** name, in a `*.nika` it carries the
 **workflow** name. Kebab-case (`^[a-z][a-z0-9-]*$`) · a bad id is
 `NIKA-PARSE-003`, an absent key is `NIKA-PARSE-002`.
 
@@ -125,9 +125,11 @@ the file's most necessary field instead.
 
 ## canonical filename
 
-`<name>.nika.yaml` ([01 §File naming](./spec/01-envelope.md#file-naming-normative)).
-`.nika.yml` is accepted-and-taught-against · bare `.nika` is reserved ·
-the reserved media type is `application/vnd.nika+yaml`.
+`<name>.nika` with a nonempty stem ([01 §File naming](./spec/01-envelope.md#file-naming-normative)).
+Project configuration is `nika.yaml`. Runtime state is `.nika/`. Retired
+`.nika.yaml` / `.nika.yml` are not live program paths. Bare `.nika`
+(empty stem) is not a program file. The reserved media type is
+`application/vnd.nika+yaml`.
 
 ## envelope · pillar · stdlib · pack
 

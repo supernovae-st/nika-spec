@@ -16,7 +16,7 @@ command -v nika >/dev/null || { echo "nika not on PATH" >&2; exit 1; }
 # trifecta fixtures, verbatim from conformance/ (never edited for camera).
 rm -rf /tmp/spec-demo
 mkdir -p /tmp/spec-demo/envelope
-cp "$ROOT"/conformance/envelope/trifecta-*.nika.yaml /tmp/spec-demo/envelope/
+cp "$ROOT"/conformance/envelope/trifecta-*.nika /tmp/spec-demo/envelope/
 
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK" /tmp/spec-demo' EXIT

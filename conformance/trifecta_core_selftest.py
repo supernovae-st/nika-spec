@@ -3,7 +3,7 @@
 """Self-test of the trifecta lane (NEP-0002 · NIKA-SEC-009) — the engine
 checker's fourteen law cases transcribed as inline docs (same law · zero
 shared code · the two-oracle doctrine), plus the corpus pin: the ONE
-deliberately-red witness (`conformance/envelope/trifecta-realized-flow-ungated.nika.yaml`) must refuse
+deliberately-red witness (`conformance/envelope/trifecta-realized-flow-ungated.nika`) must refuse
 here for the same reason it refuses at `nika check`."""
 from __future__ import annotations
 
@@ -356,7 +356,7 @@ law("the writers are the fs half of the egress set",
 # the teaching surface law — so the always-red witness lives beside the
 # other conformance inputs, same inverted assertion.)
 _witness = (Path(__file__).parent / "envelope"
-            / "trifecta-realized-flow-ungated.nika.yaml")
+            / "trifecta-realized-flow-ungated.nika")
 v = trifecta_errors(yaml.safe_load(_witness.read_text()))
 law("witness: exactly one finding", len(v) == 1)
 law("witness: the sink is exfil (the notify egress)",
