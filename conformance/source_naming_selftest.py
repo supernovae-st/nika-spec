@@ -51,9 +51,9 @@ for row in cases:
     elif "/" not in name and not name.endswith("/") and "://" not in name:
         law(f"no stem for {name!r}", logical_stem(name) is None)
 
-# The full project schema must apply the same lexical naming contract to
-# workflow references. Filesystem existence and owned-relative admission
-# remain the engine's job, as they do for classify_path above.
+# The full project schema adds the project parser's relative-path shape
+# restrictions to lexical naming. Each row records the two verdicts
+# independently; filesystem existence and cadence admission are separate.
 project_schema = json.loads((HERE.parent / "schemas" / "project.schema.json").read_text())
 Draft202012Validator.check_schema(project_schema)
 project_validator = Draft202012Validator(project_schema)
@@ -61,10 +61,11 @@ project_validator = Draft202012Validator(project_schema)
 for row in cases:
     project = {
         "nika": "schema-test",
-        "arm": [{"workflow": row["name"], "cadence": "0 9 * * *"}],
+        "arm": [{"workflow": row["name"], "cadence": "0 9 * * *",
+                 "plafond": 1.0, "manqué": "sauter"}],
     }
     errors = list(project_validator.iter_errors(project))
-    valid = row["kind"] == KIND_PROGRAM
+    valid = row["project_arm_valid"]
     law(f"project arm workflow {row['name']!r} valid={valid}", (not errors) == valid)
     if not valid:
         law(f"project refusal targets workflow name {row['name']!r}",
@@ -78,6 +79,7 @@ for data_path in ("nika.yaml", "data.yaml", "data.yml"):
         project_validator.is_valid({
             "nika": "schema-test",
             "arm": [{"workflow": "workflows/nightly.nika", "cadence": "0 9 * * *",
+                     "plafond": 1.0, "manqué": "sauter",
                      "inputs": {"source": data_path}}],
         }))
 
