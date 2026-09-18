@@ -150,7 +150,7 @@ FILES = [
     {
         "path": "VERSION",
         "class": "authored",
-        "evidence": "hand-set at the v0.1.0-draft spec commit — no lane advances it; the derivations' INPUT (showcase-projector.py reads it as pack_version)",
+        "evidence": "hand-set pack version (currently 0.2.0-draft) — no lane advances it; the derivations' INPUT (showcase-projector.py reads it as pack_version)",
     },
     {
         "path": "CODE_OF_CONDUCT.md",

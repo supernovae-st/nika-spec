@@ -422,7 +422,7 @@ rewrites them when `canon.yaml` moves and CI refuses a marker that drifted.
 
 ## Status
 
-- The spec text is [`VERSION`](VERSION) (`0.1.0-draft`): the numbered path,
+- The spec text is [`VERSION`](VERSION) (`0.2.0-draft`): the numbered path,
   the jobs and the templates (counts live in
   [examples/manifest.yaml](examples/manifest.yaml)) · `workflow.schema.json` ·
   the static conformance fixtures (core · deep · stdlib surface · the

@@ -13,6 +13,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed · pack version `0.2.0-draft` (2026-09-18)
+
+- **`VERSION` is `0.2.0-draft`.** The pack contract (`examples/manifest.yaml`
+  `pack_version`) tracks this file. Registry first-party entries mint
+  `MAJOR.MINOR.PATCH` from it (`0.1.0-draft` → `0.1.0` would overwrite
+  already-published immutable `0.1.0` rows). The `.nika` program-filename
+  hard cut is a pre-1.0 breaking pack identity; language family remains
+  v1 (`nika:` is the name, there is no `nika: v2`). Historical
+  `[0.1.0-draft]` changelog and frozen proofs stay as written.
+
 ### Changed · canonical program filename is `.nika` (2026-09-18)
 
 - **File naming law** (01 §File naming · nika#1684) — lowercase
