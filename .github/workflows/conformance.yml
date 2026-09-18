@@ -128,6 +128,9 @@ jobs:
         run: |
           python scripts/ssot-compiler.py --check
           python scripts/ssot-compiler.py --check-canon
+          # The pre-admission plane's exact allowset (spec#160): NIKA-1708 is
+          # admitted, every other bare numeric stays refused by the schema.
+          python3 scripts/tests/test_admission_plane_code.py
 
       - name: Projection gates · in-repo canon markers + pack manifest + llms files
         run: |

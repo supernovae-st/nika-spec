@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: Apache-2.0
+# Boundary half: a required input satisfied by its declared default: and an
+# omitted optional input are both lawful — no value crosses the wire.
+nika: required-default-and-optional-absent-succeed
+inputs:
+  ticket:
+    type: string
+    required: true
+    default: "from-file"
+  note:
+    type: string
+tasks:
+  echo:
+    invoke:
+      tool: nika:jq
+      args:
+        input: "${{ inputs.ticket }}"
+        expression: "."
+outputs:
+  out: ${{ tasks.echo.output }}

@@ -324,6 +324,12 @@ CANON_EXCEPTIONS = {
 # concrete table both carry zero codes for them · FINDING CF-09 · ledger row).
 CANON_DECLARED_EMPTY_NAMESPACES = {"NIKA-IMPL", "NIKA-PROVIDER"}
 
+# The pre-admission plane (spec/05-errors.md §Error code namespaces exception):
+# bare-numeric codes judged before any task exists. Exact allowset — never a
+# range: only NIKA-1708 is ratified (spec#160 · 2026-09-18 ruling); adding a
+# code here is a normative amendment, not an edit.
+ADMISSION_PLANE_CODES = {"NIKA-1708"}
+
 
 def _canon_item_names(section):
     """Item spellings for a canon.yaml section (dict items carry name/code keys)."""
@@ -433,7 +439,12 @@ def check_canon(root):
 
     # error_namespaces · derivable half GATED: every canon-code row's namespace must be a canon namespace
     canon_ns = set(_canon_item_names(canon["error_namespaces"]))
-    derived_ns = {"NIKA-" + r["namespace"] for r in diag_rows if r["id"] in set(canon_code_names)}
+    # The pre-admission plane is an explicit allowset, not a namespace: NIKA-1708's
+    # bare-numeric spelling carries classification metadata (namespace: LAUNCH) that
+    # derives no canon error_namespaces row — the 2026-09-18 ruling registers only
+    # this exact code, reserves no numeric block, and adds no 25th namespace.
+    derived_ns = {"NIKA-" + r["namespace"] for r in diag_rows
+                  if r["id"] in set(canon_code_names) and r["id"] not in ADMISSION_PLANE_CODES}
     outside = derived_ns - canon_ns
     if outside:
         divergences.append(f"error_namespaces: row namespaces outside the canon set: {_fmt_set(outside)}")
