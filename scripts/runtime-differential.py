@@ -19,7 +19,7 @@ surfaces (the binary boundary · never linkage):
   out of the repo).
 - the TRACE door · `nika trace verify <trace.ndjson>` — expected-verify
   verdicts map to measured surfaces: clean = rc 0 without a marker ·
-  finding = rc 0 with `FINDING — ` · incomplete = rc 0 with
+  finding = rc 0 with `FINDING — ` · incomplete = rc 5 with
   `INCOMPLETE — ` · forged = rc 2 · refused = rc 2 with the decode-bound
   wording « beyond the verifier's » (rc 3 = unchained/missing input · no
   fixture expects it today).
@@ -170,30 +170,83 @@ def diff_run(expected: dict, got: dict) -> list[str]:
 
 
 def trace_verdict(rc: int, out: str) -> str:
-    """The verify exit-map, pure — MEASURED, never assumed (0.109.0):
+    """The verify exit-map, pure — measured again on 0.119.0:
     forged rides rc 2 · a decode-bound refusal (17 §refused · the walk
     never ran) rides rc 2 too and only its « beyond the verifier's »
-    wording discriminates · finding and incomplete exit 0 like clean and
-    only their `FINDING — ` / `INCOMPLETE — ` markers discriminate
-    (selftest-pinned)."""
+    wording discriminates · finding exits 0 like clean; incomplete has its
+    own exit 5 since ADR-129, as required by spec 17 (selftest-pinned)."""
     if rc == 2:
         return "refused" if "beyond the verifier's" in out else "forged"
+    if rc == 5 and "INCOMPLETE — " in out:
+        return "incomplete"
     if rc == 0:
         if "INCOMPLETE — " in out:
-            return "incomplete"
+            return "invalid-incomplete-exit=0"
         return "finding" if "FINDING — " in out else "clean"
     return f"rc={rc}"
 
 
+def diff_prologue(expected: dict, events: list[dict]) -> list[str]:
+    """Assert boot facts separately from chain integrity; never infer origins."""
+    if not expected:
+        return []
+    if not events or events[0].get("kind") != "workflow_started":
+        return ["prologue: missing initial workflow_started"]
+    fields = events[0].get("fields", [])
+    if not isinstance(fields, list):
+        return ["prologue: malformed fields"]
+    values: dict[str, object] = {}
+    for field in fields:
+        if not isinstance(field, dict) or not isinstance(field.get("key"), str):
+            return ["prologue: malformed field"]
+        key = field["key"]
+        if key in values:
+            return [f"prologue: duplicate field {key}"]
+        values[key] = field.get("value")
+    diffs = [f"prologue: missing field {key}"
+             for key in expected.get("present", []) if key not in values]
+    diffs += [f"prologue: unexpected field {key}"
+              for key in expected.get("absent", []) if key in values]
+    if "input_origins" in expected:
+        raw = values.get("inputs")
+        try:
+            if not isinstance(raw, str):
+                raise ValueError("inputs must be a JSON string")
+            pairs = json.loads(raw, object_pairs_hook=list)
+            if not isinstance(pairs, list) or any(
+                not isinstance(pair, tuple) or len(pair) != 2
+                or not all(isinstance(value, str) for value in pair)
+                for pair in pairs
+            ):
+                raise ValueError("origins must be a string map")
+            origins = dict(pairs)
+            if len(origins) != len(pairs) or not raw.lstrip().startswith("{"):
+                raise ValueError("origins must be an object with unique keys")
+        except (ValueError, TypeError):
+            diffs.append("prologue.input_origins: missing or malformed map")
+        else:
+            if origins != expected["input_origins"]:
+                diffs.append(f"prologue.input_origins: want {expected['input_origins']!r} · got {origins!r}")
+    return diffs
+
+
 def judge_trace(engine: str, d: pathlib.Path) -> list[str]:
     """Differences between the verify verdict and expected-verify.json."""
-    want = json.loads((d / "expected-verify.json").read_text())["verdict"]
+    expected = json.loads((d / "expected-verify.json").read_text())
+    want = expected["verdict"]
     proc = subprocess.run(
         [engine, "trace", "verify", str(d / "trace.ndjson"), "--color", "never"],
         capture_output=True, text=True, timeout=120,
     )
     got = trace_verdict(proc.returncode, proc.stdout + proc.stderr)
-    return [] if got == want else [f"verdict: want {want} · got {got}"]
+    diffs = [] if got == want else [f"verdict: want {want} · got {got}"]
+    if expected.get("prologue"):
+        # This is a semantic assertion over recorded bytes, not a second
+        # integrity verifier. The engine's verdict above remains mandatory.
+        with (d / "trace.ndjson").open() as journal:
+            events = [json.loads(journal.readline())]
+        diffs += diff_prologue(expected["prologue"], events)
+    return diffs
 
 
 def _ev(kind: str, **fields: object) -> str:
@@ -251,14 +304,43 @@ def selftest() -> int:
                    and trace_verdict(0, "FINDING — witness absent") == "finding"
                    and trace_verdict(2, "BROKEN at line 4 — recorded chain") == "forged"
                    and trace_verdict(3, "") == "rc=3"))
-    # The two verdicts the fixtures 004/005 pin (measured on 0.109.0):
-    # incomplete exits 0 like clean and only its marker discriminates ·
-    # a decode-bound refusal exits 2 like forged and only its wording does.
-    checks.append(("trace exit-map · incomplete rides rc 0 behind its marker",
-                   trace_verdict(0, "INCOMPLETE — 9 events · chain intact") == "incomplete"))
+    # Fixture 004 now requires exit 5 (spec 17); historical exit 0 no longer
+    # discharges that law. Decode-bound refusals retain their exit 2 class.
+    checks.append(("trace exit-map · incomplete requires its own exit 5",
+                   trace_verdict(5, "INCOMPLETE — 9 events · chain intact") == "incomplete"
+                   and trace_verdict(0, "INCOMPLETE — 9 events · chain intact") != "incomplete"
+                   and trace_verdict(5, "") != "incomplete"))
     checks.append(("trace exit-map · a bound refusal rides rc 2 behind its wording",
                    trace_verdict(2, "line 2 is 1048890 bytes — beyond the verifier's "
                                     "line bound (1048576 bytes)") == "refused"))
+    boot_want = {"present": ["inputs"], "absent": ["seed"],
+                 "input_origins": {"supplied": "api-caller", "defaulted": "file"}}
+    def boot(origins):
+        return parse_events(_ev("workflow_started", inputs=origins))
+    origin_map = json.dumps(boot_want["input_origins"])
+    checks.append(("API and file origins remain distinct",
+                   diff_prologue(boot_want, boot(origin_map)) == []))
+    for wrong in ("cli-operator", "ci-context", "env", "file"):
+        substituted = json.dumps({"supplied": wrong, "defaulted": "file"})
+        checks.append((f"API origin cannot become {wrong}",
+                       bool(diff_prologue(boot_want, boot(substituted)))))
+    for name, raw in [("absent", None), ("invalid JSON", "{"),
+                      ("array", "[]"), ("null", "null"),
+                      ("wrong value type", '{"supplied": true}'),
+                      ("duplicate input", '{"supplied":"file","supplied":"api-caller","defaulted":"file"}'),
+                      ("missing input", '{"supplied":"api-caller"}'),
+                      ("extra input", '{"supplied":"api-caller","defaulted":"file","extra":"file"}')]:
+        checks.append((f"origin assertion refuses {name}",
+                       bool(diff_prologue(boot_want, boot(raw)))))
+    doubled = boot(origin_map)
+    doubled[0]["fields"].append({"key": "inputs", "value": origin_map})
+    checks.append(("duplicate boot field is not silently overwritten",
+                   bool(diff_prologue(boot_want, doubled))))
+    checks.append(("missing boot is not guessed from later events",
+                   bool(diff_prologue(boot_want, parse_events(_ev("task_started"))))))
+    checks.append(("absent boot claim is enforced",
+                   bool(diff_prologue(boot_want, parse_events(
+                       _ev("workflow_started", inputs=origin_map, seed=0))))))
     bad = [name for name, ok in checks if not ok]
     for name, ok in checks:
         print(f"{'ok  ' if ok else 'FAIL'}  {name}")

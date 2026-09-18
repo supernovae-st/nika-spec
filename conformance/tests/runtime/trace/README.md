@@ -33,6 +33,13 @@ walk does not ·
   claim, because a manifest states only what exists and a reader says
   « unrecorded » rather than guessing. An ambient run listing `seed`
   under `absent` is the law holding, not a gap.
+  Optional `input_origins` is the exact input-name → channel map decoded
+  from the prologue's JSON-string `inputs` field (04 §typed workflow
+  inputs). Missing, malformed, duplicated or misattributed origins fail
+  this assertion even if the journal's chain is intact. This names the
+  supplying channel; it proves neither caller identity nor authorization.
+  The command-level differential checks these fields independently of the
+  chain verdict. Its selftests include negative channel substitutions.
 
 Absent fields mean the fixture makes no claim there.
 

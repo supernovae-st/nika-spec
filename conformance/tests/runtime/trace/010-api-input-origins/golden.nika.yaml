@@ -1,0 +1,22 @@
+nika: bound-inputs
+inputs:
+  ticket: {type: string, required: true}
+  count: {type: integer, required: true}
+  tags: {type: {array: string}, required: true}
+  record: {type: {object: {name: string}}, required: true}
+  region: {type: string, default: eu}
+permits: {tools: ['nika:jq']}
+tasks:
+  echo:
+    invoke:
+      tool: nika:jq
+      args:
+        input:
+          ticket: '${{ inputs.ticket }}'
+          count: '${{ inputs.count }}'
+          tags: '${{ inputs.tags }}'
+          record: '${{ inputs.record }}'
+          region: '${{ inputs.region }}'
+        expression: '.'
+outputs:
+  value: '${{ tasks.echo.output }}'

@@ -96,6 +96,13 @@ F-O8 refuses at check first · reworked as the dynamic-host refusal,
 proven at the door) · and six adopted the `mock(echo) · ` output marker
 the spec's own examples already teach.)
 
+Trace fixtures can additionally assert boot-field presence, absence and the
+exact input-origin map with `expected-verify.json.prologue` (see the
+[trace fixture contract](tests/runtime/trace/README.md)). A clean chain does
+not discharge these semantic assertions. The command-level differential
+checks both; a third-party runner must not silently ignore requested
+prologue assertions.
+
 `conformance/tests/lints/` is the **linter-conformance corpus** (the
 03-dag one-obvious-way table is « normative for linters ») · per case
 `input.yaml` + `expected-lints.json` (`{"lints": [{"rule", "task"}]}` ·
