@@ -311,8 +311,11 @@ def main() -> int:
         if closed:  # a fixed engine must retire its baseline in the same change, or this stays red
             failures.append(f"{row['id']}: the expected behaviour is now observed: retire this gap and qualify its case")
     receipt["failures"] = failures
-    receipt["qualification"] = ("offline wiring and deterministic membranes on this one engine build; model tasks were "
-                                "replaced by stated outputs; no model quality, connector, HOT or comparative claim")
+    receipt["qualification"] = ("offline wiring and deterministic membranes on this one engine build, over a finite set "
+                                "of cases; model tasks were replaced by stated outputs; no model quality, connector, HOT "
+                                "or comparative claim")
+    receipt["compile_capability"] = ("not measured: every rehearsed candidate is hand-authored. Only the compile_door "
+                                     "cases exercise the Compile door, in its conservative exact and edit modes")
     text = json.dumps(receipt, indent=2, ensure_ascii=False)
     if args.receipt:
         args.receipt.write_text(text + "\n", encoding="utf-8")
@@ -320,7 +323,8 @@ def main() -> int:
                "cases_run": sum(len(v) for s in receipt["scenarios"].values() for v in s["cases"].values()),
                "compile_door_cases": len(receipt["compile_door"]),
                "retained_gaps_still_red": sum(1 for g in receipt["retained_gaps"].values() if not g["expected_behaviour_observed"]),
-               "failures": failures, "qualification": receipt["qualification"]}
+               "failures": failures, "qualification": receipt["qualification"],
+               "compile_capability": receipt["compile_capability"]}
     print(json.dumps(summary, indent=2, ensure_ascii=False))
     return 1 if failures else 0
 

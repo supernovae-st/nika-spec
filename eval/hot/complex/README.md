@@ -47,9 +47,14 @@ NIKA_BIN=/path/to/nika python3 -O eval/hot/complex/behaviour_selftest.py   # the
 python3 eval/hot/complex/judge.py --scenario X01 --candidate my.nika.yaml  # judge somebody else's candidate
 ```
 
-**`judge.py` reads meaning from the derived graph.** Its assertions are
-structure-agnostic: a differently built correct candidate passes (the
-`variant-*` files exist to prove it) and a plausible incorrect one does not.
+**`judge.py` reads declared properties from the derived graph.** Each
+assertion is one property, never a comparison with the reference's bytes or
+with a model's output. Together they are a *subset* of what a request means:
+the defects this corpus names. A candidate that passes is free of those
+defects, not proven correct, and this is not a semantic-equivalence oracle. The
+`variant-*` files show that two differently built correct candidates pass; they
+show tolerance for the rebuilds that were tried, not for every rebuild.
+
 Each candidate must be red for *exactly* the assertions its row declares and
 green for every other one; a scenario whose assertion no near-miss turns red is
 refused, because nothing would show that the assertion can fail.
@@ -65,13 +70,13 @@ refused, because nothing would show that the assertion can fail.
 | `inputs_contract` · `outputs_contract` | What may nobody guess, and is the loss visible in the result? |
 | `recover_narrow` · `fanout_isolated` | Which failures may read as absence, and can one item sink the batch? |
 | `branches_exclusive_total` | For every class in the closed set, how many branches open? |
-| `edit_locality` | Did the edit change what was asked, all of it, and nothing else? Judged on parsed values: `byte_equality` is `false`. |
+| `edit_locality` | Did the edit change what was asked, all of it, and nothing else? Judged on typed parsed nodes (`byte_equality` is `false`): an empty mapping or sequence that appears or disappears is a change, and so is `true` → `1` or `1` → `1.0`, which Python would call equal. Comments, key order and quoting are not nodes. |
 
 The `when:` reader is the decidable fragment only (boolean literals, `==`,
 `!=`, `!`, `&&`, `||`, parentheses), evaluated three-valued. An expression
 outside it is *unknown*, and unknown never counts as closed.
 
-**`behaviour.py` rehearses on an engine you name.** Exact inputs go in; outputs
+**`behaviour.py` rehearses a finite set of cases on an engine you name.** Exact inputs go in; outputs
 *and effects* are judged — which tasks started, which files exist afterwards,
 the exit code, the refusal code. A right final answer with a stray write in an
 unchosen branch fails. Model tasks are replaced by stated outputs, including
@@ -84,7 +89,19 @@ listed as static-only with the reason. The receipt carries the engine version
 and the binary's sha256.
 
 It does **not** prove model quality, another engine, a live connector, latency,
-cost, or anything under `product_contracts`.
+cost, behaviour outside the listed cases, or anything under `product_contracts`.
+
+## What a green run says about Compile: nothing
+
+Every reference, variant and near-miss is **hand-authored**, and each row says
+so (`provenance`); the judge reports `compiler-generated: 0` and
+`model-generated: 0`. Accepting a hand-authored reference measures the judge
+and the fixtures. It is not a generated Compile case and must not be counted as
+one. When a compiler or a model proposes candidates for these scenarios they
+are judged with the same command and recorded under their own provenance,
+beside these and never in their place. The only cases that exercise the
+Compile door today are the four `compile_door` cases of X06, in its
+conservative exact and edit modes.
 
 ## What is declared and refused
 

@@ -6,6 +6,7 @@
   "byte_equality": false,
   "hot_promotion": false,
   "note": "Composed product acceptance. Normative conformance stays in conformance/tests, one admitted law per fixture. Nothing here promotes a HOT family, sets a threshold or supports a comparative claim.",
+  "candidate_provenance": "Every reference, variant and near-miss here is hand-authored. Accepting them measures the judge and the fixtures. It is not evidence that Compile, or any model, can generate such a candidate: no generated candidate has been judged. The only cases that exercise the Compile door are the four `compile_door` cases of X06, in its conservative exact and edit modes.",
   "status_vocabulary": {
     "STATIC_JUDGED": "assertions and their negative controls run in CI without an engine",
     "STATIC_AND_BEHAVIOUR": "also rehearsed offline on an explicitly supplied engine; the receipt names that engine",
@@ -87,6 +88,7 @@
         {
           "file": "workflows/x01/reference.nika.yaml",
           "role": "reference",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [],
@@ -95,6 +97,7 @@
         {
           "file": "workflows/x01/variant-closed-by-after-success.nika.yaml",
           "role": "variant",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [],
@@ -107,6 +110,7 @@
         {
           "file": "workflows/x01/near-miss-defaulted-gate.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [
@@ -121,6 +125,7 @@
         {
           "file": "workflows/x01/near-miss-effect-outside-gate.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [
@@ -137,6 +142,7 @@
         {
           "file": "workflows/x01/near-miss-gated-through-data-edge.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [
@@ -152,6 +158,7 @@
         {
           "file": "workflows/x01/refused-ordering-only-gate.nika.yaml",
           "role": "refused",
+          "provenance": "hand-authored",
           "spec_oracle": "NIKA-SEC-014",
           "engine_check": "NIKA-SEC-014",
           "violates": [
@@ -323,6 +330,7 @@
         {
           "file": "workflows/x02/reference.nika.yaml",
           "role": "reference",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [],
@@ -331,6 +339,7 @@
         {
           "file": "workflows/x02/near-miss-silent-survivors.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [
@@ -345,6 +354,7 @@
         {
           "file": "workflows/x02/near-miss-constant-complete.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [],
@@ -357,6 +367,7 @@
         {
           "file": "workflows/x02/near-miss-catch-all-recover.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [
@@ -371,6 +382,7 @@
         {
           "file": "workflows/x02/near-miss-fail-fast.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [
@@ -473,6 +485,7 @@
         {
           "file": "workflows/x03/reference.nika.yaml",
           "role": "reference",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [],
@@ -481,6 +494,7 @@
         {
           "file": "workflows/x03/near-miss-anchor-anywhere.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [],
@@ -493,6 +507,7 @@
         {
           "file": "workflows/x03/near-miss-first-source-wins.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [],
@@ -505,6 +520,7 @@
         {
           "file": "workflows/x03/near-miss-model-resolves-conflict.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [
@@ -696,6 +712,7 @@
         {
           "file": "workflows/x04/reference.nika.yaml",
           "role": "reference",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [],
@@ -704,6 +721,7 @@
         {
           "file": "workflows/x04/near-miss-loop-end-is-success.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [],
@@ -716,6 +734,7 @@
         {
           "file": "workflows/x04/near-miss-model-is-the-judge.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [
@@ -732,6 +751,7 @@
         {
           "file": "workflows/x04/near-miss-open-ended-agent.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [
@@ -881,6 +901,7 @@
         {
           "file": "workflows/x05/reference.nika.yaml",
           "role": "reference",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [],
@@ -889,6 +910,7 @@
         {
           "file": "workflows/x05/near-miss-required-with-default.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [
@@ -903,6 +925,7 @@
         {
           "file": "workflows/x05/near-miss-required-means-present.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [],
@@ -915,6 +938,7 @@
         {
           "file": "workflows/x05/near-miss-null-coalesced.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [],
@@ -1081,6 +1105,7 @@
         {
           "file": "workflows/x06/edit-reference.nika.yaml",
           "role": "reference",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": []
@@ -1088,6 +1113,7 @@
         {
           "file": "workflows/x06/near-miss-also-raises-limit.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [
@@ -1098,6 +1124,7 @@
         {
           "file": "workflows/x06/near-miss-regenerated.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [
@@ -1108,6 +1135,7 @@
         {
           "file": "workflows/x06/near-miss-keeps-old-grant.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [
@@ -1291,6 +1319,7 @@
         {
           "file": "workflows/x07/reference.nika.yaml",
           "role": "reference",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": []
@@ -1298,6 +1327,7 @@
         {
           "file": "workflows/x07/near-miss-wildcard-grants.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [
@@ -1308,6 +1338,7 @@
         {
           "file": "workflows/x07/near-miss-send-dropped.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [
@@ -1319,6 +1350,7 @@
         {
           "file": "workflows/x07/refused-no-host-grant.nika.yaml",
           "role": "refused",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "NIKA-SEC-004",
           "violates": []
@@ -1326,6 +1358,7 @@
         {
           "file": "workflows/x07/refused-secret-without-door.nika.yaml",
           "role": "refused",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "NIKA-SEC-006",
           "violates": []
@@ -1333,6 +1366,7 @@
         {
           "file": "workflows/x07/refused-no-permits-block.nika.yaml",
           "role": "refused",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "NIKA-AUTH-006",
           "violates": [
@@ -1399,6 +1433,7 @@
         {
           "file": "workflows/x08/reference.nika.yaml",
           "role": "reference",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [],
@@ -1407,6 +1442,7 @@
         {
           "file": "workflows/x08/variant-route-then-save.nika.yaml",
           "role": "variant",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [],
@@ -1415,6 +1451,7 @@
         {
           "file": "workflows/x08/near-miss-destination-from-data.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [
@@ -1429,6 +1466,7 @@
         {
           "file": "workflows/x08/near-miss-shell-from-data.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [
@@ -1555,6 +1593,7 @@
         {
           "file": "workflows/x09/reference.nika.yaml",
           "role": "reference",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [],
@@ -1563,6 +1602,7 @@
         {
           "file": "workflows/x09/near-miss-cheapest-anyway.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [],
@@ -1577,6 +1617,7 @@
         {
           "file": "workflows/x09/near-miss-relax-when-empty.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [],
@@ -1589,6 +1630,7 @@
         {
           "file": "workflows/x09/near-miss-model-picks.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [
@@ -1747,6 +1789,7 @@
         {
           "file": "workflows/x10/reference.nika.yaml",
           "role": "reference",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [],
@@ -1755,6 +1798,7 @@
         {
           "file": "workflows/x10/near-miss-overlapping-branches.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [
@@ -1769,6 +1813,7 @@
         {
           "file": "workflows/x10/near-miss-no-fallback.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [
@@ -1913,6 +1958,7 @@
         {
           "file": "workflows/x11/reference.nika.yaml",
           "role": "reference",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [],
@@ -1921,6 +1967,7 @@
         {
           "file": "workflows/x11/near-miss-generic-question.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [
@@ -1935,6 +1982,7 @@
         {
           "file": "workflows/x11/near-miss-amount-not-shown.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [
@@ -2105,6 +2153,7 @@
         {
           "file": "workflows/x12/reference.nika.yaml",
           "role": "reference",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [],
@@ -2113,6 +2162,7 @@
         {
           "file": "workflows/x12/near-miss-threshold-not-in-identity.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [],
@@ -2125,6 +2175,7 @@
         {
           "file": "workflows/x12/near-miss-order-insensitive.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [],
@@ -2137,6 +2188,7 @@
         {
           "file": "workflows/x12/near-miss-score-overrides-facts.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [],
@@ -2149,6 +2201,7 @@
         {
           "file": "workflows/x12/near-miss-model-decides-reuse.nika.yaml",
           "role": "near_miss",
+          "provenance": "hand-authored",
           "spec_oracle": "valid",
           "engine_check": "valid",
           "violates": [

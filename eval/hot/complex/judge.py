@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: Apache-2.0
-"""Judge composed authoring candidates by meaning, never by bytes or by model output.
+"""Judge composed authoring candidates on declared properties of their derived graph.
 
 A candidate is a workflow somebody (a person, a compiler, a model) proposes for
 a scenario. Static validity is necessary and proves nothing else: every
-near-miss in this corpus is a workflow that reads well and is wrong. The
-assertions below are properties of the derived graph, so a differently built
-correct candidate passes and a plausible incorrect one does not.
+near-miss in this corpus is a workflow that reads well and is wrong.
+
+Each assertion is ONE property of the derived graph, never a comparison with
+the reference's bytes or with a model's output. Together they are a declared
+subset of what a request means, exercised on the references, the variants and
+the near-misses of this corpus. This is not a semantic-equivalence oracle: a
+candidate that passes is free of the defects this corpus names, not proven
+correct, and the variants show tolerance for the rebuilds that were tried, not
+for every rebuild.
 
     python3 eval/hot/complex/judge.py                      # the corpus judges itself
     python3 eval/hot/complex/judge.py --scenario X01 --candidate my.nika.yaml
@@ -34,6 +40,9 @@ STATUSES = {
     "UNQUALIFIED_PRODUCT_CONTRACT",  # acceptance case only: nothing here proves it
 }
 ROLES = {"reference", "variant", "near_miss", "refused"}
+# Who wrote a candidate. Accepting a hand-authored reference measures the judge
+# and the fixtures; it says nothing about what a compiler or a model can produce.
+PROVENANCES = {"hand-authored", "compiler-generated", "model-generated"}
 PURE_TOOLS = {"nika:jq", "nika:assert", "nika:validate", "nika:decide", "nika:json_diff",
               "nika:json_merge_patch", "nika:convert", "nika:hash", "nika:date"}
 WRITE_TOOLS = {"nika:write", "nika:edit"}
@@ -531,17 +540,28 @@ def a_branches_exclusive_total(doc, params):
 
 
 def flatten(value, prefix=""):
+    """Every node of a parsed document, typed.
+
+    A container is an entry of its own, so adding or removing an EMPTY mapping
+    or sequence is a change and not nothing. A leaf carries its YAML type, so
+    `true` is not `1`, `false` is not `0`, `1` is not `1.0` and null is not "":
+    Python would call each of those pairs equal or falsy-alike, YAML does not.
+    """
     if isinstance(value, dict):
+        yield prefix, ("<mapping>",)
         for key, item in value.items():
-            yield from flatten(item, f"{prefix}.{key}" if prefix else str(key))
+            segment = key if isinstance(key, str) else f"<{type(key).__name__}>{key}"
+            yield from flatten(item, f"{prefix}.{segment}" if prefix else segment)
     elif isinstance(value, list):
+        yield prefix, ("<sequence>",)
         for index, item in enumerate(value):
             yield from flatten(item, f"{prefix}[{index}]")
     else:
-        yield prefix, value
+        yield prefix, (type(value).__name__, value)
 
 
-def semantic_changes(base: dict, candidate: dict) -> set[str]:
+def semantic_changes(base, candidate) -> set[str]:
+    """Paths whose typed node differs. Formatting, key order, comments and quoting style are not nodes."""
     before, after = dict(flatten(base)), dict(flatten(candidate))
     return {path for path in before.keys() | after.keys() if before.get(path, UNKNOWN) != after.get(path, UNKNOWN)}
 
@@ -617,6 +637,7 @@ def validate(root: Path = ROOT) -> dict:
     require(corpus["byte_equality"] is False, "this corpus judges meaning, never bytes")
     require(corpus["hot_promotion"] is False, "no HOT promotion follows from these cases")
     judged = refused = controls = 0
+    provenance = dict.fromkeys(sorted(PROVENANCES), 0)
     for scenario in scenarios:
         sid = scenario["id"]
         require(not SCENARIO_FIELDS - scenario.keys(), f"{sid}: missing {sorted(SCENARIO_FIELDS - scenario.keys())}")
@@ -633,6 +654,8 @@ def validate(root: Path = ROOT) -> dict:
         for candidate in scenario["candidates"]:
             label = f"{sid}/{candidate['file']}"
             require(candidate["role"] in ROLES, f"{label}: role")
+            require(candidate.get("provenance") in PROVENANCES, f"{label}: who wrote this candidate?")
+            provenance[candidate["provenance"]] += 1
             path = (root / candidate["file"]).resolve()
             require(path.is_relative_to(root) and path.is_file(), f"{label}: missing file")
             verdict = spec_oracle(path)
@@ -672,8 +695,10 @@ def validate(root: Path = ROOT) -> dict:
         require(gap["baseline"] == "expected_fail", f"{gap['id']}: a retained gap stays red until it is fixed")
     return {"scenarios": len(scenarios), "candidates_judged": judged, "negative_controls": controls,
             "refused_by_reference_oracle": refused, "product_contracts_unqualified": len(contracts),
-            "retained_gaps": len(gaps), "hot_promotion": False,
-            "qualification": "static meaning only; no engine ran, no model was called, nothing here is a runtime proof"}
+            "retained_gaps": len(gaps), "hot_promotion": False, "candidate_provenance": provenance,
+            "qualification": "declared graph properties only; no engine ran and no model was called. Candidates counted "
+                             "as hand-authored measure this judge and its fixtures, never a compiler's or a model's "
+                             "ability to produce them"}
 
 
 def main() -> int:

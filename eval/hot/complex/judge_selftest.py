@@ -116,6 +116,55 @@ class TheJudgeCanFail(unittest.TestCase):
         with self.red("x10/reference.*branches_exclusive_total"):
             judge.validate(self.root)
 
+    # ── locality is judged on typed nodes, containers included ───────────────
+
+    def test_an_empty_container_that_appears_or_disappears_is_a_change(self):
+        changes = judge.semantic_changes
+        self.assertEqual(changes({"t": {"x": 1}}, {"t": {"x": 1, "on_error": {}}}), {"t.on_error"})
+        self.assertEqual(changes({"t": {"x": 1}}, {"t": {"x": 1, "read": []}}), {"t.read"})
+        self.assertEqual(changes({"t": {"x": 1, "retry": {}}}, {"t": {"x": 1}}), {"t.retry"})
+        self.assertEqual(changes({"l": [1]}, {"l": [1, []]}), {"l[1]"})
+        self.assertEqual(changes({"c": []}, {"c": {}}), {"c"})
+        self.assertEqual(changes({"c": {}}, {"c": None}), {"c"})
+
+    def test_a_value_that_changes_type_is_a_change_even_when_python_calls_it_equal(self):
+        changes = judge.semantic_changes
+        self.assertTrue(True == 1 and False == 0 and 1 == 1.0, "the trap this test exists for")  # noqa: E712
+        for before, after in ((True, 1), (False, 0), (1, 1.0), (None, ""), (None, False), ("1", 1), (0, None)):
+            with self.subTest(before=before, after=after):
+                self.assertEqual(changes({"v": before}, {"v": after}), {"v"})
+                self.assertEqual(changes({"v": after}, {"v": before}), {"v"})
+
+    def test_formatting_is_not_a_change(self):
+        import yaml
+        block = yaml.safe_load("a: 1\nb:\n  c: [1, 2]\n  d: 'x'\n")
+        flow = yaml.safe_load('# a comment\nb: {d: "x", c: [1, 2]}\na: 1\n')
+        self.assertEqual(judge.semantic_changes(block, flow), set())
+
+    def edited(self, mutate):
+        """The X06 assertion applied to the reference edit after an in-memory mutation: no oracle is involved."""
+        import yaml
+        doc = yaml.safe_load((self.root / "workflows/x06/edit-reference.nika.yaml").read_text(encoding="utf-8"))
+        mutate(doc)
+        assertion = self.scenario(judge.load(self.root), "X06")["assertions"]
+        return judge.judge(doc, assertion, self.root)["edit_locality"]
+
+    def test_the_edit_assertion_sees_what_the_old_flattening_missed(self):
+        self.assertEqual(self.edited(lambda doc: None), [])
+        self.assertEqual(self.edited(lambda doc: doc["tasks"]["notify"].update(retry={})),
+                         ["unrequested change at `tasks.notify.retry`"])
+        self.assertEqual(self.edited(lambda doc: doc["permits"].update(fs={})),
+                         ["unrequested change at `permits.fs`"])
+        self.assertEqual(self.edited(lambda doc: doc["inputs"]["ticket"].update(required=1)),
+                         ["unrequested change at `inputs.ticket.required`"])
+        self.assertEqual(self.edited(lambda doc: doc["const"].update(refund_limit_eur=100.0)),
+                         ["unrequested change at `const.refund_limit_eur`"])
+
+    def test_the_documented_paths_of_the_edit_did_not_widen(self):
+        params = self.scenario(judge.load(self.root), "X06")["assertions"][0]["params"]
+        self.assertEqual(params["allowed"], ["secrets.webhook.key", "permits.net.http[[]0[]]"])
+        self.assertEqual(params["required"], params["allowed"])
+
     # ── the manifest cannot claim more than it shows ─────────────────────────
 
     def test_a_near_miss_that_stops_declaring_its_violation_is_caught(self):
@@ -136,6 +185,16 @@ class TheJudgeCanFail(unittest.TestCase):
         self.manifest(lambda d: self.scenario(d, "X02")["candidates"][1].pop("plausible_because"))
         with self.red("say why it is plausible"):
             judge.validate(self.root)
+
+    def test_a_candidate_must_say_who_wrote_it(self):
+        self.manifest(lambda d: self.scenario(d, "X05")["candidates"][0].pop("provenance"))
+        with self.red("who wrote this candidate"):
+            judge.validate(self.root)
+
+    def test_hand_authored_candidates_are_never_counted_as_generated(self):
+        report = judge.validate(self.root)["candidate_provenance"]
+        self.assertEqual((report["compiler-generated"], report["model-generated"]), (0, 0))
+        self.assertEqual(report["hand-authored"], sum(len(s["candidates"]) for s in judge.load(self.root)["scenarios"]))
 
     def test_a_scenario_without_a_law_is_caught(self):
         self.manifest(lambda d: self.scenario(d, "X03").update(laws=[]))
