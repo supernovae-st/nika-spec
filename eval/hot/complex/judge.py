@@ -16,6 +16,12 @@ for every rebuild.
 
     python3 eval/hot/complex/judge.py                      # the corpus judges itself
     python3 eval/hot/complex/judge.py --scenario X01 --candidate my.nika.yaml
+        exit 0 accepted · 1 rejected on meaning · 2 refused as static-invalid, and then NOT judged
+
+Every candidate, the corpus's own and an ad hoc one, is admitted by the
+repository's reference static oracle before any assertion reads it, on the
+same text: a YAML parser keeps the last of two duplicate keys without a word,
+so a parsed document alone is not evidence of what a file says.
 
 No engine, no network, no model. Runtime behaviour is `behaviour.py`.
 """
@@ -26,7 +32,6 @@ import fnmatch
 import hashlib
 import json
 import re
-import subprocess
 import sys
 from pathlib import Path
 
@@ -666,17 +671,39 @@ SCENARIO_FIELDS = {"id", "title", "status", "owner", "laws", "intent", "facts", 
 CONTRACT_FIELDS = {"id", "title", "status", "owner", "given", "when", "then", "must_never", "why_unqualified"}
 
 
-_ORACLE: dict[str, dict] = {}
+_REFERENCE: list = []            # the reference oracle module, its schema validator and its canon, loaded once
+_VERDICTS: dict[tuple, dict] = {}  # (sha256 of the text, base directory) → verdict
 
 
-def spec_oracle(path: Path) -> dict:
-    """The reference static oracle, by command. Keyed by content: the verdict is a function of the bytes."""
-    key = hashlib.sha256(path.read_bytes()).hexdigest()
-    if key not in _ORACLE:
-        result = subprocess.run([sys.executable, str(REPO / "conformance/runner.py"), "validate", str(path)],
-                                capture_output=True, text=True, check=False)
-        _ORACLE[key] = json.loads(result.stdout)
-    return _ORACLE[key]
+def reference_oracle(text: str, base_dir: Path) -> dict:
+    """The repository's reference static oracle (`conformance/runner.py validate`), applied to THIS text.
+
+    It is the function behind that command, called in-process for one reason: it must judge the very
+    characters this judge goes on to parse. It owns the schema, the unique-key loader that refuses a
+    duplicate mapping key (NIKA-PARSE-017), the cross-reference, deep-static and consent layers; nothing
+    of that is re-implemented here. `base_dir` stays the candidate's own directory, because skill paths
+    and child workflows resolve against it: a snapshot copied elsewhere would be refused for the wrong reason.
+    """
+    if not _REFERENCE:
+        sys.path.insert(0, str(REPO / "conformance"))
+        import runner
+        _REFERENCE.extend((runner, runner.load_schema(), runner.load_canon()))
+    runner, validator, canon = _REFERENCE
+    key = (hashlib.sha256(text.encode("utf-8")).hexdigest(), str(base_dir))
+    if key not in _VERDICTS:
+        _VERDICTS[key] = runner.validate_text(text, validator, canon, base_dir=base_dir)
+    return _VERDICTS[key]
+
+
+def admit(path) -> tuple[str, dict]:
+    """(source text, reference verdict) from ONE read of the file.
+
+    `yaml.safe_load` keeps the last of two duplicate keys and says nothing, so a parsed document is not
+    evidence of what a file says. The oracle refuses such a source, and it must refuse the same bytes the
+    assertions would otherwise be shown: the file is read once and that one text goes to both.
+    """
+    text = path.read_bytes().decode("utf-8")
+    return text, reference_oracle(text, path.parent)
 
 
 def load(root: Path = ROOT) -> dict:
@@ -713,7 +740,7 @@ def validate(root: Path = ROOT) -> dict:
             provenance[candidate["provenance"]] += 1
             path = (root / candidate["file"]).resolve()
             require(path.is_relative_to(root) and path.is_file(), f"{label}: missing file")
-            verdict = spec_oracle(path)
+            text, verdict = admit(path)
             expected_code = candidate.get("spec_oracle", "valid")
             if expected_code == "valid":
                 require(verdict["valid"], f"{label}: the reference oracle refuses it: {verdict['errors']}")
@@ -721,7 +748,7 @@ def validate(root: Path = ROOT) -> dict:
                 require(not verdict["valid"] and any(e.get("code") == expected_code for e in verdict["errors"]),
                         f"{label}: the reference oracle must refuse with {expected_code}, got {verdict}")
                 refused += 1
-            doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+            doc = yaml.safe_load(text)
             failed = {aid for aid, problems in judge(doc, scenario["assertions"], root).items() if problems}
             declared = set(candidate.get("violates", []))
             require(declared <= known, f"{label}: violates an unknown assertion")
@@ -756,6 +783,33 @@ def validate(root: Path = ROOT) -> dict:
                              "ability to produce them"}
 
 
+ACCEPTED, REJECTED, STATIC_INVALID = 0, 1, 2
+
+
+def judge_candidate(scenario_id: str, path, root: Path = ROOT) -> tuple[int, dict]:
+    """(exit status, report) for one ad hoc candidate: admitted by the reference oracle first, judged second.
+
+    0 · accepted: statically valid and no assertion of the scenario is violated
+    1 · rejected: statically valid, and its meaning violates an assertion (listed under `violations`)
+    2 · refused as static-invalid: the reference oracle refuses the source, so its meaning was NOT judged;
+        there is no `violations` key, because a last-wins parse of a refused source proves nothing
+    """
+    scenario = next(s for s in load(root)["scenarios"] if s["id"] == scenario_id)
+    try:
+        text, verdict = admit(path)
+    except UnicodeDecodeError as error:
+        verdict = {"valid": False, "errors": [{"namespace": "JUDGE", "category": "harness_error",
+                                                "detail": f"the source is not UTF-8 text: {error}"}]}
+    if not verdict["valid"]:
+        return STATIC_INVALID, {
+            "scenario": scenario_id, "accepted": False, "refused": "static-invalid",
+            "reason": "the reference static oracle refuses this source, so its meaning was not judged",
+            "oracle": "conformance/runner.py validate", "static_errors": verdict["errors"]}
+    violations = {k: v for k, v in judge(yaml.safe_load(text), scenario["assertions"], root).items() if v}
+    return (REJECTED if violations else ACCEPTED), {"scenario": scenario_id, "accepted": not violations,
+                                                    "violations": violations}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--scenario")
@@ -764,14 +818,13 @@ def main() -> int:
     try:
         if args.candidate:
             require(bool(args.scenario), "--candidate needs --scenario")
-            scenario = next(s for s in load()["scenarios"] if s["id"] == args.scenario)
-            verdict = judge(yaml.safe_load(args.candidate.read_text(encoding="utf-8")), scenario["assertions"])
-            print(json.dumps({"scenario": args.scenario, "accepted": not any(verdict.values()),
-                              "violations": {k: v for k, v in verdict.items() if v}}, indent=2, ensure_ascii=False))
-            return 1 if any(verdict.values()) else 0
+            status, report = judge_candidate(args.scenario, args.candidate)
+            print(json.dumps(report, indent=2, ensure_ascii=False))
+            return status
         print(json.dumps(validate(), indent=2))
         return 0
-    except (JudgeError, KeyError, TypeError, OSError, StopIteration, json.JSONDecodeError, yaml.YAMLError) as error:
+    except (JudgeError, KeyError, TypeError, OSError, StopIteration, UnicodeDecodeError, json.JSONDecodeError,
+            yaml.YAMLError) as error:
         print(f"complex goldens FAIL: {error}", file=sys.stderr)
         return 1
 

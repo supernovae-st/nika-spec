@@ -3,6 +3,8 @@
 """The judge is judged: a neutered assertion, a corrupted manifest and a weakened reference must all go red."""
 import json
 import shutil
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -328,6 +330,152 @@ class TheJudgeCanFail(unittest.TestCase):
         lookalike["const"]["limits.refund_eur"] = 250
         self.assertEqual(judge.ASSERTIONS["edit_locality"](lookalike, params),
                          ['unrequested change at `const["limits.refund_eur"]`'])
+
+    # ── an ad hoc candidate is admitted by the reference oracle before it is judged ──
+
+    REFERENCE = "workflows/x01/reference.nika.yaml"
+    GOOD_WHEN = "    when: ${{ with.go == true }}\n"
+
+    def cli(self, candidate, scenario="X01"):
+        """The command a compiler's candidate would be judged with: exit code, parsed stdout, stderr."""
+        result = subprocess.run([sys.executable, judge.__file__, "--scenario", scenario, "--candidate", str(candidate)],
+                                capture_output=True, text=True, check=False)
+        try:
+            report = json.loads(result.stdout)
+        except json.JSONDecodeError:
+            report = None
+        return result.returncode, report, result.stderr
+
+    def candidate(self, name, text):
+        path = self.root / "workflows/x01" / name
+        path.write_text(text, encoding="utf-8")
+        return path
+
+    def reference_text(self):
+        return (self.root / self.REFERENCE).read_text(encoding="utf-8")
+
+    def passes_every_assertion_when_parsed_last_wins(self, text):
+        """What the unguarded command judged: the document a last-wins YAML parser makes of this text."""
+        import yaml
+        assertions = self.scenario(judge.load(self.root), "X01")["assertions"]
+        return not any(judge.judge(yaml.safe_load(text), assertions, self.root).values())
+
+    def assert_refused_as_static_invalid(self, outcome, code):
+        status, report, stderr = outcome
+        self.assertEqual(status, 2, (report, stderr))
+        self.assertIs(report["accepted"], False)
+        self.assertEqual(report["refused"], "static-invalid")
+        self.assertNotIn("violations", report, "a source that was refused was not judged")
+        found = [error.get("code") or error.get("namespace") for error in report["static_errors"]]
+        self.assertTrue(any(str(item).startswith(code) for item in found), found)
+
+    def test_cli_accepts_a_valid_reference_exactly_as_before(self):
+        status, report, _ = self.cli(self.root / self.REFERENCE)
+        self.assertEqual((status, report), (0, {"scenario": "X01", "accepted": True, "violations": {}}))
+
+    def test_cli_still_rejects_an_ordinary_semantic_near_miss(self):
+        status, report, _ = self.cli(self.root / "workflows/x01/near-miss-gated-through-data-edge.nika.yaml")
+        self.assertEqual(status, 1)
+        self.assertIs(report["accepted"], False)
+        self.assertEqual(list(report["violations"]), ["effects_gated"])
+        self.assertNotIn("refused", report, "this source is statically valid: it was judged, and rejected on meaning")
+
+    def test_cli_refuses_a_duplicate_key_even_though_the_last_value_would_pass(self):
+        text = self.reference_text()
+        self.assertEqual(text.count(self.GOOD_WHEN), 1)
+        # `when: true` first, the correct condition last. A last-wins parser keeps the correct one and the
+        # document is the reference; a first-wins reader would publish after a refusal; the engine refuses both.
+        good_last = text.replace(self.GOOD_WHEN, "    when: true\n" + self.GOOD_WHEN)
+        self.assertTrue(self.passes_every_assertion_when_parsed_last_wins(good_last),
+                        "the trap: parsed last-wins, this candidate satisfies every assertion")
+        self.assert_refused_as_static_invalid(self.cli(self.candidate("duplicate-good-last.nika.yaml", good_last)),
+                                              "NIKA-PARSE-017")
+        # The other order used to be rejected on meaning, by parser luck. It is the same defect.
+        good_first = text.replace(self.GOOD_WHEN, self.GOOD_WHEN + "    when: true\n")
+        self.assertFalse(self.passes_every_assertion_when_parsed_last_wins(good_first))
+        self.assert_refused_as_static_invalid(self.cli(self.candidate("duplicate-good-first.nika.yaml", good_first)),
+                                              "NIKA-PARSE-017")
+
+    def test_cli_refuses_a_duplicate_top_level_block_that_hides_a_wider_boundary(self):
+        text = self.reference_text()
+        wide = 'permits:\n  tools: ["nika:*"]\n  fs:\n    write: ["./**"]\n\n'
+        self.assertEqual(text.count("\npermits:\n"), 1)
+        hidden = text.replace("\npermits:\n", "\n" + wide + "permits:\n", 1)
+        self.assertTrue(self.passes_every_assertion_when_parsed_last_wins(hidden))
+        self.assert_refused_as_static_invalid(self.cli(self.candidate("duplicate-permits.nika.yaml", hidden)),
+                                              "NIKA-PARSE-017")
+
+    def test_cli_refuses_a_malformed_schema_although_every_assertion_passes(self):
+        text = self.reference_text()
+        self.assertEqual(text.count("        type: object\n"), 1)
+        malformed = text.replace("        type: object\n", "        type: objectt\n")
+        self.assertTrue(self.passes_every_assertion_when_parsed_last_wins(malformed))
+        self.assert_refused_as_static_invalid(self.cli(self.candidate("malformed-schema.nika.yaml", malformed)), "NIKA-")
+
+    def test_cli_refuses_an_unknown_envelope_key_although_every_assertion_passes(self):
+        unknown = self.reference_text() + "\npolicy:\n  refunds: allowed\n"
+        self.assertTrue(self.passes_every_assertion_when_parsed_last_wins(unknown))
+        self.assert_refused_as_static_invalid(self.cli(self.candidate("unknown-key.nika.yaml", unknown)), "NIKA-PARSE")
+
+    def test_cli_refuses_text_that_is_not_yaml_with_a_verdict_not_a_crash(self):
+        outcome = self.cli(self.candidate("not-yaml.nika.yaml", "nika: broken\ntasks: [\n"))
+        self.assert_refused_as_static_invalid(outcome, "NIKA-PARSE-001")
+
+    def test_cli_refuses_a_corpus_candidate_the_reference_oracle_refuses(self):
+        outcome = self.cli(self.root / "workflows/x01/refused-ordering-only-gate.nika.yaml")
+        self.assert_refused_as_static_invalid(outcome, "NIKA-SEC-014")
+
+    def test_the_source_is_read_once_and_the_oracle_and_the_parser_see_those_bytes(self):
+        folder = self.root / "workflows/x01"
+
+        class RewrittenWhileJudged:
+            """A file that says one thing on the first read and another afterwards."""
+
+            def __init__(self, first, later):
+                self.first, self.later, self.reads, self.parent, self.name = first, later, 0, folder, "candidate.nika.yaml"
+
+            def read_bytes(self):
+                self.reads += 1
+                return (self.first if self.reads == 1 else self.later).encode("utf-8")
+
+            def read_text(self, *args, **kwargs):
+                return self.read_bytes().decode("utf-8")
+
+        valid = self.reference_text()
+        duplicate = valid.replace(self.GOOD_WHEN, "    when: true\n" + self.GOOD_WHEN)
+        near_miss = (folder / "near-miss-gated-through-data-edge.nika.yaml").read_text(encoding="utf-8")
+
+        refused_first = RewrittenWhileJudged(duplicate, valid)
+        status, report = judge.judge_candidate("X01", refused_first, self.root)
+        self.assertEqual((status, report["refused"], refused_first.reads), (2, "static-invalid", 1),
+                         "the oracle must judge the bytes that were read, not a later, cleaner file")
+
+        valid_first = RewrittenWhileJudged(valid, near_miss)
+        status, report = judge.judge_candidate("X01", valid_first, self.root)
+        self.assertEqual((status, report, valid_first.reads),
+                         (0, {"scenario": "X01", "accepted": True, "violations": {}}, 1))
+
+        near_miss_first = RewrittenWhileJudged(near_miss, valid)
+        status, report = judge.judge_candidate("X01", near_miss_first, self.root)
+        self.assertEqual((status, list(report["violations"]), near_miss_first.reads), (1, ["effects_gated"], 1))
+
+    def test_a_usage_error_is_not_a_verdict(self):
+        # argparse exits 2 on its own, the status a static-invalid refusal also uses. A verdict always
+        # comes with a report on stdout; a misuse prints none, so a caller can tell the two apart.
+        result = subprocess.run([sys.executable, judge.__file__, "--no-such-flag"], capture_output=True, text=True,
+                                check=False)
+        self.assertEqual((result.returncode, result.stdout), (2, ""))
+        self.assertIn("usage:", result.stderr)
+
+    def test_the_corpus_and_the_command_admit_through_the_same_door(self):
+        import yaml
+        path = self.root / "workflows/x01/refused-ordering-only-gate.nika.yaml"
+        text, verdict = judge.admit(path)
+        self.assertEqual(text, path.read_text(encoding="utf-8"))
+        self.assertEqual([error["code"] for error in verdict["errors"]], ["NIKA-SEC-014"])
+        text, verdict = judge.admit(self.root / self.REFERENCE)
+        self.assertTrue(verdict["valid"])
+        self.assertEqual(yaml.safe_load(text)["nika"], "x01-fanout-approve-publish")
 
     # ── the manifest cannot claim more than it shows ─────────────────────────
 

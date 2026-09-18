@@ -44,7 +44,7 @@ python3 eval/hot/complex/judge.py                  # static · CI · no engine, 
 python3 -O eval/hot/complex/judge_selftest.py      # the judge can fail · CI
 python3 eval/hot/complex/behaviour.py --engine /path/to/nika [--receipt receipt.json]
 NIKA_BIN=/path/to/nika python3 -O eval/hot/complex/behaviour_selftest.py   # the rehearsal can fail
-python3 eval/hot/complex/judge.py --scenario X01 --candidate my.nika.yaml  # judge somebody else's candidate
+python3 eval/hot/complex/judge.py --scenario X01 --candidate my.nika.yaml  # exit 0 accepted · 1 rejected · 2 static-invalid
 ```
 
 **`judge.py` reads declared properties from the derived graph.** Each
@@ -100,6 +100,39 @@ and the binary's sha256.
 
 It does **not** prove model quality, another engine, a live connector, latency,
 cost, behaviour outside the listed cases, or anything under `product_contracts`.
+
+## Judging somebody else's candidate
+
+```sh
+python3 eval/hot/complex/judge.py --scenario X01 --candidate my.nika.yaml
+```
+
+| Exit | Meaning | Report |
+|---|---|---|
+| 0 | accepted: statically valid, and no assertion of the scenario is violated | `accepted: true` · `violations: {}` |
+| 1 | rejected on meaning: statically valid, and an assertion is violated | `accepted: false` · `violations` |
+| 2 | **refused as static-invalid, and not judged** | `accepted: false` · `refused: "static-invalid"` · `static_errors` · no `violations` |
+
+A verdict always comes with a JSON report on stdout. A usage error also exits 2
+(that is `argparse`), and prints no report.
+
+A candidate is admitted before it is judged. The repository's reference static
+oracle — the function behind `conformance/runner.py validate`, with its schema
+and its unique-key loader, nothing re-implemented here — must accept the
+source first. `yaml.safe_load` keeps the last of two duplicate keys and says
+nothing, so a parsed document alone is not evidence of what a file says: a
+second `permits:` block can hide `nika:*` behind the legitimate one, a second
+`when:` can hide an open condition, and parsed last-wins both satisfy every
+assertion. They are refused (`NIKA-PARSE-017`), as are a malformed schema, an
+unknown key and text that is not YAML. A refused source carries no
+`violations`: it was not judged, and a verdict on a lossy parse would prove
+nothing.
+
+The file is read **once**, and that one text goes to the oracle and to the
+parser, so the two cannot disagree about what was judged. The oracle resolves
+skill paths and child workflows against the candidate's own directory. The
+corpus's own candidates pass through the same door, so the command and the
+gate cannot drift apart.
 
 ## What a green run says about Compile: nothing
 
