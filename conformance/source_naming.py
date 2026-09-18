@@ -34,11 +34,12 @@ def _has_illegal_chars(name: str) -> bool:
 
 def _is_uri(path: str) -> bool:
     """A URI is not a filesystem filename. Require ``scheme://`` so ``C:``
-    drive prefixes and ``nika:`` envelope marks are not treated as URIs."""
+    drive prefixes and ``nika:`` envelope marks are not treated as URIs.
+    Schemes use RFC3986's ASCII grammar; filenames may still be Unicode."""
     if "://" not in path:
         return False
     scheme = path.split("://", 1)[0]
-    if not scheme or not scheme[0].isalpha():
+    if not scheme or not scheme.isascii() or not scheme[0].isalpha():
         return False
     return all(c.isalnum() or c in "+-." for c in scheme)
 
