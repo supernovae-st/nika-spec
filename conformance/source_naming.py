@@ -2,9 +2,10 @@
 """Lexical Nika source-name owner (spec 01 §File naming).
 
 Pure basename classification: no filesystem I/O, no grant, no case folding.
-Callers own path shape (relative vs absolute), regular-file checks, and
-root/symlink policy. Off-disk source (stdin, HTTP, SDK string, pack blob)
-never goes through this module.
+Callers own path shape (relative vs absolute vs owned-root), regular-file
+checks, and root/symlink policy. This module does not decide owned-relative
+admission. Off-disk source (stdin, HTTP, SDK string, pack blob) never goes
+through this module. A URI (`scheme://…`) is not a filename.
 
 Canonical program suffix is lowercase ``.nika`` with a nonempty stem.
 ``nika.yaml`` is project configuration. ``.nika/`` is runtime state.
@@ -29,6 +30,17 @@ KIND_NOT_PROGRAM = "not-program"
 
 def _has_illegal_chars(name: str) -> bool:
     return any(ord(c) < 32 or c == "\x7f" for c in name)
+
+
+def _is_uri(path: str) -> bool:
+    """A URI is not a filesystem filename. Require ``scheme://`` so ``C:``
+    drive prefixes and ``nika:`` envelope marks are not treated as URIs."""
+    if "://" not in path:
+        return False
+    scheme = path.split("://", 1)[0]
+    if not scheme or not scheme[0].isalpha():
+        return False
+    return all(c.isalnum() or c in "+-." for c in scheme)
 
 
 def path_basename(name: str) -> str:
@@ -59,8 +71,13 @@ def classify_basename(name: str) -> str:
 
 
 def classify_path(path: str) -> str:
-    """Classify a path string by its basename. No I/O, no traversal policy."""
-    if _has_illegal_chars(path):
+    """Classify a path string by its basename. No I/O, no traversal policy.
+
+    Trailing separators mark a directory form. URI schemes are not filenames.
+    ``../foo.nika`` and ``/absolute/foo.nika`` remain lexically programs;
+    owned-relative admission is the caller's contract.
+    """
+    if _has_illegal_chars(path) or _is_uri(path):
         return KIND_NOT_PROGRAM
     normalized = path.replace("\\", "/")
     if normalized.endswith("/"):

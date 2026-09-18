@@ -39,15 +39,14 @@ law("declarative case table is non-empty", len(cases) >= 16)
 for row in cases:
     name = row["name"]
     want = row["kind"]
-    got = classify_path(name) if ("/" in name or name.endswith("/")) else classify_basename(name)
+    got = classify_path(name)
     law(f"classify {name!r} → {want}", got == want)
     if want == KIND_PROGRAM:
         stem = row.get("stem")
-        got_stem = logical_stem(name if "/" not in name else name.replace("\\", "/").rstrip("/").rsplit("/", 1)[-1])
-        law(f"stem {name!r} → {stem}", got_stem == stem)
-    else:
-        if "/" not in name and not name.endswith("/"):
-            law(f"no stem for {name!r}", logical_stem(name) is None)
+        base = name.replace("\\", "/").rstrip("/").rsplit("/", 1)[-1]
+        law(f"stem {name!r} → {stem}", logical_stem(base) == stem)
+    elif "/" not in name and not name.endswith("/") and "://" not in name:
+        law(f"no stem for {name!r}", logical_stem(name) is None)
 
 law("canonical suffix is lowercase .nika", CANONICAL_SUFFIX == ".nika")
 law("program_filename keeps extra dots", program_filename("support.v2") == "support.v2.nika")
@@ -60,8 +59,13 @@ except ValueError:
 
 # Hostile bytes stay not-program without being decoded as allowed names.
 law("embedded NUL is not a program", classify_basename("foo.nika\x00") == KIND_NOT_PROGRAM)
+law("DEL is not a program", classify_basename("foo.nika\x7f") == KIND_NOT_PROGRAM)
 law("uppercase suffix is not a program", classify_basename("foo.NIKA") == KIND_NOT_PROGRAM)
 law("project basename is not a program", classify_basename("nika.yaml") != KIND_PROGRAM)
+law("URI is not a filename", classify_path("file:///tmp/foo.nika") == KIND_NOT_PROGRAM)
+law("HTTP URI is not a filename", classify_path("https://example.com/foo.nika") == KIND_NOT_PROGRAM)
+law("owned-relative policy is not this module", classify_path("../foo.nika") == KIND_PROGRAM)
+law("absolute lexical program is still a basename program", classify_path("/absolute/foo.nika") == KIND_PROGRAM)
 
 positive = HERE / "source-naming" / "positive"
 found = {p.name: p for p in iter_program_files(positive)}

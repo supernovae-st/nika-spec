@@ -26,6 +26,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   Owner sources, templates, examples, active conformance programs and
   generators move in this revision. Historical receipts and frozen
   provenance keep their original path strings.
+- **File naming clarifications** (01 §File naming · nika-spec#340 review) —
+  off-disk identity is the `nika:` mark plus the `tasks:` type
+  discriminant, not “the first line”. The program suffix `.nika` and the
+  runtime directory `.nika/` share a spelling and are distinct roles,
+  not a claim that the names never collide. `nika init` remains a MUST
+  emitter of `<name>.nika`. A `nika.yaml` that carries `tasks:` is
+  refused at that pathname rather than coerced into a workflow.
 
 ### Added · template refusal completeness (2026-09-11)
 

@@ -2,21 +2,21 @@
 # SPDX-License-Identifier: Apache-2.0
 """Refuse live retired Nika program suffixes in tracked paths and text.
 
-Scans pathnames and UTF-8 text for ``.nika.yaml`` / ``.nika.yml``, plus
-escaped regex / brace-glob aliases. Exceptions are bounded: path + match
-+ category + reason + owner. Stale exceptions fail. Negative tests and
-this ratchet's own pattern data must be listed explicitly — there is no
-blanket tests/ or docs/ exemption.
+Exceptions are exact paths only — never a directory prefix. Frozen
+evidence pins the whole-file digest. Teaching and negative files pin
+the exact hit-count and the hash of the matching lines, so a new
+``nika run foo.nika.yaml`` in an allowlisted chapter fails.
 
     python3 scripts/check-old-suffix.py
     python3 scripts/check-old-suffix.py --selftest
+    python3 scripts/check-old-suffix.py --dump-pins
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 import subprocess
 import sys
-import tempfile
 from pathlib import Path
 
 import yaml
@@ -24,15 +24,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 EXCEPTIONS_PATH = ROOT / "scripts" / "old-suffix-exceptions.yaml"
 RETIRED = (".nika.yaml", ".nika.yml")
-CATEGORIES = {
-    "historical",
-    "frozen",
-    "negative",
-    "ratchet",
-}
-
-# Path and content needles. Escaped/brace forms catch glob aliases that
-# would otherwise keep teaching the retired suffixes.
+CATEGORIES = {"historical", "frozen", "negative", "ratchet"}
 CONTENT_NEEDLES = (
     ".nika.yaml",
     ".nika.yml",
@@ -45,6 +37,14 @@ CONTENT_NEEDLES = (
     ".nika.{yaml,yml}",
     ".nika.{yml,yaml}",
 )
+
+
+def sha256_bytes(raw: bytes) -> str:
+    return "sha256:" + hashlib.sha256(raw).hexdigest()
+
+
+def lines_sha256(lines: list[str]) -> str:
+    return sha256_bytes(("\n".join(lines) + "\n").encode("utf-8"))
 
 
 def git_ls_files() -> list[str]:
@@ -60,125 +60,179 @@ def git_ls_files() -> list[str]:
 def load_exceptions() -> list[dict]:
     data = yaml.safe_load(EXCEPTIONS_PATH.read_text()) or {}
     rows = data.get("exceptions") or []
-    seen = set()
+    seen: set[str] = set()
     for row in rows:
-        for key in ("path", "match", "category", "reason", "owner"):
+        for key in ("path", "category", "reason", "owner"):
             if not row.get(key):
                 raise SystemExit(f"old-suffix exception missing {key}: {row}")
+        path = row["path"]
+        if path.endswith("/") or "*" in path or path.endswith("\\"):
+            raise SystemExit(f"exception path must be an exact file, not a prefix/glob: {path}")
         if row["category"] not in CATEGORIES:
             raise SystemExit(f"unknown exception category: {row['category']}")
-        ident = (row["path"], row["match"])
-        if ident in seen:
-            raise SystemExit(f"duplicate exception: {ident}")
-        seen.add(ident)
+        if path in seen:
+            raise SystemExit(f"duplicate exception path: {path}")
+        seen.add(path)
+        if row["category"] == "frozen":
+            if not row.get("digest"):
+                raise SystemExit(f"frozen exception missing digest: {path}")
+        else:
+            if "count" not in row or not row.get("lines_sha256"):
+                raise SystemExit(f"content exception missing count/lines_sha256: {path}")
     return rows
 
 
-def matching_exceptions(rel: str, text: str, exceptions: list[dict]) -> list[dict]:
-    found = []
-    for row in exceptions:
-        if rel == row["path"] or rel.startswith(row["path"].rstrip("/") + "/"):
-            if row["category"] == "ratchet" or row["match"] in text or row["match"] in rel:
-                found.append(row)
-    return found
+def content_hit_lines(text: str) -> list[str]:
+    return [line for line in text.splitlines() if any(n in line for n in CONTENT_NEEDLES)]
 
 
-def content_hits(text: str) -> list[tuple[int, str]]:
-    hits = []
-    for i, line in enumerate(text.splitlines(), 1):
-        if any(needle in line for needle in CONTENT_NEEDLES):
-            hits.append((i, line))
-    return hits
+def read_rel(rel: str, overlay: dict[str, str] | None) -> tuple[bytes, str] | None:
+    if overlay is not None and rel in overlay:
+        text = overlay[rel]
+        return text.encode("utf-8"), text
+    path = ROOT / rel
+    try:
+        raw = path.read_bytes()
+        return raw, raw.decode("utf-8")
+    except (UnicodeDecodeError, IsADirectoryError, OSError):
+        return None
 
 
-def scan(exceptions: list[dict]) -> tuple[list[str], set[tuple[str, str]]]:
-    failures: list[str] = []
-    used: set[tuple[str, str]] = set()
+def scan(
+    exceptions: list[dict],
+    *,
+    overlay: dict[str, str] | None = None,
+    extra_paths: list[str] | None = None,
+) -> list[str]:
+    by_path = {row["path"]: row for row in exceptions}
     files = git_ls_files()
+    if extra_paths:
+        files = list(dict.fromkeys([*files, *extra_paths]))
+    failures: list[str] = []
+    used: set[str] = set()
     for rel in files:
-        if rel.endswith(RETIRED):
-            rows = matching_exceptions(rel, rel, exceptions)
-            if not rows:
+        row = by_path.get(rel)
+        loaded = read_rel(rel, overlay)
+        retired_path = rel.endswith(RETIRED)
+        if loaded is None:
+            if retired_path and row is None:
                 failures.append(f"path {rel} · retired program suffix")
-            else:
-                used.update((row["path"], row["match"]) for row in rows)
-        path = ROOT / rel
-        try:
-            text = path.read_text(encoding="utf-8")
-        except (UnicodeDecodeError, IsADirectoryError, OSError):
             continue
-        for lineno, line in content_hits(text):
-            rows = matching_exceptions(rel, line, exceptions)
-            if not rows:
-                failures.append(f"{rel}:{lineno} · {line.strip()[:160]}")
+        raw, text = loaded
+        hits = content_hit_lines(text)
+        if retired_path:
+            if row is None or row["category"] != "frozen":
+                failures.append(f"path {rel} · retired program suffix")
+            elif sha256_bytes(raw) != row["digest"]:
+                failures.append(f"{rel} · frozen digest mismatch")
             else:
-                used.update((row["path"], row["match"]) for row in rows)
-    declared = {(row["path"], row["match"]) for row in exceptions}
-    stale = declared - used
-    for path, match in sorted(stale):
-        failures.append(f"stale exception · {path} · {match!r}")
-    return failures, used
+                used.add(rel)
+            continue
+        if not hits:
+            continue
+        if row is None:
+            for i, line in enumerate(text.splitlines(), 1):
+                if any(n in line for n in CONTENT_NEEDLES):
+                    failures.append(f"{rel}:{i} · {line.strip()[:160]}")
+            continue
+        used.add(rel)
+        digest = sha256_bytes(raw)
+        if row["category"] == "frozen":
+            if digest != row["digest"]:
+                failures.append(f"{rel} · frozen digest mismatch")
+            continue
+        if len(hits) != row["count"]:
+            failures.append(
+                f"{rel} · hit count {len(hits)} != pinned {row['count']}"
+            )
+        actual = lines_sha256(hits)
+        if actual != row["lines_sha256"]:
+            failures.append(f"{rel} · matching-lines hash mismatch")
+    for row in exceptions:
+        if row["path"] not in used:
+            failures.append(f"stale exception · {row['path']}")
+    return failures
+
+
+def dump_pins() -> int:
+    exceptions = load_exceptions()
+    files = set(git_ls_files())
+    for row in exceptions:
+        rel = row["path"]
+        loaded = read_rel(rel, None)
+        if loaded is None:
+            print(f"# missing {rel}", file=sys.stderr)
+            continue
+        raw, text = loaded
+        hits = content_hit_lines(text)
+        print(f"{rel}")
+        print(f"  digest: {sha256_bytes(raw)}")
+        print(f"  count: {len(hits)}")
+        print(f"  lines_sha256: {lines_sha256(hits)}")
+        if rel not in files:
+            print("  # not in git ls-files", file=sys.stderr)
+    return 0
 
 
 def selftest() -> int:
-    """A reintroduced live old suffix must be detected; listed exceptions pass."""
     bad = 0
-    with tempfile.TemporaryDirectory() as td:
-        root = Path(td)
-        (root / "live.nika.yaml").write_text("nika: x\ntasks: { t: { infer: { prompt: x } } }\n")
-        (root / "ok.nika").write_text("nika: x\ntasks: { t: { infer: { prompt: x } } }\n")
-        proc = subprocess.run(
-            [sys.executable, str(ROOT / "scripts" / "check-old-suffix.py"),
-             "--root", str(root), "--no-git"],
-            capture_output=True, text=True,
-        )
-        if proc.returncode == 0 or "live.nika.yaml" not in proc.stdout + proc.stderr:
-            print("selftest: missed a live retired path", proc.stdout, proc.stderr)
-            bad += 1
-        else:
-            print("selftest: reintroduced live.nika.yaml detected")
-    # Real tree with exceptions must be invokable from --selftest only as
-    # a smoke that the exception file parses. The main scan is CI.
-    load_exceptions()
-    print("selftest: exception file parses")
+    exceptions = load_exceptions()
+    clean = scan(exceptions)
+    if clean:
+        print("selftest: live tree should be clean, got:")
+        for item in clean:
+            print(f"  {item}")
+        bad += 1
+    else:
+        print("selftest: live tree clean")
+
+    env = "spec/01-envelope.md"
+    orig = (ROOT / env).read_text(encoding="utf-8")
+    injected = orig.rstrip() + "\n\n`nika run foo.nika.yaml`\n"
+    chapter_fail = scan(exceptions, overlay={env: injected})
+    if not any(env in item for item in chapter_fail):
+        print("selftest: missed injection into allowlisted chapter", chapter_fail)
+        bad += 1
+    else:
+        print("selftest: injection into spec/01-envelope.md detected")
+
+    proof = "proofs/_ratchet-injection.nika.yaml"
+    proof_fail = scan(
+        exceptions,
+        extra_paths=[proof],
+        overlay={proof: "nika: inject\ntasks: { t: { infer: { prompt: x } } }\n"},
+    )
+    if not any(proof in item for item in proof_fail):
+        print("selftest: missed new proofs/ retired path", proof_fail)
+        bad += 1
+    else:
+        print("selftest: new proofs/_ratchet-injection.nika.yaml detected")
+
+    if not any("retired program suffix" in item for item in proof_fail):
+        print("selftest: new proofs file should fail as a retired path")
+        bad += 1
+
+    again = scan(exceptions)
+    if again:
+        print("selftest: overlay leaked into live scan", again)
+        bad += 1
+    else:
+        print("selftest: legitimate history and negative tests still pass")
     return bad
-
-
-def scan_root_no_git(root: Path) -> list[str]:
-    failures = []
-    for path in root.rglob("*"):
-        if not path.is_file():
-            continue
-        rel = path.relative_to(root).as_posix()
-        if rel.endswith(RETIRED):
-            failures.append(f"path {rel} · retired program suffix")
-        try:
-            text = path.read_text(encoding="utf-8")
-        except (UnicodeDecodeError, OSError):
-            continue
-        for lineno, line in content_hits(text):
-            failures.append(f"{rel}:{lineno} · {line.strip()[:160]}")
-    return failures
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--selftest", action="store_true")
-    parser.add_argument("--root", type=Path)
-    parser.add_argument("--no-git", action="store_true")
+    parser.add_argument("--dump-pins", action="store_true")
     args = parser.parse_args()
+    if args.dump_pins:
+        return dump_pins()
     if args.selftest:
         return selftest()
-    if args.no_git:
-        root = args.root or ROOT
-        failures = scan_root_no_git(root)
-        for f in failures:
-            print(f"✗ {f}", file=sys.stderr)
-        print(f"old-suffix ratchet · {len(failures)} hit(s) (no-git)")
-        return 1 if failures else 0
-    failures, _used = scan(load_exceptions())
-    for f in failures:
-        print(f"✗ {f}", file=sys.stderr)
+    failures = scan(load_exceptions())
+    for item in failures:
+        print(f"✗ {item}", file=sys.stderr)
     if failures:
         print(f"old-suffix ratchet · {len(failures)} hit(s)", file=sys.stderr)
         return 1
