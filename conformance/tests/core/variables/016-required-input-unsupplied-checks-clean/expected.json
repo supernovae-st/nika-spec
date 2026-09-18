@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "Source-only Check does not require runtime values: a required input without a caller value is lawful at check and refused only at admission (NIKA-1708 · runtime admission/001 refusal pair). spec#160."
+}

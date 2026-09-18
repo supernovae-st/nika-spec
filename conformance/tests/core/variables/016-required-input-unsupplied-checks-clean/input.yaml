@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: Apache-2.0
+# Check is source-only: an unsupplied required input is a LAUNCH-plane fact
+# (NIKA-1708 at admission · 05 §Error code namespaces exception), never a
+# static refusal. The engine MUST accept this file at check.
+nika: required-input-unsupplied-checks-clean
+inputs:
+  ticket:
+    type: string
+    required: true
+tasks:
+  echo:
+    invoke:
+      tool: nika:jq
+      args:
+        input: "${{ inputs.ticket }}"
+        expression: "."
+outputs:
+  out: ${{ tasks.echo.output }}
