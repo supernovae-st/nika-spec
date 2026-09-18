@@ -1,0 +1,53 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# PROPOSED · NOT IN registry
+# known-path-agent-fallback · classify first; agent only on unknown.
+# P05. agent-loop is whole-workflow EXPLORE — this file is the exceptional branch.
+# HOT compile (if contracts known) still yields a runtime agent. That is allowed.
+nika: known-path-agent-fallback-proposed
+model: mock/echo
+inputs:
+  ticket:
+    type: string
+    required: true
+    default: "cannot login after password reset"
+permits:
+  tools: ["nika:jq", "nika:done"]
+tasks:
+  classify:
+    infer:
+      max_tokens: 400
+      prompt: "Classify this ticket as billing, login, or unknown. Ticket: ${{ inputs.ticket }}"
+      schema:
+        type: object
+        additionalProperties: false
+        required: [class]
+        properties:
+          class: { type: string, enum: [billing, login, unknown] }
+  known:
+    with:
+      classification: ${{ tasks.classify.output }}
+    when: ${{ with.classification.class != "unknown" }}
+    invoke:
+      tool: nika:jq
+      args:
+        input: ${{ with.classification }}
+        expression: "."
+  investigate:
+    # Exceptional open-world only. Bounded. Does not author the workflow.
+    with:
+      classification: ${{ tasks.classify.output }}
+    when: ${{ with.classification.class == "unknown" }}
+    agent:
+      max_turns: 4
+      max_tokens_total: 4000
+      tools: ["nika:done"]
+      prompt: "Ticket class was unknown. Investigate: ${{ inputs.ticket }}"
+      schema:
+        type: object
+        additionalProperties: false
+        required: [notes]
+        properties:
+          notes: { type: string }
+# Assembler must not invert this into agent-first orchestration.

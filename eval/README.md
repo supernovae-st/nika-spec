@@ -62,3 +62,8 @@ Results land in `eval/results/*.json` (gitignored until a run is worth
 keeping — a kept run is a benchmark, commit it deliberately).
 
 🦋 *The bible evolves on data, not on taste.*
+
+## Compile-HOT inventory (separate from this harness)
+
+[`hot/`](hot/) is the **compile-path** candidate family matrix (nika#1665).
+It does **not** drive `run-eval.py`. Do not mix the two scores.

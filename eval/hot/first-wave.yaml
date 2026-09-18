@@ -1,0 +1,761 @@
+# SPDX-License-Identifier: Apache-2.0
+# First-wave HOT families — TEST TARGETS, not promoted.
+schema_version: 1
+wave: "first"
+n: 30
+note: "TEST TARGETS not PROMOTED_HOT. 0 provider calls is an expectation until #1656 instruments compile."
+families:
+  - rank: 1
+    family_id: "A01"
+    title: "website brief"
+    example_intent: "Summarize https://example.com"
+    structure_signature: "FETCH → EXTRACT → SUMMARIZE"
+    patterns:
+      - "fetch"
+      - "extract"
+      - "summarize"
+    bindings:
+      - "url"
+    policy_fields: []
+    effects: "none_or_persist"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Summarize https://example.com"
+      fr: "Fais-moi un résumé de https://example.com"
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 2
+    family_id: "A05"
+    title: "article summarization"
+    example_intent: "Summarize this article"
+    structure_signature: "READ → SUMMARIZE"
+    patterns:
+      - "read"
+      - "summarize"
+    bindings:
+      - "document"
+    policy_fields: []
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Summarize this article"
+      fr: null
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 3
+    family_id: "A09"
+    title: "document to fields"
+    example_intent: "Extract invoice fields from this document"
+    structure_signature: "READ → VALIDATE → EXTRACT"
+    patterns:
+      - "read"
+      - "validate"
+      - "extract"
+    bindings:
+      - "document"
+    policy_fields: []
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Extract invoice fields from this document"
+      fr: "Extrais les champs de ce document"
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 4
+    family_id: "A11"
+    title: "corpus QA"
+    example_intent: "Answer from this corpus; say unknown if unsupported"
+    structure_signature: "SEARCH → ANSWER / UNKNOWN"
+    patterns:
+      - "search"
+      - "generate"
+    bindings:
+      - "corpus"
+      - "question"
+    policy_fields: []
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Answer from this corpus; say unknown if unsupported"
+      fr: null
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 5
+    family_id: "A13"
+    title: "compare documents"
+    example_intent: "Compare these two contracts"
+    structure_signature: "READ×2 → COMPARE"
+    patterns:
+      - "read"
+      - "compare"
+    bindings:
+      - "doc_a"
+      - "doc_b"
+    policy_fields: []
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Compare these two contracts"
+      fr: null
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 6
+    family_id: "A20"
+    title: "meeting action items"
+    example_intent: "Extract action items from this transcript"
+    structure_signature: "READ → EXTRACT"
+    patterns:
+      - "read"
+      - "extract"
+    bindings:
+      - "transcript"
+    policy_fields: []
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Extract action items from this transcript"
+      fr: null
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 7
+    family_id: "F01"
+    title: "validate records"
+    example_intent: "Validate these records"
+    structure_signature: "VALIDATE"
+    patterns:
+      - "validate"
+    bindings:
+      - "records"
+    policy_fields: []
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Validate these records"
+      fr: "Valide ces enregistrements"
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 8
+    family_id: "F03"
+    title: "deduplicate records"
+    example_intent: "Deduplicate these records"
+    structure_signature: "DEDUP"
+    patterns:
+      - "dedup"
+    bindings:
+      - "records"
+    policy_fields: []
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Deduplicate these records"
+      fr: null
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 9
+    family_id: "F04"
+    title: "aggregate by key"
+    example_intent: "Sum/count these records by key"
+    structure_signature: "AGGREGATE"
+    patterns:
+      - "aggregate"
+    bindings:
+      - "records"
+      - "key"
+    policy_fields: []
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Sum/count these records by key"
+      fr: "Agrège ces lignes par clé"
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 10
+    family_id: "F08"
+    title: "snapshot diff"
+    example_intent: "Diff these two snapshots"
+    structure_signature: "DIFF"
+    patterns:
+      - "diff"
+    bindings:
+      - "before"
+      - "after"
+    policy_fields: []
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Diff these two snapshots"
+      fr: null
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 11
+    family_id: "F06"
+    title: "project public fields"
+    example_intent: "Project public fields from these records"
+    structure_signature: "PROJECT / REDACT"
+    patterns:
+      - "project"
+      - "redact"
+    bindings:
+      - "records"
+    policy_fields: []
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Project public fields from these records"
+      fr: null
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 12
+    family_id: "F15"
+    title: "batch process bounded list"
+    example_intent: "Process this list in bounded batches"
+    structure_signature: "BOUNDED_BATCH"
+    patterns:
+      - "batch"
+    bindings:
+      - "list"
+    policy_fields:
+      - "max_batch"
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Process this list in bounded batches"
+      fr: null
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 13
+    family_id: "F16"
+    title: "bounded fanout"
+    example_intent: "Fan out this bounded list"
+    structure_signature: "FANOUT"
+    patterns:
+      - "fanout"
+    bindings:
+      - "list"
+    policy_fields:
+      - "max_fanout"
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Fan out this bounded list"
+      fr: null
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 14
+    family_id: "F19"
+    title: "optional resource recovery"
+    example_intent: "Recover if this optional file is missing"
+    structure_signature: "RECOVER"
+    patterns:
+      - "recover"
+    bindings:
+      - "path"
+    policy_fields: []
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Recover if this optional file is missing"
+      fr: null
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 15
+    family_id: "B01"
+    title: "ticket classification"
+    example_intent: "Classify this support ticket"
+    structure_signature: "READ → CLASSIFY"
+    patterns:
+      - "classify"
+    bindings:
+      - "ticket"
+    policy_fields: []
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Classify this support ticket"
+      fr: "Classe ce ticket support"
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 16
+    family_id: "B05"
+    title: "ticket classify route"
+    example_intent: "Classify this ticket and route it"
+    structure_signature: "READ → CLASSIFY → ROUTE"
+    patterns:
+      - "classify"
+      - "route"
+    bindings:
+      - "ticket"
+    policy_fields:
+      - "queue_policy?"
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Classify this ticket and route it"
+      fr: null
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 17
+    family_id: "B03"
+    title: "ticket customer lookup"
+    example_intent: "Look up the customer for this ticket"
+    structure_signature: "READ → LOOKUP"
+    patterns:
+      - "lookup"
+    bindings:
+      - "ticket"
+      - "customer_id"
+    policy_fields: []
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-B"
+    promotion_status: "NEEDS_PATTERN"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Look up the customer for this ticket"
+      fr: null
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 18
+    family_id: "B04"
+    title: "ticket draft response"
+    example_intent: "Draft a reply to ticket #42"
+    structure_signature: "READ → LOOKUP? → CLASSIFY → DRAFT"
+    patterns:
+      - "classify"
+      - "draft"
+    bindings:
+      - "ticket_id"
+    policy_fields: []
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Draft a reply to ticket #42"
+      fr: null
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 19
+    family_id: "C01"
+    title: "lead normalization"
+    example_intent: "Normalize this lead record"
+    structure_signature: "VALIDATE → NORMALIZE"
+    patterns:
+      - "validate"
+      - "normalize"
+    bindings:
+      - "lead"
+    policy_fields: []
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Normalize this lead record"
+      fr: null
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 20
+    family_id: "C03"
+    title: "lead enrichment"
+    example_intent: "Enrich this lead"
+    structure_signature: "LOOKUP → ENRICH → NORMALIZE"
+    patterns:
+      - "lookup"
+      - "enrich"
+      - "normalize"
+    bindings:
+      - "lead"
+    policy_fields: []
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-B"
+    promotion_status: "NEEDS_PATTERN"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Enrich this lead"
+      fr: null
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 21
+    family_id: "C04"
+    title: "lead qualification"
+    example_intent: "Qualify this lead from these rules"
+    structure_signature: "ENRICH → CLASSIFY"
+    patterns:
+      - "enrich"
+      - "classify"
+    bindings:
+      - "lead"
+    policy_fields:
+      - "icp_rules"
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-C"
+    promotion_status: "NEEDS_PATTERN"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Qualify this lead from these rules"
+      fr: null
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 22
+    family_id: "C15"
+    title: "CRM account executive brief"
+    example_intent: "Executive brief for this account"
+    structure_signature: "LOOKUP → SUMMARIZE"
+    patterns:
+      - "lookup"
+      - "summarize"
+    bindings:
+      - "account_id"
+    policy_fields: []
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "NEEDS_PATTERN"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Executive brief for this account"
+      fr: null
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 23
+    family_id: "D01"
+    title: "topic content brief"
+    example_intent: "Write a content brief on this topic"
+    structure_signature: "GENERATE"
+    patterns:
+      - "draft"
+    bindings:
+      - "topic"
+    policy_fields: []
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Write a content brief on this topic"
+      fr: null
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 24
+    family_id: "D18"
+    title: "multi-channel repurpose"
+    example_intent: "Repurpose this content across channels"
+    structure_signature: "DRAFT"
+    patterns:
+      - "draft"
+    bindings:
+      - "content"
+      - "channels"
+    policy_fields: []
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Repurpose this content across channels"
+      fr: null
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 25
+    family_id: "A16"
+    title: "changelog summary"
+    example_intent: "Summarize this changelog"
+    structure_signature: "READ → SUMMARIZE"
+    patterns:
+      - "read"
+      - "summarize"
+    bindings:
+      - "document"
+    policy_fields: []
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Summarize this changelog"
+      fr: null
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 26
+    family_id: "E05"
+    title: "PR summary"
+    example_intent: "Summarize this pull request"
+    structure_signature: "READ → SUMMARIZE"
+    patterns:
+      - "summarize"
+    bindings:
+      - "pr"
+    policy_fields: []
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Summarize this pull request"
+      fr: null
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 27
+    family_id: "E25"
+    title: "CI failure triage"
+    example_intent: "Triage this CI run failure"
+    structure_signature: "CLASSIFY → SUMMARIZE"
+    patterns:
+      - "classify"
+      - "summarize"
+    bindings:
+      - "ci_run"
+    policy_fields: []
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Triage this CI run failure"
+      fr: null
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 28
+    family_id: "E11"
+    title: "logs incident summary"
+    example_intent: "Incident summary from these logs"
+    structure_signature: "READ → SUMMARIZE"
+    patterns:
+      - "summarize"
+    bindings:
+      - "logs"
+    policy_fields: []
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Incident summary from these logs"
+      fr: null
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 29
+    family_id: "F11"
+    title: "reconcile two datasets"
+    example_intent: "Reconcile dataset A and B"
+    structure_signature: "NORMALIZE → DIFF → CLASSIFY"
+    patterns:
+      - "normalize"
+      - "diff"
+      - "classify"
+    bindings:
+      - "a"
+      - "b"
+    policy_fields: []
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Reconcile dataset A and B"
+      fr: null
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
+  - rank: 30
+    family_id: "A21"
+    title: "research brief"
+    example_intent: "Research brief from these sources"
+    structure_signature: "SEARCH → EXTRACT → SYNTHESIZE + CITATIONS"
+    patterns:
+      - "search"
+      - "extract"
+      - "summarize"
+    bindings:
+      - "query"
+      - "sources"
+    policy_fields: []
+    effects: "none"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    hot_compile_provider_calls_expectation: 0
+    check_must_run: true
+    paraphrases:
+      en: "Research brief from these sources"
+      fr: null
+    near_miss_must_not_share_fingerprint:
+      - "add send/publish/pay/delete"
+      - "every morning (trigger ≠ program unless product binds)"
+      - "keep this local vs use cloud model"
