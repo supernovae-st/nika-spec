@@ -13,6 +13,26 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed · the reference consent oracle reads a certain skip (2026-09-18)
+
+- **A write that only reads a stage the refusal certainly skips is refused
+  (`NIKA-SEC-014`).** The reference oracle's consent walk stopped at a closed
+  gate, so it never saw what read *past* it. A `with:` value edge admits a
+  skipped producer and reads null (03 · edge roles), so such a reader reaches
+  its verb on “no”, against the affirmative-consent law (10 · NEP-0020). The
+  oracle now holds a second, bounded reading beside the first and never merges
+  the two. It refuses only what it proves: the stage's bindings are total and
+  its `when:` is false on a refusal (read once, before any fan-out), the
+  reader is certainly admitted, and it certainly reaches an effect.
+  `after: { stage: success }` on the same producer cancels the reader and
+  stays valid. A skip that rests on a step that merely ran, a navigated
+  binding, an undecided left operand, a comparison across two classes or a
+  fan-out *reader* is not proven, and stays valid. No new code, no schema or
+  prose change, no new conformance fixture: the normative policy is unchanged.
+- **`conformance/consent_core_selftest.py`** states the reading as a finite
+  table (35 shapes · 47 laws) and neuters four of its guards one at a time;
+  each must flip exactly its own rows. It runs in the static gate.
+
 ### Added · composed authoring goldens (2026-09-18)
 
 - **Twelve scenario families under [`eval/hot/complex/`](eval/hot/complex/README.md).**

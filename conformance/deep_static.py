@@ -1727,6 +1727,20 @@ def net_before_exec_errors(doc: dict) -> list[dict]:
 # substitution) · when: false · a closer confirm gate. Only the PROVEN
 # non-affirmative route refuses (sound — an undecidable gate defers to
 # the engine's advisory hint, never to this code).
+#
+# Two readings, never merged.
+#   · the CLASSICAL walk follows the edges a refusal (settled SUCCESS) is
+#     admitted by, and stops at a gate the refusal closes.
+#   · the SURE-SKIP reading goes one hop further, and only where it can
+#     PROVE it. 03 §edge roles admits that a `with:` value edge passes on a
+#     SKIPPED producer and reads defined-`null`, while `after: {x: success}`
+#     cancels. So a task that only READS the value of a stage the refusal
+#     certainly skips is still admitted, and if it certainly reaches its
+#     verb the effect is attempted on « no »: NIKA-SEC-014, the same code.
+#     « Certainly » is strict (decision A): nothing before the verb may
+#     error, `when:` is read in the runtime's order, and no edge into the
+#     task may depend on a verb that merely RAN — its success is never
+#     assumed. Anything less is no claim here (the engine's advisory hint).
 
 _CONSENT_UNKNOWN = object()  # the Kleene third value (never equal to data)
 
@@ -2067,6 +2081,223 @@ def _consent_children(tasks):
     return down
 
 
+# ── the SURE-SKIP reading · what a refusal certainly does to one task ────────
+# Observation fields admit every settled state (03 §edge roles); `.error` is a
+# failure-observation. Everything else read off a task is a VALUE edge.
+_CONSENT_OBSERVED = {"status", "duration_ms", "started_at", "ended_at"}
+_CONSENT_PLAIN_READ = re.compile(
+    r"(?:tasks\.[a-z][a-z0-9_]*|inputs|const)\.[A-Za-z_][A-Za-z0-9_]*\Z")
+_CONSENT_ISLAND = re.compile(r"\s*\$\{\{\s*(.*?)\s*\}\}\s*", re.DOTALL)
+_CONSENT_TASK_READ = re.compile(r"tasks\.([a-z][a-z0-9_]*)\.([A-Za-z_][A-Za-z0-9_]*)")
+
+
+def _consent_total_binding(value) -> bool:
+    """A `with:` value that cannot error before `when:` is read (03 dispatch ·
+    GATE → BINDINGS → when: → VERB): a literal, or ONE island holding a plain
+    read. `tasks.a.output.path` navigates a possible null; a mixed template or
+    an expression may error. Those are not proven total."""
+    if isinstance(value, dict):
+        return all(_consent_total_binding(v) for v in value.values())
+    if isinstance(value, list):
+        return all(_consent_total_binding(v) for v in value)
+    if not isinstance(value, str):
+        return True
+    bodies = EXPR_BODY.findall(value)
+    if not bodies:
+        return True
+    return (len(bodies) == 1 and bool(_CONSENT_ISLAND.fullmatch(value))
+            and bool(_CONSENT_PLAIN_READ.match(bodies[0].strip())))
+
+
+def _consent_total_env(task, gate):
+    """The task's `with:` env for the total reading: literals are themselves and
+    the gate's answer is False (status 'success'). The value of a skipped stage is
+    NOT substituted: a condition over it stays undecided, so this reading never
+    proves a skip or a run from a null it would have to interpret."""
+    env = {}
+    w = task.get("with")
+    for key, value in (w.items() if isinstance(w, dict) else ()):
+        env[key] = _CONSENT_UNKNOWN
+        if isinstance(value, str):
+            bodies = EXPR_BODY.findall(value)
+            if not bodies:
+                env[key] = value
+            elif len(bodies) == 1 and _CONSENT_ISLAND.fullmatch(value):
+                m = _CONSENT_TASK_READ.fullmatch(bodies[0].strip())
+                if m and m.group(1) == gate and m.group(2) == "output":
+                    env[key] = False
+                elif m and m.group(1) == gate and m.group(2) == "status":
+                    env[key] = "success"
+        elif value is None or isinstance(value, (bool, int, float)):
+            env[key] = value
+    return env
+
+
+def _consent_class(value) -> str:
+    if value is None:
+        return "null"
+    if isinstance(value, bool):
+        return "bool"
+    return type(value).__name__
+
+
+def _consent_eval_total(tree, gate, env):
+    """The when: body read in the RUNTIME's order, not Kleene's. The left
+    operand of `&&` / `||` is always evaluated and the right one only if the
+    left does not decide, so an undecided left is undecided whatever the right
+    says (it may error first). `==` / `!=` across two classes is an evaluation
+    error at run (NIKA-VAR-006), not `false`; null compares with anything."""
+    tag = tree[0]
+    if tag in ("lit", "ref", "member", "index", "list"):
+        return _consent_eval(tree, gate, env)
+    if tag == "not":
+        value = _consent_eval_total(tree[1], gate, env)
+        return (not value) if isinstance(value, bool) else _CONSENT_UNKNOWN
+    if tag in ("and", "or"):
+        left = _consent_eval_total(tree[1], gate, env)
+        if not isinstance(left, bool):
+            return _CONSENT_UNKNOWN
+        if left is (tag == "or"):
+            return left
+        right = _consent_eval_total(tree[2], gate, env)
+        return right if isinstance(right, bool) else _CONSENT_UNKNOWN
+    if tag == "tern":
+        cond = _consent_eval_total(tree[1], gate, env)
+        if not isinstance(cond, bool):
+            return _CONSENT_UNKNOWN
+        return _consent_eval_total(tree[2] if cond else tree[3], gate, env)
+    if tag == "rel":
+        op = tree[1]
+        left = _consent_eval_total(tree[2], gate, env)
+        right = _consent_eval_total(tree[3], gate, env)
+        if left is _CONSENT_UNKNOWN or right is _CONSENT_UNKNOWN:
+            return _CONSENT_UNKNOWN
+        if op in ("==", "!="):
+            if left is not None and right is not None and _consent_class(left) != _consent_class(right):
+                return _CONSENT_UNKNOWN
+            return (left == right) if op == "==" else (left != right)
+        if op == "in" and tree[3][0] == "list" and isinstance(right, list):
+            return left in right
+    return _CONSENT_UNKNOWN
+
+
+def _consent_reader_fans_out(task) -> bool:
+    """A fan-out over a null collection fails (03 §the skipped-upstream
+    corollary · NIKA-VAR-006): such a reader is not proven to reach its verb."""
+    return "for_each" in task
+
+
+def _consent_certain(task, gate) -> str:
+    """What the refusal CERTAINLY does to an admitted task: 'skips' · 'reaches'
+    its verb · 'unclear'. A `when:` proven false skips the whole task before any
+    fan-out (03 · when: gates the whole task before expansion), so a `for_each`
+    on the stage changes nothing; on a task that would run it does."""
+    w = task.get("with")
+    if w is not None and not (isinstance(w, dict) and all(_consent_total_binding(v) for v in w.values())):
+        return "unclear"
+    when = task.get("when")
+    if when is None:
+        verdict = True
+    elif isinstance(when, bool):
+        verdict = when
+    else:
+        verdict = _CONSENT_UNKNOWN
+        bodies = EXPR_BODY.findall(when) if isinstance(when, str) else []
+        if len(bodies) == 1 and _CONSENT_ISLAND.fullmatch(when):
+            try:
+                tree = _ConsentParser(_tokenize(bodies[0].strip())).parse()
+                verdict = _consent_eval_total(tree, gate, _consent_total_env(task, gate))
+            except CelError:
+                pass
+    if verdict is False:
+        return "skips"
+    if verdict is True and not _consent_reader_fans_out(task):
+        return "reaches"
+    return "unclear"
+
+
+def _consent_edges(task):
+    """(producer, role) for every edge INTO the task: 'value' · 'observe' ·
+    'error' from its with: reads, ('after', predicate) from its after: map."""
+    import json as _json
+    edges = []
+    w = task.get("with")
+    if w is not None:
+        for body in EXPR_BODY.findall(_json.dumps(w)):
+            for m in _CONSENT_TASK_READ.finditer(body):
+                field = m.group(2)
+                role = "observe" if field in _CONSENT_OBSERVED else "error" if field == "error" else "value"
+                edges.append((m.group(1), role))
+    after = task.get("after")
+    if isinstance(after, dict):
+        edges.extend((k, ("after", "success" if pred is None else pred))
+                     for k, pred in after.items() if isinstance(k, str))
+    return edges
+
+
+def _consent_admission(task, gate, skipped) -> str:
+    """Is the task certainly ADMITTED in the refusal world: 'certain' ·
+    'cancelled' · 'unclear' (03 §admission table). Two producers are FACTS: the
+    gate settled success, a stage in `skipped` settled skipped. Any other
+    producer merely ran, and a verb that ran settles something — which one is
+    never assumed, so a restrictive edge out of it proves nothing."""
+    verdicts = set()
+    for producer, role in _consent_edges(task):
+        if role == "observe" or role == ("after", "terminal"):
+            continue  # every settled state admits
+        fact = "success" if producer == gate else "skipped" if producer in skipped else None
+        if fact is None:
+            verdicts.add("unclear")
+        elif role == "value":
+            verdicts.add("certain")  # a value edge admits success and skipped
+        elif role == "error":
+            verdicts.add("certain" if fact == "skipped" else "cancelled")
+        elif role == ("after", "success"):
+            verdicts.add("certain" if fact == "success" else "cancelled")
+        elif role == ("after", "skipped"):
+            verdicts.add("certain" if fact == "skipped" else "cancelled")
+        elif role in (("after", "failure"), ("after", "cancelled")):
+            verdicts.add("cancelled")  # a fact is success or skipped, never these
+        elif role == ("after", "unwind") and fact == "skipped":
+            verdicts.add("cancelled")  # 03 §unwind · a producer that never ran unwinds nothing
+        else:
+            verdicts.add("unclear")
+    return "cancelled" if "cancelled" in verdicts else "unclear" if "unclear" in verdicts else "certain"
+
+
+def _consent_skip_witnesses(gate, closed, by_id):
+    """[(sink, skipped stage)] the SURE-SKIP reading proves, from the stages the
+    classical walk found closed. A fixpoint, so a chain of skipped stages is
+    followed and the order the tasks were written in changes nothing. The gate is
+    a FACT whatever it waited for: a refusal exists only in a run where it ran."""
+    readers: dict[str, set[str]] = {}
+    for tid, task in by_id.items():
+        for producer, role in _consent_edges(task):
+            if role == "value":
+                readers.setdefault(producer, set()).add(tid)
+    candidates, skipped = list(closed), set()
+    grown = True
+    while grown:
+        grown = False
+        for stage in candidates:
+            task = by_id[stage]
+            if (stage not in skipped and not _is_confirm_prompt(task)
+                    and _consent_admission(task, gate, skipped) == "certain"
+                    and _consent_certain(task, gate) == "skips"):
+                skipped.add(stage)
+                candidates.extend(sorted(readers.get(stage, set()) - set(candidates)))
+                grown = True
+    witnesses = []
+    for stage in sorted(skipped):
+        for reader in sorted(readers.get(stage, set())):
+            task = by_id[reader]
+            if (reader not in skipped and not _is_confirm_prompt(task) and _consent_egress(task)
+                    and _consent_admission(task, gate, skipped) == "certain"
+                    and _consent_certain(task, gate) == "reaches"):
+                witnesses.append((reader, stage))
+    return witnesses
+
+
 def consent_errors(doc: dict) -> list[dict]:
     """The affirmative-consent law (spec 10 · NEP-0020): an egress-capable
     task reached from a confirm gate over a route no affirmative gate
@@ -2081,6 +2312,8 @@ def consent_errors(doc: dict) -> list[dict]:
             continue
         seen = {tid}
         queue = sorted(down[tid])
+        closed: list[str] = []
+        sinks: set[str] = set()
         while queue:
             n = queue.pop(0)
             if n in seen:
@@ -2090,9 +2323,15 @@ def consent_errors(doc: dict) -> list[dict]:
             # A closer confirm gate owns its closure; a closed gate (the
             # affirmative when: · when: false) cuts the route; an UNCLEAR
             # gate is unproven — the walk claims nothing past it.
-            if _is_confirm_prompt(task) or _consent_gate(task, gate=tid) != "open":
+            if _is_confirm_prompt(task):
+                continue
+            state = _consent_gate(task, gate=tid)
+            if state == "closed":
+                closed.append(n)  # the classical walk stops here; the sure-skip reading starts here
+            if state != "open":
                 continue
             if _consent_egress(task):
+                sinks.add(n)
                 errs.append({
                     "code": "NIKA-SEC-014", "namespace": "NIKA-SEC",
                     "category": "security_error",
@@ -2104,4 +2343,21 @@ def consent_errors(doc: dict) -> list[dict]:
                               f"when: ${{{{ with.go == true }}}} (NEP-0020 · "
                               "10 §the affirmative-consent law)"})
             queue.extend(sorted(down[n]))
+        for sink, stage in _consent_skip_witnesses(tid, closed, by_id):
+            if sink in sinks:
+                continue  # one finding per gate and sink
+            sinks.add(sink)
+            errs.append({
+                "code": "NIKA-SEC-014", "namespace": "NIKA-SEC",
+                "category": "security_error",
+                "detail": f"task '{sink}' only READS the value of '{stage}', which a "
+                          f"REFUSED confirm gate '{tid}' certainly skips — a with: value "
+                          "edge passes on a skipped producer and reads null (03 §edge "
+                          f"roles), so '{sink}' still reaches its verb and the effect is "
+                          "ATTEMPTED on 'no', whatever the verb then makes of a null "
+                          f"input · fix: gate '{sink}' on the answer itself — with: "
+                          f'{{ go: "${{{{ tasks.{tid}.output }}}}" }} + '
+                          "when: ${{ with.go == true }} — or close the edge with "
+                          f"after: {{ {stage}: success }} (NEP-0020 · 10 §the "
+                          "affirmative-consent law)"})
     return errs
