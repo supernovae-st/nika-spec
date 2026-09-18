@@ -52,6 +52,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   leaves. Advisory hints are expected per candidate, and a gap's recorded
   facts fail the rehearsal when they stop holding.
 
+### Added · compile-HOT measurement split (2026-09-18)
+
+- **[`eval/hot/splits.json`](eval/hot/splits.json)** freezes TRAIN/DEVELOPMENT
+  vs HELD-OUT vs ADVERSARIAL at origin/main `7722aa66b`. Ids already on main
+  and already read on 2026-09-18 (G01–G24, N01–N15, E01–E10, X01–X12, 220
+  families) are DEVELOPMENT. HELD-OUT and ADVERSARIAL are empty: this pin
+  has no unseen labelled set, and moving those ids would invent a holdout.
+  File and `complex/` tree sha256s are recorded. `PROMOTED_HOT` stays 0;
+  no compiler-generated workflows. Owners nika#1656 / nika#1666.
+
 ### Changed · pack version `0.2.0-draft` (2026-09-18)
 
 - **`VERSION` is `0.2.0-draft`.** The pack contract (`examples/manifest.yaml`

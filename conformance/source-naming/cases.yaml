@@ -2,89 +2,160 @@
 # Declarative filename fixtures for spec 01 §File naming (nika#1684).
 # These rows classify NAMES, not workflow bytes. Parser fixtures stay
 # input.yaml; off-disk source stays filename-independent.
+# project_arm_valid separately records the project schema's workflow-path
+# shape: relative slash paths, no colon or native backslash. Filesystem
+# existence and cadence admission remain separate engine checks.
 schema: nika-source-naming/v1
 law: spec/01-envelope.md#file-naming-normative
 cases:
   - name: foo.nika
     kind: program
+    project_arm_valid: true
     stem: foo
     note: canonical live program path
   - name: support.v2.nika
     kind: program
+    project_arm_valid: true
     stem: support.v2
     note: extra dots stay in the stem; do not chain file_stem()
   - name: 10-compose-child.nika
     kind: program
+    project_arm_valid: true
     stem: 10-compose-child
   - name: foo.nika.yaml
     kind: retired
+    project_arm_valid: false
     note: retired live program suffix; refuse, no silent fallback
   - name: foo.nika.yml
     kind: retired
+    project_arm_valid: false
     note: retired matcher spelling; refuse, never emit
   - name: foo.yaml
     kind: not-program
+    project_arm_valid: false
     note: ordinary YAML is not a Nika program path
   - name: foo.yml
     kind: not-program
+    project_arm_valid: false
   - name: foo.nika.evil
     kind: not-program
+    project_arm_valid: false
     note: appended lookalike
   - name: foo.nika.minisig
     kind: not-program
+    project_arm_valid: false
     note: detached signature sidecar
   - name: foo.nika.golden.json
     kind: not-program
+    project_arm_valid: false
     note: golden sidecar
   - name: foo.NIKA
     kind: not-program
+    project_arm_valid: false
     note: exact lowercase suffix; no case folding
   - name: foo.Nika
     kind: not-program
+    project_arm_valid: false
   - name: nika.yaml
     kind: project
+    project_arm_valid: false
     note: project configuration only
   - name: .nika
     kind: not-program
+    project_arm_valid: false
     note: empty stem / runtime directory name
   - name: ""
     kind: not-program
+    project_arm_valid: false
     note: empty stem
   - name: workflows/support-triage.nika
     kind: program
+    project_arm_valid: true
     stem: support-triage
     note: classify by basename; path-shape policy is the caller
   - name: ../foo.nika
     kind: program
+    project_arm_valid: true
     stem: foo
-    note: lexical program; relative-escape policy is the caller
+    note: project shape accepts it; relative-escape policy is the consuming caller
   - name: /absolute/foo.nika
     kind: program
+    project_arm_valid: false
     stem: foo
   - name: foo.nika/
     kind: not-program
+    project_arm_valid: false
     note: directory form, trailing separator
   - name: something.nika/
     kind: not-program
+    project_arm_valid: false
     note: directory named with the suffix
   - name: foo.nika.yaml/
     kind: not-program
+    project_arm_valid: false
     note: trailing separator wins over retired suffix
   - name: ".nika.yaml"
     kind: retired
+    project_arm_valid: false
     note: empty stem with retired suffix is still retired, not a program
   - name: ".nika.yml"
     kind: retired
+    project_arm_valid: false
   - name: "foo.nika\u007f"
     kind: not-program
+    project_arm_valid: false
     note: DEL (U+007F) is illegal in a source name
   - name: "foo.nika\u0001"
     kind: not-program
+    project_arm_valid: false
     note: C0 controls are illegal
   - name: "file:///tmp/foo.nika"
     kind: not-program
+    project_arm_valid: false
     note: URI, not a filename; callers own filesystem admission
   - name: "https://example.com/foo.nika"
     kind: not-program
+    project_arm_valid: false
     note: HTTP URI is not a program path
-
+  - name: 'workflows\support.v2.nika'
+    kind: program
+    project_arm_valid: false
+    stem: support.v2
+    note: lexical path classification accepts either separator
+  - name: workflows/.nika
+    kind: not-program
+    project_arm_valid: false
+    note: a parent directory does not supply the empty basename stem
+  - name: 'workflows\.nika'
+    kind: not-program
+    project_arm_valid: false
+  - name: 'foo.nika\'
+    kind: not-program
+    project_arm_valid: false
+    note: backslash trailing separator is also a directory form
+  - name: "foo.nika\n"
+    kind: not-program
+    project_arm_valid: false
+    note: a trailing newline is not an end-of-string match
+  - name: "foo\n.nika"
+    kind: not-program
+    project_arm_valid: false
+    note: embedded controls are not program filename characters
+  - name: "work\u0000flows/foo.nika"
+    kind: not-program
+    project_arm_valid: false
+    note: controls in a parent component also make the path invalid
+  - name: C:/workflows/nightly.nika
+    kind: program
+    project_arm_valid: false
+    stem: nightly
+    note: a drive prefix is lexical but not project-relative
+  - name: workflows/name:part.nika
+    kind: program
+    project_arm_valid: false
+    stem: name:part
+    note: project workflow references forbid colons
+  - name: ./workflows/nightly.nika
+    kind: program
+    project_arm_valid: true
+    stem: nightly

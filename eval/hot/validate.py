@@ -24,6 +24,18 @@ REQUIRED = {
     "patterns", "bindings", "policy_fields", "effects", "authority_class",
     "promotion_status", "proposed_path",
 }
+PINNED_FILES = (
+    "goldens.json", "families.json", "patterns.json", "paraphrases.json",
+    "near-misses.json", "edits.json", "composition-fixtures.json",
+    "skeleton-audit.json",
+)
+# Namespaced: family G01 and golden G01 are different objects.
+ALREADY_READ_GOLDENS = tuple(
+    [f"golden:G{i:02d}" for i in range(1, 25)]
+    + [f"golden:N{i:02d}" for i in range(1, 16)]
+    + [f"golden:E{i:02d}" for i in range(1, 11)]
+)
+ALREADY_READ_SCENARIOS = tuple(f"scenario:X{i:02d}" for i in range(1, 13))
 
 
 class CorpusError(ValueError):
@@ -43,6 +55,36 @@ def read_json(root: Path, name: str) -> dict:
 def unique(rows: list, key: str, label: str) -> set:
     ids = [row[key] for row in rows]
     require(len(ids) == len(set(ids)), f"{label}: duplicate {key}")
+    return set(ids)
+
+
+def sha256_file(path: Path) -> str:
+    return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def sha256_tree(root: Path) -> str:
+    acc = hashlib.sha256()
+    files = [
+        path for path in root.rglob("*")
+        if path.is_file()
+        and path.name != ".DS_Store"
+        and path.suffix != ".pyc"
+        and "__pycache__" not in path.parts
+    ]
+    for path in sorted(files, key=lambda p: p.relative_to(root).as_posix()):
+        rel = path.relative_to(root).as_posix()
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        acc.update(f"{rel} {digest}\n".encode())
+    return "sha256:" + acc.hexdigest()
+
+
+def split_ids(block: object, name: str) -> set:
+    require(isinstance(block, dict), f"splits/{name}: must be an object")
+    ids = block.get("ids")
+    require(isinstance(ids, list), f"splits/{name}: ids must be a list")
+    for item in ids:
+        require(isinstance(item, str) and item, f"splits/{name}: empty id")
+    require(len(ids) == len(set(ids)), f"splits/{name}: duplicate id")
     return set(ids)
 
 
@@ -134,8 +176,48 @@ def validate(root: Path = ROOT) -> dict:
                 f"{task}: missing classified-state dependency")
         require(branch.get("when") == '${{ with.classification.class ' + op + ' "unknown" }}',
                 f"{task}: exceptional-branch gate drift")
+
+    splits_path = root / "splits.json"
+    require(splits_path.is_file(), "splits.json missing")
+    splits = json.loads(splits_path.read_text())
+    require(splits.get("promoted_hot") == 0, "splits: PROMOTED_HOT must stay 0")
+    require(splits.get("compiler_generated") == 0, "splits: no compiler-generated workflows")
+    buckets = splits["splits"]
+    development = split_ids(buckets["DEVELOPMENT"], "DEVELOPMENT")
+    train = buckets.get("TRAIN")
+    require(isinstance(train, dict) and train.get("alias_of") == "DEVELOPMENT",
+            "TRAIN must alias DEVELOPMENT")
+    held = split_ids(buckets["HELD-OUT"], "HELD-OUT")
+    adversarial = split_ids(buckets["ADVERSARIAL"], "ADVERSARIAL")
+    require(not (development & held), "DEVELOPMENT id is also in HELD-OUT")
+    already_read = (
+        {f"family:{family_id}" for family_id in ids}
+        | set(ALREADY_READ_GOLDENS)
+        | set(ALREADY_READ_SCENARIOS)
+    )
+    require(already_read <= development,
+            "already-read id missing from DEVELOPMENT: "
+            + ", ".join(sorted(already_read - development)))
+    require(not (already_read & held),
+            "already-read id moved to HELD-OUT: "
+            + ", ".join(sorted(already_read & held)))
+    require(buckets["HELD-OUT"].get("freeze_date") == "2026-09-18",
+            "HELD-OUT freeze_date must be 2026-09-18")
+    require(isinstance(buckets["HELD-OUT"].get("reason"), str)
+            and buckets["HELD-OUT"]["reason"].strip(),
+            "HELD-OUT: empty list needs an explicit reason")
+    require(isinstance(buckets["ADVERSARIAL"].get("reason"), str)
+            and buckets["ADVERSARIAL"]["reason"].strip(),
+            "ADVERSARIAL: empty list needs an explicit reason")
+    pin = splits["pin_sha256"]
+    for name in PINNED_FILES:
+        require(pin.get(name) == sha256_file(root / name), f"splits: stale pin {name}")
+    require(pin.get("complex/") == sha256_tree(root / "complex"),
+            "splits: stale pin complex/")
     return {"family_count": len(families), "status": counts, "promoted_hot": 0,
             "skeleton_count": len(skeletons), "proposed_static_valid": len(files),
+            "splits": {"development": len(development), "held_out": len(held),
+                       "adversarial": len(adversarial)},
             "qualification": "inventory integrity + static validity; no HOT or model-quality measurement"}
 
 

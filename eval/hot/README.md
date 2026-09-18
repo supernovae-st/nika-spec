@@ -33,6 +33,7 @@ False HOT is worse than a safe WARM/COLD miss. Template count is not a KPI.
 | `skeleton-audit.json` | derived audit of the 22 canon skeletons |
 | `patterns.json` | private pattern contracts (no public YAML keys) |
 | `goldens.json` | G01–G24, N01–N15, E01–E10 |
+| `splits.json` | TRAIN/DEVELOPMENT · HELD-OUT · ADVERSARIAL freeze at this pin; not a score |
 | `paraphrases.json` | FR/EN seeds — do not tune BM25 on held-out |
 | `near-misses.json` | effect/authority traps |
 | `edits.json` | locality metrics |
@@ -87,8 +88,14 @@ python3 -O eval/hot/complex/judge_selftest.py
 python3 eval/hot/complex/behaviour.py --engine /path/to/nika
 ```
 
-The corpus has no frozen TRAIN/DEV/HELDOUT split yet. Paraphrases and negative
-cases are design seeds, not held-out measurements. No latency, HOT coverage,
-classifier accuracy, or zero-provider-calls-during-compile claim follows from
-these checks. No assembler exists in this repo; all candidate statuses remain
-unchanged and `PROMOTED_HOT` stays zero.
+`splits.json` freezes TRAIN/DEVELOPMENT vs HELD-OUT vs ADVERSARIAL as of
+origin/main `7722aa66b` (2026-09-18). Every id already on main and already
+read that day (G01–G24, N01–N15, E01–E10, X01–X12, 220 families) is
+DEVELOPMENT. HELD-OUT and ADVERSARIAL are empty lists with an explicit
+reason: inventing a holdout by moving those ids would leak the research
+set. Paraphrases and negative cases remain design seeds, not held-out
+measurements. No latency, HOT coverage, classifier accuracy, or
+zero-provider-calls-during-compile claim follows from these checks. No
+assembler exists in this repo; nothing here is a compiler-generated
+workflow; all candidate statuses remain unchanged and `PROMOTED_HOT`
+stays zero.
