@@ -75,6 +75,47 @@ class InventoryGate(unittest.TestCase):
         with self.assertRaisesRegex(validate.CorpusError, "exceptional-branch gate drift"):
             validate.validate(self.root)
 
+    def test_splits_held_out_empty_on_this_pin(self):
+        report = validate.validate(self.root)
+        self.assertEqual(report["splits"]["held_out"], 0)
+        self.assertEqual(report["splits"]["adversarial"], 0)
+        self.assertEqual(report["promoted_hot"], 0)
+
+    def test_splits_must_parse(self):
+        (self.root / "splits.json").write_text("{")
+        with self.assertRaises(json.JSONDecodeError):
+            validate.validate(self.root)
+
+    def test_development_id_cannot_also_be_held_out(self):
+        def leak(d):
+            d["splits"]["HELD-OUT"]["ids"] = [d["splits"]["DEVELOPMENT"]["ids"][0]]
+        self.change_json("splits", leak)
+        with self.assertRaisesRegex(validate.CorpusError, "DEVELOPMENT id is also in HELD-OUT"):
+            validate.validate(self.root)
+
+    def test_already_read_id_cannot_move_to_held_out(self):
+        def move(d):
+            d["splits"]["DEVELOPMENT"]["ids"].remove("golden:G01")
+            d["splits"]["HELD-OUT"]["ids"] = ["golden:G01"]
+        self.change_json("splits", move)
+        with self.assertRaisesRegex(validate.CorpusError, "already-read"):
+            validate.validate(self.root)
+
+    def test_splits_cannot_claim_promotion(self):
+        self.change_json("splits", lambda d: d.update(promoted_hot=1))
+        with self.assertRaisesRegex(validate.CorpusError, "PROMOTED_HOT"):
+            validate.validate(self.root)
+
+    def test_splits_cannot_claim_compiler_generated(self):
+        self.change_json("splits", lambda d: d.update(compiler_generated=1))
+        with self.assertRaisesRegex(validate.CorpusError, "compiler-generated"):
+            validate.validate(self.root)
+
+    def test_stale_split_pin(self):
+        self.change_json("goldens", lambda d: d["positive"][0].update(title="mutated"))
+        with self.assertRaisesRegex(validate.CorpusError, "stale pin goldens.json"):
+            validate.validate(self.root)
+
 
 if __name__ == "__main__":
     unittest.main()
