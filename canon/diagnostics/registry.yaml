@@ -2636,3 +2636,36 @@ diagnostics:
     span_required: true
     teaching: 'the floor is yours — lower it deliberately in ~/.nika/registry/policy.toml, or ask the publisher for evidence that reaches it (unprovenanced < provenanced < stage-clear < verified).'
     notes: 'r3-registry (2026-07-30) · category: security_error · transient: false · minted engine-side first (F-P27 · NEP-0016 · #751) and hoisted to the SSOT.'
+  - id: NIKA-1708
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: LAUNCH
+    plane: run
+    condition: 'admission refuses a required: true input that has neither a declared default:
+      nor a caller-supplied value — before the prologue (zero task events · zero spend ·
+      zero inference); an omitted optional input and a required input satisfied by its declared
+      default: are lawful'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'a required input has no value at launch — supply it (`--var ticket=<value>`
+      satisfies it) or declare a default: · admission refuses before any task starts: the
+      run never began, so nothing can retry or catch it.'
+    notes: 'spec#160 reconciliation (2026-09-18 · root decision: preserve the shipped spelling
+      · bounded additive admission class, no blanket 17xx admission) · category: validation_error
+      · transient: false (canon.yaml verbatim) · minted engine-side first and hoisted to the
+      SSOT (engine nika-error registry.rs NIKA_1708 · Category::Runtime · slug runtime-missing-required-input
+      · producer nika-runtime admit.rs required_inputs_refusal · issue #603) · the only
+      ratified code of the pre-admission plane (no NIKA-17xx block reserved — exact-literal
+      schema admission, root correction 2026-09-18) · separate
+      plane: pre-admission — no task exists to retry or catch, so retry.on_codes/on_error.on_codes
+      keep the canonical pattern unchanged · the LAUNCH namespace field is explicit classification
+      metadata only: no 25th canon namespace and no numeric block is reserved (root correction
+      2026-09-18 · only NIKA-1708 is ratified) · released binary 0.119.0 (d2f89bedd) observed emitting
+      NIKA-1708 (exit 3 · dossier evidence/spec160) · machine-JSON pre-admission proof awaits the
+      current-engine frozen binary (PR1679 compact refusal frames).'

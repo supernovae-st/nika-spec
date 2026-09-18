@@ -1,0 +1,10 @@
+{
+  "workflow_state": "success",
+  "tasks": {
+    "echo": {
+      "status": "success",
+      "output_contains": "hello"
+    }
+  },
+  "note": "The caller-supplied value satisfies the required input at admission; the jq echo proves the binding reached the expression environment."
+}

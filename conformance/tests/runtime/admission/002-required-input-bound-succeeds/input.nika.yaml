@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: Apache-2.0
+# The supplied half of the pair: the caller value binds the declared input
+# literally and the run succeeds (model-free · nika:jq only).
+nika: required-input-bound-succeeds
+inputs:
+  ticket:
+    type: string
+    required: true
+tasks:
+  echo:
+    invoke:
+      tool: nika:jq
+      args:
+        input: "${{ inputs.ticket }}"
+        expression: "."
+outputs:
+  out: ${{ tasks.echo.output }}
