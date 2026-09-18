@@ -51,7 +51,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   leave no file, so an engine that still admits it fails by the file it
   leaves. Advisory hints are expected per candidate, and a gap's recorded
   facts fail the rehearsal when they stop holding.
-||||||| ad639fe
+
 ### Changed · pack version `0.2.0-draft` (2026-09-18)
 
 - **`VERSION` is `0.2.0-draft`.** The pack contract (`examples/manifest.yaml`
