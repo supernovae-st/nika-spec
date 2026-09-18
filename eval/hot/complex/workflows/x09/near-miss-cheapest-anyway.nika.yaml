@@ -1,0 +1,38 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# X09 · NEAR-MISS · the constraints are computed, reported, and then not applied to the choice.
+# The cheapest quote is selected whether or not it fits. Static check: valid.
+# Judge: passes. Behaviour: rejects.
+nika: x09-near-miss-cheapest-anyway
+model: mock/echo
+
+const:
+  max_total_eur: 5000
+  max_delivery_days: 14
+
+permits:
+  tools: ["nika:jq", "nika:read"]
+  fs:
+    read: ["./fixtures/quotes.json"]
+
+tasks:
+  quotes:
+    invoke:
+      tool: "nika:read"
+      args:
+        path: "./fixtures/quotes.json"
+
+  select:
+    with:
+      raw: ${{ tasks.quotes.output }}
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: { raw: "${{ with.raw }}", max_total: "${{ const.max_total_eur }}", max_days: "${{ const.max_delivery_days }}" }
+        expression: '. as $r | ($r.raw | fromjson) as $q | [$q[] | . + {violations: ([if .total_eur > $r.max_total then "over_budget" else empty end, if .delivery_days > $r.max_days then "late" else empty end])}] as $judged | [$judged[] | select((.violations | length) == 0)] as $fit | {selected: (if ($q | length) == 0 then null else ($judged | min_by(.total_eur) | .id) end), reason: (if ($q | length) == 0 then "no_candidates" else "cheapest_fit" end), rejected: [$judged[] | select((.violations | length) > 0) | {id, violations}]}'
+
+outputs:
+  selected: ${{ tasks.select.output.selected }}
+  reason: ${{ tasks.select.output.reason }}
+  rejected: ${{ tasks.select.output.rejected }}

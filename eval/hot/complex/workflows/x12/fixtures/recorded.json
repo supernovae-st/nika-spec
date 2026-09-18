@@ -1,0 +1,10 @@
+{
+  "question_version": "fit/2",
+  "threshold": 0.8,
+  "candidates": ["pattern-lookup", "pattern-gate", "pattern-notify"],
+  "model_requested": "judge-1.13.0",
+  "model_returned": "judge-1.13.0",
+  "score": 0.97,
+  "choice": "pattern-gate",
+  "exact": {"order_id": "A-1043", "amount_eur": 40, "revision": 7, "approval_scope": "refund:A-1043:40"}
+}

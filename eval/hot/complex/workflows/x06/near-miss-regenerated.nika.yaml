@@ -1,0 +1,67 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# X06 · NEAR-MISS · the workflow is written afresh with the new vendor: same behaviour, new names.
+# Every stable identity is gone, so review, resume and earlier approvals have
+# nothing to hold on to. Static check: valid. Judge: edit_locality.
+nika: x06-refund-triage
+model: mock/echo
+
+inputs:
+  ticket:
+    type: string
+    required: true
+  amount_eur:
+    type: integer
+    required: true
+
+const:
+  refund_limit_eur: 100
+
+secrets:
+  webhook:
+    source: env
+    key: TEAMS_WEBHOOK_URL
+    egress:
+      - to: "nika:notify"
+        host_from_self: true
+
+permits:
+  tools: ["nika:jq", "nika:notify"]
+  net:
+    http: ["teams.webhook.test"]
+
+tasks:
+  categorise:
+    infer:
+      max_tokens: 200
+      prompt: "Decide which team this ticket belongs to. Ticket: ${{ inputs.ticket }}"
+      schema:
+        type: object
+        additionalProperties: false
+        required: [class]
+        properties:
+          class: { type: string, enum: [billing, login, other] }
+
+  within_limit:
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: { amount: "${{ inputs.amount_eur }}", limit: "${{ const.refund_limit_eur }}" }
+        expression: ".amount <= .limit"
+
+  notify:
+    with:
+      verdict: ${{ tasks.categorise.output }}
+      within_limit: ${{ tasks.within_limit.output }}
+    invoke:
+      tool: "nika:notify"
+      args:
+        channel: webhook
+        target: "${{ secrets.webhook }}"
+        message: "Ticket class ${{ with.verdict.class }} · within refund limit: ${{ with.within_limit }}"
+        severity: info
+
+outputs:
+  class: ${{ tasks.categorise.output.class }}
+  within_limit: ${{ tasks.within_limit.output }}
