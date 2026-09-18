@@ -1,0 +1,77 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# X03 · NEAR-MISS · the anchor is looked up in the whole corpus, not in the source it names.
+# Every cited fragment exists somewhere, so the check is green, and a value
+# attributed to the wrong document passes as sourced. Static check: valid.
+# Judge: passes. Behaviour: rejects.
+nika: x03-near-miss-anchor-anywhere
+model: mock/echo
+
+const:
+  sources:
+    - { id: "crm", text: "Contract C-77. Renewal date: 2026-11-01. Owner: Dana." }
+    - { id: "agreement", text: "Agreement C-77 renews on 2026-10-01. Notice period: 60 days." }
+
+permits:
+  tools: ["nika:jq", "nika:assert"]
+
+tasks:
+  extract:
+    infer:
+      max_tokens: 800
+      prompt: |
+        Extract the contract facts stated in these sources. For every value give
+        the id of the source and the shortest exact fragment that contains it.
+
+        ${{ const.sources }}
+      schema:
+        type: object
+        additionalProperties: false
+        required: [fields]
+        properties:
+          fields:
+            type: array
+            minItems: 1
+            items:
+              type: object
+              additionalProperties: false
+              required: [name, value, source_id, anchor]
+              properties:
+                name: { type: string, minLength: 1 }
+                value: { type: string, minLength: 1 }
+                source_id: { type: string, minLength: 1 }
+                anchor: { type: string, minLength: 1 }
+
+  verify:
+    with:
+      fields: ${{ tasks.extract.output.fields }}
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: { fields: "${{ with.fields }}", sources: "${{ const.sources }}" }
+        expression: '. as $r | ([$r.sources[].text] | join(" ")) as $all | [$r.fields[] | . as $f | select((($all | contains($f.anchor)) | not) or (($f.anchor | contains($f.value)) | not)) | {name: $f.name, source_id: $f.source_id}]'
+
+  anchors_hold:
+    with:
+      unsupported: ${{ tasks.verify.output }}
+    invoke:
+      tool: "nika:assert"
+      args:
+        condition: ${{ size(with.unsupported) == 0 }}
+        message: "A cited fragment is not in the source it names"
+
+  reconcile:
+    after:
+      anchors_hold: success
+    with:
+      fields: ${{ tasks.extract.output.fields }}
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: ${{ with.fields }}
+        expression: 'group_by(.name) | map({name: .[0].name, values: (map({source_id, value}) | sort_by(.source_id))}) | {agreed: [.[] | select((.values | map(.value) | unique | length) == 1) | {name, value: .values[0].value, source_ids: (.values | map(.source_id))}], conflicts: [.[] | select((.values | map(.value) | unique | length) > 1)]}'
+
+outputs:
+  agreed: ${{ tasks.reconcile.output.agreed }}
+  conflicts: ${{ tasks.reconcile.output.conflicts }}

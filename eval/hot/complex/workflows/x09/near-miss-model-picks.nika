@@ -1,0 +1,44 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# X09 · NEAR-MISS · a model call is asked to pick the best quote under the constraints.
+# It will always name one. Arithmetic over stated limits is a rule.
+# Static check: valid. Judge: decision_deterministic.
+nika: x09-near-miss-model-picks
+model: mock/echo
+
+const:
+  max_total_eur: 5000
+  max_delivery_days: 14
+
+permits:
+  tools: ["nika:jq", "nika:read"]
+  fs:
+    read: ["./fixtures/quotes.json"]
+
+tasks:
+  quotes:
+    invoke:
+      tool: "nika:read"
+      args:
+        path: "./fixtures/quotes.json"
+
+  select:
+    with:
+      raw: ${{ tasks.quotes.output }}
+    infer:
+      max_tokens: 400
+      prompt: "Pick the best quote. Total must be at most ${{ const.max_total_eur }} EUR and delivery within ${{ const.max_delivery_days }} days. Quotes: ${{ with.raw }}"
+      schema:
+        type: object
+        additionalProperties: false
+        required: [selected, reason, rejected]
+        properties:
+          selected: { type: string }
+          reason: { type: string }
+          rejected: { type: array, items: { type: object } }
+
+outputs:
+  selected: ${{ tasks.select.output.selected }}
+  reason: ${{ tasks.select.output.reason }}
+  rejected: ${{ tasks.select.output.rejected }}

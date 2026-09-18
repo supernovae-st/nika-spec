@@ -1,0 +1,91 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# X01 · VARIANT · a differently built correct candidate.
+# Other task names, the `!= false` polarity, and the write closed through an
+# `after: success` edge from a task that reads the answer. A skipped task is not
+# a success, so the write is cancelled on a refusal. The judge must accept this.
+nika: x01-variant-closed-by-after-success
+model: mock/echo
+
+const:
+  destination: "./out/report.md"
+  sources:
+    - { id: "src-a", ok: true, text: "Alpha shipped on time." }
+    - { id: "src-b", ok: false, text: "" }
+    - { id: "src-c", ok: true, text: "Gamma slipped one week." }
+
+permits:
+  tools: ["nika:jq", "nika:prompt", "nika:write"]
+  fs:
+    write: ["./out/report.md"]
+
+tasks:
+  digest:
+    for_each:
+      items: ${{ const.sources }}
+      max_parallel: 2
+      fail_fast: false
+    on_error:
+      recover: null
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: ${{ item }}
+        expression: 'if .ok then {id: .id, line: .text} else error("source unreadable") end'
+
+  coverage:
+    with:
+      digests: ${{ tasks.digest.output }}
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: { digests: "${{ with.digests }}", sources: "${{ const.sources }}" }
+        expression: '. as $r | [range(0; ($r.sources | length))] | {total: length, missing_ids: [.[] | select($r.digests[.] == null) | $r.sources[.].id], lines: [$r.digests[] | select(. != null) | .line]}'
+
+  merge:
+    with:
+      coverage: ${{ tasks.coverage.output }}
+    infer:
+      max_tokens: 600
+      prompt: "Merge these lines into a short status report: ${{ with.coverage.lines }}"
+      schema:
+        type: object
+        additionalProperties: false
+        required: [report]
+        properties:
+          report: { type: string, minLength: 1 }
+
+  sign_off:
+    with:
+      coverage: ${{ tasks.coverage.output }}
+      report: ${{ tasks.merge.output.report }}
+    invoke:
+      tool: "nika:prompt"
+      args:
+        message: "Publish to ${{ const.destination }}? Missing sources: ${{ with.coverage.missing_ids }}. Report: ${{ with.report }}"
+
+  approved:
+    with:
+      answer: ${{ tasks.sign_off.output }}
+    when: ${{ with.answer != false }}
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: ${{ with.answer }}
+        expression: "."
+
+  release:
+    after:
+      approved: success
+    with:
+      report: ${{ tasks.merge.output.report }}
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "${{ const.destination }}"
+        content: "${{ with.report }}"
+
+outputs:
+  published: ${{ tasks.release.status }}
+  missing_ids: ${{ tasks.coverage.output.missing_ids }}

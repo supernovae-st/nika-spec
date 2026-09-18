@@ -1,0 +1,43 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# X11 · reference · the question shows every fact the effect consumes, so an answer cannot outlive them.
+#
+#   [human ⏸]──yes──▶[refund]
+#
+# An answer is bound to the content that was shown. If the amount, the account
+# or the order changes between the question and the effect, the shown content no
+# longer matches and the old answer is refused. A question that shows nothing
+# binds nothing: the same answer would then authorise any later amount.
+nika: x11-approval-binds-the-facts
+model: mock/echo
+
+const:
+  account: "ACME"
+  order_id: "A-1043"
+  amount_eur: 40
+
+permits:
+  tools: ["nika:prompt", "nika:write"]
+  fs:
+    write: ["./out/refund.txt"]
+
+tasks:
+  human:
+    invoke:
+      tool: "nika:prompt"
+      args:
+        message: "Refund ${{ const.amount_eur }} EUR to ${{ const.account }} for order ${{ const.order_id }}?"
+
+  refund:
+    with:
+      go: ${{ tasks.human.output }}
+    when: ${{ with.go == true }}
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/refund.txt"
+        content: "refund ${{ const.amount_eur }} EUR to ${{ const.account }} for order ${{ const.order_id }}"
+
+outputs:
+  refunded: ${{ tasks.refund.status }}

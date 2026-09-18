@@ -1,0 +1,74 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# X05 · NEAR-MISS · the account is `required: true` and carries a default.
+# A forgotten value no longer refuses the launch: it becomes "unknown" and a
+# receipt is written for it. Static check: valid. Judge: inputs_contract.
+nika: x05-near-miss-required-with-default
+model: mock/echo
+
+inputs:
+  account:
+    type: string
+    required: true
+    default: "unknown"
+  note:
+    type: { union: [string, "null"] }
+    required: false
+    default: null
+  tags:
+    type: { array: string }
+    required: false
+    default: []
+  limit:
+    type: integer
+    required: false
+    default: 5
+
+permits:
+  tools: ["nika:jq", "nika:assert", "nika:write"]
+  fs:
+    write: ["./out/receipt.json"]
+
+tasks:
+  normalise:
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: { account: "${{ inputs.account }}", note: "${{ inputs.note }}", tags: "${{ inputs.tags }}", limit: "${{ inputs.limit }}" }
+        expression: '{account: (.account | gsub("^\\s+|\\s+$"; "")), note_state: (if .note == null then "absent" elif (.note | length) == 0 then "empty" else "text" end), tags: (.tags[:.limit]), tag_count: (.tags | length), limit: .limit}'
+
+  account_present:
+    with:
+      account: ${{ tasks.normalise.output.account }}
+    invoke:
+      tool: "nika:assert"
+      args:
+        condition: ${{ size(with.account) > 0 }}
+        message: "The account is empty after trimming"
+
+  receipt:
+    after:
+      account_present: success
+    with:
+      facts: ${{ tasks.normalise.output }}
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: ${{ with.facts }}
+        expression: "."
+
+  save:
+    with:
+      receipt: ${{ tasks.receipt.output }}
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/receipt.json"
+        content: "${{ with.receipt }}"
+
+outputs:
+  account: ${{ tasks.receipt.output.account }}
+  note_state: ${{ tasks.receipt.output.note_state }}
+  tags: ${{ tasks.receipt.output.tags }}
+  tag_count: ${{ tasks.receipt.output.tag_count }}

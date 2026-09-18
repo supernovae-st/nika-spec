@@ -1,0 +1,40 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# X12 · NEAR-MISS · a very high recorded score is allowed to stand in for a changed exact fact.
+# The amount changed; the judgment was confident; the record is reused.
+# Static check: valid. Judge: passes. Behaviour: rejects.
+nika: x12-near-miss-score-overrides-facts
+model: mock/echo
+
+permits:
+  tools: ["nika:jq", "nika:read"]
+  fs:
+    read: ["./fixtures/request.json", "./fixtures/recorded.json"]
+
+tasks:
+  request:
+    invoke:
+      tool: "nika:read"
+      args:
+        path: "./fixtures/request.json"
+
+  recorded:
+    invoke:
+      tool: "nika:read"
+      args:
+        path: "./fixtures/recorded.json"
+
+  decide:
+    with:
+      request: ${{ tasks.request.output }}
+      recorded: ${{ tasks.recorded.output }}
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: { request: "${{ with.request }}", recorded: "${{ with.recorded }}" }
+        expression: '(.request | fromjson) as $q | (.recorded | fromjson) as $e | [if $q.question_version != $e.question_version then "question_version_changed" else empty end, if $q.threshold != $e.threshold then "threshold_changed" else empty end, if $q.candidates != $e.candidates then (if ($q.candidates | sort) == ($e.candidates | sort) then "candidate_order_changed" else "candidates_changed" end) else empty end, if $q.model_requested != $e.model_requested then "model_requested_changed" else empty end, if $e.model_returned != $e.model_requested then "model_returned_differs" else empty end, if ($q.exact != $e.exact) and ($e.score < 0.95) then "exact_facts_changed" else empty end] as $reasons | {reuse: (($reasons | length) == 0), reasons: $reasons, recorded_score: $e.score}'
+
+outputs:
+  reuse: ${{ tasks.decide.output.reuse }}
+  reasons: ${{ tasks.decide.output.reasons }}

@@ -1,0 +1,116 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# X04 · reference · two fixed repair rounds, then a rule decides. The end of the loop is not a verdict.
+#
+#   [draft]─▶[critique_1]─▶[repair_1]─▶[critique_2]─▶[repair_2]─▶[final_score]─▶[verdict]
+#
+# The bound is structural: the rounds are unrolled, every model call is capped,
+# and no model can add a turn. `accepted` is the recorded threshold applied to
+# the final score; a text that misses it is withheld, not shipped as the result.
+nika: x04-bounded-repair-loop
+model: mock/echo
+
+const:
+  brief: "Explain the refund policy to a customer in three sentences."
+  accept_at: 80
+
+permits:
+  tools: ["nika:jq"]
+
+tasks:
+  draft:
+    infer:
+      max_tokens: 400
+      prompt: "Draft this deliverable: ${{ const.brief }}"
+      schema:
+        type: object
+        additionalProperties: false
+        required: [text]
+        properties:
+          text: { type: string, minLength: 1 }
+
+  critique_1:
+    with:
+      candidate: ${{ tasks.draft.output.text }}
+    infer:
+      max_tokens: 400
+      prompt: "Critique this candidate against the brief and name one repair. Brief: ${{ const.brief }} Candidate: ${{ with.candidate }}"
+      schema:
+        type: object
+        additionalProperties: false
+        required: [score, repair]
+        properties:
+          score: { type: integer, minimum: 0, maximum: 100 }
+          repair: { type: string, minLength: 1 }
+
+  repair_1:
+    with:
+      candidate: ${{ tasks.draft.output.text }}
+      repair: ${{ tasks.critique_1.output.repair }}
+    infer:
+      max_tokens: 400
+      prompt: "Revise the candidate using the repair. Candidate: ${{ with.candidate }} Repair: ${{ with.repair }}"
+      schema:
+        type: object
+        additionalProperties: false
+        required: [text]
+        properties:
+          text: { type: string, minLength: 1 }
+
+  critique_2:
+    with:
+      candidate: ${{ tasks.repair_1.output.text }}
+    infer:
+      max_tokens: 400
+      prompt: "Critique this revision against the brief and name one repair. Brief: ${{ const.brief }} Candidate: ${{ with.candidate }}"
+      schema:
+        type: object
+        additionalProperties: false
+        required: [score, repair]
+        properties:
+          score: { type: integer, minimum: 0, maximum: 100 }
+          repair: { type: string, minLength: 1 }
+
+  repair_2:
+    with:
+      candidate: ${{ tasks.repair_1.output.text }}
+      repair: ${{ tasks.critique_2.output.repair }}
+    infer:
+      max_tokens: 400
+      prompt: "Produce the final revision using the repair. Candidate: ${{ with.candidate }} Repair: ${{ with.repair }}"
+      schema:
+        type: object
+        additionalProperties: false
+        required: [text]
+        properties:
+          text: { type: string, minLength: 1 }
+
+  final_score:
+    with:
+      candidate: ${{ tasks.repair_2.output.text }}
+    infer:
+      max_tokens: 400
+      prompt: "Score the final candidate against the brief, exactly as written. Brief: ${{ const.brief }} Candidate: ${{ with.candidate }}"
+      schema:
+        type: object
+        additionalProperties: false
+        required: [score]
+        properties:
+          score: { type: integer, minimum: 0, maximum: 100 }
+
+  verdict:
+    with:
+      score: ${{ tasks.final_score.output.score }}
+      text: ${{ tasks.repair_2.output.text }}
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: { score: "${{ with.score }}", text: "${{ with.text }}", accept_at: "${{ const.accept_at }}" }
+        expression: '. as $r | {accepted: ($r.score >= $r.accept_at), final_score: $r.score, rounds: 2} | . + {released: (if .accepted then $r.text else null end)}'
+
+outputs:
+  accepted: ${{ tasks.verdict.output.accepted }}
+  final_score: ${{ tasks.verdict.output.final_score }}
+  rounds: ${{ tasks.verdict.output.rounds }}
+  released: ${{ tasks.verdict.output.released }}

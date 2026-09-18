@@ -1,0 +1,66 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# X10 · NEAR-MISS · the last branch names the one leftover class it remembers.
+# `security` is in the closed set and opens no branch. The run is green and the
+# ticket is in no queue. Static check: valid. Judge: branches_exclusive_total.
+nika: x10-near-miss-no-fallback
+model: mock/echo
+
+inputs:
+  ticket:
+    type: string
+    required: true
+
+permits:
+  tools: ["nika:write"]
+  fs:
+    write: ["./out/billing.txt", "./out/login.txt", "./out/triage.txt"]
+
+tasks:
+  classify:
+    infer:
+      max_tokens: 200
+      prompt: "Classify this support ticket. Ticket: ${{ inputs.ticket }}"
+      schema:
+        type: object
+        additionalProperties: false
+        required: [class]
+        properties:
+          class: { type: string, enum: [billing, login, security, unknown] }
+
+  to_billing:
+    with:
+      c: ${{ tasks.classify.output }}
+    when: ${{ with.c.class == "billing" }}
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/billing.txt"
+        content: "queued for billing"
+
+  to_login:
+    with:
+      c: ${{ tasks.classify.output }}
+    when: ${{ with.c.class == "login" }}
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/login.txt"
+        content: "queued for login"
+
+  to_triage:
+    with:
+      c: ${{ tasks.classify.output }}
+    when: ${{ with.c.class == "unknown" }}
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/triage.txt"
+        content: "queued for human triage"
+
+outputs:
+  class: ${{ tasks.classify.output.class }}
+  billing: ${{ tasks.to_billing.status }}
+  login: ${{ tasks.to_login.status }}
+  triage: ${{ tasks.to_triage.status }}
