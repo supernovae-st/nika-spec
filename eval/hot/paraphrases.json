@@ -1,0 +1,839 @@
+{
+  "note": "Seeds. Do not tune BM25 on a held-out split of this file. Human-review FR.",
+  "count": 157,
+  "cases": [
+    {
+      "family_id": "A01",
+      "lang": "en",
+      "text": "Summarize https://example.com"
+    },
+    {
+      "family_id": "A01",
+      "lang": "en",
+      "text": "Give me a brief of https://example.com"
+    },
+    {
+      "family_id": "A01",
+      "lang": "en",
+      "text": "Can you brief this site? https://example.com"
+    },
+    {
+      "family_id": "A01",
+      "lang": "en",
+      "text": "Website brief for https://example.com please"
+    },
+    {
+      "family_id": "A01",
+      "lang": "en",
+      "text": "What does https://example.com actually do?"
+    },
+    {
+      "family_id": "A01",
+      "lang": "en",
+      "text": "Quick summary of https://example.com"
+    },
+    {
+      "family_id": "A01",
+      "lang": "en",
+      "text": "Summarize https://a.com"
+    },
+    {
+      "family_id": "A01",
+      "lang": "en",
+      "text": "Give me a brief of https://a.com"
+    },
+    {
+      "family_id": "A01",
+      "lang": "en",
+      "text": "Can you brief this site? https://a.com"
+    },
+    {
+      "family_id": "A01",
+      "lang": "en",
+      "text": "Website brief for https://a.com please"
+    },
+    {
+      "family_id": "A01",
+      "lang": "en",
+      "text": "What does https://a.com actually do?"
+    },
+    {
+      "family_id": "A01",
+      "lang": "en",
+      "text": "Quick summary of https://a.com"
+    },
+    {
+      "family_id": "A01",
+      "lang": "en",
+      "text": "Summarize https://b.com"
+    },
+    {
+      "family_id": "A01",
+      "lang": "en",
+      "text": "Give me a brief of https://b.com"
+    },
+    {
+      "family_id": "A01",
+      "lang": "en",
+      "text": "Can you brief this site? https://b.com"
+    },
+    {
+      "family_id": "A01",
+      "lang": "en",
+      "text": "Website brief for https://b.com please"
+    },
+    {
+      "family_id": "A01",
+      "lang": "en",
+      "text": "What does https://b.com actually do?"
+    },
+    {
+      "family_id": "A01",
+      "lang": "en",
+      "text": "Quick summary of https://b.com"
+    },
+    {
+      "family_id": "A01",
+      "lang": "en",
+      "text": "Summarize https://acme.example"
+    },
+    {
+      "family_id": "A01",
+      "lang": "en",
+      "text": "Give me a brief of https://acme.example"
+    },
+    {
+      "family_id": "A01",
+      "lang": "en",
+      "text": "Can you brief this site? https://acme.example"
+    },
+    {
+      "family_id": "A01",
+      "lang": "en",
+      "text": "Website brief for https://acme.example please"
+    },
+    {
+      "family_id": "A01",
+      "lang": "en",
+      "text": "What does https://acme.example actually do?"
+    },
+    {
+      "family_id": "A01",
+      "lang": "en",
+      "text": "Quick summary of https://acme.example"
+    },
+    {
+      "family_id": "A01",
+      "lang": "fr",
+      "text": "Résume https://example.com"
+    },
+    {
+      "family_id": "A01",
+      "lang": "fr",
+      "text": "Fais-moi un brief de https://example.com"
+    },
+    {
+      "family_id": "A01",
+      "lang": "fr",
+      "text": "Résumé rapide de ce site https://example.com stp"
+    },
+    {
+      "family_id": "A01",
+      "lang": "fr",
+      "text": "Tu peux me faire un résumé de https://example.com ?"
+    },
+    {
+      "family_id": "A01",
+      "lang": "fr",
+      "text": "Brief du site https://example.com"
+    },
+    {
+      "family_id": "A01",
+      "lang": "fr",
+      "text": "Qu’est-ce que fait vraiment https://example.com ?"
+    },
+    {
+      "family_id": "A01",
+      "lang": "fr",
+      "text": "Résume https://a.com"
+    },
+    {
+      "family_id": "A01",
+      "lang": "fr",
+      "text": "Fais-moi un brief de https://a.com"
+    },
+    {
+      "family_id": "A01",
+      "lang": "fr",
+      "text": "Résumé rapide de ce site https://a.com stp"
+    },
+    {
+      "family_id": "A01",
+      "lang": "fr",
+      "text": "Tu peux me faire un résumé de https://a.com ?"
+    },
+    {
+      "family_id": "A01",
+      "lang": "fr",
+      "text": "Brief du site https://a.com"
+    },
+    {
+      "family_id": "A01",
+      "lang": "fr",
+      "text": "Qu’est-ce que fait vraiment https://a.com ?"
+    },
+    {
+      "family_id": "A01",
+      "lang": "fr",
+      "text": "Résume https://b.com"
+    },
+    {
+      "family_id": "A01",
+      "lang": "fr",
+      "text": "Fais-moi un brief de https://b.com"
+    },
+    {
+      "family_id": "A01",
+      "lang": "fr",
+      "text": "Résumé rapide de ce site https://b.com stp"
+    },
+    {
+      "family_id": "A01",
+      "lang": "fr",
+      "text": "Tu peux me faire un résumé de https://b.com ?"
+    },
+    {
+      "family_id": "A01",
+      "lang": "fr",
+      "text": "Brief du site https://b.com"
+    },
+    {
+      "family_id": "A01",
+      "lang": "fr",
+      "text": "Qu’est-ce que fait vraiment https://b.com ?"
+    },
+    {
+      "family_id": "A01",
+      "lang": "fr",
+      "text": "Résume https://acme.example"
+    },
+    {
+      "family_id": "A01",
+      "lang": "fr",
+      "text": "Fais-moi un brief de https://acme.example"
+    },
+    {
+      "family_id": "A01",
+      "lang": "fr",
+      "text": "Résumé rapide de ce site https://acme.example stp"
+    },
+    {
+      "family_id": "A01",
+      "lang": "fr",
+      "text": "Tu peux me faire un résumé de https://acme.example ?"
+    },
+    {
+      "family_id": "A01",
+      "lang": "fr",
+      "text": "Brief du site https://acme.example"
+    },
+    {
+      "family_id": "A01",
+      "lang": "fr",
+      "text": "Qu’est-ce que fait vraiment https://acme.example ?"
+    },
+    {
+      "family_id": "A05",
+      "lang": "en",
+      "text": "Summarize this article"
+    },
+    {
+      "family_id": "A05",
+      "lang": "en",
+      "style": "question",
+      "text": "Can you summarize this article?"
+    },
+    {
+      "family_id": "A05",
+      "lang": "en",
+      "style": "terse",
+      "text": "article summarization"
+    },
+    {
+      "family_id": "A09",
+      "lang": "en",
+      "text": "Extract the fields from this document"
+    },
+    {
+      "family_id": "A09",
+      "lang": "en",
+      "text": "Pull structured fields out of invoice.pdf"
+    },
+    {
+      "family_id": "A09",
+      "lang": "en",
+      "text": "Pull structured fields out of contrat.docx"
+    },
+    {
+      "family_id": "A09",
+      "lang": "en",
+      "text": "Document to fields: invoice.pdf"
+    },
+    {
+      "family_id": "A09",
+      "lang": "en",
+      "text": "Document to fields: contrat.docx"
+    },
+    {
+      "family_id": "A09",
+      "lang": "en",
+      "text": "Typed extraction from invoice.pdf"
+    },
+    {
+      "family_id": "A09",
+      "lang": "en",
+      "text": "Typed extraction from contrat.docx"
+    },
+    {
+      "family_id": "A09",
+      "lang": "fr",
+      "text": "Extrais les champs de ce document"
+    },
+    {
+      "family_id": "A09",
+      "lang": "fr",
+      "text": "Champs structurés depuis invoice.pdf"
+    },
+    {
+      "family_id": "A09",
+      "lang": "fr",
+      "text": "Champs structurés depuis contrat.docx"
+    },
+    {
+      "family_id": "A09",
+      "lang": "fr",
+      "text": "Extraction typée de invoice.pdf"
+    },
+    {
+      "family_id": "A09",
+      "lang": "fr",
+      "text": "Extraction typée de contrat.docx"
+    },
+    {
+      "family_id": "A11",
+      "lang": "en",
+      "text": "Answer from this corpus; say unknown if unsupported"
+    },
+    {
+      "family_id": "A11",
+      "lang": "en",
+      "style": "question",
+      "text": "Can you answer from this corpus; say unknown if unsupported?"
+    },
+    {
+      "family_id": "A11",
+      "lang": "en",
+      "style": "terse",
+      "text": "corpus QA"
+    },
+    {
+      "family_id": "A13",
+      "lang": "en",
+      "text": "Compare these two contracts"
+    },
+    {
+      "family_id": "A13",
+      "lang": "en",
+      "style": "question",
+      "text": "Can you compare these two contracts?"
+    },
+    {
+      "family_id": "A13",
+      "lang": "en",
+      "style": "terse",
+      "text": "compare documents"
+    },
+    {
+      "family_id": "A20",
+      "lang": "en",
+      "text": "Extract action items from this transcript"
+    },
+    {
+      "family_id": "A20",
+      "lang": "en",
+      "style": "question",
+      "text": "Can you extract action items from this transcript?"
+    },
+    {
+      "family_id": "A20",
+      "lang": "en",
+      "style": "terse",
+      "text": "meeting action items"
+    },
+    {
+      "family_id": "F01",
+      "lang": "en",
+      "text": "Validate these records"
+    },
+    {
+      "family_id": "F01",
+      "lang": "en",
+      "text": "Reject malformed rows in rows.json"
+    },
+    {
+      "family_id": "F01",
+      "lang": "en",
+      "text": "Reject malformed rows in batch.csv"
+    },
+    {
+      "family_id": "F01",
+      "lang": "en",
+      "text": "Validate rows.json against the schema"
+    },
+    {
+      "family_id": "F01",
+      "lang": "en",
+      "text": "Validate batch.csv against the schema"
+    },
+    {
+      "family_id": "F01",
+      "lang": "fr",
+      "text": "Valide ces enregistrements"
+    },
+    {
+      "family_id": "F01",
+      "lang": "fr",
+      "text": "Refuse les lignes mal formées de rows.json"
+    },
+    {
+      "family_id": "F01",
+      "lang": "fr",
+      "text": "Refuse les lignes mal formées de batch.csv"
+    },
+    {
+      "family_id": "F03",
+      "lang": "en",
+      "text": "Deduplicate these records"
+    },
+    {
+      "family_id": "F03",
+      "lang": "en",
+      "style": "question",
+      "text": "Can you deduplicate these records?"
+    },
+    {
+      "family_id": "F03",
+      "lang": "en",
+      "style": "terse",
+      "text": "deduplicate records"
+    },
+    {
+      "family_id": "F04",
+      "lang": "en",
+      "text": "Sum these records by tenant"
+    },
+    {
+      "family_id": "F04",
+      "lang": "en",
+      "text": "Aggregate sales.json by tenant with exact totals"
+    },
+    {
+      "family_id": "F04",
+      "lang": "en",
+      "text": "Group validated amounts by tenant"
+    },
+    {
+      "family_id": "F04",
+      "lang": "fr",
+      "text": "Agrège ces lignes par tenant"
+    },
+    {
+      "family_id": "F04",
+      "lang": "fr",
+      "text": "Totaux exacts par tenant sur sales.json"
+    },
+    {
+      "family_id": "F08",
+      "lang": "en",
+      "text": "Diff these two snapshots"
+    },
+    {
+      "family_id": "F08",
+      "lang": "en",
+      "style": "question",
+      "text": "Can you diff these two snapshots?"
+    },
+    {
+      "family_id": "F08",
+      "lang": "en",
+      "style": "terse",
+      "text": "snapshot diff"
+    },
+    {
+      "family_id": "F06",
+      "lang": "en",
+      "text": "Project public fields from these records"
+    },
+    {
+      "family_id": "F06",
+      "lang": "en",
+      "style": "question",
+      "text": "Can you project public fields from these records?"
+    },
+    {
+      "family_id": "F06",
+      "lang": "en",
+      "style": "terse",
+      "text": "project public fields"
+    },
+    {
+      "family_id": "F15",
+      "lang": "en",
+      "text": "Process this list in bounded batches"
+    },
+    {
+      "family_id": "F15",
+      "lang": "en",
+      "style": "question",
+      "text": "Can you process this list in bounded batches?"
+    },
+    {
+      "family_id": "F15",
+      "lang": "en",
+      "style": "terse",
+      "text": "batch process bounded list"
+    },
+    {
+      "family_id": "F16",
+      "lang": "en",
+      "text": "Fan out this bounded list"
+    },
+    {
+      "family_id": "F16",
+      "lang": "en",
+      "style": "question",
+      "text": "Can you fan out this bounded list?"
+    },
+    {
+      "family_id": "F16",
+      "lang": "en",
+      "style": "terse",
+      "text": "bounded fanout"
+    },
+    {
+      "family_id": "F19",
+      "lang": "en",
+      "text": "Recover if this optional file is missing"
+    },
+    {
+      "family_id": "F19",
+      "lang": "en",
+      "style": "question",
+      "text": "Can you recover if this optional file is missing?"
+    },
+    {
+      "family_id": "F19",
+      "lang": "en",
+      "style": "terse",
+      "text": "optional resource recovery"
+    },
+    {
+      "family_id": "B01",
+      "lang": "en",
+      "text": "Classify this support ticket"
+    },
+    {
+      "family_id": "B01",
+      "lang": "en",
+      "text": "What category is ticket 42?"
+    },
+    {
+      "family_id": "B01",
+      "lang": "en",
+      "text": "Classify ticket 42"
+    },
+    {
+      "family_id": "B01",
+      "lang": "en",
+      "text": "Label this ticket"
+    },
+    {
+      "family_id": "B01",
+      "lang": "fr",
+      "text": "Classe ce ticket support"
+    },
+    {
+      "family_id": "B01",
+      "lang": "fr",
+      "text": "Catégorie du ticket 42"
+    },
+    {
+      "family_id": "B01",
+      "lang": "fr",
+      "text": "Trie le ticket 42"
+    },
+    {
+      "family_id": "B05",
+      "lang": "en",
+      "text": "Classify this ticket and route it"
+    },
+    {
+      "family_id": "B05",
+      "lang": "en",
+      "text": "Route ticket 42 after classification"
+    },
+    {
+      "family_id": "B05",
+      "lang": "en",
+      "text": "Classify and route 42"
+    },
+    {
+      "family_id": "B05",
+      "lang": "fr",
+      "text": "Classe et route le ticket 42"
+    },
+    {
+      "family_id": "B05",
+      "lang": "fr",
+      "text": "Aiguille le ticket 42 après classification"
+    },
+    {
+      "family_id": "B03",
+      "lang": "en",
+      "text": "Look up the customer for this ticket"
+    },
+    {
+      "family_id": "B03",
+      "lang": "en",
+      "style": "question",
+      "text": "Can you look up the customer for this ticket?"
+    },
+    {
+      "family_id": "B03",
+      "lang": "en",
+      "style": "terse",
+      "text": "ticket customer lookup"
+    },
+    {
+      "family_id": "B04",
+      "lang": "en",
+      "text": "Draft a reply to ticket #42"
+    },
+    {
+      "family_id": "B04",
+      "lang": "en",
+      "style": "question",
+      "text": "Can you draft a reply to ticket #42?"
+    },
+    {
+      "family_id": "B04",
+      "lang": "en",
+      "style": "terse",
+      "text": "ticket draft response"
+    },
+    {
+      "family_id": "C01",
+      "lang": "en",
+      "text": "Normalize this lead record"
+    },
+    {
+      "family_id": "C01",
+      "lang": "en",
+      "style": "question",
+      "text": "Can you normalize this lead record?"
+    },
+    {
+      "family_id": "C01",
+      "lang": "en",
+      "style": "terse",
+      "text": "lead normalization"
+    },
+    {
+      "family_id": "C03",
+      "lang": "en",
+      "text": "Enrich this lead"
+    },
+    {
+      "family_id": "C03",
+      "lang": "en",
+      "style": "question",
+      "text": "Can you enrich this lead?"
+    },
+    {
+      "family_id": "C03",
+      "lang": "en",
+      "style": "terse",
+      "text": "lead enrichment"
+    },
+    {
+      "family_id": "C04",
+      "lang": "en",
+      "text": "Qualify this lead from these rules"
+    },
+    {
+      "family_id": "C04",
+      "lang": "en",
+      "style": "question",
+      "text": "Can you qualify this lead from these rules?"
+    },
+    {
+      "family_id": "C04",
+      "lang": "en",
+      "style": "terse",
+      "text": "lead qualification"
+    },
+    {
+      "family_id": "C15",
+      "lang": "en",
+      "text": "Executive brief for this account"
+    },
+    {
+      "family_id": "C15",
+      "lang": "en",
+      "style": "question",
+      "text": "Can you executive brief for this account?"
+    },
+    {
+      "family_id": "C15",
+      "lang": "en",
+      "style": "terse",
+      "text": "CRM account executive brief"
+    },
+    {
+      "family_id": "D01",
+      "lang": "en",
+      "text": "Write a content brief on this topic"
+    },
+    {
+      "family_id": "D01",
+      "lang": "en",
+      "style": "question",
+      "text": "Can you write a content brief on this topic?"
+    },
+    {
+      "family_id": "D01",
+      "lang": "en",
+      "style": "terse",
+      "text": "topic content brief"
+    },
+    {
+      "family_id": "D18",
+      "lang": "en",
+      "text": "Repurpose this content across channels"
+    },
+    {
+      "family_id": "D18",
+      "lang": "en",
+      "style": "question",
+      "text": "Can you repurpose this content across channels?"
+    },
+    {
+      "family_id": "D18",
+      "lang": "en",
+      "style": "terse",
+      "text": "multi-channel repurpose"
+    },
+    {
+      "family_id": "A16",
+      "lang": "en",
+      "text": "Summarize this changelog"
+    },
+    {
+      "family_id": "A16",
+      "lang": "en",
+      "style": "question",
+      "text": "Can you summarize this changelog?"
+    },
+    {
+      "family_id": "A16",
+      "lang": "en",
+      "style": "terse",
+      "text": "changelog summary"
+    },
+    {
+      "family_id": "E05",
+      "lang": "en",
+      "text": "Summarize this pull request"
+    },
+    {
+      "family_id": "E05",
+      "lang": "en",
+      "style": "question",
+      "text": "Can you summarize this pull request?"
+    },
+    {
+      "family_id": "E05",
+      "lang": "en",
+      "style": "terse",
+      "text": "PR summary"
+    },
+    {
+      "family_id": "E25",
+      "lang": "en",
+      "text": "Triage this CI run failure"
+    },
+    {
+      "family_id": "E25",
+      "lang": "en",
+      "style": "question",
+      "text": "Can you triage this CI run failure?"
+    },
+    {
+      "family_id": "E25",
+      "lang": "en",
+      "style": "terse",
+      "text": "CI failure triage"
+    },
+    {
+      "family_id": "E11",
+      "lang": "en",
+      "text": "Incident summary from these logs"
+    },
+    {
+      "family_id": "E11",
+      "lang": "en",
+      "style": "question",
+      "text": "Can you incident summary from these logs?"
+    },
+    {
+      "family_id": "E11",
+      "lang": "en",
+      "style": "terse",
+      "text": "logs incident summary"
+    },
+    {
+      "family_id": "F11",
+      "lang": "en",
+      "text": "Reconcile dataset A and B"
+    },
+    {
+      "family_id": "F11",
+      "lang": "en",
+      "style": "question",
+      "text": "Can you reconcile dataset A and B?"
+    },
+    {
+      "family_id": "F11",
+      "lang": "en",
+      "style": "terse",
+      "text": "reconcile two datasets"
+    },
+    {
+      "family_id": "A21",
+      "lang": "en",
+      "text": "Research brief from these sources"
+    },
+    {
+      "family_id": "A21",
+      "lang": "en",
+      "style": "question",
+      "text": "Can you research brief from these sources?"
+    },
+    {
+      "family_id": "A21",
+      "lang": "en",
+      "style": "terse",
+      "text": "research brief"
+    }
+  ]
+}

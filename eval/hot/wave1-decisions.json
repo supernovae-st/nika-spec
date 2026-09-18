@@ -1,0 +1,66 @@
+{
+  "law": "A candidate family is not a skeleton. Canon templates stay 22 until a file clears digest+INDEX+rehearsal.",
+  "canon_skeleton_count": 22,
+  "decisions": [
+    {
+      "id": "P01",
+      "name": "LOOKUP / ENRICH",
+      "decision": "PATTERN_ONLY + GOLDEN + PROPOSED_SKELETON",
+      "rationale": "No CRM skeleton exists. Do not add hubspot-lookup. Provider-neutral lookup-and-enrich.nika.yaml lives under eval/hot/proposed-skeletons until digest/INDEX/rehearsal gates. Unlocks B03/C02/C03/F10."
+    },
+    {
+      "id": "P02",
+      "name": "FACTS \u2192 DRAFT",
+      "decision": "PATTERN_ONLY + GOLDEN + PROPOSED_SKELETON",
+      "rationale": "chain generates but does not preserve source facts as a first-class output. facts-to-draft teaches {facts, generated}."
+    },
+    {
+      "id": "P03",
+      "name": "RECONCILE \u2192 PROPOSAL",
+      "decision": "FACTOR snapshot-diff + GOLDEN",
+      "rationale": "snapshot-diff is compare-only (bounded 8 strings). Proposed mutations are a layer on DIFF, not a new vendor template. Keep apply split (P04). No reconcile-and-propose in canon yet."
+    },
+    {
+      "id": "P04",
+      "name": "APPROVE \u2192 APPLY",
+      "decision": "FACTOR human-gated-ship",
+      "rationale": "human-gated-ship already: parallel gates \u2192 blocking nika:prompt \u2192 act \u2192 always-record. Do not add approve-and-apply.nika.yaml."
+    },
+    {
+      "id": "P05",
+      "name": "KNOWN DAG + AGENT FALLBACK",
+      "decision": "PATTERN + GOLDEN + PROPOSED_SKELETON",
+      "rationale": "agent-loop is whole-workflow EXPLORE. Need known-path-agent-fallback as composition teaching file. Not HOT-forced."
+    },
+    {
+      "id": "P06",
+      "name": "LOOKUP \u2192 DECIDE \u2192 GATE/EFFECT",
+      "decision": "GOLDEN_ONLY (HOT-B compose)",
+      "rationale": "Would become a giant domain template. Compose P01 + classify-and-route + P04. Support-triage G05 is the golden."
+    },
+    {
+      "id": "P07",
+      "name": "JOIN / ENRICH TWO SOURCES",
+      "decision": "PATTERN_ONLY",
+      "rationale": "Deterministic jq join; no new complete skeleton until a unique law vs snapshot-diff/aggregate is proven in tests."
+    },
+    {
+      "id": "P08",
+      "name": "FACT-PRESERVING GENERATION",
+      "decision": "DEDUPE into P02",
+      "rationale": "Same contract as facts-to-draft."
+    },
+    {
+      "id": "notify-effect",
+      "name": "NOTIFY/PUBLISH",
+      "decision": "FACTOR gate-and-act + human-gated-ship record",
+      "rationale": "Do not add notify-effect.nika.yaml."
+    },
+    {
+      "id": "chain-hot",
+      "name": "chain as HOT family",
+      "decision": "REJECT",
+      "rationale": "TOO_GENERIC. Near-miss magnet for any read\u2192LLM\u2192write."
+    }
+  ]
+}

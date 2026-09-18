@@ -1,0 +1,5307 @@
+# SPDX-License-Identifier: Apache-2.0
+# eval/hot/families.yaml — COMPILE-HOT candidate inventory.
+#
+# NOT the LLM authoring harness (eval/intents.yaml + run-eval.py).
+# NOT the official template registry (canon/templates/registry.yaml).
+# Count of templates is NOT a KPI. False HOT > expensive COLD miss.
+#
+# Owners: nika#1665 (HOT/prepared) · nika#1666 (patterns) · nika#1656 (measure).
+# Recount 2026-09-18: 22 canonical skeletons. Do not freeze 22.
+#
+schema_version: 1
+kind: "hot_candidate_inventory"
+not: "canon template registry — SSOT remains canon/templates/registry.yaml"
+date: "2026-09-18"
+skeleton_recount: 22
+owners:
+  hot: "nika#1665"
+  stdlib: "nika#1666"
+  measure: "nika#1656"
+  compiler: "nika#1663"
+  identity: "nika#1664"
+  check: "nika#1636"
+law: "HOT = known structure + typed binding + 0 authoring provider calls + Check still runs. Runtime infer/agent allowed. False HOT worse than COLD."
+promotion_status_enum:
+  - "CANDIDATE"
+  - "COVERED"
+  - "FACTORABLE"
+  - "NEEDS_PATTERN"
+  - "READY_FOR_HOT_TEST"
+  - "PROMOTED_HOT"
+  - "REJECTED_FOR_HOT"
+  - "OPEN_WORLD"
+  - "NEEDS_WARM"
+  - "NEEDS_COLD"
+counts:
+  COVERED: 21
+  FACTORABLE: 59
+  CANDIDATE: 107
+  OPEN_WORLD: 3
+  NEEDS_PATTERN: 17
+  NEEDS_WARM: 12
+  NEEDS_COLD: 1
+family_count: 220
+families:
+  - family_id: "A01"
+    domain: "research"
+    title: "website brief"
+    example_intent: "Summarize https://example.com"
+    structure_signature: "FETCH → EXTRACT → SUMMARIZE"
+    patterns:
+      - "fetch"
+      - "extract"
+      - "summarize"
+    bindings:
+      - "url"
+    policy_fields: []
+    effects: "none_or_persist"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    notes: "current nika-spec skeleton website-brief"
+    current_coverage: "COVERED skeleton website-brief"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "A02"
+    domain: "research"
+    title: "website comparison"
+    example_intent: "Compare https://a.com and https://b.com"
+    structure_signature: "FETCH×2 → EXTRACT → COMPARE → GENERATE"
+    patterns:
+      - "fetch"
+      - "extract"
+      - "compare"
+      - "summarize"
+    bindings:
+      - "url_a"
+      - "url_b"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "A03"
+    domain: "research"
+    title: "URL to structured facts"
+    example_intent: "Extract company facts from https://acme.com"
+    structure_signature: "FETCH → EXTRACT"
+    patterns:
+      - "fetch"
+      - "extract"
+    bindings:
+      - "url"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "A04"
+    domain: "research"
+    title: "multiple URLs compare"
+    example_intent: "Compare these three product pages"
+    structure_signature: "FETCH×N → EXTRACT → COMPARE"
+    patterns:
+      - "fetch"
+      - "extract"
+      - "compare"
+    bindings:
+      - "urls"
+    policy_fields:
+      - "max_urls?"
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "A05"
+    domain: "research"
+    title: "article summarization"
+    example_intent: "Summarize this article"
+    structure_signature: "READ → SUMMARIZE"
+    patterns:
+      - "read"
+      - "summarize"
+    bindings:
+      - "document"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "A06"
+    domain: "research"
+    title: "article key claims"
+    example_intent: "Extract key claims from this article"
+    structure_signature: "READ → EXTRACT"
+    patterns:
+      - "read"
+      - "extract"
+    bindings:
+      - "document"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "A07"
+    domain: "research"
+    title: "article metadata"
+    example_intent: "Extract title, authors, date from this paper"
+    structure_signature: "READ → EXTRACT"
+    patterns:
+      - "read"
+      - "extract"
+    bindings:
+      - "document"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "A08"
+    domain: "research"
+    title: "document summary"
+    example_intent: "Summarize this PDF/report"
+    structure_signature: "READ → SUMMARIZE"
+    patterns:
+      - "read"
+      - "summarize"
+    bindings:
+      - "document"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "A09"
+    domain: "research"
+    title: "document to fields"
+    example_intent: "Extract invoice fields from this document"
+    structure_signature: "READ → VALIDATE → EXTRACT"
+    patterns:
+      - "read"
+      - "validate"
+      - "extract"
+    bindings:
+      - "document"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    notes: "current nika-spec skeleton document-to-fields"
+    current_coverage: "COVERED skeleton document-to-fields"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "A10"
+    domain: "research"
+    title: "document QA"
+    example_intent: "Answer these questions from the document only"
+    structure_signature: "READ → RETRIEVE → ANSWER / UNKNOWN"
+    patterns:
+      - "read"
+      - "search"
+      - "generate"
+    bindings:
+      - "document"
+      - "question"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "A11"
+    domain: "research"
+    title: "corpus QA"
+    example_intent: "Answer from this corpus; say unknown if unsupported"
+    structure_signature: "SEARCH → ANSWER / UNKNOWN"
+    patterns:
+      - "search"
+      - "generate"
+    bindings:
+      - "corpus"
+      - "question"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    notes: "current nika-spec skeleton corpus-qa"
+    current_coverage: "COVERED skeleton corpus-qa"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "A12"
+    domain: "research"
+    title: "corpus citations"
+    example_intent: "Answer with citations from the corpus"
+    structure_signature: "SEARCH → ANSWER + CITATIONS"
+    patterns:
+      - "search"
+      - "generate"
+    bindings:
+      - "corpus"
+      - "question"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "A13"
+    domain: "research"
+    title: "compare documents"
+    example_intent: "Compare these two contracts"
+    structure_signature: "READ×2 → COMPARE"
+    patterns:
+      - "read"
+      - "compare"
+    bindings:
+      - "doc_a"
+      - "doc_b"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "A14"
+    domain: "research"
+    title: "contract clauses"
+    example_intent: "Extract clauses from this contract"
+    structure_signature: "READ → EXTRACT"
+    patterns:
+      - "read"
+      - "extract"
+    bindings:
+      - "document"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "A15"
+    domain: "research"
+    title: "policy requirements"
+    example_intent: "Extract requirements from this policy"
+    structure_signature: "READ → EXTRACT"
+    patterns:
+      - "read"
+      - "extract"
+    bindings:
+      - "document"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "A16"
+    domain: "research"
+    title: "changelog summary"
+    example_intent: "Summarize this changelog"
+    structure_signature: "READ → SUMMARIZE"
+    patterns:
+      - "read"
+      - "summarize"
+    bindings:
+      - "document"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "A17"
+    domain: "research"
+    title: "GitHub release brief"
+    example_intent: "Turn this GitHub release into an engineering brief"
+    structure_signature: "READ → SUMMARIZE"
+    patterns:
+      - "read"
+      - "summarize"
+    bindings:
+      - "release"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "A18"
+    domain: "research"
+    title: "repo inventory"
+    example_intent: "Inventory this repository structure"
+    structure_signature: "EXPLORE → EXTRACT"
+    patterns:
+      - "agent_edge"
+    bindings:
+      - "repo"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "agent"
+    proposed_path: "EXPLORE"
+    promotion_status: "OPEN_WORLD"
+    notes: ""
+    current_coverage: "agent-loop embryo; do not force HOT"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "A19"
+    domain: "research"
+    title: "meeting summary"
+    example_intent: "Summarize this meeting transcript"
+    structure_signature: "READ → SUMMARIZE"
+    patterns:
+      - "read"
+      - "summarize"
+    bindings:
+      - "transcript"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "A20"
+    domain: "research"
+    title: "meeting action items"
+    example_intent: "Extract action items from this transcript"
+    structure_signature: "READ → EXTRACT"
+    patterns:
+      - "read"
+      - "extract"
+    bindings:
+      - "transcript"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "A21"
+    domain: "research"
+    title: "research brief"
+    example_intent: "Research brief from these sources"
+    structure_signature: "SEARCH → EXTRACT → SYNTHESIZE + CITATIONS"
+    patterns:
+      - "search"
+      - "extract"
+      - "summarize"
+    bindings:
+      - "query"
+      - "sources"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "A22"
+    domain: "research"
+    title: "evidence table"
+    example_intent: "Build an evidence table from these sources"
+    structure_signature: "SEARCH → EXTRACT → PROJECT"
+    patterns:
+      - "search"
+      - "extract"
+      - "project"
+    bindings:
+      - "sources"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "A23"
+    domain: "research"
+    title: "claims vs counterclaims"
+    example_intent: "Claims and counterclaims from these sources"
+    structure_signature: "SEARCH → EXTRACT → COMPARE"
+    patterns:
+      - "search"
+      - "extract"
+      - "compare"
+    bindings:
+      - "sources"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "A24"
+    domain: "research"
+    title: "competitor comparison"
+    example_intent: "Compare these competitor pages"
+    structure_signature: "FETCH×N → EXTRACT → COMPARE"
+    patterns:
+      - "fetch"
+      - "extract"
+      - "compare"
+    bindings:
+      - "urls"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "A25"
+    domain: "research"
+    title: "feature matrix"
+    example_intent: "Build a feature matrix from these product pages"
+    structure_signature: "FETCH×N → EXTRACT → PROJECT"
+    patterns:
+      - "fetch"
+      - "extract"
+      - "project"
+    bindings:
+      - "urls"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "B01"
+    domain: "support"
+    title: "ticket classification"
+    example_intent: "Classify this support ticket"
+    structure_signature: "READ → CLASSIFY"
+    patterns:
+      - "classify"
+    bindings:
+      - "ticket"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    notes: "current nika-spec skeleton classify-and-route"
+    current_coverage: "COVERED skeleton classify-and-route"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "B02"
+    domain: "support"
+    title: "ticket urgency"
+    example_intent: "Score urgency of this ticket"
+    structure_signature: "READ → SCORE"
+    patterns:
+      - "score"
+    bindings:
+      - "ticket"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "B03"
+    domain: "support"
+    title: "ticket customer lookup"
+    example_intent: "Look up the customer for this ticket"
+    structure_signature: "READ → LOOKUP"
+    patterns:
+      - "lookup"
+    bindings:
+      - "ticket"
+      - "customer_id"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-B"
+    promotion_status: "NEEDS_PATTERN"
+    notes: " missing LOOKUP/ENRICH/JOIN pattern"
+    current_coverage: "CANDIDATE"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "B04"
+    domain: "support"
+    title: "ticket draft response"
+    example_intent: "Draft a reply to ticket #42"
+    structure_signature: "READ → LOOKUP? → CLASSIFY → DRAFT"
+    patterns:
+      - "classify"
+      - "draft"
+    bindings:
+      - "ticket_id"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "B05"
+    domain: "support"
+    title: "ticket classify route"
+    example_intent: "Classify this ticket and route it"
+    structure_signature: "READ → CLASSIFY → ROUTE"
+    patterns:
+      - "classify"
+      - "route"
+    bindings:
+      - "ticket"
+    policy_fields:
+      - "queue_policy?"
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    notes: "current nika-spec skeleton classify-and-route"
+    current_coverage: "COVERED skeleton classify-and-route"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "B06"
+    domain: "support"
+    title: "ticket lookup classify draft"
+    example_intent: "Lookup customer, classify, draft reply"
+    structure_signature: "LOOKUP → CLASSIFY → DRAFT"
+    patterns:
+      - "lookup"
+      - "classify"
+      - "draft"
+    bindings:
+      - "ticket_id"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "NEEDS_PATTERN"
+    notes: " missing LOOKUP/ENRICH/JOIN pattern"
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "B07"
+    domain: "support"
+    title: "ticket knowledge draft"
+    example_intent: "Draft from knowledge base for this ticket"
+    structure_signature: "SEARCH → DRAFT"
+    patterns:
+      - "search"
+      - "draft"
+    bindings:
+      - "ticket"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "B08"
+    domain: "support"
+    title: "ticket duplicate detection"
+    example_intent: "Find duplicate tickets"
+    structure_signature: "READ → COMPARE → DEDUP"
+    patterns:
+      - "compare"
+      - "dedup"
+    bindings:
+      - "ticket"
+      - "corpus"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "B09"
+    domain: "support"
+    title: "sentiment urgency queue"
+    example_intent: "Urgency and sentiment then queue"
+    structure_signature: "READ → SCORE → ROUTE"
+    patterns:
+      - "score"
+      - "route"
+    bindings:
+      - "ticket"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "B10"
+    domain: "support"
+    title: "bug vs billing vs sales"
+    example_intent: "Is this bug, billing, or sales?"
+    structure_signature: "READ → CLASSIFY → ROUTE"
+    patterns:
+      - "classify"
+      - "route"
+    bindings:
+      - "ticket"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    notes: "current nika-spec skeleton classify-and-route"
+    current_coverage: "COVERED skeleton classify-and-route"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "B11"
+    domain: "support"
+    title: "escalation recommendation"
+    example_intent: "Recommend escalation for this ticket"
+    structure_signature: "READ → SCORE → ROUTE"
+    patterns:
+      - "score"
+      - "route"
+    bindings:
+      - "ticket"
+    policy_fields:
+      - "escalation_policy?"
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "WARM"
+    promotion_status: "NEEDS_WARM"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "B12"
+    domain: "support"
+    title: "conversation summary"
+    example_intent: "Summarize this support thread"
+    structure_signature: "READ → SUMMARIZE"
+    patterns:
+      - "summarize"
+    bindings:
+      - "thread"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "B13"
+    domain: "support"
+    title: "conversation CRM note"
+    example_intent: "Write a CRM note from this thread"
+    structure_signature: "READ → SUMMARIZE"
+    patterns:
+      - "summarize"
+    bindings:
+      - "thread"
+    policy_fields: []
+    effects: "propose_update"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "B14"
+    domain: "support"
+    title: "complaint incident"
+    example_intent: "Turn this complaint into a structured incident"
+    structure_signature: "READ → EXTRACT"
+    patterns:
+      - "extract"
+    bindings:
+      - "complaint"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "B15"
+    domain: "support"
+    title: "refund eligibility facts"
+    example_intent: "Extract refund eligibility facts (no decision)"
+    structure_signature: "LOOKUP → EXTRACT"
+    patterns:
+      - "lookup"
+      - "extract"
+    bindings:
+      - "order_id"
+      - "customer_id"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-B"
+    promotion_status: "NEEDS_PATTERN"
+    notes: " missing LOOKUP/ENRICH/JOIN pattern"
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "B16"
+    domain: "support"
+    title: "refund policy approval"
+    example_intent: "Refund this order if eligible"
+    structure_signature: "LOOKUP → FACTS → POLICY → HUMAN? → EFFECT"
+    patterns:
+      - "lookup"
+      - "verify"
+      - "gate"
+      - "human_approve"
+    bindings:
+      - "order_id"
+    policy_fields:
+      - "refund_cap"
+    effects: "refund"
+    authority_class: "write"
+    custody: "inherit"
+    human_gate: "required_if_policy"
+    runtime_cognition: "decision"
+    proposed_path: "WARM"
+    promotion_status: "NEEDS_WARM"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "B17"
+    domain: "support"
+    title: "cancellation retention draft"
+    example_intent: "Draft a retention reply for this cancel request"
+    structure_signature: "READ → DRAFT"
+    patterns:
+      - "draft"
+    bindings:
+      - "request"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "B18"
+    domain: "support"
+    title: "enterprise mandatory approval"
+    example_intent: "Handle this enterprise ticket with approval before send"
+    structure_signature: "CLASSIFY → DRAFT → HUMAN → SEND"
+    patterns:
+      - "classify"
+      - "draft"
+      - "human_approve"
+      - "notify"
+    bindings:
+      - "ticket"
+    policy_fields:
+      - "enterprise_rule"
+    effects: "send"
+    authority_class: "write"
+    custody: "inherit"
+    human_gate: "required"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-C"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "B19"
+    domain: "support"
+    title: "abusive content moderation"
+    example_intent: "Route abusive content for moderation"
+    structure_signature: "READ → CLASSIFY → ROUTE"
+    patterns:
+      - "classify"
+      - "route"
+    bindings:
+      - "content"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    notes: "current nika-spec skeleton classify-and-route"
+    current_coverage: "COVERED skeleton classify-and-route"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "B20"
+    domain: "support"
+    title: "unusual ticket agent fallback"
+    example_intent: "Investigate this unknown technical issue"
+    structure_signature: "KNOWN PATH → AGENT_EDGE"
+    patterns:
+      - "classify"
+      - "agent_edge"
+    bindings:
+      - "ticket"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "agent"
+    proposed_path: "EXPLORE"
+    promotion_status: "OPEN_WORLD"
+    notes: ""
+    current_coverage: "agent-loop embryo; do not force HOT"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "C01"
+    domain: "sales"
+    title: "lead normalization"
+    example_intent: "Normalize this lead record"
+    structure_signature: "VALIDATE → NORMALIZE"
+    patterns:
+      - "validate"
+      - "normalize"
+    bindings:
+      - "lead"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "C02"
+    domain: "sales"
+    title: "lead company lookup"
+    example_intent: "Look up the company for this lead"
+    structure_signature: "LOOKUP"
+    patterns:
+      - "lookup"
+    bindings:
+      - "lead"
+      - "domain"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-B"
+    promotion_status: "NEEDS_PATTERN"
+    notes: " missing LOOKUP/ENRICH/JOIN pattern"
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "C03"
+    domain: "sales"
+    title: "lead enrichment"
+    example_intent: "Enrich this lead"
+    structure_signature: "LOOKUP → ENRICH → NORMALIZE"
+    patterns:
+      - "lookup"
+      - "enrich"
+      - "normalize"
+    bindings:
+      - "lead"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-B"
+    promotion_status: "NEEDS_PATTERN"
+    notes: " missing LOOKUP/ENRICH/JOIN pattern"
+    current_coverage: "CANDIDATE"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "C04"
+    domain: "sales"
+    title: "lead qualification"
+    example_intent: "Qualify this lead from these rules"
+    structure_signature: "ENRICH → CLASSIFY"
+    patterns:
+      - "enrich"
+      - "classify"
+    bindings:
+      - "lead"
+    policy_fields:
+      - "icp_rules"
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-C"
+    promotion_status: "NEEDS_PATTERN"
+    notes: " missing LOOKUP/ENRICH/JOIN pattern"
+    current_coverage: "CANDIDATE"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "C05"
+    domain: "sales"
+    title: "lead scoring explicit policy"
+    example_intent: "Score this lead with our point table"
+    structure_signature: "ENRICH → SCORE"
+    patterns:
+      - "score"
+    bindings:
+      - "lead"
+    policy_fields:
+      - "score_table"
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-C"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "C06"
+    domain: "sales"
+    title: "lead route territory"
+    example_intent: "Route this lead by territory"
+    structure_signature: "CLASSIFY → ROUTE"
+    patterns:
+      - "route"
+    bindings:
+      - "lead"
+      - "region"
+    policy_fields:
+      - "territory_map"
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-C"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "C07"
+    domain: "sales"
+    title: "lead owner assignment"
+    example_intent: "Assign owner for this lead"
+    structure_signature: "ROUTE"
+    patterns:
+      - "route"
+    bindings:
+      - "lead"
+    policy_fields:
+      - "assignment_policy"
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "WARM"
+    promotion_status: "NEEDS_WARM"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "C08"
+    domain: "sales"
+    title: "lead research brief"
+    example_intent: "Research brief for this account"
+    structure_signature: "SEARCH → SUMMARIZE"
+    patterns:
+      - "search"
+      - "summarize"
+    bindings:
+      - "account"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "C09"
+    domain: "sales"
+    title: "lead outreach draft"
+    example_intent: "Draft outreach for this lead"
+    structure_signature: "ENRICH → DRAFT"
+    patterns:
+      - "enrich"
+      - "draft"
+    bindings:
+      - "lead"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "NEEDS_PATTERN"
+    notes: " missing LOOKUP/ENRICH/JOIN pattern"
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "C10"
+    domain: "sales"
+    title: "personalized email draft"
+    example_intent: "Draft a personalized email to this lead"
+    structure_signature: "ENRICH → DRAFT"
+    patterns:
+      - "enrich"
+      - "draft"
+    bindings:
+      - "lead"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "NEEDS_PATTERN"
+    notes: " missing LOOKUP/ENRICH/JOIN pattern"
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "C11"
+    domain: "sales"
+    title: "lead approval outbound"
+    example_intent: "Send outreach after approval"
+    structure_signature: "DRAFT → HUMAN → SEND"
+    patterns:
+      - "draft"
+      - "human_approve"
+      - "notify"
+    bindings:
+      - "lead"
+    policy_fields: []
+    effects: "send"
+    authority_class: "write"
+    custody: "inherit"
+    human_gate: "required"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "C12"
+    domain: "sales"
+    title: "inbound email CRM lookup"
+    example_intent: "Look up CRM contact for this inbound email"
+    structure_signature: "READ → LOOKUP"
+    patterns:
+      - "lookup"
+    bindings:
+      - "email"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-B"
+    promotion_status: "NEEDS_PATTERN"
+    notes: " missing LOOKUP/ENRICH/JOIN pattern"
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "C13"
+    domain: "sales"
+    title: "inbound opportunity proposal"
+    example_intent: "Propose an opportunity from this inbound request"
+    structure_signature: "EXTRACT → DRAFT"
+    patterns:
+      - "extract"
+      - "draft"
+    bindings:
+      - "email"
+    policy_fields: []
+    effects: "propose_create"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "WARM"
+    promotion_status: "NEEDS_WARM"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "C14"
+    domain: "sales"
+    title: "meeting notes CRM proposal"
+    example_intent: "Propose CRM updates from meeting notes"
+    structure_signature: "EXTRACT → PROJECT"
+    patterns:
+      - "extract"
+      - "project"
+    bindings:
+      - "notes"
+      - "account_id"
+    policy_fields: []
+    effects: "propose_update"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "C15"
+    domain: "sales"
+    title: "CRM account executive brief"
+    example_intent: "Executive brief for this account"
+    structure_signature: "LOOKUP → SUMMARIZE"
+    patterns:
+      - "lookup"
+      - "summarize"
+    bindings:
+      - "account_id"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "NEEDS_PATTERN"
+    notes: " missing LOOKUP/ENRICH/JOIN pattern"
+    current_coverage: "CANDIDATE"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "C16"
+    domain: "sales"
+    title: "account activity summary"
+    example_intent: "Summarize recent activity for this account"
+    structure_signature: "LOOKUP → SUMMARIZE"
+    patterns:
+      - "lookup"
+      - "summarize"
+    bindings:
+      - "account_id"
+      - "date_range"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "NEEDS_PATTERN"
+    notes: " missing LOOKUP/ENRICH/JOIN pattern"
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "C17"
+    domain: "sales"
+    title: "renewal risk evidence"
+    example_intent: "Collect renewal-risk evidence for this account"
+    structure_signature: "LOOKUP → EXTRACT"
+    patterns:
+      - "lookup"
+      - "extract"
+    bindings:
+      - "account_id"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-B"
+    promotion_status: "NEEDS_PATTERN"
+    notes: " missing LOOKUP/ENRICH/JOIN pattern"
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "C18"
+    domain: "sales"
+    title: "pipeline aggregate"
+    example_intent: "Aggregate this pipeline snapshot"
+    structure_signature: "VALIDATE → AGGREGATE"
+    patterns:
+      - "validate"
+      - "aggregate"
+    bindings:
+      - "snapshot"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "C19"
+    domain: "sales"
+    title: "pipeline anomalies"
+    example_intent: "Find anomalies in this pipeline snapshot"
+    structure_signature: "AGGREGATE → COMPARE"
+    patterns:
+      - "aggregate"
+      - "compare"
+    bindings:
+      - "snapshot"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "C20"
+    domain: "sales"
+    title: "stale leads review queue"
+    example_intent: "Queue stale leads for review"
+    structure_signature: "FILTER → ROUTE"
+    patterns:
+      - "filter"
+      - "route"
+    bindings:
+      - "list"
+      - "as_of"
+    policy_fields:
+      - "stale_days"
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-C"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "C21"
+    domain: "sales"
+    title: "duplicate contacts dedupe proposal"
+    example_intent: "Propose duplicate contact merges"
+    structure_signature: "DEDUP → PROJECT"
+    patterns:
+      - "dedup"
+      - "project"
+    bindings:
+      - "contacts"
+    policy_fields: []
+    effects: "propose_update"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "C22"
+    domain: "sales"
+    title: "enrichment batch"
+    example_intent: "Enrich this bounded lead list"
+    structure_signature: "BOUNDED_BATCH → ENRICH → MERGE"
+    patterns:
+      - "batch"
+      - "enrich"
+    bindings:
+      - "leads"
+    policy_fields:
+      - "max_batch"
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-B"
+    promotion_status: "NEEDS_PATTERN"
+    notes: " missing LOOKUP/ENRICH/JOIN pattern"
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "C23"
+    domain: "sales"
+    title: "ICP classify list"
+    example_intent: "Classify this list ICP vs not"
+    structure_signature: "CLASSIFY"
+    patterns:
+      - "classify"
+    bindings:
+      - "leads"
+    policy_fields:
+      - "icp_rules"
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-C"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "C24"
+    domain: "sales"
+    title: "prospect enrich draft"
+    example_intent: "Enrich person+company then draft"
+    structure_signature: "ENRICH → DRAFT"
+    patterns:
+      - "enrich"
+      - "draft"
+    bindings:
+      - "prospect"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "NEEDS_PATTERN"
+    notes: " missing LOOKUP/ENRICH/JOIN pattern"
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "C25"
+    domain: "sales"
+    title: "sales handoff package"
+    example_intent: "Build a structured sales handoff package"
+    structure_signature: "LOOKUP → PROJECT"
+    patterns:
+      - "lookup"
+      - "project"
+    bindings:
+      - "opportunity_id"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-B"
+    promotion_status: "NEEDS_PATTERN"
+    notes: " missing LOOKUP/ENRICH/JOIN pattern"
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "D01"
+    domain: "marketing"
+    title: "topic content brief"
+    example_intent: "Write a content brief on this topic"
+    structure_signature: "GENERATE"
+    patterns:
+      - "draft"
+    bindings:
+      - "topic"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "D02"
+    domain: "marketing"
+    title: "brief to article draft"
+    example_intent: "Draft an article from this brief"
+    structure_signature: "DRAFT"
+    patterns:
+      - "draft"
+    bindings:
+      - "brief"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "D03"
+    domain: "marketing"
+    title: "article social posts"
+    example_intent: "Turn this article into social posts"
+    structure_signature: "SUMMARIZE → DRAFT"
+    patterns:
+      - "summarize"
+      - "draft"
+    bindings:
+      - "article"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "D04"
+    domain: "marketing"
+    title: "article tweet thread"
+    example_intent: "Turn this article into a thread"
+    structure_signature: "DRAFT"
+    patterns:
+      - "draft"
+    bindings:
+      - "article"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "D05"
+    domain: "marketing"
+    title: "article LinkedIn draft"
+    example_intent: "LinkedIn draft from this article"
+    structure_signature: "DRAFT"
+    patterns:
+      - "draft"
+    bindings:
+      - "article"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "D06"
+    domain: "marketing"
+    title: "long content shorts"
+    example_intent: "Shorts scripts from this long content"
+    structure_signature: "SUMMARIZE → DRAFT"
+    patterns:
+      - "summarize"
+      - "draft"
+    bindings:
+      - "content"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "D07"
+    domain: "marketing"
+    title: "page SEO metadata"
+    example_intent: "SEO metadata for this page"
+    structure_signature: "EXTRACT → DRAFT"
+    patterns:
+      - "extract"
+      - "draft"
+    bindings:
+      - "page"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "D08"
+    domain: "marketing"
+    title: "keyword clusters"
+    example_intent: "Cluster this keyword list"
+    structure_signature: "CLASSIFY → AGGREGATE"
+    patterns:
+      - "classify"
+      - "aggregate"
+    bindings:
+      - "keywords"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "D09"
+    domain: "marketing"
+    title: "internal links suggestions"
+    example_intent: "Suggest internal links for this article"
+    structure_signature: "SEARCH → PROJECT"
+    patterns:
+      - "search"
+      - "project"
+    bindings:
+      - "article"
+      - "corpus"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "WARM"
+    promotion_status: "NEEDS_WARM"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "D10"
+    domain: "marketing"
+    title: "article FAQ"
+    example_intent: "FAQ from this article"
+    structure_signature: "EXTRACT → DRAFT"
+    patterns:
+      - "extract"
+      - "draft"
+    bindings:
+      - "article"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "D11"
+    domain: "marketing"
+    title: "landing page critique"
+    example_intent: "Structured critique of this landing page"
+    structure_signature: "READ → EXTRACT"
+    patterns:
+      - "extract"
+    bindings:
+      - "page"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "D12"
+    domain: "marketing"
+    title: "landing A/B copy"
+    example_intent: "A/B copy candidates for this landing page"
+    structure_signature: "DRAFT"
+    patterns:
+      - "draft"
+    bindings:
+      - "page"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "D13"
+    domain: "marketing"
+    title: "page rewrite proposal"
+    example_intent: "Rewrite proposal for this page"
+    structure_signature: "DRAFT"
+    patterns:
+      - "draft"
+    bindings:
+      - "page"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "D14"
+    domain: "marketing"
+    title: "brand style review"
+    example_intent: "Brand/style review of this content"
+    structure_signature: "VERIFY"
+    patterns:
+      - "verify"
+    bindings:
+      - "content"
+      - "guide"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "WARM"
+    promotion_status: "NEEDS_WARM"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "D15"
+    domain: "marketing"
+    title: "content compliance review"
+    example_intent: "Compliance review of this content"
+    structure_signature: "VERIFY"
+    patterns:
+      - "verify"
+    bindings:
+      - "content"
+      - "policy"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "WARM"
+    promotion_status: "NEEDS_WARM"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "D16"
+    domain: "marketing"
+    title: "content approval publish"
+    example_intent: "Publish this content after approval"
+    structure_signature: "VERIFY → HUMAN → PUBLISH"
+    patterns:
+      - "verify"
+      - "human_approve"
+      - "publish"
+    bindings:
+      - "content"
+      - "channel"
+    policy_fields: []
+    effects: "publish"
+    authority_class: "write"
+    custody: "inherit"
+    human_gate: "required"
+    runtime_cognition: "none"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "D17"
+    domain: "marketing"
+    title: "asset pack plan"
+    example_intent: "Plan an asset pack for this campaign"
+    structure_signature: "DRAFT"
+    patterns:
+      - "draft"
+    bindings:
+      - "campaign"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "FACTORABLE"
+    promotion_status: "COVERED"
+    notes: "current nika-spec skeleton media-asset-pack"
+    current_coverage: "COVERED skeleton media-asset-pack"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "D18"
+    domain: "marketing"
+    title: "multi-channel repurpose"
+    example_intent: "Repurpose this content across channels"
+    structure_signature: "DRAFT"
+    patterns:
+      - "draft"
+    bindings:
+      - "content"
+      - "channels"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "D19"
+    domain: "marketing"
+    title: "content-gap brief"
+    example_intent: "Content-gap brief vs competitor pages"
+    structure_signature: "FETCH → COMPARE → DRAFT"
+    patterns:
+      - "fetch"
+      - "compare"
+      - "draft"
+    bindings:
+      - "urls"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "D20"
+    domain: "marketing"
+    title: "changelog launch copy"
+    example_intent: "Launch copy from this changelog"
+    structure_signature: "SUMMARIZE → DRAFT"
+    patterns:
+      - "summarize"
+      - "draft"
+    bindings:
+      - "changelog"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "D21"
+    domain: "marketing"
+    title: "release announcement pack"
+    example_intent: "Announcement pack for this product release"
+    structure_signature: "SUMMARIZE → DRAFT"
+    patterns:
+      - "summarize"
+      - "draft"
+    bindings:
+      - "release"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "D22"
+    domain: "marketing"
+    title: "reviews theme clustering"
+    example_intent: "Cluster themes in these reviews"
+    structure_signature: "CLASSIFY → AGGREGATE"
+    patterns:
+      - "classify"
+      - "aggregate"
+    bindings:
+      - "reviews"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "D23"
+    domain: "marketing"
+    title: "analytics content recs"
+    example_intent: "Content recommendations from this analytics summary"
+    structure_signature: "SUMMARIZE → DRAFT"
+    patterns:
+      - "summarize"
+      - "draft"
+    bindings:
+      - "metrics"
+    policy_fields:
+      - "priority_policy?"
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "WARM"
+    promotion_status: "NEEDS_WARM"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "D24"
+    domain: "marketing"
+    title: "calendar generate drafts"
+    example_intent: "Generate drafts for this content calendar"
+    structure_signature: "BOUNDED_BATCH → DRAFT"
+    patterns:
+      - "batch"
+      - "draft"
+    bindings:
+      - "calendar"
+    policy_fields:
+      - "max_batch"
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "D25"
+    domain: "marketing"
+    title: "approved publish channels"
+    example_intent: "Publish approved content to selected channels"
+    structure_signature: "HUMAN → PUBLISH"
+    patterns:
+      - "human_approve"
+      - "publish"
+    bindings:
+      - "content"
+      - "channels"
+    policy_fields: []
+    effects: "publish"
+    authority_class: "write"
+    custody: "inherit"
+    human_gate: "required"
+    runtime_cognition: "none"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E01"
+    domain: "engineering"
+    title: "issue summary"
+    example_intent: "Summarize this GitHub issue"
+    structure_signature: "READ → SUMMARIZE"
+    patterns:
+      - "summarize"
+    bindings:
+      - "issue"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E02"
+    domain: "engineering"
+    title: "issue classify"
+    example_intent: "Classify this issue"
+    structure_signature: "CLASSIFY"
+    patterns:
+      - "classify"
+    bindings:
+      - "issue"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E03"
+    domain: "engineering"
+    title: "issue route"
+    example_intent: "Route this issue"
+    structure_signature: "CLASSIFY → ROUTE"
+    patterns:
+      - "classify"
+      - "route"
+    bindings:
+      - "issue"
+    policy_fields:
+      - "routing_policy"
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E04"
+    domain: "engineering"
+    title: "bug reproducibility checklist"
+    example_intent: "Reproducibility checklist from this bug report"
+    structure_signature: "EXTRACT"
+    patterns:
+      - "extract"
+    bindings:
+      - "bug"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E05"
+    domain: "engineering"
+    title: "PR summary"
+    example_intent: "Summarize this pull request"
+    structure_signature: "READ → SUMMARIZE"
+    patterns:
+      - "summarize"
+    bindings:
+      - "pr"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "E06"
+    domain: "engineering"
+    title: "PR review checklist"
+    example_intent: "Review checklist for this PR"
+    structure_signature: "READ → PROJECT"
+    patterns:
+      - "extract"
+    bindings:
+      - "pr"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E07"
+    domain: "engineering"
+    title: "diff release note"
+    example_intent: "Release note from this diff"
+    structure_signature: "READ → SUMMARIZE"
+    patterns:
+      - "summarize"
+    bindings:
+      - "diff"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E08"
+    domain: "engineering"
+    title: "commits changelog"
+    example_intent: "Changelog from these commits"
+    structure_signature: "READ → SUMMARIZE"
+    patterns:
+      - "summarize"
+    bindings:
+      - "commits"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E09"
+    domain: "engineering"
+    title: "release notes announcement"
+    example_intent: "Announcement from these release notes"
+    structure_signature: "DRAFT"
+    patterns:
+      - "draft"
+    bindings:
+      - "notes"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E10"
+    domain: "engineering"
+    title: "test failures grouped"
+    example_intent: "Group these test failures"
+    structure_signature: "CLASSIFY → AGGREGATE"
+    patterns:
+      - "classify"
+      - "aggregate"
+    bindings:
+      - "failures"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E11"
+    domain: "engineering"
+    title: "logs incident summary"
+    example_intent: "Incident summary from these logs"
+    structure_signature: "READ → SUMMARIZE"
+    patterns:
+      - "summarize"
+    bindings:
+      - "logs"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "E12"
+    domain: "engineering"
+    title: "logs anomaly classification"
+    example_intent: "Classify anomalies in these logs"
+    structure_signature: "CLASSIFY"
+    patterns:
+      - "classify"
+    bindings:
+      - "logs"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E13"
+    domain: "engineering"
+    title: "dependency outdated report"
+    example_intent: "Outdated dependency report"
+    structure_signature: "COMPARE → PROJECT"
+    patterns:
+      - "compare"
+      - "project"
+    bindings:
+      - "lockfile"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E14"
+    domain: "engineering"
+    title: "dependency diff"
+    example_intent: "Diff these two dependency snapshots"
+    structure_signature: "DIFF"
+    patterns:
+      - "diff"
+    bindings:
+      - "before"
+      - "after"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E15"
+    domain: "engineering"
+    title: "security findings normalized"
+    example_intent: "Normalize these security findings"
+    structure_signature: "NORMALIZE → DEDUP"
+    patterns:
+      - "normalize"
+      - "dedup"
+    bindings:
+      - "findings"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E16"
+    domain: "engineering"
+    title: "repo architecture inventory"
+    example_intent: "Architecture inventory of this repo"
+    structure_signature: "EXPLORE → EXTRACT"
+    patterns:
+      - "agent_edge"
+    bindings:
+      - "repo"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "agent"
+    proposed_path: "EXPLORE"
+    promotion_status: "OPEN_WORLD"
+    notes: ""
+    current_coverage: "agent-loop embryo; do not force HOT"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E17"
+    domain: "engineering"
+    title: "API schema docs draft"
+    example_intent: "Documentation draft from this API schema"
+    structure_signature: "READ → DRAFT"
+    patterns:
+      - "draft"
+    bindings:
+      - "schema"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E18"
+    domain: "engineering"
+    title: "OpenAPI endpoint inventory"
+    example_intent: "Endpoint inventory from this OpenAPI file"
+    structure_signature: "EXTRACT → PROJECT"
+    patterns:
+      - "extract"
+      - "project"
+    bindings:
+      - "openapi"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E19"
+    domain: "engineering"
+    title: "code owner mapping"
+    example_intent: "Map code owners for these paths"
+    structure_signature: "PROJECT"
+    patterns:
+      - "project"
+    bindings:
+      - "paths"
+      - "owners_file"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E20"
+    domain: "engineering"
+    title: "TODO FIXME extraction"
+    example_intent: "Extract TODO/FIXME from this tree"
+    structure_signature: "SEARCH → PROJECT"
+    patterns:
+      - "search"
+      - "project"
+    bindings:
+      - "root"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E21"
+    domain: "engineering"
+    title: "backlog dedupe"
+    example_intent: "Dedupe this issue backlog"
+    structure_signature: "DEDUP"
+    patterns:
+      - "dedup"
+    bindings:
+      - "issues"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E22"
+    domain: "engineering"
+    title: "backlog categorize"
+    example_intent: "Categorize this issue backlog"
+    structure_signature: "CLASSIFY"
+    patterns:
+      - "classify"
+    bindings:
+      - "issues"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E23"
+    domain: "engineering"
+    title: "issue task decomposition"
+    example_intent: "Propose task decomposition for this issue"
+    structure_signature: "DRAFT"
+    patterns:
+      - "draft"
+    bindings:
+      - "issue"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "COLD"
+    promotion_status: "NEEDS_COLD"
+    notes: ""
+    current_coverage: "OPEN_WORLD"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E24"
+    domain: "engineering"
+    title: "benchmark comparison"
+    example_intent: "Compare these benchmark results"
+    structure_signature: "COMPARE"
+    patterns:
+      - "compare"
+    bindings:
+      - "a"
+      - "b"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E25"
+    domain: "engineering"
+    title: "CI failure triage"
+    example_intent: "Triage this CI run failure"
+    structure_signature: "CLASSIFY → SUMMARIZE"
+    patterns:
+      - "classify"
+      - "summarize"
+    bindings:
+      - "ci_run"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "E26"
+    domain: "engineering"
+    title: "service health incident brief"
+    example_intent: "Incident brief from service health"
+    structure_signature: "SUMMARIZE"
+    patterns:
+      - "summarize"
+    bindings:
+      - "health"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E27"
+    domain: "engineering"
+    title: "config snapshots drift"
+    example_intent: "Drift report between config snapshots"
+    structure_signature: "DIFF"
+    patterns:
+      - "diff"
+    bindings:
+      - "before"
+      - "after"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E28"
+    domain: "engineering"
+    title: "release docs update proposal"
+    example_intent: "Docs update proposal for this release"
+    structure_signature: "DRAFT"
+    patterns:
+      - "draft"
+    bindings:
+      - "release"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E29"
+    domain: "engineering"
+    title: "error telemetry root-cause candidates"
+    example_intent: "Group root-cause candidates from telemetry"
+    structure_signature: "CLASSIFY → AGGREGATE"
+    patterns:
+      - "classify"
+      - "aggregate"
+    bindings:
+      - "events"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "WARM"
+    promotion_status: "NEEDS_WARM"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "E30"
+    domain: "engineering"
+    title: "known incident response workflow"
+    example_intent: "Run the known incident-response pattern"
+    structure_signature: "KNOWN DAG"
+    patterns:
+      - "classify"
+      - "notify"
+    bindings:
+      - "alert"
+    policy_fields:
+      - "severity_policy"
+    effects: "notify?"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "maybe"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "F01"
+    domain: "data"
+    title: "validate records"
+    example_intent: "Validate these records"
+    structure_signature: "VALIDATE"
+    patterns:
+      - "validate"
+    bindings:
+      - "records"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    notes: "current nika-spec skeleton validate-records"
+    current_coverage: "COVERED skeleton validate-records"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "F02"
+    domain: "data"
+    title: "normalize records"
+    example_intent: "Normalize these records"
+    structure_signature: "NORMALIZE"
+    patterns:
+      - "normalize"
+    bindings:
+      - "records"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "F03"
+    domain: "data"
+    title: "deduplicate records"
+    example_intent: "Deduplicate these records"
+    structure_signature: "DEDUP"
+    patterns:
+      - "dedup"
+    bindings:
+      - "records"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    notes: "current nika-spec skeleton deduplicate-records"
+    current_coverage: "COVERED skeleton deduplicate-records"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "F04"
+    domain: "data"
+    title: "aggregate by key"
+    example_intent: "Sum/count these records by key"
+    structure_signature: "AGGREGATE"
+    patterns:
+      - "aggregate"
+    bindings:
+      - "records"
+      - "key"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    notes: "current nika-spec skeleton aggregate-by-key"
+    current_coverage: "COVERED skeleton aggregate-by-key"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "F05"
+    domain: "data"
+    title: "filter records"
+    example_intent: "Filter these records"
+    structure_signature: "FILTER"
+    patterns:
+      - "filter"
+    bindings:
+      - "records"
+      - "predicate"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "F06"
+    domain: "data"
+    title: "project public fields"
+    example_intent: "Project public fields from these records"
+    structure_signature: "PROJECT / REDACT"
+    patterns:
+      - "project"
+      - "redact"
+    bindings:
+      - "records"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    notes: "current nika-spec skeleton project-public-fields"
+    current_coverage: "COVERED skeleton project-public-fields"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "F07"
+    domain: "data"
+    title: "sort rank records"
+    example_intent: "Sort/rank these records"
+    structure_signature: "SORT"
+    patterns:
+      - "filter"
+    bindings:
+      - "records"
+      - "order"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "F08"
+    domain: "data"
+    title: "snapshot diff"
+    example_intent: "Diff these two snapshots"
+    structure_signature: "DIFF"
+    patterns:
+      - "diff"
+    bindings:
+      - "before"
+      - "after"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    notes: "current nika-spec skeleton snapshot-diff"
+    current_coverage: "COVERED skeleton snapshot-diff"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "F09"
+    domain: "data"
+    title: "join two datasets"
+    example_intent: "Join these two datasets"
+    structure_signature: "JOIN"
+    patterns:
+      - "join"
+    bindings:
+      - "left"
+      - "right"
+      - "on"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-B"
+    promotion_status: "NEEDS_PATTERN"
+    notes: " missing LOOKUP/ENRICH/JOIN pattern"
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "F10"
+    domain: "data"
+    title: "enrich dataset lookup"
+    example_intent: "Enrich this dataset from a lookup"
+    structure_signature: "LOOKUP → JOIN"
+    patterns:
+      - "lookup"
+      - "join"
+    bindings:
+      - "records"
+      - "lookup"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-B"
+    promotion_status: "NEEDS_PATTERN"
+    notes: " missing LOOKUP/ENRICH/JOIN pattern"
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "F11"
+    domain: "data"
+    title: "reconcile two datasets"
+    example_intent: "Reconcile dataset A and B"
+    structure_signature: "NORMALIZE → DIFF → CLASSIFY"
+    patterns:
+      - "normalize"
+      - "diff"
+      - "classify"
+    bindings:
+      - "a"
+      - "b"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "F12"
+    domain: "data"
+    title: "identify missing records"
+    example_intent: "Find missing records vs reference"
+    structure_signature: "DIFF"
+    patterns:
+      - "diff"
+    bindings:
+      - "source"
+      - "reference"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "F13"
+    domain: "data"
+    title: "identify conflicting records"
+    example_intent: "Find conflicting records"
+    structure_signature: "COMPARE"
+    patterns:
+      - "compare"
+    bindings:
+      - "a"
+      - "b"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "F14"
+    domain: "data"
+    title: "transform CSV-like"
+    example_intent: "Transform these CSV-like records"
+    structure_signature: "NORMALIZE → PROJECT"
+    patterns:
+      - "normalize"
+      - "project"
+    bindings:
+      - "records"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "F15"
+    domain: "data"
+    title: "batch process bounded list"
+    example_intent: "Process this list in bounded batches"
+    structure_signature: "BOUNDED_BATCH"
+    patterns:
+      - "batch"
+    bindings:
+      - "list"
+    policy_fields:
+      - "max_batch"
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    notes: "current nika-spec skeleton bounded-batch"
+    current_coverage: "COVERED skeleton bounded-batch"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "F16"
+    domain: "data"
+    title: "bounded fanout"
+    example_intent: "Fan out this bounded list"
+    structure_signature: "FANOUT"
+    patterns:
+      - "fanout"
+    bindings:
+      - "list"
+    policy_fields:
+      - "max_fanout"
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    notes: "current nika-spec skeleton fanout"
+    current_coverage: "COVERED skeleton fanout"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "F17"
+    domain: "data"
+    title: "parallel fan-in"
+    example_intent: "Fan-in these independent results"
+    structure_signature: "FANIN"
+    patterns:
+      - "fanin"
+    bindings:
+      - "parts"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    notes: "current nika-spec skeleton docker-report"
+    current_coverage: "COVERED skeleton docker-report"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "F18"
+    domain: "data"
+    title: "ETL state resume"
+    example_intent: "ETL with resume from last state"
+    structure_signature: "RESUME → TRANSFORM"
+    patterns:
+      - "resume"
+      - "normalize"
+    bindings:
+      - "source"
+      - "cursor"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    notes: "current nika-spec skeleton etl-state"
+    current_coverage: "COVERED skeleton etl-state"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "F19"
+    domain: "data"
+    title: "optional resource recovery"
+    example_intent: "Recover if this optional file is missing"
+    structure_signature: "RECOVER"
+    patterns:
+      - "recover"
+    bindings:
+      - "path"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    notes: "current nika-spec skeleton recover-optional-file"
+    current_coverage: "COVERED skeleton recover-optional-file"
+    first_wave: true
+    positive_cases: 8
+    near_miss_cases: 4
+    edit_cases: 3
+  - family_id: "F20"
+    domain: "data"
+    title: "API upload create"
+    example_intent: "Upload this artifact then create the record"
+    structure_signature: "UPLOAD → CREATE"
+    patterns:
+      - "upload"
+      - "create"
+    bindings:
+      - "artifact"
+    policy_fields: []
+    effects: "create"
+    authority_class: "write"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    notes: "current nika-spec skeleton api-upload-and-create"
+    current_coverage: "COVERED skeleton api-upload-and-create"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "F21"
+    domain: "data"
+    title: "validate aggregate report"
+    example_intent: "Validate then aggregate then report"
+    structure_signature: "VALIDATE → AGGREGATE → PROJECT"
+    patterns:
+      - "validate"
+      - "aggregate"
+      - "project"
+    bindings:
+      - "records"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "F22"
+    domain: "data"
+    title: "normalize compare output"
+    example_intent: "Normalize source then compare then output"
+    structure_signature: "NORMALIZE → COMPARE → PROJECT"
+    patterns:
+      - "normalize"
+      - "compare"
+      - "project"
+    bindings:
+      - "source"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "F23"
+    domain: "data"
+    title: "reconciliation proposal"
+    example_intent: "Reconciliation proposal for A vs B"
+    structure_signature: "DIFF → PROJECT"
+    patterns:
+      - "diff"
+      - "project"
+    bindings:
+      - "a"
+      - "b"
+    policy_fields: []
+    effects: "propose_update"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "F24"
+    domain: "data"
+    title: "approved reconciliation apply"
+    example_intent: "Apply approved reconciliation updates"
+    structure_signature: "HUMAN → UPDATE"
+    patterns:
+      - "human_approve"
+      - "update"
+    bindings:
+      - "proposal"
+    policy_fields: []
+    effects: "update"
+    authority_class: "write"
+    custody: "inherit"
+    human_gate: "required"
+    runtime_cognition: "none"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "F25"
+    domain: "data"
+    title: "scheduled bounded report"
+    example_intent: "Bounded report (schedule is product trigger)"
+    structure_signature: "AGGREGATE → PROJECT"
+    patterns:
+      - "aggregate"
+      - "project"
+    bindings:
+      - "dataset"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "F26"
+    domain: "data"
+    title: "metrics anomaly candidates"
+    example_intent: "Anomaly candidates from these metrics"
+    structure_signature: "COMPARE → CLASSIFY"
+    patterns:
+      - "compare"
+      - "classify"
+    bindings:
+      - "metrics"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "F27"
+    domain: "data"
+    title: "inventory low-stock report"
+    example_intent: "Low-stock report from this inventory"
+    structure_signature: "FILTER → PROJECT"
+    patterns:
+      - "filter"
+      - "project"
+    bindings:
+      - "inventory"
+    policy_fields:
+      - "threshold"
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-C"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "F28"
+    domain: "data"
+    title: "records grouped summary"
+    example_intent: "Grouped summary of these records"
+    structure_signature: "AGGREGATE → SUMMARIZE"
+    patterns:
+      - "aggregate"
+      - "summarize"
+    bindings:
+      - "records"
+      - "key"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "F29"
+    domain: "data"
+    title: "event stream batch digest"
+    example_intent: "Digest this event-stream batch"
+    structure_signature: "BOUNDED_BATCH → SUMMARIZE"
+    patterns:
+      - "batch"
+      - "summarize"
+    bindings:
+      - "events"
+    policy_fields:
+      - "max_batch"
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "F30"
+    domain: "data"
+    title: "exact arithmetic report"
+    example_intent: "Exact totals report (deterministic compute)"
+    structure_signature: "VALIDATE → AGGREGATE"
+    patterns:
+      - "validate"
+      - "aggregate"
+    bindings:
+      - "records"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "G01"
+    domain: "product"
+    title: "feedback categorize"
+    example_intent: "Categorize this feedback"
+    structure_signature: "CLASSIFY"
+    patterns:
+      - "classify"
+    bindings:
+      - "feedback"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "G02"
+    domain: "product"
+    title: "feedback themes"
+    example_intent: "Extract themes from this feedback"
+    structure_signature: "CLASSIFY → AGGREGATE"
+    patterns:
+      - "classify"
+      - "aggregate"
+    bindings:
+      - "feedback"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "G03"
+    domain: "product"
+    title: "reviews themes"
+    example_intent: "Themes from these reviews"
+    structure_signature: "CLASSIFY → AGGREGATE"
+    patterns:
+      - "classify"
+      - "aggregate"
+    bindings:
+      - "reviews"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "G04"
+    domain: "product"
+    title: "feature requests dedupe"
+    example_intent: "Dedupe these feature requests"
+    structure_signature: "DEDUP"
+    patterns:
+      - "dedup"
+    bindings:
+      - "requests"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "G05"
+    domain: "product"
+    title: "feature requests cluster"
+    example_intent: "Cluster these feature requests"
+    structure_signature: "CLASSIFY"
+    patterns:
+      - "classify"
+    bindings:
+      - "requests"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "G06"
+    domain: "product"
+    title: "events funnel summary"
+    example_intent: "Funnel summary from these events"
+    structure_signature: "AGGREGATE"
+    patterns:
+      - "aggregate"
+    bindings:
+      - "events"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "G07"
+    domain: "product"
+    title: "metrics snapshot report"
+    example_intent: "Report from this metrics snapshot"
+    structure_signature: "PROJECT"
+    patterns:
+      - "project"
+    bindings:
+      - "metrics"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "G08"
+    domain: "product"
+    title: "experiment results summary"
+    example_intent: "Summarize these experiment results"
+    structure_signature: "SUMMARIZE"
+    patterns:
+      - "summarize"
+    bindings:
+      - "results"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "G09"
+    domain: "product"
+    title: "experiment A/B compare"
+    example_intent: "Compare experiment A vs B"
+    structure_signature: "COMPARE"
+    patterns:
+      - "compare"
+    bindings:
+      - "a"
+      - "b"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "G10"
+    domain: "product"
+    title: "cohort summary"
+    example_intent: "Summarize this cohort data"
+    structure_signature: "AGGREGATE → SUMMARIZE"
+    patterns:
+      - "aggregate"
+      - "summarize"
+    bindings:
+      - "cohort"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "G11"
+    domain: "product"
+    title: "user interviews insights"
+    example_intent: "Insights from these interviews"
+    structure_signature: "EXTRACT"
+    patterns:
+      - "extract"
+    bindings:
+      - "interviews"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "G12"
+    domain: "product"
+    title: "user interviews pain points"
+    example_intent: "Pain points from these interviews"
+    structure_signature: "EXTRACT"
+    patterns:
+      - "extract"
+    bindings:
+      - "interviews"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "G13"
+    domain: "product"
+    title: "NPS comments categorize"
+    example_intent: "Categorize these NPS comments"
+    structure_signature: "CLASSIFY"
+    patterns:
+      - "classify"
+    bindings:
+      - "comments"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "G14"
+    domain: "product"
+    title: "churn reasons cluster"
+    example_intent: "Cluster these churn reasons"
+    structure_signature: "CLASSIFY"
+    patterns:
+      - "classify"
+    bindings:
+      - "reasons"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "G15"
+    domain: "product"
+    title: "usage anomaly report"
+    example_intent: "Anomaly report from usage data"
+    structure_signature: "COMPARE → CLASSIFY"
+    patterns:
+      - "compare"
+      - "classify"
+    bindings:
+      - "usage"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "G16"
+    domain: "product"
+    title: "release customer-impact brief"
+    example_intent: "Customer-impact brief for this release"
+    structure_signature: "SUMMARIZE"
+    patterns:
+      - "summarize"
+    bindings:
+      - "release"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "G17"
+    domain: "product"
+    title: "roadmap status digest"
+    example_intent: "Status digest of these roadmap issues"
+    structure_signature: "AGGREGATE → SUMMARIZE"
+    patterns:
+      - "aggregate"
+      - "summarize"
+    bindings:
+      - "issues"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "G18"
+    domain: "product"
+    title: "backlog prioritized evidence"
+    example_intent: "Evidence table for this backlog (no invented priority)"
+    structure_signature: "PROJECT"
+    patterns:
+      - "project"
+    bindings:
+      - "backlog"
+    policy_fields:
+      - "priority_policy?"
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "WARM"
+    promotion_status: "NEEDS_WARM"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "G19"
+    domain: "product"
+    title: "product docs FAQ"
+    example_intent: "FAQ from these product docs"
+    structure_signature: "EXTRACT"
+    patterns:
+      - "extract"
+    bindings:
+      - "docs"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "G20"
+    domain: "product"
+    title: "customer requests product routing"
+    example_intent: "Route customer requests to product areas"
+    structure_signature: "CLASSIFY → ROUTE"
+    patterns:
+      - "classify"
+      - "route"
+    bindings:
+      - "requests"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "H01"
+    domain: "finance"
+    title: "invoice fields"
+    example_intent: "Extract fields from this invoice"
+    structure_signature: "EXTRACT"
+    patterns:
+      - "extract"
+    bindings:
+      - "invoice"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "H02"
+    domain: "finance"
+    title: "invoice totals validation"
+    example_intent: "Validate exact invoice totals in code"
+    structure_signature: "VALIDATE + ARITHMETIC"
+    patterns:
+      - "validate"
+      - "aggregate"
+    bindings:
+      - "invoice"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "H03"
+    domain: "finance"
+    title: "invoice duplicate detection"
+    example_intent: "Detect duplicate invoices"
+    structure_signature: "DEDUP"
+    patterns:
+      - "dedup"
+    bindings:
+      - "invoices"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "H04"
+    domain: "finance"
+    title: "invoice payment recommendation"
+    example_intent: "Payment recommendation for this invoice"
+    structure_signature: "FACTS → POLICY → ROUTE"
+    patterns:
+      - "verify"
+      - "route"
+    bindings:
+      - "invoice"
+    policy_fields:
+      - "pay_threshold"
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "WARM"
+    promotion_status: "NEEDS_WARM"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "H05"
+    domain: "finance"
+    title: "invoice approval payment proposal"
+    example_intent: "Propose payment after approval"
+    structure_signature: "POLICY → HUMAN → EFFECT"
+    patterns:
+      - "verify"
+      - "human_approve"
+    bindings:
+      - "invoice"
+    policy_fields:
+      - "pay_threshold"
+    effects: "pay"
+    authority_class: "write"
+    custody: "inherit"
+    human_gate: "required"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "H06"
+    domain: "finance"
+    title: "expenses categorize"
+    example_intent: "Categorize these expenses"
+    structure_signature: "CLASSIFY"
+    patterns:
+      - "classify"
+    bindings:
+      - "expenses"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "H07"
+    domain: "finance"
+    title: "expenses aggregate"
+    example_intent: "Aggregate these expenses"
+    structure_signature: "AGGREGATE"
+    patterns:
+      - "aggregate"
+    bindings:
+      - "expenses"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "H08"
+    domain: "finance"
+    title: "transactions reconcile"
+    example_intent: "Reconcile these transactions"
+    structure_signature: "RECONCILE"
+    patterns:
+      - "normalize"
+      - "diff"
+    bindings:
+      - "a"
+      - "b"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "H09"
+    domain: "finance"
+    title: "transactions anomaly candidates"
+    example_intent: "Anomaly candidates in these transactions"
+    structure_signature: "CLASSIFY"
+    patterns:
+      - "classify"
+    bindings:
+      - "txns"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "H10"
+    domain: "finance"
+    title: "budget variance report"
+    example_intent: "Variance report from this budget snapshot"
+    structure_signature: "COMPARE → PROJECT"
+    patterns:
+      - "compare"
+      - "project"
+    bindings:
+      - "budget"
+      - "actuals"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "H11"
+    domain: "finance"
+    title: "purchase request policy facts"
+    example_intent: "Policy facts for this purchase request"
+    structure_signature: "EXTRACT → VERIFY"
+    patterns:
+      - "extract"
+      - "verify"
+    bindings:
+      - "request"
+    policy_fields:
+      - "policy"
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "H12"
+    domain: "finance"
+    title: "purchase request approval"
+    example_intent: "Approve this purchase request"
+    structure_signature: "HUMAN_APPROVE"
+    patterns:
+      - "human_approve"
+    bindings:
+      - "request"
+    policy_fields:
+      - "amount_threshold"
+    effects: "approve"
+    authority_class: "write"
+    custody: "inherit"
+    human_gate: "required"
+    runtime_cognition: "none"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "H13"
+    domain: "finance"
+    title: "vendor documents structured record"
+    example_intent: "Structured record from these vendor docs"
+    structure_signature: "EXTRACT"
+    patterns:
+      - "extract"
+    bindings:
+      - "docs"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "H14"
+    domain: "finance"
+    title: "quote comparison"
+    example_intent: "Compare these quotes"
+    structure_signature: "COMPARE"
+    patterns:
+      - "compare"
+    bindings:
+      - "quotes"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "H15"
+    domain: "finance"
+    title: "recurring costs summary"
+    example_intent: "Summary of recurring costs"
+    structure_signature: "AGGREGATE"
+    patterns:
+      - "aggregate"
+    bindings:
+      - "costs"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "I01"
+    domain: "internal"
+    title: "meeting notes action items"
+    example_intent: "Action items from these notes"
+    structure_signature: "EXTRACT"
+    patterns:
+      - "extract"
+    bindings:
+      - "notes"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "I02"
+    domain: "internal"
+    title: "meeting notes decisions"
+    example_intent: "Decisions from these notes"
+    structure_signature: "EXTRACT"
+    patterns:
+      - "extract"
+    bindings:
+      - "notes"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "I03"
+    domain: "internal"
+    title: "weekly updates team digest"
+    example_intent: "Team digest from weekly updates"
+    structure_signature: "SUMMARIZE"
+    patterns:
+      - "summarize"
+    bindings:
+      - "updates"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "I04"
+    domain: "internal"
+    title: "status reports executive brief"
+    example_intent: "Executive brief from status reports"
+    structure_signature: "SUMMARIZE"
+    patterns:
+      - "summarize"
+    bindings:
+      - "reports"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "I05"
+    domain: "internal"
+    title: "project issues weekly report"
+    example_intent: "Weekly report from project issues"
+    structure_signature: "AGGREGATE → SUMMARIZE"
+    patterns:
+      - "aggregate"
+      - "summarize"
+    bindings:
+      - "issues"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "I06"
+    domain: "internal"
+    title: "onboarding docs checklist"
+    example_intent: "Checklist from onboarding docs"
+    structure_signature: "EXTRACT"
+    patterns:
+      - "extract"
+    bindings:
+      - "docs"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "I07"
+    domain: "internal"
+    title: "internal docs FAQ"
+    example_intent: "FAQ from internal docs"
+    structure_signature: "EXTRACT"
+    patterns:
+      - "extract"
+    bindings:
+      - "docs"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "I08"
+    domain: "internal"
+    title: "requests categorize route"
+    example_intent: "Categorize and route these requests"
+    structure_signature: "CLASSIFY → ROUTE"
+    patterns:
+      - "classify"
+      - "route"
+    bindings:
+      - "requests"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "I09"
+    domain: "internal"
+    title: "forms structured records"
+    example_intent: "Structured records from these forms"
+    structure_signature: "EXTRACT"
+    patterns:
+      - "extract"
+    bindings:
+      - "forms"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "I10"
+    domain: "internal"
+    title: "forms validation"
+    example_intent: "Validate these form submissions"
+    structure_signature: "VALIDATE"
+    patterns:
+      - "validate"
+    bindings:
+      - "forms"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "I11"
+    domain: "internal"
+    title: "applications structured extraction"
+    example_intent: "Extract fields from these applications"
+    structure_signature: "EXTRACT"
+    patterns:
+      - "extract"
+    bindings:
+      - "apps"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "I12"
+    domain: "internal"
+    title: "task list dedupe"
+    example_intent: "Dedupe this task list"
+    structure_signature: "DEDUP"
+    patterns:
+      - "dedup"
+    bindings:
+      - "tasks"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "I13"
+    domain: "internal"
+    title: "task list group by owner"
+    example_intent: "Group this task list by owner"
+    structure_signature: "AGGREGATE"
+    patterns:
+      - "aggregate"
+    bindings:
+      - "tasks"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "I14"
+    domain: "internal"
+    title: "incident timeline postmortem draft"
+    example_intent: "Postmortem draft from this timeline"
+    structure_signature: "SUMMARIZE"
+    patterns:
+      - "summarize"
+    bindings:
+      - "timeline"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "I15"
+    domain: "internal"
+    title: "project snapshot risks unknowns"
+    example_intent: "Risks/unknowns from this project snapshot"
+    structure_signature: "EXTRACT"
+    patterns:
+      - "extract"
+    bindings:
+      - "snapshot"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "J01"
+    domain: "security"
+    title: "finding normalize"
+    example_intent: "Normalize this finding"
+    structure_signature: "NORMALIZE"
+    patterns:
+      - "normalize"
+    bindings:
+      - "finding"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "J02"
+    domain: "security"
+    title: "finding severity evidence"
+    example_intent: "Severity evidence for this finding"
+    structure_signature: "EXTRACT → SCORE"
+    patterns:
+      - "extract"
+      - "score"
+    bindings:
+      - "finding"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "J03"
+    domain: "security"
+    title: "findings dedupe"
+    example_intent: "Dedupe these findings"
+    structure_signature: "DEDUP"
+    patterns:
+      - "dedup"
+    bindings:
+      - "findings"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "J04"
+    domain: "security"
+    title: "findings group by asset"
+    example_intent: "Group findings by asset"
+    structure_signature: "AGGREGATE"
+    patterns:
+      - "aggregate"
+    bindings:
+      - "findings"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "J05"
+    domain: "security"
+    title: "policy controls extraction"
+    example_intent: "Extract controls from this policy"
+    structure_signature: "EXTRACT"
+    patterns:
+      - "extract"
+    bindings:
+      - "policy"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "extract"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "J06"
+    domain: "security"
+    title: "controls evidence checklist"
+    example_intent: "Evidence checklist for these controls"
+    structure_signature: "PROJECT"
+    patterns:
+      - "project"
+    bindings:
+      - "controls"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "J07"
+    domain: "security"
+    title: "config snapshot drift"
+    example_intent: "Config drift between snapshots"
+    structure_signature: "DIFF"
+    patterns:
+      - "diff"
+    bindings:
+      - "before"
+      - "after"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "J08"
+    domain: "security"
+    title: "access report anomaly candidates"
+    example_intent: "Anomaly candidates in this access report"
+    structure_signature: "CLASSIFY"
+    patterns:
+      - "classify"
+    bindings:
+      - "report"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-B"
+    promotion_status: "FACTORABLE"
+    notes: ""
+    current_coverage: "compose from existing motifs; not a new YAML"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "J09"
+    domain: "security"
+    title: "audit evidence structured package"
+    example_intent: "Structured audit evidence package"
+    structure_signature: "PROJECT"
+    patterns:
+      - "project"
+    bindings:
+      - "evidence"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "J10"
+    domain: "security"
+    title: "logs security incident brief"
+    example_intent: "Security incident brief from logs"
+    structure_signature: "SUMMARIZE"
+    patterns:
+      - "summarize"
+    bindings:
+      - "logs"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "generate"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "J11"
+    domain: "security"
+    title: "suspicious event triage"
+    example_intent: "Triage this suspicious event"
+    structure_signature: "CLASSIFY → ROUTE"
+    patterns:
+      - "classify"
+      - "route"
+    bindings:
+      - "event"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "J12"
+    domain: "security"
+    title: "change compliance review"
+    example_intent: "Compliance review of this change"
+    structure_signature: "VERIFY"
+    patterns:
+      - "verify"
+    bindings:
+      - "change"
+      - "policy"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "WARM"
+    promotion_status: "NEEDS_WARM"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "J13"
+    domain: "security"
+    title: "artifact parallel independent review"
+    example_intent: "N independent reviews of this artifact"
+    structure_signature: "FANOUT → FANIN"
+    patterns:
+      - "fanout"
+      - "fanin"
+      - "verify"
+    bindings:
+      - "artifact"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "decision"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    notes: "current nika-spec skeleton parallel-review"
+    current_coverage: "COVERED skeleton parallel-review"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "J14"
+    domain: "security"
+    title: "review deterministic conjunction"
+    example_intent: "Conjunction of these review verdicts"
+    structure_signature: "FANIN"
+    patterns:
+      - "fanin"
+    bindings:
+      - "reviews"
+    policy_fields: []
+    effects: "none"
+    authority_class: "read"
+    custody: "inherit"
+    human_gate: "none"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "CANDIDATE"
+    notes: ""
+    current_coverage: "CANDIDATE"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1
+  - family_id: "J15"
+    domain: "security"
+    title: "sensitive action approval-before-effect"
+    example_intent: "Ask me before this sensitive action"
+    structure_signature: "HUMAN → EFFECT"
+    patterns:
+      - "human_approve"
+    bindings:
+      - "proposal"
+    policy_fields: []
+    effects: "effect"
+    authority_class: "write"
+    custody: "inherit"
+    human_gate: "required"
+    runtime_cognition: "none"
+    proposed_path: "HOT-A"
+    promotion_status: "COVERED"
+    notes: "current nika-spec skeleton human-gated-ship"
+    current_coverage: "COVERED skeleton human-gated-ship"
+    first_wave: false
+    positive_cases: 4
+    near_miss_cases: 2
+    edit_cases: 1

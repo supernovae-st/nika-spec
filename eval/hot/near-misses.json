@@ -1,0 +1,102 @@
+{
+  "severe_if_hot_hit": true,
+  "count": 16,
+  "cases": [
+    {
+      "family_id": "A01",
+      "text": "Monitor https://example.com every day and notify me",
+      "must_not_share_fingerprint": true,
+      "why": "schedule+effect"
+    },
+    {
+      "family_id": "A01",
+      "text": "Summarize https://example.com and send it to Slack",
+      "must_not_share_fingerprint": true,
+      "why": "send effect"
+    },
+    {
+      "family_id": "A01",
+      "text": "Compare https://example.com with competitor.com",
+      "must_not_share_fingerprint": true,
+      "why": "compare"
+    },
+    {
+      "family_id": "A01",
+      "text": "Download every PDF from https://example.com",
+      "must_not_share_fingerprint": true,
+      "why": "bulk fetch"
+    },
+    {
+      "family_id": "A01",
+      "text": "Update the copy on https://example.com",
+      "must_not_share_fingerprint": true,
+      "why": "write effect"
+    },
+    {
+      "family_id": "B01",
+      "text": "Classify this ticket and automatically refund",
+      "must_not_share_fingerprint": true,
+      "why": "refund effect+policy"
+    },
+    {
+      "family_id": "B01",
+      "text": "Classify and delete the abusive account",
+      "must_not_share_fingerprint": true,
+      "why": "delete"
+    },
+    {
+      "family_id": "B01",
+      "text": "Investigate this unknown production bug",
+      "must_not_share_fingerprint": true,
+      "why": "open world"
+    },
+    {
+      "family_id": "E05",
+      "text": "Review and merge this PR",
+      "must_not_share_fingerprint": true,
+      "why": "merge effect"
+    },
+    {
+      "family_id": "E05",
+      "text": "Deploy this PR",
+      "must_not_share_fingerprint": true,
+      "why": "deploy"
+    },
+    {
+      "family_id": "E05",
+      "text": "Rewrite the implementation in this PR",
+      "must_not_share_fingerprint": true,
+      "why": "code write"
+    },
+    {
+      "family_id": "F01",
+      "text": "Ignore malformed rows and continue silently",
+      "must_not_share_fingerprint": true,
+      "why": "policy skip"
+    },
+    {
+      "family_id": "F01",
+      "text": "Validate then pay the invoices",
+      "must_not_share_fingerprint": true,
+      "why": "pay"
+    },
+    {
+      "family_id": "F04",
+      "text": "Predict next month revenue from these totals",
+      "must_not_share_fingerprint": true,
+      "why": "forecast not exact"
+    },
+    {
+      "family_id": "F04",
+      "text": "Pay the aggregated invoices",
+      "must_not_share_fingerprint": true,
+      "why": "pay"
+    },
+    {
+      "family_id": "G05",
+      "text": "Handle tickets and auto-refund good customers",
+      "must_not_share_fingerprint": true,
+      "why": "policy hole as HOT"
+    }
+  ]
+}

@@ -68,6 +68,11 @@ jobs:
       # (the engine parser refuses duplicates itself · NIKA-PARSE-017) and
       # conformance/tests/ is the harness's torture corpus, not this
       # gate's law. Selftest first: the teeth are proven before they bite.
+      - name: HOT candidate inventory integrity (not HOT qualification)
+        run: |
+          python eval/hot/validate.py
+          python -O eval/hot/validate_selftest.py
+
       - name: YAML duplicate-key gate (selftest + sweep)
         run: |
           python scripts/check-yaml-dup-keys.py --selftest
