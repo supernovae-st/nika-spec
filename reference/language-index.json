@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "kind": "spec-language-knowledge",
   "owner": "supernovae-st/nika-spec",
-  "revision": "923e5936e2132fa27ad8c917b2af088d6fa08c85",
+  "revision": "60696338ef08adb25df6cca23cb47f0a39eb785a",
   "inputs": {
-    "schemas/workflow.schema.json": "0979b0350eaa78b1ed38eb87dfae82d96ac5f552ca290cf594f2605c9b15de0b",
+    "schemas/workflow.schema.json": "e9f01b4b6adbd04590a518eb4548ece221f080fe4da20bb1f07c25b5483402f8",
     "templates/agent-loop.nika": "4bac2151575df3fc3342ea19cdadf5b5e416eeaaa528bc3ec5f012acfb98da8e",
     "templates/aggregate-by-key.nika": "a7a34d9415e3187ff32607d79272da49e790500f1998593730c5047dc8a111fd",
     "templates/api-upload-and-create.nika": "1e06897b41686f7c51f97e70893bd16e09dba869df85378cb3c89913e1d20952",
