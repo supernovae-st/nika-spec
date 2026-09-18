@@ -3,7 +3,7 @@
   "kind": "compile_hot_measurement_split",
   "not": "a HOT quality score, a compiler-generated corpus, or a hold-out invented by moving already-read ids",
   "date": "2026-09-18",
-  "pin": "7722aa66b053cf310975abe746c62cbbd5b1a96e",
+  "pin": "8c73d7d9f9cdc8215e5349dec43aa2ba84c13480",
   "freeze_date": "2026-09-18",
   "owners": {
     "measure": "nika#1656",
@@ -300,9 +300,10 @@
         "scenario:X09",
         "scenario:X10",
         "scenario:X11",
-        "scenario:X12"
+        "scenario:X12",
+        "scenario:X13"
       ],
-      "reason": "Every id already on spec main at pin 7722aa66b and already read during 2026-09-18 research: goldens G01–G24, N01–N15, E01–E10; composed scenarios X01–X12; 220 families in families.json. Paraphrases and near-misses have no own ids and belong to those families. Tuning BM25 τ, fingerprints, compiler prompts, pattern metadata or policy heuristics on this set is in-sample."
+      "reason": "Every id already on spec main at pin 7722aa66b and already read during 2026-09-18 research: goldens G01–G24, N01–N15, E01–E10; composed scenarios X01–X12; 220 families in families.json. Paraphrases and near-misses have no own ids and belong to those families. Tuning BM25 τ, fingerprints, compiler prompts, pattern metadata or policy heuristics on this set is in-sample. The consent extension at the current pin adds scenario:X13 and updates existing assertions; all remain already-read DEVELOPMENT."
     },
     "HELD-OUT": {
       "ids": [],
@@ -327,6 +328,26 @@
     "edits.json": "sha256:948d610fef658805213470d402f09ba888dfeb6890b2c730ba71b2b0c67884cf",
     "composition-fixtures.json": "sha256:cce8c723cb7802b36d9ce4cbc75ec1b429a8a23017cbdf2106326090734b22e7",
     "skeleton-audit.json": "sha256:112d5823b2515d6d4e5f751ed6a530ae8381f9fd86653b2b73a58105719007c8",
-    "complex/": "sha256:ec149a6326052846da502d07eccc0ed4508616c369737aff8fb2d149d784d71e"
-  }
+    "complex/": "sha256:c3c50e456694e422a7b0bf0215ac8c5bbeefba78e1ad45caa6edc75a0374dda0"
+  },
+  "initial_freeze": {
+    "pin": "7722aa66b053cf310975abe746c62cbbd5b1a96e",
+    "pin_sha256": {
+      "algorithm": {
+        "file": "sha256 of the file bytes, hex, prefixed sha256:",
+        "tree": "sha256 of sorted UTF-8 lines 'relative/posix/path<space>hexdigest<newline>' over regular files under the directory; skip .DS_Store, *.pyc and any path with a __pycache__ component"
+      },
+      "goldens.json": "sha256:4d02c0da3690ee8af2022ae65645cb40e1b4a67f1b9804e57df9978e9fa0b3ca",
+      "families.json": "sha256:075b60d43ab980196fd1e7979f498ed1c477a210f2b928d0896da2b32e7c3481",
+      "patterns.json": "sha256:3e790d53234af4130b26ecf7eb76ad52ebcd9c727695a2ee6e7172741f3e99c8",
+      "paraphrases.json": "sha256:15705207a5ba90574ee64245e0f1ad3738f85d691749e760c82750e4e8059003",
+      "near-misses.json": "sha256:236233b578e04c440b0e6ac4f02ba85a5094fdd177bbb8bb413113280ebc998a",
+      "edits.json": "sha256:948d610fef658805213470d402f09ba888dfeb6890b2c730ba71b2b0c67884cf",
+      "composition-fixtures.json": "sha256:cce8c723cb7802b36d9ce4cbc75ec1b429a8a23017cbdf2106326090734b22e7",
+      "skeleton-audit.json": "sha256:112d5823b2515d6d4e5f751ed6a530ae8381f9fd86653b2b73a58105719007c8",
+      "complex/": "sha256:ec149a6326052846da502d07eccc0ed4508616c369737aff8fb2d149d784d71e"
+    },
+    "note": "Original measurement freeze, preserved as historical provenance. The current pin below includes the already-read X13 consent extension in DEVELOPMENT."
+  },
+  "development_revision": "Consent extension: X13 and the revised KG01 assertions are already-read development material; neither the scoring splits nor compiler-generated provenance is promoted."
 }

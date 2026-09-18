@@ -106,6 +106,33 @@ class InventoryGate(unittest.TestCase):
         with self.assertRaisesRegex(validate.CorpusError, "PROMOTED_HOT"):
             validate.validate(self.root)
 
+    def test_consent_extension_cannot_move_to_a_scoring_split(self):
+        original = (self.root / "splits.json").read_text()
+        for bucket in ("HELD-OUT", "ADVERSARIAL"):
+            with self.subTest(bucket=bucket):
+                (self.root / "splits.json").write_text(original)
+
+                def move(d):
+                    d["splits"]["DEVELOPMENT"]["ids"].remove("scenario:X13")
+                    d["splits"][bucket]["ids"].append("scenario:X13")
+
+                self.change_json("splits", move)
+                with self.assertRaisesRegex(validate.CorpusError, "already-read"):
+                    validate.validate(self.root)
+
+    def test_development_id_cannot_also_be_adversarial(self):
+        self.change_json("splits", lambda d: d["splits"]["ADVERSARIAL"]["ids"].append("scenario:X13"))
+        with self.assertRaisesRegex(validate.CorpusError, "DEVELOPMENT id is also in ADVERSARIAL"):
+            validate.validate(self.root)
+
+    def test_unseen_id_cannot_belong_to_both_scoring_splits(self):
+        def overlap(d):
+            for bucket in ("HELD-OUT", "ADVERSARIAL"):
+                d["splits"][bucket]["ids"].append("scenario:unseen")
+        self.change_json("splits", overlap)
+        with self.assertRaisesRegex(validate.CorpusError, "HELD-OUT id is also in ADVERSARIAL"):
+            validate.validate(self.root)
+
     def test_splits_cannot_claim_compiler_generated(self):
         self.change_json("splits", lambda d: d.update(compiler_generated=1))
         with self.assertRaisesRegex(validate.CorpusError, "compiler-generated"):

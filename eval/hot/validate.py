@@ -35,7 +35,7 @@ ALREADY_READ_GOLDENS = tuple(
     + [f"golden:N{i:02d}" for i in range(1, 16)]
     + [f"golden:E{i:02d}" for i in range(1, 11)]
 )
-ALREADY_READ_SCENARIOS = tuple(f"scenario:X{i:02d}" for i in range(1, 13))
+ALREADY_READ_SCENARIOS = tuple(f"scenario:X{i:02d}" for i in range(1, 14))
 
 
 class CorpusError(ValueError):
@@ -190,6 +190,8 @@ def validate(root: Path = ROOT) -> dict:
     held = split_ids(buckets["HELD-OUT"], "HELD-OUT")
     adversarial = split_ids(buckets["ADVERSARIAL"], "ADVERSARIAL")
     require(not (development & held), "DEVELOPMENT id is also in HELD-OUT")
+    require(not (development & adversarial), "DEVELOPMENT id is also in ADVERSARIAL")
+    require(not (held & adversarial), "HELD-OUT id is also in ADVERSARIAL")
     already_read = (
         {f"family:{family_id}" for family_id in ids}
         | set(ALREADY_READ_GOLDENS)

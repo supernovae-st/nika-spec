@@ -99,3 +99,9 @@ zero-provider-calls-during-compile claim follows from these checks. No
 assembler exists in this repo; nothing here is a compiler-generated
 workflow; all candidate statuses remain unchanged and `PROMOTED_HOT`
 stays zero.
+
+The consent extension adds X13 to DEVELOPMENT and pins the revised `complex/`
+tree at `8c73d7d9`; `splits.json.initial_freeze` retains the original pin and
+digests. Its near-misses are adversarial in kind and already read, so they do
+not enter the ADVERSARIAL scoring split. Both scoring splits remain empty,
+and the integrity gate rejects overlapping membership.
