@@ -1,0 +1,5 @@
+[
+  {"id": "quote-a", "total_eur": 5200, "delivery_days": 10},
+  {"id": "quote-b", "total_eur": 4900, "delivery_days": 21},
+  {"id": "quote-c", "total_eur": 5050, "delivery_days": 14}
+]

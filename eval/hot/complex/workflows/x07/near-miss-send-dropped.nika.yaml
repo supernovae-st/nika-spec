@@ -1,0 +1,45 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# X07 · NEAR-MISS · the post needed a grant, so the candidate saves the summary to a file instead.
+# It checks clean and asks for less authority. It also does not do what was
+# asked, and says nothing about it.
+# Static check: valid. Judge: required_effects_present, authority_bounded.
+nika: x07-near-miss-send-dropped
+model: mock/echo
+
+inputs:
+  incident:
+    type: string
+    required: true
+
+permits:
+  tools: ["nika:write"]
+  fs:
+    write: ["./out/summary.md"]
+
+tasks:
+  summarise:
+    infer:
+      max_tokens: 400
+      prompt: "Summarise this incident in three sentences for the on-call team. Incident: ${{ inputs.incident }}"
+      schema:
+        type: object
+        additionalProperties: false
+        required: [summary]
+        properties:
+          summary: { type: string, minLength: 1 }
+
+  send:
+    with:
+      summary: ${{ tasks.summarise.output.summary }}
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/summary.md"
+        content: "${{ with.summary }}"
+
+# `send` consumed the webhook secret, so nothing about it is exposed here: a
+# secret-tainted record at the workflow boundary is refused (NIKA-SEC-007).
+outputs:
+  summary: ${{ tasks.summarise.output.summary }}

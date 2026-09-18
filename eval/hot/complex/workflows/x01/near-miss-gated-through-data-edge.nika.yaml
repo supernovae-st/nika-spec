@@ -1,0 +1,90 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# X01 · NEAR-MISS · the write reads a gated task's output and has no condition of its own.
+# It looks closed: the staging task is skipped on a refusal. A skipped task hands
+# null across a `with:` edge and the consumer still runs, so the write fires on
+# no. Static check: valid (retained gap KG01). Judge: effects_gated.
+nika: x01-near-miss-gated-through-data-edge
+model: mock/echo
+
+const:
+  destination: "./out/report.md"
+  sources:
+    - { id: "src-a", ok: true, text: "Alpha shipped on time." }
+    - { id: "src-b", ok: false, text: "" }
+    - { id: "src-c", ok: true, text: "Gamma slipped one week." }
+
+permits:
+  tools: ["nika:jq", "nika:prompt", "nika:write"]
+  fs:
+    write: ["./out/report.md"]
+
+tasks:
+  digest:
+    for_each:
+      items: ${{ const.sources }}
+      max_parallel: 2
+      fail_fast: false
+    on_error:
+      recover: null
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: ${{ item }}
+        expression: 'if .ok then {id: .id, line: .text} else error("source unreadable") end'
+
+  coverage:
+    with:
+      digests: ${{ tasks.digest.output }}
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: { digests: "${{ with.digests }}", sources: "${{ const.sources }}" }
+        expression: '. as $r | [range(0; ($r.sources | length))] | {total: length, missing_ids: [.[] | select($r.digests[.] == null) | $r.sources[.].id], lines: [$r.digests[] | select(. != null) | .line]}'
+
+  merge:
+    with:
+      coverage: ${{ tasks.coverage.output }}
+    infer:
+      max_tokens: 600
+      prompt: "Merge these lines into a short status report: ${{ with.coverage.lines }}"
+      schema:
+        type: object
+        additionalProperties: false
+        required: [report]
+        properties:
+          report: { type: string, minLength: 1 }
+
+  human:
+    with:
+      coverage: ${{ tasks.coverage.output }}
+      report: ${{ tasks.merge.output.report }}
+    invoke:
+      tool: "nika:prompt"
+      args:
+        message: "Publish to ${{ const.destination }}? Missing sources: ${{ with.coverage.missing_ids }}. Report: ${{ with.report }}"
+
+  stage:
+    with:
+      go: ${{ tasks.human.output }}
+      report: ${{ tasks.merge.output.report }}
+    when: ${{ with.go == true }}
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: ${{ with.report }}
+        expression: "."
+
+  publish:
+    with:
+      staged: ${{ tasks.stage.output }}
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "${{ const.destination }}"
+        content: "Report: ${{ with.staged }}"
+
+outputs:
+  published: ${{ tasks.publish.status }}
+  missing_ids: ${{ tasks.coverage.output.missing_ids }}

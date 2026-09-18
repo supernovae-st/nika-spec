@@ -1,0 +1,39 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# X11 · NEAR-MISS · the question is "Proceed with the refund?".
+# It is a real blocking gate and the effect reads the answer. It shows none of the
+# facts the effect consumes, so the answer stays valid after the amount changes.
+# Static check: valid. Judge: gate_binds_effect_facts.
+nika: x11-near-miss-generic-question
+model: mock/echo
+
+const:
+  account: "ACME"
+  order_id: "A-1043"
+  amount_eur: 40
+
+permits:
+  tools: ["nika:prompt", "nika:write"]
+  fs:
+    write: ["./out/refund.txt"]
+
+tasks:
+  human:
+    invoke:
+      tool: "nika:prompt"
+      args:
+        message: "Proceed with the refund?"
+
+  refund:
+    with:
+      go: ${{ tasks.human.output }}
+    when: ${{ with.go == true }}
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/refund.txt"
+        content: "refund ${{ const.amount_eur }} EUR to ${{ const.account }} for order ${{ const.order_id }}"
+
+outputs:
+  refunded: ${{ tasks.refund.status }}

@@ -1,0 +1,48 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# X07 · REFUSED · the send is present and the file declares no boundary at all.
+# An absent block is zero authority, not a floor (NIKA-AUTH-006).
+nika: x07-refused-no-permits-block
+model: mock/echo
+
+inputs:
+  incident:
+    type: string
+    required: true
+
+secrets:
+  webhook:
+    source: env
+    key: TEAM_WEBHOOK_URL
+    egress:
+      - to: "nika:notify"
+        host_from_self: true
+
+tasks:
+  summarise:
+    infer:
+      max_tokens: 400
+      prompt: "Summarise this incident in three sentences for the on-call team. Incident: ${{ inputs.incident }}"
+      schema:
+        type: object
+        additionalProperties: false
+        required: [summary]
+        properties:
+          summary: { type: string, minLength: 1 }
+
+  send:
+    with:
+      summary: ${{ tasks.summarise.output.summary }}
+    invoke:
+      tool: "nika:notify"
+      args:
+        channel: webhook
+        target: "${{ secrets.webhook }}"
+        message: "${{ with.summary }}"
+        severity: info
+
+# `send` consumed the webhook secret, so nothing about it is exposed here: a
+# secret-tainted record at the workflow boundary is refused (NIKA-SEC-007).
+outputs:
+  summary: ${{ tasks.summarise.output.summary }}

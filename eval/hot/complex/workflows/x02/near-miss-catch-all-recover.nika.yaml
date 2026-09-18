@@ -1,0 +1,58 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# X02 · NEAR-MISS · the optional read recovers from every failure, not only from absence.
+# A corrupt or forbidden override file now reads as "no overrides" and the run
+# is green. Static check: valid. Judge: recover_narrow.
+nika: x02-near-miss-catch-all-recover
+model: mock/echo
+
+const:
+  items:
+    - { id: "inv-1", amount: 40 }
+    - { id: "inv-2", amount: "forty" }
+    - { id: "inv-3", amount: 25 }
+
+permits:
+  tools: ["nika:jq", "nika:read"]
+  fs:
+    read: ["./fixtures/overrides.json"]
+
+tasks:
+  overrides:
+    invoke:
+      tool: "nika:read"
+      args:
+        path: "./fixtures/overrides.json"
+    on_error:
+      recover: "{}"
+
+  convert:
+    for_each:
+      items: ${{ const.items }}
+      max_parallel: 2
+      fail_fast: false
+    on_error:
+      recover: null
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: ${{ item }}
+        expression: 'if (.amount | type) == "number" then {id: .id, cents: (.amount * 100)} else error("amount is not a number") end'
+
+  account:
+    with:
+      results: ${{ tasks.convert.output }}
+      overrides: ${{ tasks.overrides.output }}
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: { results: "${{ with.results }}", items: "${{ const.items }}", overrides: "${{ with.overrides }}" }
+        expression: '. as $r | [range(0; ($r.items | length))] as $idx | {total: ($r.items | length), ok_ids: [$idx[] | select($r.results[.] != null) | $r.items[.].id], failed_ids: [$idx[] | select($r.results[.] == null) | $r.items[.].id], overrides: ($r.overrides | fromjson)} | . + {complete: ((.failed_ids | length) == 0)} | . + {total_cents: (if .complete then ([$r.results[] | .cents] | add) else null end)}'
+
+outputs:
+  total: ${{ tasks.account.output.total }}
+  ok_ids: ${{ tasks.account.output.ok_ids }}
+  failed_ids: ${{ tasks.account.output.failed_ids }}
+  complete: ${{ tasks.account.output.complete }}
+  total_cents: ${{ tasks.account.output.total_cents }}

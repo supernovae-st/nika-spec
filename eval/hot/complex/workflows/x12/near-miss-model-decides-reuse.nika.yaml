@@ -1,0 +1,45 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# X12 · NEAR-MISS · a model call is asked whether the old judgment still applies.
+# Identity is equality over recorded fields. Static check: valid.
+# Judge: decision_deterministic.
+nika: x12-near-miss-model-decides-reuse
+model: mock/echo
+
+permits:
+  tools: ["nika:jq", "nika:read"]
+  fs:
+    read: ["./fixtures/request.json", "./fixtures/recorded.json"]
+
+tasks:
+  request:
+    invoke:
+      tool: "nika:read"
+      args:
+        path: "./fixtures/request.json"
+
+  recorded:
+    invoke:
+      tool: "nika:read"
+      args:
+        path: "./fixtures/recorded.json"
+
+  decide:
+    with:
+      request: ${{ tasks.request.output }}
+      recorded: ${{ tasks.recorded.output }}
+    infer:
+      max_tokens: 300
+      prompt: "Does this recorded judgment still apply to this request? Request: ${{ with.request }} Recorded: ${{ with.recorded }}"
+      schema:
+        type: object
+        additionalProperties: false
+        required: [reuse, reasons]
+        properties:
+          reuse: { type: boolean }
+          reasons: { type: array, items: { type: string } }
+
+outputs:
+  reuse: ${{ tasks.decide.output.reuse }}
+  reasons: ${{ tasks.decide.output.reasons }}

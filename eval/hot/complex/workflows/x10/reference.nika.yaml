@@ -1,0 +1,71 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# X10 · reference · for every class exactly one branch runs, and the branches that did not run wrote nothing.
+#
+#   [classify]──┬─billing──▶[to_billing]
+#               ├─login────▶[to_login]
+#               └─else─────▶[to_triage]     security · unknown · the fallback is the negation, so it is total
+#
+# Ported branch logic keeps its fallback and its exclusivity as obligations.
+# A correct final answer with a stray write in an unchosen branch is a defect.
+nika: x10-exclusive-branches
+model: mock/echo
+
+inputs:
+  ticket:
+    type: string
+    required: true
+
+permits:
+  tools: ["nika:write"]
+  fs:
+    write: ["./out/billing.txt", "./out/login.txt", "./out/triage.txt"]
+
+tasks:
+  classify:
+    infer:
+      max_tokens: 200
+      prompt: "Classify this support ticket. Ticket: ${{ inputs.ticket }}"
+      schema:
+        type: object
+        additionalProperties: false
+        required: [class]
+        properties:
+          class: { type: string, enum: [billing, login, security, unknown] }
+
+  to_billing:
+    with:
+      c: ${{ tasks.classify.output }}
+    when: ${{ with.c.class == "billing" }}
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/billing.txt"
+        content: "queued for billing"
+
+  to_login:
+    with:
+      c: ${{ tasks.classify.output }}
+    when: ${{ with.c.class == "login" }}
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/login.txt"
+        content: "queued for login"
+
+  to_triage:
+    with:
+      c: ${{ tasks.classify.output }}
+    when: ${{ with.c.class != "billing" && with.c.class != "login" }}
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/triage.txt"
+        content: "queued for human triage"
+
+outputs:
+  class: ${{ tasks.classify.output.class }}
+  billing: ${{ tasks.to_billing.status }}
+  login: ${{ tasks.to_login.status }}
+  triage: ${{ tasks.to_triage.status }}
