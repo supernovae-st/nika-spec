@@ -754,6 +754,12 @@ def validate(root: Path = ROOT) -> dict:
             require(declared <= known, f"{label}: violates an unknown assertion")
             if candidate["role"] in ("reference", "variant"):
                 require(not declared, f"{label}: a correct candidate declares no violation")
+            for key in ("engine_hints_include", "engine_hints_exclude"):
+                require(all(isinstance(kind, str) for kind in candidate.get(key, [])), f"{label}: {key} lists hint kinds")
+            if "refused_run" in candidate:
+                require(candidate["role"] == "refused", f"{label}: only a refused candidate is run as written")
+                require({"exit", "tasks_started", "files_written"} <= candidate["refused_run"]["expect"].keys(),
+                        f"{label}: a refused run states its exit, the tasks that started and the files it left")
             if candidate["role"] == "near_miss":
                 require(bool(candidate.get("plausible_because")), f"{label}: say why it is plausible")
                 require(bool(declared) or bool(candidate.get("caught_by_behaviour")),
@@ -775,6 +781,25 @@ def validate(root: Path = ROOT) -> dict:
         require({"id", "title", "owner", "law", "expected", "observed", "reproduce", "baseline"} <= gap.keys(),
                 f"{gap['id']}: missing fields")
         require(gap["baseline"] == "expected_fail", f"{gap['id']}: a retained gap stays red until it is fixed")
+        pinned = gap["reproduce"].get("sha256")
+        if pinned is not None:  # the witness is the original bytes: a gap is never closed by editing its witness
+            witness = hashlib.sha256((root / gap["reproduce"]["file"]).read_bytes()).hexdigest()
+            require(witness == pinned, f"{gap['id']}: its witness file changed; a retained gap is not redefined "
+                                       "by editing the workflow that shows it")
+        if gap.get("repaired_subcases"):
+            # A PARTLY repaired gap: what remains keeps its bytes, and a repair is never a renamed green case.
+            # Each repaired sub-case is a candidate that is refused AND run as written, so an engine that
+            # still admits it fails by running it.
+            require(pinned is not None, f"{gap['id']}: a partly repaired gap pins the bytes of the witness that remains")
+            proven = {c["file"] for s in scenarios for c in s["candidates"]
+                      if c["role"] == "refused" and "refused_run" in c}
+            require(set(gap["repaired_subcases"]) <= proven,
+                    f"{gap['id']}: a repaired sub-case is a refused candidate that is also run as written")
+            require(gap["reproduce"]["file"] not in gap["repaired_subcases"],
+                    f"{gap['id']}: the witness that remains is not one of its repaired sub-cases")
+        for fact in gap.get("facts", []):
+            require(fact.get("kind") in {"engine_check", "engine_hint", "behaviour_rejects"} and bool(fact.get("says")),
+                    f"{gap['id']}: a fact has a known kind and says what it records")
     return {"scenarios": len(scenarios), "candidates_judged": judged, "negative_controls": controls,
             "refused_by_reference_oracle": refused, "product_contracts_unqualified": len(contracts),
             "retained_gaps": len(gaps), "hot_promotion": False, "candidate_provenance": provenance,

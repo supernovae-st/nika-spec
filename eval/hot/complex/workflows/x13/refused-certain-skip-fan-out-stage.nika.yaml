@@ -1,0 +1,52 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# X13 · REFUSED · the same, and the skipped stage is a fan-out.
+# `when:` gates the whole task once, BEFORE the fan-out, so a refusal skips the
+# stage however many items it would have had. The collection changes nothing:
+# NIKA-SEC-014, and a run is refused before any task starts.
+# This is a repaired sub-case of KG01. It is not the original golden.
+nika: x13-refused-certain-skip-fan-out-stage
+model: mock/echo
+
+const:
+  note: "Release 2.4.1 is ready."
+
+permits:
+  tools: ["nika:jq", "nika:prompt", "nika:write"]
+  fs:
+    write: ["./out/report.md"]
+
+tasks:
+  human:
+    invoke:
+      tool: "nika:prompt"
+      args:
+        message: "Publish this note to ./out/report.md? ${{ const.note }}"
+
+  stage:
+    with:
+      go: ${{ tasks.human.output }}
+      lines: ["Release 2.4.1 is ready.", "Rollback plan attached."]
+    for_each:
+      items: ${{ with.lines }}
+      max_parallel: 2
+      fail_fast: false
+    when: ${{ with.go == true }}
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: ${{ item }}
+        expression: "."
+
+  publish:
+    with:
+      staged: ${{ tasks.stage.output }}
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/report.md"
+        content: "Release note: ${{ with.staged }}"
+
+outputs:
+  published: ${{ tasks.publish.status }}

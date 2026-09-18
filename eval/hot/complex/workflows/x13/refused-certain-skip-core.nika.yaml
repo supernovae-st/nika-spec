@@ -1,0 +1,49 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# X13 · REFUSED · the write only READS the stage the refusal certainly skips.
+# It looks closed: the staging task is gated on the answer. A skipped task hands
+# null across a `with:` edge, nothing else feeds the write, so it reaches its
+# verb on no. Every step before the verb is total, so this is PROVEN, not
+# suspected: NIKA-SEC-014, and a run is refused before any task starts.
+# This is a repaired sub-case of KG01. It is not the original golden.
+nika: x13-refused-certain-skip-core
+model: mock/echo
+
+const:
+  note: "Release 2.4.1 is ready."
+
+permits:
+  tools: ["nika:jq", "nika:prompt", "nika:write"]
+  fs:
+    write: ["./out/report.md"]
+
+tasks:
+  human:
+    invoke:
+      tool: "nika:prompt"
+      args:
+        message: "Publish this note to ./out/report.md? ${{ const.note }}"
+
+  stage:
+    with:
+      go: ${{ tasks.human.output }}
+      note: ${{ const.note }}
+    when: ${{ with.go == true }}
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: ${{ with.note }}
+        expression: "."
+
+  publish:
+    with:
+      staged: ${{ tasks.stage.output }}
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/report.md"
+        content: "Release note: ${{ with.staged }}"
+
+outputs:
+  published: ${{ tasks.publish.status }}

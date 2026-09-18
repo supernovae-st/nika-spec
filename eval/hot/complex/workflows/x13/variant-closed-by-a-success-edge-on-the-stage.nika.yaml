@@ -1,0 +1,49 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# X13 · VARIANT · a differently built correct candidate.
+# The write reads the staged note and ALSO waits for the stage's success. A
+# skipped stage is not a success, so a refusal cancels the write: the same
+# producer's success edge closes what its value edge leaves open.
+nika: x13-variant-closed-by-a-success-edge-on-the-stage
+model: mock/echo
+
+const:
+  note: "Release 2.4.1 is ready."
+
+permits:
+  tools: ["nika:jq", "nika:prompt", "nika:write"]
+  fs:
+    write: ["./out/report.md"]
+
+tasks:
+  human:
+    invoke:
+      tool: "nika:prompt"
+      args:
+        message: "Publish this note to ./out/report.md? ${{ const.note }}"
+
+  stage:
+    with:
+      go: ${{ tasks.human.output }}
+      note: ${{ const.note }}
+    when: ${{ with.go == true }}
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: ${{ with.note }}
+        expression: "."
+
+  publish:
+    after:
+      stage: success
+    with:
+      staged: ${{ tasks.stage.output }}
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/report.md"
+        content: "Release note: ${{ with.staged }}"
+
+outputs:
+  published: ${{ tasks.publish.status }}

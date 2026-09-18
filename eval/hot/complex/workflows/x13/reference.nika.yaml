@@ -1,0 +1,52 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# X13 · reference · a refusal skips the stage, and the write asks the person itself.
+#
+#   [human ⏸]──yes──▶[stage]──▶[publish]   publish reads the staged note AND the answer
+#
+# A refused confirm settles success with value false, so `stage` is skipped and
+# hands null across its `with:` edge. Reading that value is not consent: the
+# write reads the answer too, and a refusal closes it.
+nika: x13-refusal-skips-the-stage
+model: mock/echo
+
+const:
+  note: "Release 2.4.1 is ready."
+
+permits:
+  tools: ["nika:jq", "nika:prompt", "nika:write"]
+  fs:
+    write: ["./out/report.md"]
+
+tasks:
+  human:
+    invoke:
+      tool: "nika:prompt"
+      args:
+        message: "Publish this note to ./out/report.md? ${{ const.note }}"
+
+  stage:
+    with:
+      go: ${{ tasks.human.output }}
+      note: ${{ const.note }}
+    when: ${{ with.go == true }}
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: ${{ with.note }}
+        expression: "."
+
+  publish:
+    with:
+      go: ${{ tasks.human.output }}
+      staged: ${{ tasks.stage.output }}
+    when: ${{ with.go == true }}
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/report.md"
+        content: "Release note: ${{ with.staged }}"
+
+outputs:
+  published: ${{ tasks.publish.status }}

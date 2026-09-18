@@ -33,6 +33,25 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   table (35 shapes · 47 laws) and neuters four of its guards one at a time;
   each must flip exactly its own rows. It runs in the static gate.
 
+### Changed · composed authoring goldens: KG01 is partly repaired (2026-09-18)
+
+- **X13, a thirteenth family,** isolates the route where a refusal skips a
+  stage: a reference, a variant closed by a success edge on the same stage,
+  two `refused` candidates (the certain core · a fan-out stage) and two
+  near-misses that differ from them by one unprovable step and still write on
+  “no”.
+- **KG01 stays a retained gap, as KG01-conditional.** Its witness is
+  byte-identical and pinned. Both oracles still admit it, the rehearsed engine
+  build can only warn, and a refusal still writes `Report: null`; those facts
+  are now asserted on every rehearsal. The X13 refused candidates are its
+  repaired sub-cases, not proof that the original golden is fixed. Three gaps
+  remain.
+- **A repair is proven by running it.** A `refused` candidate can declare a
+  `refused_run`: run as written, it must be refused before any task starts and
+  leave no file, so an engine that still admits it fails by the file it
+  leaves. Advisory hints are expected per candidate, and a gap's recorded
+  facts fail the rehearsal when they stop holding.
+
 ### Added · composed authoring goldens (2026-09-18)
 
 - **Twelve scenario families under [`eval/hot/complex/`](eval/hot/complex/README.md).**

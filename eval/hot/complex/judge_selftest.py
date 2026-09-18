@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: Apache-2.0
 """The judge is judged: a neutered assertion, a corrupted manifest and a weakened reference must all go red."""
+import contextlib
 import json
 import shutil
 import subprocess
@@ -541,6 +542,129 @@ class TheJudgeCanFail(unittest.TestCase):
                      "      report: ${{ tasks.merge.output.report }}\n    when: ${{ with.go == true }}\n    invoke:\n      tool: \"nika:write\"")
         with self.red("must refuse with NIKA-SEC-014"):
             judge.validate(self.root)
+
+    # ── a partly repaired gap: what remains stays, and a repair is proven ────
+
+    KG01_WITNESS = "workflows/x01/near-miss-gated-through-data-edge.nika.yaml"
+    CORE = "workflows/x13/refused-certain-skip-core.nika.yaml"
+    COUSIN = "workflows/x13/refused-certain-skip-fan-out-stage.nika.yaml"
+    CLOSED = "workflows/x13/variant-closed-by-a-success-edge-on-the-stage.nika.yaml"
+    CONDITIONAL = "workflows/x13/near-miss-stage-also-reads-a-step-that-ran.nika.yaml"
+
+    def gap(self, data, gid):
+        return next(g for g in data["retained_gaps"] if g["id"] == gid)
+
+    def row(self, data, file):
+        return next(c for s in data["scenarios"] for c in s["candidates"] if c["file"] == file)
+
+    def test_the_three_retained_gaps_keep_their_criterion(self):
+        gaps = {g["id"]: g for g in judge.load(self.root)["retained_gaps"]}
+        self.assertEqual(sorted(gaps), ["KG01", "KG02", "KG03"])
+        probe = gaps["KG01"]["reproduce"]
+        self.assertEqual((probe["kind"], probe["file"], probe["expect_code"], gaps["KG01"]["baseline"]),
+                         ("engine_check", self.KG01_WITNESS, "NIKA-SEC-014", "expected_fail"))
+        self.assertEqual(gaps["KG01"]["title"], "A route closed only by a skippable data edge fires on no")
+        self.assertEqual(gaps["KG01"]["repaired_subcases"], [self.CORE, self.COUSIN])
+        witness = self.row(judge.load(self.root), self.KG01_WITNESS)
+        self.assertEqual((witness["role"], witness.get("spec_oracle", "valid"), witness.get("engine_check", "valid")),
+                         ("near_miss", "valid", "valid"), "the original golden is still admitted by both oracles")
+
+    def test_a_retained_gap_is_not_closed_by_editing_its_witness(self):
+        path = self.root / self.KG01_WITNESS
+        path.write_text(path.read_text(encoding="utf-8") + "# a comment no judge reads\n", encoding="utf-8")
+        with self.red("KG01: its witness file changed"):
+            judge.validate(self.root)
+
+    def test_a_partly_repaired_gap_cannot_drop_its_pin(self):
+        self.manifest(lambda d: self.gap(d, "KG01")["reproduce"].pop("sha256"))
+        with self.red("KG01: a partly repaired gap pins the bytes"):
+            judge.validate(self.root)
+
+    def test_a_repair_is_a_refused_candidate_that_is_also_run_as_written(self):
+        self.manifest(lambda d: self.row(d, self.CORE).pop("refused_run"))
+        with self.red("KG01: a repaired sub-case is a refused candidate that is also run as written"):
+            judge.validate(self.root)
+
+    def test_a_correct_candidate_cannot_be_named_as_the_repair(self):
+        self.manifest(lambda d: self.gap(d, "KG01").update(repaired_subcases=["workflows/x13/reference.nika.yaml"]))
+        with self.red("KG01: a repaired sub-case is a refused candidate"):
+            judge.validate(self.root)
+
+    def test_only_a_refused_candidate_is_run_as_written(self):
+        run = {"answers": {"human": False}, "expect": {"exit": 2, "tasks_started": [], "files_written": {}}}
+        self.manifest(lambda d: self.row(d, "workflows/x13/reference.nika.yaml").update(refused_run=run))
+        with self.red("only a refused candidate is run as written"):
+            judge.validate(self.root)
+
+    def test_a_refused_run_states_what_it_left_behind(self):
+        self.manifest(lambda d: self.row(d, self.COUSIN)["refused_run"]["expect"].pop("files_written"))
+        with self.red("a refused run states its exit, the tasks that started and the files it left"):
+            judge.validate(self.root)
+
+    def test_a_success_edge_on_the_same_stage_closes_the_repaired_core(self):
+        """Closed: the same producer's success edge cancels what its value edge leaves open, so the
+        refusal is not a blanket one. The manifest still declares a refusal, and that is what goes red."""
+        self.rewrite(self.CORE, "  publish:\n    with:\n", "  publish:\n    after:\n      stage: success\n    with:\n")
+        with self.red("refused-certain-skip-core.*must refuse with NIKA-SEC-014"):
+            judge.validate(self.root)
+
+    def oracle_verdicts(self):
+        """The reference oracle's blocking verdict on every candidate of this corpus."""
+        judge._VERDICTS.clear()
+        verdicts = {}
+        for scenario in judge.load(self.root)["scenarios"]:
+            for row in scenario["candidates"]:
+                _, verdict = judge.admit(self.root / row["file"])
+                codes = sorted({error.get("code") for error in verdict["errors"]})
+                verdicts[row["file"]] = "valid" if verdict["valid"] else "+".join(codes)
+        return verdicts
+
+    @contextlib.contextmanager
+    def neutered(self, **guards):
+        """The reference consent oracle with some of its guards replaced, restored on the way out."""
+        judge.admit(self.root / self.CORE)  # the oracle is loaded on first use
+        oracle = sys.modules["deep_static"]
+        real = {name: getattr(oracle, name) for name in guards}
+        for name, fake in guards.items():
+            setattr(oracle, name, fake)
+        judge._VERDICTS.clear()
+        try:
+            yield
+        finally:
+            for name, guard in real.items():
+                setattr(oracle, name, guard)
+            judge._VERDICTS.clear()
+
+    def flips(self, **guards):
+        before = self.oracle_verdicts()
+        with self.neutered(**guards):
+            after = self.oracle_verdicts()
+        return {file: after[file] for file in before if before[file] != after[file]}
+
+    def test_without_the_sure_skip_reading_exactly_the_repaired_subcases_are_admitted(self):
+        """What the reference oracle said before it read a certain skip: both files valid. Nothing else moves."""
+        blind = {"_consent_skip_witnesses": lambda gate, closed, by_id: []}
+        self.assertEqual(self.flips(**blind), {self.CORE: "valid", self.COUSIN: "valid"})
+        with self.neutered(**blind), self.red("refused-certain-skip-core.*must refuse with NIKA-SEC-014"):
+            judge.validate(self.root)
+
+    def test_an_oracle_that_refuses_what_it_cannot_prove_is_caught(self):
+        """Every admission taken for certain: the conditional near-miss and the closed variant are refused,
+        and ONLY they are. Both are declared valid here, so an over-claiming oracle turns this corpus red."""
+        eager = {"_consent_admission": lambda task, gate, skipped: "certain"}
+        self.assertEqual(self.flips(**eager), {self.CONDITIONAL: "NIKA-SEC-014", self.CLOSED: "NIKA-SEC-014"})
+        with self.neutered(**eager), self.red("variant-closed-by-a-success-edge.*the reference oracle refuses it"):
+            judge.validate(self.root)
+
+    def test_the_original_witness_is_kept_admitted_by_two_independent_guards(self):
+        """Why no oracle may refuse the original golden: its stage navigates into a value (the binding
+        is not total) AND reads a step that merely ran (the admission is not certain). Either guard
+        alone keeps it valid; only an oracle with neither would refuse it."""
+        certain, total = (lambda task, gate, skipped: "certain"), (lambda value: True)
+        self.assertNotIn(self.KG01_WITNESS, self.flips(_consent_admission=certain))
+        self.assertNotIn(self.KG01_WITNESS, self.flips(_consent_total_binding=total))
+        self.assertEqual(self.flips(_consent_admission=certain, _consent_total_binding=total).get(self.KG01_WITNESS),
+                         "NIKA-SEC-014")
 
     # ── the reading of `when:` everything above rests on ─────────────────────
 
