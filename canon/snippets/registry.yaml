@@ -14,6 +14,6 @@ snippets:
     introduced_in: C0
     selector:
       kind: whole_file
-      source: research/pre1-gate/probes/anchors.nika.yaml
+      source: research/pre1-gate/probes/anchors.nika
     class: negative_fixture
     notes: "Fixture RÉELLE (monorepo pre1-gate) : contient un anchor &shared (jamais un simple exemple mort) + un alias *shared. Couvre les négatifs des lois anchor + alias du pilote R11."

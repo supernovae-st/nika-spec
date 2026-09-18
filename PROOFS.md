@@ -128,7 +128,7 @@ tous valident contre registries.schema.json. Seed migrations : 7 rows réelles
 - **F-06 · zéro fixture yaml-profile au repo spec (mesuré).** `find` sur
   conformance/ : 0 hit anchor/alias/merge/yaml-profile. Convention : chemins
   `to-mint-c1/...` (la forme majuscule `TO-MINT-C1` violerait le pattern fixturePath
-  scellé). Seule fixture RÉELLE : `research/pre1-gate/probes/anchors.nika.yaml`
+  scellé). Seule fixture RÉELLE : `research/pre1-gate/probes/anchors.nika`
   (monorepo · `&shared` + `*shared`) · enregistrée au registre conformance
   (polarity negative · row `yaml-profile-anchors-probe`) et snippets.
 - **F-07 · normalisation machine des receipts (documentée row par row).** migrationRow

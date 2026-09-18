@@ -2,5 +2,5 @@ nika: comp-006-misfit
 tasks:
   call:
     invoke:
-      workflow: "./child.nika.yaml"
+      workflow: "./child.nika"
       args: { url: 42 }

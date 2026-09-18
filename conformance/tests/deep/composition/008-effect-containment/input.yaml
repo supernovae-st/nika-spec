@@ -5,5 +5,5 @@ permits:
 tasks:
   call:
     invoke:
-      workflow: "./child.nika.yaml"
+      workflow: "./child.nika"
       args: { url: "https://api.example.com/x" }

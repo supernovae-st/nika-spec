@@ -254,7 +254,7 @@ def judge_file(path: _Path) -> list[dict]:
 
 def main(argv: list[str]) -> int:
     if len(argv) < 2:
-        print("usage: values_core.py <file.nika.yaml> [...]", file=_sys.stderr)
+        print("usage: values_core.py <file.nika> [...]", file=_sys.stderr)
         return 2
     refused = False
     for name in argv[1:]:

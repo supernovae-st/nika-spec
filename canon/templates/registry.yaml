@@ -1,7 +1,7 @@
 # canon/templates/registry.yaml · C0 CANON-FLIP · Template Registry (SSOT-2 §A)
 # Schema: schemas/registries.schema.json#/$defs/templateRow (SCELLÉ · consommé as-is).
 # SSOT-2 §A verbatim (extraits) : « 2. Le registre est l'unique inventaire officiel
-# des templates. » · « 6. Chaque entrée référence une source `.nika.yaml` canonique
+# des templates. » · « 6. Chaque entrée référence une source `.nika` canonique
 # vérifiée. » · « 4. Aucun regex parsing du README ou d'une page Markdown pour
 # reconstruire le catalogue. »
 # Import 2026-07-17 (canon-flip) : le placeholder digest-zéro du sandbox est remplacé
@@ -11,14 +11,14 @@
 registry_document_format: 1
 $comment: 'canon-flip import 2026-07-17 · the instantiable skeletons imported from canon.yaml (prose
   home templates/README.md) · the C0-sandbox all-zero-digest placeholder row is REPLACED per its own declaration
-  · every source_digest is the real sha256 of templates/<id>.nika.yaml · gate: ssot-compiler --check-canon.'
+  · every source_digest is the real sha256 of templates/<id>.nika · gate: ssot-compiler --check-canon.'
 templates:
   - id: agent-loop
     status: reserved
     owner: spec
     law_ids: []
     introduced_in: C0
-    source_path: templates/agent-loop.nika.yaml
+    source_path: templates/agent-loop.nika
     source_digest: sha256:4bac2151575df3fc3342ea19cdadf5b5e416eeaaa528bc3ec5f012acfb98da8e
     category: agent-loop
     tags: [research, review]
@@ -30,7 +30,7 @@ templates:
     owner: spec
     law_ids: []
     introduced_in: C0
-    source_path: templates/api-upload-and-create.nika.yaml
+    source_path: templates/api-upload-and-create.nika
     source_digest: sha256:1e06897b41686f7c51f97e70893bd16e09dba869df85378cb3c89913e1d20952
     category: api-upload
     tags: [product-api, upload]
@@ -42,7 +42,7 @@ templates:
     owner: spec
     law_ids: []
     introduced_in: C0
-    source_path: templates/chain.nika.yaml
+    source_path: templates/chain.nika
     source_digest: sha256:c09adee68ad5548be7f3de4ea3d749293fb8312d8fd32d42f181a21307bce520
     category: linear
     tags: [content]
@@ -54,7 +54,7 @@ templates:
     owner: spec
     law_ids: []
     introduced_in: 0.113.0
-    source_path: templates/classify-and-route.nika.yaml
+    source_path: templates/classify-and-route.nika
     source_digest: sha256:4528338b033f53a849ca0c7fa7f0151792442ace3789f890b3ef230beb3d737c
     category: decision-routing
     tags: [operations]
@@ -65,7 +65,7 @@ templates:
     owner: spec
     law_ids: []
     introduced_in: 0.113.0
-    source_path: templates/corpus-qa.nika.yaml
+    source_path: templates/corpus-qa.nika
     source_digest: sha256:0c219f7765a1df77ae6af91281129f82a1e677496e348bbb2d0a34e5141cce72
     category: retrieval
     tags: [knowledge]
@@ -76,7 +76,7 @@ templates:
     owner: spec
     law_ids: []
     introduced_in: C0
-    source_path: templates/docker-report.nika.yaml
+    source_path: templates/docker-report.nika
     source_digest: sha256:6e2a3211a39b960cc170efe70964a5e0b50bf99eeba78752cae27acadb64e9c6
     category: parallel-fan-in
     tags: [operations, report]
@@ -88,7 +88,7 @@ templates:
     owner: spec
     law_ids: []
     introduced_in: 0.113.0
-    source_path: templates/document-to-fields.nika.yaml
+    source_path: templates/document-to-fields.nika
     source_digest: sha256:a3916e19ae3dc85f95413690768e25fbdc7e0cc01dabf823891b5b619d98f837
     category: structured-extraction
     tags: [documents]
@@ -99,7 +99,7 @@ templates:
     owner: spec
     law_ids: []
     introduced_in: C0
-    source_path: templates/etl-state.nika.yaml
+    source_path: templates/etl-state.nika
     source_digest: sha256:64d090ea10a33ab224d16feea6b80bbfeb4e1c8396d514361ae0740399958136
     category: state-resume
     tags: [etl]
@@ -111,7 +111,7 @@ templates:
     owner: spec
     law_ids: []
     introduced_in: 0.113.0
-    source_path: templates/evaluate-and-optimize.nika.yaml
+    source_path: templates/evaluate-and-optimize.nika
     source_digest: sha256:6abb970d905444b07d0df63e6330f7eb6d0a6c636cc49a0f19c5d9d817552513
     category: bounded-loop
     tags: [quality]
@@ -122,7 +122,7 @@ templates:
     owner: spec
     law_ids: []
     introduced_in: C0
-    source_path: templates/fanout.nika.yaml
+    source_path: templates/fanout.nika
     source_digest: sha256:e45da5bcc8080771eb279b8a347715f5ba50bb428bb7b9493167a909c21729db
     category: fanout
     tags: [batch]
@@ -134,7 +134,7 @@ templates:
     owner: spec
     law_ids: []
     introduced_in: C0
-    source_path: templates/gate-and-act.nika.yaml
+    source_path: templates/gate-and-act.nika
     source_digest: sha256:4870c70f7a6198f86b1da8587e7e1345bbece86ce07446d74e16866cbe514610
     category: conditional-gate
     tags: [monitoring]
@@ -146,7 +146,7 @@ templates:
     owner: spec
     law_ids: []
     introduced_in: C0
-    source_path: templates/human-gated-ship.nika.yaml
+    source_path: templates/human-gated-ship.nika
     source_digest: sha256:e447e644d2e34327ab03f5fee8bed54fd0cfc2293e1379e3dcdb3a6b050bf65c
     category: human-gate
     tags: [release]
@@ -158,7 +158,7 @@ templates:
     owner: spec
     law_ids: []
     introduced_in: C0
-    source_path: templates/media-asset-pack.nika.yaml
+    source_path: templates/media-asset-pack.nika
     source_digest: sha256:9358b5a04ba81ec9b3c3b9c7195f3f87e1777274d1721ce4428cffb0c901d519
     category: linear
     tags: [media]
@@ -170,7 +170,7 @@ templates:
     owner: spec
     law_ids: []
     introduced_in: C0
-    source_path: templates/website-brief.nika.yaml
+    source_path: templates/website-brief.nika
     source_digest: sha256:52ff867ab56ab2aef8c3a86a69cccaab0c68681bdf96dec53bf2f8cdc37d4bac
     category: linear
     tags: [website]
@@ -182,7 +182,7 @@ templates:
     owner: spec
     law_ids: []
     introduced_in: 0.120.0-dev
-    source_path: templates/bounded-batch.nika.yaml
+    source_path: templates/bounded-batch.nika
     source_digest: sha256:5333556fdb46fd16bd6e48f9a267d470558f6e663e2510df6322066eb75833d2
     category: bounded-batch
     tags: [authoring, bounded]
@@ -192,7 +192,7 @@ templates:
     owner: spec
     law_ids: []
     introduced_in: 0.120.0-dev
-    source_path: templates/validate-records.nika.yaml
+    source_path: templates/validate-records.nika
     source_digest: sha256:fa9c9f0ea60b2d73b45d14ea5f55053b70ff01eadf70f11ab5aab6f53cb41d2c
     category: validate-records
     tags: [authoring, bounded]
@@ -202,7 +202,7 @@ templates:
     owner: spec
     law_ids: []
     introduced_in: 0.120.0-dev
-    source_path: templates/snapshot-diff.nika.yaml
+    source_path: templates/snapshot-diff.nika
     source_digest: sha256:ec5772c13742e1ce2a8555663ce1d6832a17f35aa52c679b91b1750f81b86837
     category: snapshot-diff
     tags: [authoring, bounded]
@@ -212,7 +212,7 @@ templates:
     owner: spec
     law_ids: []
     introduced_in: 0.120.0-dev
-    source_path: templates/deduplicate-records.nika.yaml
+    source_path: templates/deduplicate-records.nika
     source_digest: sha256:268f72d69e07053f22042ff69e34071092c9c349be060fed7811763bf083c073
     category: deduplicate-records
     tags: [authoring, bounded]
@@ -222,7 +222,7 @@ templates:
     owner: spec
     law_ids: []
     introduced_in: 0.120.0-dev
-    source_path: templates/project-public-fields.nika.yaml
+    source_path: templates/project-public-fields.nika
     source_digest: sha256:c4bc776cf730f13543c0379eec178ebf90dfb465c51b1d356ed6628c0f4fc614
     category: project-public-fields
     tags: [authoring, bounded]
@@ -232,7 +232,7 @@ templates:
     owner: spec
     law_ids: []
     introduced_in: 0.120.0-dev
-    source_path: templates/parallel-review.nika.yaml
+    source_path: templates/parallel-review.nika
     source_digest: sha256:d02b45349edb57fe66b0692584c822f5bab0a7620c0d5d6ec445d96d332f43db
     category: parallel-review
     tags: [authoring, bounded]
@@ -242,7 +242,7 @@ templates:
     owner: spec
     law_ids: []
     introduced_in: 0.120.0-dev
-    source_path: templates/recover-optional-file.nika.yaml
+    source_path: templates/recover-optional-file.nika
     source_digest: sha256:923ed35265aadfbf46cb6be76e86655d0cc03c37950128d3c05664e665c467de
     category: recover-optional-file
     tags: [authoring, bounded]
@@ -252,7 +252,7 @@ templates:
     owner: spec
     law_ids: []
     introduced_in: 0.120.0-dev
-    source_path: templates/aggregate-by-key.nika.yaml
+    source_path: templates/aggregate-by-key.nika
     source_digest: sha256:a7a34d9415e3187ff32607d79272da49e790500f1998593730c5047dc8a111fd
     category: aggregate-by-key
     tags: [authoring, bounded]

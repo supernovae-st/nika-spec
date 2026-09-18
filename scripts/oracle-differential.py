@@ -102,8 +102,8 @@ def main() -> int:
         return 2
     validator, canon = load_schema(), load_canon()
     files = sorted(
-        list((SPEC_ROOT / "examples").glob("*.nika.yaml"))
-        + list((SPEC_ROOT / "templates").glob("*.nika.yaml"))
+        list((SPEC_ROOT / "examples").glob("*.nika"))
+        + list((SPEC_ROOT / "templates").glob("*.nika"))
     )
     ledger = {name: (e, r, why) for name, e, r, why in LEDGER}
     agree = 0

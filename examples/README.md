@@ -16,24 +16,24 @@
 
 | File | Theme | Introduces |
 |---|---|---|
-| [`01-hello`](01-hello.nika.yaml) | the complete minimum | `nika:` (the mark AND the name) · `model:` · `permits: {}` · `infer:` · `max_tokens:` · `outputs:` |
-| [`02-parallel-fanout`](02-parallel-fanout.nika.yaml) | the DAG | implicit parallelism · `const:` · `with:` value edges · `${{ tasks.<id>.output }}` |
-| [`03-exec-pipeline`](03-exec-pipeline.nika.yaml) | shells and gates | `exec:` (`shell:` + `command:`) · `capture: structured` · `timeout:` · `run.clock` · `when:` · `after:` control edges · `after: {…: unwind}` cleanup |
-| [`04-schema-retry`](04-schema-retry.nika.yaml) | typed calls | typed `inputs:` + `default:` · `infer.schema:` · `additionalProperties: false` · `retry:` · the long `outputs:` form |
-| [`05-fetch-chain`](05-fetch-chain.nika.yaml) | reaching outside | `invoke:` · `nika:fetch` · `permits.tools` + `permits.net.http` · `extract:` jq bindings · `on_error: recover:` |
-| [`06-code-review`](06-code-review.nika.yaml) | the agent loop | `agent:` · default-deny `tools:` · `max_turns:` + `max_tokens_total:` · `nika:done` · `permits.fs` inside the loop |
-| [`07-for-each-locales`](07-for-each-locales.nika.yaml) | mapping | `for_each:` · `${{ item }}` / `${{ index }}` · `for_each.max_parallel:` · `for_each.fail_fast:` · array-preserving recovery |
-| [`08-config-values`](08-config-values.nika.yaml) | the value authorities | the deployment's knobs — an `inputs:` entry with `required: false` + `default:`, typed and unreachable from the caller (measured: `--var region=…` refuses) |
-| [`09-returns-typed-door`](09-returns-typed-door.nika.yaml) | typed task outputs | `returns:` — the declared shape deep references are proven against |
-| [`10-compose-pipeline`](10-compose-pipeline.nika.yaml) | composition · the caller | `workflow:` under `invoke:` — one workflow calls another, statically resolved |
-| [`10-compose-child`](10-compose-child.nika.yaml) | composition · the callee | the child's contract — typed `inputs:` in, typed `outputs:` out |
-| [`11-lift-the-door`](11-lift-the-door.nika.yaml) | the taint's one door | `lift:` (`law: taint` · `from:` · `because:`) — defers the check to the run, never lifts the boundary |
-| [`12-failure-routing`](12-failure-routing.nika.yaml) | routing failure | the `failure` edge predicate — a strictly-failure arm that settles `⊘` on green runs |
-| [`13-extract-then-law`](13-extract-then-law.nika.yaml) | facts, then the law | `infer.schema:` as `type: integer` + numeric `enum` · `for_each` over `item.field` · `nika:jq` scores · const-fixture `nika:assert` (hint `unproven-law`) · the model never names the level |
-| [`14-decide-publish`](14-decide-publish.nika.yaml) | publish or abstain | `nika:decide` over an inline Decision Bundle · `never_automatic` · assert a hand-known `human_required` fixture |
-| [`15-compose-self-check`](15-compose-self-check.nika.yaml) | the loop checks the draft | `nika:compose` on `agent.tools` (after `nika:done`) · mock/echo rehearsal · standalone invoke is `NIKA-BUILTIN-COMPOSE-001` · checking never executes |
-| [`16-inspect-self`](16-inspect-self.nika.yaml) | the run reads itself | `nika:inspect` `view: dag_info` · live cell seeded at run start · assert `available` |
-| [`17-tts-self`](17-tts-self.nika.yaml) | mock speech on disk | `nika:tts_generate` `provider: mock` · real WAV · `permits.fs.write` on `out/speech/**` · bytes never ride outputs |
+| [`01-hello`](01-hello.nika) | the complete minimum | `nika:` (the mark AND the name) · `model:` · `permits: {}` · `infer:` · `max_tokens:` · `outputs:` |
+| [`02-parallel-fanout`](02-parallel-fanout.nika) | the DAG | implicit parallelism · `const:` · `with:` value edges · `${{ tasks.<id>.output }}` |
+| [`03-exec-pipeline`](03-exec-pipeline.nika) | shells and gates | `exec:` (`shell:` + `command:`) · `capture: structured` · `timeout:` · `run.clock` · `when:` · `after:` control edges · `after: {…: unwind}` cleanup |
+| [`04-schema-retry`](04-schema-retry.nika) | typed calls | typed `inputs:` + `default:` · `infer.schema:` · `additionalProperties: false` · `retry:` · the long `outputs:` form |
+| [`05-fetch-chain`](05-fetch-chain.nika) | reaching outside | `invoke:` · `nika:fetch` · `permits.tools` + `permits.net.http` · `extract:` jq bindings · `on_error: recover:` |
+| [`06-code-review`](06-code-review.nika) | the agent loop | `agent:` · default-deny `tools:` · `max_turns:` + `max_tokens_total:` · `nika:done` · `permits.fs` inside the loop |
+| [`07-for-each-locales`](07-for-each-locales.nika) | mapping | `for_each:` · `${{ item }}` / `${{ index }}` · `for_each.max_parallel:` · `for_each.fail_fast:` · array-preserving recovery |
+| [`08-config-values`](08-config-values.nika) | the value authorities | the deployment's knobs — an `inputs:` entry with `required: false` + `default:`, typed and unreachable from the caller (measured: `--var region=…` refuses) |
+| [`09-returns-typed-door`](09-returns-typed-door.nika) | typed task outputs | `returns:` — the declared shape deep references are proven against |
+| [`10-compose-pipeline`](10-compose-pipeline.nika) | composition · the caller | `workflow:` under `invoke:` — one workflow calls another, statically resolved |
+| [`10-compose-child`](10-compose-child.nika) | composition · the callee | the child's contract — typed `inputs:` in, typed `outputs:` out |
+| [`11-lift-the-door`](11-lift-the-door.nika) | the taint's one door | `lift:` (`law: taint` · `from:` · `because:`) — defers the check to the run, never lifts the boundary |
+| [`12-failure-routing`](12-failure-routing.nika) | routing failure | the `failure` edge predicate — a strictly-failure arm that settles `⊘` on green runs |
+| [`13-extract-then-law`](13-extract-then-law.nika) | facts, then the law | `infer.schema:` as `type: integer` + numeric `enum` · `for_each` over `item.field` · `nika:jq` scores · const-fixture `nika:assert` (hint `unproven-law`) · the model never names the level |
+| [`14-decide-publish`](14-decide-publish.nika) | publish or abstain | `nika:decide` over an inline Decision Bundle · `never_automatic` · assert a hand-known `human_required` fixture |
+| [`15-compose-self-check`](15-compose-self-check.nika) | the loop checks the draft | `nika:compose` on `agent.tools` (after `nika:done`) · mock/echo rehearsal · standalone invoke is `NIKA-BUILTIN-COMPOSE-001` · checking never executes |
+| [`16-inspect-self`](16-inspect-self.nika) | the run reads itself | `nika:inspect` `view: dag_info` · live cell seeded at run start · assert `available` |
+| [`17-tts-self`](17-tts-self.nika) | mock speech on disk | `nika:tts_generate` `provider: mock` · real WAV · `permits.fs.write` on `out/speech/**` · bytes never ride outputs |
 
 All **4 verbs** appear across the path; everything callable is a tool under
 `invoke:`. The per-construct index is derived from the files, never
@@ -49,7 +49,7 @@ three — `inputs:` · `const:` · `secrets:` — since the envelope nuke.
 `secrets:` and its `egress:` sanctions are **not** here on purpose: a secret
 needs a real credential and a real host, which would cost every file in this
 directory its zero-setup run. That subject belongs to a job with stakes —
-see [`support-triage`](support-triage.nika.yaml) for
+see [`support-triage`](support-triage.nika) for
 the reference shape (a secret that carries a webhook URL, an `egress:` that
 sanctions the one send, and the `permits.net.http` that grants the reach —
 you need both, and `CONVENTIONS.md` §3 explains why).
@@ -81,9 +81,9 @@ Cloud providers appear only as swap hints, never as a default.
 ## Run them
 
 ```bash
-nika run examples/01-hello.nika.yaml                     # as written
-nika run examples/01-hello.nika.yaml --model mock/echo   # zero-setup dry twin
-nika run examples/01-hello.nika.yaml --output json       # the typed outputs, as one JSON object
+nika run examples/01-hello.nika                     # as written
+nika run examples/01-hello.nika --model mock/echo   # zero-setup dry twin
+nika run examples/01-hello.nika --output json       # the typed outputs, as one JSON object
 ```
 
 Run from the **repo root**: paths inside a workflow resolve against your

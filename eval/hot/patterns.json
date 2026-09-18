@@ -51,7 +51,7 @@
       "output_family": "route+record",
       "effects": [],
       "derived_from": [
-        "templates/classify-and-route.nika.yaml"
+        "templates/classify-and-route.nika"
       ],
       "status": "COVERED",
       "law": "selected class is not authority"
@@ -60,7 +60,7 @@
       "id": "validate",
       "semantic_role": "VALIDATE",
       "derived_from": [
-        "templates/validate-records.nika.yaml"
+        "templates/validate-records.nika"
       ],
       "status": "COVERED",
       "effects": []
@@ -69,7 +69,7 @@
       "id": "aggregate",
       "semantic_role": "AGGREGATE",
       "derived_from": [
-        "templates/aggregate-by-key.nika.yaml"
+        "templates/aggregate-by-key.nika"
       ],
       "status": "COVERED",
       "effects": [],
@@ -79,7 +79,7 @@
       "id": "diff",
       "semantic_role": "DIFF",
       "derived_from": [
-        "templates/snapshot-diff.nika.yaml"
+        "templates/snapshot-diff.nika"
       ],
       "status": "COVERED",
       "effects": []
@@ -88,7 +88,7 @@
       "id": "human-approve-effect",
       "semantic_role": "HUMAN_APPROVE",
       "derived_from": [
-        "templates/human-gated-ship.nika.yaml"
+        "templates/human-gated-ship.nika"
       ],
       "status": "COVERED",
       "human_gate_requirement": true,
@@ -98,7 +98,7 @@
       "id": "bounded-batch",
       "semantic_role": "BATCH",
       "derived_from": [
-        "templates/bounded-batch.nika.yaml"
+        "templates/bounded-batch.nika"
       ],
       "status": "COVERED"
     },
@@ -106,7 +106,7 @@
       "id": "agent-explore",
       "semantic_role": "AGENT_FALLBACK",
       "derived_from": [
-        "templates/agent-loop.nika.yaml"
+        "templates/agent-loop.nika"
       ],
       "status": "OPEN_WORLD_WHOLE_WORKFLOW",
       "note": "need exceptional-branch contract P05"
@@ -115,7 +115,7 @@
       "id": "fetch-summarize-persist",
       "semantic_role": "FETCH+GENERATE",
       "derived_from": [
-        "templates/website-brief.nika.yaml"
+        "templates/website-brief.nika"
       ],
       "status": "COVERED",
       "hot": "HOT-A",

@@ -84,7 +84,7 @@ forbids exporting it to authors.
 
 ## Decision
 
-**`nika run wf.nika.yaml --resume <trace>` re-executes a workflow,
+**`nika run wf.nika --resume <trace>` re-executes a workflow,
 skipping every task whose identity matches a completed record in the
 given trace.** The trace is the run's own NDJSON journal — no second
 store, no new artifact, no daemon.
@@ -278,7 +278,7 @@ run reports and events, never inside `${{ }}`.
 
 Behavioral-tier shape per
 [conformance/tests/runtime/README.md](../conformance/tests/runtime/README.md)
-(`input.nika.yaml` + `run.json` + `expected-run.json` · `mock/echo`) ·
+(`input.nika` + `run.json` + `expected-run.json` · `mock/echo`) ·
 resume fixtures add the two-phase invocation (run → interrupt → resume)
 to the runner protocol:
 

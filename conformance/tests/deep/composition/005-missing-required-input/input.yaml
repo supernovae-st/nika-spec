@@ -1,4 +1,4 @@
 nika: comp-005-missing
 tasks:
   call:
-    invoke: { workflow: "./child.nika.yaml" }
+    invoke: { workflow: "./child.nika" }

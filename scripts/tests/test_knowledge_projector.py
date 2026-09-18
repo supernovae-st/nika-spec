@@ -30,7 +30,7 @@ class ProjectionTests(unittest.TestCase):
                 }
             )
         )
-        (self.root / "templates/example.nika.yaml").write_text(
+        (self.root / "templates/example.nika").write_text(
             "tasks:\n  first:\n    after: previous\n"
         )
 

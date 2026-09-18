@@ -35,7 +35,7 @@ class RehearsalTests(unittest.TestCase):
         self.rows["rehearsals"][0]["fill"] = fill
         self.save()
         out = rehearsals.render(self.root)
-        body = yaml.safe_load(out[self.root / "examples/18-bounded-batch.nika.yaml"])
+        body = yaml.safe_load(out[self.root / "examples/18-bounded-batch.nika"])
         self.assertEqual(body["const"]["brief"], fill)
         self.assertEqual(body["tasks"]["process"]["for_each"]["max_parallel"], 2)
 
@@ -55,7 +55,7 @@ class RehearsalTests(unittest.TestCase):
             rehearsals.render(self.root)
 
     def test_missing_or_extra_value_slot_is_refused(self):
-        path = self.root / "templates/bounded-batch.nika.yaml"
+        path = self.root / "templates/bounded-batch.nika"
         original = path.read_text()
         for body in (original.replace("<SLOT: the per-item instruction>", "filled"),
                      original.replace("first note", "'<SLOT: another value>'")):
@@ -64,23 +64,23 @@ class RehearsalTests(unittest.TestCase):
                 rehearsals.render(self.root)
 
     def test_template_logic_edit_changes_its_lesson(self):
-        path = self.root / "templates/bounded-batch.nika.yaml"
+        path = self.root / "templates/bounded-batch.nika"
         path.write_text(path.read_text().replace("max_parallel: 2", "max_parallel: 1"))
         out = rehearsals.render(self.root)
-        self.assertIn("max_parallel: 1", out[self.root / "examples/18-bounded-batch.nika.yaml"])
+        self.assertIn("max_parallel: 1", out[self.root / "examples/18-bounded-batch.nika"])
 
     def test_docs_project_a_lesson_without_inventing_a_standalone_page(self):
         module_spec = importlib.util.spec_from_file_location("showcase", ROOT / "scripts/showcase-projector.py")
         showcase = importlib.util.module_from_spec(module_spec)
         module_spec.loader.exec_module(showcase)
         page = self.root / "lesson.mdx"
-        page.write_text("{/* showcase:begin 18-bounded-batch.nika.yaml */}\n{/* showcase:end */}\n"
+        page.write_text("{/* showcase:begin 18-bounded-batch.nika */}\n{/* showcase:end */}\n"
                         "{/* showcase:coverage-begin */}\n{/* showcase:coverage-end */}\n"
                         "{/* template-index:begin */}\n{/* template-index:end */}\n")
-        lesson = (ROOT / "examples/18-bounded-batch.nika.yaml").read_text()
-        template = (ROOT / "templates/bounded-batch.nika.yaml").read_text()
-        workflows = {"18-bounded-batch.nika.yaml": showcase.lean(lesson)}
-        templates = {"bounded-batch.nika.yaml": showcase.lean(template)}
+        lesson = (ROOT / "examples/18-bounded-batch.nika").read_text()
+        template = (ROOT / "templates/bounded-batch.nika").read_text()
+        workflows = {"18-bounded-batch.nika": showcase.lean(lesson)}
+        templates = {"bounded-batch.nika": showcase.lean(template)}
         self.assertFalse(showcase.project_docs_page(page, workflows, templates, True))
         self.assertTrue(showcase.project_docs_page(page, workflows, templates, False))
         self.assertIn(showcase.lean(lesson), page.read_text())

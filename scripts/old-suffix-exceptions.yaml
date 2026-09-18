@@ -1,0 +1,120 @@
+# SPDX-License-Identifier: Apache-2.0
+# Bounded old-suffix exceptions for scripts/check-old-suffix.py.
+# Each row is path + match + category + reason + owner. No blanket
+# tests/ or docs/ exemption. Stale rows fail the ratchet.
+exceptions:
+  - path: scripts/check-old-suffix.py
+    match: ".nika.yaml"
+    category: ratchet
+    reason: "The scanner's own forbidden-pattern data."
+    owner: spec
+  - path: scripts/old-suffix-exceptions.yaml
+    match: ".nika.yaml"
+    category: ratchet
+    reason: "Exception rows must name the retired suffixes they cover."
+    owner: spec
+  - path: conformance/source_naming.py
+    match: ".nika.yaml"
+    category: negative
+    reason: "Lexical owner declares retired suffixes as data, not live paths."
+    owner: spec
+  - path: conformance/source_naming.py
+    match: ".nika.yml"
+    category: negative
+    reason: "Lexical owner declares both retired suffixes as data."
+    owner: spec
+  - path: conformance/source-naming/cases.yaml
+    match: ".nika.yaml"
+    category: negative
+    reason: "Declarative negative filename fixtures."
+    owner: spec
+  - path: conformance/source-naming/cases.yaml
+    match: ".nika.yml"
+    category: negative
+    reason: "Declarative negative filename fixtures for the .yml spelling."
+    owner: spec
+  - path: scripts/check-old-suffix.py
+    match: ".nika.yml"
+    category: ratchet
+    reason: "The scanner's own forbidden-pattern data includes .yml."
+    owner: spec
+  - path: scripts/old-suffix-exceptions.yaml
+    match: ".nika.yml"
+    category: ratchet
+    reason: "Exception rows must name both retired suffixes they cover."
+    owner: spec
+  - path: conformance/composition_core.py
+    match: ".nika.yaml"
+    category: negative
+    reason: "Composition owner names retired suffixes in the COMP-001 diagnostic."
+    owner: spec
+  - path: conformance/composition_core_selftest.py
+    match: ".nika.yaml"
+    category: negative
+    reason: "Negative composition tests refuse retired suffixes even with valid bytes."
+    owner: spec
+  - path: conformance/composition_core_selftest.py
+    match: ".nika.yml"
+    category: negative
+    reason: "Negative composition tests refuse the .yml retired spelling."
+    owner: spec
+  - path: spec/01-envelope.md
+    match: ".nika.yaml"
+    category: negative
+    reason: "The naming law names the retired suffixes it refuses."
+    owner: spec
+  - path: spec/01-envelope.md
+    match: ".nika.yml"
+    category: negative
+    reason: "The naming law names both retired suffixes."
+    owner: spec
+  - path: GLOSSARY.md
+    match: ".nika.yaml"
+    category: negative
+    reason: "Glossary names the retired suffixes as not live program paths."
+    owner: spec
+  - path: GLOSSARY.md
+    match: ".nika.yml"
+    category: negative
+    reason: "Glossary names both retired suffixes."
+    owner: spec
+  - path: CHANGELOG.md
+    match: ".nika.yaml"
+    category: historical
+    reason: "Records the superseded 2026-07 law and the 2026-09-18 hard cut by naming the old suffixes."
+    owner: spec
+  - path: CHANGELOG.md
+    match: ".nika.yml"
+    category: historical
+    reason: "Historical changelog names both retired spellings."
+    owner: spec
+  - path: proofs/
+    match: ".nika.yaml"
+    category: frozen
+    reason: "Sealed mutation-kill and canon-flip receipts must keep original bytes and path strings."
+    owner: spec
+  - path: conformance/tests/runtime/registry/001-cache-hit-admits-at-default-floor/record.meta.json
+    match: "examples/release-radar.nika.yaml"
+    category: frozen
+    reason: "Provenance path is pinned to historical rev 699ebb08 where the source still used the old suffix."
+    owner: spec
+  - path: conformance/tests/runtime/registry/002-cache-below-raised-floor-refused/record.meta.json
+    match: "examples/release-radar.nika.yaml"
+    category: frozen
+    reason: "Provenance path is pinned to the same historical rev; bytes of the receipt stay authentic."
+    owner: spec
+  - path: llms-full.txt
+    match: ".nika.yaml"
+    category: negative
+    reason: "Projection of spec/01-envelope.md and GLOSSARY.md, which name the retired suffixes they refuse."
+    owner: spec
+  - path: llms-full.txt
+    match: ".nika.yml"
+    category: negative
+    reason: "Projection of the naming law's retired .yml spelling."
+    owner: spec
+  - path: conformance/source-naming/rename-manifest.json
+    match: ".nika.yaml"
+    category: historical
+    reason: "Old-path → new-path rename receipt for #1684; not a live program source."
+    owner: spec

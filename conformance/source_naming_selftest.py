@@ -1,0 +1,83 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
+"""Table-driven selftest for the lexical source-name owner.
+
+Proves the 01 §File naming matrix and the on-disk positive fixtures.
+Does no filesystem I/O inside classify_basename / logical_stem.
+Exit 0 green · 1 red.
+"""
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+import yaml
+
+HERE = Path(__file__).resolve().parent
+from source_naming import (  # noqa: E402
+    CANONICAL_SUFFIX,
+    KIND_NOT_PROGRAM,
+    KIND_PROGRAM,
+    classify_basename,
+    classify_path,
+    iter_program_files,
+    logical_stem,
+    program_filename,
+    template_source_path,
+)
+
+CHECKS: list[tuple[str, bool]] = []
+
+
+def law(name: str, holds: bool) -> None:
+    CHECKS.append((name, holds))
+
+
+cases = yaml.safe_load((HERE / "source-naming" / "cases.yaml").read_text())["cases"]
+law("declarative case table is non-empty", len(cases) >= 16)
+
+for row in cases:
+    name = row["name"]
+    want = row["kind"]
+    got = classify_path(name) if ("/" in name or name.endswith("/")) else classify_basename(name)
+    law(f"classify {name!r} → {want}", got == want)
+    if want == KIND_PROGRAM:
+        stem = row.get("stem")
+        got_stem = logical_stem(name if "/" not in name else name.replace("\\", "/").rstrip("/").rsplit("/", 1)[-1])
+        law(f"stem {name!r} → {stem}", got_stem == stem)
+    else:
+        if "/" not in name and not name.endswith("/"):
+            law(f"no stem for {name!r}", logical_stem(name) is None)
+
+law("canonical suffix is lowercase .nika", CANONICAL_SUFFIX == ".nika")
+law("program_filename keeps extra dots", program_filename("support.v2") == "support.v2.nika")
+law("template path uses canonical suffix", template_source_path("chain") == "templates/chain.nika")
+try:
+    program_filename("")
+    law("empty stem refused", False)
+except ValueError:
+    law("empty stem refused", True)
+
+# Hostile bytes stay not-program without being decoded as allowed names.
+law("embedded NUL is not a program", classify_basename("foo.nika\x00") == KIND_NOT_PROGRAM)
+law("uppercase suffix is not a program", classify_basename("foo.NIKA") == KIND_NOT_PROGRAM)
+law("project basename is not a program", classify_basename("nika.yaml") != KIND_PROGRAM)
+
+positive = HERE / "source-naming" / "positive"
+found = {p.name: p for p in iter_program_files(positive)}
+law("on-disk canonical.nika is a program file", "canonical.nika" in found)
+law("on-disk support.v2.nika is a program file", "support.v2.nika" in found)
+law("support.v2 stem does not drop v2", logical_stem("support.v2.nika") == "support.v2")
+law("positive dir yields only program files", all(classify_basename(n) == KIND_PROGRAM for n in found))
+law("iter_program_files skips directories", all(p.is_file() for p in found.values()))
+
+# Parser fixtures must remain input.yaml and must not be harvested as programs.
+core_envelope = HERE / "tests" / "core" / "envelope" / "001-valid-minimal"
+law("static parser fixture stays input.yaml", (core_envelope / "input.yaml").is_file())
+law("parser fixture is not a program filename", classify_basename("input.yaml") == KIND_NOT_PROGRAM)
+
+bad = [n for n, ok in CHECKS if not ok]
+print(f"source-naming selftest · {len(CHECKS) - len(bad)}/{len(CHECKS)} laws hold")
+for n in bad:
+    print(f"  ✗ {n}")
+sys.exit(1 if bad else 0)

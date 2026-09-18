@@ -3,7 +3,7 @@
 Prove an engine implements **Nika v1** (the nine-key envelope · `nika: <id>`) without reading the reference
 implementation: run every workflow here through YOUR engine and match each
 file's **declared intent**. Five pillars — `envelope/` · `variables/` ·
-`verbs/` · `errors/` · `dag/` (the tree is the count: `ls <pillar>/*.nika.yaml`
+`verbs/` · `errors/` · `dag/` (the tree is the count: `ls <pillar>/*.nika`
 — hand-typed totals rotted twice) — all runnable offline (`mock/*` models only · no keys · no
 network · deterministic).
 
@@ -44,7 +44,7 @@ the reference engine itself diverges from the normative spec text, the case
 is still IN the corpus, marked `DIVERGENCE` in its header, and reports
 `DIVERGENT` — visible pressure, never a silent green.
 
-v0.1 carries one: `errors/recover-task-ref-no-edge.nika.yaml` — spec 05
+v0.1 carries one: `errors/recover-task-ref-no-edge.nika` — spec 05
 §recover requires awaiting a no-edge referent's terminal state; the
 reference engine currently raises `NIKA-VAR-001`
 ([supernovae-st/nika#291](https://github.com/supernovae-st/nika/issues/291)).

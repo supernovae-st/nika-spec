@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# Positive filename fixture · extra dots belong in the stem (support.v2).
+
+nika: support-v2
+
+model: mock/echo
+permits: {}
+
+tasks:
+  ping:
+    infer:
+      prompt: "ok"
+      max_tokens: 8

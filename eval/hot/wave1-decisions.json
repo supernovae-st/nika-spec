@@ -6,7 +6,7 @@
       "id": "P01",
       "name": "LOOKUP / ENRICH",
       "decision": "PATTERN_ONLY + GOLDEN + PROPOSED_SKELETON",
-      "rationale": "No CRM skeleton exists. Do not add hubspot-lookup. Provider-neutral lookup-and-enrich.nika.yaml lives under eval/hot/proposed-skeletons until digest/INDEX/rehearsal gates. Unlocks B03/C02/C03/F10."
+      "rationale": "No CRM skeleton exists. Do not add hubspot-lookup. Provider-neutral lookup-and-enrich.nika lives under eval/hot/proposed-skeletons until digest/INDEX/rehearsal gates. Unlocks B03/C02/C03/F10."
     },
     {
       "id": "P02",
@@ -24,7 +24,7 @@
       "id": "P04",
       "name": "APPROVE \u2192 APPLY",
       "decision": "FACTOR human-gated-ship",
-      "rationale": "human-gated-ship already: parallel gates \u2192 blocking nika:prompt \u2192 act \u2192 always-record. Do not add approve-and-apply.nika.yaml."
+      "rationale": "human-gated-ship already: parallel gates \u2192 blocking nika:prompt \u2192 act \u2192 always-record. Do not add approve-and-apply.nika."
     },
     {
       "id": "P05",
@@ -54,7 +54,7 @@
       "id": "notify-effect",
       "name": "NOTIFY/PUBLISH",
       "decision": "FACTOR gate-and-act + human-gated-ship record",
-      "rationale": "Do not add notify-effect.nika.yaml."
+      "rationale": "Do not add notify-effect.nika."
     },
     {
       "id": "chain-hot",

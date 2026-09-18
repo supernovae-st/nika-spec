@@ -9,7 +9,7 @@ after:skipped · after:terminal · when-true · when-false · no-edge} =
 40 cells. Every cell is a PERMANENT fixture:
 
 - 35 cells are runtime observations → `conformance/tests/runtime/gates/`
-  (input.nika.yaml + run.json + expected-run.json). Expected statuses come
+  (input.nika + run.json + expected-run.json). Expected statuses come
   from `reference/semantics.py` — the model DEFINES the outcome, this
   script never hand-writes one.
 - 5 cells are STATICALLY DEAD (03 §static liveness): the edge's pass-set
@@ -255,7 +255,7 @@ def generate(root: pathlib.Path) -> list[tuple[str, str, str]]:
             d = gates / name
             d.mkdir(exist_ok=True)
             text = cell_workflow(state, form)
-            (d / "input.nika.yaml").write_text(text)
+            (d / "input.nika").write_text(text)
             (d / "run.json").write_text('{"vars": {}}\n')
             (d / "expected-run.json").write_text(
                 json.dumps(expected_run(state, form, text), indent=2) + "\n")
@@ -302,7 +302,7 @@ def prove(binary: str) -> int:
     bad = 0
     total = 0
     for d in sorted(RUNTIME_DIR.iterdir()):
-        wf = d / "input.nika.yaml"
+        wf = d / "input.nika"
         if not wf.exists():
             continue
         total += 1

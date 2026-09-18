@@ -13,6 +13,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed · canonical program filename is `.nika` (2026-09-18)
+
+- **File naming law** (01 §File naming · nika#1684) — lowercase
+  `<name>.nika` with a nonempty stem is the only canonical on-disk
+  program filename. Project configuration remains `nika.yaml`. Runtime
+  state remains `.nika/`. Retired `.nika.yaml` / `.nika.yml` are refused
+  as live program paths (no matcher alias, no silent fallback, no
+  content-sniffing of `foo.yaml`). Off-disk source (stdin · HTTP · pack
+  blob) stays filename-independent; `tasks:` remains the type
+  discriminant. Media type `application/vnd.nika+yaml` is unchanged.
+  Owner sources, templates, examples, active conformance programs and
+  generators move in this revision. Historical receipts and frozen
+  provenance keep their original path strings.
+
 ### Added · template refusal completeness (2026-09-11)
 
 - **Nine remaining skeletons keep a refusal witness.** `chain`, `fanout`,

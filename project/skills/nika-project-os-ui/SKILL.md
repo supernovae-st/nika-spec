@@ -22,13 +22,13 @@ venture. Never hard-code a temporary worktree path.
 2. Run:
 
    ```bash
-   nika check project/project-os-audit.nika.yaml
+   nika check project/project-os-audit.nika
    ```
 
 3. For an explicitly armed Codex automation, run the deterministic preflight:
 
    ```bash
-   nika run project/project-os-audit.nika.yaml --max-cost-usd 0
+   nika run project/project-os-audit.nika --max-cost-usd 0
    ```
 
    The workflow contains no model task. Outside an armed automation, propose

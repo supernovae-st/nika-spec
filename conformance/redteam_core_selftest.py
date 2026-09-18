@@ -5,7 +5,7 @@ refused by the deterministic oracle, and the refusal MUST carry the law
 the fixture header names (F-P10 · a seeded attack that passes silently
 is the worst verdict in the corpus).
 
-Each `saf-tNNNN-*.nika.yaml` declares its expectation in the header:
+Each `saf-tNNNN-*.nika` declares its expectation in the header:
 `Expected: NIKA-XXX-NNN at CHECK`. This walks the directory, judges
 every fixture with the reference pipeline (the same `validate_text`
 the runner gates on), and asserts (a) the verdict is a refusal and
@@ -29,7 +29,7 @@ EXPECTED_RE = re.compile(r"^#\s*Expected:\s*(NIKA-[A-Z]+-\d+)\s+at\s+(CHECK|RUN)
 def main() -> int:
     validator = load_schema()
     canon = load_canon()
-    fixtures = sorted(REDTEAM.glob("saf-t*-*.nika.yaml"))
+    fixtures = sorted(REDTEAM.glob("saf-t*-*.nika"))
     checks: list[tuple[str, bool, str]] = []
     if not fixtures:
         checks.append(("corpus non-empty", False, "no saf-t* fixture found"))

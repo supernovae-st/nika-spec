@@ -1,0 +1,69 @@
+# SPDX-License-Identifier: Apache-2.0
+# Declarative filename fixtures for spec 01 §File naming (nika#1684).
+# These rows classify NAMES, not workflow bytes. Parser fixtures stay
+# input.yaml; off-disk source stays filename-independent.
+schema: nika-source-naming/v1
+law: spec/01-envelope.md#file-naming-normative
+cases:
+  - name: foo.nika
+    kind: program
+    stem: foo
+    note: canonical live program path
+  - name: support.v2.nika
+    kind: program
+    stem: support.v2
+    note: extra dots stay in the stem; do not chain file_stem()
+  - name: 10-compose-child.nika
+    kind: program
+    stem: 10-compose-child
+  - name: foo.nika.yaml
+    kind: retired
+    note: retired live program suffix; refuse, no silent fallback
+  - name: foo.nika.yml
+    kind: retired
+    note: retired matcher spelling; refuse, never emit
+  - name: foo.yaml
+    kind: not-program
+    note: ordinary YAML is not a Nika program path
+  - name: foo.yml
+    kind: not-program
+  - name: foo.nika.evil
+    kind: not-program
+    note: appended lookalike
+  - name: foo.nika.minisig
+    kind: not-program
+    note: detached signature sidecar
+  - name: foo.nika.golden.json
+    kind: not-program
+    note: golden sidecar
+  - name: foo.NIKA
+    kind: not-program
+    note: exact lowercase suffix; no case folding
+  - name: foo.Nika
+    kind: not-program
+  - name: nika.yaml
+    kind: project
+    note: project configuration only
+  - name: .nika
+    kind: not-program
+    note: empty stem / runtime directory name
+  - name: ""
+    kind: not-program
+    note: empty stem
+  - name: workflows/support-triage.nika
+    kind: program
+    stem: support-triage
+    note: classify by basename; path-shape policy is the caller
+  - name: ../foo.nika
+    kind: program
+    stem: foo
+    note: lexical program; relative-escape policy is the caller
+  - name: /absolute/foo.nika
+    kind: program
+    stem: foo
+  - name: foo.nika/
+    kind: not-program
+    note: directory form, trailing separator
+  - name: something.nika/
+    kind: not-program
+    note: directory named with the suffix

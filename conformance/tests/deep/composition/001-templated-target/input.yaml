@@ -3,4 +3,4 @@ const:
   which: "a"
 tasks:
   call:
-    invoke: { workflow: "./sub-${{ const.which }}.nika.yaml" }
+    invoke: { workflow: "./sub-${{ const.which }}.nika" }
