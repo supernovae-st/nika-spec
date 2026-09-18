@@ -54,7 +54,7 @@ files:
   evidence: "its own header: 'Bump deliberately: edit this' · the already-published nika-spec rev the shared estate tool is mirrored from (path tools/estate/scripts/estate.py), and the INPUT the mirror gate compares against; names f14f6872 (PR #315) and records historical nika-estate 247deb86 as the upgrade from 74287c75"
 - path: "SSOT.md"
   class: authored
-  sha256: ae9ba2ff9ffdf7734323bd5207397dbcf52c7990771f277b5183981c8cbf9aa4
+  sha256: 7e31f668a9691b297ab360f8eccb41f8cd0834dee682949f0138035192f8d068
   evidence: "the map of where every fact lives — prose and judgments are authored, but it carries ONE generated island (the estate:map markers · §9): scripts/ssot-map-projector.py --write derives the gated-surfaces table from THIS manifest, and --check (exit 5 · conformance.yml 'Projection gates') refuses a hand edit inside the markers — the canon.yaml hybrid, inverted"
 - path: "VERSION"
   class: authored
@@ -317,7 +317,7 @@ patterns:
 - glob: "templates/**"
   class: authored
   match_count: 72
-  aggregate_sha256: c3d84d4d4a5a5597b073d3b227d893787ab5103573b75915fef317898fb1b435
+  aggregate_sha256: feffdab0e16e3526f9b09b1675071cb438c52a7a9e5502cd2d3d4a7e51c93faf
   evidence: "the canonical template originals + adjacent refusal/golden proofs + README — each row in canon/templates/registry.yaml carries 'source_digest is the real sha256 of templates/<id>.nika · gate: ssot-compiler --check-canon' (the registry digests these, nothing writes them)"
 - glob: "spec/**"
   class: authored
@@ -328,7 +328,7 @@ patterns:
 - glob: "stdlib/**"
   class: authored
   match_count: 6
-  aggregate_sha256: c74991a0f7af3812502ff547c4fdc704dad32a6a0cfa5eac08caa5225a6083fc
+  aggregate_sha256: 19e182c173a9b4e6b1d27a7448d84d0d0a30bfdd1ca041718ef68cc503fbdef2
   evidence: "the stdlib contracts (builtins · providers · extract-modes v0.1) + the two authored SSOTs the projectors CONSUME (verb-starters-v0.1.yaml → starters-projector.py · authoring-shapes-v0.1.yaml → authoring-projector.py — 'Values change in the YAML FIRST, then re-project')"
   note: "the four .md files carry the same canon-projected count markers as spec/ — tool-maintained blocks inside authored prose"
 - glob: "governance/**"

@@ -5,9 +5,10 @@
 # One canonical answer to « I typed `infer:` — now what? » per verb ·
 # grounded on spec/02-verbs.md (each body is that chapter's Minimal/Full
 # shapes, cut to the idiomatic gesture). Editors surface these above the
-# verb line; the website's verb pages and `nika new` may render the same
-# rows. Values change HERE first, consumers re-project — never fork a
-# starter in a consumer repo.
+# verb line; the website's verb pages and the vscode picker may render
+# the same rows (`scripts/starters-projector.py`). `nika compile`
+# instantiates templates, not these starters. Values change HERE first,
+# consumers re-project — never fork a starter in a consumer repo.
 #
 # Contract per starter ·
 #   id     kebab-case · unique across the file

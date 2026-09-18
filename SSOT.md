@@ -89,7 +89,7 @@ spec/templates/         ★ EDIT HERE
        ▼
 engine/crates/nika-pack/pack/     ⚠️ MIRROR · edits here are overwritten
        │
-       ├──▶ `nika new <t>`            what a BEGINNER receives
+       ├──▶ `nika compile <slug> <file>.nika`  Ready + explicit dest · beginner
        ├──▶ `nika_examples <s>` (MCP) what an AGENT reads
        └──▶ nika-onboard 62/62        the gate that refuses a broken scaffold
 ```
