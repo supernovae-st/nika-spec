@@ -18,11 +18,11 @@ classes:
   testimonial: "captured evidence — fixtures, corpora, traces, receipts: proves behavior; neither shipped source nor regenerable output"
   foreign: "pointer to a third-party sovereign source"
 summary:
-  classified_files: 1668
+  classified_files: 1676
   file_rows: 22
   pattern_rows: 29
   by_class:
-    authored: 1333
+    authored: 1341
     authored-pin: 1
     generated: 137
     pinned-copy: 4
@@ -54,7 +54,7 @@ files:
   evidence: "its own header: 'Bump deliberately: edit this' · the already-published nika-spec rev the shared estate tool is mirrored from (path tools/estate/scripts/estate.py), and the INPUT the mirror gate compares against; names f14f6872 (PR #315) and records historical nika-estate 247deb86 as the upgrade from 74287c75"
 - path: "SSOT.md"
   class: authored
-  sha256: 7e31f668a9691b297ab360f8eccb41f8cd0834dee682949f0138035192f8d068
+  sha256: b77fce5ea5aa1a4358c9c2ae23287b3c7b633abd4432aedf162e4057646ec603
   evidence: "the map of where every fact lives — prose and judgments are authored, but it carries ONE generated island (the estate:map markers · §9): scripts/ssot-map-projector.py --write derives the gated-surfaces table from THIS manifest, and --check (exit 5 · conformance.yml 'Projection gates') refuses a hand edit inside the markers — the canon.yaml hybrid, inverted"
 - path: "VERSION"
   class: authored
@@ -286,8 +286,8 @@ patterns:
   evidence: "run.sh: 'Corpus files write ONLY under ./out/<family>/' — the nika:write outputs captured from the reference run of the corpus; evidence of behavior, not law and not regenerable here"
 - glob: "conformance/**"
   class: authored
-  match_count: 208
-  aggregate_sha256: 7011dc571b1f8c13edb80b5f1c845e08e719bf2d2a108547c2842645fa257e3b
+  match_count: 209
+  aggregate_sha256: a838dd2d841b77bb2daff2c445586cd92d33d30d4c0bd6edfb2822fb2163b758
   evidence: "the 95-workflow corpus (envelope · variables · verbs · errors · dag · gates · types · yaml-profile · values · composition · decision-goldens frozen at authoring time and consumed by decision_core_selftest.py) + the Python cores/selftests/runner + README/FINDINGS/runner-protocol; type-corpus + coverage-matrix excepted in files:"
 - glob: "proofs/**"
   class: testimonial
@@ -306,8 +306,8 @@ patterns:
   evidence: "captured authorability eval outputs (2026-07-05 qwen35-9b partial) — dated evidence, not law"
 - glob: "eval/**"
   class: authored
-  match_count: 91
-  aggregate_sha256: 068dfb8de3581af9266789c772ba201b3067c86955a83c5a90fbe98c1c944302
+  match_count: 98
+  aggregate_sha256: 6176170734119cb94f60f60136611e15a99d76e4e1320efbbe9c969907d973b6
   evidence: "the eval harness humans wrote — run-eval.py · intents.yaml · authorability/{eval.yaml,generate.py,tasks.jsonl} · READMEs; results excepted above"
 - glob: "examples/**"
   class: authored
@@ -354,17 +354,17 @@ patterns:
 - glob: "schemas/**"
   class: authored
   match_count: 5
-  aggregate_sha256: be2a4dea6b1002b6c28cffee4685800d5a49c20bc03f14624c1198172b04f733
+  aggregate_sha256: 3ae7f006bd1d006ef6bc3b3ec9a2d47f1a2c987fce2dc59e978ec6d5a14ea072
   evidence: "workflow.schema.json's own $comment: 'INTERIM hand-derived schema · prose spec is the single source of truth · regenerate + diff against engine nika-schema at GA' — authored today, generated at GA; law.schema.json + registries.schema.json are the sealed R2 design-pack contracts (consumed as-is, byte-identical per PROOFS.md §P0)"
 - glob: "scripts/**"
   class: authored
   match_count: 34
-  aggregate_sha256: 323b6acccabd22bb974a44684ab96fe0ad6451b3504847a2f95c38116cb1525a
+  aggregate_sha256: e5201705c8a4e08c7132f75f683ef404bcd8e0628ac37251561c0151ce34897f
   evidence: "the compiler + projectors humans wrote (ssot-compiler · canon/showcase/llms/starters/authoring/design projectors · gen-gate-matrix · gen-type-corpus · check-md-refs) — the tools that WRITE the generated surfaces; estate.py excepted in files: (the self row)"
 - glob: "timeline/**"
   class: authored
   match_count: 4
-  aggregate_sha256: 35e286615818ac6d53e2fcb14e14a8f899b23cc02f4a413a6172cb50988002c3
+  aggregate_sha256: 8ebd6e04b7b98f57bd77f795bedf73e7fbeb3c20d1d8a251e7a766ab721a79a0
   evidence: "timeline.yaml (the SSOT — 'every provable claim … re-proven against its source of truth' per timeline.yml) + verify.py + project-board.py (writes OUTWARD to the org Projects board, never into this tree)"
 - glob: "registry/**"
   class: authored
@@ -384,12 +384,12 @@ patterns:
 - glob: ".github/**"
   class: authored
   match_count: 11
-  aggregate_sha256: cd853f335ec7d6e630c7fe52a876992cdf7cbf3d5f82e6fc78ef73f13418aa9a
+  aggregate_sha256: be54c143ba14e553cb96041e1109f4e632d3c74a2be93bedfebcbca70d09787b
   evidence: "6 hand-written SHA-pinned workflows (conformance · timeline · board · codeql · reuse · scorecard) + dependabot config — ZERO in-repo bot lanes: board.yml writes to the org Projects board, timeline.yml verifies read-only, nothing here rewrites tracked files; requirements.txt excepted in files:"
 - glob: "*"
   class: authored
   match_count: 17
-  aggregate_sha256: 48978bb10ad7dfd9057517750cce1b31b0b5a67bd4361ade60e77b41f34500e8
+  aggregate_sha256: 73b1a1e7045568951ec4d84528f2c451134ba365b923b1cdfaab228db88a9c4f
   evidence: "root prose + config (README · QUICKSTART · GLOSSARY · CONTRIBUTING · CHANGELOG hand-kept per Keep a Changelog · SECURITY · CITATION.cff · CONFORMANT_IMPLEMENTATIONS · PROOFS.md the receipts ledger · LICENSE · REUSE.toml · ruff.toml · .gitignore · .pre-commit-hooks.yaml · .bestpractices.json) — no generation markers; VERSION · llms*.txt · canon.yaml · CODE_OF_CONDUCT.md excepted in files:"
   note: "README · QUICKSTART · GLOSSARY · CONTRIBUTING · CHANGELOG carry the canon-projected count markers — tool-maintained blocks inside authored prose"
 - glob: "**"
