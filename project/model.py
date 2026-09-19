@@ -19,6 +19,9 @@ STAGE_SHIPPED = "✅ shipped · in the record"
 STAGE_WORK = "🛠 work · active"
 STAGE_REVIEW = "🔍 review · integrating"
 STAGE_RELEASE = "📦 release · published"
+STAGE_CLOSED_COMPLETED = "● settled · completed at source"
+STAGE_MERGED = "● settled · merged at source"
+STAGE_CLOSED_NOT_INTEGRATED = "○ closed · not integrated"
 ERA_AHEAD = "◇ ahead"
 ERA_LABEL = {
     "exploration": "✧ exploration",
@@ -470,6 +473,28 @@ def pull_request_item(
         content_kind="PullRequest",
         source_url=pull["html_url"],
     )
+
+
+def terminal_classification(node: dict[str, Any]) -> tuple[str, str] | None:
+    """Map a resolved source node to its terminal ``(Stage, Certainty)``.
+
+    Only a closed or merged source is terminal. Issue closure separates a
+    completed reason from not-planned, duplicate or reason-less closures;
+    a merged pull request is integrated code, never a published artifact.
+    Returns None for open or non-work nodes, whose lifecycle is untouched.
+    """
+    typename = node.get("__typename")
+    state = node.get("state")
+    if typename == "Issue" and state == "CLOSED":
+        if node.get("stateReason") == "COMPLETED":
+            return STAGE_CLOSED_COMPLETED, CERTAINTY_COMMITTED
+        return STAGE_CLOSED_NOT_INTEGRATED, CERTAINTY_UNKNOWN
+    if typename == "PullRequest":
+        if state == "MERGED" or node.get("merged"):
+            return STAGE_MERGED, CERTAINTY_COMMITTED
+        if state == "CLOSED":
+            return STAGE_CLOSED_NOT_INTEGRATED, CERTAINTY_UNKNOWN
+    return None
 
 
 def release_item(repo: str, release: dict[str, Any], order: int) -> DesiredItem:

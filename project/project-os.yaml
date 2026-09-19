@@ -18,7 +18,7 @@ project:
   number: 3
   title: "Nika · the road (a projection)"
   public: true
-  repositories: [nika, nika-spec]
+  repositories: [nika, nika-spec, nika-client, nika-vscode]
   short_description: "One public operating surface for Nika · record, gates, issues, pull requests and releases · projected from their real sources."
 
 sources:
@@ -26,16 +26,16 @@ sources:
     path: timeline/timeline.yaml
     owns: [record, gates, proof, past_dates, sequence]
   github_issues:
-    repositories: [nika, nika-spec]
+    repositories: [nika, nika-spec, nika-client, nika-vscode]
     state: open
     exclude_labels: [gate]
     owns: [title, status, assignees, milestone, dependencies]
   github_pull_requests:
-    repositories: [nika, nika-spec]
+    repositories: [nika, nika-spec, nika-client, nika-vscode]
     state: open
     owns: [title, review, checks, assignees, milestone]
   github_releases:
-    repositories: [nika, nika-spec]
+    repositories: [nika, nika-spec, nika-client, nika-vscode]
     state: published
     limit_per_repository: 12
     owns: [tag, published_at, prerelease]
@@ -45,6 +45,7 @@ identity:
   marker: "nika-project-os:ssot:"
   unknown_items: quarantine
   removed_managed_items: retain_as_orphan
+  terminal_source_items: settle_in_place
   destructive_rebuild: forbidden
 
 fields:
@@ -67,6 +68,9 @@ fields:
       - ["🛠 work · active", BLUE, "an open issue"]
       - ["🔍 review · integrating", ORANGE, "an open pull request"]
       - ["📦 release · published", GREEN, "a published release"]
+      - ["● settled · completed at source", GRAY, "issue closed as completed; closure is not shipment proof"]
+      - ["● settled · merged at source", GRAY, "pull request merged; integrated code is not a published artifact"]
+      - ["○ closed · not integrated", GRAY, "closed unmerged, not planned or duplicate; no completion claim"]
   - name: Era
     type: SINGLE_SELECT
     writer: projector
@@ -200,14 +204,14 @@ views:
   - name: "🧭 Command · the rail"
     layout: TABLE
     purpose: "The human starting point · derived attention, owner, horizon and fresh source context."
-    filter: '-Item-type:"📜 Record" -Item-type:"📦 Release"'
+    filter: '-Item-type:"📜 Record" -Item-type:"📦 Release" -Signal:"● settled"'
     group_by: Stage
     sort: [{ field: Signal, direction: asc }, { field: Order, direction: asc }]
     fields: [Title, Signal, Stage, Accountable, Horizon, "Block state", Repository, Updated]
   - name: "🦋 Flow"
     layout: BOARD
     purpose: "The active flow · Todo, In progress and Done with lean cards."
-    filter: 'Item-type:"🧩 Issue","🔀 Pull request","🚪 Gate"'
+    filter: 'Item-type:"🧩 Issue","🔀 Pull request","🚪 Gate" -Signal:"● settled"'
     column_by: Status
     group_by: Pole
     sort: [{ field: Order, direction: asc }]
@@ -225,7 +229,7 @@ views:
   - name: "🧬 Missions"
     layout: TABLE
     purpose: "Native issue hierarchy · parent, sub-issues and progress without a second task model."
-    filter: 'Item-type:"🧩 Issue","🚪 Gate"'
+    filter: 'Item-type:"🧩 Issue","🚪 Gate" -Signal:"● settled"'
     group_by: Pole
     sort: [{ field: Signal, direction: asc }]
     fields: [Title, Parent issue, "Sub-issues progress", "Item type", Signal, Accountable, Status]
@@ -249,7 +253,7 @@ views:
   - name: "🔍 Review"
     layout: TABLE
     purpose: "Open pull requests · review decision, CI and accountable human."
-    filter: 'Item-type:"🔀 Pull request"'
+    filter: 'Item-type:"🔀 Pull request" -Signal:"● settled"'
     group_by: "Review state"
     sort: [{ field: Signal, direction: asc }]
     fields: [Title, Signal, Repository, "Review state", "CI state", Accountable, Target, Updated]
