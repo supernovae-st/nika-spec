@@ -17,6 +17,15 @@ The projector follows six laws:
 5. Every projector-owned classification carries one stable semantic sigil.
 6. `Signal` is derived attention. `Priority` and `Effort` remain human choices.
 
+Closed sources settle in place. The reconciler reads each retained item's
+actual source state from the Project snapshot; a closed or merged source
+moves to its terminal Stage — `● settled · completed at source`,
+`● settled · merged at source` or `○ closed · not integrated` — with Signal
+`● settled`, leaving the active lenses. Closure is never shipment: `Proof`
+stays `◌ pending` until the record itself proves the work. A source that
+cannot be read keeps no lifecycle claim: the orphan is cleared to
+`? unknown`, never painted done.
+
 ## 🚨 Signal
 
 | Value | Meaning |

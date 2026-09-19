@@ -220,6 +220,13 @@ def offline_findings(
         findings.append("destructive rebuild must be forbidden")
     if manifest.get("identity", {}).get("unknown_items") != "quarantine":
         findings.append("unknown items must be quarantined")
+    if (
+        manifest.get("identity", {}).get("terminal_source_items")
+        != "settle_in_place"
+    ):
+        findings.append(
+            "terminal source items must settle in place from actual state"
+        )
     automation = manifest.get("automation", {})
     guardian = automation.get("ui_guardian", {})
     if guardian.get("skill") != "nika-project-os-ui":

@@ -12,10 +12,15 @@ from dataclasses import dataclass
 from typing import Any
 
 from .model import (
+    BLOCK_UNKNOWN,
+    CERTAINTY_UNKNOWN,
     DesiredItem,
     PROJECTION_ORPHANED,
     PROJECTION_QUARANTINED,
+    PROJECTION_SYNCED,
+    SIGNAL_SETTLED,
     extract_marker,
+    terminal_classification,
 )
 
 
@@ -150,6 +155,7 @@ class ActualItem:
     body: str
     url: str | None
     fields: dict[str, Any]
+    terminal: tuple[str, str] | None = None
 
     @property
     def ssot_id(self) -> str | None:
@@ -312,8 +318,8 @@ ITEMS_QUERY = """
             content{
               __typename
               ... on DraftIssue{id title body}
-              ... on Issue{id title body url}
-              ... on PullRequest{id title body url}
+              ... on Issue{id title body url state stateReason}
+              ... on PullRequest{id title body url state merged}
             }
           }
         }
@@ -354,6 +360,7 @@ def snapshot_items(client: GitHub, project_id: str) -> list[ActualItem]:
                     body=(content.get("body") or "").strip(),
                     url=content.get("url"),
                     fields=values,
+                    terminal=terminal_classification(content),
                 )
             )
         page = connection["pageInfo"]
@@ -389,32 +396,6 @@ def clear_field(
     """
     client.graphql(
         query, {"project": project_id, "item": item_id, "field": field_id}
-    )
-
-
-def set_field(
-    client: GitHub,
-    project_id: str,
-    item_id: str,
-    field: dict[str, Any],
-    value: Any,
-) -> None:
-    encoded = encode_field_value(field, value)
-    query = """
-      mutation($project:ID!,$item:ID!,$field:ID!,$value:ProjectV2FieldValue!){
-        updateProjectV2ItemFieldValue(input:{
-          projectId:$project,itemId:$item,fieldId:$field,value:$value
-        }){projectV2Item{id}}
-      }
-    """
-    client.graphql(
-        query,
-        {
-            "project": project_id,
-            "item": item_id,
-            "field": field["id"],
-            "value": encoded,
-        },
     )
 
 
@@ -681,6 +662,79 @@ def _planned_field_changes(
     return changes
 
 
+ORPHAN_CLEARED_FIELDS = (
+    "Stage",
+    "Signal",
+    "Status",
+    "Horizon",
+    "Proof",
+    "Block state",
+    "Review state",
+    "CI state",
+    "Start",
+    "Target",
+)
+
+
+def _orphan_field_repairs(
+    actual: ActualItem,
+    definitions: dict[str, dict[str, Any]],
+) -> list[tuple[str, Any]]:
+    """Strip stale active-work claims from a retained orphan.
+
+    An orphaned item's source left the active set, so its truth is unknown:
+    lifecycle classifications are cleared rather than repainted, Certainty
+    becomes explicitly unknown, and human-owned fields are never touched.
+    """
+    repairs: list[tuple[str, Any]] = []
+    for name in ORPHAN_CLEARED_FIELDS:
+        definition = definitions.get(name)
+        if definition and definition.get("writer") == "human":
+            continue
+        if actual.fields.get(name) is not None:
+            repairs.append((name, None))
+    certainty = definitions.get("Certainty")
+    if (not certainty or certainty.get("writer") != "human") and actual.fields.get(
+        "Certainty"
+    ) != CERTAINTY_UNKNOWN:
+        repairs.append(("Certainty", CERTAINTY_UNKNOWN))
+    return repairs
+
+
+def _terminal_field_repairs(
+    actual: ActualItem,
+    definitions: dict[str, dict[str, Any]],
+    stage: str,
+    certainty: str,
+) -> list[tuple[str, Any]]:
+    """Settle a retained item whose source reached a terminal state.
+
+    The item keeps its identity and history; lifecycle fields move to their
+    terminal truth and leave the forward lenses. Proof stays pending: a
+    closure or merge is never shipment evidence. Human-owned fields are
+    never touched.
+    """
+    wanted: dict[str, Any] = {
+        "Stage": stage,
+        "Status": "Done",
+        "Signal": SIGNAL_SETTLED,
+        "Certainty": certainty,
+        "Proof": "◌ pending",
+        "Horizon": None,
+        "Start": None,
+        "Target": None,
+        "Block state": BLOCK_UNKNOWN,
+    }
+    repairs: list[tuple[str, Any]] = []
+    for name, value in wanted.items():
+        definition = definitions.get(name)
+        if definition and definition.get("writer") == "human":
+            continue
+        if actual.fields.get(name) != value:
+            repairs.append((name, value))
+    return repairs
+
+
 def reconcile(
     client: GitHub,
     project_id: str,
@@ -721,9 +775,39 @@ def reconcile(
             if apply:
                 update_draft(client, actual, desired)
 
-        field_changes = _planned_field_changes(
-            actual, desired.fields, definitions
-        )
+        if actual.terminal is not None:
+            # Discovered open but closed or merged by snapshot time:
+            # classify the actual source state, never the requested one.
+            # An adopted item still receives its identity and Item type.
+            field_changes = _terminal_field_repairs(
+                actual, definitions, actual.terminal[0], actual.terminal[1]
+            )
+            field_changes += _planned_field_changes(
+                actual,
+                {
+                    name: desired.fields[name]
+                    for name in ("SSOT ID", "Item type")
+                    if name in desired.fields
+                },
+                definitions,
+            )
+            if actual.fields.get("Projection state") != PROJECTION_SYNCED:
+                field_changes.append(("Projection state", PROJECTION_SYNCED))
+        elif (
+            desired.content_id
+            and not desired.managed_content
+            and actual.content_id is None
+            and actual.content_kind is None
+        ):
+            # Matched by identity but the source content is no longer
+            # readable: stay explicitly unknown, never repaint as active.
+            field_changes = _orphan_field_repairs(actual, definitions)
+            if actual.fields.get("Projection state") != PROJECTION_ORPHANED:
+                field_changes.append(("Projection state", PROJECTION_ORPHANED))
+        else:
+            field_changes = _planned_field_changes(
+                actual, desired.fields, definitions
+            )
         for name, _wanted in field_changes:
             actions.append(f"field {desired.ssot_id} · {name}")
         if apply:
@@ -740,17 +824,43 @@ def reconcile(
     for actual in actual_items:
         if actual.item_id in used:
             continue
-        state = (
-            PROJECTION_ORPHANED
-            if actual.ssot_id
-            else PROJECTION_QUARANTINED
-        )
-        if actual.fields.get("Projection state") == state:
-            continue
         label = actual.ssot_id or actual.title or actual.item_id
-        actions.append(f"{state.lower()} {label}")
-        if apply and projection:
-            set_field(client, project_id, actual.item_id, projection, state)
+        repairs: list[tuple[str, Any]]
+        if not actual.ssot_id:
+            # Unknown, unmanaged identity: quarantine and never repaint,
+            # even when its content happens to be a closed source node.
+            state = PROJECTION_QUARANTINED
+            repairs = []
+        elif actual.terminal is not None:
+            # Closed or merged at the source: settle in place from the
+            # actual state, which also absorbs close/reopen races.
+            state = PROJECTION_SYNCED
+            repairs = _terminal_field_repairs(
+                actual, definitions, actual.terminal[0], actual.terminal[1]
+            )
+        else:
+            # Open without fresh desired metadata (a reopen that discovery
+            # has not classified yet), deleted, inaccessible or stateless:
+            # the truth is unknown, so stale lifecycle claims are cleared
+            # to explicit unknown — never repainted as done.
+            state = PROJECTION_ORPHANED
+            repairs = _orphan_field_repairs(actual, definitions)
+        if actual.fields.get("Projection state") != state:
+            actions.append(f"{state.lower()} {label}")
+            if projection:
+                repairs = [("Projection state", state), *repairs]
+        for name, _wanted in repairs:
+            if name != "Projection state":
+                actions.append(f"field {label} · {name}")
+        if apply:
+            apply_field_changes(
+                client,
+                project_id,
+                actual.item_id,
+                actual,
+                repairs,
+                catalog,
+            )
     return actions
 
 

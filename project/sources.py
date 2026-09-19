@@ -163,11 +163,30 @@ def _dependency_count(
     return sum(1 for value in values if value.get("state") == "open")
 
 
+def ensure_public_repositories(client: GitHub, repositories: list[str]) -> None:
+    """Reject private or inaccessible repositories before any projection.
+
+    The public Project must never mirror a private source. A repository the
+    token cannot see fails the run instead of silently dropping its items.
+    """
+    for repo in repositories:
+        metadata = client.rest("GET", f"/repos/{ORG}/{repo}")
+        if metadata.get("private"):
+            raise ValueError(f"private repository rejected: {ORG}/{repo}")
+
+
 def issue_items(
     client: GitHub,
     repositories: list[str],
     excluded_labels: set[str],
 ) -> list[DesiredItem]:
+    """Project open issues; closed sources settle through retained repair.
+
+    Only open work is discovered here. Fetching every historical close
+    exceeds the pagination cap and the per-item API budget, so terminal
+    states reach retained Project items through the reconciler's batched
+    source-state resolution instead.
+    """
     output: list[DesiredItem] = []
     for repo in repositories:
         issues = client.pages(f"/repos/{ORG}/{repo}/issues?state=open") or []
@@ -190,13 +209,16 @@ def issue_items(
 def pull_request_items(
     client: GitHub, repositories: list[str]
 ) -> list[DesiredItem]:
+    """Project open pull requests; closed ones settle via retained repair."""
     output: list[DesiredItem] = []
     for repo in repositories:
         pulls = client.pages(f"/repos/{ORG}/{repo}/pulls?state=open") or []
         for pull in pulls:
+            # Reviews decide the Review state, which has no honest unknown
+            # option: a failed read fails the run rather than inventing
+            # "review needed".
             reviews = client.pages(
-                f"/repos/{ORG}/{repo}/pulls/{pull['number']}/reviews",
-                optional=True,
+                f"/repos/{ORG}/{repo}/pulls/{pull['number']}/reviews"
             )
             checks_response = client.rest(
                 "GET",
@@ -208,9 +230,7 @@ def pull_request_items(
                 if checks_response is not None
                 else None
             )
-            output.append(
-                pull_request_item(repo, pull, reviews or [], checks)
-            )
+            output.append(pull_request_item(repo, pull, reviews or [], checks))
     return output
 
 
@@ -246,6 +266,20 @@ def desired_from_sources(
     apply_gate_issues: bool,
 ) -> tuple[list[DesiredItem], list[str]]:
     project_repositories = manifest["project"]["repositories"]
+    issue_source = manifest["sources"]["github_issues"]
+    pull_source = manifest["sources"]["github_pull_requests"]
+    release_source = manifest["sources"]["github_releases"]
+    ensure_public_repositories(
+        client,
+        sorted(
+            {
+                *project_repositories,
+                *issue_source["repositories"],
+                *pull_source["repositories"],
+                *release_source["repositories"],
+            }
+        ),
+    )
     gate_nodes, gate_actions = sync_gate_issues(
         client,
         timeline,
@@ -259,7 +293,6 @@ def desired_from_sources(
             item = replace(item, content_id=gate_nodes.get(gate_id))
         desired.append(item)
 
-    issue_source = manifest["sources"]["github_issues"]
     desired.extend(
         issue_items(
             client,
@@ -267,9 +300,9 @@ def desired_from_sources(
             {value.lower() for value in issue_source.get("exclude_labels", [])},
         )
     )
-    pull_source = manifest["sources"]["github_pull_requests"]
-    desired.extend(pull_request_items(client, pull_source["repositories"]))
-    release_source = manifest["sources"]["github_releases"]
+    desired.extend(
+        pull_request_items(client, pull_source["repositories"])
+    )
     desired.extend(
         release_items(
             client,

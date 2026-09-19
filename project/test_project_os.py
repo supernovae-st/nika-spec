@@ -10,27 +10,39 @@ from unittest.mock import MagicMock, patch
 
 import yaml
 
-from project.github import ActualItem, GitHub, reconcile
+from project.github import ActualItem, GitHub, GitHubError, reconcile
 from project.model import (
     BLOCK_BLOCKED,
     BLOCK_BLOCKING,
     BLOCK_BOTH,
     BLOCK_CLEAR,
     BLOCK_UNKNOWN,
+    CERTAINTY_COMMITTED,
+    CERTAINTY_PROVEN,
+    CERTAINTY_UNKNOWN,
     CI_GREEN,
+    CI_NOT_APPLICABLE,
     CI_RED,
     DesiredItem,
     ITEM_GATE,
+    ITEM_ISSUE,
     PROJECTION_ORPHANED,
     PROJECTION_QUARANTINED,
     PROJECTION_SYNCED,
     REVIEW_APPROVED,
     REVIEW_CHANGES_REQUESTED,
     REVIEW_DRAFT,
+    REVIEW_NOT_APPLICABLE,
     SIGNAL_ACTIVE,
     SIGNAL_ATTENTION,
     SIGNAL_QUEUED,
     SIGNAL_READY,
+    SIGNAL_SETTLED,
+    STAGE_CLOSED_COMPLETED,
+    STAGE_CLOSED_NOT_INTEGRATED,
+    STAGE_MERGED,
+    STAGE_SHIPPED,
+    STAGE_WORK,
     STATUS_IN_PROGRESS,
     accountable,
     block_state,
@@ -40,7 +52,13 @@ from project.model import (
     marker,
     pull_request_signal,
     review_state,
+    terminal_classification,
     timeline_items,
+)
+from project.sources import (
+    desired_from_sources,
+    ensure_public_repositories,
+    pull_request_items,
 )
 
 
@@ -149,6 +167,71 @@ class ModelTests(unittest.TestCase):
         }
         self.assertEqual(accountable(assigned), "nika, thibaut")
 
+    def test_terminal_classification_reads_actual_source_state(self) -> None:
+        self.assertEqual(
+            terminal_classification(
+                {
+                    "__typename": "Issue",
+                    "state": "CLOSED",
+                    "stateReason": "COMPLETED",
+                }
+            ),
+            (STAGE_CLOSED_COMPLETED, CERTAINTY_COMMITTED),
+        )
+        for reason in ("NOT_PLANNED", "DUPLICATE", None):
+            self.assertEqual(
+                terminal_classification(
+                    {
+                        "__typename": "Issue",
+                        "state": "CLOSED",
+                        "stateReason": reason,
+                    }
+                ),
+                (STAGE_CLOSED_NOT_INTEGRATED, CERTAINTY_UNKNOWN),
+            )
+        self.assertEqual(
+            terminal_classification(
+                {"__typename": "PullRequest", "state": "MERGED"}
+            ),
+            (STAGE_MERGED, CERTAINTY_COMMITTED),
+        )
+        self.assertEqual(
+            terminal_classification(
+                {
+                    "__typename": "PullRequest",
+                    "state": "CLOSED",
+                    "merged": True,
+                }
+            ),
+            (STAGE_MERGED, CERTAINTY_COMMITTED),
+        )
+        self.assertEqual(
+            terminal_classification(
+                {
+                    "__typename": "PullRequest",
+                    "state": "CLOSED",
+                    "merged": False,
+                }
+            ),
+            (STAGE_CLOSED_NOT_INTEGRATED, CERTAINTY_UNKNOWN),
+        )
+        self.assertIsNone(
+            terminal_classification({"__typename": "Issue", "state": "OPEN"})
+        )
+        self.assertIsNone(
+            terminal_classification({"__typename": "PullRequest", "state": "OPEN"})
+        )
+        self.assertIsNone(terminal_classification({"__typename": "DraftIssue"}))
+        self.assertIsNone(terminal_classification({}))
+
+    def test_terminal_stages_are_never_shipped(self) -> None:
+        for stage in (
+            STAGE_CLOSED_COMPLETED,
+            STAGE_MERGED,
+            STAGE_CLOSED_NOT_INTEGRATED,
+        ):
+            self.assertNotEqual(stage, STAGE_SHIPPED)
+
 
 class ReconcileTests(unittest.TestCase):
     def setUp(self) -> None:
@@ -172,6 +255,90 @@ class ReconcileTests(unittest.TestCase):
                     {"id": "O6", "name": "Done"},
                 ],
             },
+            "Stage": {
+                "id": "F4",
+                "dataType": "SINGLE_SELECT",
+                "options": [
+                    {"id": "O7", "name": STAGE_WORK},
+                    {"id": "O8", "name": STAGE_CLOSED_COMPLETED},
+                    {"id": "O9", "name": STAGE_MERGED},
+                    {"id": "O10", "name": STAGE_CLOSED_NOT_INTEGRATED},
+                ],
+            },
+            "Signal": {
+                "id": "F5",
+                "dataType": "SINGLE_SELECT",
+                "options": [
+                    {"id": "O11", "name": SIGNAL_QUEUED},
+                    {"id": "O12", "name": SIGNAL_ACTIVE},
+                    {"id": "O13", "name": SIGNAL_SETTLED},
+                ],
+            },
+            "Certainty": {
+                "id": "F6",
+                "dataType": "SINGLE_SELECT",
+                "options": [
+                    {"id": "O14", "name": CERTAINTY_COMMITTED},
+                    {"id": "O15", "name": CERTAINTY_UNKNOWN},
+                    {"id": "O16", "name": CERTAINTY_PROVEN},
+                ],
+            },
+            "Proof": {
+                "id": "F7",
+                "dataType": "SINGLE_SELECT",
+                "options": [
+                    {"id": "O17", "name": "◌ pending"},
+                    {"id": "O18", "name": "✓ proven"},
+                ],
+            },
+            "Horizon": {
+                "id": "F8",
+                "dataType": "SINGLE_SELECT",
+                "options": [
+                    {"id": "O19", "name": "● now"},
+                    {"id": "O20", "name": "→ next"},
+                ],
+            },
+            "Block state": {
+                "id": "F9",
+                "dataType": "SINGLE_SELECT",
+                "options": [
+                    {"id": "O23", "name": BLOCK_CLEAR},
+                    {"id": "O24", "name": BLOCK_UNKNOWN},
+                ],
+            },
+            "Review state": {
+                "id": "F10",
+                "dataType": "SINGLE_SELECT",
+                "options": [
+                    {"id": "O25", "name": REVIEW_NOT_APPLICABLE},
+                    {"id": "O26", "name": REVIEW_APPROVED},
+                ],
+            },
+            "CI state": {
+                "id": "F11",
+                "dataType": "SINGLE_SELECT",
+                "options": [
+                    {"id": "O27", "name": CI_NOT_APPLICABLE},
+                ],
+            },
+            "Start": {"id": "F12", "dataType": "DATE"},
+            "Target": {"id": "F13", "dataType": "DATE"},
+            "Priority": {
+                "id": "F14",
+                "dataType": "SINGLE_SELECT",
+                "options": [{"id": "O28", "name": "High"}],
+            },
+            "Effort": {
+                "id": "F15",
+                "dataType": "SINGLE_SELECT",
+                "options": [{"id": "O29", "name": "Medium"}],
+            },
+            "Item type": {
+                "id": "F16",
+                "dataType": "SINGLE_SELECT",
+                "options": [{"id": "O30", "name": ITEM_ISSUE}],
+            },
         }
         self.definitions = [
             {"name": "SSOT ID", "type": "TEXT", "writer": "projector"},
@@ -185,6 +352,57 @@ class ReconcileTests(unittest.TestCase):
                 "type": "SINGLE_SELECT",
                 "writer": "projector",
             },
+            {"name": "Stage", "type": "SINGLE_SELECT", "writer": "projector"},
+            {"name": "Signal", "type": "SINGLE_SELECT", "writer": "projector"},
+            {
+                "name": "Certainty",
+                "type": "SINGLE_SELECT",
+                "writer": "projector",
+            },
+            {"name": "Proof", "type": "SINGLE_SELECT", "writer": "projector"},
+            {"name": "Horizon", "type": "SINGLE_SELECT", "writer": "projector"},
+            {
+                "name": "Block state",
+                "type": "SINGLE_SELECT",
+                "writer": "projector",
+            },
+            {
+                "name": "Review state",
+                "type": "SINGLE_SELECT",
+                "writer": "projector",
+            },
+            {"name": "CI state", "type": "SINGLE_SELECT", "writer": "projector"},
+            {"name": "Start", "type": "DATE", "writer": "github"},
+            {"name": "Target", "type": "DATE", "writer": "github"},
+            {"name": "Priority", "type": "SINGLE_SELECT", "writer": "human"},
+            {"name": "Effort", "type": "SINGLE_SELECT", "writer": "human"},
+            {
+                "name": "Item type",
+                "type": "SINGLE_SELECT",
+                "writer": "projector",
+            },
+        ]
+
+    def capture_changes(
+        self,
+        actual: list[ActualItem],
+        desired: list[DesiredItem],
+    ) -> list[tuple[str, object]]:
+        with patch(
+            "project.github.snapshot_items", return_value=actual
+        ), patch("project.github.apply_field_changes") as apply_mock:
+            reconcile(
+                object(),
+                "PROJECT",
+                desired,
+                self.fields,
+                self.definitions,
+                apply=True,
+            )
+        return [
+            change
+            for call in apply_mock.call_args_list
+            for change in call.args[4]
         ]
 
     def test_legacy_title_migrates_without_add_or_delete(self) -> None:
@@ -298,6 +516,359 @@ class ReconcileTests(unittest.TestCase):
             "field github:pr:supernovae-st/nika#1 · Status",
             actions,
         )
+
+    @staticmethod
+    def open_issue(number: int) -> dict:
+        return {
+            "number": number,
+            "title": f"Issue {number}",
+            "body": "",
+            "node_id": f"ISSUE{number}",
+            "html_url": f"https://github.com/supernovae-st/nika/issues/{number}",
+            "created_at": "2026-09-01T00:00:00Z",
+            "assignees": [],
+            "labels": [],
+        }
+
+    def test_stale_closed_item_settles_from_actual_state(self) -> None:
+        ssot = "github:issue:supernovae-st/nika#651"
+        actual = ActualItem(
+            item_id="ITEM651",
+            content_id="ISSUE651",
+            content_kind="Issue",
+            title="Stale closed issue",
+            body="",
+            url="https://github.com/supernovae-st/nika/issues/651",
+            fields={
+                "SSOT ID": ssot,
+                "Stage": STAGE_WORK,
+                "Signal": SIGNAL_QUEUED,
+                "Status": STATUS_IN_PROGRESS,
+                "Horizon": "● now",
+                "Certainty": CERTAINTY_COMMITTED,
+                "Proof": "✓ proven",
+                "Priority": "High",
+                "Effort": "Medium",
+                "Projection state": PROJECTION_SYNCED,
+            },
+            terminal=(STAGE_CLOSED_COMPLETED, CERTAINTY_COMMITTED),
+        )
+        with patch("project.github.snapshot_items", return_value=[actual]):
+            actions = reconcile(
+                object(), "PROJECT", [], self.fields, self.definitions,
+                apply=False,
+            )
+        self.assertIn(f"field {ssot} · Stage", actions)
+        self.assertIn(f"field {ssot} · Signal", actions)
+        self.assertIn(f"field {ssot} · Status", actions)
+        self.assertFalse(any("orphaned" in action for action in actions))
+        self.assertFalse(any(action.startswith("add ") for action in actions))
+        self.assertFalse(
+            any("Priority" in action or "Effort" in action for action in actions)
+        )
+
+        changes = self.capture_changes([actual], [])
+        self.assertIn(("Stage", STAGE_CLOSED_COMPLETED), changes)
+        self.assertIn(("Status", "Done"), changes)
+        self.assertIn(("Signal", SIGNAL_SETTLED), changes)
+        self.assertIn(("Horizon", None), changes)
+        # A stale false-proof claim is repaired to pending, never kept.
+        self.assertIn(("Proof", "◌ pending"), changes)
+        self.assertNotIn(("Stage", STAGE_SHIPPED), changes)
+        self.assertFalse(
+            any(name in {"Priority", "Effort"} for name, _ in changes)
+        )
+
+    def test_merged_and_unmerged_pull_requests_settle_distinctly(self) -> None:
+        merged = ActualItem(
+            item_id="ITEM1",
+            content_id="PR1",
+            content_kind="PullRequest",
+            title="Merged pull request",
+            body="",
+            url="https://github.com/supernovae-st/nika/pull/1",
+            fields={"SSOT ID": "github:pr:supernovae-st/nika#1"},
+            terminal=(STAGE_MERGED, CERTAINTY_COMMITTED),
+        )
+        unmerged = ActualItem(
+            item_id="ITEM2",
+            content_id="PR2",
+            content_kind="PullRequest",
+            title="Closed unmerged pull request",
+            body="",
+            url="https://github.com/supernovae-st/nika/pull/2",
+            fields={"SSOT ID": "github:pr:supernovae-st/nika#2"},
+            terminal=(STAGE_CLOSED_NOT_INTEGRATED, CERTAINTY_UNKNOWN),
+        )
+        merged_changes = self.capture_changes([merged], [])
+        self.assertIn(("Stage", STAGE_MERGED), merged_changes)
+        self.assertIn(("Certainty", CERTAINTY_COMMITTED), merged_changes)
+        self.assertIn(("Status", "Done"), merged_changes)
+        unmerged_changes = self.capture_changes([unmerged], [])
+        self.assertIn(("Stage", STAGE_CLOSED_NOT_INTEGRATED), unmerged_changes)
+        self.assertIn(("Certainty", CERTAINTY_UNKNOWN), unmerged_changes)
+        for changes in (merged_changes, unmerged_changes):
+            self.assertIn(("Proof", "◌ pending"), changes)
+            self.assertNotIn(("Stage", STAGE_SHIPPED), changes)
+            self.assertNotIn(("Certainty", CERTAINTY_PROVEN), changes)
+
+    def test_unmanaged_closed_item_is_quarantined_untouched(self) -> None:
+        actual = ActualItem(
+            item_id="ITEMH",
+            content_id="ISSUE9",
+            content_kind="Issue",
+            title="Human note",
+            body="not projected",
+            url="https://github.com/supernovae-st/nika/issues/9",
+            fields={"Stage": STAGE_WORK, "Status": "Todo"},
+            terminal=(STAGE_CLOSED_COMPLETED, CERTAINTY_COMMITTED),
+        )
+        with patch("project.github.snapshot_items", return_value=[actual]):
+            actions = reconcile(
+                object(), "PROJECT", [], self.fields, self.definitions,
+                apply=False,
+            )
+        self.assertIn(
+            f"{PROJECTION_QUARANTINED.lower()} Human note", actions
+        )
+        self.assertFalse(any(action.startswith("field ") for action in actions))
+        self.assertFalse(any("synced" in action for action in actions))
+
+    def test_reopen_race_clears_stale_terminal_claims(self) -> None:
+        ssot = "github:issue:supernovae-st/nika#42"
+        actual = ActualItem(
+            item_id="ITEM42",
+            content_id="ISSUE42",
+            content_kind="Issue",
+            title="Reopened before discovery caught it",
+            body="",
+            url="https://github.com/supernovae-st/nika/issues/42",
+            fields={
+                "SSOT ID": ssot,
+                "Stage": STAGE_CLOSED_COMPLETED,
+                "Signal": SIGNAL_SETTLED,
+                "Status": "Done",
+                "Certainty": CERTAINTY_COMMITTED,
+                "Proof": "◌ pending",
+                "Priority": "High",
+                "Projection state": PROJECTION_SYNCED,
+            },
+            terminal=None,
+        )
+        with patch("project.github.snapshot_items", return_value=[actual]):
+            actions = reconcile(
+                object(), "PROJECT", [], self.fields, self.definitions,
+                apply=False,
+            )
+        self.assertIn(f"{PROJECTION_ORPHANED.lower()} {ssot}", actions)
+        self.assertIn(f"field {ssot} · Stage", actions)
+        self.assertFalse(any("Priority" in action for action in actions))
+
+        changes = self.capture_changes([actual], [])
+        self.assertIn(("Stage", None), changes)
+        self.assertIn(("Signal", None), changes)
+        self.assertIn(("Status", None), changes)
+        self.assertIn(("Certainty", CERTAINTY_UNKNOWN), changes)
+        self.assertIn(("Projection state", PROJECTION_ORPHANED), changes)
+        self.assertNotIn(("Status", "Done"), changes)
+        self.assertNotIn(("Stage", STAGE_WORK), changes)
+
+    def test_desired_item_closed_by_snapshot_time_settles(self) -> None:
+        desired = issue_item("nika", self.open_issue(42), 0, 0)
+        actual = ActualItem(
+            item_id="ITEM42",
+            content_id="ISSUE42",
+            content_kind="Issue",
+            title="Issue 42",
+            body="",
+            url="https://github.com/supernovae-st/nika/issues/42",
+            fields={
+                "SSOT ID": desired.ssot_id,
+                "Stage": STAGE_WORK,
+                "Signal": SIGNAL_QUEUED,
+                "Status": "Todo",
+                "Projection state": PROJECTION_SYNCED,
+            },
+            terminal=(STAGE_CLOSED_COMPLETED, CERTAINTY_COMMITTED),
+        )
+        changes = self.capture_changes([actual], [desired])
+        self.assertIn(("Stage", STAGE_CLOSED_COMPLETED), changes)
+        self.assertIn(("Status", "Done"), changes)
+        self.assertIn(("Signal", SIGNAL_SETTLED), changes)
+        self.assertNotIn(("Stage", STAGE_WORK), changes)
+        self.assertNotIn(("Signal", SIGNAL_QUEUED), changes)
+
+    def test_desired_matched_with_null_content_stays_unknown(self) -> None:
+        desired = issue_item("nika", self.open_issue(77), 0, 0)
+        actual = ActualItem(
+            item_id="ITEM77",
+            content_id=None,
+            content_kind=None,
+            title="Vanished source",
+            body="",
+            url=None,
+            fields={
+                "SSOT ID": desired.ssot_id,
+                "Stage": STAGE_WORK,
+                "Signal": SIGNAL_ACTIVE,
+                "Status": STATUS_IN_PROGRESS,
+                "Certainty": CERTAINTY_COMMITTED,
+                "Proof": "◌ pending",
+                "Priority": "High",
+                "Projection state": PROJECTION_SYNCED,
+            },
+        )
+        changes = self.capture_changes([actual], [desired])
+        self.assertIn(("Stage", None), changes)
+        self.assertIn(("Signal", None), changes)
+        self.assertIn(("Status", None), changes)
+        self.assertIn(("Certainty", CERTAINTY_UNKNOWN), changes)
+        self.assertIn(("Projection state", PROJECTION_ORPHANED), changes)
+        self.assertNotIn(("Stage", STAGE_WORK), changes)
+        self.assertNotIn(("Status", "Done"), changes)
+        self.assertFalse(
+            any(name in {"Priority", "Effort"} for name, _ in changes)
+        )
+
+    def test_adopted_terminal_item_receives_identity(self) -> None:
+        desired = issue_item("nika", self.open_issue(88), 0, 0)
+        actual = ActualItem(
+            item_id="ITEM88",
+            content_id="ISSUE88",
+            content_kind="Issue",
+            title="Issue 88",
+            body="",
+            url="https://github.com/supernovae-st/nika/issues/88",
+            fields={},
+            terminal=(STAGE_CLOSED_COMPLETED, CERTAINTY_COMMITTED),
+        )
+        changes = self.capture_changes([actual], [desired])
+        self.assertIn(("SSOT ID", desired.ssot_id), changes)
+        self.assertIn(("Item type", ITEM_ISSUE), changes)
+        self.assertIn(("Stage", STAGE_CLOSED_COMPLETED), changes)
+        self.assertIn(("Status", "Done"), changes)
+        self.assertIn(("Signal", SIGNAL_SETTLED), changes)
+        self.assertIn(("Projection state", PROJECTION_SYNCED), changes)
+        self.assertNotIn(("Stage", STAGE_WORK), changes)
+
+    def test_reopened_item_regains_active_fields(self) -> None:
+        desired = issue_item("nika", self.open_issue(99), 0, 0)
+        actual = ActualItem(
+            item_id="ITEM99",
+            content_id="ISSUE99",
+            content_kind="Issue",
+            title="Issue 99",
+            body="",
+            url="https://github.com/supernovae-st/nika/issues/99",
+            fields={
+                "SSOT ID": desired.ssot_id,
+                "Stage": STAGE_CLOSED_COMPLETED,
+                "Signal": SIGNAL_SETTLED,
+                "Status": "Done",
+                "Certainty": CERTAINTY_COMMITTED,
+                "Proof": "◌ pending",
+                "Projection state": PROJECTION_SYNCED,
+            },
+            terminal=None,
+        )
+        changes = self.capture_changes([actual], [desired])
+        self.assertIn(("Stage", STAGE_WORK), changes)
+        self.assertIn(("Signal", SIGNAL_QUEUED), changes)
+        self.assertIn(("Status", "Todo"), changes)
+        self.assertIn(("Horizon", "→ next"), changes)
+        self.assertFalse(
+            any(value == STAGE_CLOSED_COMPLETED for _, value in changes)
+        )
+
+
+class SourceTests(unittest.TestCase):
+    manifest = {
+        "project": {"repositories": ["nika"]},
+        "sources": {
+            "github_issues": {
+                "repositories": ["nika"],
+                "exclude_labels": ["gate"],
+            },
+            "github_pull_requests": {"repositories": ["nika"]},
+            "github_releases": {
+                "repositories": ["nika"],
+                "limit_per_repository": 12,
+            },
+        },
+    }
+    timeline = {"entries": [], "gates": []}
+
+    def test_private_repository_is_rejected(self) -> None:
+        client = MagicMock()
+        client.rest.return_value = {"private": True}
+        with self.assertRaisesRegex(ValueError, "private repository rejected"):
+            ensure_public_repositories(client, ["nika-lab"])
+
+    def test_inaccessible_repository_fails_the_run(self) -> None:
+        client = MagicMock()
+        client.rest.side_effect = GitHubError("repos/nika-lab: HTTP 404")
+        with self.assertRaises(GitHubError):
+            ensure_public_repositories(client, ["nika-lab"])
+
+    def test_duplicate_normalized_identity_is_rejected(self) -> None:
+        issue = {
+            "number": 7,
+            "title": "Duplicated by the API",
+            "body": "",
+            "node_id": "ISSUE7",
+            "html_url": "https://github.com/supernovae-st/nika/issues/7",
+            "created_at": "2026-09-01T00:00:00Z",
+            "assignees": [],
+            "labels": [],
+        }
+
+        def pages(path: str, optional: bool = False) -> list | None:
+            if "dependencies" in path:
+                return None
+            if "milestones" in path:
+                return []
+            if "labels=gate" in path:
+                return []
+            if "issues?state=open" in path:
+                return [issue, dict(issue)]
+            if "pulls?state=open" in path:
+                return []
+            if "releases" in path:
+                return []
+            raise AssertionError(f"unexpected path: {path}")
+
+        client = MagicMock()
+        client.pages.side_effect = pages
+        client.rest.return_value = {"private": False}
+        with self.assertRaisesRegex(ValueError, "duplicate normalized SSOT IDs"):
+            desired_from_sources(
+                client, self.manifest, self.timeline, apply_gate_issues=False
+            )
+
+    def test_review_read_failure_fails_loudly(self) -> None:
+        pull = {
+            "number": 5,
+            "title": "A pull request",
+            "body": "",
+            "node_id": "PR5",
+            "html_url": "https://github.com/supernovae-st/nika/pull/5",
+            "created_at": "2026-09-01T00:00:00Z",
+            "assignees": [],
+            "labels": [],
+            "head": {"sha": "abc123"},
+        }
+
+        def pages(path: str, optional: bool = False) -> list:
+            if "pulls?state=open" in path:
+                return [pull]
+            if path.endswith("/reviews"):
+                raise GitHubError("pulls/5/reviews: HTTP 500")
+            raise AssertionError(f"unexpected path: {path}")
+
+        client = MagicMock()
+        client.pages.side_effect = pages
+        with self.assertRaises(GitHubError):
+            pull_request_items(client, ["nika"])
 
 
 class GitHubClientTests(unittest.TestCase):
