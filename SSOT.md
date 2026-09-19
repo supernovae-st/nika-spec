@@ -227,7 +227,7 @@ refused by `--check` (exit 5), the same contract every projection has.
 | `tools/estate/scripts/estate.py` | `Import the declared public source files and generated provenance with their recorded file modes` | `python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml` |
 | `tools/estate/scripts/selftest.py` | `Import the declared public source files and generated provenance with their recorded file modes` | `python3 scripts/check-estate-projection.py · .github/workflows/estate-projection.yml` |
 
-Provenance floor: 1668 tracked files classified · authored 1333 · generated 137 · pinned-copy 4 · testimonial 193 (estate schema 2 · mode observation).
+Provenance floor: 1676 tracked files classified · authored 1341 · generated 137 · pinned-copy 4 · testimonial 193 (estate schema 2 · mode observation).
 
 <!-- /estate:map -->
 
