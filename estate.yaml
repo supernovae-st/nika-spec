@@ -364,7 +364,7 @@ patterns:
 - glob: "timeline/**"
   class: authored
   match_count: 4
-  aggregate_sha256: 8ebd6e04b7b98f57bd77f795bedf73e7fbeb3c20d1d8a251e7a766ab721a79a0
+  aggregate_sha256: 47fd8da759c450ba5fb97bbd1a4324822551c1b7c5bc5cae0fdc99f7a9e1aa71
   evidence: "timeline.yaml (the SSOT — 'every provable claim … re-proven against its source of truth' per timeline.yml) + verify.py + project-board.py (writes OUTWARD to the org Projects board, never into this tree)"
 - glob: "registry/**"
   class: authored
