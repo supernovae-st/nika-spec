@@ -13,6 +13,45 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed · the reference consent oracle reads a certain skip (2026-09-18)
+
+- **A write that only reads a stage the refusal certainly skips is refused
+  (`NIKA-SEC-014`).** The reference oracle's consent walk stopped at a closed
+  gate, so it never saw what read *past* it. A `with:` value edge admits a
+  skipped producer and reads null (03 · edge roles), so such a reader reaches
+  its verb on “no”, against the affirmative-consent law (10 · NEP-0020). The
+  oracle now holds a second, bounded reading beside the first and never merges
+  the two. It refuses only what it proves: the stage's bindings are total and
+  its `when:` is false on a refusal (read once, before any fan-out), the
+  reader is certainly admitted, and it certainly reaches an effect.
+  `after: { stage: success }` on the same producer cancels the reader and
+  stays valid. A skip that rests on a step that merely ran, a navigated
+  binding, an undecided left operand, a comparison across two classes or a
+  fan-out *reader* is not proven, and stays valid. No new code, no schema or
+  prose change, no new conformance fixture: the normative policy is unchanged.
+- **`conformance/consent_core_selftest.py`** states the reading as a finite
+  table (35 shapes · 47 laws) and neuters four of its guards one at a time;
+  each must flip exactly its own rows. It runs in the static gate.
+
+### Changed · composed authoring goldens: KG01 is partly repaired (2026-09-18)
+
+- **X13, a thirteenth family,** isolates the route where a refusal skips a
+  stage: a reference, a variant closed by a success edge on the same stage,
+  two `refused` candidates (the certain core · a fan-out stage) and two
+  near-misses that differ from them by one unprovable step and still write on
+  “no”.
+- **KG01 stays a retained gap, as KG01-conditional.** Its witness is
+  byte-identical and pinned. Both oracles still admit it, the rehearsed engine
+  build can only warn, and a refusal still writes `Report: null`; those facts
+  are now asserted on every rehearsal. The X13 refused candidates are its
+  repaired sub-cases, not proof that the original golden is fixed. Three gaps
+  remain.
+- **A repair is proven by running it.** A `refused` candidate can declare a
+  `refused_run`: run as written, it must be refused before any task starts and
+  leave no file, so an engine that still admits it fails by the file it
+  leaves. Advisory hints are expected per candidate, and a gap's recorded
+  facts fail the rehearsal when they stop holding.
+
 ### Added · compile-HOT measurement split (2026-09-18)
 
 - **[`eval/hot/splits.json`](eval/hot/splits.json)** freezes TRAIN/DEVELOPMENT

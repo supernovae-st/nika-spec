@@ -1,0 +1,57 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# X13 · NEAR-MISS · the null is passed through one ordinary step before the write.
+# The write reads `format`, and `format` reads the skipped stage. Whether
+# `format` succeeds on a null is not provable, so no oracle may REFUSE this: the
+# engine gives a consent advisory and the file is valid. On no it still writes.
+# Static check: valid. Judge: effects_gated. Behaviour: rejects.
+nika: x13-near-miss-laundered-through-a-step-that-ran
+model: mock/echo
+
+const:
+  note: "Release 2.4.1 is ready."
+
+permits:
+  tools: ["nika:jq", "nika:prompt", "nika:write"]
+  fs:
+    write: ["./out/report.md"]
+
+tasks:
+  human:
+    invoke:
+      tool: "nika:prompt"
+      args:
+        message: "Publish this note to ./out/report.md? ${{ const.note }}"
+
+  stage:
+    with:
+      go: ${{ tasks.human.output }}
+      note: ${{ const.note }}
+    when: ${{ with.go == true }}
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: ${{ with.note }}
+        expression: "."
+
+  format:
+    with:
+      staged: ${{ tasks.stage.output }}
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: ${{ with.staged }}
+        expression: "."
+
+  publish:
+    with:
+      staged: ${{ tasks.format.output }}
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/report.md"
+        content: "Release note: ${{ with.staged }}"
+
+outputs:
+  published: ${{ tasks.publish.status }}

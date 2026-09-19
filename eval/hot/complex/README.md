@@ -1,6 +1,6 @@
 # eval/hot/complex — composed authoring goldens
 
-Twelve scenario families built from the admitted language, each with a
+Thirteen scenario families built from the admitted language, each with a
 reference workflow, the near-misses that read well and are wrong, and the
 mechanical judgment that tells them apart.
 
@@ -14,7 +14,8 @@ promotes a HOT family, sets a threshold or supports a comparative claim.
 
 Owners: nika#1663 (compile semantics · the semantic oracle) · nika#1666
 (patterns) · nika#1656 (measure) · nika#1664 (program identity, so that a stale
-approval cannot authorise) · nika#1643 (the runtime answer door).
+approval cannot authorise) · nika#1643 (the runtime answer door) · nika#1636
+(consent: what a refusal must close).
 
 ## Why a judge is needed at all
 
@@ -36,6 +37,14 @@ and nothing else.
 | X10 | exactly one queue per ticket | a fallback written as “anything that is not a login” | `branches_exclusive_total` · behaviour: two queues receive one ticket |
 | X11 | ask before the refund | “Proceed with the refund?” | `gate_binds_effect_facts` · behaviour: an answer for 40 EUR pays 400 EUR |
 | X12 | reuse a recorded judgment only if nothing moved | leave the threshold out of the identity · compare candidates as a set · let 0.97 stand in for a changed amount | behaviour: stale evidence is reused |
+| X13 | stage the note, publish it only on yes | pass the skipped stage's null through one ordinary step · or let the stage also read a step that merely ran | `effects_gated` · behaviour: `Release note: null` is written after a refusal |
+
+X13 is the one family whose two plainest wrong candidates do **not** pass
+check: a write that reads a stage the refusal *certainly* skips, and nothing
+else, is refused by both oracles (`NIKA-SEC-014`). They are kept as `refused`
+candidates beside the near-misses that differ from them by one unprovable
+step, because that one step is the whole difference between a refusal and a
+warning (see [the retained gaps](#what-is-declared-and-refused)).
 
 ## Two layers, two kinds of proof
 
@@ -97,6 +106,22 @@ directory, with an empty environment; a candidate that needs a network, a
 secret or a program is never executed — its engine check is recorded and it is
 listed as static-only with the reason. The receipt carries the engine version
 and the binary's sha256.
+
+Three more things are read from the engine, each because a rename could
+otherwise pass for a repair:
+
+- **A refusal is proven by running it.** A `refused` candidate may declare a
+  `refused_run`: the file is run *as written*, with the declared answers, and
+  must be refused before any task starts and leave no file. An engine that
+  admits it fails here by running it, and the failure names the file it left.
+- **A warning is not a verdict, and it is recorded.** `engine_hints_include`
+  and `engine_hints_exclude` state which advisory kinds `check` must and must
+  not give. A candidate an engine can only *warn* about is still admitted and
+  still runs; that is a different fact from one it says nothing about.
+- **A retained gap states its facts.** Each `facts` row of a gap is asserted on
+  every rehearsal (`engine_check` · `engine_hint` · `behaviour_rejects`, with
+  the exact problem it must report). When one stops holding the rehearsal
+  fails and says which, so a gap cannot drift unnoticed in either direction.
 
 It does **not** prove model quality, another engine, a live connector, latency,
 cost, behaviour outside the listed cases, or anything under `product_contracts`.
@@ -171,9 +196,41 @@ behaviour cases, and the command that validates it.
 
   | Gap | Expected | Observed on the rehearsed build |
   |---|---|---|
-  | KG01 | a route closed only by a skippable data edge is refused (`NIKA-SEC-014`) | both oracles accept it; a refusal still writes |
+  | KG01 · *conditional* | a route closed only by a skippable data edge is refused (`NIKA-SEC-014`) | both oracles still accept the original witness; the engine gives a `consent` advisory; a refusal still writes `Report: null` |
   | KG02 | an answer does not authorise a changed effect, whatever the question said | a generic question lets the old answer pay the new amount |
   | KG03 | a one-constant edit keeps the licence header | the candidate is re-serialised and every comment is gone |
+
+  **KG01 is partly repaired, and the original golden is not.** Three things
+  are kept apart:
+
+  | | File | Reference oracle | Engine check | On a refusal |
+  |---|---|---|---|---|
+  | the original witness | `x01/near-miss-gated-through-data-edge` | valid | valid · `consent` advisory | the write starts · `Report: null` |
+  | repaired · the certain core | `x13/refused-certain-skip-core` | `NIKA-SEC-014` | `NIKA-SEC-014` | refused before any task · no file |
+  | repaired · the fan-out cousin | `x13/refused-certain-skip-fan-out-stage` | `NIKA-SEC-014` | `NIKA-SEC-014` | refused before any task · no file |
+
+  A refusal is a proof, so an oracle refuses only what it proves: that the
+  stage *certainly* skips (its bindings are total and its `when:` is false
+  on a refusal, read once, before any fan-out), that the reader is
+  *certainly* admitted (a `with:` value edge passes on a skipped producer
+  and reads null; `after: { stage: success }` on the same stage cancels
+  instead), and that it *certainly* reaches an effect. The original
+  witness fails the first proof twice over: its stage navigates into a
+  value (`tasks.merge.output.report`), which may error before `when:` is
+  read, and it reads a step that merely ran, which may fail and cancel the
+  stage rather than skip it. Neither happens on the ordinary run, so on
+  “no” the write still fires. Closing that is for the owners to weigh
+  (nika#1636 · nika#1663); it is not claimed here.
+
+  On an engine build that does not read a certain skip, both repaired
+  sub-cases are admitted and run, and the rehearsal fails on the file each
+  leaves (`Release note: null`). That failure is the control working, not a
+  regression of this corpus.
+
+  The witness's bytes are pinned (`reproduce.sha256`), a partly repaired gap
+  must keep that pin, and each file it names under `repaired_subcases` must be
+  a `refused` candidate that is also run as written. A gap is never closed by
+  editing the workflow that shows it, nor by redefining what it expects.
 
 ## Adding a scenario
 

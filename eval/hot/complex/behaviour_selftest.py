@@ -106,6 +106,106 @@ class TheRehearsalCanFail(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertTrue(any("KG01: the expected behaviour is now observed" in f for f in summary["failures"]))
 
+    # ── a refusal is proven by running it, a warning by reading it, a gap by its facts ──
+
+    CORE = "workflows/x13/refused-certain-skip-core.nika"
+    CONDITIONAL = "workflows/x13/near-miss-stage-also-reads-a-step-that-ran.nika"
+    WITNESS = "workflows/x01/near-miss-gated-through-data-edge.nika"
+
+    def row(self, data, file):
+        return next(c for s in data["scenarios"] for c in s["candidates"] if c["file"] == file)
+
+    def receipt(self):
+        path = Path(self.temp.name) / "receipt.json"
+        result = subprocess.run([sys.executable, str(HARNESS), "--engine", ENGINE, "--root", str(self.root),
+                                 "--receipt", str(path)], capture_output=True, text=True, check=False)
+        return result.returncode, json.loads(path.read_text(encoding="utf-8"))
+
+    def test_the_repaired_subcases_are_refused_and_leave_nothing_as_committed(self):
+        self.only("X13")
+        code, receipt = self.receipt()
+        self.assertEqual(code, 0, receipt)
+        runs = receipt["scenarios"]["X13"]["refused_runs"]
+        self.assertEqual(len(runs), 2)
+        for file, run in runs.items():
+            with self.subTest(file=file):
+                seen = run["observed"]
+                self.assertEqual((seen["exit"], seen["tasks_started"], seen["files_written"]), (2, [], {}))
+
+    def test_a_refused_candidate_that_the_engine_runs_is_caught_by_the_file_it_leaves(self):
+        """The shape of an engine that does not refuse: under the refused candidate's name sits a workflow
+        this engine admits. It is caught three times over, and the third is the effect itself."""
+        self.only("X13")
+        shutil.copy(self.root / self.CONDITIONAL, self.root / self.CORE)
+        code, summary = self.rehearse()
+        self.assertEqual(code, 1)
+        name = "X13/refused-certain-skip-core.nika"
+        for wanted in (f"{name}: engine check expected NIKA-SEC-014, observed valid",
+                       f"{name}: run as written: exit: expected 2, observed 0",
+                       f"{name}: run as written: files: expected exactly {{}}, "
+                       "observed {'out/report.md': 'Release note: null'}"):
+            self.assertIn(wanted, summary["failures"])
+
+    def test_a_refusal_that_is_only_static_is_caught_at_run(self):
+        """Closed by a success edge, the file is valid: nothing is refused, and the run says so by starting."""
+        self.only("X13")
+        self.rewrite(self.CORE, "  publish:\n    with:\n", "  publish:\n    after:\n      stage: success\n    with:\n")
+        code, summary = self.rehearse()
+        self.assertEqual(code, 1)
+        self.assertTrue(any("refused-certain-skip-core.nika: run as written: tasks started: expected [], "
+                            "observed ['human']" in f for f in summary["failures"]), summary["failures"])
+        self.assertFalse(any("refused-certain-skip-core.nika: run as written: files" in f
+                             for f in summary["failures"]), "a closed route writes nothing")
+
+    def test_a_near_miss_the_engine_says_nothing_about_is_caught(self):
+        self.only("X13")
+        self.manifest(lambda d: self.row(d, "workflows/x13/reference.nika").update(
+            engine_hints_exclude=[], engine_hints_include=["consent"]))
+        code, summary = self.rehearse()
+        self.assertEqual(code, 1)
+        self.assertTrue(any("reference.nika: the engine gives no `consent` advisory" in f
+                            for f in summary["failures"]), summary["failures"])
+
+    def test_a_warning_on_a_closed_route_is_caught(self):
+        self.only("X13")
+        self.manifest(lambda d: self.row(d, self.CONDITIONAL).update(engine_hints_include=[],
+                                                                    engine_hints_exclude=["consent"]))
+        code, summary = self.rehearse()
+        self.assertEqual(code, 1)
+        self.assertTrue(any("near-miss-stage-also-reads-a-step-that-ran.nika: the engine gives a `consent` "
+                            "advisory on a candidate whose route is closed" in f for f in summary["failures"]),
+                        summary["failures"])
+
+    def test_the_original_witness_is_still_admitted_still_warned_about_and_still_leaks(self):
+        self.only("X01")
+        code, receipt = self.receipt()
+        self.assertEqual(code, 0, receipt)
+        kg01 = receipt["retained_gaps"]["KG01"]
+        self.assertFalse(kg01["expected_behaviour_observed"], "the original golden is not refused: the gap is open")
+        self.assertEqual([(fact["kind"], fact["holds"]) for fact in kg01["facts"]],
+                         [("engine_check", True), ("engine_hint", True), ("behaviour_rejects", True)])
+        refusal = receipt["scenarios"]["X01"]["cases"]["X01-B1"][self.WITNESS]["observed"][0]
+        self.assertEqual(refusal["files_written"], {"out/report.md": "Report: null"})
+
+    def with_a_fact_pointed_at_the_reference(self, kind, key):
+        """The correct reference is where a fact about the witness is false: the run must say which fact."""
+        self.only("X01")
+        self.manifest(lambda d: next(f for f in d["retained_gaps"][0]["facts"] if f["kind"] == kind).update(
+            {key: "workflows/x01/reference.nika"}))
+        code, summary = self.rehearse()
+        self.assertEqual(code, 1)
+        return summary["failures"]
+
+    def test_a_gap_whose_witness_is_no_longer_warned_about_is_caught(self):
+        failures = self.with_a_fact_pointed_at_the_reference("engine_hint", "file")
+        self.assertTrue(any("KG01: a recorded fact no longer holds (the engine warns about the original witness"
+                            in f for f in failures), failures)
+
+    def test_a_gap_whose_witness_no_longer_leaks_is_caught(self):
+        failures = self.with_a_fact_pointed_at_the_reference("behaviour_rejects", "candidate")
+        self.assertTrue(any("KG01: a recorded fact no longer holds (on a refusal the original witness still"
+                            in f for f in failures), failures)
+
     def test_a_candidate_that_needs_a_program_is_never_executed(self):
         self.only("X08")
         self.manifest(lambda d: d["scenarios"][0]["candidates"][3].update(behaviour=True))

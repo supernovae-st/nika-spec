@@ -97,15 +97,22 @@ class Engine:
         return subprocess.run([self.path, *argv], cwd=cwd, env=isolated_env(home), capture_output=True,
                               text=True, timeout=TIMEOUT, check=False)
 
-    def check(self, path: Path) -> str:
-        """`valid`, or the refusal codes joined by `+`."""
+    def check_report(self, path: Path) -> dict:
+        """{"verdict": `valid` or the refusal codes joined by `+`, "hints": the advisory kinds}.
+
+        An advisory is not a verdict: the file is still admitted and still runs. It is recorded because a
+        candidate the engine can only WARN about is a different fact from one it says nothing about.
+        """
         with tempfile.TemporaryDirectory(prefix="complex-check-") as temp:
             shutil.copy(path, Path(temp) / path.name)
             result = self.call(["check", "--json", "--native-strict", path.name], Path(temp))
         report = json.loads(result.stdout)
-        if report["verdicts"]["valid"]:
-            return "valid"
-        return "+".join(sorted({f["code"] for f in report["findings"] if f.get("severity") == "error"}))
+        codes = sorted({f["code"] for f in report["findings"] if f.get("severity") == "error"})
+        return {"verdict": "valid" if report["verdicts"]["valid"] else "+".join(codes),
+                "hints": sorted({h["kind"] for h in report.get("hints", []) if h.get("kind")})}
+
+    def check(self, path: Path) -> str:
+        return self.check_report(path)["verdict"]
 
 
 def frames(stdout: str) -> list[dict]:
@@ -206,6 +213,36 @@ def rehearse(engine: Engine, candidate: Path, case: dict, rename: dict) -> tuple
     return problems, observations
 
 
+def refused_run(engine: Engine, candidate: Path, spec: dict) -> tuple[list[str], dict]:
+    """A REFUSED candidate, run exactly as written: the refusal must hold at run too, before any task,
+    and leave nothing behind. An engine that admits the file fails here by running it."""
+    reason = local_only(yaml.safe_load(candidate.read_text(encoding="utf-8")))
+    require(reason is None, f"{candidate.name}: refusing to execute, {reason}")
+    with tempfile.TemporaryDirectory(prefix="complex-refused-") as temp:
+        directory = Path(temp).resolve()
+        shutil.copy(candidate, directory / "candidate.nika")  # the original bytes, never a re-serialisation
+        before = {p for p in directory.rglob("*") if p.is_file()}
+        argv = ["run", "candidate.nika", "--json", "--no-trace-file"]
+        for task, value in spec.get("answers", {}).items():
+            argv += ["--answer", f"{task}={json.dumps(value)}"]
+        seen = observe(engine.call(argv, directory), directory, before)
+    return compare(spec["expect"], seen, {}), seen
+
+
+def fact_holds(engine: Engine, corpus: dict, fact: dict, root: Path) -> bool:
+    """A fact recorded about a retained gap. It is asserted, so that the gap cannot drift unnoticed."""
+    if fact["kind"] == "engine_check":
+        return engine.check(root / fact["file"]) == fact["verdict"]
+    if fact["kind"] == "engine_hint":
+        return fact["hint"] in engine.check_report(root / fact["file"])["hints"]
+    if fact["kind"] == "behaviour_rejects":
+        scenario = next(s for s in corpus["scenarios"] if any(c["id"] == fact["case"] for c in s["behaviour"]))
+        case = next(c for c in scenario["behaviour"] if c["id"] == fact["case"])
+        problems, _ = rehearse(engine, root / fact["candidate"], case, {})
+        return bool(problems) and all(any(needle in p for p in problems) for needle in fact.get("because", []))
+    raise JudgeError(f"unknown fact kind {fact['kind']!r}")
+
+
 def compile_door(engine: Engine, case: dict, root: Path) -> tuple[list[str], dict]:
     expect, problems = case["expect"], []
     with tempfile.TemporaryDirectory(prefix="complex-compile-") as temp:
@@ -277,14 +314,30 @@ def main() -> int:
                "scenarios": {}, "compile_door": {}, "retained_gaps": {}}
     door: dict[str, dict] = {}
     for scenario in corpus["scenarios"]:
-        rows = receipt["scenarios"][scenario["id"]] = {"engine_check": {}, "cases": {}, "static_only": {}}
+        rows = receipt["scenarios"][scenario["id"]] = {"engine_check": {}, "engine_hints": {}, "refused_runs": {},
+                                                       "cases": {}, "static_only": {}}
         for candidate in scenario["candidates"]:
             path = root / candidate["file"]
-            verdict = engine.check(path)
+            report = engine.check_report(path)
+            verdict = report["verdict"]
             rows["engine_check"][candidate["file"]] = verdict
+            rows["engine_hints"][candidate["file"]] = report["hints"]
             wanted = candidate.get("engine_check", "valid")
             if verdict != wanted:
                 failures.append(f"{scenario['id']}/{path.name}: engine check expected {wanted}, observed {verdict}")
+            for kind in candidate.get("engine_hints_include", []):
+                if kind not in report["hints"]:
+                    failures.append(f"{scenario['id']}/{path.name}: the engine gives no `{kind}` advisory; it must at "
+                                    "least warn about this candidate")
+            for kind in candidate.get("engine_hints_exclude", []):
+                if kind in report["hints"]:
+                    failures.append(f"{scenario['id']}/{path.name}: the engine gives a `{kind}` advisory on a candidate "
+                                    "whose route is closed")
+            if "refused_run" in candidate:
+                problems, seen = refused_run(engine, path, candidate["refused_run"])
+                rows["refused_runs"][candidate["file"]] = {"verdict": "refused, no effect" if not problems else "NOT refused",
+                                                          "problems": problems, "observed": seen}
+                failures += [f"{scenario['id']}/{path.name}: run as written: {p}" for p in problems]
             reason = local_only(yaml.safe_load(path.read_text(encoding="utf-8")))
             if not candidate.get("behaviour"):
                 rows["static_only"][candidate["file"]] = reason or "declared static only"
@@ -310,9 +363,13 @@ def main() -> int:
             failures += [f"{case['id']}: {p}" for p in problems]
     for row in corpus["retained_gaps"]:
         closed = gap(engine, corpus, row, door, root)
-        receipt["retained_gaps"][row["id"]] = {"expected_behaviour_observed": closed, "baseline": row["baseline"]}
+        facts = [dict(fact, holds=fact_holds(engine, corpus, fact, root)) for fact in row.get("facts", [])]
+        receipt["retained_gaps"][row["id"]] = {"expected_behaviour_observed": closed, "baseline": row["baseline"],
+                                               "facts": facts}
         if closed:  # a fixed engine must retire its baseline in the same change, or this stays red
             failures.append(f"{row['id']}: the expected behaviour is now observed: retire this gap and qualify its case")
+        failures += [f"{row['id']}: a recorded fact no longer holds ({fact['says']}): re-qualify the gap"
+                     for fact in facts if not fact["holds"]]
     receipt["failures"] = failures
     receipt["qualification"] = ("offline wiring and deterministic membranes on this one engine build, over a finite set "
                                 "of cases; model tasks were replaced by stated outputs; no model quality, connector, HOT "
@@ -325,6 +382,8 @@ def main() -> int:
     summary = {"engine": receipt["engine"], "scenarios": len(corpus["scenarios"]),
                "cases_run": sum(len(v) for s in receipt["scenarios"].values() for v in s["cases"].values()),
                "compile_door_cases": len(receipt["compile_door"]),
+               "refused_runs": sum(len(s["refused_runs"]) for s in receipt["scenarios"].values()),
+               "gap_facts_asserted": sum(len(g["facts"]) for g in receipt["retained_gaps"].values()),
                "retained_gaps_still_red": sum(1 for g in receipt["retained_gaps"].values() if not g["expected_behaviour_observed"]),
                "failures": failures, "qualification": receipt["qualification"],
                "compile_capability": receipt["compile_capability"]}

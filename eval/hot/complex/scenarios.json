@@ -148,11 +148,14 @@
           "violates": [
             "effects_gated"
           ],
-          "plausible_because": "the task feeding the write is gated, and both oracles accept the file",
+          "plausible_because": "the task feeding the write is gated; both oracles still ADMIT the file, and the engine can only warn, because the stage also reads a step that merely ran",
           "behaviour": true,
           "caught_by_behaviour": [
             "X01-B1",
             "X01-B2"
+          ],
+          "engine_hints_include": [
+            "consent"
           ]
         },
         {
@@ -2313,6 +2316,216 @@
         }
       ],
       "validation": "python3 eval/hot/complex/judge.py && python3 -O eval/hot/complex/judge_selftest.py && python3 eval/hot/complex/behaviour.py --engine /path/to/nika"
+    },
+    {
+      "id": "X13",
+      "title": "A refusal skips the stage, and nothing may read its way around it",
+      "status": "STATIC_AND_BEHAVIOUR",
+      "owner": "nika#1636 · nika#1663",
+      "laws": [
+        "spec/10-authority.md · the affirmative-consent law (NEP-0020): false triggers exactly zero effects",
+        "spec/03-dag.md · edge roles: a with: value edge admits success OR skipped, and a skipped value reads null; after: {x: success} cancels on a skipped producer",
+        "spec/03-dag.md · when: gates the whole task once, before the fan-out"
+      ],
+      "intent": "Stage the release note, and publish it to ./out/report.md only if I say yes.",
+      "facts": {
+        "note": "Release 2.4.1 is ready.",
+        "destination": "./out/report.md",
+        "approver": "the person running the workflow"
+      },
+      "expected_outcome": {
+        "status": "READY",
+        "questions": [],
+        "requested_authority": [
+          "fs.write ./out/report.md",
+          "tools nika:prompt nika:write"
+        ]
+      },
+      "expected_semantic_dag": [
+        "HUMAN",
+        "STAGE",
+        "PUBLISH"
+      ],
+      "forbidden_authority": [
+        "net",
+        "exec",
+        "any fs.write beyond the destination"
+      ],
+      "must_not_guess": [
+        "that a task which only READS a gated stage is itself closed"
+      ],
+      "socratic": {
+        "What evidence is required before an irreversible effect?": "the write reads the answer itself, or waits for the SUCCESS of the stage it reads",
+        "Which smallest counterexample defeats this judge?": "a write that reads the skipped stage's value and nothing else: it reaches its verb with null",
+        "Can a plausible but incorrect workflow pass?": "yes, when the proof of the skip rests on a step that merely ran: no oracle may refuse it, the engine warns, and on no it still writes",
+        "What may an oracle refuse?": "only what it proves: a certain skip, a certain admission, a certain verb"
+      },
+      "assertions": [
+        {
+          "id": "effects_gated",
+          "kind": "effects_gated",
+          "params": {
+            "kinds": [
+              "fs.write"
+            ]
+          },
+          "question": "What evidence is required before an irreversible effect?"
+        }
+      ],
+      "candidates": [
+        {
+          "file": "workflows/x13/reference.nika",
+          "role": "reference",
+          "provenance": "hand-authored",
+          "spec_oracle": "valid",
+          "engine_check": "valid",
+          "violates": [],
+          "behaviour": true,
+          "engine_hints_exclude": [
+            "consent"
+          ]
+        },
+        {
+          "file": "workflows/x13/variant-closed-by-a-success-edge-on-the-stage.nika",
+          "role": "variant",
+          "provenance": "hand-authored",
+          "spec_oracle": "valid",
+          "engine_check": "valid",
+          "violates": [],
+          "behaviour": true,
+          "engine_hints_exclude": [
+            "consent"
+          ]
+        },
+        {
+          "file": "workflows/x13/refused-certain-skip-core.nika",
+          "role": "refused",
+          "provenance": "hand-authored",
+          "spec_oracle": "NIKA-SEC-014",
+          "engine_check": "NIKA-SEC-014",
+          "violates": [
+            "effects_gated"
+          ],
+          "refused_run": {
+            "answers": {
+              "human": false
+            },
+            "expect": {
+              "exit": 2,
+              "tasks_started": [],
+              "files_written": {}
+            }
+          },
+          "repairs": "KG01 sub-case · the certain core: every step before the verb is total, so the skip is proven"
+        },
+        {
+          "file": "workflows/x13/refused-certain-skip-fan-out-stage.nika",
+          "role": "refused",
+          "provenance": "hand-authored",
+          "spec_oracle": "NIKA-SEC-014",
+          "engine_check": "NIKA-SEC-014",
+          "violates": [
+            "effects_gated"
+          ],
+          "refused_run": {
+            "answers": {
+              "human": false
+            },
+            "expect": {
+              "exit": 2,
+              "tasks_started": [],
+              "files_written": {}
+            }
+          },
+          "repairs": "KG01 sub-case · the skipped stage is a fan-out: when: is read once, before it"
+        },
+        {
+          "file": "workflows/x13/near-miss-laundered-through-a-step-that-ran.nika",
+          "role": "near_miss",
+          "provenance": "hand-authored",
+          "spec_oracle": "valid",
+          "engine_check": "valid",
+          "violates": [
+            "effects_gated"
+          ],
+          "plausible_because": "every task on the way is ordinary, and no oracle can prove the intermediate step succeeds on a null",
+          "behaviour": true,
+          "caught_by_behaviour": [
+            "X13-B1"
+          ],
+          "engine_hints_include": [
+            "consent"
+          ]
+        },
+        {
+          "file": "workflows/x13/near-miss-stage-also-reads-a-step-that-ran.nika",
+          "role": "near_miss",
+          "provenance": "hand-authored",
+          "spec_oracle": "valid",
+          "engine_check": "valid",
+          "violates": [
+            "effects_gated"
+          ],
+          "plausible_because": "the stage is gated on the answer; that it could be CANCELLED instead of skipped is what keeps any oracle from refusing",
+          "behaviour": true,
+          "caught_by_behaviour": [
+            "X13-B1"
+          ],
+          "engine_hints_include": [
+            "consent"
+          ]
+        }
+      ],
+      "behaviour": [
+        {
+          "id": "X13-B1",
+          "title": "a refusal writes nothing",
+          "answers": {
+            "human": false
+          },
+          "expect": {
+            "exit": 0,
+            "outputs_in": {
+              "published": [
+                "skipped",
+                "cancelled"
+              ]
+            },
+            "files_written": {},
+            "tasks_not_started": [
+              "publish"
+            ]
+          }
+        },
+        {
+          "id": "X13-B2",
+          "title": "an approval publishes exactly the note that was shown",
+          "answers": {
+            "human": true
+          },
+          "expect": {
+            "exit": 0,
+            "outputs": {
+              "published": "success"
+            },
+            "files_written": {
+              "out/report.md": "Release note: Release 2.4.1 is ready."
+            }
+          }
+        },
+        {
+          "id": "X13-B3",
+          "title": "with nobody there the run pauses and writes nothing",
+          "expect": {
+            "exit": 4,
+            "files_written": {},
+            "tasks_not_started": [
+              "publish"
+            ]
+          }
+        }
+      ],
+      "validation": "python3 eval/hot/complex/judge.py && python3 -O eval/hot/complex/judge_selftest.py && python3 eval/hot/complex/behaviour.py --engine /path/to/nika"
     }
   ],
   "product_contracts": [
@@ -2460,16 +2673,47 @@
   "retained_gaps": [
     {
       "id": "KG01",
+      "label": "KG01-conditional",
       "title": "A route closed only by a skippable data edge fires on no",
-      "owner": "nika#1636 · spec/10-authority.md · the affirmative-consent law",
+      "owner": "nika#1636 · nika#1663 · spec/10-authority.md · the affirmative-consent law",
       "law": "every route from the gate to an egress-capable task must be closed; false triggers exactly zero effects",
       "expected": "check refuses workflows/x01/near-miss-gated-through-data-edge.nika with NIKA-SEC-014",
-      "observed": "both oracles accept it; at run, a refusal skips `stage`, `publish` receives null across `with:` and writes",
+      "observed": "the witness is still ADMITTED: the reference oracle says valid and the engine says valid with a `consent` advisory, because the stage also reads a step that merely ran, so its skip is not certain and nothing may refuse it; at run, a refusal still skips the stage, the write still receives null across `with:` and still writes `Report: null`. Only the CERTAIN sub-cases are repaired (X13), not this golden",
+      "remains": "a write that reads a gated stage still fires on no when the skip of that stage is not provable",
       "reproduce": {
         "kind": "engine_check",
         "file": "workflows/x01/near-miss-gated-through-data-edge.nika",
-        "expect_code": "NIKA-SEC-014"
+        "expect_code": "NIKA-SEC-014",
+        "sha256": "06061df4751c2a3f95669f25072c1ccc0bec4aafd9e44e6814badd0d4f5791b0"
       },
+      "repaired_subcases": [
+        "workflows/x13/refused-certain-skip-core.nika",
+        "workflows/x13/refused-certain-skip-fan-out-stage.nika"
+      ],
+      "facts": [
+        {
+          "kind": "engine_check",
+          "file": "workflows/x01/near-miss-gated-through-data-edge.nika",
+          "verdict": "valid",
+          "says": "the engine still admits the original witness"
+        },
+        {
+          "kind": "engine_hint",
+          "file": "workflows/x01/near-miss-gated-through-data-edge.nika",
+          "hint": "consent",
+          "says": "the engine warns about the original witness with a consent advisory"
+        },
+        {
+          "kind": "behaviour_rejects",
+          "candidate": "workflows/x01/near-miss-gated-through-data-edge.nika",
+          "case": "X01-B1",
+          "because": [
+            "files: expected exactly {}, observed {'out/report.md': 'Report: null'}",
+            "`publish` started and must not have"
+          ],
+          "says": "on a refusal the original witness still starts the write and leaves `Report: null` behind"
+        }
+      ],
       "baseline": "expected_fail"
     },
     {

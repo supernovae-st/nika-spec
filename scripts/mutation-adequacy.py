@@ -120,6 +120,12 @@ PROBES = [
      "def profile_errors(*a, **k):\n    return []\n"),
     ("conformance/trifecta_core_selftest.py", "conformance/trifecta_core.py",
      "def trifecta_errors(*a, **k):\n    return []\n"),
+    # The consent layer lives in deep_static, whose other laws die through
+    # the fixture corpus. Its finite sure-skip table has a selftest of its
+    # own, so it is probed here: a consent judge that refuses nothing must
+    # lose every SEC-014 row of that table.
+    ("conformance/consent_core_selftest.py", "conformance/deep_static.py",
+     "def consent_errors(*a, **k):\n    return []\n"),
     # redteam's judge is the reference pipeline itself: a permissive
     # validate_text means every seeded attack "PASSED SILENTLY".
     ("conformance/redteam_core_selftest.py", "conformance/runner.py",
