@@ -76,7 +76,9 @@ jobs:
     if: github.event_name != 'pull_request'
     needs: audit
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    # Initial historical repair can exceed 3,000 throttled field mutations.
+    # Keep it bounded while allowing the incremental projection to converge.
+    timeout-minutes: 45
     steps:
       - name: Guard on the Project token
         id: guard
