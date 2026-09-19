@@ -78,7 +78,7 @@ wiring, not classification quality. Engine version is included in the result.
 
 `G01`–`G24`, `N01`–`N15` and `E01`–`E10` state what a compiled candidate
 should mean; they carry no workflow and no judge. [`complex/`](complex/README.md)
-is where twelve of those meanings become executable: a candidate is accepted or
+is where the declared families become executable: a candidate is accepted or
 rejected mechanically, and every assertion is shown to reject a plausible
 incorrect workflow. It judges candidates, not the compiler that produced them.
 
@@ -88,11 +88,11 @@ python3 -O eval/hot/complex/judge_selftest.py
 python3 eval/hot/complex/behaviour.py --engine /path/to/nika
 ```
 
-`splits.json` freezes TRAIN/DEVELOPMENT vs HELD-OUT vs ADVERSARIAL as of
-origin/main `7722aa66b` (2026-09-18). Every id already on main and already
-read that day (G01–G24, N01–N15, E01–E10, X01–X12, 220 families) is
-DEVELOPMENT. HELD-OUT and ADVERSARIAL are empty lists with an explicit
-reason: inventing a holdout by moving those ids would leak the research
+`splits.json.initial_freeze` records the original TRAIN/DEVELOPMENT vs
+HELD-OUT vs ADVERSARIAL boundary at origin/main `7722aa66b` (2026-09-18).
+Every id already on main and read that day was assigned to DEVELOPMENT.
+The current pin and consent extension are described below. HELD-OUT and
+ADVERSARIAL are empty lists with an explicit reason: inventing a holdout by moving those ids would leak the research
 set. Paraphrases and negative cases remain design seeds, not held-out
 measurements. No latency, HOT coverage, classifier accuracy, or
 zero-provider-calls-during-compile claim follows from these checks. No
