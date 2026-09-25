@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: Apache-2.0
+# Contract: stdlib/builtins-v0.1.md · nika:convert columns.
+nika: convert-reject-invalid-columns
+permits:
+  tools:
+  - nika:convert
+  - nika:jq
+tasks:
+  bad:
+    invoke:
+      tool: nika:jq
+      args:
+        input:
+          columns: a,b
+        expression: .columns
+  csv:
+    with:
+      columns: ${{ tasks.bad.output }}
+    invoke:
+      tool: nika:convert
+      args:
+        input:
+        - a: 1
+          b: 2
+        from: json
+        to: csv
+        columns: ${{ with.columns }}

@@ -1,0 +1,9 @@
+{
+  "workflow_state": "success",
+  "tasks": {
+    "csv": {
+      "status": "success",
+      "output": "order_id,customer,amount\nA1,Aster,12\n"
+    }
+  }
+}

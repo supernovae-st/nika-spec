@@ -1,0 +1,13 @@
+{
+  "workflow_state": "failure",
+  "tasks": {
+    "bad": {
+      "status": "success",
+      "output": "a,b"
+    },
+    "csv": {
+      "status": "failure",
+      "error_code": "NIKA-BUILTIN-CONVERT-001"
+    }
+  }
+}

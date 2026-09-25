@@ -7,6 +7,12 @@ field writers, visual grammar, eight lenses, six Pulse charts and automation.
 `timeline/timeline.yaml` remains the source of the record and gates.
 GitHub Issues, pull requests and releases remain the sources of live work.
 
+The Project overview begins with `project.product_brief` from the same manifest:
+the product goal, each component's role, the dated qualification boundary and
+links to the existing acceptance issues. Refresh this authored brief when a
+delivery changes the evidence; the projector publishes it with the operating
+guide. It neither creates a second backlog nor changes issue acceptance.
+
 The projector follows six laws:
 
 1. Stable `SSOT ID` values match items across runs.

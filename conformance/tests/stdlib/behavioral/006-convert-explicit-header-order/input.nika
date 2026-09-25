@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: Apache-2.0
+# Contract: stdlib/builtins-v0.1.md · nika:convert columns.
+nika: convert-explicit-header-order
+permits:
+  tools:
+  - nika:convert
+tasks:
+  csv:
+    invoke:
+      tool: nika:convert
+      args:
+        input:
+        - amount: 12
+          customer: Aster
+          order_id: A1
+        from: json
+        to: csv
+        columns:
+        - order_id
+        - customer
+        - amount

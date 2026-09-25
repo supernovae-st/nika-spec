@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: Apache-2.0
+# Contract: stdlib/builtins-v0.1.md · nika:convert columns.
+nika: convert-partial-header-order
+permits:
+  tools:
+  - nika:convert
+tasks:
+  csv:
+    invoke:
+      tool: nika:convert
+      args:
+        input:
+        - z: '1'
+          b: '2'
+          m: '3'
+          a: '4'
+        from: json
+        to: csv
+        columns:
+        - m
+        - missing
+        - m
+        - z
