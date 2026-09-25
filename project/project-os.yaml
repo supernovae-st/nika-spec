@@ -20,6 +20,41 @@ project:
   public: true
   repositories: [nika, nika-spec, nika-client, nika-vscode]
   short_description: "One public operating surface for Nika · record, gates, issues, pull requests and releases · projected from their real sources."
+  product_brief: |
+    ## From an intention to a result you can inspect
+
+    **Product goal:** open a terminal, type `nika`, describe the work, answer any
+    necessary question, review the proposed workflow, approve it, run it explicitly
+    and open the result. The workflow remains yours to inspect, edit and repeat.
+
+    **Delivery snapshot · 25 September 2026.** The installed development candidate
+    `4c728c980` completed a file transformation, a real DeepSeek summary, and a
+    corrected proposal restored after restart and then executed. Six terminal
+    sessions and their traces support that bounded result. The
+    [qualification note](https://github.com/supernovae-st/nika/blob/8e1683d2237e1bbfa7401b7ed853ab91a2e2e6c9/docs/qa/delivery-a-2026-09.md)
+    identifies the source, checks and limits. This is separate from the published
+    [release artifacts](https://github.com/supernovae-st/nika/releases).
+
+    | Component | What it contributes | Current evidence and remaining objective |
+    |---|---|---|
+    | **Authoring / Session** | A conversation around one proposal: context, missing information, corrections, review, save, explicit Run and restore. | Installed journeys verified on the identified candidate. Publish the same usable path through supported installers; expand varied intentions without losing earlier requirements. [Authoring](https://github.com/supernovae-st/nika/issues/1663), [durable Session](https://github.com/supernovae-st/nika/issues/1464). |
+    | **Compiler** | Turns the request and its answers into an inspectable `.nika` candidate, requested access and Check diagnostics. | Implemented and exercised through the installed Session; general composition and semantic fidelity remain bounded claims. [Composition acceptance](https://github.com/supernovae-st/nika/issues/1666). |
+    | **Check, admission and runtime** | Verify exact properties, resolve available access, enforce the accepted boundary, execute and record the outcome. | Check, execution, trace integrity and inspected output are separate evidence. Continue qualifying remote approval, recovery and external-effect outcomes. [Proof](https://github.com/supernovae-st/nika/issues/1669), [effect reliability](https://github.com/supernovae-st/nika/issues/1695). |
+    | **Foundry** | Supplies identified technical knowledge to the compiler and authoring path. | Context consumption was observed with an explicitly installed technical snapshot. Universal installer packaging and measured benefit over a baseline are not established by that receipt. [Compiler](https://github.com/supernovae-st/nika/issues/1663), [evaluation](https://github.com/supernovae-st/nika/issues/1656). |
+    | **Arena / evaluation** | Executes identified candidates against independent obligations and checks the resulting files or effects. | Evaluation machinery and scoped receipts exist. Preparation of 2,000 intentions is not 2,000 successful executions; broader independent qualification remains work. [Bench](https://github.com/supernovae-st/nika/issues/457), [decision comparisons](https://github.com/supernovae-st/nika/issues/1656). |
+    | **Lab** | Connects sources, experiments and receipts; proposes reviewable improvements. | Research infrastructure does not certify a released engine or deploy improvements automatically. The complete result → evaluation → reviewed change loop remains to be demonstrated. [Lab acceptance](https://github.com/supernovae-st/nika/issues/1640). |
+    | **SDK, editor and distribution** | Expose the same engine through TypeScript, editor tools, packages and documented installation. | Adapter tests and native consumer receipts exist; each published coordinate needs its own verified artifact and installation evidence. [Ecosystem tracking](https://github.com/supernovae-st/nika/issues/841), [quickstart contract](https://github.com/supernovae-st/nika/issues/1659). |
+
+    DeepSeek is the current delivery priority. Jev is an optional source of bounded
+    judgments; neither a model's confidence nor a lexical guess grants authority
+    or proves a correct result. Memory / Connectome and the
+    [1.0 launch conditions](https://github.com/supernovae-st/nika/issues/696) remain
+    separate objectives.
+
+    **Read the board:** open issues carry acceptance and next work; merged PRs
+    establish integration; releases establish publication; linked qualification
+    identifies what was actually tested. Closing an issue does not turn it into
+    a universal product claim. The tables below project those existing sources.
 
 sources:
   timeline:

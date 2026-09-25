@@ -1,0 +1,9 @@
+{
+  "workflow_state": "success",
+  "tasks": {
+    "csv": {
+      "status": "success",
+      "output": "m,missing,z,a,b\n3,,1,4,2\n"
+    }
+  }
+}

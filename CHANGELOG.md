@@ -13,6 +13,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added · explicit CSV header order (2026-09-25)
+
+- `nika:convert` documents the implemented `columns` option for CSV emission:
+  requested order, omitted cells, duplicate names, sorted remaining keys and
+  malformed-list refusal. Three command-level behavioral fixtures cover these
+  outcomes, paired with the default-order fixture.
+
+### Fixed · current product direction and Project views (2026-09-25)
+
+- The Project overview now explains Authoring, Compiler, runtime, Foundry,
+  Arena, Lab and distribution, with a dated installed qualification boundary
+  and links to the existing acceptance issues.
+- The local Project audit inherits the launch directory instead of passing a
+  relative `cwd` to macOS Seatbelt. Its Python checks remain confined and offline.
+
 ### Fixed · the reference consent oracle reads a certain skip (2026-09-18)
 
 - **A write that only reads a stage the refusal certainly skips is refused

@@ -122,7 +122,9 @@ def render_readme(manifest: dict[str, Any]) -> str:
             "📜 Record: [`timeline/timeline.yaml`](https://github.com/supernovae-st/nika-spec/blob/main/timeline/timeline.yaml) · rendered timeline: https://nika.sh/timeline",
         ]
     )
-    return "\n".join(lines)
+    product_brief = manifest["project"].get("product_brief", "").strip()
+    operating_guide = "\n".join(lines)
+    return f"{product_brief}\n\n---\n\n{operating_guide}" if product_brief else operating_guide
 
 
 def parser() -> argparse.ArgumentParser:

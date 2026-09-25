@@ -24,21 +24,18 @@ tasks:
     timeout: "1m"
     exec:
       command: ["python3", "project/verify.py", "--offline"]
-      cwd: "."
       capture: combined
 
   timeline:
     timeout: "1m"
     exec:
       command: ["python3", "timeline/verify.py", "--offline"]
-      cwd: "."
       capture: combined
 
   unit:
     timeout: "1m"
     exec:
       command: ["python3", "-m", "unittest", "discover", "-s", "project", "-t", ".", "-p", "test_*.py"]
-      cwd: "."
       capture: combined
 
 outputs:
