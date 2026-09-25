@@ -59,6 +59,7 @@ from project.sources import (
     desired_from_sources,
     ensure_public_repositories,
     pull_request_items,
+    release_items,
 )
 
 
@@ -869,6 +870,39 @@ class SourceTests(unittest.TestCase):
         client.pages.side_effect = pages
         with self.assertRaises(GitHubError):
             pull_request_items(client, ["nika"])
+
+    def test_drafts_do_not_evict_published_releases_from_the_window(self) -> None:
+        def release(tag: str, day: int, **flags: bool) -> dict:
+            return {
+                "tag_name": tag,
+                "name": tag,
+                "html_url": f"https://github.com/supernovae-st/nika/releases/tag/{tag}",
+                "created_at": f"2026-09-{day:02d}T00:00:00Z",
+                "published_at": None if flags.get("draft") else f"2026-09-{day:02d}T00:00:00Z",
+                "draft": flags.get("draft", False),
+                "prerelease": flags.get("prerelease", False),
+            }
+
+        # The API lists drafts first; two of them must not cost published slots.
+        values = [
+            release("v0.121.0", 25, draft=True),
+            release("v0.118.4", 5, draft=True),
+            release("v0.120.0", 20),
+            release("v0.119.0", 13, prerelease=True),
+            release("v0.114.0", 3),
+            release("v0.113.0", 2),
+        ]
+        client = MagicMock()
+        client.pages.return_value = values
+        items = release_items(client, ["nika"], 3, self.timeline, order_start=0)
+        self.assertEqual(
+            [item.ssot_id for item in items],
+            [
+                "github:release:supernovae-st/nika@v0.114.0",
+                "github:release:supernovae-st/nika@v0.119.0",
+                "github:release:supernovae-st/nika@v0.120.0",
+            ],
+        )
 
 
 class GitHubClientTests(unittest.TestCase):
