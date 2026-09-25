@@ -725,6 +725,11 @@ def _terminal_field_repairs(
         "Target": None,
         "Block state": BLOCK_UNKNOWN,
     }
+    if actual.content_kind == "PullRequest":
+        # Review and CI described the last open head, and discovery reads
+        # open pull requests only: a settled one clears them, never repaints.
+        wanted["Review state"] = None
+        wanted["CI state"] = None
     repairs: list[tuple[str, Any]] = []
     for name, value in wanted.items():
         definition = definitions.get(name)

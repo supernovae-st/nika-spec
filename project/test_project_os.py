@@ -32,6 +32,7 @@ from project.model import (
     REVIEW_APPROVED,
     REVIEW_CHANGES_REQUESTED,
     REVIEW_DRAFT,
+    REVIEW_NEEDED,
     REVIEW_NOT_APPLICABLE,
     SIGNAL_ACTIVE,
     SIGNAL_ATTENTION,
@@ -612,6 +613,61 @@ class ReconcileTests(unittest.TestCase):
             self.assertIn(("Proof", "◌ pending"), changes)
             self.assertNotIn(("Stage", STAGE_SHIPPED), changes)
             self.assertNotIn(("Certainty", CERTAINTY_PROVEN), changes)
+
+    def test_settled_pull_requests_clear_stale_review_and_ci(self) -> None:
+        def pull(number: int, terminal: tuple[str, str], review: str) -> ActualItem:
+            return ActualItem(
+                item_id=f"ITEM{number}",
+                content_id=f"PR{number}",
+                content_kind="PullRequest",
+                title=f"Pull request {number}",
+                body="",
+                url=f"https://github.com/supernovae-st/nika/pull/{number}",
+                fields={
+                    "SSOT ID": f"github:pr:supernovae-st/nika#{number}",
+                    "Review state": review,
+                    "CI state": CI_RED,
+                    "Priority": "High",
+                    "Effort": "Medium",
+                },
+                terminal=terminal,
+            )
+
+        # Old-head claims from the last open snapshot: never repainted.
+        for actual in (
+            pull(1734, (STAGE_MERGED, CERTAINTY_COMMITTED), REVIEW_NEEDED),
+            pull(1730, (STAGE_CLOSED_NOT_INTEGRATED, CERTAINTY_UNKNOWN), REVIEW_DRAFT),
+        ):
+            changes = self.capture_changes([actual], [])
+            self.assertIn(("Review state", None), changes)
+            self.assertIn(("CI state", None), changes)
+            self.assertIn(("Proof", "◌ pending"), changes)
+            for painted in (("Review state", REVIEW_APPROVED), ("CI state", CI_GREEN)):
+                self.assertNotIn(painted, changes)
+            self.assertFalse(
+                any(name in {"Priority", "Effort"} for name, _ in changes)
+            )
+
+    def test_settled_issue_keeps_not_applicable_review_and_ci(self) -> None:
+        issue = ActualItem(
+            item_id="ITEM652",
+            content_id="ISSUE652",
+            content_kind="Issue",
+            title="Closed issue",
+            body="",
+            url="https://github.com/supernovae-st/nika/issues/652",
+            fields={
+                "SSOT ID": "github:issue:supernovae-st/nika#652",
+                "Review state": REVIEW_NOT_APPLICABLE,
+                "CI state": CI_NOT_APPLICABLE,
+            },
+            terminal=(STAGE_CLOSED_COMPLETED, CERTAINTY_COMMITTED),
+        )
+        changes = self.capture_changes([issue], [])
+        self.assertIn(("Stage", STAGE_CLOSED_COMPLETED), changes)
+        self.assertFalse(
+            any(name in {"Review state", "CI state"} for name, _ in changes)
+        )
 
     def test_unmanaged_closed_item_is_quarantined_untouched(self) -> None:
         actual = ActualItem(
