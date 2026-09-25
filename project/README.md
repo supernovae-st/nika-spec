@@ -28,7 +28,9 @@ actual source state from the Project snapshot; a closed or merged source
 moves to its terminal Stage — `● settled · completed at source`,
 `● settled · merged at source` or `○ closed · not integrated` — with Signal
 `● settled`, leaving the active lenses. Closure is never shipment: `Proof`
-stays `◌ pending` until the record itself proves the work. A source that
+stays `◌ pending` until the record itself proves the work. A settled pull
+request clears `Review state` and `CI state`, which described its last open
+head and are not re-read after closure. A source that
 cannot be read keeps no lifecycle claim: the orphan is cleared to
 `? unknown`, never painted done.
 
