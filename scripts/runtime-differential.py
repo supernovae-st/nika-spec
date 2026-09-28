@@ -547,6 +547,9 @@ def trace_expectation(raw: str) -> dict:
                               parse_constant=reject_constant, parse_float=finite_float)
         if not isinstance(expected, dict):
             raise ValueError("expectation must be an object")
+        unknown = set(expected) - {"verdict", "cost_replay", "prologue", "items", "note"}
+        if unknown:
+            raise ValueError(f"unknown trace assertion: {', '.join(sorted(unknown))}")
         verdict = expected.get("verdict")
         if not isinstance(verdict, str) or verdict not in {
             "clean", "finding", "incomplete", "forged", "refused",

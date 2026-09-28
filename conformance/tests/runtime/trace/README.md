@@ -44,7 +44,10 @@ walk does not ·
   The command-level differential checks these fields independently of the
   chain verdict. Its selftests include negative channel substitutions.
 
-Absent fields mean the fixture makes no claim there.
+Absent fields mean the fixture makes no claim there. The top-level expectation
+keys are closed to `verdict`, `cost_replay`, `prologue`, `items` and descriptive
+`note`. Unknown assertions and misspellings are fixture errors before any engine
+invocation; an adapter cannot silently ignore a claim it does not implement.
 
 `items` optionally maps task ids to the complete expected item arrays, or
 `null` when no complete table may be projected. Fixture `008` is a real

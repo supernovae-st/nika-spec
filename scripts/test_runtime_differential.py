@@ -160,6 +160,26 @@ class RunJudgeLaws(unittest.TestCase):
         self.assertIn("FIXTURE-ERROR", output.getvalue())
         self.assertIn("misspelled", output.getvalue())
 
+    def test_trace_assertion_names_cannot_be_silently_ignored(self):
+        (self.fixture / "trace.ndjson").write_text("{}\n")
+        for key, value in [("prolouge", {"absent": ["inputs"]}),
+                           ("costReplay", "refused"), ("item", {"fan": []}),
+                           ("route_identity", "unsupported-claim")]:
+            with self.subTest(key=key):
+                (self.fixture / "expected-verify.json").write_text(
+                    json.dumps({"verdict": "clean", key: value}))
+                with patch.object(runner.subprocess, "run") as invoke:
+                    invoke.return_value = subprocess.CompletedProcess([], 0, "OK", "")
+                    with self.assertRaises(runner.InvalidFixture):
+                        runner.judge_trace("output-double", self.fixture)
+                    invoke.assert_not_called()
+        expected = {"verdict": "clean", "note": "descriptive only"}
+        (self.fixture / "expected-verify.json").write_text(json.dumps(expected))
+        with patch.object(runner.subprocess, "run") as invoke:
+            invoke.return_value = subprocess.CompletedProcess([], 0, "OK", "")
+            self.assertEqual(runner.judge_trace("output-double", self.fixture), [])
+            invoke.assert_called_once()
+
 
 if __name__ == "__main__":
     unittest.main()
