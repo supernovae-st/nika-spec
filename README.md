@@ -29,16 +29,16 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" alt="Apache-2.0"></a>
 </p>
 
-<!-- engine clips on this page (GIFs, posters, MP4s) are served from supernovae-st/nika main: they exist only there until the next engine release · at the next lockstep bump, pin them to that release tag -->
+<!-- engine clips on this page (GIFs) are served from supernovae-st/nika main: they exist only there until the next engine release · at the next lockstep bump, pin them to that release tag -->
+<p align="center"><b>Watch a workflow drawn as a graph, then lit up in the order it will run.</b></p>
 <p align="center">
-  <a href="https://github.com/supernovae-st/nika/raw/refs/heads/main/media/videos/dag-execution.mp4">
+  <a href="https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/dag-execution.optimized.gif">
     <img src="https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/dag-execution.optimized.gif"
          alt="A pull-request review workflow from this repository's examples, drawn by nika inspect as a graph of tasks colored by verb, then lit wave by wave in the order nika check plans"
-         width="760">
+         width="960">
   </a>
-  <br>
-  <sub>A workflow is a graph: <a href="examples/pr-review-fanout.nika"><code>examples/pr-review-fanout.nika</code></a>, drawn by <code>nika inspect</code>, planned by <code>nika check</code> · click to play the MP4</sub>
 </p>
+<p align="center"><sub>A workflow is a graph: <a href="examples/pr-review-fanout.nika"><code>examples/pr-review-fanout.nika</code></a>, drawn by <code>nika inspect</code>, planned by <code>nika check</code>. Notice the tasks that share a wave, and the review that fans out once per changed file. The graph and the waves are the commands' own output (nika 0.121.0); the lighting illustrates the plan.</sub></p>
 
 ## What is Nika?
 
@@ -131,7 +131,16 @@ A `.nika` file is plain YAML with nine top-level keys. Two are required,
 touch and what the run hands back, so a reviewer sees everything a workflow
 can do in one file.
 
-<!-- motion: the anatomy of a .nika file — the nine envelope keys and the four verbs, assembled -->
+**Watch one file use all nine keys and every verb, labelled key by key.**
+
+<p align="center">
+  <a href="https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/spec-anatomy.optimized.gif">
+    <img src="https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/spec-anatomy.optimized.gif"
+         alt="One .nika file using all nine envelope keys, each labelled in the spec's own words, with four tasks that each bind one verb; nika check says run ready and the file folds to a labelled skeleton"
+         width="860">
+  </a>
+</p>
+<p align="center"><sub>Notice that every label is the spec's own wording, read from <code>nika spec</code>, and that each task binds exactly one verb. The verdict is the real <code>nika check</code> on that file (nika 0.121.0): run ready. The framing and the final fold are illustration.</sub></p>
 
 ```mermaid
 flowchart LR
@@ -218,27 +227,29 @@ graph TD
 
 The spec does more than name keys: it tells an engine what to prove before
 a run and what to record during one. Here is the reference engine doing it,
-on captured output. Click a frame to play its clip.
+on captured output.
 
-<table>
-  <tr>
-    <td align="center" valign="top" width="33%">
-      <a href="https://github.com/supernovae-st/nika/raw/refs/heads/main/media/videos/static-check-fix.mp4"><img src="https://raw.githubusercontent.com/supernovae-st/nika/main/media/posters/static-check-fix.png" alt="nika check catches two defects in a pull-request review workflow; after the fix, the re-check comes back clean and ready to run" width="240"></a><br>
-      <b>Checked before it runs</b><br>
-      <sub><code>nika check</code> audits the plan, permits, cost, secrets and types without calling a model. <a href="spec/07-conformance.md">spec/07</a></sub>
-    </td>
-    <td align="center" valign="top" width="33%">
-      <a href="https://github.com/supernovae-st/nika/raw/refs/heads/main/media/videos/permits-audit.mp4"><img src="https://raw.githubusercontent.com/supernovae-st/nika/main/media/posters/permits-audit.png" alt="A workflow's permits drawn as a map of what each task reaches; the check catches a task escaping the boundary, and the widened boundary passes" width="240"></a><br>
-      <b>The file is the boundary</b><br>
-      <sub><code>permits:</code> lists what a workflow may reach, run and read. Anything outside is refused. <a href="spec/10-authority.md">spec/10</a></sub>
-    </td>
-    <td align="center" valign="top" width="33%">
-      <a href="https://github.com/supernovae-st/nika/raw/refs/heads/main/media/videos/on-error-recover.mp4"><img src="https://raw.githubusercontent.com/supernovae-st/nika/main/media/posters/on-error-recover.png" alt="A live feed goes missing; on_error: recover falls back to the cached value, the run finishes and the trace records the recovered failure" width="240"></a><br>
-      <b>Failure is part of the plan</b><br>
-      <sub>Errors carry stable codes. <code>on_error: recover</code> names the fallback; the trace records what failed. <a href="spec/05-errors.md">spec/05</a></sub>
-    </td>
-  </tr>
-</table>
+**Watch the check catch two mistakes before anything runs.**
+
+<p align="center">
+  <a href="https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/static-check-fix.optimized.gif">
+    <img src="https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/static-check-fix.optimized.gif"
+         alt="nika check catches two defects in a pull-request review workflow; after the fix, the re-check comes back clean and ready to run"
+         width="860">
+  </a>
+</p>
+<p align="center"><sub><b>Checked before it runs.</b> <code>nika check</code> audits the plan, permits, cost, secrets and types without calling a model (<a href="spec/07-conformance.md">spec/07</a>). Notice the misspelled task name it catches (<i>did you mean <code>assess</code>?</i>), the fix, and the re-check that ends <i>run ready</i>. The output is captured from the real CLI (nika 0.121.0) and the fix is a real diff.</sub></p>
+
+Two more rules at work, each beside its chapter:
+
+- **The file is the boundary.** `permits:` lists what a workflow may reach,
+  run and read. Anything outside is refused
+  ([spec/10](spec/10-authority.md)).
+  ▶ [Watch the boundary catch an escape](https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/permits-audit.optimized.gif)
+- **Failure is part of the plan.** Errors carry stable codes.
+  `on_error: recover` names the fallback; the trace records what failed
+  ([spec/05](spec/05-errors.md)).
+  ▶ [Watch a run recover when its live feed goes missing](https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/on-error-recover.optimized.gif)
 
 ### The <!-- canon:pillars -->5<!-- /canon --> pillars · immutable forever
 
@@ -306,13 +317,7 @@ declaring it.
 engine: one Rust binary, AGPL-3.0-or-later. Install it with
 `brew install supernovae-st/tap/nika`, then check and run any workflow.
 
-<p align="center">
-  <a href="https://github.com/supernovae-st/nika/raw/refs/heads/main/media/videos/nika-hero.mp4">
-    <img src="https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/nika-hero.optimized.gif"
-         alt="nika check audits a meeting-notes workflow before anything runs, then nika run executes it on a local model, writes the action items it found and records a hash-chained trace"
-         width="760">
-  </a>
-</p>
+▶ [Watch it audit a meeting-notes workflow, then run it on a local model](https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/nika-hero.optimized.gif)
 
 - **The spec travels inside it.** The binary embeds this repository's
   chapters, schema and examples at the commit its `SPEC_PIN` names, so
@@ -368,13 +373,7 @@ The full boundary, including what Nika deliberately does not do, is in
 Every spec version ships a pack of canonical workflows: a numbered learning
 path, and real jobs you can copy.
 
-<p align="center">
-  <a href="https://github.com/supernovae-st/nika/raw/refs/heads/main/media/videos/workflow-gallery.mp4">
-    <img src="https://raw.githubusercontent.com/supernovae-st/nika/main/media/posters/workflow-gallery.png"
-         alt="nika try lists the workflows this pack ships, each card showing a job's name, what it does and the verbs it uses"
-         width="760">
-  </a>
-</p>
+▶ [Watch `nika try` list the jobs this pack ships](https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/workflow-gallery.optimized.gif)
 
 - **Every example is a test.** CI validates each one as a conformance
   input, so an example that breaks the rules breaks the build.
