@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: fetch-response-max-bound
+permits:
+  tools: [nika:fetch]
+  net: {http: [example.com]}
+tasks:
+  probe:
+    invoke:
+      tool: nika:fetch
+      args:
+        url: 'https://example.com/probe'
+        mode: raw
+        response: {accept: [200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215]}

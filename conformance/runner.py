@@ -64,6 +64,7 @@ from composition_core import composition_errors
 from trifecta_core import trifecta_errors
 from type_core import type_core_errors
 from interpolation_core import interpolation_errors
+from http_response_core import findings as http_response_findings
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "reference"))
 from values_core import values_core_errors  # noqa: E402 · the E-split value-authority layer
@@ -203,7 +204,7 @@ def _fetch_traverse_errors(where: str, args: dict) -> list[dict]:
     err = lambda detail: errs.append({"namespace": "NIKA-BUILTIN",
                                       "category": "validation_error",
                                       "detail": f"{where} · {detail}"})
-    for key in ("mode", "selector", "jq", "body", "form", "multipart"):
+    for key in ("mode", "selector", "jq", "body", "form", "multipart", "headers", "response"):
         if key in args:
             err(f"traverse: excludes {key}: — the crawl emits the fixed page-digest "
                 "shape (builtins-v0.1.md §nika:fetch · traverse)")
@@ -352,6 +353,10 @@ def stdlib_surface_errors(doc: dict, canon: dict) -> list[dict]:
             errs.extend(_fetch_payload_errors(where, args))
             if "traverse" in args:
                 errs.extend(_fetch_traverse_errors(where, args))
+            elif "response" in args:
+                errs.extend({"namespace": "NIKA-BUILTIN", "category": "validation_error",
+                             "detail": f"{where} · {detail}"}
+                            for detail in http_response_findings(args["response"]))
         if isinstance(inv, dict) and inv.get("tool") == "nika:hash":
             args = inv.get("args")
             if isinstance(args, dict):
