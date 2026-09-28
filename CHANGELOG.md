@@ -13,6 +13,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed · budget replay and malformed trace claims (2026-09-28)
+
+- The command-level trace runner now judges requested `cost_replay` arms
+  independently of chain integrity, including missing or contradictory reports.
+- Malformed prologue assertions, unknown cost-replay arms, exponent overflow
+  and invalid UTF-8 are fixture errors before any engine invocation.
+
 ### Fixed · trace expectation validation (2026-09-28)
 
 - The command-level trace runner rejects duplicate expectation keys,

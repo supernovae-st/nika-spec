@@ -27,6 +27,9 @@ walk does not ·
   the journal carries no pin at all. The three arms live at `007`,
   `006` and `001`. The legs never gate each other: a refused
   cost-replay leaves a `clean` walk clean.
+  The command-level differential checks the engine's separate `COST-REPLAY`
+  report; missing, ambiguous or unrecognized evidence fails this assertion.
+  A known pin alone does not stand in for an actual budget re-judgment.
 - **`prologue`** — `{present: [...], absent: [...]}` over the boot
   manifest's fields (17 §the prologue). It asserts CONTENT, not a
   verdict, which is why it is a field of its own: `absent` is a real
@@ -59,6 +62,11 @@ non-JSON numeric constants. A present `items` map must name at least one
 nonempty task id, with an array or `null` for each value. Omit `items` to make
 no claim; an empty row array is a valid assertion of a complete empty table.
 An invalid expectation is a fixture error, never an engine success or failure.
+Invalid UTF-8 and exponent overflow (for example `1e999`) are fixture errors
+too. A `cost_replay` claim must name one of its three arms; a `prologue` claim
+must be an object with correctly typed field lists and origin map. Presence
+and absence lists use unique nonempty names and cannot claim both for one
+field. These checks all precede the first engine invocation.
 
 Fixtures `011` and `012` retain actual inline and paged item observations
 with `failed`, `cancelled` and `never_started` rows. `013` is the historical

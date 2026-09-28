@@ -26,7 +26,8 @@ surfaces (the binary boundary · never linkage):
 
 Verdicts per fixture: AGREE · DIVERGE (each difference named) ·
 ENGINE-ERROR (crash / no events — counted loud, never folded into
-divergence). Exit 0 iff every fixture AGREEs.
+divergence) · FIXTURE-ERROR (invalid expectation, before engine invocation).
+Exit 0 iff every fixture AGREEs.
 
     NIKA_BIN=/path/to/nika python3 scripts/runtime-differential.py
     NIKA_BIN=… python3 scripts/runtime-differential.py runtime/gates  # one area
@@ -34,6 +35,7 @@ divergence). Exit 0 iff every fixture AGREEs.
 from __future__ import annotations
 
 import json
+import math
 import os
 import pathlib
 import shutil
@@ -244,13 +246,44 @@ class InvalidFixture(ValueError):
     """An expectation cannot be evaluated as a conformance claim."""
 
 
+def finite_float(raw: str) -> float:
+    """JSON exponent syntax must not overflow into a non-finite expectation."""
+    value = float(raw)
+    if not math.isfinite(value):
+        raise ValueError("non-finite JSON number")
+    return value
+
+
+def validate_prologue(expected: object) -> None:
+    """Validate the shape of every documented boot assertion before any effect."""
+    if not isinstance(expected, dict):
+        raise ValueError("prologue must be an object")
+    for key in ("present", "absent"):
+        fields = expected.get(key, [])
+        if not isinstance(fields, list) or any(
+            not isinstance(field, str) or not field for field in fields
+        ):
+            raise ValueError(f"prologue.{key} must be an array of nonempty field names")
+        if len(set(fields)) != len(fields):
+            raise ValueError(f"prologue.{key} repeats a field")
+    if set(expected.get("present", [])) & set(expected.get("absent", [])):
+        raise ValueError("a prologue field cannot be both present and absent")
+    if "input_origins" in expected:
+        origins = expected["input_origins"]
+        if not isinstance(origins, dict) or any(
+            not key or not isinstance(value, str) or not value
+            for key, value in origins.items()
+        ):
+            raise ValueError("prologue.input_origins must map input names to channel names")
+
+
 def trace_expectation(raw: str) -> dict:
     """Reject ambiguous fixture bytes before invoking any engine command."""
     def reject_constant(value: str):
         raise ValueError(f"non-JSON numeric constant {value}")
     try:
         expected = json.loads(raw, object_pairs_hook=unique_object,
-                              parse_constant=reject_constant)
+                              parse_constant=reject_constant, parse_float=finite_float)
         if not isinstance(expected, dict):
             raise ValueError("expectation must be an object")
         verdict = expected.get("verdict")
@@ -258,6 +291,14 @@ def trace_expectation(raw: str) -> dict:
             "clean", "finding", "incomplete", "forged", "refused",
         }:
             raise ValueError("missing or unknown trace verdict")
+        if "cost_replay" in expected:
+            replay = expected["cost_replay"]
+            if not isinstance(replay, str) or replay not in {
+                "replayed", "refused", "unrecorded",
+            }:
+                raise ValueError("unknown cost_replay claim")
+        if "prologue" in expected:
+            validate_prologue(expected["prologue"])
         if "items" in expected:
             items = expected["items"]
             if not isinstance(items, dict) or not items:
@@ -270,6 +311,31 @@ def trace_expectation(raw: str) -> dict:
         return expected
     except (ValueError, TypeError) as error:
         raise InvalidFixture(str(error)) from error
+
+
+def load_trace_expectation(path: pathlib.Path) -> dict:
+    """Decode failures belong to the fixture, never to an uninvoked engine."""
+    try:
+        raw = path.read_text(encoding="utf-8")
+    except (UnicodeError, OSError) as error:
+        raise InvalidFixture(f"cannot read UTF-8 expectation: {error}") from error
+    return trace_expectation(raw)
+
+
+def cost_replay_verdict(out: str) -> str:
+    """Read the public verify report's separate budget leg, never the journal pin."""
+    markers = [line for line in out.splitlines() if line.startswith("COST-REPLAY — ")]
+    if len(markers) != 1:
+        return "missing-or-ambiguous"
+    marker = markers[0]
+    if marker.startswith("COST-REPLAY — unrecorded · "):
+        return "unrecorded"
+    if marker.startswith("COST-REPLAY — REFUSED · "):
+        return "refused"
+    if marker.startswith("COST-REPLAY — the pinned pricing table is this engine's (") \
+            and "the budget verdict re-judged from the journaled dollars" in out:
+        return "replayed"
+    return "unrecognized"
 
 
 def diff_items(expected: dict, raw: str) -> list[str]:
@@ -303,7 +369,7 @@ def diff_items(expected: dict, raw: str) -> list[str]:
 
 def judge_trace(engine: str, d: pathlib.Path) -> list[str]:
     """Differences between the verify verdict and expected-verify.json."""
-    expected = trace_expectation((d / "expected-verify.json").read_text())
+    expected = load_trace_expectation(d / "expected-verify.json")
     want = expected["verdict"]
     proc = subprocess.run(
         [engine, "trace", "verify", str(d / "trace.ndjson"), "--color", "never"],
@@ -311,6 +377,10 @@ def judge_trace(engine: str, d: pathlib.Path) -> list[str]:
     )
     got = trace_verdict(proc.returncode, proc.stdout + proc.stderr)
     diffs = [] if got == want else [f"verdict: want {want} · got {got}"]
+    if "cost_replay" in expected:
+        replay = cost_replay_verdict(proc.stdout + proc.stderr)
+        if replay != expected["cost_replay"]:
+            diffs.append(f"cost_replay: want {expected['cost_replay']} · got {replay}")
     if expected.get("prologue"):
         # This is a semantic assertion over recorded bytes, not a second
         # integrity verifier. The engine's verdict above remains mandatory.
@@ -458,11 +528,26 @@ def selftest() -> int:
         ("empty task identity", '{"verdict":"clean","items":{"":null}}'),
         ("item scalar", '{"verdict":"clean","items":{"fan":0}}'),
         ("non-finite expectation", '{"verdict":"clean","items":{"fan":[{"index":NaN}]}}'),
+        ("overflowing JSON float", '{"verdict":"clean","note":1e999}'),
+        ("negative overflowing JSON float", '{"verdict":"clean","items":{"fan":[-1e999]}}'),
+        ("undecodable expectation", b'{"verdict":"clean","note":"\xff"}'),
+        ("numeric cost replay", '{"verdict":"clean","cost_replay":5}'),
+        ("unknown cost replay", '{"verdict":"clean","cost_replay":"unknown"}'),
+        ("null cost replay", '{"verdict":"clean","cost_replay":null}'),
+        ("scalar prologue", '{"verdict":"clean","prologue":5}'),
+        ("null prologue", '{"verdict":"clean","prologue":null}'),
+        ("string present fields", '{"verdict":"clean","prologue":{"present":"seed"}}'),
+        ("non-string absent field", '{"verdict":"clean","prologue":{"absent":[5]}}'),
+        ("empty field name", '{"verdict":"clean","prologue":{"present":[""]}}'),
+        ("contradictory fields", '{"verdict":"clean","prologue":{"present":["seed"],"absent":["seed"]}}'),
+        ("scalar input origins", '{"verdict":"clean","prologue":{"input_origins":5}}'),
+        ("non-string input origin", '{"verdict":"clean","prologue":{"input_origins":{"x":false}}}'),
     ]
     for label, raw in invalid_expectations:
         with tempfile.TemporaryDirectory(prefix="nika-rt-selftest-") as scratch:
             fixture = pathlib.Path(scratch)
-            (fixture / "expected-verify.json").write_text(raw)
+            (fixture / "expected-verify.json").write_bytes(
+                raw if isinstance(raw, bytes) else raw.encode("utf-8"))
             with patch("subprocess.run") as invoke:
                 invoke.side_effect = [
                     subprocess.CompletedProcess([], 0, "OK — chain intact", ""),
@@ -471,8 +556,10 @@ def selftest() -> int:
                 rejected = False
                 try:
                     judge_trace("unused-engine", fixture)
-                except ValueError:
+                except InvalidFixture:
                     rejected = True
+                except (ValueError, TypeError, AttributeError, OSError):
+                    pass  # A fixture failure must keep its own classification.
                 checks.append((f"fixture refuses {label} before engine invocation",
                                rejected and invoke.call_count == 0))
     for name, expected in [
@@ -480,9 +567,46 @@ def selftest() -> int:
         ("empty complete table", {"verdict": "clean", "items": {"fan": []}}),
         ("unrecorded table", {"verdict": "clean", "items": {"fan": None}}),
         ("ordered typed rows", {"verdict": "clean", "items": {"fan": rows}}),
+        ("prologue assertions", {"verdict": "clean", "prologue": boot_want}),
+        ("empty origin map", {"verdict": "clean", "prologue": {"input_origins": {}}}),
+        ("finite fractional value", {"verdict": "clean", "note": 1.25}),
     ]:
         checks.append((f"fixture accepts {name}",
                        trace_expectation(json.dumps(expected)) == expected))
+    replay_lines = {
+        "unrecorded": "COST-REPLAY — unrecorded · the boot frame pins no pricing table",
+        "refused": "COST-REPLAY — REFUSED · the pinned pricing table is not this engine's",
+        "replayed": "COST-REPLAY — the pinned pricing table is this engine's (known pin)\n"
+                    "  the budget verdict re-judged from the journaled dollars",
+    }
+    for wanted in replay_lines:
+        for actual, line in replay_lines.items():
+            with tempfile.TemporaryDirectory(prefix="nika-cost-selftest-") as scratch:
+                fixture = pathlib.Path(scratch)
+                (fixture / "expected-verify.json").write_text(json.dumps(
+                    {"verdict": "clean", "cost_replay": wanted}))
+                with patch("subprocess.run") as invoke:
+                    invoke.return_value = subprocess.CompletedProcess(
+                        [], 0, "OK — chain intact\n" + line, "")
+                    diffs = judge_trace("unused-engine", fixture)
+                    checks.append((f"cost replay {wanted} compared with {actual}",
+                                   bool(diffs) == (wanted != actual)
+                                   and invoke.call_count == 1))
+    for label, line in [
+        ("missing", ""),
+        ("unknown", "COST-REPLAY — unknown"),
+        ("unjudged pin", "COST-REPLAY — the pinned pricing table is this engine's"),
+        ("conflicting", replay_lines["replayed"] + "\n" + replay_lines["refused"]),
+    ]:
+        with tempfile.TemporaryDirectory(prefix="nika-cost-selftest-") as scratch:
+            fixture = pathlib.Path(scratch)
+            (fixture / "expected-verify.json").write_text(
+                '{"verdict":"clean","cost_replay":"replayed"}')
+            with patch("subprocess.run") as invoke:
+                invoke.return_value = subprocess.CompletedProcess(
+                    [], 0, "OK — chain intact\n" + line, "")
+                checks.append((f"cost replay refuses {label} evidence",
+                               bool(judge_trace("unused-engine", fixture))))
     bad = [name for name, ok in checks if not ok]
     for name, ok in checks:
         print(f"{'ok  ' if ok else 'FAIL'}  {name}")

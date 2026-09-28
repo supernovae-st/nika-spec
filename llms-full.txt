@@ -9504,6 +9504,13 @@ not discharge these semantic assertions. The command-level differential
 checks both; a third-party runner must not silently ignore requested
 prologue assertions.
 
+`expected-verify.json.cost_replay` asserts the separate budget-meaning leg:
+`replayed`, `refused` or `unrecorded`. The command-level differential reads the
+engine's `COST-REPLAY` verify report independently of the chain verdict. It
+requires an explicit re-judgment for `replayed`; a missing, conflicting or
+unrecognized report cannot satisfy the assertion. It never substitutes a
+local reading of the pricing pin for the engine's actual budget judgment.
+
 `expected-verify.json.items` separately asserts the engine's item-table
 projection through `nika trace outputs <trace> --json`. Its task-id map carries
 exact ordered row arrays, or `null` when no complete table may be projected.
@@ -9519,6 +9526,12 @@ keys at any depth and non-JSON numeric constants are fixture errors. If
 item claim. A task's empty array asserts a complete empty table, while
 `null` asserts that no complete table may be projected. Invalid expectations
 fail before invoking the engine and are reported separately from engine errors.
+This includes invalid UTF-8, JSON exponents that overflow to non-finite values,
+and malformed `cost_replay` or `prologue` claims. Prologue presence/absence
+lists contain unique nonempty field names and cannot contradict each other;
+`input_origins` maps nonempty input names to nonempty channel names. An empty
+origin map is a valid exact assertion. No engine is invoked to judge a fixture
+whose assertions cannot be interpreted.
 
 `conformance/tests/lints/` is the **linter-conformance corpus** (the
 03-dag one-obvious-way table is « normative for linters ») · per case
