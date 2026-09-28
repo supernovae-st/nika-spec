@@ -56,6 +56,33 @@ injected harness attestations or harness receipts is currently `UNSUPPORTED`
 by that runner, before any engine call; this is a nonzero suite result, never
 agreement. A malformed fixture is separately `FIXTURE-ERROR`.
 
+The run command's evidence must be unambiguous: duplicate JSON members,
+duplicate event-field keys, malformed NDJSON and repeated task or workflow
+terminal events never agree. A task's terminal kind must match its outcome
+class. An executed run needs one initial `workflow_started`, one terminal
+workflow event and one final `run_settled`. Settlement statuses `succeeded`,
+`failed` and `cancelled` correspond to workflow states `success`, `failure`
+and `cancelled`, with command exits 0, 1 and 130 respectively. A success event
+followed by a crash does not discharge an execution assertion. Pre-admission
+refusals retain the separate nonzero-exit contract above.
+
+`output` uses recursive JSON equality: booleans and numbers are distinct,
+object member order is irrelevant, array order matters, and numerically
+equal numbers such as `1` and `1.0` agree. Decimal JSON literals retain their
+exact values during comparison; they are not rounded through binary floats.
+`attempts` requires an integer count, never a boolean or decimal.
+`output_contains` searches a string directly; other values are rendered as
+compact JSON, with sorted object keys and lowercase JSON literals. Thus
+boolean `true` contains `true`, not Python's `True`.
+
+Each fixture has exactly one behavioral expectation and its required input:
+`input.nika` for run, `trace.ndjson` for verify. Missing inputs, simultaneous
+run/verify claims and misspelled expectation files fail before invoking the
+engine. Discovery includes malformed neighboring fixtures rather than
+silently dropping them. The separately specified resume, receipt-explanation
+and energy doors are listed as `UNSUPPORTED` by this run/verify adapter;
+they are not counted as agreements or omitted from a complete sweep.
+
 Runtime type-error fixtures obtain the invalid value from an upstream task
 through `with:`. A statically known invalid constant may be refused at check
 and therefore cannot demonstrate an evaluation-time failure.

@@ -124,6 +124,7 @@ jobs:
         run: |
           python scripts/lints-differential.py --selftest
           python scripts/runtime-differential.py --selftest
+          python scripts/test_runtime_differential.py
 
       # The 36 gate-matrix fixtures are GENERATED (edit the generator,
       # never the cells) — an ungated lane rots, so the drift gate joins

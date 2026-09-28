@@ -42,12 +42,11 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from decimal import Decimal
 
 SPEC_ROOT = pathlib.Path(__file__).resolve().parent.parent
-# The behavioral universe is discovered by FILE SHAPE anywhere under
-# tests/ (expected-run.json / expected-verify.json triples) — that is
-# how tests/stdlib/behavioral/ joins the same sweep as tests/runtime/
-# while the static tiers (expected.json) stay invisible to it.
+# Behavioral markers anywhere under tests/ include stdlib's run fixtures.
+# Discover malformed neighbors too; static expected.json/lints stay separate.
 RUNTIME = SPEC_ROOT / "conformance" / "tests"
 
 TERMINAL_TASK_KINDS = {
@@ -61,17 +60,34 @@ WORKFLOW_STATE = {
 
 
 def parse_events(stdout: str) -> list[dict]:
+    # A pretty check/error document is a different public response shape.
+    # Once reading NDJSON, no malformed line may disappear from the evidence.
+    try:
+        document = strict_json(stdout)
+    except ValueError:
+        document = None
+    if isinstance(document, dict) and "kind" not in document:
+        return []
     events = []
-    for line in stdout.splitlines():
+    diagnostics = 0
+    for number, line in enumerate(stdout.splitlines(), 1):
         line = line.strip()
-        if not line.startswith("{"):
+        if not line:
             continue
         try:
-            event = json.loads(line)
-            if isinstance(event.get("kind"), str) and event["kind"]:
-                events.append(event)
-        except json.JSONDecodeError:
-            continue
+            event = strict_json(line)
+            if not isinstance(event, dict):
+                raise ValueError("event must be an object")
+            if "kind" not in event and set(event) & {"error", "clean"}:
+                diagnostics += 1
+                continue  # admission judges the complete diagnostic separately
+            if not isinstance(event.get("kind"), str) or not event["kind"]:
+                raise ValueError("event has no nonempty kind")
+            events.append(event)
+        except ValueError as error:
+            raise ValueError(f"invalid engine JSON at line {number}: {error}") from error
+    if diagnostics and events:
+        raise ValueError("runtime events mixed with a separate pre-boot diagnostic")
     return events
 
 
@@ -82,25 +98,41 @@ def project(events: list[dict]) -> dict:
     seen: set[str] = set()
     for e in events:
         kind = e.get("kind", "")
-        fields = {f["key"]: f["value"] for f in e.get("fields", [])
-                  if isinstance(f, dict) and "key" in f}
-        task = str(fields.get("task", ""))
+        fields = event_fields(e)
+        task = fields.get("task", "")
+        if not isinstance(task, str):
+            raise ValueError("task identity must be a string")
         seen.add(f"{kind.replace('_', '.')}:{task}" if task else kind.replace("_", "."))
+        if state is not None and kind.startswith("task_"):
+            raise ValueError("task event follows workflow termination")
         if kind in WORKFLOW_STATE:
+            if state is not None:
+                raise ValueError("multiple workflow terminal events")
             state = WORKFLOW_STATE[kind]
-        if kind in TERMINAL_TASK_KINDS and task:
+        if kind in TERMINAL_TASK_KINDS:
+            if not task or task in tasks:
+                raise ValueError("missing task identity or repeated terminal event")
             outcome = fields.get("outcome")
-            out: dict = {}
-            if isinstance(outcome, str):
-                try:
-                    out = json.loads(outcome)
-                except json.JSONDecodeError:
-                    out = {}
-            payload = out.get("payload") or {}
+            if not isinstance(outcome, str):
+                raise ValueError("task outcome must be encoded JSON")
+            out = strict_json(outcome)
+            status = {"task_completed": "success", "task_failed": "failure",
+                      "task_skipped": "skipped", "task_cancelled": "cancelled"}[kind]
+            if not isinstance(out, dict) or out.get("class") != status:
+                raise ValueError("task kind and outcome class disagree")
+            payload = out.get("payload", {})
+            if not isinstance(payload, dict):
+                raise ValueError("task payload must be an object")
+            error = payload.get("error") or {}
+            if not isinstance(error, dict):
+                raise ValueError("task error must be an object")
+            if "attempts" in payload and (type(payload["attempts"]) is not int
+                                          or payload["attempts"] < 0):
+                raise ValueError("task attempts must be a nonnegative integer")
             tasks[task] = {
-                "status": out.get("class") or kind.removeprefix("task_"),
+                "status": status,
                 "output": payload.get("value"),
-                "error_code": (payload.get("error") or {}).get("code"),
+                "error_code": error.get("code"),
                 "attempts": payload.get("attempts"),
             }
     return {"workflow_state": state, "tasks": tasks, "events": seen}
@@ -117,19 +149,20 @@ def judge_run(engine: str, d: pathlib.Path) -> list[str]:
     # never threaded it, and the divergence was the harness's.)
     launch = {**(run.get("vars") or {}), **(run.get("inputs") or {})}
     for k, v in launch.items():
-        cmd += ["--var", f"{k}={v if isinstance(v, str) else json.dumps(v)}"]
+        cmd += ["--var", f"{k}={v if isinstance(v, str) else json_text(v)}"]
     env = dict(os.environ)
     env.update({k: str(v) for k, v in (run.get("env") or {}).items()})
     with tempfile.TemporaryDirectory(prefix="nika-rt-") as scratch:
         proc = subprocess.run(cmd, capture_output=True, text=True,
                               timeout=180, cwd=scratch, env=env)
-    events = parse_events(proc.stdout)
+    try:
+        events = parse_events(proc.stdout)
+    except ValueError as error:
+        return [f"invalid engine evidence: {error}"]
     if "admission" in expected:
         diffs = diff_admission(expected["admission"], proc, events)
-        if expected["admission"]["accepted"] and any(
-            key in expected for key in ("workflow_state", "tasks", "events_include")
-        ):
-            diffs += diff_run(expected, project(events))
+        if expected["admission"]["accepted"]:
+            diffs += diff_execution(expected, proc.returncode, events)
         return diffs
     if not events:
         # A run can refuse at its EMBEDDED CHECK before any event boots —
@@ -138,15 +171,26 @@ def judge_run(engine: str, d: pathlib.Path) -> list[str]:
         # difference so the fixture's runtime expectation reads against
         # the truth (the static gate fired first).
         try:
-            report = json.loads(proc.stdout)
-        except json.JSONDecodeError:
+            report = strict_json(proc.stdout)
+        except ValueError:
             report = None
         if proc.returncode == 2 and isinstance(report, dict):
             return [f"CHECK-REFUSED pre-boot (clean={report.get('clean')}) · "
                     "the embedded static gate fired before any runtime event"]
+        if isinstance(report, dict) and isinstance(report.get("error"), dict):
+            return [f"RUN-REFUSED pre-boot · {report['error'].get('code')} · "
+                    "no runtime execution claim was observed"]
         raise RuntimeError(f"no events on stdout (rc={proc.returncode} · "
                            f"stderr: {proc.stderr.strip()[:140]!r})")
-    return diff_run(expected, project(events))
+    return diff_execution(expected, proc.returncode, events)
+
+
+def diff_execution(expected: dict, code: int, events: list[dict]) -> list[str]:
+    try:
+        got = project(events)
+    except ValueError as error:
+        return [f"invalid engine evidence: {error}"]
+    return diff_run(expected, got) + diff_run_completion(code, events)
 
 
 def diff_run(expected: dict, got: dict) -> list[str]:
@@ -162,15 +206,17 @@ def diff_run(expected: dict, got: dict) -> list[str]:
             continue
         if "status" in want and have["status"] != want["status"]:
             diffs.append(f"task {tid}.status: want {want['status']} · got {have['status']}")
-        if "output" in want and have["output"] != want["output"]:
+        if "output" in want and not json_equal(have["output"], want["output"]):
             diffs.append(f"task {tid}.output: want {want['output']!r} · "
                          f"got {str(have['output'])[:80]!r}")
-        if "output_contains" in want and want["output_contains"] not in str(have["output"]):
+        text = have["output"] if isinstance(have["output"], str) else json_text(have["output"])
+        if "output_contains" in want and want["output_contains"] not in text:
             diffs.append(f"task {tid}.output missing substring {want['output_contains']!r}")
         if "error_code" in want and have["error_code"] != want["error_code"]:
             diffs.append(f"task {tid}.error_code: want {want['error_code']} · "
                          f"got {have['error_code']}")
-        if "attempts" in want and have["attempts"] != want["attempts"]:
+        if "attempts" in want and (type(have["attempts"]) is not int
+                                   or have["attempts"] != want["attempts"]):
             diffs.append(f"task {tid}.attempts: want {want['attempts']} · "
                          f"got {have['attempts']}")
     for ev in expected.get("events_include") or []:
@@ -258,8 +304,96 @@ class UnsupportedFixture(ValueError):
     """A valid contract needs an adapter this command runner does not provide."""
 
 
+def strict_json(raw: str):
+    def reject_constant(value):
+        raise ValueError(f"non-JSON numeric constant {value}")
+    return json.loads(raw, object_pairs_hook=unique_object, parse_float=finite_float,
+                      parse_constant=reject_constant)
+
+
+def json_equal(left, right) -> bool:
+    """JSON kinds are distinct; numbers compare exactly, objects without key order."""
+    numbers = (int, float, Decimal)
+    if type(left) in numbers and type(right) in numbers:
+        return left == right
+    if type(left) is not type(right):
+        return False
+    if isinstance(left, dict):
+        return left.keys() == right.keys() and all(json_equal(v, right[k]) for k, v in left.items())
+    if isinstance(left, list):
+        return len(left) == len(right) and all(json_equal(a, b) for a, b in zip(left, right))
+    return left == right
+
+
+def json_text(value) -> str:
+    """Stable compact JSON without converting exact decimal values to binary floats."""
+    if isinstance(value, Decimal):
+        return str(value)
+    if isinstance(value, dict):
+        return "{" + ",".join(json.dumps(k, ensure_ascii=False) + ":" + json_text(value[k])
+                               for k in sorted(value)) + "}"
+    if isinstance(value, list):
+        return "[" + ",".join(map(json_text, value)) + "]"
+    return json.dumps(value, ensure_ascii=False, allow_nan=False, separators=(",", ":"))
+
+
+def event_fields(event: dict) -> dict:
+    fields = event.get("fields", [])
+    if not isinstance(fields, list):
+        raise ValueError("event fields must be an array")
+    pairs = []
+    for field in fields:
+        if (not isinstance(field, dict) or not isinstance(field.get("key"), str)
+                or not field["key"] or "value" not in field):
+            raise ValueError("malformed event field")
+        pairs.append((field["key"], field["value"]))
+    return unique_object(pairs)
+
+
+def diff_run_completion(code: int, events: list[dict]) -> list[str]:
+    """A command claim includes its unique boot, terminal settlement and process exit."""
+    starts = [i for i, e in enumerate(events) if e["kind"] == "workflow_started"]
+    terminal = [e for e in events if e["kind"] in WORKFLOW_STATE]
+    settlements = [i for i, e in enumerate(events) if e["kind"] == "run_settled"]
+    diffs = []
+    if starts != [0]:
+        diffs.append("run: missing or repeated initial workflow_started")
+    if len(terminal) != 1:
+        diffs.append("run: missing or repeated workflow terminal event")
+    if len(settlements) != 1 or settlements != [len(events) - 1]:
+        diffs.append("run: missing, repeated or non-final run_settled")
+    if len(terminal) == 1:
+        state = WORKFLOW_STATE[terminal[0]["kind"]]
+        status = {"success": "succeeded", "failure": "failed", "cancelled": "cancelled"}[state]
+        if len(settlements) == 1 and events[settlements[0]].get("status") != status:
+            diffs.append("run: settlement status contradicts workflow terminal")
+        expected_code = {"success": 0, "failure": 1, "cancelled": 130}[state]
+        if code != expected_code:
+            diffs.append(f"run exit: want {expected_code} for {state} · got {code}")
+    return diffs
+
+
+def fixture_door(directory: pathlib.Path) -> str:
+    """Validate owned fixture layout before dispatch; never pick one of two claims."""
+    names = {p.name for p in directory.iterdir()}
+    claims = {n for n in names if n.startswith("expected-") and n != "expected-lints.json"}
+    if len(claims) != 1:
+        raise InvalidFixture("fixture requires exactly one behavioral expectation")
+    claim = claims.pop()
+    if claim in {"expected-resume.json", "expected-explain.json", "expected-energy.json"}:
+        raise UnsupportedFixture(f"{claim} requires a separate command adapter")
+    required = {"expected-run.json": "input.nika", "expected-verify.json": "trace.ndjson"}
+    if claim not in required:
+        raise InvalidFixture(f"unknown behavioral expectation {claim}")
+    if not (directory / required[claim]).is_file():
+        raise InvalidFixture(f"missing {required[claim]}")
+    return "run" if claim == "expected-run.json" else "trace"
+
+
 def load_run_contract(directory: pathlib.Path) -> tuple[dict, dict]:
     """Validate every run assertion and invocation before calling the engine."""
+    if fixture_door(directory) != "run":
+        raise InvalidFixture("run door requires expected-run.json")
     def reject_constant(value):
         raise ValueError(f"non-JSON numeric constant {value}")
 
@@ -330,7 +464,7 @@ def load_run_contract(directory: pathlib.Path) -> tuple[dict, dict]:
         if any(not isinstance(v, str) for v in run.get("env", {}).values()):
             raise ValueError("env values must be strings")
         for key in set(run.get("vars", {})) & set(run.get("inputs", {})):
-            if json.dumps(run["vars"][key], sort_keys=True) != json.dumps(run["inputs"][key], sort_keys=True):
+            if not json_equal(run["vars"][key], run["inputs"][key]):
                 raise ValueError(f"vars and inputs disagree for {key}")
     except (ValueError, TypeError, UnicodeError, OSError) as error:
         raise InvalidFixture(str(error)) from error
@@ -355,7 +489,7 @@ def diff_admission(expected: dict, proc, events: list[dict]) -> list[str]:
     if execution:
         diffs.append("admission: execution events preceded or accompanied refusal")
     try:
-        document = json.loads(proc.stdout, object_pairs_hook=unique_object)
+        document = strict_json(proc.stdout)
         error = document["error"]
         if not isinstance(error, dict):
             raise ValueError("error must be an object")
@@ -370,12 +504,12 @@ def diff_admission(expected: dict, proc, events: list[dict]) -> list[str]:
     return diffs
 
 
-def finite_float(raw: str) -> float:
+def finite_float(raw: str) -> Decimal:
     """JSON exponent syntax must not overflow into a non-finite expectation."""
     value = float(raw)
     if not math.isfinite(value):
         raise ValueError("non-finite JSON number")
-    return value
+    return Decimal(raw)
 
 
 def validate_prologue(expected: object) -> None:
@@ -490,7 +624,7 @@ def journal_prologue(path: pathlib.Path, expected: dict) -> list[str]:
 def diff_items(expected: dict, raw: str) -> list[str]:
     """Judge the engine's item projection, not a second local page fold."""
     try:
-        document = json.loads(raw, object_pairs_hook=unique_object)
+        document = strict_json(raw)
         tasks = document.get("tasks") if isinstance(document, dict) else None
         if not isinstance(tasks, list):
             raise ValueError("missing task array")
@@ -511,13 +645,15 @@ def diff_items(expected: dict, raw: str) -> list[str]:
         actual = by_id[task_id].get("items")
         # JSON equality keeps true distinct from 1 and a numeric index from
         # its string spelling; array order and every row field are asserted.
-        if json.dumps(actual, sort_keys=True) != json.dumps(wanted, sort_keys=True):
+        if not json_equal(actual, wanted):
             diffs.append(f"items {task_id}: projection differs from expected table")
     return diffs
 
 
 def judge_trace(engine: str, d: pathlib.Path) -> list[str]:
     """Differences between the verify verdict and expected-verify.json."""
+    if fixture_door(d) != "trace":
+        raise InvalidFixture("trace door requires expected-verify.json")
     expected = load_trace_expectation(d / "expected-verify.json")
     want = expected["verdict"]
     proc = subprocess.run(
@@ -697,6 +833,9 @@ def selftest() -> int:
     for label, raw in invalid_expectations:
         with tempfile.TemporaryDirectory(prefix="nika-rt-selftest-") as scratch:
             fixture = pathlib.Path(scratch)
+            # These tests double the process; the required input still exists.
+            (fixture / "input.nika").write_text("nika: judge-selftest\n")
+            (fixture / "trace.ndjson").write_text("")
             (fixture / "expected-verify.json").write_bytes(
                 raw if isinstance(raw, bytes) else raw.encode("utf-8"))
             with patch("subprocess.run") as invoke:
@@ -734,6 +873,9 @@ def selftest() -> int:
         for actual, line in replay_lines.items():
             with tempfile.TemporaryDirectory(prefix="nika-cost-selftest-") as scratch:
                 fixture = pathlib.Path(scratch)
+                # These tests double the process; the required input still exists.
+                (fixture / "input.nika").write_text("nika: judge-selftest\n")
+                (fixture / "trace.ndjson").write_text("")
                 (fixture / "expected-verify.json").write_text(json.dumps(
                     {"verdict": "clean", "cost_replay": wanted}))
                 with patch("subprocess.run") as invoke:
@@ -751,6 +893,9 @@ def selftest() -> int:
     ]:
         with tempfile.TemporaryDirectory(prefix="nika-cost-selftest-") as scratch:
             fixture = pathlib.Path(scratch)
+            # These tests double the process; the required input still exists.
+            (fixture / "input.nika").write_text("nika: judge-selftest\n")
+            (fixture / "trace.ndjson").write_text("")
             (fixture / "expected-verify.json").write_text(
                 '{"verdict":"clean","cost_replay":"replayed"}')
             with patch("subprocess.run") as invoke:
@@ -771,6 +916,9 @@ def selftest() -> int:
     ]:
         with tempfile.TemporaryDirectory(prefix="nika-prologue-selftest-") as scratch:
             fixture = pathlib.Path(scratch)
+            # These tests double the process; the required input still exists.
+            (fixture / "input.nika").write_text("nika: judge-selftest\n")
+            (fixture / "trace.ndjson").write_text("")
             (fixture / "expected-verify.json").write_text(
                 '{"verdict":"clean","prologue":{"present":["seed"]}}')
             (fixture / "trace.ndjson").write_bytes(raw)
@@ -793,6 +941,9 @@ def selftest() -> int:
     ]:
         with tempfile.TemporaryDirectory(prefix="nika-stream-selftest-") as scratch:
             fixture = pathlib.Path(scratch)
+            # These tests double the process; the required input still exists.
+            (fixture / "input.nika").write_text("nika: judge-selftest\n")
+            (fixture / "trace.ndjson").write_text("")
             (fixture / "expected-verify.json").write_text(json.dumps(
                 {"verdict": "clean", "cost_replay": wanted}))
             with patch("subprocess.run") as invoke:
@@ -816,6 +967,9 @@ def selftest() -> int:
     ]:
         with tempfile.TemporaryDirectory(prefix="nika-admission-selftest-") as scratch:
             fixture = pathlib.Path(scratch)
+            # These tests double the process; the required input still exists.
+            (fixture / "input.nika").write_text("nika: judge-selftest\n")
+            (fixture / "trace.ndjson").write_text("")
             (fixture / "expected-run.json").write_text(json.dumps(admission))
             with patch("subprocess.run") as invoke:
                 invoke.return_value = subprocess.CompletedProcess([], code, stdout, "")
@@ -843,6 +997,9 @@ def selftest() -> int:
     ]:
         with tempfile.TemporaryDirectory(prefix="nika-run-contract-selftest-") as scratch:
             fixture = pathlib.Path(scratch)
+            # These tests double the process; the required input still exists.
+            (fixture / "input.nika").write_text("nika: judge-selftest\n")
+            (fixture / "trace.ndjson").write_text("")
             (fixture / "expected-run.json").write_bytes(
                 expectation if isinstance(expectation, bytes) else expectation.encode())
             (fixture / "run.json").write_text(invocation)
@@ -868,9 +1025,9 @@ def main(argv: list[str]) -> int:
     root = RUNTIME
     if len(argv) > 1:
         root = SPEC_ROOT / "conformance" / "tests" / argv[1].removeprefix("conformance/tests/")
-    dirs = sorted(p for p in root.rglob("*")
-                  if p.is_dir() and ((p / "expected-run.json").exists()
-                                     or (p / "expected-verify.json").exists()))
+    markers = {"input.nika", "run.json", "trace.ndjson"}
+    dirs = sorted({p.parent for p in root.rglob("*") if p.is_file() and (
+        p.name in markers or (p.name.startswith("expected-") and p.name != "expected-lints.json"))})
     if not dirs:
         print(f"FAIL  {root} · no runtime fixtures found")
         return 1
@@ -878,7 +1035,7 @@ def main(argv: list[str]) -> int:
     for d in dirs:
         rel = d.relative_to(RUNTIME)
         try:
-            diffs = (judge_run(engine, d) if (d / "expected-run.json").exists()
+            diffs = (judge_run(engine, d) if fixture_door(d) == "run"
                      else judge_trace(engine, d))
         except UnsupportedFixture as e:
             unsupported += 1

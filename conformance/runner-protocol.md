@@ -90,6 +90,15 @@ that needs an adapter this command runner does not provide; it is never
 `AGREE` and makes the suite exit nonzero. Injected harness attestations
 and harness receipts currently require that separate adapter. Unknown
 assertion or invocation keys are fixture errors before engine calls.
+Behavioral discovery also reports missing inputs and ambiguous or misspelled
+expectation files; it must not select one of two competing claims. Resume,
+receipt-explanation and energy expectations require separate adapters and
+are explicitly `UNSUPPORTED` in this run/verify sweep. Run evidence must
+have unique JSON members and event-field keys, consistent unique terminal
+events, a final settlement and the matching process exit. Recursive JSON
+value matching distinguishes booleans from numbers and preserves decimal
+precision; the full comparison and substring rules are in the
+[runtime fixture contract](tests/runtime/README.md).
 The measurement earned its keep on the way: two regate
 fixtures owed their divergence to the HARNESS (the run.json `inputs`
 key never threaded — the engine's SEC-004 regate was right all along) ·
