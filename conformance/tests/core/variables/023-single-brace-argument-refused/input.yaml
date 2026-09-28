@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: typo-argument
+const: { seed: hello }
+permits:
+  tools: [nika:hash]
+tasks:
+  t:
+    invoke: { tool: "nika:hash", args: { content: "${ const.seed }", algo: sha256 } }

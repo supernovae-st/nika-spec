@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: case-033-shell-reference-refused
+const:
+  seed: hello
+  tool: nika:hash
+tasks:
+  t:
+    exec:
+      shell: echo ${ const.seed }
+permits:
+  exec: true

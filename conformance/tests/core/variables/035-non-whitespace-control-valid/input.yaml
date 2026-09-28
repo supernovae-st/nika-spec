@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: case-035-non-whitespace-control-valid
+const:
+  seed: hello
+  tool: nika:hash
+tasks:
+  t:
+    infer:
+      prompt: "${\x1Cconst.seed}"

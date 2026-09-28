@@ -63,6 +63,7 @@ from deep_static import deep_static_errors, consent_errors, net_before_exec_erro
 from composition_core import composition_errors
 from trifecta_core import trifecta_errors
 from type_core import type_core_errors
+from interpolation_core import interpolation_errors
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "reference"))
 from values_core import values_core_errors  # noqa: E402 · the E-split value-authority layer
@@ -1135,6 +1136,7 @@ def validate_workflow(doc: dict, validator: Draft202012Validator,
         errs.append({"namespace": "NIKA-PARSE", "category": "validation_error",
                      "detail": detail})
     errs.extend(cross_ref_errors(doc))
+    errs.extend(interpolation_errors(doc))
     errs.extend(deep_static_errors(doc, base_dir=base_dir))
     errs.extend(type_core_errors(doc))
     errs.extend(values_core_errors(doc))

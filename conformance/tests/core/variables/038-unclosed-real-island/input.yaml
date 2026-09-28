@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: case-038-unclosed-real-island
+const:
+  seed: hello
+  tool: nika:hash
+tasks:
+  t:
+    infer:
+      prompt: ${{ '${ const.seed }'
