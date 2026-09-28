@@ -498,9 +498,17 @@ refuse. Unknown keys, a present null, empty or oversized sets, duplicates,
 non-integers and out-of-range statuses are errors, never silently coerced,
 deduplicated or ignored.
 
-For a health probe, use `mode: raw` and `response: { accept: [200, 404] }`,
-then branch on `${{ tasks.probe.output.status_code == 404 }}`. Its 404 now
-follows the success edge; a failure edge is reserved for actual failures.
+For a health probe, use `mode: raw` and `response: { accept: [200, 404] }`.
+A downstream task binds the observed status through `with` before its `when`
+condition reads it:
+
+```yaml
+with:
+  observed_status: ${{ tasks.probe.output.status_code }}
+when: ${{ with.observed_status == 404 }}
+```
+
+Its 404 follows the success edge; a failure edge is reserved for actual failures.
 JSON extraction of an HTML error body still fails, and a HEAD or 204
 response with an empty body remains an empty string under `mode: raw`.
 
