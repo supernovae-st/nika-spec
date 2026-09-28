@@ -48,6 +48,18 @@ schema → shaped defaults · no network (fetch fixtures use the engine's
 HTTP mock · post-announce) · no wall-clock asserts (durations are
 reported · never asserted).
 
+The command runner validates assertion and invocation keys before execution.
+A pre-admission refusal requires a nonzero exit, the exact structured error
+code and each requested witness, with no workflow or task event. Compact
+check reports and error documents are not runtime events. A contract needing
+injected harness attestations or harness receipts is currently `UNSUPPORTED`
+by that runner, before any engine call; this is a nonzero suite result, never
+agreement. A malformed fixture is separately `FIXTURE-ERROR`.
+
+Runtime type-error fixtures obtain the invalid value from an upstream task
+through `with:`. A statically known invalid constant may be refused at check
+and therefore cannot demonstrate an evaluation-time failure.
+
 `mock/text` is the text-only probe for agent completion. It uses the same
 echo and schema-shaped response rules, with the `mock(text) · ` marker for
 unstructured text, but MUST emit no tool calls even when tools are offered

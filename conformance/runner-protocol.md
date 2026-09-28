@@ -79,15 +79,18 @@ conformance/tests/stdlib/    stdlib static surface · provider prefixes · extra
 run.json invocation · expected-run.json assertions · determinism rules ·
 see [tests/runtime/README.md](tests/runtime/README.md). They use
 `input.nika`, NOT `input.yaml`, so the static `all` gate ignores
-them by construction. **First measured by command 2026-07-30 — and
-fully green**:
+them by construction. **First measured by command 2026-07-30**:
 [`scripts/runtime-differential.py`](../scripts/runtime-differential.py)
 drives every behavioral fixture through the public doors (`nika run
 --json` event-stream projection · `nika trace verify` for the trace
-area) — **54/54 agree at first measure**, and the universe has grown
-green since (the promised-contract pair · the stdlib behavioral
-batches, refusals included — the differential's own summary is the
-live count, never this prose). The measurement earned its keep on the way: two regate
+area) — **54/54 agreed at first measure**. That historical result does
+not qualify subsequently added assertions. The differential's summary
+is the current measured count. `UNSUPPORTED` identifies a valid fixture
+that needs an adapter this command runner does not provide; it is never
+`AGREE` and makes the suite exit nonzero. Injected harness attestations
+and harness receipts currently require that separate adapter. Unknown
+assertion or invocation keys are fixture errors before engine calls.
+The measurement earned its keep on the way: two regate
 fixtures owed their divergence to the HARNESS (the run.json `inputs`
 key never threaded — the engine's SEC-004 regate was right all along) ·
 one fixture asserted a string where the engine's typed value is a

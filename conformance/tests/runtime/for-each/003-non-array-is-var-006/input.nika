@@ -1,10 +1,14 @@
 # SPDX-License-Identifier: Apache-2.0
 nika: rt-foreach-non-array
 model: mock/echo
-const:
-  not_a_list: "just a string"
 tasks:
+  source:
+    invoke:
+      tool: "nika:jq"
+      args: { input: null, expression: '"just a string"' }
   work:
+    with:
+      collection: ${{ tasks.source.output }}
     for_each:
-      items: ${{ const.not_a_list }}
+      items: ${{ with.collection }}
     infer: { prompt: "never runs" }

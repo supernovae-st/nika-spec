@@ -13,6 +13,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed · runtime assertion coverage (2026-09-28)
+
+- Admission refusals now assert the structured error, witness, nonzero exit
+  and absence of execution events. Compact diagnostics are not events.
+- Unsupported injected-harness and receipt contracts remain visible failures
+  instead of silently agreeing; unknown fixture keys fail before execution.
+- Non-array evaluation fixtures use an upstream value so static rejection
+  cannot mask the runtime law. Existing static refusal coverage is preserved.
+
 ### Fixed · trace claim boundaries (2026-09-28)
 
 - Misspelled prologue assertion keys are fixture errors before engine calls.

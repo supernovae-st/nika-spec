@@ -67,7 +67,9 @@ def parse_events(stdout: str) -> list[dict]:
         if not line.startswith("{"):
             continue
         try:
-            events.append(json.loads(line))
+            event = json.loads(line)
+            if isinstance(event.get("kind"), str) and event["kind"]:
+                events.append(event)
         except json.JSONDecodeError:
             continue
     return events
@@ -106,8 +108,7 @@ def project(events: list[dict]) -> dict:
 
 def judge_run(engine: str, d: pathlib.Path) -> list[str]:
     """Differences between the projected run and expected-run.json."""
-    expected = json.loads((d / "expected-run.json").read_text())
-    run = json.loads((d / "run.json").read_text()) if (d / "run.json").exists() else {}
+    expected, run = load_run_contract(d)
     cmd = [engine, "run", str(d / "input.nika"), "--json"]
     # run.json carries the launch invocation: `vars` and `inputs` both land
     # on --var (the flag sets a workflow `inputs:` value) · `env` overlays
@@ -123,6 +124,13 @@ def judge_run(engine: str, d: pathlib.Path) -> list[str]:
         proc = subprocess.run(cmd, capture_output=True, text=True,
                               timeout=180, cwd=scratch, env=env)
     events = parse_events(proc.stdout)
+    if "admission" in expected:
+        diffs = diff_admission(expected["admission"], proc, events)
+        if expected["admission"]["accepted"] and any(
+            key in expected for key in ("workflow_state", "tasks", "events_include")
+        ):
+            diffs += diff_run(expected, project(events))
+        return diffs
     if not events:
         # A run can refuse at its EMBEDDED CHECK before any event boots —
         # rc 2 with the check report (one pretty-printed object) on
@@ -244,6 +252,122 @@ def unique_object(pairs: list[tuple]) -> dict:
 
 class InvalidFixture(ValueError):
     """An expectation cannot be evaluated as a conformance claim."""
+
+
+class UnsupportedFixture(ValueError):
+    """A valid contract needs an adapter this command runner does not provide."""
+
+
+def load_run_contract(directory: pathlib.Path) -> tuple[dict, dict]:
+    """Validate every run assertion and invocation before calling the engine."""
+    def reject_constant(value):
+        raise ValueError(f"non-JSON numeric constant {value}")
+
+    def read(name):
+        value = json.loads((directory / name).read_text(encoding="utf-8"),
+                           object_pairs_hook=unique_object, parse_float=finite_float,
+                           parse_constant=reject_constant)
+        if not isinstance(value, dict):
+            raise ValueError(f"{name} must be an object")
+        return value
+
+    def keys(value, allowed, label):
+        if not isinstance(value, dict):
+            raise ValueError(f"{label} must be an object")
+        unknown = set(value) - allowed
+        if unknown:
+            raise ValueError(f"unknown {label} keys: {', '.join(sorted(unknown))}")
+
+    def words(value, label):
+        if not isinstance(value, list) or any(not isinstance(v, str) or not v for v in value):
+            raise ValueError(f"{label} must be an array of nonempty strings")
+
+    try:
+        expected = read("expected-run.json")
+        run = read("run.json") if (directory / "run.json").exists() else {}
+        keys(expected, {"workflow_state", "tasks", "events_include", "admission", "receipt", "note"},
+             "run assertion")
+        keys(run, {"vars", "inputs", "env", "access", "harness_attestations"}, "run invocation")
+        if not set(expected) - {"note"}:
+            raise ValueError("run expectation has no assertions")
+        if "workflow_state" in expected and expected["workflow_state"] not in {
+            "success", "failure", "cancelled",
+        }:
+            raise ValueError("unknown workflow_state")
+        tasks = expected.get("tasks", {})
+        if not isinstance(tasks, dict) or ("tasks" in expected and not tasks):
+            raise ValueError("tasks must be a nonempty object")
+        for task, wanted in tasks.items():
+            if not task:
+                raise ValueError("empty task identity")
+            keys(wanted, {"status", "output", "output_contains", "error_code", "attempts"}, "task assertion")
+            if wanted.get("status") not in {"success", "failure", "skipped", "cancelled"}:
+                raise ValueError("missing or unknown task status")
+            for key in ("output_contains", "error_code"):
+                if key in wanted and not isinstance(wanted[key], str):
+                    raise ValueError(f"{key} must be a string")
+            if "attempts" in wanted and (type(wanted["attempts"]) is not int or wanted["attempts"] < 0):
+                raise ValueError("attempts must be a nonnegative integer")
+        if "events_include" in expected:
+            words(expected["events_include"], "events_include")
+        if "admission" in expected:
+            admission = expected["admission"]
+            keys(admission, {"accepted", "error_code", "witness_contains"}, "admission")
+            if type(admission.get("accepted")) is not bool:
+                raise ValueError("admission.accepted must be boolean")
+            if admission["accepted"]:
+                if set(admission) != {"accepted"}:
+                    raise ValueError("accepted admission cannot assert a refusal")
+            else:
+                if not isinstance(admission.get("error_code"), str) or not admission["error_code"]:
+                    raise ValueError("refused admission needs an error_code")
+                words(admission.get("witness_contains", []), "admission.witness_contains")
+                if set(expected) & {"workflow_state", "tasks", "events_include"}:
+                    raise ValueError("refused admission cannot assert execution")
+        for key in ("vars", "inputs", "env"):
+            if key in run and (not isinstance(run[key], dict) or any(not k for k in run[key])):
+                raise ValueError(f"{key} must be an object with nonempty names")
+        if any(not isinstance(v, str) for v in run.get("env", {}).values()):
+            raise ValueError("env values must be strings")
+        for key in set(run.get("vars", {})) & set(run.get("inputs", {})):
+            if json.dumps(run["vars"][key], sort_keys=True) != json.dumps(run["inputs"][key], sort_keys=True):
+                raise ValueError(f"vars and inputs disagree for {key}")
+    except (ValueError, TypeError, UnicodeError, OSError) as error:
+        raise InvalidFixture(str(error)) from error
+    unsupported = set(run) & {"access", "harness_attestations"}
+    if "receipt" in expected:
+        unsupported.add("receipt")
+    if unsupported:
+        raise UnsupportedFixture("injected harness/receipt adapter required: " + ", ".join(sorted(unsupported)))
+    return expected, run
+
+
+def diff_admission(expected: dict, proc, events: list[dict]) -> list[str]:
+    """Admission refusal is a structured diagnostic before every workflow/task event."""
+    execution = [e for e in events if e["kind"].replace(".", "_").startswith(("workflow_", "task_"))]
+    if expected["accepted"]:
+        return [] if any(e["kind"].replace(".", "_") == "workflow_started" for e in execution) else [
+            "admission: accepted run has no workflow_started"
+        ]
+    diffs = []
+    if proc.returncode == 0:
+        diffs.append("admission: refusal exited zero")
+    if execution:
+        diffs.append("admission: execution events preceded or accompanied refusal")
+    try:
+        document = json.loads(proc.stdout, object_pairs_hook=unique_object)
+        error = document["error"]
+        if not isinstance(error, dict):
+            raise ValueError("error must be an object")
+    except (ValueError, KeyError, TypeError):
+        return diffs + ["admission: missing or ambiguous structured error"]
+    if error.get("code") != expected["error_code"]:
+        diffs.append(f"admission.error_code: want {expected['error_code']} · got {error.get('code')}")
+    message = error.get("message")
+    for witness in expected.get("witness_contains", []):
+        if not isinstance(message, str) or witness not in message:
+            diffs.append(f"admission: missing witness {witness!r}")
+    return diffs
 
 
 def finite_float(raw: str) -> float:
@@ -675,6 +799,61 @@ def selftest() -> int:
                 invoke.return_value = subprocess.CompletedProcess([], 0, stdout, stderr)
                 checks.append((f"cost report keeps {label} boundaries",
                                (not judge_trace("unused-engine", fixture)) == agrees))
+    checks.append(("compact check reports and errors are not events",
+                   parse_events('{"clean":false}\n{"error":{"code":"NIKA-1708"}}') == []))
+    admission = {"admission": {"accepted": False, "error_code": "NIKA-1708",
+                               "witness_contains": ["ticket"]}}
+    diagnostic = json.dumps({"error": {"code": "NIKA-1708", "message": "missing ticket"}})
+    for label, code, stdout, agrees in [
+        ("exact refusal", 3, diagnostic, True),
+        ("zero exit", 0, diagnostic, False),
+        ("wrong code", 3, diagnostic.replace("1708", "1709"), False),
+        ("missing witness", 3, diagnostic.replace("ticket", "other"), False),
+        ("missing diagnostic", 3, "", False),
+        ("duplicate error", 3, '{"error":{},"error":{"code":"NIKA-1708","message":"ticket"}}', False),
+        ("boot before refusal", 3, _ev("workflow_started") + "\n" + diagnostic, False),
+        ("task before refusal", 3, _ev("task_started", task="a") + "\n" + diagnostic, False),
+    ]:
+        with tempfile.TemporaryDirectory(prefix="nika-admission-selftest-") as scratch:
+            fixture = pathlib.Path(scratch)
+            (fixture / "expected-run.json").write_text(json.dumps(admission))
+            with patch("subprocess.run") as invoke:
+                invoke.return_value = subprocess.CompletedProcess([], code, stdout, "")
+                checks.append((f"admission judges {label}",
+                               (not judge_run("unused-engine", fixture)) == agrees))
+    valid_run = '{"workflow_state":"success","tasks":{"a":{"status":"success"}}}'
+    for label, expectation, invocation, error_type in [
+        ("misspelled assertion", '{"workflow_stat":"success"}', '{}', InvalidFixture),
+        ("empty assertions", '{"note":"not a test"}', '{}', InvalidFixture),
+        ("duplicate verdict", '{"workflow_state":"success","workflow_state":"failure"}', '{}', InvalidFixture),
+        ("unknown task assertion", '{"tasks":{"a":{"status":"success","outpt":0}}}', '{}', InvalidFixture),
+        ("boolean attempts", '{"tasks":{"a":{"status":"success","attempts":true}}}', '{}', InvalidFixture),
+        ("NaN", '{"tasks":{"a":{"status":"success","output":NaN}}}', '{}', InvalidFixture),
+        ("overflow", '{"tasks":{"a":{"status":"success","output":1e999}}}', '{}', InvalidFixture),
+        ("non-UTF8", b'{"note":"\xff"}', '{}', InvalidFixture),
+        ("string admission", '{"admission":{"accepted":"false"}}', '{}', InvalidFixture),
+        ("unknown admission claim", '{"admission":{"accepted":false,"error_code":"x","witness":[]}}', '{}', InvalidFixture),
+        ("unknown invocation", valid_run, '{"var":{"x":1}}', InvalidFixture),
+        ("duplicate input", valid_run, '{"vars":{"x":1,"x":2}}', InvalidFixture),
+        ("conflicting input sources", valid_run, '{"vars":{"x":1},"inputs":{"x":true}}', InvalidFixture),
+        ("null env", valid_run, '{"env":null}', InvalidFixture),
+        ("injected harness", '{"admission":{"accepted":true}}', '{"harness_attestations":{}}', UnsupportedFixture),
+        ("access seat", valid_run, '{"access":"codex"}', UnsupportedFixture),
+        ("receipt", '{"admission":{"accepted":true},"receipt":{"tokens":null}}', '{}', UnsupportedFixture),
+    ]:
+        with tempfile.TemporaryDirectory(prefix="nika-run-contract-selftest-") as scratch:
+            fixture = pathlib.Path(scratch)
+            (fixture / "expected-run.json").write_bytes(
+                expectation if isinstance(expectation, bytes) else expectation.encode())
+            (fixture / "run.json").write_text(invocation)
+            with patch("subprocess.run") as invoke:
+                rejected = False
+                try:
+                    judge_run("unused-engine", fixture)
+                except error_type:
+                    rejected = True
+                checks.append((f"run fixture classifies {label} before any engine call",
+                               rejected and not invoke.called))
     bad = [name for name, ok in checks if not ok]
     for name, ok in checks:
         print(f"{'ok  ' if ok else 'FAIL'}  {name}")
@@ -695,12 +874,16 @@ def main(argv: list[str]) -> int:
     if not dirs:
         print(f"FAIL  {root} · no runtime fixtures found")
         return 1
-    agree = diverged = errors = fixture_errors = 0
+    agree = diverged = errors = fixture_errors = unsupported = 0
     for d in dirs:
         rel = d.relative_to(RUNTIME)
         try:
             diffs = (judge_run(engine, d) if (d / "expected-run.json").exists()
                      else judge_trace(engine, d))
+        except UnsupportedFixture as e:
+            unsupported += 1
+            print(f"UNSUPPORTED  {rel} · {e}")
+            continue
         except InvalidFixture as e:
             fixture_errors += 1
             print(f"FIXTURE-ERROR  {rel} · {e}")
@@ -717,10 +900,10 @@ def main(argv: list[str]) -> int:
         else:
             agree += 1
             print(f"AGREE     {rel}")
-    print(f"\nruntime-differential · {agree + diverged + errors + fixture_errors} fixtures · "
+    print(f"\nruntime-differential · {agree + diverged + errors + fixture_errors + unsupported} fixtures · "
           f"{agree} agree · {diverged} diverge · {errors} engine-errors · "
-          f"{fixture_errors} fixture-errors")
-    return 1 if (diverged or errors or fixture_errors) else 0
+          f"{fixture_errors} fixture-errors · {unsupported} unsupported")
+    return 1 if (diverged or errors or fixture_errors or unsupported) else 0
 
 
 if __name__ == "__main__":
