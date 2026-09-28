@@ -67,6 +67,12 @@ too. A `cost_replay` claim must name one of its three arms; a `prologue` claim
 must be an object with correctly typed field lists and origin map. Presence
 and absence lists use unique nonempty names and cannot claim both for one
 field. These checks all precede the first engine invocation.
+The prologue key set is closed to `present`, `absent` and `input_origins`;
+unknown spellings are errors. Its reader skips leading blank journal lines,
+but never skips a malformed initial event to find a later boot. An unreadable
+initial event fails the prologue claim, without reclassifying the engine call
+as a crash. Cost reports retain separate stdout/stderr line boundaries, and
+the explicit re-judgment line must follow its marker in the same stream.
 
 Fixtures `011` and `012` retain actual inline and paged item observations
 with `failed`, `cancelled` and `never_started` rows. `013` is the historical

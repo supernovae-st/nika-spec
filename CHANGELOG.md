@@ -13,6 +13,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed · trace claim boundaries (2026-09-28)
+
+- Misspelled prologue assertion keys are fixture errors before engine calls.
+  Leading blank journal lines no longer hide a valid boot event; an unreadable
+  initial event fails its semantic assertion without blaming the engine.
+- Cost replay binds its re-judgment to the marker's own following line and
+  preserves stdout/stderr boundaries, including unterminated lines.
+
 ### Fixed · budget replay and malformed trace claims (2026-09-28)
 
 - The command-level trace runner now judges requested `cost_replay` arms

@@ -9503,6 +9503,12 @@ exact input-origin map with `expected-verify.json.prologue` (see the
 not discharge these semantic assertions. The command-level differential
 checks both; a third-party runner must not silently ignore requested
 prologue assertions.
+The prologue assertion object has exactly three optional keys: `present`,
+`absent` and `input_origins`. Unknown keys are fixture errors, including
+misspellings; they must not silently remove an assertion. The command-level
+reader skips blank lines before the first journal event, as the verifier does.
+An unreadable, malformed or non-object initial event leaves the prologue claim
+unsatisfied (`DIVERGE`), separately from the engine's completed verdict.
 
 `expected-verify.json.cost_replay` asserts the separate budget-meaning leg:
 `replayed`, `refused` or `unrecorded`. The command-level differential reads the
@@ -9510,6 +9516,10 @@ engine's `COST-REPLAY` verify report independently of the chain verdict. It
 requires an explicit re-judgment for `replayed`; a missing, conflicting or
 unrecognized report cannot satisfy the assertion. It never substitutes a
 local reading of the pricing pin for the engine's actual budget judgment.
+The report's re-judgment line must immediately follow its marker in the same
+output stream; a phrase in an unrelated warning is not evidence. Stdout and
+stderr retain their line boundaries, and a conflicting marker in either stream
+prevents agreement even when the other stream has no final newline.
 
 `expected-verify.json.items` separately asserts the engine's item-table
 projection through `nika trace outputs <trace> --json`. Its task-id map carries

@@ -258,6 +258,9 @@ def validate_prologue(expected: object) -> None:
     """Validate the shape of every documented boot assertion before any effect."""
     if not isinstance(expected, dict):
         raise ValueError("prologue must be an object")
+    unknown = set(expected) - {"present", "absent", "input_origins"}
+    if unknown:
+        raise ValueError(f"unknown prologue assertion: {', '.join(sorted(unknown))}")
     for key in ("present", "absent"):
         fields = expected.get(key, [])
         if not isinstance(fields, list) or any(
@@ -322,20 +325,42 @@ def load_trace_expectation(path: pathlib.Path) -> dict:
     return trace_expectation(raw)
 
 
-def cost_replay_verdict(out: str) -> str:
+def cost_replay_verdict(out: str, stderr: str = "") -> str:
     """Read the public verify report's separate budget leg, never the journal pin."""
-    markers = [line for line in out.splitlines() if line.startswith("COST-REPLAY — ")]
+    # A stream boundary is not a continuation of an unterminated line or
+    # of a report in the other stream. Preserve each report's own context.
+    markers = []
+    for stream in (out, stderr):
+        lines = stream.splitlines()
+        markers += [(line, lines[index + 1:index + 2])
+                    for index, line in enumerate(lines)
+                    if line.startswith("COST-REPLAY — ")]
     if len(markers) != 1:
         return "missing-or-ambiguous"
-    marker = markers[0]
+    marker, following = markers[0]
     if marker.startswith("COST-REPLAY — unrecorded · "):
         return "unrecorded"
     if marker.startswith("COST-REPLAY — REFUSED · "):
         return "refused"
+    phrase = "  the budget verdict re-judged from the journaled dollars"
     if marker.startswith("COST-REPLAY — the pinned pricing table is this engine's (") \
-            and "the budget verdict re-judged from the journaled dollars" in out:
+            and following and (following[0] == phrase or following[0].startswith(phrase + " (")):
         return "replayed"
     return "unrecognized"
+
+
+def journal_prologue(path: pathlib.Path, expected: dict) -> list[str]:
+    """Read only the initial nonempty event; other trace laws stay engine-owned."""
+    try:
+        with path.open("rb") as journal:
+            raw = next((line for line in journal if line.strip()), b"")
+        event = json.loads(raw.decode("utf-8"), object_pairs_hook=unique_object,
+                           parse_float=finite_float)
+        if not isinstance(event, dict):
+            raise ValueError("initial event must be an object")
+    except (ValueError, UnicodeError, OSError) as error:
+        return [f"prologue: cannot read initial event ({error})"]
+    return diff_prologue(expected, [event])
 
 
 def diff_items(expected: dict, raw: str) -> list[str]:
@@ -375,18 +400,16 @@ def judge_trace(engine: str, d: pathlib.Path) -> list[str]:
         [engine, "trace", "verify", str(d / "trace.ndjson"), "--color", "never"],
         capture_output=True, text=True, timeout=120,
     )
-    got = trace_verdict(proc.returncode, proc.stdout + proc.stderr)
+    got = trace_verdict(proc.returncode, "\n".join((proc.stdout, proc.stderr)))
     diffs = [] if got == want else [f"verdict: want {want} · got {got}"]
     if "cost_replay" in expected:
-        replay = cost_replay_verdict(proc.stdout + proc.stderr)
+        replay = cost_replay_verdict(proc.stdout, proc.stderr)
         if replay != expected["cost_replay"]:
             diffs.append(f"cost_replay: want {expected['cost_replay']} · got {replay}")
     if expected.get("prologue"):
         # This is a semantic assertion over recorded bytes, not a second
         # integrity verifier. The engine's verdict above remains mandatory.
-        with (d / "trace.ndjson").open() as journal:
-            events = [json.loads(journal.readline())]
-        diffs += diff_prologue(expected["prologue"], events)
+        diffs += journal_prologue(d / "trace.ndjson", expected["prologue"])
     if "items" in expected:
         projection = subprocess.run(
             [engine, "trace", "outputs", str(d / "trace.ndjson"), "--json", "--color", "never"],
@@ -542,6 +565,10 @@ def selftest() -> int:
         ("contradictory fields", '{"verdict":"clean","prologue":{"present":["seed"],"absent":["seed"]}}'),
         ("scalar input origins", '{"verdict":"clean","prologue":{"input_origins":5}}'),
         ("non-string input origin", '{"verdict":"clean","prologue":{"input_origins":{"x":false}}}'),
+        ("misspelled origins", '{"verdict":"clean","prologue":{"input-origins":{"x":"env"}}}'),
+        ("misspelled absence", '{"verdict":"clean","prologue":{"absnet":["inputs"]}}'),
+        ("singular origin", '{"verdict":"clean","prologue":{"input_origin":{"x":"env"}}}'),
+        ("capitalized presence", '{"verdict":"clean","prologue":{"Present":["seed"]}}'),
     ]
     for label, raw in invalid_expectations:
         with tempfile.TemporaryDirectory(prefix="nika-rt-selftest-") as scratch:
@@ -607,6 +634,47 @@ def selftest() -> int:
                     [], 0, "OK — chain intact\n" + line, "")
                 checks.append((f"cost replay refuses {label} evidence",
                                bool(judge_trace("unused-engine", fixture))))
+    # Each semantic claim keeps its own reading failure; a malformed boot
+    # does not turn a completed engine command into an engine crash.
+    for label, raw, agrees in [
+        ("leading blank", b"\n  \n" + _ev("workflow_started", seed=7).encode(), True),
+        ("truncated first row", b'{"kind":', False),
+        ("non-UTF-8 first row", b'\xff', False),
+        ("empty journal", b'', False),
+        ("scalar boot", b'5\n', False),
+        ("array boot", b'[]\n', False),
+        ("duplicate boot key", b'{"kind":"task_started","kind":"workflow_started","fields":[{"key":"seed","value":7}]}', False),
+    ]:
+        with tempfile.TemporaryDirectory(prefix="nika-prologue-selftest-") as scratch:
+            fixture = pathlib.Path(scratch)
+            (fixture / "expected-verify.json").write_text(
+                '{"verdict":"clean","prologue":{"present":["seed"]}}')
+            (fixture / "trace.ndjson").write_bytes(raw)
+            with patch("subprocess.run") as invoke:
+                invoke.return_value = subprocess.CompletedProcess([], 0, "OK — chain intact\n", "")
+                try:
+                    differences = judge_trace("unused-engine", fixture)
+                    held = (not differences) == agrees and invoke.call_count == 1
+                except (ValueError, TypeError, AttributeError, UnicodeError):
+                    held = False
+                checks.append((f"journal prologue reads {label} without misattribution", held))
+    known = replay_lines["replayed"].splitlines()[0]
+    phrase = "  the budget verdict re-judged from the journaled dollars"
+    for label, stdout, stderr, wanted, agrees in [
+        ("unrelated warning", known + "\n", "warning: " + phrase, "replayed", False),
+        ("unrelated following section", known + "\nOTHER\n" + phrase, "", "replayed", False),
+        ("phrase in other stream", known + "\n", phrase, "replayed", False),
+        ("unterminated conflicting reports", replay_lines["unrecorded"], replay_lines["refused"], "unrecorded", False),
+        ("stderr report after unterminated stdout", "OK — chain intact", replay_lines["unrecorded"], "unrecorded", True),
+    ]:
+        with tempfile.TemporaryDirectory(prefix="nika-stream-selftest-") as scratch:
+            fixture = pathlib.Path(scratch)
+            (fixture / "expected-verify.json").write_text(json.dumps(
+                {"verdict": "clean", "cost_replay": wanted}))
+            with patch("subprocess.run") as invoke:
+                invoke.return_value = subprocess.CompletedProcess([], 0, stdout, stderr)
+                checks.append((f"cost report keeps {label} boundaries",
+                               (not judge_trace("unused-engine", fixture)) == agrees))
     bad = [name for name, ok in checks if not ok]
     for name, ok in checks:
         print(f"{'ok  ' if ok else 'FAIL'}  {name}")
