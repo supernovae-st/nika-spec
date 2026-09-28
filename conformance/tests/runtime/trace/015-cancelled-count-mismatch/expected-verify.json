@@ -1,0 +1,7 @@
+{
+  "verdict": "clean",
+  "items": {
+    "ask": null
+  },
+  "note": "Derived from 012 by changing items_cancelled from 1 to 2 and recomputing the unkeyed chain. A count the rows do not support MUST NOT project a complete table."
+}

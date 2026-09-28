@@ -1,0 +1,42 @@
+{
+  "source_case": "runs-p2-20260928T080651Z/c1-stopped-inline-b8",
+  "source_trace": "runs-p2-20260928T080651Z/c1-stopped-inline-b8/.nika/traces/2026-09-28T08-07-00Z-8b0b.ndjson",
+  "source_trace_sha256": "cbed30eb93dbbce06a2d4160c63c9a753dc93190123e2f378a98290566dd3024",
+  "golden_sha256": "8adf0aadd2b2859869639675c744fd13d7c9e7ec6dccf46ab4b8bc73f9d619d5",
+  "engine": {
+    "version": "nika 0.121.0 (a807bfea6)",
+    "binary_sha256": "23de402fd8a70ecc9beb37a5fddd3c24dbc59993eefe1714b56445e6b662aa63",
+    "worktree_head": "a807bfea6ae4903bf42581781e0f53ea8ba60901"
+  },
+  "mutations": [],
+  "rechained_lines": 0,
+  "trace_sha256": "cbed30eb93dbbce06a2d4160c63c9a753dc93190123e2f378a98290566dd3024",
+  "derived_by": {
+    "verify": {
+      "argv": [
+        "nika",
+        "trace",
+        "verify",
+        "trace.ndjson",
+        "--color",
+        "never"
+      ],
+      "exit": 0,
+      "stdout_sha256": "acc1268b405a8160ba693e0a414d19cf7c6c62b108e0b46bc412bdd3c994aab6"
+    },
+    "outputs": {
+      "argv": [
+        "nika",
+        "trace",
+        "outputs",
+        "trace.ndjson",
+        "--json",
+        "--color",
+        "never"
+      ],
+      "exit": 0,
+      "stdout_sha256": "6caf22bce9150ac130e387154af77f02ebd7cab8329dcf2c7a57382f42460c88"
+    }
+  },
+  "verdict_mapping": "root scripts/runtime-differential.py trace_verdict (mirror copy)"
+}

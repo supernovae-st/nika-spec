@@ -49,6 +49,20 @@ native fan-out with paged evidence; `009` removes its first page and
 recomputes the unkeyed chain. Both walks are internally consistent, but
 only `008` permits a complete item projection. This is a semantic
 completeness check, not an authenticity claim against coherent rewriting.
+The command-level differential compares these assertions to the engine's
+`nika trace outputs <trace> --json` task projection. Unsupported commands,
+nonzero exits, malformed output and duplicate task identities fail the
+assertion; a runner never silently skips it or reconstructs the expected
+table on the engine's behalf. Row order and typed field values matter.
+
+Fixtures `011` and `012` retain actual inline and paged item observations
+with `failed`, `cancelled` and `never_started` rows. `013` is the historical
+zero-cancelled count omission. `014` omits a required cancelled count, `015`
+changes that count, and `016` substitutes an unknown paged status; their
+chains remain consistent but their item projections MUST be incomplete.
+Each case records its source hash, engine pin and exact mutations in
+`provenance.json`. Re-chaining these unkeyed negative fixtures tests the
+reader's semantic completeness rules, never authenticity against rewriting.
 
 Verdict law · four classes, and the first three all mean « the chain
 walks » ·

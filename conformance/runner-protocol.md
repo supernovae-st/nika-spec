@@ -103,6 +103,15 @@ not discharge these semantic assertions. The command-level differential
 checks both; a third-party runner must not silently ignore requested
 prologue assertions.
 
+`expected-verify.json.items` separately asserts the engine's item-table
+projection through `nika trace outputs <trace> --json`. Its task-id map carries
+exact ordered row arrays, or `null` when no complete table may be projected.
+A runner must check the requested tasks and typed row values, reject malformed
+or ambiguous output, and fail if this command is unsupported. A clean chain
+does not discharge item assertions, and a runner must not substitute its own
+page fold for the engine's public projection. Historical and new item
+vocabularies are described in [§17](../spec/17-trace.md).
+
 `conformance/tests/lints/` is the **linter-conformance corpus** (the
 03-dag one-obvious-way table is « normative for linters ») · per case
 `input.yaml` + `expected-lints.json` (`{"lints": [{"rule", "task"}]}` ·

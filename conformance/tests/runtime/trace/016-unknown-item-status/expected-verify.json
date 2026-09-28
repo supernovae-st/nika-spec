@@ -1,0 +1,7 @@
+{
+  "verdict": "clean",
+  "items": {
+    "ask": null
+  },
+  "note": "Derived from 012 by changing the cancelled row's status to the unknown word 'abandoned' in its page and recomputing the unkeyed chain. An unknown status MUST NOT project a complete table (the recorded counts are left as written; an unknown row cannot satisfy them, and the engine's own unit test pins the status rule with consistent counts)."
+}

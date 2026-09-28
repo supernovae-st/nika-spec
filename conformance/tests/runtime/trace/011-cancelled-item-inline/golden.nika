@@ -1,0 +1,6 @@
+nika: c1-stopped-inline
+permits: {}
+tasks:
+  ask:
+    for_each: { items: ['a', 'b', 'c'], max_parallel: 2 }
+    infer: { model: 'ollama/llama3.2', prompt: 'say ${{ item }}', max_tokens: 64 }

@@ -13,6 +13,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed · abandoned fan-out iterations (2026-09-28)
+
+- §§03 and 17 distinguish a started iteration abandoned before a recorded
+  terminal (`cancelled`) from one whose execution never began (`never_started`).
+  Already recorded outcomes remain intact; fail-fast still stops immediately.
+- Paged item evidence gains `items_cancelled`. Historical tables without that
+  field remain readable only when they contain no cancelled rows. Unknown
+  statuses and inconsistent counts cannot produce a complete item table.
+- This closed-vocabulary extension requires the reference engine's next MINOR
+  after 0.121 and a paired changelog entry. It changes neither workflow syntax
+  nor the trace envelope version, and it makes no physical-wire or billing claim.
+
 ### Added · explicit CSV header order (2026-09-25)
 
 - `nika:convert` documents the implemented `columns` option for CSV emission:

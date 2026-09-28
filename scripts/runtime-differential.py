@@ -230,6 +230,45 @@ def diff_prologue(expected: dict, events: list[dict]) -> list[str]:
     return diffs
 
 
+def unique_object(pairs: list[tuple]) -> dict:
+    """Machine output must not silently overwrite a repeated field."""
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate JSON field {key}")
+        result[key] = value
+    return result
+
+
+def diff_items(expected: dict, raw: str) -> list[str]:
+    """Judge the engine's item projection, not a second local page fold."""
+    try:
+        document = json.loads(raw, object_pairs_hook=unique_object)
+        tasks = document.get("tasks") if isinstance(document, dict) else None
+        if not isinstance(tasks, list):
+            raise ValueError("missing task array")
+        by_id = {}
+        for task in tasks:
+            if not isinstance(task, dict) or not isinstance(task.get("id"), str):
+                raise ValueError("malformed task")
+            if task["id"] in by_id:
+                raise ValueError("duplicate task identity")
+            by_id[task["id"]] = task
+    except (ValueError, TypeError) as error:
+        return [f"items: malformed engine projection ({error})"]
+    diffs = []
+    for task_id, wanted in expected.items():
+        if task_id not in by_id:
+            diffs.append(f"items {task_id}: task absent")
+            continue
+        actual = by_id[task_id].get("items")
+        # JSON equality keeps true distinct from 1 and a numeric index from
+        # its string spelling; array order and every row field are asserted.
+        if json.dumps(actual, sort_keys=True) != json.dumps(wanted, sort_keys=True):
+            diffs.append(f"items {task_id}: projection differs from expected table")
+    return diffs
+
+
 def judge_trace(engine: str, d: pathlib.Path) -> list[str]:
     """Differences between the verify verdict and expected-verify.json."""
     expected = json.loads((d / "expected-verify.json").read_text())
@@ -246,6 +285,15 @@ def judge_trace(engine: str, d: pathlib.Path) -> list[str]:
         with (d / "trace.ndjson").open() as journal:
             events = [json.loads(journal.readline())]
         diffs += diff_prologue(expected["prologue"], events)
+    if "items" in expected:
+        projection = subprocess.run(
+            [engine, "trace", "outputs", str(d / "trace.ndjson"), "--json", "--color", "never"],
+            capture_output=True, text=True, timeout=120,
+        )
+        if projection.returncode:
+            diffs.append(f"items: trace outputs exited {projection.returncode}")
+        else:
+            diffs += diff_items(expected["items"], projection.stdout)
     return diffs
 
 
@@ -341,6 +389,32 @@ def selftest() -> int:
     checks.append(("absent boot claim is enforced",
                    bool(diff_prologue(boot_want, parse_events(
                        _ev("workflow_started", inputs=origin_map, seed=0))))))
+    rows = [{"index": 0, "item": "a", "status": "failed"},
+            {"index": 1, "item": "b", "status": "cancelled"},
+            {"index": 2, "item": "c", "status": "never_started"}]
+    def item_document(value):
+        return json.dumps({"tasks": [{"id": "fan", "items": value}]})
+    checks.append(("exact item projection preserves cancelled versus never_started",
+                   diff_items({"fan": rows}, item_document(rows)) == []))
+    checks.append(("incomplete item table remains unrecorded",
+                   diff_items({"fan": None}, item_document(None)) == []))
+    for label, value in [
+        ("cancelled relabelled never_started", [rows[0], {**rows[1], "status": "never_started"}, rows[2]]),
+        ("false completion of missing pages", []),
+        ("lost item", rows[:-1]),
+        ("reordered items", list(reversed(rows))),
+        ("boolean index", [rows[0], {**rows[1], "index": True}, rows[2]]),
+        ("string index", [{**rows[0], "index": "0"}, *rows[1:]]),
+    ]:
+        checks.append((f"item assertion refuses {label}",
+                       bool(diff_items({"fan": rows}, item_document(value)))))
+    checks.append(("a complete table cannot stand in for an incomplete one",
+                   bool(diff_items({"fan": None}, item_document(rows)))))
+    for raw in ('{}', '[]', '{', '{"tasks":[]}',
+                '{"tasks":[{"id":"fan"},{"id":"fan"}]}',
+                '{"tasks":[{"id":"fan","items":null,"items":[]}]}'):
+        checks.append(("malformed or absent item projection fails",
+                       bool(diff_items({"fan": rows}, raw))))
     bad = [name for name, ok in checks if not ok]
     for name, ok in checks:
         print(f"{'ok  ' if ok else 'FAIL'}  {name}")

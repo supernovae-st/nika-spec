@@ -1,0 +1,25 @@
+{
+  "verdict": "clean",
+  "items": {
+    "ask": [
+      {
+        "code": "NIKA-INFER-001",
+        "index": 0,
+        "item": "a",
+        "message": "for_each item [0] a: provider call failed during `infer`: provider API error (HTTP 500); usage and billing unknown",
+        "status": "failed"
+      },
+      {
+        "index": 1,
+        "item": "b",
+        "status": "cancelled"
+      },
+      {
+        "index": 2,
+        "item": "c",
+        "status": "never_started"
+      }
+    ]
+  },
+  "note": "Real reference-engine run (loopback peer, sandboxed): max_parallel 2 over a b c; the peer held a and b at a barrier, failed a (HTTP 500) and never answered b; fail_fast abandoned b in flight; c was never polled. Inline items: failed, cancelled, never_started. The peer received requests for a and b only; neither word is a billing verdict."
+}
