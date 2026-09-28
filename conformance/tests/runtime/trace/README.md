@@ -54,6 +54,11 @@ The command-level differential compares these assertions to the engine's
 nonzero exits, malformed output and duplicate task identities fail the
 assertion; a runner never silently skips it or reconstructs the expected
 table on the engine's behalf. Row order and typed field values matter.
+The expectation JSON must also reject duplicate keys at every depth and
+non-JSON numeric constants. A present `items` map must name at least one
+nonempty task id, with an array or `null` for each value. Omit `items` to make
+no claim; an empty row array is a valid assertion of a complete empty table.
+An invalid expectation is a fixture error, never an engine success or failure.
 
 Fixtures `011` and `012` retain actual inline and paged item observations
 with `failed`, `cancelled` and `never_started` rows. `013` is the historical

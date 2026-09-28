@@ -13,6 +13,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed · trace expectation validation (2026-09-28)
+
+- The command-level trace runner rejects duplicate expectation keys,
+  non-JSON numeric constants and empty item-assertion maps before invoking
+  the engine. Invalid fixtures are reported separately from engine failures;
+  explicit empty tables and unrecorded tables remain distinct valid claims.
+
 ### Changed · abandoned fan-out iterations (2026-09-28)
 
 - §§03 and 17 distinguish a started iteration abandoned before a recorded

@@ -112,6 +112,13 @@ does not discharge item assertions, and a runner must not substitute its own
 page fold for the engine's public projection. Historical and new item
 vocabularies are described in [§17](../spec/17-trace.md).
 
+The expectation document itself must be unambiguous JSON: duplicate object
+keys at any depth and non-JSON numeric constants are fixture errors. If
+`items` is present, it must be a nonempty task-id map; omit it to make no
+item claim. A task's empty array asserts a complete empty table, while
+`null` asserts that no complete table may be projected. Invalid expectations
+fail before invoking the engine and are reported separately from engine errors.
+
 `conformance/tests/lints/` is the **linter-conformance corpus** (the
 03-dag one-obvious-way table is « normative for linters ») · per case
 `input.yaml` + `expected-lints.json` (`{"lints": [{"rule", "task"}]}` ·

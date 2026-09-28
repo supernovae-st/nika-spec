@@ -231,13 +231,45 @@ def diff_prologue(expected: dict, events: list[dict]) -> list[str]:
 
 
 def unique_object(pairs: list[tuple]) -> dict:
-    """Machine output must not silently overwrite a repeated field."""
+    """Neither evidence nor expectations may overwrite a repeated field."""
     result = {}
     for key, value in pairs:
         if key in result:
             raise ValueError(f"duplicate JSON field {key}")
         result[key] = value
     return result
+
+
+class InvalidFixture(ValueError):
+    """An expectation cannot be evaluated as a conformance claim."""
+
+
+def trace_expectation(raw: str) -> dict:
+    """Reject ambiguous fixture bytes before invoking any engine command."""
+    def reject_constant(value: str):
+        raise ValueError(f"non-JSON numeric constant {value}")
+    try:
+        expected = json.loads(raw, object_pairs_hook=unique_object,
+                              parse_constant=reject_constant)
+        if not isinstance(expected, dict):
+            raise ValueError("expectation must be an object")
+        verdict = expected.get("verdict")
+        if not isinstance(verdict, str) or verdict not in {
+            "clean", "finding", "incomplete", "forged", "refused",
+        }:
+            raise ValueError("missing or unknown trace verdict")
+        if "items" in expected:
+            items = expected["items"]
+            if not isinstance(items, dict) or not items:
+                raise ValueError("items must be a nonempty task map")
+            for task, rows in items.items():
+                if not task:
+                    raise ValueError("item task identity must be nonempty")
+                if rows is not None and not isinstance(rows, list):
+                    raise ValueError("item expectation must be an array or null")
+        return expected
+    except (ValueError, TypeError) as error:
+        raise InvalidFixture(str(error)) from error
 
 
 def diff_items(expected: dict, raw: str) -> list[str]:
@@ -271,7 +303,7 @@ def diff_items(expected: dict, raw: str) -> list[str]:
 
 def judge_trace(engine: str, d: pathlib.Path) -> list[str]:
     """Differences between the verify verdict and expected-verify.json."""
-    expected = json.loads((d / "expected-verify.json").read_text())
+    expected = trace_expectation((d / "expected-verify.json").read_text())
     want = expected["verdict"]
     proc = subprocess.run(
         [engine, "trace", "verify", str(d / "trace.ndjson"), "--color", "never"],
@@ -415,6 +447,42 @@ def selftest() -> int:
                 '{"tasks":[{"id":"fan","items":null,"items":[]}]}'):
         checks.append(("malformed or absent item projection fails",
                        bool(diff_items({"fan": rows}, raw))))
+    # Exercise the fixture-loading boundary as well as the pure comparator.
+    # Ambiguous expectations cannot become agreement by dropping assertions.
+    from unittest.mock import patch
+    invalid_expectations = [
+        ("duplicate verdict", '{"verdict":"forged","verdict":"clean"}'),
+        ("duplicate items field", '{"verdict":"clean","items":{"fan":[]},"items":{"fan":null}}'),
+        ("duplicate task expectation", '{"verdict":"clean","items":{"fan":[],"fan":null}}'),
+        ("empty item task map", '{"verdict":"clean","items":{}}'),
+        ("empty task identity", '{"verdict":"clean","items":{"":null}}'),
+        ("item scalar", '{"verdict":"clean","items":{"fan":0}}'),
+        ("non-finite expectation", '{"verdict":"clean","items":{"fan":[{"index":NaN}]}}'),
+    ]
+    for label, raw in invalid_expectations:
+        with tempfile.TemporaryDirectory(prefix="nika-rt-selftest-") as scratch:
+            fixture = pathlib.Path(scratch)
+            (fixture / "expected-verify.json").write_text(raw)
+            with patch("subprocess.run") as invoke:
+                invoke.side_effect = [
+                    subprocess.CompletedProcess([], 0, "OK — chain intact", ""),
+                    subprocess.CompletedProcess([], 0, item_document(None), ""),
+                ]
+                rejected = False
+                try:
+                    judge_trace("unused-engine", fixture)
+                except ValueError:
+                    rejected = True
+                checks.append((f"fixture refuses {label} before engine invocation",
+                               rejected and invoke.call_count == 0))
+    for name, expected in [
+        ("verdict only", {"verdict": "clean"}),
+        ("empty complete table", {"verdict": "clean", "items": {"fan": []}}),
+        ("unrecorded table", {"verdict": "clean", "items": {"fan": None}}),
+        ("ordered typed rows", {"verdict": "clean", "items": {"fan": rows}}),
+    ]:
+        checks.append((f"fixture accepts {name}",
+                       trace_expectation(json.dumps(expected)) == expected))
     bad = [name for name, ok in checks if not ok]
     for name, ok in checks:
         print(f"{'ok  ' if ok else 'FAIL'}  {name}")
@@ -435,12 +503,16 @@ def main(argv: list[str]) -> int:
     if not dirs:
         print(f"FAIL  {root} · no runtime fixtures found")
         return 1
-    agree = diverged = errors = 0
+    agree = diverged = errors = fixture_errors = 0
     for d in dirs:
         rel = d.relative_to(RUNTIME)
         try:
             diffs = (judge_run(engine, d) if (d / "expected-run.json").exists()
                      else judge_trace(engine, d))
+        except InvalidFixture as e:
+            fixture_errors += 1
+            print(f"FIXTURE-ERROR  {rel} · {e}")
+            continue
         except Exception as e:  # engine crash / timeout / no events — loud
             errors += 1
             print(f"ENGINE-ERROR  {rel} · {e}")
@@ -453,9 +525,10 @@ def main(argv: list[str]) -> int:
         else:
             agree += 1
             print(f"AGREE     {rel}")
-    print(f"\nruntime-differential · {agree + diverged + errors} fixtures · "
-          f"{agree} agree · {diverged} diverge · {errors} engine-errors")
-    return 1 if (diverged or errors) else 0
+    print(f"\nruntime-differential · {agree + diverged + errors + fixture_errors} fixtures · "
+          f"{agree} agree · {diverged} diverge · {errors} engine-errors · "
+          f"{fixture_errors} fixture-errors")
+    return 1 if (diverged or errors or fixture_errors) else 0
 
 
 if __name__ == "__main__":
