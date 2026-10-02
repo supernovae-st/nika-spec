@@ -245,9 +245,10 @@ def release_items(
     releases: list[tuple[str, dict[str, Any]]] = []
     for repo in repositories:
         values = client.pages(f"/repos/{ORG}/{repo}/releases") or []
-        for release in values[:limit_per_repository]:
-            if release.get("draft"):
-                continue
+        # A draft is not a public release: drop drafts BEFORE the window, or
+        # unpublished drafts (listed first) consume slots and evict history.
+        published = [release for release in values if not release.get("draft")]
+        for release in published[:limit_per_repository]:
             if (f"{ORG}/{repo}", release["tag_name"]) in represented:
                 continue
             releases.append((repo, release))

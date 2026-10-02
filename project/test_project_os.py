@@ -32,6 +32,7 @@ from project.model import (
     REVIEW_APPROVED,
     REVIEW_CHANGES_REQUESTED,
     REVIEW_DRAFT,
+    REVIEW_NEEDED,
     REVIEW_NOT_APPLICABLE,
     SIGNAL_ACTIVE,
     SIGNAL_ATTENTION,
@@ -59,6 +60,7 @@ from project.sources import (
     desired_from_sources,
     ensure_public_repositories,
     pull_request_items,
+    release_items,
 )
 
 
@@ -612,6 +614,61 @@ class ReconcileTests(unittest.TestCase):
             self.assertNotIn(("Stage", STAGE_SHIPPED), changes)
             self.assertNotIn(("Certainty", CERTAINTY_PROVEN), changes)
 
+    def test_settled_pull_requests_clear_stale_review_and_ci(self) -> None:
+        def pull(number: int, terminal: tuple[str, str], review: str) -> ActualItem:
+            return ActualItem(
+                item_id=f"ITEM{number}",
+                content_id=f"PR{number}",
+                content_kind="PullRequest",
+                title=f"Pull request {number}",
+                body="",
+                url=f"https://github.com/supernovae-st/nika/pull/{number}",
+                fields={
+                    "SSOT ID": f"github:pr:supernovae-st/nika#{number}",
+                    "Review state": review,
+                    "CI state": CI_RED,
+                    "Priority": "High",
+                    "Effort": "Medium",
+                },
+                terminal=terminal,
+            )
+
+        # Old-head claims from the last open snapshot: never repainted.
+        for actual in (
+            pull(1734, (STAGE_MERGED, CERTAINTY_COMMITTED), REVIEW_NEEDED),
+            pull(1730, (STAGE_CLOSED_NOT_INTEGRATED, CERTAINTY_UNKNOWN), REVIEW_DRAFT),
+        ):
+            changes = self.capture_changes([actual], [])
+            self.assertIn(("Review state", None), changes)
+            self.assertIn(("CI state", None), changes)
+            self.assertIn(("Proof", "◌ pending"), changes)
+            for painted in (("Review state", REVIEW_APPROVED), ("CI state", CI_GREEN)):
+                self.assertNotIn(painted, changes)
+            self.assertFalse(
+                any(name in {"Priority", "Effort"} for name, _ in changes)
+            )
+
+    def test_settled_issue_keeps_not_applicable_review_and_ci(self) -> None:
+        issue = ActualItem(
+            item_id="ITEM652",
+            content_id="ISSUE652",
+            content_kind="Issue",
+            title="Closed issue",
+            body="",
+            url="https://github.com/supernovae-st/nika/issues/652",
+            fields={
+                "SSOT ID": "github:issue:supernovae-st/nika#652",
+                "Review state": REVIEW_NOT_APPLICABLE,
+                "CI state": CI_NOT_APPLICABLE,
+            },
+            terminal=(STAGE_CLOSED_COMPLETED, CERTAINTY_COMMITTED),
+        )
+        changes = self.capture_changes([issue], [])
+        self.assertIn(("Stage", STAGE_CLOSED_COMPLETED), changes)
+        self.assertFalse(
+            any(name in {"Review state", "CI state"} for name, _ in changes)
+        )
+
     def test_unmanaged_closed_item_is_quarantined_untouched(self) -> None:
         actual = ActualItem(
             item_id="ITEMH",
@@ -869,6 +926,39 @@ class SourceTests(unittest.TestCase):
         client.pages.side_effect = pages
         with self.assertRaises(GitHubError):
             pull_request_items(client, ["nika"])
+
+    def test_drafts_do_not_evict_published_releases_from_the_window(self) -> None:
+        def release(tag: str, day: int, **flags: bool) -> dict:
+            return {
+                "tag_name": tag,
+                "name": tag,
+                "html_url": f"https://github.com/supernovae-st/nika/releases/tag/{tag}",
+                "created_at": f"2026-09-{day:02d}T00:00:00Z",
+                "published_at": None if flags.get("draft") else f"2026-09-{day:02d}T00:00:00Z",
+                "draft": flags.get("draft", False),
+                "prerelease": flags.get("prerelease", False),
+            }
+
+        # The API lists drafts first; two of them must not cost published slots.
+        values = [
+            release("v0.121.0", 25, draft=True),
+            release("v0.118.4", 5, draft=True),
+            release("v0.120.0", 20),
+            release("v0.119.0", 13, prerelease=True),
+            release("v0.114.0", 3),
+            release("v0.113.0", 2),
+        ]
+        client = MagicMock()
+        client.pages.return_value = values
+        items = release_items(client, ["nika"], 3, self.timeline, order_start=0)
+        self.assertEqual(
+            [item.ssot_id for item in items],
+            [
+                "github:release:supernovae-st/nika@v0.114.0",
+                "github:release:supernovae-st/nika@v0.119.0",
+                "github:release:supernovae-st/nika@v0.120.0",
+            ],
+        )
 
 
 class GitHubClientTests(unittest.TestCase):
