@@ -1,0 +1,5 @@
+{
+  "valid": true,
+  "errors": [],
+  "note": "04-variables.md: an escaped opener has no island extent and cannot mask later reference typos."
+}

@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: missing-child
+tasks:
+  call:
+    invoke:
+      workflow: ./absent-child.nika

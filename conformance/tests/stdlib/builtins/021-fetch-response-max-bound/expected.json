@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "Single-fetch exact response policy: static unknowns grant no runtime acceptance; all literal siblings remain checked (stdlib/builtins-v0.1.md)."
+}

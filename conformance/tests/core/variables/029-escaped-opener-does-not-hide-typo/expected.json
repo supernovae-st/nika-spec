@@ -1,0 +1,9 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-VAR-005"
+    }
+  ],
+  "note": "04-variables.md: an escaped opener has no island extent and cannot mask later reference typos."
+}

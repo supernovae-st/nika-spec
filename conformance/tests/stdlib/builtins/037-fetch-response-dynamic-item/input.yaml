@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: fetch-response-dynamic-item
+inputs:
+  code: {type: integer, required: true}
+permits:
+  tools: [nika:fetch]
+  net: {http: [example.com]}
+tasks:
+  probe:
+    invoke:
+      tool: nika:fetch
+      args:
+        url: 'https://example.com/probe'
+        mode: raw
+        response: {accept: [200, "${{ inputs.code }}"]}

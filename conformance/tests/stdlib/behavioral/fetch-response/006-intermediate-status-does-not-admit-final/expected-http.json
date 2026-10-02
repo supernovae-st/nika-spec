@@ -1,0 +1,53 @@
+{
+  "contract_version": 1,
+  "law": "stdlib/builtins-v0.1.md#nikafetch",
+  "input": "input.nika",
+  "given": {
+    "method": "GET",
+    "via": "workflow",
+    "response": {
+      "accept": [
+        302
+      ]
+    },
+    "mode": "raw",
+    "retry": 0,
+    "keyed": false,
+    "fault": "none",
+    "responses": [
+      {
+        "status": 302,
+        "final_url": "https://example.test/probe",
+        "body": "missing",
+        "headers": {
+          "x-private": "must-not-be-exported"
+        }
+      },
+      {
+        "status": 503,
+        "final_url": "https://example.test/probe",
+        "body": "missing",
+        "headers": {
+          "x-private": "must-not-be-exported"
+        }
+      }
+    ],
+    "sibling": true
+  },
+  "observations": {
+    "outcome": "failure",
+    "requests": 2,
+    "attempts": 1,
+    "output": null,
+    "error": {
+      "code": "NIKA-BUILTIN-FETCH-001",
+      "status_code": 503,
+      "accepted": [
+        302
+      ],
+      "transient": true
+    },
+    "sibling": "quarantined"
+  },
+  "note": "The transport is a deterministic injected mock, with an independent request journal. Reserved hosts are never contacted. Task attempts do not stand in for observed transport requests."
+}

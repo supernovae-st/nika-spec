@@ -1,0 +1,61 @@
+# SPDX-License-Identifier: Apache-2.0
+# Stdlib BEHAVIORAL · nika:write serializes a non-string content: value as
+# compact JSON with no added newline (builtins-v0.1.md §nika:write). The
+# integer, boolean and array read back as their exact JSON text; the object
+# reads back as the same value with no whitespace, and its key order is a
+# reference-engine detail this fixture never asserts. The .json, .txt and
+# .yaml targets show that no extension selects the serializer. Each read
+# waits on its write through a with: edge.
+nika: rt-stdlib-write-json-values
+permits:
+  tools: ["nika:write", "nika:read", "nika:jq"]
+  fs: { write: ["./out/**"], read: ["./out/**"] }
+tasks:
+  put_integer:
+    invoke:
+      tool: "nika:write"
+      args: { path: "./out/integer.json", content: 42 }
+  put_boolean:
+    invoke:
+      tool: "nika:write"
+      args: { path: "./out/boolean.txt", content: false }
+  put_array:
+    invoke:
+      tool: "nika:write"
+      args: { path: "./out/array.txt", content: [1, "x"] }
+  put_object:
+    invoke:
+      tool: "nika:write"
+      args: { path: "./out/object.yaml", content: { z: 1, a: { c: 2, b: 3 } } }
+  get_integer:
+    with:
+      done: ${{ tasks.put_integer.output }}
+    invoke:
+      tool: "nika:read"
+      args: { path: "./out/integer.json" }
+  get_boolean:
+    with:
+      done: ${{ tasks.put_boolean.output }}
+    invoke:
+      tool: "nika:read"
+      args: { path: "./out/boolean.txt" }
+  get_array:
+    with:
+      done: ${{ tasks.put_array.output }}
+    invoke:
+      tool: "nika:read"
+      args: { path: "./out/array.txt" }
+  get_object:
+    with:
+      done: ${{ tasks.put_object.output }}
+    invoke:
+      tool: "nika:read"
+      args: { path: "./out/object.yaml" }
+  object_value:
+    with:
+      text: ${{ tasks.get_object.output }}
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: ${{ with.text }}
+        expression: '{ value: fromjson, compact: ((contains(" ") or contains("\n") or contains("\t") or contains("\r")) | not) }'

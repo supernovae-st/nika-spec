@@ -79,15 +79,34 @@ conformance/tests/stdlib/    stdlib static surface · provider prefixes · extra
 run.json invocation · expected-run.json assertions · determinism rules ·
 see [tests/runtime/README.md](tests/runtime/README.md). They use
 `input.nika`, NOT `input.yaml`, so the static `all` gate ignores
-them by construction. **First measured by command 2026-07-30 — and
-fully green**:
+them by construction. **First measured by command 2026-07-30**:
 [`scripts/runtime-differential.py`](../scripts/runtime-differential.py)
 drives every behavioral fixture through the public doors (`nika run
---json` event-stream projection · `nika trace verify` for the trace
-area) — **54/54 agree at first measure**, and the universe has grown
-green since (the promised-contract pair · the stdlib behavioral
-batches, refusals included — the differential's own summary is the
-live count, never this prose). The measurement earned its keep on the way: two regate
+--json` event-stream projection · `nika trace verify --json` and `nika
+trace outputs --json` for the trace area) — **54/54 agreed at first
+measure** (through the earlier prose verify door). That historical result does
+not qualify subsequently added assertions. The differential's summary
+is the current measured count. `UNSUPPORTED` identifies a fixture whose
+expectation is well-formed but needs an adapter this command runner does
+not provide, or a well-framed engine reply it has no admitted reading for;
+it validates nothing more of that contract, is never `AGREE`, never hides a
+divergence of the same fixture, and makes the suite exit nonzero. Injected
+harness attestations and harness receipts currently require that separate
+adapter. Unknown assertion or invocation keys are fixture errors before
+engine calls.
+Behavioral discovery also reports missing inputs and ambiguous or misspelled
+expectation files; it must not select one of two competing claims. Resume,
+receipt-explanation and energy expectations are recognized only after their
+expectation is one unambiguous JSON object. Malformed JSON, duplicate
+members, invalid UTF-8 and non-JSON/non-finite numbers are `FIXTURE-ERROR`.
+`UNSUPPORTED` for these doors does not certify their remaining contract; it
+is never agreement and keeps the suite nonzero. Run evidence must
+have unique JSON members and event-field keys, consistent unique terminal
+events, a final settlement and the matching process exit. Recursive JSON
+value matching distinguishes booleans from numbers and preserves decimal
+precision; the full comparison and substring rules are in the
+[runtime fixture contract](tests/runtime/README.md).
+The measurement earned its keep on the way: two regate
 fixtures owed their divergence to the HARNESS (the run.json `inputs`
 key never threaded — the engine's SEC-004 regate was right all along) ·
 one fixture asserted a string where the engine's typed value is a
@@ -96,12 +115,77 @@ F-O8 refuses at check first · reworked as the dynamic-host refusal,
 proven at the door) · and six adopted the `mock(echo) · ` output marker
 the spec's own examples already teach.)
 
+The adapter-dependent [observation contracts](tests/runtime/observation-contracts.md)
+add four explicitly collected doors: approval sessions, HTTP transport, the
+compose intrinsic and secret exports. Their entire closed declaration and
+input premises are validated before classification. Valid cases are
+`UNSUPPORTED` before any engine command; malformed declarations are
+`FIXTURE-ERROR`. They specify behavior but are not Runtime agreement. The
+separate command adapter and its observation decoder/judge must be qualified
+before any of these cases can contribute an implementation result. Existing
+run and verify doors keep their own contracts unchanged.
+
+The trace door is the reference engine's JSON report: `nika trace verify
+<journal> --json --color never` on one absolute journal path, read as one
+JSON document framed by its exit (stdout for 0, 2 and 5; `nika: ` and the
+document on stderr for 3), with `verify_version` 1, the same journal path
+and the process exit. A closed table of typed result families decides
+`clean`, `finding`, `incomplete`, `forged` and `refused` (see the [trace
+fixture contract](tests/runtime/trace/README.md)). An absent, malformed,
+contradictory or unbound reply is a divergence, never a verdict read from
+prose or from the exit alone; a torn chain, an unknown family or another
+version is `UNSUPPORTED`. The journal must not change while its commands
+run, or the measurement is invalid. This selects the reference engine's
+transport: another implementation needs its own admitted adapter, never a
+fallback.
+
 Trace fixtures can additionally assert boot-field presence, absence and the
 exact input-origin map with `expected-verify.json.prologue` (see the
 [trace fixture contract](tests/runtime/trace/README.md)). A clean chain does
 not discharge these semantic assertions. The command-level differential
 checks both; a third-party runner must not silently ignore requested
 prologue assertions.
+The prologue assertion object has exactly three optional keys: `present`,
+`absent` and `input_origins`. Unknown keys are fixture errors, including
+misspellings; they must not silently remove an assertion. The command-level
+reader skips blank lines before the first journal event, as the verifier does.
+An unreadable, malformed or non-object initial event leaves the prologue claim
+unsatisfied (`DIVERGE`), separately from the engine's completed verdict.
+
+`expected-verify.json.cost_replay` asserts the separate budget-meaning leg:
+`replayed`, `refused` or `unrecorded`. The command-level differential reads the
+engine's `COST-REPLAY` report from the ordered `lines` of the admitted verify
+report, independently of the chain verdict: exactly one marker at the start
+of a line and, for `replayed`, the explicit re-judgment as the next line of
+the same `lines` entry. A missing, repeated, conflicting or unrecognized
+report, or a continuation taken from another entry or stream, cannot satisfy
+the assertion. It never substitutes a local reading of the pricing pin for
+the engine's actual budget judgment.
+
+`expected-verify.json.items` separately asserts the engine's item-table
+projection through `nika trace outputs <trace> --json --color never` on the
+same journal path, version 2 (`outputs_version: 2`): only each task's `id`
+and `items` are read, and a version-1 projection, whose `error_code` aliased
+the recovery code, is `UNSUPPORTED`. Its task-id map carries
+exact ordered row arrays, or `null` when no complete table may be projected.
+A runner must check the requested tasks and typed row values, reject malformed
+or ambiguous output, and fail if this command is unsupported. A clean chain
+does not discharge item assertions, and a runner must not substitute its own
+page fold for the engine's public projection. Historical and new item
+vocabularies are described in [§17](../spec/17-trace.md).
+
+The expectation document itself must be unambiguous JSON: duplicate object
+keys at any depth and non-JSON numeric constants are fixture errors. If
+`items` is present, it must be a nonempty task-id map; omit it to make no
+item claim. A task's empty array asserts a complete empty table, while
+`null` asserts that no complete table may be projected. Invalid expectations
+fail before invoking the engine and are reported separately from engine errors.
+This includes invalid UTF-8, JSON exponents that overflow to non-finite values,
+and malformed `cost_replay` or `prologue` claims. Prologue presence/absence
+lists contain unique nonempty field names and cannot contradict each other;
+`input_origins` maps nonempty input names to nonempty channel names. An empty
+origin map is a valid exact assertion. No engine is invoked to judge a fixture
+whose assertions cannot be interpreted.
 
 `conformance/tests/lints/` is the **linter-conformance corpus** (the
 03-dag one-obvious-way table is « normative for linters ») · per case
@@ -179,6 +263,18 @@ would let a broken engine pass them — fail-open, the one thing this
 suite exists to refuse. Applied 2026-07-30 to the six class-C fixtures
 (below); the engine-side workaround (choosing narrow tiers) is
 superseded.
+
+## Direct secret output in the reference static verdict
+
+The combined Python verdict includes the Check security refusal already
+specified by `01-envelope.md` §egress: a value in `outputs:` that directly
+references a declared secret is `NIKA-SEC-007`, even with `egress: outputs`.
+This supplements Core validation; it does not redefine Core or the Core
+result returned by `nika:compose`. The rule scans actual CEL references
+in output values, including literal-key access, not text or declaration
+metadata. It does not follow task aliases, resolve secrets, or prove runtime
+masking. A derived value exported through a task and an identity alias are
+separate runtime witnesses; a static pass certifies neither publication.
 
 ## The stdlib STATIC-surface layer (`tests/stdlib/`)
 

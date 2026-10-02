@@ -13,6 +13,49 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed · runtime assertion coverage (2026-09-28)
+
+- Admission refusals now assert the structured error, witness, nonzero exit
+  and absence of execution events. Compact diagnostics are not events.
+- Unsupported injected-harness and receipt contracts remain visible failures
+  instead of silently agreeing; unknown fixture keys fail before execution.
+- Non-array evaluation fixtures use an upstream value so static rejection
+  cannot mask the runtime law. Existing static refusal coverage is preserved.
+
+### Fixed · trace claim boundaries (2026-09-28)
+
+- Misspelled prologue assertion keys are fixture errors before engine calls.
+  Leading blank journal lines no longer hide a valid boot event; an unreadable
+  initial event fails its semantic assertion without blaming the engine.
+- Cost replay binds its re-judgment to the marker's own following line and
+  preserves stdout/stderr boundaries, including unterminated lines.
+
+### Fixed · budget replay and malformed trace claims (2026-09-28)
+
+- The command-level trace runner now judges requested `cost_replay` arms
+  independently of chain integrity, including missing or contradictory reports.
+- Malformed prologue assertions, unknown cost-replay arms, exponent overflow
+  and invalid UTF-8 are fixture errors before any engine invocation.
+
+### Fixed · trace expectation validation (2026-09-28)
+
+- The command-level trace runner rejects duplicate expectation keys,
+  non-JSON numeric constants and empty item-assertion maps before invoking
+  the engine. Invalid fixtures are reported separately from engine failures;
+  explicit empty tables and unrecorded tables remain distinct valid claims.
+
+### Changed · abandoned fan-out iterations (2026-09-28)
+
+- §§03 and 17 distinguish a started iteration abandoned before a recorded
+  terminal (`cancelled`) from one whose execution never began (`never_started`).
+  Already recorded outcomes remain intact; fail-fast still stops immediately.
+- Paged item evidence gains `items_cancelled`. Historical tables without that
+  field remain readable only when they contain no cancelled rows. Unknown
+  statuses and inconsistent counts cannot produce a complete item table.
+- This closed-vocabulary extension requires the reference engine's next MINOR
+  after 0.121 and a paired changelog entry. It changes neither workflow syntax
+  nor the trace envelope version, and it makes no physical-wire or billing claim.
+
 ### Added · explicit CSV header order (2026-09-25)
 
 - `nika:convert` documents the implemented `columns` option for CSV emission:

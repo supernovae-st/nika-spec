@@ -1,0 +1,55 @@
+{
+  "source_case": "runs-p2-20260928T080651Z/c7-queued-paged-b8",
+  "source_trace": "runs-p2-20260928T080651Z/c7-queued-paged-b8/.nika/traces/2026-09-28T08-07-12Z-029b.ndjson",
+  "source_trace_sha256": "17a0a4decd6f7d993aed1635023b4dfe6b5c6d74fb181feb502a1dcd5f83be0b",
+  "golden_sha256": "561b09849fb21bddfe5ddcfb29cc9acbd625e083e0245c57a906bd29218d81cf",
+  "engine": {
+    "version": "nika 0.121.0 (a807bfea6)",
+    "binary_sha256": "23de402fd8a70ecc9beb37a5fddd3c24dbc59993eefe1714b56445e6b662aa63",
+    "worktree_head": "a807bfea6ae4903bf42581781e0f53ea8ba60901"
+  },
+  "mutations": [
+    {
+      "line": 6,
+      "kind": "drop-field",
+      "detail": {
+        "kind": "drop-field",
+        "target": "terminal",
+        "key": "items_cancelled"
+      },
+      "removed_or_replaced": ",{\"key\":\"items_cancelled\",\"value\":0}",
+      "line_sha256_before": "3244b9bd5653ac2b1029a8ade37308002e19f9049a168f0908385cd21f614c69",
+      "line_sha256_after": "be2ceb3b02523252b8f0b52d28342fc65e6dccfd6f36a4bc044b95114a6285fd"
+    }
+  ],
+  "rechained_lines": 1,
+  "trace_sha256": "4db23499cc99d1458a141527efcffe62e62461d4e23d32aedc8d8472e34e1762",
+  "derived_by": {
+    "verify": {
+      "argv": [
+        "nika",
+        "trace",
+        "verify",
+        "trace.ndjson",
+        "--color",
+        "never"
+      ],
+      "exit": 0,
+      "stdout_sha256": "9e1521965f2d83d597826914af3836a92d50b7acb9a783b0ef29e3071d3bb194"
+    },
+    "outputs": {
+      "argv": [
+        "nika",
+        "trace",
+        "outputs",
+        "trace.ndjson",
+        "--json",
+        "--color",
+        "never"
+      ],
+      "exit": 0,
+      "stdout_sha256": "18aba32f4e9a77e493845b71d60d537d67956ae30d63eb4db9be76a26e6fd696"
+    }
+  },
+  "verdict_mapping": "root scripts/runtime-differential.py trace_verdict (mirror copy)"
+}

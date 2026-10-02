@@ -1,0 +1,25 @@
+# SPDX-License-Identifier: Apache-2.0
+# Stdlib BEHAVIORAL · a bytes_base64 value must be a string: a number is
+# refused with NIKA-BUILTIN-WRITE-001 (builtins-v0.1.md §nika:write), never
+# written as the JSON of its wrapper object. The object comes from an
+# upstream jq task through with:, so the refusal is an execution verdict.
+# Sibling of 012 (an invalid token) with the same verdict.
+nika: rt-stdlib-write-base64-type-refused
+permits:
+  tools: ["nika:jq", "nika:write"]
+  fs: { write: ["./out/**"] }
+tasks:
+  payload:
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: { number: 7 }
+        expression: "{ bytes_base64: .number }"
+  put:
+    with:
+      value: ${{ tasks.payload.output }}
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/refused.bin"
+        content: ${{ with.value }}

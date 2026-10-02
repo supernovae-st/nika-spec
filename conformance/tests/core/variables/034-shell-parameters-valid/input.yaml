@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: case-034-shell-parameters-valid
+const:
+  seed: hello
+  tool: nika:hash
+tasks:
+  t:
+    exec:
+      shell: for item in a b; do echo ${item} ${arr[0]} ${#arr[@]} ${HOME:-/tmp};
+        done
+permits:
+  exec: true

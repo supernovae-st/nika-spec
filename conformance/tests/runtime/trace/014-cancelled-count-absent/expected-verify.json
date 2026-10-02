@@ -1,0 +1,7 @@
+{
+  "verdict": "clean",
+  "items": {
+    "ask": null
+  },
+  "note": "Derived from 012 by removing items_cancelled (1) from the terminal and recomputing the unkeyed chain. A cancelled row without its count MUST NOT project a complete table."
+}

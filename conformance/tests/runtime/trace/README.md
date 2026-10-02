@@ -27,6 +27,11 @@ walk does not ·
   the journal carries no pin at all. The three arms live at `007`,
   `006` and `001`. The legs never gate each other: a refused
   cost-replay leaves a `clean` walk clean.
+  The command-level differential reads the engine's separate `COST-REPLAY`
+  report from the ordered `lines` of the verify JSON report; missing,
+  ambiguous or unrecognized evidence fails this assertion, and a `replayed`
+  re-judgment must be the next line of its marker's own entry. A known pin
+  alone does not stand in for an actual budget re-judgment.
 - **`prologue`** — `{present: [...], absent: [...]}` over the boot
   manifest's fields (17 §the prologue). It asserts CONTENT, not a
   verdict, which is why it is a field of its own: `absent` is a real
@@ -41,7 +46,10 @@ walk does not ·
   The command-level differential checks these fields independently of the
   chain verdict. Its selftests include negative channel substitutions.
 
-Absent fields mean the fixture makes no claim there.
+Absent fields mean the fixture makes no claim there. The top-level expectation
+keys are closed to `verdict`, `cost_replay`, `prologue`, `items` and descriptive
+`note`. Unknown assertions and misspellings are fixture errors before any engine
+invocation; an adapter cannot silently ignore a claim it does not implement.
 
 `items` optionally maps task ids to the complete expected item arrays, or
 `null` when no complete table may be projected. Fixture `008` is a real
@@ -49,6 +57,40 @@ native fan-out with paged evidence; `009` removes its first page and
 recomputes the unkeyed chain. Both walks are internally consistent, but
 only `008` permits a complete item projection. This is a semantic
 completeness check, not an authenticity claim against coherent rewriting.
+The command-level differential compares these assertions to the engine's
+`nika trace outputs <trace> --json --color never` task projection, version 2
+(`outputs_version: 2`, bound to the same journal path): only each task's
+`id` and `items` are read, and a version-1 projection is `UNSUPPORTED`.
+Unsupported commands, nonzero exits, malformed output and duplicate task
+identities fail the assertion; a runner never silently skips it or
+reconstructs the expected table on the engine's behalf. Row order and typed
+field values matter.
+The expectation JSON must also reject duplicate keys at every depth and
+non-JSON numeric constants. A present `items` map must name at least one
+nonempty task id, with an array or `null` for each value. Omit `items` to make
+no claim; an empty row array is a valid assertion of a complete empty table.
+An invalid expectation is a fixture error, never an engine success or failure.
+Invalid UTF-8 and exponent overflow (for example `1e999`) are fixture errors
+too. A `cost_replay` claim must name one of its three arms; a `prologue` claim
+must be an object with correctly typed field lists and origin map. Presence
+and absence lists use unique nonempty names and cannot claim both for one
+field. These checks all precede the first engine invocation.
+The prologue key set is closed to `present`, `absent` and `input_origins`;
+unknown spellings are errors. Its reader skips leading blank journal lines,
+but never skips a malformed initial event to find a later boot. An unreadable
+initial event fails the prologue claim, without reclassifying the engine call
+as a crash. The prologue is read from the same journal bytes the engine
+commands read; a journal that changes while they run invalidates the
+measurement.
+
+Fixtures `011` and `012` retain actual inline and paged item observations
+with `failed`, `cancelled` and `never_started` rows. `013` is the historical
+zero-cancelled count omission. `014` omits a required cancelled count, `015`
+changes that count, and `016` substitutes an unknown paged status; their
+chains remain consistent but their item projections MUST be incomplete.
+Each case records its source hash, engine pin and exact mutations in
+`provenance.json`. Re-chaining these unkeyed negative fixtures tests the
+reader's semantic completeness rules, never authenticity against rewriting.
 
 Verdict law · four classes, and the first three all mean « the chain
 walks » ·
@@ -83,3 +125,33 @@ A bound fixture costs its bound: `005` carries a 1 MiB line because
 that is the only way to cross a 1 MiB bound. One repeated byte packs to
 about 1.7 KiB, the same trade `yaml-profile/invalid/document-over-cap.nika`
 already makes on the authoring side.
+
+## Command-level reading · the reference engine's JSON report
+
+The command-level differential reads `nika trace verify <journal> --json
+--color never` on one absolute journal path: one JSON document framed by its
+exit (stdout for 0, 2 and 5; `nika: ` and the document on stderr for 3), with
+`verify_version` 1, `trace` equal to that path and `exit` equal to the process
+exit. Only these families yield a verdict; every ladder has `replay`
+`not-asked`. A line that begins with a leg marker (`UNSEALED — `,
+`SEALED — `, `SEAL FORGED — `, `ANCHORED — `, `ANCHOR FORGED — `,
+`REPLAYED — `, …) states that leg: it must agree with the typed field, and a
+refusing leg is always stated. A non-ladder report states no leg, except a
+buried seal's own `SEAL BURIED — ` line.
+
+| report | exit | verdict |
+|---|---|---|
+| ladder `ok`·`unsealed`·`not-present`, `sealed`·`sealed`·`not-present` or `anchored`·`sealed`·`anchored`, headline `intact`, no witness finding | 0 | `clean` |
+| the same ladder with exactly one witness `FINDING — ` line | 0 | `finding` |
+| ladder `ok`·`unsealed`·`not-present`, headline `incomplete`, liveness `alive`, `dead` or `unknown` | 5 | `incomplete` |
+| ladder with a `forged` seal, or `sealed`·`sealed` with an anchor `gap` | 2 | `forged` |
+| `broken` (`BROKEN at line …`) or `buried-seal` (`TAMPERED — …` with its `SEAL BURIED — ` line) | 2 | `forged` |
+| `line-over-long` (the line-bound report, its size above its bound) | 2 | `refused` |
+| `refused` with the exact total-file-bound report for this journal | 3 | `refused` |
+
+A torn headline attests no lifecycle end: it is `UNSUPPORTED` for a `clean`,
+`finding` or `incomplete` claim and a divergence from the others. An
+unattributable seal, an unchained, empty or unreadable journal, and a refusal
+without the file-bound report (a key refusal) agree with no current fixture.
+An unknown family, value or version is `UNSUPPORTED`; any other reply is a
+divergence, never a verdict inferred from its exit.

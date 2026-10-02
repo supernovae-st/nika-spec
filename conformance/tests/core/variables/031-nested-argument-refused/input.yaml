@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: case-031-nested-argument-refused
+const:
+  seed: hello
+  tool: nika:hash
+tasks:
+  t:
+    invoke:
+      tool: nika:hash
+      args:
+        a:
+          b:
+          - ${ const.seed }

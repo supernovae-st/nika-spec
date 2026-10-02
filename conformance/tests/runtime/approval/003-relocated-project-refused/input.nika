@@ -1,0 +1,38 @@
+# SPDX-License-Identifier: Apache-2.0
+{
+  "nika": "approval-single-use",
+  "permits": {
+    "tools": [
+      "nika:prompt",
+      "nika:write"
+    ],
+    "fs": {
+      "write": [
+        "./out/**"
+      ]
+    }
+  },
+  "tasks": {
+    "approve": {
+      "invoke": {
+        "tool": "nika:prompt",
+        "args": {
+          "message": "Write out/approved.txt once?"
+        }
+      }
+    },
+    "effect": {
+      "with": {
+        "approved": "${{ tasks.approve.output }}"
+      },
+      "when": "${{ with.approved == true }}",
+      "invoke": {
+        "tool": "nika:write",
+        "args": {
+          "path": "./out/approved.txt",
+          "content": "approved\n"
+        }
+      }
+    }
+  }
+}

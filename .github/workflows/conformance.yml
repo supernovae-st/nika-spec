@@ -53,6 +53,9 @@ jobs:
           python conformance/corpus_contract_selftest.py
           python conformance/authoring_contract_selftest.py
           python conformance/type_core_selftest.py
+          python conformance/interpolation_core_selftest.py
+          python conformance/http_response_core_selftest.py
+          python conformance/secret_outputs_selftest.py
           python conformance/decision_core_selftest.py
           python conformance/gateway_core_selftest.py
           python conformance/outcome_core_selftest.py
@@ -122,6 +125,8 @@ jobs:
         run: |
           python scripts/lints-differential.py --selftest
           python scripts/runtime-differential.py --selftest
+          python scripts/test_runtime_differential.py
+          python scripts/test_observation_contracts.py
 
       # The 36 gate-matrix fixtures are GENERATED (edit the generator,
       # never the cells) — an ungated lane rots, so the drift gate joins

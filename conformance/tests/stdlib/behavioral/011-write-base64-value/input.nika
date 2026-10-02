@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: Apache-2.0
+# Stdlib BEHAVIORAL · an object content: value with a bytes_base64 key is
+# binary (builtins-v0.1.md §nika:write): the string is decoded to bytes and
+# the other keys are ignored. "YQo=" decodes to the two bytes of "a" and a
+# newline, so the text read back is neither the base64 token nor the
+# wrapper object, and the ignored key never reaches the file.
+nika: rt-stdlib-write-base64-value
+permits:
+  tools: ["nika:write", "nika:read"]
+  fs: { write: ["./out/**"], read: ["./out/**"] }
+tasks:
+  put:
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/decoded.txt"
+        content: { bytes_base64: "YQo=", ignored: "must not appear" }
+  get:
+    with:
+      done: ${{ tasks.put.output }}
+    invoke:
+      tool: "nika:read"
+      args: { path: "./out/decoded.txt" }

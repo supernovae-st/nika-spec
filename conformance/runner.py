@@ -40,6 +40,10 @@
 # Behavioral Runtime/Stdlib fixtures (execution · mock provider) are separate
 # (see 07-conformance.md §Suite status).
 #
+# This also judges the bounded Check security rule for direct secret output
+# (NIKA-SEC-007; 01-envelope §egress), not transitive taint or runtime masking.
+# Core itself is unchanged; runner-protocol.md permits additional Spec layers.
+#
 # This is the canonical ORACLE for Level-1 (Core) conformance · a language
 # engine in any language re-implements the same checks; this reference runner
 # proves the fixture suite is self-consistent and is CI-runnable today.
@@ -63,6 +67,9 @@ from deep_static import deep_static_errors, consent_errors, net_before_exec_erro
 from composition_core import composition_errors
 from trifecta_core import trifecta_errors
 from type_core import type_core_errors
+from interpolation_core import interpolation_errors
+from http_response_core import findings as http_response_findings
+from secret_outputs import secret_output_errors
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "reference"))
 from values_core import values_core_errors  # noqa: E402 · the E-split value-authority layer
@@ -202,7 +209,7 @@ def _fetch_traverse_errors(where: str, args: dict) -> list[dict]:
     err = lambda detail: errs.append({"namespace": "NIKA-BUILTIN",
                                       "category": "validation_error",
                                       "detail": f"{where} · {detail}"})
-    for key in ("mode", "selector", "jq", "body", "form", "multipart"):
+    for key in ("mode", "selector", "jq", "body", "form", "multipart", "headers", "response"):
         if key in args:
             err(f"traverse: excludes {key}: — the crawl emits the fixed page-digest "
                 "shape (builtins-v0.1.md §nika:fetch · traverse)")
@@ -351,6 +358,10 @@ def stdlib_surface_errors(doc: dict, canon: dict) -> list[dict]:
             errs.extend(_fetch_payload_errors(where, args))
             if "traverse" in args:
                 errs.extend(_fetch_traverse_errors(where, args))
+            elif "response" in args:
+                errs.extend({"namespace": "NIKA-BUILTIN", "category": "validation_error",
+                             "detail": f"{where} · {detail}"}
+                            for detail in http_response_findings(args["response"]))
         if isinstance(inv, dict) and inv.get("tool") == "nika:hash":
             args = inv.get("args")
             if isinstance(args, dict):
@@ -1100,7 +1111,9 @@ def validate_workflow(doc: dict, validator: Draft202012Validator,
 
     `canon` enables the Stdlib v0.1 static-surface layer (always on for this
     reference runner · a Core-only engine implements the schema + cross-ref
-    layers and skips it · stdlib fixtures only bind Stdlib-level claims)."""
+    layers and skips it · stdlib fixtures only bind Stdlib-level claims).
+    Additional Check rules include direct-secret output refusal; this does
+    not make the combined verdict a complete confidentiality analysis."""
     errs: list[dict] = []
     for e in validator.iter_errors(doc):
         # Schema violations are spec-rule violations · NIKA-PARSE / validation_error.
@@ -1135,12 +1148,14 @@ def validate_workflow(doc: dict, validator: Draft202012Validator,
         errs.append({"namespace": "NIKA-PARSE", "category": "validation_error",
                      "detail": detail})
     errs.extend(cross_ref_errors(doc))
+    errs.extend(interpolation_errors(doc))
     errs.extend(deep_static_errors(doc, base_dir=base_dir))
     errs.extend(type_core_errors(doc))
     errs.extend(values_core_errors(doc))
     errs.extend(consent_errors(doc))
     errs.extend(net_before_exec_errors(doc))
     errs.extend(trifecta_errors(doc))
+    errs.extend(secret_output_errors(doc))
     errs.extend(composition_errors(doc, base_dir))
     if canon is not None:
         errs.extend(stdlib_surface_errors(doc, canon))

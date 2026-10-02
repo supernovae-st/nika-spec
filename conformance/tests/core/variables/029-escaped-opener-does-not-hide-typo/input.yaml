@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: escaped-opener
+const: { seed: hello }
+tasks:
+  t:
+    infer:
+      prompt: "\\${{ don't }} then ${ const.seed }"

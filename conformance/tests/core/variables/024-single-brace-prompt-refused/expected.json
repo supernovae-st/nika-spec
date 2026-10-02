@@ -1,0 +1,9 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-VAR-005"
+    }
+  ],
+  "note": "04-variables.md: single-brace dotted namespace lookalikes refuse; genuine islands, CEL string literals and ordinary shell/currency text retain their meaning."
+}

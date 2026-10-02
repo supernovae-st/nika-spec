@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: Apache-2.0
+{
+  "nika": "compose-draft",
+  "permits": {
+    "tools": [
+      "nika:jq"
+    ]
+  },
+  "tasks": {
+    "value": {
+      "invoke": {
+        "tool": "nika:jq",
+        "args": {
+          "input": "${{ with.key }}",
+          "expression": "."
+        }
+      },
+      "with": {
+        "key": "${{ secrets.key }}"
+      }
+    }
+  },
+  "secrets": {
+    "key": {
+      "source": "env",
+      "key": "SYNTHETIC_FIXTURE_SECRET"
+    }
+  }
+}

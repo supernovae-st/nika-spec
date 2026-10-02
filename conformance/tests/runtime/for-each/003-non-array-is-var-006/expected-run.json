@@ -1,10 +1,14 @@
 {
  "workflow_state": "failure",
  "tasks": {
+  "source": {
+   "status": "success",
+   "output": "just a string"
+  },
   "work": {
    "status": "failure",
    "error_code": "NIKA-VAR-006"
   }
  },
- "note": "for_each over a non-array is an evaluation type error (03 §for_each semantics)"
+ "note": "An upstream non-array reaches evaluation through with: and fails NIKA-VAR-006 (03 §for_each semantics); a literal const can be refused before runtime."
 }

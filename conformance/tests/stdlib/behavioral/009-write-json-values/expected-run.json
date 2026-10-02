@@ -1,0 +1,18 @@
+{
+  "workflow_state": "success",
+  "tasks": {
+    "put_integer": { "status": "success" },
+    "put_boolean": { "status": "success" },
+    "put_array": { "status": "success" },
+    "put_object": { "status": "success" },
+    "get_integer": { "status": "success", "output": "42" },
+    "get_boolean": { "status": "success", "output": "false" },
+    "get_array": { "status": "success", "output": "[1,\"x\"]" },
+    "get_object": { "status": "success" },
+    "object_value": {
+      "status": "success",
+      "output": { "value": { "z": 1, "a": { "c": 2, "b": 3 } }, "compact": true }
+    }
+  },
+  "note": "Scalars and arrays read back as exact compact JSON text with no trailing newline. The object is compared by value and by the absence of whitespace, never by key order."
+}

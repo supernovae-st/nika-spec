@@ -1,0 +1,8 @@
+{
+  "workflow_state": "failure",
+  "tasks": {
+    "payload": { "status": "success", "output": { "bytes_base64": 7 } },
+    "put": { "status": "failure", "error_code": "NIKA-BUILTIN-WRITE-001" }
+  },
+  "note": "The wrapper holds the number 7, and the write refuses it instead of serializing the object as JSON."
+}

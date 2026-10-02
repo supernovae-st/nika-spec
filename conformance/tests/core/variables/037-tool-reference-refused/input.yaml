@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: case-037-tool-reference-refused
+const:
+  seed: hello
+  tool: nika:hash
+tasks:
+  t:
+    invoke:
+      tool: mcp:server/${ const.tool }
+      args: {}

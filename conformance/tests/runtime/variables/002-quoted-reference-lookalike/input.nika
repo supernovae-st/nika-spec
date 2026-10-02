@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: quoted-reference-lookalike
+permits:
+  tools:
+  - nika:hash
+tasks:
+  hash:
+    invoke:
+      tool: nika:hash
+      args:
+        content: ${{ '${ const.seed }' }}
+        algo: sha256
+        encoding: hex

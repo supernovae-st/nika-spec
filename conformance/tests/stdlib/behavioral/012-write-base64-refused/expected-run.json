@@ -1,0 +1,8 @@
+{
+  "workflow_state": "failure",
+  "tasks": {
+    "payload": { "status": "success", "output": { "bytes_base64": "not valid!" } },
+    "put": { "status": "failure", "error_code": "NIKA-BUILTIN-WRITE-001" }
+  },
+  "note": "The upstream value is the exact wrapper object, and the write refuses its invalid token at execution."
+}

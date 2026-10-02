@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: quoted-lookalike
+tasks:
+  t:
+    infer: { prompt: "${{ '${ const.seed }' }}" }

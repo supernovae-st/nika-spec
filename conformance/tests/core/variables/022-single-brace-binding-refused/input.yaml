@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: typo-binding
+const: { seed: hello }
+tasks:
+  t:
+    with: { value: "${ const.seed }" }
+    infer: { prompt: "${{ with.value }}" }

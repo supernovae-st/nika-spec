@@ -9,6 +9,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+import yaml
+
 sys.path.insert(0, str(Path(__file__).parent))
 from composition_core import composition_errors  # noqa: E402
 
@@ -116,6 +118,26 @@ law("no reader → cross-file laws silent (COMP-001 still fires)",
     and "NIKA-COMP-001" in codes(call("./x-${{y}}.yaml"), None))
 law("retired suffix without reader → COMP-001",
     "NIKA-COMP-001" in codes(call("./child.nika.yaml"), None))
+
+# ── the missing-child fixture's own document, in both oracle modes ──────
+# (tests/deep/composition/010-missing-child) · without a reader, child
+# loading is skipped by design; a file-aware reader refuses the unreadable
+# child, and the same document beside a readable pure child is clean, so
+# the refusal is the absence alone. This proves the oracle's two modes, not
+# the intrinsic's in-memory door or its zero effects.
+MISSING_CHILD = yaml.safe_load(
+    (Path(__file__).parent / "tests" / "deep" / "composition" / "010-missing-child"
+     / "input.yaml").read_text())
+law("missing child without a reader → no finding (child loading skipped)",
+    codes(MISSING_CHILD, None) == set())
+with tempfile.TemporaryDirectory() as td:
+    base = Path(td)
+    law("missing child beside an empty directory → exactly COMP-001",
+        codes(MISSING_CHILD, base) == {"NIKA-COMP-001"})
+    (base / "absent-child.nika").write_text(
+        "nika: ac\ntasks: { think: { infer: { prompt: pure } } }\n")
+    law("the same document beside a readable pure child → clean",
+        codes(MISSING_CHILD, base) == set())
 
 bad = [n for n, ok in CHECKS if not ok]
 print(f"composition-core selftest · {len(CHECKS) - len(bad)}/{len(CHECKS)} laws hold")
