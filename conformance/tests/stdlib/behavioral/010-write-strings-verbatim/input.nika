@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: Apache-2.0
+# Stdlib BEHAVIORAL · a string content: value is written verbatim
+# (builtins-v0.1.md §nika:write). A string that already holds JSON keeps its
+# spacing, key order and single trailing newline in a .yaml target: it is
+# neither encoded a second time nor converted by extension. The string
+# "null" writes that literal text into a .json target, where a present null
+# value would be refused. Each read waits on its write through a with: edge.
+nika: rt-stdlib-write-strings-verbatim
+permits:
+  tools: ["nika:write", "nika:read"]
+  fs: { write: ["./out/**"], read: ["./out/**"] }
+tasks:
+  put_json_text:
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/document.yaml"
+        content: "{\"z\":1, \"a\":2}\n"
+  put_null_text:
+    invoke:
+      tool: "nika:write"
+      args: { path: "./out/null.json", content: "null" }
+  get_json_text:
+    with:
+      done: ${{ tasks.put_json_text.output }}
+    invoke:
+      tool: "nika:read"
+      args: { path: "./out/document.yaml" }
+  get_null_text:
+    with:
+      done: ${{ tasks.put_null_text.output }}
+    invoke:
+      tool: "nika:read"
+      args: { path: "./out/null.json" }

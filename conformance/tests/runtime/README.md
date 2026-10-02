@@ -54,7 +54,9 @@ code and each requested witness, with no workflow or task event. Compact
 check reports and error documents are not runtime events. A contract needing
 injected harness attestations or harness receipts is currently `UNSUPPORTED`
 by that runner, before any engine call; this is a nonzero suite result, never
-agreement. A malformed fixture is separately `FIXTURE-ERROR`.
+agreement. Malformed contracts at the supported run and verify doors are
+separately `FIXTURE-ERROR`; the separate doors named below are classified
+before their full contract is validated.
 
 The run command's evidence must be unambiguous: duplicate JSON members,
 duplicate event-field keys, malformed NDJSON and repeated task or workflow
@@ -80,8 +82,39 @@ Each fixture has exactly one behavioral expectation and its required input:
 run/verify claims and misspelled expectation files fail before invoking the
 engine. Discovery includes malformed neighboring fixtures rather than
 silently dropping them. The separately specified resume, receipt-explanation
-and energy doors are listed as `UNSUPPORTED` by this run/verify adapter;
-they are not counted as agreements or omitted from a complete sweep.
+and energy doors are listed as `UNSUPPORTED` by this run/verify adapter once
+their expectation is one well-formed JSON object; malformed bytes there are
+`FIXTURE-ERROR`. That classification validates nothing more of their
+contract and does not certify a well-formed fixture: they are not counted
+as agreements or omitted from a complete sweep.
+
+A verify verdict needs one positive JSON report consistent with its exit, never
+prose: the command-level runner reads `nika trace verify <journal> --json
+--color never` as one document framed by its exit (stdout for 0, 2 and 5;
+`nika: ` and the document on stderr for 3), bound to the journal path and to
+the process exit, and maps a closed table of typed families to the five
+verdicts ([trace fixture contract](trace/README.md)). An empty, malformed,
+doubled, contradictory or unbound reply never agrees; a torn chain, an
+unknown family or another `verify_version` is `UNSUPPORTED`.
+
+**Qualification boundaries.** The static `fetch.response` fixtures prove
+policy admission only. They do not prove request counts, redirect handling,
+response extraction, retry behavior or output durability. Those claims
+require deterministic transport fixtures with independently observed
+requests. Approval replay requires a multi-command fixture that preserves
+the run and project while varying the operator store. The compose intrinsic
+requires a tool-invocation adapter; running an example that completes with
+`nika:done` does not invoke `nika:compose`. Until the relevant adapter
+executes the contract, report it as unsupported and unqualified, never as
+behavioral agreement.
+
+The [observation contracts](observation-contracts.md) now carry declarative
+success/refusal cases for these doors, including secret export delivery and
+masking. Discovery validates their closed fields and premises; it reports all
+valid cases as `UNSUPPORTED` before any engine invocation. Their existence
+closes the missing corpus declarations, not the missing Runtime observations.
+The current run/verify adapter cannot discharge them. Invalid declarations
+are `FIXTURE-ERROR`, and both categories keep the sweep nonzero.
 
 Runtime type-error fixtures obtain the invalid value from an upstream task
 through `with:`. A statically known invalid constant may be refused at check
@@ -103,6 +136,7 @@ of a false success. `mock/echo` keeps its existing tool-call behavior.
 | `errors/` | retry honors transient-only (the non-transient half is `004-retry-never-on-non-transient` — attempts stays 1 under a declared retry · the TRANSIENT half needs a deterministic transient error and parks behind the HTTP mock, post-announce) + on_codes · on_error.skip preserves the error · recover substitutes BEFORE bindings · DAG-004-class await never deadlocks — **parked**: the engine's check refuses the await shape itself (the corpus's one divergent-by-design row, `errors/recover-task-ref-no-edge` · nika#291), so the runtime contract is unstageable by command until that lands |
 | `agent/` | budget exhaustion = NIKA-AGENT-001/002 with partial in error.details · tool errors feed back EXCEPT security_error (the feed-back half is `003-tool-error-feeds-back` — the final AGENT-001 IS the proof the loop survived the tool error · the security half — a refusal that must END the loop — stays unstageable with mock/echo, which cannot be steered to synthesize an out-of-boundary argument deterministically) · nika:done result: becomes .output |
 | `permits/` | NIKA-SEC-004 at the first out-of-boundary effect · permits:{} = pure compute |
+| `secrets/` | under a jq and an `outputs` egress rule the sanctioned workflow completes and its derive task is observed as the JSON boolean `true` (001 · the workflow's exported value is not asserted: output export and secret masking need their own observed door) · an `outputs:` entry reading the secret itself stays a check refusal (`envelope/secrets-direct-output-egress-refused.nika`) · the absence of the secret's bytes from every export surface needs an adapter that scans exports and trace artifacts, and stays unqualified until then |
 | `variables/` | jq clock forms bind to the immutable `WorkflowStarted` instant, never an ambient host clock |
 | `admission/` | a `required: true` input with no `default:` and no caller value refuses with `NIKA-1708` before any task event (001 · the launch plane of [05 §Error code namespaces](../../../spec/05-errors.md) — the refusal is an admission verdict, so no task exists to retry or catch it) · a supplied value (002) and a declared default beside an absent optional input (003) succeed · Check stays source-only (core/variables/016) |
 | `access-harness/` | an unattested agent seat refuses `infer:` with the failed infer-grade conjuncts; an attested one-shot seat admits the same task · `run.json.harness_attestations` is injected conformance evidence, never host discovery |

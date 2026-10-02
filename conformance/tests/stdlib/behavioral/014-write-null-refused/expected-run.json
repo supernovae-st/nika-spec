@@ -1,0 +1,8 @@
+{
+  "workflow_state": "failure",
+  "tasks": {
+    "missing": { "status": "success", "output": null },
+    "put": { "status": "failure", "error_code": "NIKA-BUILTIN-WRITE-001" }
+  },
+  "note": "The upstream task succeeds with a JSON null, and the write refuses that present null at execution."
+}

@@ -7801,12 +7801,14 @@ resolved content hash differs halts (`approval.content_mismatch` at the
 receipt) · (2) **scoped and TTL'd** — this run × this step × this
 content hash, with a bounded TTL; an expired ticket re-prompts, a
 cross-run replay is refused, and a decided ticket is **single-use for
-the run**: its claim is written once in the operator's HOME and in the
-run's project (`<project>/.nika/approval-claims`, the project a resume
-is already bound to), so a replay is refused from any HOME; a trace
-resumed under the waived chain (`--resume-unverified`) or recorded
-before that binding can reach a fresh store from another project, and
-its TTL bounds it · (3) **rate-limited** — at most N=5
+the run**: a change of the operator's home directory or of the
+project's location creates no new authority to reuse a consumed
+decision. Before a gated effect the engine MUST establish the ticket's
+binding to the resumed run and that its decision was not already
+consumed; where it cannot, it MUST refuse the reuse, and proceeding
+needs a fresh ticket and a new affirmative decision. A
+chain-verification waiver and an unexpired TTL are never substitutes
+for fresh consent · (3) **rate-limited** — at most N=5
 approvals per run; identical prompts dedup (the same content hash rides
 one ticket, attested `dedup`); a heterogeneous batch is refused at
 check (one prompt gates one action of one class); the N+1th prompt is a
@@ -7815,6 +7817,14 @@ decision emits a hash-chained `approval_decided` event (ticket digest ·
 shown hash · decision · remaining TTL · scope), and the digests rise to
 the receipt · (5) **revocable before execution only** — never after:
 the receipt shows what executed under which authority.
+
+**Reference-engine storage note (nonnormative)** · the reference engine
+records approval claims in an operator store and in a store bound to the
+run's project (`<project>/.nika/approval-claims`); those locations are
+implementation details, not the law above. Historical traces and resumes
+that waive chain verification (`--resume-unverified`) need separate
+qualification of their lineage and replay protection: their TTL alone
+does not establish single-use authority.
 
 ## The affirmative-consent law · *normative · NEP-0020*
 
@@ -9498,18 +9508,25 @@ see [tests/runtime/README.md](tests/runtime/README.md). They use
 them by construction. **First measured by command 2026-07-30**:
 [`scripts/runtime-differential.py`](../scripts/runtime-differential.py)
 drives every behavioral fixture through the public doors (`nika run
---json` event-stream projection · `nika trace verify` for the trace
-area) — **54/54 agreed at first measure**. That historical result does
+--json` event-stream projection · `nika trace verify --json` and `nika
+trace outputs --json` for the trace area) — **54/54 agreed at first
+measure** (through the earlier prose verify door). That historical result does
 not qualify subsequently added assertions. The differential's summary
-is the current measured count. `UNSUPPORTED` identifies a valid fixture
-that needs an adapter this command runner does not provide; it is never
-`AGREE` and makes the suite exit nonzero. Injected harness attestations
-and harness receipts currently require that separate adapter. Unknown
-assertion or invocation keys are fixture errors before engine calls.
+is the current measured count. `UNSUPPORTED` identifies a fixture whose
+expectation is well-formed but needs an adapter this command runner does
+not provide, or a well-framed engine reply it has no admitted reading for;
+it validates nothing more of that contract, is never `AGREE`, never hides a
+divergence of the same fixture, and makes the suite exit nonzero. Injected
+harness attestations and harness receipts currently require that separate
+adapter. Unknown assertion or invocation keys are fixture errors before
+engine calls.
 Behavioral discovery also reports missing inputs and ambiguous or misspelled
 expectation files; it must not select one of two competing claims. Resume,
-receipt-explanation and energy expectations require separate adapters and
-are explicitly `UNSUPPORTED` in this run/verify sweep. Run evidence must
+receipt-explanation and energy expectations are recognized only after their
+expectation is one unambiguous JSON object. Malformed JSON, duplicate
+members, invalid UTF-8 and non-JSON/non-finite numbers are `FIXTURE-ERROR`.
+`UNSUPPORTED` for these doors does not certify their remaining contract; it
+is never agreement and keeps the suite nonzero. Run evidence must
 have unique JSON members and event-field keys, consistent unique terminal
 events, a final settlement and the matching process exit. Recursive JSON
 value matching distinguishes booleans from numbers and preserves decimal
@@ -9523,6 +9540,30 @@ number · one premise was unexercisable (ABSENT permits defer to run —
 F-O8 refuses at check first · reworked as the dynamic-host refusal,
 proven at the door) · and six adopted the `mock(echo) · ` output marker
 the spec's own examples already teach.)
+
+The adapter-dependent [observation contracts](tests/runtime/observation-contracts.md)
+add four explicitly collected doors: approval sessions, HTTP transport, the
+compose intrinsic and secret exports. Their entire closed declaration and
+input premises are validated before classification. Valid cases are
+`UNSUPPORTED` before any engine command; malformed declarations are
+`FIXTURE-ERROR`. They specify behavior but are not Runtime agreement. The
+separate command adapter and its observation decoder/judge must be qualified
+before any of these cases can contribute an implementation result. Existing
+run and verify doors keep their own contracts unchanged.
+
+The trace door is the reference engine's JSON report: `nika trace verify
+<journal> --json --color never` on one absolute journal path, read as one
+JSON document framed by its exit (stdout for 0, 2 and 5; `nika: ` and the
+document on stderr for 3), with `verify_version` 1, the same journal path
+and the process exit. A closed table of typed result families decides
+`clean`, `finding`, `incomplete`, `forged` and `refused` (see the [trace
+fixture contract](tests/runtime/trace/README.md)). An absent, malformed,
+contradictory or unbound reply is a divergence, never a verdict read from
+prose or from the exit alone; a torn chain, an unknown family or another
+version is `UNSUPPORTED`. The journal must not change while its commands
+run, or the measurement is invalid. This selects the reference engine's
+transport: another implementation needs its own admitted adapter, never a
+fallback.
 
 Trace fixtures can additionally assert boot-field presence, absence and the
 exact input-origin map with `expected-verify.json.prologue` (see the
@@ -9539,17 +9580,19 @@ unsatisfied (`DIVERGE`), separately from the engine's completed verdict.
 
 `expected-verify.json.cost_replay` asserts the separate budget-meaning leg:
 `replayed`, `refused` or `unrecorded`. The command-level differential reads the
-engine's `COST-REPLAY` verify report independently of the chain verdict. It
-requires an explicit re-judgment for `replayed`; a missing, conflicting or
-unrecognized report cannot satisfy the assertion. It never substitutes a
-local reading of the pricing pin for the engine's actual budget judgment.
-The report's re-judgment line must immediately follow its marker in the same
-output stream; a phrase in an unrelated warning is not evidence. Stdout and
-stderr retain their line boundaries, and a conflicting marker in either stream
-prevents agreement even when the other stream has no final newline.
+engine's `COST-REPLAY` report from the ordered `lines` of the admitted verify
+report, independently of the chain verdict: exactly one marker at the start
+of a line and, for `replayed`, the explicit re-judgment as the next line of
+the same `lines` entry. A missing, repeated, conflicting or unrecognized
+report, or a continuation taken from another entry or stream, cannot satisfy
+the assertion. It never substitutes a local reading of the pricing pin for
+the engine's actual budget judgment.
 
 `expected-verify.json.items` separately asserts the engine's item-table
-projection through `nika trace outputs <trace> --json`. Its task-id map carries
+projection through `nika trace outputs <trace> --json --color never` on the
+same journal path, version 2 (`outputs_version: 2`): only each task's `id`
+and `items` are read, and a version-1 projection, whose `error_code` aliased
+the recovery code, is `UNSUPPORTED`. Its task-id map carries
 exact ordered row arrays, or `null` when no complete table may be projected.
 A runner must check the requested tasks and typed row values, reject malformed
 or ambiguous output, and fail if this command is unsupported. A clean chain
@@ -9646,6 +9689,18 @@ would let a broken engine pass them — fail-open, the one thing this
 suite exists to refuse. Applied 2026-07-30 to the six class-C fixtures
 (below); the engine-side workaround (choosing narrow tiers) is
 superseded.
+
+## Direct secret output in the reference static verdict
+
+The combined Python verdict includes the Check security refusal already
+specified by `01-envelope.md` §egress: a value in `outputs:` that directly
+references a declared secret is `NIKA-SEC-007`, even with `egress: outputs`.
+This supplements Core validation; it does not redefine Core or the Core
+result returned by `nika:compose`. The rule scans actual CEL references
+in output values, including literal-key access, not text or declaration
+metadata. It does not follow task aliases, resolve secrets, or prove runtime
+masking. A derived value exported through a task and an identity alias are
+separate runtime witnesses; a static pass certifies neither publication.
 
 ## The stdlib STATIC-surface layer (`tests/stdlib/`)
 

@@ -1,0 +1,43 @@
+{
+  "contract_version": 1,
+  "law": "stdlib/builtins-v0.1.md#nikafetch",
+  "input": "input.nika",
+  "given": {
+    "method": "GET",
+    "via": "workflow",
+    "response": {
+      "accept": [
+        200,
+        404
+      ]
+    },
+    "mode": "raw",
+    "retry": 2,
+    "keyed": false,
+    "fault": "none",
+    "responses": [
+      {
+        "status": 404,
+        "final_url": "https://example.test/probe",
+        "body": "missing",
+        "headers": {
+          "x-private": "must-not-be-exported"
+        }
+      }
+    ],
+    "sibling": true
+  },
+  "observations": {
+    "outcome": "success",
+    "requests": 1,
+    "attempts": 1,
+    "output": {
+      "status_code": 404,
+      "url": "https://example.test/probe",
+      "body": "missing"
+    },
+    "error": null,
+    "sibling": "retained"
+  },
+  "note": "The transport is a deterministic injected mock, with an independent request journal. Reserved hosts are never contacted. Task attempts do not stand in for observed transport requests."
+}

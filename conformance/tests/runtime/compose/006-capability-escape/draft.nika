@@ -1,0 +1,25 @@
+# SPDX-License-Identifier: Apache-2.0
+{
+  "nika": "compose-draft",
+  "permits": {
+    "tools": [
+      "nika:write"
+    ],
+    "fs": {
+      "write": [
+        "./elsewhere/**"
+      ]
+    }
+  },
+  "tasks": {
+    "effect": {
+      "invoke": {
+        "tool": "nika:write",
+        "args": {
+          "path": "./out/draft-effect.txt",
+          "content": "must-not-be-written"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "contract_version": 1,
+  "law": "stdlib/builtins-v0.1.md#nikacompose--self-check-a-drafted-workflow-agent-loops-only",
+  "input": "draft.nika",
+  "given": {
+    "case": "missing-child",
+    "child": "absent-child.nika"
+  },
+  "observations": {
+    "valid": true,
+    "child_reads": 0,
+    "draft_effects": 0,
+    "secret_findings": "zero",
+    "capability_escapes": "zero",
+    "certificate": true,
+    "saved_check": "NIKA-COMP-001"
+  },
+  "note": "Invoke the loop intrinsic once with this draft; observe its tool result and a fenced child-read/effect monitor. The saved-file check is a distinct door; do not run the draft."
+}

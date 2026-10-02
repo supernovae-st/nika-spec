@@ -40,6 +40,10 @@
 # Behavioral Runtime/Stdlib fixtures (execution · mock provider) are separate
 # (see 07-conformance.md §Suite status).
 #
+# This also judges the bounded Check security rule for direct secret output
+# (NIKA-SEC-007; 01-envelope §egress), not transitive taint or runtime masking.
+# Core itself is unchanged; runner-protocol.md permits additional Spec layers.
+#
 # This is the canonical ORACLE for Level-1 (Core) conformance · a language
 # engine in any language re-implements the same checks; this reference runner
 # proves the fixture suite is self-consistent and is CI-runnable today.
@@ -65,6 +69,7 @@ from trifecta_core import trifecta_errors
 from type_core import type_core_errors
 from interpolation_core import interpolation_errors
 from http_response_core import findings as http_response_findings
+from secret_outputs import secret_output_errors
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "reference"))
 from values_core import values_core_errors  # noqa: E402 · the E-split value-authority layer
@@ -1106,7 +1111,9 @@ def validate_workflow(doc: dict, validator: Draft202012Validator,
 
     `canon` enables the Stdlib v0.1 static-surface layer (always on for this
     reference runner · a Core-only engine implements the schema + cross-ref
-    layers and skips it · stdlib fixtures only bind Stdlib-level claims)."""
+    layers and skips it · stdlib fixtures only bind Stdlib-level claims).
+    Additional Check rules include direct-secret output refusal; this does
+    not make the combined verdict a complete confidentiality analysis."""
     errs: list[dict] = []
     for e in validator.iter_errors(doc):
         # Schema violations are spec-rule violations · NIKA-PARSE / validation_error.
@@ -1148,6 +1155,7 @@ def validate_workflow(doc: dict, validator: Draft202012Validator,
     errs.extend(consent_errors(doc))
     errs.extend(net_before_exec_errors(doc))
     errs.extend(trifecta_errors(doc))
+    errs.extend(secret_output_errors(doc))
     errs.extend(composition_errors(doc, base_dir))
     if canon is not None:
         errs.extend(stdlib_surface_errors(doc, canon))

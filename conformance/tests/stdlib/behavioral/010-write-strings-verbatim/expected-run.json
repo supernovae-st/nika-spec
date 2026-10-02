@@ -1,0 +1,10 @@
+{
+  "workflow_state": "success",
+  "tasks": {
+    "put_json_text": { "status": "success" },
+    "put_null_text": { "status": "success" },
+    "get_json_text": { "status": "success", "output": "{\"z\":1, \"a\":2}\n" },
+    "get_null_text": { "status": "success", "output": "null" }
+  },
+  "note": "The JSON-looking string keeps its space, its key order and its one trailing newline; the four-character string null is text, never a JSON null."
+}

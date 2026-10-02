@@ -1,0 +1,22 @@
+{
+  "contract_version": 1,
+  "law": "spec/10-authority.md#the-two-judges-that-remain",
+  "input": "input.nika",
+  "given": {
+    "decision": "fresh",
+    "operator_store": "same",
+    "project": "same",
+    "lineage": "verified",
+    "answer": "affirmative",
+    "now_ms": 1000,
+    "expires_ms": 2000,
+    "effect_path": "out/approved.txt"
+  },
+  "observations": {
+    "reuse": "not-requested",
+    "fresh_ticket_required": false,
+    "new_decisions": 1,
+    "gated_effects": 1
+  },
+  "note": "Observe the attempted gated effect with an unexpired ticket; stores and project are isolated fixture locations. No ambient approval, real user or home directory is used."
+}

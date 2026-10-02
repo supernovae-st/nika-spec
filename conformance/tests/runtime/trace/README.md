@@ -27,9 +27,11 @@ walk does not ·
   the journal carries no pin at all. The three arms live at `007`,
   `006` and `001`. The legs never gate each other: a refused
   cost-replay leaves a `clean` walk clean.
-  The command-level differential checks the engine's separate `COST-REPLAY`
-  report; missing, ambiguous or unrecognized evidence fails this assertion.
-  A known pin alone does not stand in for an actual budget re-judgment.
+  The command-level differential reads the engine's separate `COST-REPLAY`
+  report from the ordered `lines` of the verify JSON report; missing,
+  ambiguous or unrecognized evidence fails this assertion, and a `replayed`
+  re-judgment must be the next line of its marker's own entry. A known pin
+  alone does not stand in for an actual budget re-judgment.
 - **`prologue`** — `{present: [...], absent: [...]}` over the boot
   manifest's fields (17 §the prologue). It asserts CONTENT, not a
   verdict, which is why it is a field of its own: `absent` is a real
@@ -56,10 +58,13 @@ recomputes the unkeyed chain. Both walks are internally consistent, but
 only `008` permits a complete item projection. This is a semantic
 completeness check, not an authenticity claim against coherent rewriting.
 The command-level differential compares these assertions to the engine's
-`nika trace outputs <trace> --json` task projection. Unsupported commands,
-nonzero exits, malformed output and duplicate task identities fail the
-assertion; a runner never silently skips it or reconstructs the expected
-table on the engine's behalf. Row order and typed field values matter.
+`nika trace outputs <trace> --json --color never` task projection, version 2
+(`outputs_version: 2`, bound to the same journal path): only each task's
+`id` and `items` are read, and a version-1 projection is `UNSUPPORTED`.
+Unsupported commands, nonzero exits, malformed output and duplicate task
+identities fail the assertion; a runner never silently skips it or
+reconstructs the expected table on the engine's behalf. Row order and typed
+field values matter.
 The expectation JSON must also reject duplicate keys at every depth and
 non-JSON numeric constants. A present `items` map must name at least one
 nonempty task id, with an array or `null` for each value. Omit `items` to make
@@ -74,8 +79,9 @@ The prologue key set is closed to `present`, `absent` and `input_origins`;
 unknown spellings are errors. Its reader skips leading blank journal lines,
 but never skips a malformed initial event to find a later boot. An unreadable
 initial event fails the prologue claim, without reclassifying the engine call
-as a crash. Cost reports retain separate stdout/stderr line boundaries, and
-the explicit re-judgment line must follow its marker in the same stream.
+as a crash. The prologue is read from the same journal bytes the engine
+commands read; a journal that changes while they run invalidates the
+measurement.
 
 Fixtures `011` and `012` retain actual inline and paged item observations
 with `failed`, `cancelled` and `never_started` rows. `013` is the historical
@@ -119,3 +125,33 @@ A bound fixture costs its bound: `005` carries a 1 MiB line because
 that is the only way to cross a 1 MiB bound. One repeated byte packs to
 about 1.7 KiB, the same trade `yaml-profile/invalid/document-over-cap.nika`
 already makes on the authoring side.
+
+## Command-level reading · the reference engine's JSON report
+
+The command-level differential reads `nika trace verify <journal> --json
+--color never` on one absolute journal path: one JSON document framed by its
+exit (stdout for 0, 2 and 5; `nika: ` and the document on stderr for 3), with
+`verify_version` 1, `trace` equal to that path and `exit` equal to the process
+exit. Only these families yield a verdict; every ladder has `replay`
+`not-asked`. A line that begins with a leg marker (`UNSEALED — `,
+`SEALED — `, `SEAL FORGED — `, `ANCHORED — `, `ANCHOR FORGED — `,
+`REPLAYED — `, …) states that leg: it must agree with the typed field, and a
+refusing leg is always stated. A non-ladder report states no leg, except a
+buried seal's own `SEAL BURIED — ` line.
+
+| report | exit | verdict |
+|---|---|---|
+| ladder `ok`·`unsealed`·`not-present`, `sealed`·`sealed`·`not-present` or `anchored`·`sealed`·`anchored`, headline `intact`, no witness finding | 0 | `clean` |
+| the same ladder with exactly one witness `FINDING — ` line | 0 | `finding` |
+| ladder `ok`·`unsealed`·`not-present`, headline `incomplete`, liveness `alive`, `dead` or `unknown` | 5 | `incomplete` |
+| ladder with a `forged` seal, or `sealed`·`sealed` with an anchor `gap` | 2 | `forged` |
+| `broken` (`BROKEN at line …`) or `buried-seal` (`TAMPERED — …` with its `SEAL BURIED — ` line) | 2 | `forged` |
+| `line-over-long` (the line-bound report, its size above its bound) | 2 | `refused` |
+| `refused` with the exact total-file-bound report for this journal | 3 | `refused` |
+
+A torn headline attests no lifecycle end: it is `UNSUPPORTED` for a `clean`,
+`finding` or `incomplete` claim and a divergence from the others. An
+unattributable seal, an unchained, empty or unreadable journal, and a refusal
+without the file-bound report (a key refusal) agree with no current fixture.
+An unknown family, value or version is `UNSUPPORTED`; any other reply is a
+divergence, never a verdict inferred from its exit.

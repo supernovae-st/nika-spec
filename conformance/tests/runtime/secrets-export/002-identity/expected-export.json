@@ -1,0 +1,27 @@
+{
+  "contract_version": 1,
+  "law": "spec/01-envelope.md#egress--optional--sanctioned-destinations-declassification",
+  "input": "input.nika",
+  "given": {
+    "case": "identity",
+    "secret": "synthetic-conformance-secret-7f29",
+    "public_sentinel": "public-control"
+  },
+  "observations": {
+    "allowed_outcomes": [
+      "redacted",
+      "refused"
+    ],
+    "derived_value": null,
+    "secret_occurrences": 0,
+    "surfaces": [
+      "stdout",
+      "stderr",
+      "journal",
+      "trace-outputs"
+    ],
+    "public_sentinel": "public-control",
+    "refusal_code": null
+  },
+  "note": "Supply only the named synthetic secret. Observe the workflow export itself and every produced diagnostic/trace surface. A task boolean alone does not satisfy this contract."
+}

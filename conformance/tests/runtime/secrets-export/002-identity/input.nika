@@ -1,0 +1,50 @@
+# SPDX-License-Identifier: Apache-2.0
+{
+  "nika": "secret-export",
+  "permits": {
+    "tools": [
+      "nika:jq"
+    ]
+  },
+  "secrets": {
+    "key": {
+      "source": "env",
+      "key": "SYNTHETIC_FIXTURE_SECRET",
+      "egress": [
+        {
+          "to": "nika:jq"
+        },
+        {
+          "to": "outputs"
+        }
+      ]
+    }
+  },
+  "tasks": {
+    "derive": {
+      "with": {
+        "key": "${{ secrets.key }}"
+      },
+      "invoke": {
+        "tool": "nika:jq",
+        "args": {
+          "input": "${{ with.key }}",
+          "expression": "."
+        }
+      }
+    },
+    "public": {
+      "invoke": {
+        "tool": "nika:jq",
+        "args": {
+          "input": "public-control",
+          "expression": "."
+        }
+      }
+    }
+  },
+  "outputs": {
+    "exported": "${{ tasks.derive.output }}",
+    "public": "${{ tasks.public.output }}"
+  }
+}

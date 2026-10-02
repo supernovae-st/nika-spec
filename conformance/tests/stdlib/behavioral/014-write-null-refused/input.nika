@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: Apache-2.0
+# Stdlib BEHAVIORAL · a present null content: value is refused with
+# NIKA-BUILTIN-WRITE-001 (builtins-v0.1.md §nika:write), never written as
+# the four bytes null. jq over a missing key legally yields null, so check
+# passes and the refusal is an execution verdict (the dataflow of
+# verbs/builtin-write-runtime-gap.nika). An absent content: argument is the
+# separate check refusal of deep/009-write-without-content; 010 writes the
+# string "null" as text.
+nika: rt-stdlib-write-null-refused
+permits:
+  tools: ["nika:jq", "nika:write"]
+  fs: { write: ["./out/**"] }
+const:
+  data:
+    value: 42
+tasks:
+  missing:
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: ${{ const.data }}
+        expression: ".nonexistent_key | .nested_path"
+  put:
+    with:
+      value: ${{ tasks.missing.output }}
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./out/refused.json"
+        content: ${{ with.value }}

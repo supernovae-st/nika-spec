@@ -1,0 +1,51 @@
+{
+  "contract_version": 1,
+  "law": "stdlib/builtins-v0.1.md#nikafetch",
+  "input": "input.nika",
+  "given": {
+    "method": "GET",
+    "via": "workflow",
+    "response": {
+      "accept": [
+        200,
+        404
+      ]
+    },
+    "mode": "raw",
+    "retry": 0,
+    "keyed": false,
+    "fault": "none",
+    "responses": [
+      {
+        "status": 302,
+        "final_url": "https://example.test/probe",
+        "body": "redirect",
+        "headers": {
+          "x-private": "must-not-be-exported"
+        }
+      },
+      {
+        "status": 404,
+        "final_url": "https://user:synthetic@final.example.test/final?q=synthetic#part",
+        "body": "missing",
+        "headers": {
+          "x-private": "must-not-be-exported"
+        }
+      }
+    ],
+    "sibling": false
+  },
+  "observations": {
+    "outcome": "success",
+    "requests": 2,
+    "attempts": 1,
+    "output": {
+      "status_code": 404,
+      "url": "https://final.example.test/final",
+      "body": "missing"
+    },
+    "error": null,
+    "sibling": "not-requested"
+  },
+  "note": "The transport is a deterministic injected mock, with an independent request journal. Reserved hosts are never contacted. Task attempts do not stand in for observed transport requests."
+}

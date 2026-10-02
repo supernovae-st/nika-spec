@@ -1,0 +1,8 @@
+{
+  "workflow_state": "success",
+  "tasks": {
+    "put": { "status": "success" },
+    "get": { "status": "success", "output": "a\n" }
+  },
+  "note": "The decoded bytes are the letter a and one newline: not the token YQo=, not a JSON object, and without the ignored key."
+}

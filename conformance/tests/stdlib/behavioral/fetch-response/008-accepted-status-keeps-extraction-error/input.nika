@@ -1,0 +1,49 @@
+# SPDX-License-Identifier: Apache-2.0
+{
+  "nika": "fetch-observation",
+  "permits": {
+    "tools": [
+      "nika:fetch",
+      "nika:jq"
+    ],
+    "net": {
+      "http": [
+        "example.test",
+        "final.example.test"
+      ]
+    }
+  },
+  "tasks": {
+    "policy": {
+      "invoke": {
+        "tool": "nika:jq",
+        "args": {
+          "input": {
+            "policy": {
+              "accept": [
+                200,
+                404
+              ]
+            }
+          },
+          "expression": ".policy"
+        }
+      }
+    },
+    "probe": {
+      "invoke": {
+        "tool": "nika:fetch",
+        "args": {
+          "url": "https://example.test/probe",
+          "method": "GET",
+          "mode": "jq",
+          "response": "${{ with.policy }}",
+          "jq": "."
+        }
+      },
+      "with": {
+        "policy": "${{ tasks.policy.output }}"
+      }
+    }
+  }
+}

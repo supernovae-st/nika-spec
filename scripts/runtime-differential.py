@@ -17,16 +17,25 @@ surfaces (the binary boundary · never linkage):
   normalization (`task.started:<id>` ↔ kind task_started + task field).
   Each fixture runs in its own throwaway cwd (traces and fs effects stay
   out of the repo).
-- the TRACE door · `nika trace verify <trace.ndjson>` — expected-verify
-  verdicts map to measured surfaces: clean = rc 0 without a marker ·
-  finding = rc 0 with `FINDING — ` · incomplete = rc 5 with
-  `INCOMPLETE — ` · forged = rc 2 · refused = rc 2 with the decode-bound
-  wording « beyond the verifier's » (rc 3 = unchained/missing input · no
-  fixture expects it today).
+- the TRACE door · `nika trace verify <abs trace.ndjson> --json --color
+  never` — one JSON report (`verify_version` 1) framed by its exit (0/2/5
+  on stdout · 3 as `nika: ` + the document on stderr), bound to the staged
+  journal path and to the process exit. A closed table of typed families
+  maps it to clean · finding · incomplete · forged · refused; the witness
+  finding and the cost-replay leg are read from its ordered `lines`. A torn
+  chain, an unknown family or another version is UNSUPPORTED, never a
+  guessed verdict; any other reply is invalid evidence, never forged by its
+  exit alone. Item tables come from `nika trace outputs <same path> --json
+  --color never` (`outputs_version` 2 · only `id` and `items` are read), the
+  prologue from the same frozen journal bytes, which must not change while
+  the commands run.
 
 Verdicts per fixture: AGREE · DIVERGE (each difference named) ·
-ENGINE-ERROR (crash / no events — counted loud, never folded into
-divergence) · FIXTURE-ERROR (invalid expectation, before engine invocation).
+ENGINE-ERROR (crash / timeout / signal / no events / a journal changed under
+measurement — counted loud, never folded into divergence) · FIXTURE-ERROR
+(invalid expectation, before engine invocation) · UNSUPPORTED (a valid
+contract or a well-framed reply this runner has no adapter for — never
+agreement, and never hiding a divergence).
 Exit 0 iff every fixture AGREEs.
 
     NIKA_BIN=/path/to/nika python3 scripts/runtime-differential.py
@@ -34,10 +43,12 @@ Exit 0 iff every fixture AGREEs.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import os
 import pathlib
+import re
 import shutil
 import subprocess
 import sys
@@ -225,23 +236,6 @@ def diff_run(expected: dict, got: dict) -> list[str]:
     return diffs
 
 
-def trace_verdict(rc: int, out: str) -> str:
-    """The verify exit-map, pure — measured again on 0.119.0:
-    forged rides rc 2 · a decode-bound refusal (17 §refused · the walk
-    never ran) rides rc 2 too and only its « beyond the verifier's »
-    wording discriminates · finding exits 0 like clean; incomplete has its
-    own exit 5 since ADR-129, as required by spec 17 (selftest-pinned)."""
-    if rc == 2:
-        return "refused" if "beyond the verifier's" in out else "forged"
-    if rc == 5 and "INCOMPLETE — " in out:
-        return "incomplete"
-    if rc == 0:
-        if "INCOMPLETE — " in out:
-            return "invalid-incomplete-exit=0"
-        return "finding" if "FINDING — " in out else "clean"
-    return f"rc={rc}"
-
-
 def diff_prologue(expected: dict, events: list[dict]) -> list[str]:
     """Assert boot facts separately from chain integrity; never infer origins."""
     if not expected:
@@ -380,7 +374,30 @@ def fixture_door(directory: pathlib.Path) -> str:
     if len(claims) != 1:
         raise InvalidFixture("fixture requires exactly one behavioral expectation")
     claim = claims.pop()
+    if claim in {"expected-approval.json", "expected-http.json",
+                 "expected-compose.json", "expected-export.json"}:
+        # A separate, fully validated observation contract never falls through
+        # to run or verify. Load the pure validator only for these new doors.
+        import importlib.util
+        module_spec = importlib.util.spec_from_file_location(
+            "nika_observation_contracts", pathlib.Path(__file__).with_name("observation_contracts.py"))
+        module = importlib.util.module_from_spec(module_spec)
+        module_spec.loader.exec_module(module)
+        try:
+            capability = module.validate(directory, claim)
+        except (ValueError, TypeError, UnicodeError, OSError) as error:
+            raise InvalidFixture(str(error)) from error
+        raise UnsupportedFixture(f"{capability} requires a qualified command adapter")
     if claim in {"expected-resume.json", "expected-explain.json", "expected-energy.json"}:
+        # A separate door is recognized only once its expectation is one well-formed
+        # JSON object: malformed bytes stay FIXTURE-ERROR, never « unsupported ». The
+        # rest of that door's contract is not validated by this adapter.
+        try:
+            value = strict_json((directory / claim).read_text(encoding="utf-8"))
+        except (ValueError, UnicodeError, OSError) as error:
+            raise InvalidFixture(f"{claim} is not one well-formed JSON document: {error}") from error
+        if not isinstance(value, dict):
+            raise InvalidFixture(f"{claim} must be a JSON object")
         raise UnsupportedFixture(f"{claim} requires a separate command adapter")
     required = {"expected-run.json": "input.nika", "expected-verify.json": "trace.ndjson"}
     if claim not in required:
@@ -586,19 +603,275 @@ def load_trace_expectation(path: pathlib.Path) -> dict:
     return trace_expectation(raw)
 
 
-def cost_replay_verdict(out: str, stderr: str = "") -> str:
-    """Read the public verify report's separate budget leg, never the journal pin."""
-    # A stream boundary is not a continuation of an unterminated line or
-    # of a report in the other stream. Preserve each report's own context.
-    markers = []
-    for stream in (out, stderr):
-        lines = stream.splitlines()
-        markers += [(line, lines[index + 1:index + 2])
-                    for index, line in enumerate(lines)
-                    if line.startswith("COST-REPLAY — ")]
+# The trace door reads the reference engine's own JSON reports. One command
+# yields one report, framed by its exit as the command dispatcher prints it: exit
+# 0, 2 or 5 put the document on stdout; exit 3 puts `nika: ` and the document
+# on stderr. Nothing is read from prose outside that document, and no other
+# version or family inherits a known verdict.
+ENV_PREFIX = "nika: "
+VERIFY_VERSION = 1
+OUTPUTS_VERSION = 2
+LADDER_TIERS = {"ok", "sealed", "anchored", "replayed"}
+FINISH_EXITS = {"broken": 2, "buried-seal": 2, "line-over-long": 2, "refused": 3,
+                "unchained": 3, "empty": 3, "unreadable": 3}
+# (attained tier, seal leg, anchor leg) → the exit of that ladder; any other
+# combination is no report of a keyless, anchor-free, replay-free verify.
+LADDER_ROWS = {
+    ("ok", "unsealed", "not-present"): 0,
+    ("sealed", "sealed", "not-present"): 0,
+    ("anchored", "sealed", "anchored"): 0,
+    ("ok", "forged", "not-present"): 2,
+    ("sealed", "sealed", "gap"): 2,
+    ("ok", "unattributable", "not-present"): 3,
+}
+SEAL_FIELDS = {"unsealed": {}, "sealed": {"key_id": str, "source": str},
+               "forged": {"reason": str}, "unattributable": {"reason": str},
+               "buried": {"line": int, "trailing": int}}
+ANCHOR_FIELDS = {"not-present": {}, "required": {}, "gap": {"reason": str},
+                 "anchored": {"log_index": str, "tree_size": str, "gen_time": str}}
+REPLAY_FIELDS = {"not-asked": {}, "replayed": {}, "diverged": {"reason": str},
+                 "not-attempted": {"reason": str}}
+# The leg a line states by its marker, the most specific first; None marks a value no
+# keyless, anchor-free, replay-free verify produces. A refusing leg must be stated.
+LEG_MARKERS = (
+    ("UNSEALED — ", "seal", "unsealed"), ("SEALED — ", "seal", "sealed"),
+    ("SEAL FORGED — ", "seal", "forged"), ("SEAL UNATTRIBUTABLE — ", "seal", "unattributable"),
+    ("SEAL BURIED — ", "seal", "buried"),
+    ("ANCHORED — rekor index ", "anchor", "anchored"),
+    ("ANCHORED — no sidecar", "anchor", "not-present"),
+    ("ANCHOR FORGED — ", "anchor", "gap"), ("ANCHORED — ", "anchor", None),
+    ("REPLAYED — the journal re-executes identically", "replay", "replayed"),
+    ("REPLAYED — not attempted (pass --replay", "replay", "not-asked"),
+    ("REPLAYED — not attempted: ", "replay", "not-attempted"),
+    ("REPLAY DIVERGED — ", "replay", "diverged"), ("REPLAYED — ", "replay", None),
+)
+STATED_REFUSALS = {("seal", "forged"), ("seal", "unattributable"), ("anchor", "gap")}
+# A headline line belongs to one report family; no report carries a second.
+HEADLINES = ("OK — ", "INCOMPLETE — ", "BROKEN at line ", "TAMPERED — ")
+BOUND_PHRASES = ("beyond the verifier's line bound", "over the journal bound")
+WITNESS = "FINDING — the run exercised effects and carries zero permit_checked frames"
+BROKEN = re.compile(r"BROKEN at line \d+ — ")
+LINE_BOUND = re.compile(r"line \d+ is (\d+) bytes — beyond the verifier's line bound \((\d+) bytes\)")
+FILE_BOUND = re.compile(r"(\d+) bytes — over the journal bound \((\d+) bytes · NEP-0012 law 1 · "
+                        r"a file beyond it is not a run this engine produced\)")
+
+
+class InvalidEvidence(ValueError):
+    """An engine reply that is not one well-typed report of its family."""
+
+
+class InvalidMeasurement(RuntimeError):
+    """The journal changed while its commands ran: no observation is joined."""
+
+
+def decoded(stream) -> str:
+    """Commands return bytes; invalid UTF-8 is invalid evidence, never repaired."""
+    if isinstance(stream, bytes):
+        try:
+            return stream.decode("utf-8")
+        except UnicodeDecodeError as error:
+            raise InvalidEvidence("output is not UTF-8") from error
+    return stream or ""
+
+
+def one_object(text: str) -> dict:
+    """Exactly one strict JSON object, outer whitespace only."""
+    try:
+        document = strict_json(text)
+    except ValueError as error:
+        raise InvalidEvidence(f"not one JSON document ({error})") from error
+    if not isinstance(document, dict):
+        raise InvalidEvidence("the report is not a JSON object")
+    return document
+
+
+def framed_report(proc) -> dict:
+    """The one document a command frames by its exit; no search, no prose fallback."""
+    if proc.returncode < 0:
+        raise RuntimeError(f"killed by signal {-proc.returncode}")
+    stdout, stderr = decoded(proc.stdout), decoded(proc.stderr)
+    if proc.returncode in (0, 2, 5):
+        if stderr.strip():
+            raise InvalidEvidence("stderr beside a stdout report")
+        return one_object(stdout)
+    if proc.returncode != 3:
+        raise InvalidEvidence(f"exit {proc.returncode} frames no report")
+    if stdout.strip():
+        raise InvalidEvidence("stdout beside an ENV report")
+    if not stderr.startswith(ENV_PREFIX):
+        raise InvalidEvidence("an ENV report without its exact frame")
+    return one_object(stderr[len(ENV_PREFIX):])
+
+
+def verify_report(proc, trace: str) -> dict:
+    """The verify document bound to this command: version, subject, exit, lines."""
+    document = framed_report(proc)
+    version = document.get("verify_version")
+    if type(version) is not int:
+        raise InvalidEvidence("verify_version is not an integer")
+    if version != VERIFY_VERSION:
+        raise UnsupportedFixture(f"verify_version {version} has no admitted adapter")
+    if document.get("trace") != trace:
+        raise InvalidEvidence("the report names another trace")
+    if type(document.get("tier")) is not str or not document["tier"]:
+        raise InvalidEvidence("tier is not a nonempty string")
+    if type(document.get("exit")) is not int or document["exit"] != proc.returncode:
+        raise InvalidEvidence("exit does not state the process exit")
+    lines = document.get("lines")
+    if not isinstance(lines, list) or any(type(line) is not str for line in lines):
+        raise InvalidEvidence("lines is not a list of strings")
+    return document
+
+
+def physical(lines: list[str]) -> list[str]:
+    """Every entry's own lines, in order: one entry may hold several."""
+    return [row for entry in lines for row in entry.split("\n")]
+
+
+def headline_line(line: str) -> bool:
+    return line.startswith(HEADLINES) or any(phrase in line for phrase in BOUND_PHRASES)
+
+
+def stated_legs(lines: list[str]) -> list[tuple[str, str | None]]:
+    """The leg each line states by its marker, in order; a line without one states none."""
+    stated = []
+    for line in lines:
+        marker = next(((name, value) for prefix, name, value in LEG_MARKERS
+                       if line.startswith(prefix)), None)
+        if marker:
+            stated.append(marker)
+    return stated
+
+
+def leg(document: dict, name: str, families: dict) -> str:
+    """One typed ladder leg; an unrecognized value has no admitted reading."""
+    value = document.get(name)
+    if not isinstance(value, dict) or type(value.get("tier")) is not str:
+        raise InvalidEvidence(f"{name} is not a typed leg")
+    tier = value["tier"]
+    if tier not in families:
+        raise UnsupportedFixture(f"{name} tier {tier!r} has no admitted reading")
+    for key, kind in families[tier].items():
+        if type(value.get(key)) is not kind:
+            raise InvalidEvidence(f"{name}.{key} is not a {kind.__name__}")
+    return tier
+
+
+def chain_headline(document: dict) -> str:
+    """The chain's own headline, with the liveness only an incomplete one carries."""
+    chain = document.get("chain")
+    if not isinstance(chain, dict):
+        raise InvalidEvidence("chain is not an object")
+    events, head = chain.get("events"), chain.get("head")
+    if type(events) is not int or events < 0 or type(head) is not str or not head:
+        raise InvalidEvidence("chain events or head are mistyped")
+    if type(chain.get("headline")) is not str or "liveness" not in chain:
+        raise InvalidEvidence("chain headline or liveness is missing")
+    headline, liveness = chain["headline"], chain["liveness"]
+    if headline not in ("intact", "torn", "incomplete"):
+        raise UnsupportedFixture(f"chain headline {headline!r} has no admitted reading")
+    if headline != "incomplete":
+        if liveness is not None:
+            raise InvalidEvidence(f"an {headline} chain states a liveness")
+    elif type(liveness) is not str:
+        raise InvalidEvidence("an incomplete chain without its liveness")
+    elif liveness not in ("alive", "dead", "unknown"):
+        raise UnsupportedFixture(f"liveness {liveness!r} has no admitted reading")
+    return headline
+
+
+def ladder_reading(document: dict) -> tuple[str, str]:
+    """A ladder report: its typed legs decide and its owned lines must agree."""
+    headline = chain_headline(document)
+    seal = leg(document, "seal", SEAL_FIELDS)
+    anchor = leg(document, "anchor", ANCHOR_FIELDS)
+    replay = leg(document, "replay", REPLAY_FIELDS)
+    row = (document["tier"], seal, anchor)
+    if replay != "not-asked" or row not in LADDER_ROWS:
+        raise InvalidEvidence(f"tier {row[0]} · seal {seal} · anchor {anchor} · replay {replay} "
+                              "is no report of this invocation")
+    lines = physical(document["lines"])
+    typed = {"seal": seal, "anchor": anchor, "replay": replay}
+    stated = stated_legs(lines)
+    if any(typed[name] != value for name, value in stated):
+        raise InvalidEvidence("a line states a leg its typed field contradicts")
+    if not ({(name, typed[name]) for name in typed} & STATED_REFUSALS) <= set(stated):
+        raise InvalidEvidence("a refusing leg is not stated by its lines")
+    if any(headline_line(line) for line in lines):
+        raise InvalidEvidence("a ladder report carries a headline line")
+    code, exit_code = LADDER_ROWS[row], document["exit"]
+    if code:
+        # A refusing leg keeps its own exit, whatever the lifecycle says.
+        if exit_code != code:
+            raise InvalidEvidence(f"a {seal} seal and {anchor} anchor at exit {exit_code}")
+        return ("verdict", "forged") if code == 2 else ("observation", "unattributable")
+    if headline == "incomplete":
+        if row != ("ok", "unsealed", "not-present") or exit_code != 5:
+            raise InvalidEvidence(f"an incomplete chain with a {seal} seal at exit {exit_code}")
+        return "verdict", "incomplete"
+    if exit_code:
+        raise InvalidEvidence(f"an {headline} chain at exit {exit_code}")
+    if headline == "torn":
+        return "observation", "torn"
+    findings = [line for line in lines if line.startswith("FINDING")]
+    witnesses = [line for line in findings if line.startswith(WITNESS)]
+    if len(witnesses) != len(findings):
+        raise UnsupportedFixture("a finding family this adapter does not read")
+    if len(witnesses) > 1:
+        raise InvalidEvidence("a repeated witness finding")
+    return "verdict", "finding" if witnesses else "clean"
+
+
+def finish_reading(document: dict, trace: str) -> tuple[str, str]:
+    """A non-ladder report: its family, its exit and its own headline line."""
+    tier, exit_code = document["tier"], document["exit"]
+    if any(name in document for name in ("chain", "seal", "anchor", "replay")):
+        raise InvalidEvidence(f"a {tier} report carries a ladder claim")
+    if exit_code != FINISH_EXITS[tier]:
+        raise InvalidEvidence(f"a {tier} report at exit {exit_code}")
+    first, *rest = physical(document["lines"]) or [""]
+    if any(headline_line(line) for line in rest):
+        raise InvalidEvidence(f"a {tier} report carries a second headline")
+    # A finish family states no ladder leg, a buried seal only its own.
+    if stated_legs([first, *rest]) != ([("seal", "buried")] if tier == "buried-seal" else []):
+        raise InvalidEvidence(f"a {tier} report states a ladder leg it does not carry")
+    if tier == "broken" and BROKEN.match(first):
+        return "verdict", "forged"
+    if tier == "buried-seal" and first.startswith("TAMPERED — "):
+        return "verdict", "forged"
+    bound = LINE_BOUND.fullmatch(first)
+    if tier == "line-over-long" and bound and int(bound[1]) > int(bound[2]):
+        return "verdict", "refused"
+    if tier == "refused":
+        # The decode bound is the exact total-file report; a key refusal is not.
+        size = FILE_BOUND.fullmatch(first[len(trace) + 2:]) \
+            if first.startswith(trace + ": ") and not rest else None
+        if size and int(size[1]) > int(size[2]):
+            return "verdict", "refused"
+        return "observation", "refused without the file-bound report"
+    if tier in ("unchained", "empty", "unreadable"):
+        return "observation", tier
+    raise InvalidEvidence(f"a {tier} report without its own headline line")
+
+
+def verify_reading(document: dict, trace: str) -> tuple[str, str]:
+    """A verdict from one admitted family, or a named observation no fixture claims."""
+    tier = document["tier"]
+    if tier in LADDER_TIERS:
+        return ladder_reading(document)
+    if tier in FINISH_EXITS:
+        return finish_reading(document, trace)
+    raise UnsupportedFixture(f"verify tier {tier!r} has no admitted reading")
+
+
+def cost_replay_verdict(lines: list[str]) -> str:
+    """The report's own budget leg: one marker, its continuation in the same entry."""
+    markers = [(rows, index) for rows in (entry.split("\n") for entry in lines)
+               for index, row in enumerate(rows) if row.startswith("COST-REPLAY — ")]
     if len(markers) != 1:
         return "missing-or-ambiguous"
-    marker, following = markers[0]
+    rows, index = markers[0]
+    marker, following = rows[index], rows[index + 1:index + 2]
     if marker.startswith("COST-REPLAY — unrecorded · "):
         return "unrecorded"
     if marker.startswith("COST-REPLAY — REFUSED · "):
@@ -610,79 +883,120 @@ def cost_replay_verdict(out: str, stderr: str = "") -> str:
     return "unrecognized"
 
 
-def journal_prologue(path: pathlib.Path, expected: dict) -> list[str]:
-    """Read only the initial nonempty event; other trace laws stay engine-owned."""
+def journal_prologue(raw: bytes, expected: dict) -> list[str]:
+    """Read only the initial nonempty event of the frozen bytes; other laws stay engine-owned."""
     try:
-        with path.open("rb") as journal:
-            raw = next((line for line in journal if line.strip()), b"")
-        event = json.loads(raw.decode("utf-8"), object_pairs_hook=unique_object,
+        first = next((line for line in raw.split(b"\n") if line.strip()), b"")
+        event = json.loads(first.decode("utf-8"), object_pairs_hook=unique_object,
                            parse_float=finite_float)
         if not isinstance(event, dict):
             raise ValueError("initial event must be an object")
-    except (ValueError, UnicodeError, OSError) as error:
+    except ValueError as error:
         return [f"prologue: cannot read initial event ({error})"]
     return diff_prologue(expected, [event])
 
 
-def diff_items(expected: dict, raw: str) -> list[str]:
+def outputs_tasks(proc, trace: str) -> dict:
+    """The version-2 task projection bound to this journal, by unique task identity."""
+    if proc.returncode < 0:
+        raise RuntimeError(f"trace outputs killed by signal {-proc.returncode}")
+    if proc.returncode:
+        raise InvalidEvidence(f"trace outputs exited {proc.returncode}")
+    stdout, stderr = decoded(proc.stdout), decoded(proc.stderr)
+    if stderr.strip():
+        raise InvalidEvidence("stderr beside the projection")
+    document = one_object(stdout)
+    version = document.get("outputs_version")
+    if type(version) is not int:
+        raise InvalidEvidence("outputs_version is not an integer")
+    if version != OUTPUTS_VERSION:
+        raise UnsupportedFixture(f"outputs_version {version} has no admitted item adapter")
+    if document.get("trace") != trace:
+        raise InvalidEvidence("the projection names another trace")
+    tasks = document.get("tasks")
+    if not isinstance(tasks, list):
+        raise InvalidEvidence("missing task array")
+    by_id = {}
+    for task in tasks:
+        if not isinstance(task, dict) or type(task.get("id")) is not str or not task["id"]:
+            raise InvalidEvidence("malformed task")
+        if task["id"] in by_id:
+            raise InvalidEvidence("duplicate task identity")
+        by_id[task["id"]] = task
+    return by_id
+
+
+def diff_items(expected: dict, by_id: dict) -> list[str]:
     """Judge the engine's item projection, not a second local page fold."""
-    try:
-        document = strict_json(raw)
-        tasks = document.get("tasks") if isinstance(document, dict) else None
-        if not isinstance(tasks, list):
-            raise ValueError("missing task array")
-        by_id = {}
-        for task in tasks:
-            if not isinstance(task, dict) or not isinstance(task.get("id"), str):
-                raise ValueError("malformed task")
-            if task["id"] in by_id:
-                raise ValueError("duplicate task identity")
-            by_id[task["id"]] = task
-    except (ValueError, TypeError) as error:
-        return [f"items: malformed engine projection ({error})"]
     diffs = []
     for task_id, wanted in expected.items():
-        if task_id not in by_id:
-            diffs.append(f"items {task_id}: task absent")
-            continue
-        actual = by_id[task_id].get("items")
+        if task_id not in by_id or "items" not in by_id[task_id]:
+            diffs.append(f"items {task_id}: task or item table absent")
         # JSON equality keeps true distinct from 1 and a numeric index from
         # its string spelling; array order and every row field are asserted.
-        if not json_equal(actual, wanted):
+        elif not json_equal(by_id[task_id]["items"], wanted):
             diffs.append(f"items {task_id}: projection differs from expected table")
     return diffs
 
 
 def judge_trace(engine: str, d: pathlib.Path) -> list[str]:
-    """Differences between the verify verdict and expected-verify.json."""
+    """Differences between the engine's JSON reports and expected-verify.json."""
     if fixture_door(d) != "trace":
         raise InvalidFixture("trace door requires expected-verify.json")
     expected = load_trace_expectation(d / "expected-verify.json")
-    want = expected["verdict"]
-    proc = subprocess.run(
-        [engine, "trace", "verify", str(d / "trace.ndjson"), "--color", "never"],
-        capture_output=True, text=True, timeout=120,
-    )
-    got = trace_verdict(proc.returncode, "\n".join((proc.stdout, proc.stderr)))
-    diffs = [] if got == want else [f"verdict: want {want} · got {got}"]
-    if "cost_replay" in expected:
-        replay = cost_replay_verdict(proc.stdout, proc.stderr)
+    try:
+        journal = (d / "trace.ndjson").resolve(strict=True)
+        frozen = journal.read_bytes()
+    except OSError as error:
+        raise InvalidFixture(f"cannot stage trace.ndjson: {error}") from error
+    # One canonical path and one byte image serve every command and the prologue.
+    trace, digest, want = str(journal), hashlib.sha256(frozen).hexdigest(), expected["verdict"]
+    diffs, unsupported, admitted = [], [], None
+    proc = subprocess.run([engine, "trace", "verify", trace, "--json", "--color", "never"],
+                          capture_output=True, timeout=120)
+    try:
+        report = verify_report(proc, trace)
+        kind, got = verify_reading(report, trace)
+        admitted = report
+    except InvalidEvidence as error:
+        diffs.append(f"verify: invalid evidence ({error})")
+    except UnsupportedFixture as error:
+        unsupported.append(f"verify: {error}")
+    else:
+        if kind == "observation" and got == "torn" and want in ("clean", "finding", "incomplete"):
+            unsupported.append(f"verify: a torn chain attests no lifecycle end for {want}")
+        elif got != want:
+            diffs.append(f"verdict: want {want} · got {got}")
+    if "cost_replay" in expected and admitted is not None:
+        replay = cost_replay_verdict(admitted["lines"])
         if replay != expected["cost_replay"]:
             diffs.append(f"cost_replay: want {expected['cost_replay']} · got {replay}")
     if expected.get("prologue"):
         # This is a semantic assertion over recorded bytes, not a second
         # integrity verifier. The engine's verdict above remains mandatory.
-        diffs += journal_prologue(d / "trace.ndjson", expected["prologue"])
+        diffs += journal_prologue(frozen, expected["prologue"])
     if "items" in expected:
         projection = subprocess.run(
-            [engine, "trace", "outputs", str(d / "trace.ndjson"), "--json", "--color", "never"],
-            capture_output=True, text=True, timeout=120,
+            [engine, "trace", "outputs", trace, "--json", "--color", "never"],
+            capture_output=True, timeout=120,
         )
-        if projection.returncode:
-            diffs.append(f"items: trace outputs exited {projection.returncode}")
-        else:
-            diffs += diff_items(expected["items"], projection.stdout)
-    return diffs
+        try:
+            diffs += diff_items(expected["items"], outputs_tasks(projection, trace))
+        except InvalidEvidence as error:
+            diffs.append(f"items: invalid evidence ({error})")
+        except UnsupportedFixture as error:
+            unsupported.append(f"items: {error}")
+    try:
+        after = hashlib.sha256(journal.read_bytes()).hexdigest()
+    except OSError as error:
+        raise InvalidMeasurement(f"trace.ndjson unreadable after its commands: {error}") from error
+    if after != digest:
+        raise InvalidMeasurement("trace.ndjson changed while its commands ran")
+    if diffs:
+        return diffs + [f"unsupported · {note}" for note in unsupported]
+    if unsupported:
+        raise UnsupportedFixture("; ".join(unsupported))
+    return []
 
 
 def _ev(kind: str, **fields: object) -> str:
@@ -735,20 +1049,95 @@ def selftest() -> int:
                        {"tasks": {"ghost": {"status": "success"}}}, got))))
     checks.append(("a pretty-printed check report is NOT an event stream",
                    parse_events('{\n  "analysis": {}\n}') == []))
-    checks.append(("trace exit-map · clean / finding / forged / other",
-                   trace_verdict(0, "OK — chain intact") == "clean"
-                   and trace_verdict(0, "FINDING — witness absent") == "finding"
-                   and trace_verdict(2, "BROKEN at line 4 — recorded chain") == "forged"
-                   and trace_verdict(3, "") == "rc=3"))
-    # Fixture 004 now requires exit 5 (spec 17); historical exit 0 no longer
-    # discharges that law. Decode-bound refusals retain their exit 2 class.
-    checks.append(("trace exit-map · incomplete requires its own exit 5",
-                   trace_verdict(5, "INCOMPLETE — 9 events · chain intact") == "incomplete"
-                   and trace_verdict(0, "INCOMPLETE — 9 events · chain intact") != "incomplete"
-                   and trace_verdict(5, "") != "incomplete"))
-    checks.append(("trace exit-map · a bound refusal rides rc 2 behind its wording",
-                   trace_verdict(2, "line 2 is 1048890 bytes — beyond the verifier's "
-                                    "line bound (1048576 bytes)") == "refused"))
+    # The trace door's JSON reports (verify v1): a closed table of positive
+    # families; framing, types, subject, exit and owned lines must agree.
+    trace = "/fixtures/case/trace.ndjson"
+    def ladder(lines=(), code=0, headline="intact", liveness=None, tier="ok",
+               seal=None, anchor=None, path=trace, **extra):
+        return json.dumps({"verify_version": 1, "trace": path, "tier": tier, "exit": code,
+                           "chain": {"events": 9, "head": "0123abcd", "headline": headline,
+                                     "liveness": liveness},
+                           "seal": seal or {"tier": "unsealed"},
+                           "anchor": anchor or {"tier": "not-present"},
+                           "replay": {"tier": "not-asked"}, "lines": list(lines), **extra})
+    def finish(tier, code, lines, **extra):
+        return json.dumps({"verify_version": 1, "trace": trace, "tier": tier, "exit": code,
+                           "lines": lines, **extra})
+    def verdict_of(code, stdout, stderr=""):
+        try:
+            report = verify_report(subprocess.CompletedProcess([], code, stdout, stderr), trace)
+            return ":".join(verify_reading(report, trace))
+        except InvalidEvidence:
+            return "invalid"
+        except UnsupportedFixture:
+            return "unsupported"
+    witness = WITNESS + ": the\n  permit witness is absent"
+    forged = {"tier": "forged", "reason": "the signature does not verify"}
+    broken = ["BROKEN at line 4 — recorded chain a · computed b"]
+    file_bound = (f"{trace}: 268435457 bytes — over the journal bound (268435456 bytes · "
+                  "NEP-0012 law 1 · a file beyond it is not a run this engine produced)")
+    for label, code, stdout, stderr, wanted in [
+        ("an intact unsealed ladder is clean", 0, ladder(), "", "verdict:clean"),
+        ("one witness finding is a finding", 0, ladder([witness]), "", "verdict:finding"),
+        ("incomplete has its exit 5 and a liveness", 5,
+         ladder(code=5, headline="incomplete", liveness="dead"), "", "verdict:incomplete"),
+        ("a forged seal leg is forged", 2, ladder(["SEAL FORGED — bad"], 2, seal=forged), "",
+         "verdict:forged"),
+        ("a broken chain is forged", 2, finish("broken", 2, broken), "", "verdict:forged"),
+        ("an append after the seal is forged", 2,
+         finish("buried-seal", 2, ["TAMPERED — 9 events · chain intact · head 0123abcd",
+                                   "SEAL BURIED — the journal carries a run_sealed frame"]),
+         "", "verdict:forged"),
+        ("the line bound is refused", 2,
+         finish("line-over-long", 2,
+                ["line 2 is 1048890 bytes — beyond the verifier's line bound (1048576 bytes)"]),
+         "", "verdict:refused"),
+        ("the file bound is refused in its ENV frame", 3, "",
+         "nika: " + finish("refused", 3, [file_bound]), "verdict:refused"),
+        ("a key refusal is not the decode bound", 3, "",
+         "nika: " + finish("refused", 3, ["no trusted key: the keyring is unreadable"]),
+         "observation:refused without the file-bound report"),
+        ("a torn chain is its own observation", 0, ladder(headline="torn"), "",
+         "observation:torn"),
+        ("an empty exit 2 is no forgery", 2, "", "", "invalid"),
+        ("an arbitrary exit 2 is no forgery", 2, "error: unexpected argument", "", "invalid"),
+        ("prose is no report", 0, "OK — 9 events · chain intact · head 0123abcd", "", "invalid"),
+        ("a stdout report at exit 3 is the wrong frame", 3, finish("refused", 3, [file_bound]),
+         "", "invalid"),
+        ("a warning beside the report is no single report", 0, ladder(), "warning: x",
+         "invalid"),
+        ("two documents are no single report", 0, ladder() + ladder(), "", "invalid"),
+        ("another verify_version is unsupported", 0, ladder(verify_version=2), "",
+         "unsupported"),
+        ("a boolean version is no version", 0, ladder(verify_version=True), "", "invalid"),
+        ("another journal is another subject", 0, ladder(path="/elsewhere/trace.ndjson"), "",
+         "invalid"),
+        ("the stated exit is the process exit", 0, ladder(code=2), "", "invalid"),
+        ("an intact chain cannot exit 5", 5, ladder(code=5), "", "invalid"),
+        ("an incomplete chain cannot exit 0", 0,
+         ladder(headline="incomplete", liveness="dead"), "", "invalid"),
+        ("a forged leg cannot exit 0", 0, ladder(["SEAL FORGED — bad"], seal=forged), "",
+         "invalid"),
+        ("a refusing line contradicts a clean ladder", 0, ladder(["SEAL FORGED — bad"]), "",
+         "invalid"),
+        ("a positive leg line contradicts its typed leg", 0,
+         ladder(["SEALED — the run_sealed signature verifies · key k1 (trusted)"]), "", "invalid"),
+        ("a broken report states no ladder leg", 2,
+         finish("broken", 2, broken + ["ANCHOR FORGED — contradictory diagnostic"]), "",
+         "invalid"),
+        ("a headline line contradicts a ladder", 0,
+         ladder(["OK — 9 events · chain intact · head 0123abcd"]), "", "invalid"),
+        ("a replay result needs --replay", 0, ladder(replay={"tier": "replayed"}), "",
+         "invalid"),
+        ("an unknown verify tier is unsupported", 3, "", "nika: " + finish("unknown", 3, ["?"]),
+         "unsupported"),
+        ("an unknown finding family is unsupported", 0, ladder(["FINDING — a new law"]), "",
+         "unsupported"),
+        ("a repeated witness is no finding", 0, ladder([witness, witness]), "", "invalid"),
+        ("a finish report cannot carry a ladder", 2, finish("broken", 2, broken, chain={}), "",
+         "invalid"),
+    ]:
+        checks.append((f"verify JSON · {label}", verdict_of(code, stdout, stderr) == wanted))
     boot_want = {"present": ["inputs"], "absent": ["seed"],
                  "input_origins": {"supplied": "api-caller", "defaulted": "file"}}
     def boot(origins):
@@ -780,12 +1169,24 @@ def selftest() -> int:
     rows = [{"index": 0, "item": "a", "status": "failed"},
             {"index": 1, "item": "b", "status": "cancelled"},
             {"index": 2, "item": "c", "status": "never_started"}]
-    def item_document(value):
-        return json.dumps({"tasks": [{"id": "fan", "items": value}]})
+    def item_document(value, version=2, path=trace):
+        return json.dumps({"outputs_version": version, "trace": path, "state": "completed",
+                           "liveness": None,
+                           "tasks": [{"id": "fan", "status": "ok", "cause": "normal",
+                                      "error_code": None, "recovered_from": None,
+                                      "items": value}]})
+    def items_diff(wanted, raw, code=0, stderr=""):
+        try:
+            return diff_items(wanted, outputs_tasks(
+                subprocess.CompletedProcess([], code, raw, stderr), trace))
+        except InvalidEvidence as error:
+            return [f"invalid: {error}"]
+        except UnsupportedFixture as error:
+            return [f"unsupported: {error}"]
     checks.append(("exact item projection preserves cancelled versus never_started",
-                   diff_items({"fan": rows}, item_document(rows)) == []))
+                   items_diff({"fan": rows}, item_document(rows)) == []))
     checks.append(("incomplete item table remains unrecorded",
-                   diff_items({"fan": None}, item_document(None)) == []))
+                   items_diff({"fan": None}, item_document(None)) == []))
     for label, value in [
         ("cancelled relabelled never_started", [rows[0], {**rows[1], "status": "never_started"}, rows[2]]),
         ("false completion of missing pages", []),
@@ -795,14 +1196,29 @@ def selftest() -> int:
         ("string index", [{**rows[0], "index": "0"}, *rows[1:]]),
     ]:
         checks.append((f"item assertion refuses {label}",
-                       bool(diff_items({"fan": rows}, item_document(value)))))
+                       bool(items_diff({"fan": rows}, item_document(value)))))
     checks.append(("a complete table cannot stand in for an incomplete one",
-                   bool(diff_items({"fan": None}, item_document(rows)))))
-    for raw in ('{}', '[]', '{', '{"tasks":[]}',
-                '{"tasks":[{"id":"fan"},{"id":"fan"}]}',
-                '{"tasks":[{"id":"fan","items":null,"items":[]}]}'):
-        checks.append(("malformed or absent item projection fails",
-                       bool(diff_items({"fan": rows}, raw))))
+                   bool(items_diff({"fan": None}, item_document(rows)))))
+    head = '{"outputs_version":2,"trace":' + json.dumps(trace) + ','
+    for raw in ('{}', '[]', '{', head + '"tasks":[]}',
+                head + '"tasks":[{"id":"fan","items":null},{"id":"fan","items":null}]}',
+                head + '"tasks":[{"id":"fan","items":null,"items":[]}]}',
+                head + '"tasks":[{"id":"fan"}]}'):
+        checks.append(("malformed, absent or field-less item projection fails",
+                       bool(items_diff({"fan": None}, raw))))
+    checks.append(("outputs version 1 is unsupported, never read as version 2",
+                   items_diff({"fan": rows}, item_document(rows, version=1))[0]
+                   .startswith("unsupported")))
+    for label, raw, code, stderr in [
+        ("a boolean version", item_document(rows, version=True), 0, ""),
+        ("a string version", item_document(rows, version="2"), 0, ""),
+        ("another journal", item_document(rows, path="/elsewhere/trace.ndjson"), 0, ""),
+        ("a nonzero exit", item_document(rows), 3, ""),
+        ("a warning beside it", item_document(rows), 0, "warning: x"),
+    ]:
+        outcome = items_diff({"fan": rows}, raw, code, stderr)
+        checks.append((f"item projection refuses {label}",
+                       bool(outcome) and outcome[0].startswith("invalid")))
     # Exercise the fixture-loading boundary as well as the pure comparator.
     # Ambiguous expectations cannot become agreement by dropping assertions.
     from unittest.mock import patch
@@ -870,42 +1286,40 @@ def selftest() -> int:
         "unrecorded": "COST-REPLAY — unrecorded · the boot frame pins no pricing table",
         "refused": "COST-REPLAY — REFUSED · the pinned pricing table is not this engine's",
         "replayed": "COST-REPLAY — the pinned pricing table is this engine's (known pin)\n"
-                    "  the budget verdict re-judged from the journaled dollars",
+                    "  the budget verdict re-judged from the journaled dollars (re-pricing)",
     }
+    known, phrase = replay_lines["replayed"].split("\n")
+    for wanted, line in replay_lines.items():
+        checks.append((f"cost replay reads {wanted} from its own entry",
+                       cost_replay_verdict(["UNSEALED — no run_sealed frame", line]) == wanted))
+    for label, lines in [
+        ("missing", []),
+        ("unknown", ["COST-REPLAY — unknown"]),
+        ("unjudged pin", [known]),
+        ("conflicting", [replay_lines["replayed"], replay_lines["refused"]]),
+        ("continuation in another entry", [known, phrase]),
+        ("blank before the continuation", [known + "\n\n" + phrase]),
+        ("reordered continuation", [phrase + "\n" + known]),
+        ("indented marker", ["  " + replay_lines["unrecorded"]]),
+    ]:
+        checks.append((f"cost replay refuses {label} evidence",
+                       cost_replay_verdict(lines) not in replay_lines))
+    def staged(scratch, expected, journal=b"{}\n"):
+        fixture = pathlib.Path(scratch)
+        (fixture / "trace.ndjson").write_bytes(journal)
+        (fixture / "expected-verify.json").write_text(json.dumps(expected))
+        return fixture, str((fixture / "trace.ndjson").resolve())
     for wanted in replay_lines:
         for actual, line in replay_lines.items():
             with tempfile.TemporaryDirectory(prefix="nika-cost-selftest-") as scratch:
-                fixture = pathlib.Path(scratch)
-                # These tests double the process; the required input still exists.
-                (fixture / "input.nika").write_text("nika: judge-selftest\n")
-                (fixture / "trace.ndjson").write_text("")
-                (fixture / "expected-verify.json").write_text(json.dumps(
-                    {"verdict": "clean", "cost_replay": wanted}))
+                fixture, path = staged(scratch, {"verdict": "clean", "cost_replay": wanted})
                 with patch("subprocess.run") as invoke:
                     invoke.return_value = subprocess.CompletedProcess(
-                        [], 0, "OK — chain intact\n" + line, "")
+                        [], 0, ladder([line], path=path), "")
                     diffs = judge_trace("unused-engine", fixture)
                     checks.append((f"cost replay {wanted} compared with {actual}",
                                    bool(diffs) == (wanted != actual)
                                    and invoke.call_count == 1))
-    for label, line in [
-        ("missing", ""),
-        ("unknown", "COST-REPLAY — unknown"),
-        ("unjudged pin", "COST-REPLAY — the pinned pricing table is this engine's"),
-        ("conflicting", replay_lines["replayed"] + "\n" + replay_lines["refused"]),
-    ]:
-        with tempfile.TemporaryDirectory(prefix="nika-cost-selftest-") as scratch:
-            fixture = pathlib.Path(scratch)
-            # These tests double the process; the required input still exists.
-            (fixture / "input.nika").write_text("nika: judge-selftest\n")
-            (fixture / "trace.ndjson").write_text("")
-            (fixture / "expected-verify.json").write_text(
-                '{"verdict":"clean","cost_replay":"replayed"}')
-            with patch("subprocess.run") as invoke:
-                invoke.return_value = subprocess.CompletedProcess(
-                    [], 0, "OK — chain intact\n" + line, "")
-                checks.append((f"cost replay refuses {label} evidence",
-                               bool(judge_trace("unused-engine", fixture))))
     # Each semantic claim keeps its own reading failure; a malformed boot
     # does not turn a completed engine command into an engine crash.
     for label, raw, agrees in [
@@ -918,41 +1332,59 @@ def selftest() -> int:
         ("duplicate boot key", b'{"kind":"task_started","kind":"workflow_started","fields":[{"key":"seed","value":7}]}', False),
     ]:
         with tempfile.TemporaryDirectory(prefix="nika-prologue-selftest-") as scratch:
-            fixture = pathlib.Path(scratch)
-            # These tests double the process; the required input still exists.
-            (fixture / "input.nika").write_text("nika: judge-selftest\n")
-            (fixture / "trace.ndjson").write_text("")
-            (fixture / "expected-verify.json").write_text(
-                '{"verdict":"clean","prologue":{"present":["seed"]}}')
-            (fixture / "trace.ndjson").write_bytes(raw)
+            fixture, path = staged(
+                scratch, {"verdict": "clean", "prologue": {"present": ["seed"]}}, raw)
             with patch("subprocess.run") as invoke:
-                invoke.return_value = subprocess.CompletedProcess([], 0, "OK — chain intact\n", "")
+                invoke.return_value = subprocess.CompletedProcess([], 0, ladder(path=path), "")
                 try:
                     differences = judge_trace("unused-engine", fixture)
                     held = (not differences) == agrees and invoke.call_count == 1
                 except (ValueError, TypeError, AttributeError, UnicodeError):
                     held = False
                 checks.append((f"journal prologue reads {label} without misattribution", held))
-    known = replay_lines["replayed"].splitlines()[0]
-    phrase = "  the budget verdict re-judged from the journaled dollars"
-    for label, stdout, stderr, wanted, agrees in [
-        ("unrelated warning", known + "\n", "warning: " + phrase, "replayed", False),
-        ("unrelated following section", known + "\nOTHER\n" + phrase, "", "replayed", False),
-        ("phrase in other stream", known + "\n", phrase, "replayed", False),
-        ("unterminated conflicting reports", replay_lines["unrecorded"], replay_lines["refused"], "unrecorded", False),
-        ("stderr report after unterminated stdout", "OK — chain intact", replay_lines["unrecorded"], "unrecorded", True),
-    ]:
-        with tempfile.TemporaryDirectory(prefix="nika-stream-selftest-") as scratch:
-            fixture = pathlib.Path(scratch)
-            # These tests double the process; the required input still exists.
-            (fixture / "input.nika").write_text("nika: judge-selftest\n")
-            (fixture / "trace.ndjson").write_text("")
-            (fixture / "expected-verify.json").write_text(json.dumps(
-                {"verdict": "clean", "cost_replay": wanted}))
-            with patch("subprocess.run") as invoke:
-                invoke.return_value = subprocess.CompletedProcess([], 0, stdout, stderr)
-                checks.append((f"cost report keeps {label} boundaries",
-                               (not judge_trace("unused-engine", fixture)) == agrees))
+    # One fixture, one class: an unsupported reading never agrees nor hides a
+    # divergence, a journal changed under measurement joins nothing, and the
+    # commands are exactly the two JSON doors on one canonical path.
+    def judged(expected, *replies, mutate=None):
+        with tempfile.TemporaryDirectory(prefix="nika-door-selftest-") as scratch:
+            fixture, path = staged(scratch, expected)
+            answers = iter(replies)
+            def double(argv, **kwargs):
+                if mutate is not None:
+                    (fixture / "trace.ndjson").write_bytes(mutate)
+                return subprocess.CompletedProcess(argv, 0, next(answers)(path), "")
+            with patch("subprocess.run", side_effect=double) as invoke:
+                try:
+                    outcome = "DIVERGE" if judge_trace("engine", fixture) else "AGREE"
+                except UnsupportedFixture:
+                    outcome = "UNSUPPORTED"
+                except InvalidMeasurement:
+                    outcome = "INVALID-MEASUREMENT"
+                return outcome, [call.args[0] for call in invoke.call_args_list], path
+    clean = lambda path: ladder(path=path)
+    torn = lambda path: ladder(headline="torn", path=path)
+    version_1 = lambda path: item_document(rows, version=1, path=path)
+    version_2 = lambda path: item_document(rows, path=path)
+    outcome, calls, path = judged({"verdict": "clean", "items": {"fan": rows}}, clean, version_2)
+    checks.append(("the doors are exactly verify --json and outputs --json on one path",
+                   outcome == "AGREE" and calls == [
+                       ["engine", "trace", "verify", path, "--json", "--color", "never"],
+                       ["engine", "trace", "outputs", path, "--json", "--color", "never"]]))
+    checks.append(("no item claim issues no projection command",
+                   judged({"verdict": "clean"}, clean)[1][1:] == []))
+    checks.append(("a torn chain cannot discharge clean",
+                   judged({"verdict": "clean"}, torn)[0] == "UNSUPPORTED"))
+    checks.append(("a torn chain still diverges from forged",
+                   judged({"verdict": "forged"}, torn)[0] == "DIVERGE"))
+    checks.append(("version-1 items are unsupported, never agreement",
+                   judged({"verdict": "clean", "items": {"fan": rows}}, clean, version_1)[0]
+                   == "UNSUPPORTED"))
+    checks.append(("an unsupported door never hides a divergence",
+                   judged({"verdict": "forged", "items": {"fan": rows}}, clean, version_1)[0]
+                   == "DIVERGE"))
+    checks.append(("a journal changed under measurement joins nothing",
+                   judged({"verdict": "clean"}, clean, mutate=b"{}\n{}\n")[0]
+                   == "INVALID-MEASUREMENT"))
     checks.append(("compact check reports and errors are not events",
                    parse_events('{"clean":false}\n{"error":{"code":"NIKA-1708"}}') == []))
     admission = {"admission": {"accepted": False, "error_code": "NIKA-1708",
@@ -1028,7 +1460,7 @@ def main(argv: list[str]) -> int:
     root = RUNTIME
     if len(argv) > 1:
         root = SPEC_ROOT / "conformance" / "tests" / argv[1].removeprefix("conformance/tests/")
-    markers = {"input.nika", "run.json", "trace.ndjson"}
+    markers = {"input.nika", "draft.nika", "run.json", "trace.ndjson"}
     dirs = sorted({p.parent for p in root.rglob("*") if p.is_file() and (
         p.name in markers or (p.name.startswith("expected-") and p.name != "expected-lints.json"))})
     if not dirs:
