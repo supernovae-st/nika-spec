@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-012",
+      "category": "security_error"
+    }
+  ],
+  "note": "10 §the effect vocabulary (same-path mutations) · write and remove of one lexical key (./out/a/../note ≡ out//note) with no precedence path race"
+}

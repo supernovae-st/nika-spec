@@ -312,6 +312,9 @@ for _tool, _args in [
     ("nika:image_fx", '{ input: "a.png", ops: ["dither"], out: "./out/${{ with.d }}.png" }'),
     ("nika:image_generate", '{ prompt: "${{ with.d }}", output_dir: "./out" }'),
     ("nika:tts_generate", '{ text: "${{ with.d }}", output_dir: "./out" }'),
+    # Removal is a write effect: an attacker-chosen path deletes a file the
+    # operator did not choose.
+    ("nika:remove_file", '{ path: "./out/${{ with.d }}.txt" }'),
 ]:
     _v = judge(f"""
 nika: media

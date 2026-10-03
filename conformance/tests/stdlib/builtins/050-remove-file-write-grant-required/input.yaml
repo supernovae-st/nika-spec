@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+# The callable is granted and the path is readable, but nothing grants write.
+nika: remove-file-write-grant-required
+permits:
+  tools: ["nika:remove_file"]
+  fs: { read: ["./out/**"] }
+tasks:
+  drop:
+    invoke:
+      tool: "nika:remove_file"
+      args: { path: "./out/stale.txt" }

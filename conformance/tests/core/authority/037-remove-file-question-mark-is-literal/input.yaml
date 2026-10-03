@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: remove-file-question-mark-is-literal
+permits:
+  tools: ["nika:remove_file"]
+  fs: { write: ["out/?.txt"] }
+tasks:
+  drop:
+    invoke:
+      tool: "nika:remove_file"
+      args: { path: "out/a.txt" }

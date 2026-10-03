@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-004",
+      "category": "security_error"
+    }
+  ],
+  "note": "10 §the permit-parameterization taint (canonical form) · a relative bound and an absolute path are different trees · ** never consumes the root"
+}

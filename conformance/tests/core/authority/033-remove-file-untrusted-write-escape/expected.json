@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-AUTH-008",
+      "category": "security_error"
+    }
+  ],
+  "note": "NEP-0004 law 2 · the caller-replaceable default is untrusted and escapes the write bound · AUTH-008, not SEC-004"
+}

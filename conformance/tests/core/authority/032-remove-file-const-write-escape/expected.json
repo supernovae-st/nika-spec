@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-004",
+      "category": "security_error"
+    }
+  ],
+  "note": "01 §permits · a whole bare const reference is a check-time value · its declared string escapes the write bound"
+}

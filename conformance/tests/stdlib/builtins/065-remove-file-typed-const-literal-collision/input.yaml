@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: remove-file-typed-const-literal-collision
+const:
+  target: { type: { enum: ["out/note"] }, value: "out/note" }
+permits:
+  tools: ["nika:write", "nika:remove_file"]
+  fs: { write: ["./out/**"] }
+tasks:
+  put:
+    invoke:
+      tool: "nika:write"
+      args: { path: "./out/note", content: "draft" }
+  drop:
+    invoke:
+      tool: "nika:remove_file"
+      args: { path: "${{ const.target }}" }

@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-012",
+      "category": "security_error"
+    }
+  ],
+  "note": "10 §the effect vocabulary (same-path mutations) · two whole bare references to one immutable input are the same key without knowing its value · unordered remove/remove races"
+}

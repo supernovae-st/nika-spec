@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: remove-file-affirmative
+permits:
+  tools: ["nika:prompt", "nika:remove_file"]
+  fs: { write: ["./out/**"] }
+tasks:
+  ask:
+    invoke:
+      tool: "nika:prompt"
+      args: { mode: confirm, message: "remove the draft?", default: false }
+  drop:
+    with: { go: "${{ tasks.ask.output }}" }
+    when: ${{ with.go == true }}
+    invoke:
+      tool: "nika:remove_file"
+      args: { path: "./out/draft.txt" }

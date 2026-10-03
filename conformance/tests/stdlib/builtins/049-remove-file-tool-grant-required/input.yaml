@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+# The write bound covers the path, but the callable itself is not granted.
+nika: remove-file-tool-grant-required
+permits:
+  fs: { write: ["./out/**"] }
+tasks:
+  drop:
+    invoke:
+      tool: "nika:remove_file"
+      args: { path: "./out/stale.txt" }

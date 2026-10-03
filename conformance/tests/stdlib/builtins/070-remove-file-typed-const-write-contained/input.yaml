@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: remove-file-typed-const-write-contained
+const:
+  target: { type: { enum: ["out/note"] }, value: "out/note" }
+permits:
+  tools: ["nika:remove_file"]
+  fs: { write: ["./out/**"] }
+tasks:
+  drop:
+    invoke:
+      tool: "nika:remove_file"
+      args: { path: "${{ const.target }}" }

@@ -1,0 +1,18 @@
+{
+  "workflow_state": "failure",
+  "tasks": {
+    "put": {
+      "status": "success",
+      "output": "./out/note.txt"
+    },
+    "drop": {
+      "status": "success",
+      "output": "./out/note.txt"
+    },
+    "get": {
+      "status": "failure",
+      "error_code": "NIKA-BUILTIN-READ-001"
+    }
+  },
+  "note": "builtins-v0.1.md §nika:remove_file · the read-after is an indirect witness with its own read grant · the harness takes no independent disk inventory"
+}

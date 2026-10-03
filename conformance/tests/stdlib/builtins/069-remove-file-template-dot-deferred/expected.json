@@ -1,0 +1,5 @@
+{
+  "valid": true,
+  "errors": [],
+  "note": "builtins-v0.1.md §nika:remove_file · a visible final /. in a templated path is still deferred to the resolved run judgment · static validity claims no runtime success"
+}

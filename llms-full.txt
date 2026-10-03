@@ -289,7 +289,7 @@ declaring it.
 |---|---|---|
 | **Core** | Parses and validates any workflow, builds the graph, resolves every reference, returns typed errors | Linters, editors, static analyzers |
 | **Runtime** | Core, plus executing the verbs | A working engine with its own providers and tools |
-| **Stdlib v0.1** | Runtime, plus the <!-- canon:providers -->17<!-- /canon --> providers, <!-- canon:extract_modes -->10<!-- /canon --> extract modes and <!-- canon:builtins -->28<!-- /canon --> builtins | A full engine, equivalent to the reference |
+| **Stdlib v0.1** | Runtime, plus the <!-- canon:providers -->17<!-- /canon --> providers, <!-- canon:extract_modes -->10<!-- /canon --> extract modes and <!-- canon:builtins -->29<!-- /canon --> builtins | A full engine, equivalent to the reference |
 
 1. **Learn the words.** [GLOSSARY.md](GLOSSARY.md) gives each term one
    meaning (oracle, gate, golden…).
@@ -877,7 +877,7 @@ a caller receives).
 - **[templates/](./templates/)**: writing your own? Instantiate a
   skeleton (6 valid, slot-marked) instead of starting blank, the
   deterministic path agents follow ([protocol](AGENTS.md))
-- **[stdlib/](./stdlib/)**: the <!-- canon:providers -->17<!-- /canon --> providers · <!-- canon:extract_modes -->10<!-- /canon --> extract modes · <!-- canon:builtins -->28<!-- /canon --> builtins
+- **[stdlib/](./stdlib/)**: the <!-- canon:providers -->17<!-- /canon --> providers · <!-- canon:extract_modes -->10<!-- /canon --> extract modes · <!-- canon:builtins -->29<!-- /canon --> builtins
 - **[examples/](./examples/)**: the numbered path + the jobs, all shipped and CI-gated (the count lives in [examples/manifest.yaml](./examples/manifest.yaml))
 - **[README.md](./README.md)**: why a language · repo layout · governance
 
@@ -1056,7 +1056,7 @@ outputs:                              # what the workflow returns · symmetric t
 | [16 projections](./16-projections.md) | The oracle surface · one canonical projection (graph_format:3) served byte-identical across CLI · LSP · MCP · the LSP semantic document (`semantic_document_format: 1`) wraps it with spans + one-word `reason` · the additive arc (holes · actions · capabilities over the frozen IR) |
 | [17 trace](./17-trace.md) | The run journal · NDJSON frames chained by sha256 (`trace_format: 2` · the prologue manifest · the closed kind vocabulary) · the REQUIRED permit-decision witness (NEP-0007 · granted and refused alike) · the differential check ⇔ run equivalence law · graved from an observed run |
 
-**Stdlib** (versioned independently · not a spec section) · [stdlib/](../stdlib/): **<!-- canon:providers -->17<!-- /canon --> providers · <!-- canon:extract_modes -->10<!-- /canon --> extract modes · <!-- canon:builtins -->28<!-- /canon --> builtins** (6 core · 5 file · 8 data · 2 network · 2 introspection · 4 media).
+**Stdlib** (versioned independently · not a spec section) · [stdlib/](../stdlib/): **<!-- canon:providers -->17<!-- /canon --> providers · <!-- canon:extract_modes -->10<!-- /canon --> extract modes · <!-- canon:builtins -->29<!-- /canon --> builtins**.
 
 ---
 
@@ -2416,7 +2416,7 @@ read_config:
         path: "./config.yaml"
 ```
 
-See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md) for the canonical builtin list (<!-- canon:builtins -->28<!-- /canon --> builtins in v0.1).
+See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md) for the canonical builtin list (<!-- canon:builtins -->29<!-- /canon --> builtins in v0.1).
 
 > **Grouped paths are grammar-legal · v0.1 ships none.** The reference
 > grammar admits `nika:<group>/<tool>` (the `nika:connectome/recall`
@@ -5660,7 +5660,7 @@ these from this file alone.
 | `NIKA-SEC-009` | lethal trifecta complete — the declared boundary grants private read (`fs.read` non-empty) + untrusted ingress (a `nika:fetch` builtin invoked · an `mcp:*` tool invoked · an `agent:` whose whitelist admits ingress · **v2.2: an `exec:` task, `permits.exec` itself the ingress channel**) + external egress (`net.http` non-empty · an escaping `fs.write` glob · `exec` enabled), the untrusted content **reaches** an egress-capable task's effect surface (a realized flow), and no blocking `invoke: nika:prompt` (no `default:`) dominates it · one finding per ungated tainted egress task, witness-named `source → sink` (NEP-0002 v2.0 · the Rule of Two as a static check · SEC-008 stays allocated to the AUTH plane) | `security_error` | false |
 | `NIKA-SEC-010` | the approval-capability law is violated (NEP-0013 · the 6th invariant) — a rate-limited approval burst (`approval.rate_limited` · the N+1th distinct mint of a run, never a queue) · an approval whose resolved content hash differs from the shown hash (`approval.content_mismatch`) · a ticket replayed outside its run/step/hash scope (`approval.scope_mismatch`) · or the static heterogeneous-batch refusal (one prompt whose descendant closure unleashes two or more of `exec · write · net`) | `security_error` | false |
 | `NIKA-SEC-011` | preview-commit divergence — the commit digest recomputed at the sink over the exact bytes about to fire differs from the preview digest judged at resolution (one bit of rendered argv · a permuted context field · a mutated tool argument) · the step refuses fail-closed and the receipt carries `divergence: {preview, commit}` — judged = executed at the action scale (NEP-0015 · F-P6) | `security_error` | false |
-| `NIKA-SEC-012` | unordered shared writes — two tasks incomparable in the DAG closure whose literal `nika:write`/`nika:edit` paths collide with no ordering edge (`after:` · `with:`) to serialize them, or a `for_each` fan writing one constant path · parallelism is safe exactly where the writes are provably disjoint (NEP-0014 law 1 · F-P15) | `security_error` | false |
+| `NIKA-SEC-012` | unordered shared mutations — two tasks incomparable in the DAG closure whose `nika:write`/`nika:edit`/`nika:remove_file` targets collide (a literal path in lexical normal form · a whole bare `const`/`inputs` reference with a string const value or string input default, keyed by that string's lexical normal form · otherwise that reference's own immutable binding identity, distinct from file names) with no precedence path (`with:` · `group` fold · `after:` other than `unwind`) to serialize them, or a `for_each` fan mutating one known path · parallelism is safe exactly where the mutations are provably disjoint (NEP-0014 law 1 · F-P15) | `security_error` | false |
 | `NIKA-SEC-014` | the affirmative-consent law — a confirm-mode human gate (`invoke: nika:prompt` · mode absent or `confirm`) reaches an egress-capable task over a route no affirmative gate closes: a REFUSED confirm settles success with value `false`, so a bare `after: { gate: success }` edge, a `when:` that never reads the answer, and a `when:` provably true on the refusal all let the effect through · the gate is credited only when every route consumes the answer and proves false on it (the Kleene-falsifiable `when:` · `when: false` · a closer confirm gate owns its closure) · an undecidable gate defers to the advisory hint, never a refusal ([10 §the affirmative-consent law](./10-authority.md#the-affirmative-consent-law--normative--nep-0020) · NEP-0020 · P0-2) | `security_error` | false |
 | `NIKA-SEC-015` | the order law — an `exec:` task sits transitively downstream of a net-effecting task (`nika:fetch` · `nika:notify`) over the derived graph (`with:` data edges ∪ `after:` control edges): content the workflow did not author must not reach a shell · the diagnostic names the PATH, which is the witness · **UNCONDITIONAL** — no block declares it and none can disable it ([10 §the unconditional laws](./10-authority.md)) | `security_error` | false |
 | `NIKA-SEC-016` | the effect-safe retry law — a declared `retry:` (`max_attempts > 1`) on a `nika:fetch` whose method replays side effects (`POST` · `PUT` · `DELETE` · `PATCH`) with no `idempotency-key` header: the failure may be ambiguous (the server may have committed before the socket dropped or the error was emitted), so the engine types the keyless call's failures non-transient and the declared retry is refused statically (an `on_codes:` retry would blind-replay regardless of `transient`) · pair an `idempotency-key` header (the receiver dedups the replay) or drop the `retry:` — GET/HEAD retry free ([§the effect-safe retry law](#the-effect-safe-retry-law-normative--issue-1371) · issue #1371) | `security_error` | false |
@@ -6127,7 +6127,7 @@ The stdlib has **independent versioning** ·
 
 - `stdlib/providers-v0.1.md`, the <!-- canon:providers -->17<!-- /canon --> canonical providers for v0.1
 - `stdlib/extract-modes-v0.1.md`, the <!-- canon:extract_modes -->10<!-- /canon --> canonical extract modes for v0.1
-- `stdlib/builtins-v0.1.md`, the <!-- canon:builtins -->28<!-- /canon --> canonical builtins for v0.1
+- `stdlib/builtins-v0.1.md`, the <!-- canon:builtins -->29<!-- /canon --> canonical builtins for v0.1
 
 When the stdlib evolves to v0.2 · those files become `*-v0.2.md` and new versions are published. The core language contract (v1 · no version typed in the file) is unchanged.
 
@@ -6162,15 +6162,15 @@ Selected via a single `model: <provider>/<name>` field. Any other OpenAI-compati
 
 See [stdlib/extract-modes-v0.1.md](../stdlib/extract-modes-v0.1.md).
 
-### Builtins (28)
+### Builtins
 
 6 core (log · emit · assert · prompt · done · wait)
-+ 5 file (read · write · edit · glob · grep)
++ file (read · write · edit · remove_file · glob · grep · the `category: file` rows of [canon/builtins.yaml](../canon/builtins.yaml) · `remove_file` joined in 0.123 · exact regular-file removal, a filesystem write effect)
 + 9 data (jq · json_diff · validate · json_merge_patch · convert · uuid · date · hash · decide · the decision kernel · spec 11 · 2026-07-15)
 + 2 introspection (inspect · view-discriminated · 4 views cost/records/dag_info/threads · compose · agent-loop self-check)
 + 2 network (fetch · notify)
 + 4 media (image_generate · graduate #1 · 2026-07-05 · tts_generate · §Audio · sovereign-first · 2026-07-05 · image_fx · graduate #3 · deterministic artistic effects · 2026-07-09 · chart · graduate #4 · attested deterministic charts · 2026-07-09)
-= **<!-- canon:builtins -->28<!-- /canon --> canonical builtins** (Stdlib v0.1 · consolidated · was 42 · `jq` subsumes 13 data builtins · validators merged into `validate` · `task_status`/`orchestrate`/`locale_lookup` cut · `sleep`+`wait_until` merged into unified `nika:wait` per ADR-087 · `cost`+`records`+`dag_info`+`threads` merged into unified `nika:inspect` per ADR-088 · ZERO capability loss · `decide` joined per spec 11 W-DEC · 2026-07-15)
+= **<!-- canon:builtins -->29<!-- /canon --> canonical builtins** (Stdlib v0.1 · consolidated · was 42 · `jq` subsumes 13 data builtins · validators merged into `validate` · `task_status`/`orchestrate`/`locale_lookup` cut · `sleep`+`wait_until` merged into unified `nika:wait` per ADR-087 · `cost`+`records`+`dag_info`+`threads` merged into unified `nika:inspect` per ADR-088 · ZERO capability loss · `decide` joined per spec 11 W-DEC · 2026-07-15)
 (+ the remaining media class · **deferred** to stdlib v0.x · NOT in the v0.1 count)
 
 See [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md).
@@ -6269,7 +6269,7 @@ See [07-conformance.md](./07-conformance.md). In summary ·
 |---|---|
 | Core | None · only parse + DAG + variable + error · no execution needed |
 | Runtime | Must execute the 4 verbs · provider/tool implementations engine's choice |
-| Stdlib v0.1 | Must ship the <!-- canon:providers -->17<!-- /canon --> providers + <!-- canon:extract_modes -->10<!-- /canon --> extract modes + <!-- canon:builtins -->28<!-- /canon --> builtins |
+| Stdlib v0.1 | Must ship the <!-- canon:providers -->17<!-- /canon --> providers + <!-- canon:extract_modes -->10<!-- /canon --> extract modes + <!-- canon:builtins -->29<!-- /canon --> builtins |
 | Stdlib v0.1+media | RESERVED · enumerated when the media set publishes (stdlib v0.x · the 24 names are not yet normative) |
 
 A v0.1-compliant engine for a workflow author depends on which level they need.
@@ -6314,7 +6314,7 @@ Three nested levels · increasing scope ·
 |---|---|---|
 | **Core** | Parse + validate · DAG semantics · variable resolution · error structure | Linters · spec editors · static analyzers |
 | **Runtime** | Core + verb execution | Working engine (with own provider/tool impls) |
-| **Stdlib v0.1** | Runtime + the <!-- canon:providers -->17<!-- /canon --> providers + <!-- canon:extract_modes -->10<!-- /canon --> extract modes + <!-- canon:builtins -->28<!-- /canon --> builtins | Full reference-impl-equivalent engine |
+| **Stdlib v0.1** | Runtime + the <!-- canon:providers -->17<!-- /canon --> providers + <!-- canon:extract_modes -->10<!-- /canon --> extract modes + <!-- canon:builtins -->29<!-- /canon --> builtins | Full reference-impl-equivalent engine |
 
 A higher level **includes** the lower levels.
 
@@ -6544,7 +6544,7 @@ An engine claims « Stdlib v0.1-compliant » if it satisfies Runtime conformance
 
 1. **Ships all <!-- canon:providers -->17<!-- /canon --> canonical providers** (per [stdlib/providers-v0.1.md](../stdlib/providers-v0.1.md))
 2. **Ships all <!-- canon:extract_modes -->10<!-- /canon --> canonical extract modes** (per [stdlib/extract-modes-v0.1.md](../stdlib/extract-modes-v0.1.md))
-3. **Ships at least all <!-- canon:builtins -->28<!-- /canon --> canonical builtins** (core 6 + file 5 + data 9 + network 2 + introspection 2 + media 4 · the remaining deferred media builtins are optional · the byte-determinism clauses of `nika:image_fx` and `nika:chart` are part of the bar — an engine that cannot honor them is not conformant, no waiver)
+3. **Ships at least all <!-- canon:builtins -->29<!-- /canon --> canonical builtins** (the remaining deferred media builtins are optional · the byte-determinism clauses of `nika:image_fx` and `nika:chart` are part of the bar — an engine that cannot honor them is not conformant, no waiver)
 4. **Passes** all tests in `conformance/tests/stdlib/`
 
 A Stdlib-compliant engine is functionally equivalent to the reference implementation for any workflow that uses only the canonical stdlib elements.
@@ -7781,7 +7781,7 @@ never a parallel list):
 
 | Effect category | Carried by | Granted by |
 |---|---|---|
-| `fs` (read · write) | `nika:read` · `nika:grep` · `nika:write` · `nika:edit` · file-writing media builtins | `permits.fs.read` / `permits.fs.write` (path globs) |
+| `fs` (read · write) | `nika:read` · `nika:grep` · `nika:write` · `nika:edit` · `nika:remove_file` (write · no read) · file-writing media builtins | `permits.fs.read` / `permits.fs.write` (path globs) |
 | `net` | `nika:fetch` · `nika:notify` (webhook) · any URL-reaching builtin | `permits.net.http` (host allowlist · SSRF floor beneath) |
 | `exec` | the `exec:` verb | `permits.exec` (`false` · `true` · program allowlist) |
 | `tools` | the `invoke:` verb surface | `permits.tools` (id globs) |
@@ -7813,6 +7813,35 @@ Two derived facts the engine computes and no author writes:
 **Required ⊆ permitted is judged twice** (per 01 §permits): statically
 at `nika check` (an escape = refusal before any token) and at run time
 (`NIKA-SEC-004` — the dynamic cases a static check cannot see).
+
+**Removal is a write.** `nika:remove_file` carries the `fs` write effect on
+its exact `path:` and nothing else: it needs `permits.fs.write` for that
+path and the tool grant, never `permits.fs.read`, and it rides every law
+a write rides — the taint re-gate, the affirmative-consent law, the
+composition containment, the lethal-trifecta egress leg. The static check
+judges a literal path, or a whole bare `const` reference to a declared
+string, against `permits.fs.write`; a caller-replaceable `inputs` default is
+the taint re-gate's ground, and any other template is judged on its resolved
+value at run time.
+
+**Same-path mutations.** `nika:write`, `nika:edit` and `nika:remove_file`
+mutate their path. Two such tasks on one known target MUST be ordered by a
+precedence path (`with:` · a `group` fold · `after:` other than `unwind`),
+and a `for_each` task MUST NOT fan onto one known target; otherwise the
+check refuses `NIKA-SEC-012`. A target is known in two forms. A literal
+path is keyed by its lexical normal form. A whole bare `const`/`inputs`
+reference whose declaration gives a string — a constant's string value or
+an input's string default — is keyed by that string's lexical normal form
+too, so it collides with an equal literal or with a different binding that
+resolves to it. A reference with no resolvable string keeps the identity of
+its own immutable binding, distinct from every file name and equal only to
+another reference to that binding (resolution and declaration rules still
+judge the reference itself). Every other expression form is unknown and
+never compared. This key is not the write fit: the static fit judges a
+literal or a bare `const` value only, never a caller-replaceable `inputs`
+default, which remains the taint re-gate's ground. Ordered mutations of one path
+are permitted — there is no one-writer rule — and graph order is a
+scheduling fact, never a proof of the filesystem state that results.
 
 ## The unconditional laws · *normative · the `policy:` block is dead*
 
@@ -9600,7 +9629,7 @@ conformance/tests/core/      schema shape · DAG cross-refs · variables · erro
 conformance/tests/deep/      the deep-static layer · CEL EBNF parse · jq compile ·
                              durations · schema-meta · when-form · binding purity ·
                              builtin arg shapes (jq expression · wait XOR · write
-                             content · done placement)
+                             content · done placement · remove_file path)
 conformance/tests/stdlib/    stdlib static surface · provider prefixes · extract
                              modes · builtin names (canon.yaml-derived)
 ```
@@ -9654,6 +9683,13 @@ input premises are validated before classification. Valid cases are
 separate command adapter and its observation decoder/judge must be qualified
 before any of these cases can contribute an implementation result. Existing
 run and verify doors keep their own contracts unchanged.
+
+The run door judges task status, output and exact code; it has no
+filesystem-inventory assertion. A `nika:remove_file` fixture that reports
+its path therefore proves the builtin's reply, not that the file is absent.
+The read-after fixture is an indirect witness with its own read grant.
+Link, special-file, confinement and cancellation behavior needs engine
+tests; no fixture here may add setup keys or `exec:` staging to imitate them.
 
 The trace door is the reference engine's JSON report: `nika trace verify
 <journal> --json --color never` on one absolute journal path, read as one
@@ -10483,7 +10519,7 @@ the market's shelf, one certificate model for both.
 
 # Stdlib v0.1 · Builtins
 
-> **<!-- canon:builtins -->28<!-- /canon --> canonical builtins** shipped with Stdlib v0.1-compliant engines.
+> **<!-- canon:builtins -->29<!-- /canon --> canonical builtins** shipped with Stdlib v0.1-compliant engines.
 > Invoked via `invoke: tool: "nika:<name>"`. Plus the remaining media
 > builtins deferred to stdlib v0.x (opt-in feature flag).
 >
@@ -10519,14 +10555,14 @@ the market's shelf, one certificate model for both.
 | Category | Count | Status |
 |---|---|---|
 | Core | 6 | Required for execution (log · emit · assert · prompt · done · wait) |
-| File | 5 | I/O primitives (read · write · edit · glob · grep) |
+| File | the `category: file` rows of [`canon/builtins.yaml`](../canon/builtins.yaml) | I/O primitives (read · write · edit · remove_file · glob · grep) |
 | Data | 8 | `jq` (THE data language) + 7 capabilities jq can't express (json_diff · validate · json_merge_patch · convert · uuid · date · hash) |
 | Introspection | 2 | Self-awareness · `inspect` (runtime state · 4 views) · `compose` (static check of a drafted workflow · agent loops only) |
 | Network | 2 | fetch (HTTP+extraction) · notify (alerts out) |
 | Media | 4 | `chart` (§Media #4 · deterministic/attested · 2026-07-09) · `image_generate` (§Media · 2026-07-05) · `image_fx` (§Media #3 · deterministic ops chain · 2026-07-09) · `tts_generate` (§Audio · 2026-07-05) — the REST of the media class stays deferred to stdlib v0.x |
-| **Total v0.1** | **<!-- canon:builtins -->28<!-- /canon -->** | |
+| **Total v0.1** | **<!-- canon:builtins -->29<!-- /canon -->** | |
 
-A Stdlib v0.1-compliant engine MUST ship these <!-- canon:builtins -->28<!-- /canon -->.
+A Stdlib v0.1-compliant engine MUST ship these <!-- canon:builtins -->29<!-- /canon -->.
 
 ---
 
@@ -10627,7 +10663,7 @@ Throws · `NIKA-BUILTIN-WAIT-001` on absolute timeout · `-002` if the timestamp
 
 ---
 
-## File builtins (5)
+## File builtins
 
 ### `nika:read`
 ```yaml
@@ -10653,7 +10689,7 @@ The reference engine serializes object keys in sorted order, including nested ob
 
 A present null `content:` is refused with `NIKA-BUILTIN-WRITE-001`; pass the string `"null"` to write that literal text. In a checked workflow, an absent required `content:` argument is refused by `check` with `NIKA-BUILTIN-001`; a reference to a missing upstream value fails before the write with `NIKA-VAR-001`. A direct builtin call without `content:` is also refused with `NIKA-BUILTIN-WRITE-001`.
 
-`overwrite:` defaults **true** · `create_dirs:` defaults **false** — and a false `create_dirs:` is ENFORCED, not ignored: a missing parent directory is refused loudly (a typo'd path surfaces rather than silently materializing a directory tree), so pass `create_dirs: true` to create the parent. **One carve-out, by decision (engine #433 option C): a declared `permits.fs.write` entry covering the target path IS the intent** — the boundary creates the parent tree before the builtin's gate, and the write lands without `create_dirs:` (measured on the reference engine: a literal grant `deep/dir/new.txt` and a glob grant `out/**` both materialize their tree · run green). The refusal keeps its teeth where no declared grant covers the path — and there the boundary itself speaks first: an uncovered write is `NIKA-SEC-004` before the parent gate can. A typo'd path under a *narrow* grant still surfaces (it falls outside the grant → SEC-004); the tree-scatter the enforcement exists to catch cannot hide inside a boundary the author drew. Throws · `NIKA-BUILTIN-WRITE-001` (IO failure, or a missing parent while `create_dirs: false` outside a covering grant · a directory-shaped `path:` — a trailing `/` is `write failed: path not found`, an existing directory is `filesystem I/O error: Is a directory` · a file in the way of `create_dirs:` — `create_dirs failed: path already exists`, the mark an earlier empty write at the directory's path leaves behind, and nothing deletes it; all three measured on the reference engine 0.118.7) · `-002` (`overwrite: false` and the path exists). Both `tool_error` · `transient: false`.
+`overwrite:` defaults **true** · `create_dirs:` defaults **false** — and a false `create_dirs:` is ENFORCED, not ignored: a missing parent directory is refused loudly (a typo'd path surfaces rather than silently materializing a directory tree), so pass `create_dirs: true` to create the parent. **One carve-out, by decision (engine #433 option C): a declared `permits.fs.write` entry covering the target path IS the intent** — the boundary creates the parent tree before the builtin's gate, and the write lands without `create_dirs:` (measured on the reference engine: a literal grant `deep/dir/new.txt` and a glob grant `out/**` both materialize their tree · run green). The refusal keeps its teeth where no declared grant covers the path — and there the boundary itself speaks first: an uncovered write is `NIKA-SEC-004` before the parent gate can. A typo'd path under a *narrow* grant still surfaces (it falls outside the grant → SEC-004); the tree-scatter the enforcement exists to catch cannot hide inside a boundary the author drew. Throws · `NIKA-BUILTIN-WRITE-001` (IO failure, or a missing parent while `create_dirs: false` outside a covering grant · a directory-shaped `path:` — a trailing `/` is `write failed: path not found`, an existing directory is `filesystem I/O error: Is a directory` · a file in the way of `create_dirs:` — `create_dirs failed: path already exists`, the mark an earlier empty write at the directory's path leaves behind, which `nika:write` never removes; all three measured on the reference engine 0.118.7) · `-002` (`overwrite: false` and the path exists). Both `tool_error` · `transient: false`.
 
 ### `nika:edit`
 ```yaml
@@ -10669,6 +10705,75 @@ intent-inversion footgun class). Throws ·
 `NIKA-BUILTIN-EDIT-001` (`find:` matched nothing: an edit that edits
 nothing is an authoring bug · `tool_error` · also a non-integer `count:`) ·
 `-002` (IO failure).
+
+### `nika:remove_file` · exact regular-file removal
+```yaml
+invoke: { tool: "nika:remove_file", args: { path: "./out/scratch.txt" } }
+```
+Remove ONE existing regular file named by `path:` · returns the requested
+path string. The arguments are exactly `{ path: string }`: there is no
+recursive, glob, force, missing-ok or destination option, no alias and no
+`nika:delete`.
+
+**Authority.** Removal is an external filesystem **write** effect. It needs
+the callable's tool grant (`permits.tools`) AND a `permits.fs.write` bound
+containing the exact resolved path. It needs no read grant: no content is
+read, and no parent directory is created. A preceding copy (`nika:read` →
+`nika:write`) needs its own independent read and write grants. Removal joins
+the ordinary authority, taint, consent and composition laws exactly like
+`nika:write`, and the same-path mutation law (`NIKA-SEC-012`): ordered
+mutations of one path are permitted; an incomparable write/remove or
+remove/remove pair on one path, or a `for_each` fan onto one constant path,
+is refused. There is no global one-writer rule.
+
+**Path shape** (judged on the RAW spelling, before any normalization). The
+components are delimited by `/` and the target platform's main separator.
+The path MUST be a non-empty string; it is not trimmed (a single-space file
+name is a name). A trailing separator, a final `.` or `..` component, or a
+root or platform prefix with no file name names a directory and is refused —
+`out/.` is refused even though a pure path API normalizes the final dot
+away. On POSIX a backslash is an ordinary file-name character, never
+silently turned into a separator. `out/./note`, `out/part/../note`,
+`out/...` and ` ` pass the shape rule; the boundary judges them next.
+Wildcard-looking characters (`*` · `?` · `[`) are literal file-name
+characters: one path names one target and is never expanded.
+
+**Execution.** The engine validates, without following links, that an
+existing **regular** entry sits at the resolved path. A missing entry, a
+directory, a symlink (dangling or not), a FIFO or any other special entry
+fails; there is no recursive removal, no content-opening probe and no
+link-following metadata fallback. Confinement to the granted boundary is
+descriptor-relative or carries an equivalent guarantee; a backend that cannot
+provide it refuses. Success reports the requested path only after the backend
+reports the removal. That returned path, or a permit allow, is not
+independent proof of disk state. No atomic inode comparison is promised: the
+leaf may change between validation and unlink, but a substituted symlink
+never redirects the removal to its target.
+
+**Not a transaction.** Copy-then-remove is two effects. A failed publication
+prevents a dependent removal; a removal that fails after a successful
+publication leaves a visible copy. There is no rollback, inode-preserving
+rename, whole-batch atomicity or automatic cleanup, and a cancellation
+without a settled backend result does not prove that nothing was removed.
+
+| Condition | Code | Category · transient |
+|---|---|---|
+| invalid argument object, keys or types, or an invalid **literal** path shape | `NIKA-BUILTIN-001` | `validation_error` · false |
+| invalid resolved args or path shape | `NIKA-BUILTIN-REMOVE_FILE-001` | `validation_error` · false |
+| the permitted operation fails: absent or nonregular entry, unsupported backend, ordinary OS error | `NIKA-BUILTIN-REMOVE_FILE-002` | `tool_error` · false |
+| tool grant or write boundary escaped | `NIKA-SEC-004` | `security_error` · false |
+| the whole `permits:` block absent | `NIKA-AUTH-006` | `security_error` · false |
+| a statically resolved untrusted value escapes | `NIKA-AUTH-008` | `security_error` · false |
+| unordered shared mutation or constant-target fan | `NIKA-SEC-012` | `security_error` · false |
+
+The static path-shape judgment covers literal paths only. The shape of a
+templated path string is deferred whole to the judgment of its resolved
+value, even when a trailing `/` or a final `/.` is visible in the template
+(`REMOVE_FILE-001` then refuses it); deferral never means the path is safe
+or runnable. A missing or non-string `path`, a non-object `args` and any
+extra argument key stay static refusals, even beside a templated path.
+
+An authority refusal is never reported as `REMOVE_FILE-002`.
 
 ### `nika:glob`
 ```yaml
@@ -11456,7 +11561,7 @@ external users · before the forever-clock).
 
 ---
 
-🦋 *<!-- canon:builtins -->28<!-- /canon --> builtins canonical · jq = the data language · 5-layer Rams symmetry (fetch+extract · jq · convert · wait · inspect) · assets land on disk, never inline · clear forever.*
+🦋 *<!-- canon:builtins -->29<!-- /canon --> builtins canonical · jq = the data language · 5-layer Rams symmetry (fetch+extract · jq · convert · wait · inspect) · assets land on disk, never inline · clear forever.*
 
 <!-- ═══ stdlib/providers-v0.1.md ═══ -->
 

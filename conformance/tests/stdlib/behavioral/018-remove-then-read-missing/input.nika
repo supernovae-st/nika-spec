@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: Apache-2.0
+# Stdlib BEHAVIORAL · the indirect witness: after removal, a separately
+# granted read reports not-found. Authored contract · native pending.
+nika: rt-stdlib-remove-then-read
+permits:
+  tools: ["nika:write", "nika:remove_file", "nika:read"]
+  fs: { write: ["./out/**"], read: ["./out/**"] }
+tasks:
+  put:
+    invoke:
+      tool: "nika:write"
+      args: { path: "./out/note.txt", content: "temporary" }
+  drop:
+    with: { written: "${{ tasks.put.output }}" }
+    invoke:
+      tool: "nika:remove_file"
+      args: { path: "./out/note.txt" }
+  get:
+    with: { removed: "${{ tasks.drop.output }}" }
+    invoke:
+      tool: "nika:read"
+      args: { path: "./out/note.txt" }

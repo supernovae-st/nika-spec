@@ -1,0 +1,14 @@
+{
+  "workflow_state": "success",
+  "tasks": {
+    "put": {
+      "status": "success",
+      "output": "./out/note.txt"
+    },
+    "drop": {
+      "status": "success",
+      "output": "./out/note.txt"
+    }
+  },
+  "note": "builtins-v0.1.md §nika:remove_file · success returns the requested path string after the backend reports removal · the returned path is not independent proof of absence (018 is the indirect read-after witness)"
+}

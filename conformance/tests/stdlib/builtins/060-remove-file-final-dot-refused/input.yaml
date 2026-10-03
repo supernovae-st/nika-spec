@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+# A pure path API can normalize the final dot away; the raw leaf is judged.
+nika: remove-file-final-dot-refused
+permits:
+  tools: ["nika:remove_file"]
+  fs: { write: ["./out/**"] }
+tasks:
+  drop:
+    invoke:
+      tool: "nika:remove_file"
+      args: { path: "out/." }

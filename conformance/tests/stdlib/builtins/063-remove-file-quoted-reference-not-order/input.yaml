@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0
+# The with: value is a quoted CEL string; it names no task and orders nothing.
+nika: remove-file-quoted-reference-not-order
+permits:
+  tools: ["nika:remove_file"]
+  fs: { write: ["./out/**"] }
+tasks:
+  first:
+    invoke:
+      tool: "nika:remove_file"
+      args: { path: "./out/note.txt" }
+  second:
+    with: { label: "${{ 'tasks.first.output' }}" }
+    invoke:
+      tool: "nika:remove_file"
+      args: { path: "./out/note.txt" }

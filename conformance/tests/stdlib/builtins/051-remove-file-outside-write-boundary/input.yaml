@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+# The literal path normalizes lexically to ../stale.txt, outside ./out/**.
+nika: remove-file-outside-write-boundary
+permits:
+  tools: ["nika:remove_file"]
+  fs: { write: ["./out/**"] }
+tasks:
+  drop:
+    invoke:
+      tool: "nika:remove_file"
+      args: { path: "./out/../../stale.txt" }

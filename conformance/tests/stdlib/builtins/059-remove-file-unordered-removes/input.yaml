@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: Apache-2.0
+# The same caller-supplied binding, spelled with dot and index access.
+nika: remove-file-unordered-removes
+inputs:
+  target: { type: string, required: true }
+permits:
+  tools: ["nika:remove_file"]
+  fs: { write: ["./out/**"] }
+tasks:
+  drop_a:
+    invoke:
+      tool: "nika:remove_file"
+      args: { path: "${{ inputs.target }}" }
+  drop_b:
+    invoke:
+      tool: "nika:remove_file"
+      args: { path: '${{ inputs["target"] }}' }

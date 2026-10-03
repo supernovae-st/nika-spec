@@ -1,0 +1,10 @@
+{
+  "workflow_state": "failure",
+  "tasks": {
+    "drop": {
+      "status": "failure",
+      "error_code": "NIKA-BUILTIN-REMOVE_FILE-001"
+    }
+  },
+  "note": "builtins-v0.1.md §nika:remove_file · a resolved directory-shaped path is the invalid argument REMOVE_FILE-001 (its static twin is BUILTIN-001 · stdlib/builtins/056)"
+}

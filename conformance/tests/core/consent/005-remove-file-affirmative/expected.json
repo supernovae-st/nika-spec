@@ -1,0 +1,5 @@
+{
+  "valid": true,
+  "errors": [],
+  "note": "NEP-0020 · the when: consumes the answer and is false under the refusal · the removal runs only on an affirmative answer"
+}

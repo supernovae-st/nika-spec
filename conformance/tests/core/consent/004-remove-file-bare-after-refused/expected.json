@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-014",
+      "category": "security_error"
+    }
+  ],
+  "note": "NEP-0020 · a refused confirm settles success with false · the bare after: edge carries the refusal into the removal"
+}

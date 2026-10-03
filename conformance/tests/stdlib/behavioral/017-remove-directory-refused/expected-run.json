@@ -1,0 +1,14 @@
+{
+  "workflow_state": "failure",
+  "tasks": {
+    "put": {
+      "status": "success",
+      "output": "./out/dir/child.txt"
+    },
+    "drop": {
+      "status": "failure",
+      "error_code": "NIKA-BUILTIN-REMOVE_FILE-002"
+    }
+  },
+  "note": "builtins-v0.1.md §nika:remove_file · a syntactically ordinary path naming an existing directory is a nonregular entry · REMOVE_FILE-002, never recursive removal"
+}

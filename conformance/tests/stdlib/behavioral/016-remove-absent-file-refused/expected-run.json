@@ -1,0 +1,10 @@
+{
+  "workflow_state": "failure",
+  "tasks": {
+    "drop": {
+      "status": "failure",
+      "error_code": "NIKA-BUILTIN-REMOVE_FILE-002"
+    }
+  },
+  "note": "builtins-v0.1.md §nika:remove_file · an absent entry under a permitted path is the operation failure REMOVE_FILE-002 · no parent is created"
+}

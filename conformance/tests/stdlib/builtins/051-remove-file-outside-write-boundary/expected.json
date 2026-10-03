@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-004",
+      "category": "security_error"
+    }
+  ],
+  "note": "10 §the permit-parameterization taint (canonical form) · the literal path is judged in lexical normal form (../stale.txt) against the write bound · a leading .. never re-enters it"
+}

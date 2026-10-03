@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: Apache-2.0
+# Stdlib BEHAVIORAL · writing a child prepares a directory; removing the
+# directory itself fails (no recursive removal).
+# Authored contract · native observation pending.
+nika: rt-stdlib-remove-directory-refused
+permits:
+  tools: ["nika:write", "nika:remove_file"]
+  fs: { write: ["./out/**"] }
+tasks:
+  put:
+    invoke:
+      tool: "nika:write"
+      args: { path: "./out/dir/child.txt", content: "kept", create_dirs: true }
+  drop:
+    with: { written: "${{ tasks.put.output }}" }
+    invoke:
+      tool: "nika:remove_file"
+      args: { path: "./out/dir" }

@@ -1,0 +1,5 @@
+{
+  "valid": true,
+  "errors": [],
+  "note": "NEP-0004 law 2 · the default normalizes to out/note, inside ./out/** · a tainted removal path inside its bound passes"
+}

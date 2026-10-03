@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+# Stdlib BEHAVIORAL · the caller supplies a directory-shaped path; the
+# resolved value is re-vetted. Authored contract · native pending.
+nika: rt-stdlib-remove-resolved-invalid
+inputs:
+  target: { type: string, required: true }
+permits:
+  tools: ["nika:remove_file"]
+  fs: { write: ["./out/**"] }
+tasks:
+  drop:
+    invoke:
+      tool: "nika:remove_file"
+      args: { path: "${{ inputs.target }}" }

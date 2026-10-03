@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: comp-012-remove-contained
+permits:
+  tools: ["nika:remove_file"]
+  fs: { write: ["./out/**"] }
+tasks:
+  call:
+    invoke:
+      workflow: "./child.nika"

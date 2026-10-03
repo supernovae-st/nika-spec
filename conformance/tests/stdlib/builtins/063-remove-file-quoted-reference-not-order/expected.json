@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-012",
+      "category": "security_error"
+    }
+  ],
+  "note": "03 §with · a quoted string inside ${{ }} is a literal, never a reference · the two removals stay incomparable"
+}

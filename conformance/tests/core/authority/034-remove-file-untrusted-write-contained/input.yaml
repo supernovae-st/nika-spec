@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: remove-file-untrusted-write-contained
+inputs:
+  target: { type: string, default: "out/part/../note" }
+permits:
+  tools: ["nika:remove_file"]
+  fs: { write: ["./out/**"] }
+tasks:
+  drop:
+    invoke:
+      tool: "nika:remove_file"
+      args: { path: "${{ inputs.target }}" }

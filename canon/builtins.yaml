@@ -335,6 +335,22 @@ builtins:
     error_plane: NIKA-BUILTIN-READ
     notes: Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
       · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT).
+  - id: nika:remove_file
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: '0.123'
+    category: file
+    capability_classification:
+      class: external
+      requires:
+        - fs
+    args_schema: to-mint-c1/remove-file-args
+    error_plane: NIKA-BUILTIN-REMOVE_FILE
+    notes: Exact regular-file removal · args exactly {path} · an external filesystem write effect (tool grant + fs.write
+      for the exact path, no read grant) · error plane and semantics per stdlib/builtins-v0.1.md §nika:remove_file ·
+      args_schema is a placeholder, no formal args schema is minted yet · classification law LAW-AUTH-0311.
   - id: nika:tts_generate
     status: reserved
     owner: spec

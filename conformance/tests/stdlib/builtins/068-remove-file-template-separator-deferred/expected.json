@@ -1,0 +1,5 @@
+{
+  "valid": true,
+  "errors": [],
+  "note": "builtins-v0.1.md §nika:remove_file · the static shape judgment covers literal paths only · a templated path defers its whole shape, a visible trailing / included, to the resolved run judgment · static validity claims no runtime success"
+}
