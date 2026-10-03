@@ -1,0 +1,10 @@
+{
+  "workflow_state": "failure",
+  "tasks": {
+    "drop": {
+      "status": "failure",
+      "error_code": "NIKA-SEC-004"
+    }
+  },
+  "note": "NEP-0004 laws 2+4 · a no-default path defers at check (stdlib/builtins/061) · the run re-gate judges the resolved value against fs.write and refuses the escape before any filesystem operation · authored contract, native observation pending"
+}

@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+# A typed constant whose TypeExpr is not the bare word string still has a
+# string value: the boundary judges that value.
+nika: remove-file-typed-const-write-escape
+const:
+  victim: { type: { enum: ["../escape"] }, value: "../escape" }
+permits:
+  tools: ["nika:remove_file"]
+  fs: { write: ["./out/**"] }
+tasks:
+  drop:
+    invoke:
+      tool: "nika:remove_file"
+      args: { path: "${{ const.victim }}" }

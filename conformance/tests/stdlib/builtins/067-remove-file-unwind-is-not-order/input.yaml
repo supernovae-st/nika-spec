@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0
+# The removal attaches to the write as cleanup; unwind never schedules.
+nika: remove-file-unwind-is-not-order
+permits:
+  tools: ["nika:write", "nika:remove_file"]
+  fs: { write: ["./out/**"] }
+tasks:
+  put:
+    invoke:
+      tool: "nika:write"
+      args: { path: "./out/note", content: "draft" }
+  drop:
+    after: { put: unwind }
+    invoke:
+      tool: "nika:remove_file"
+      args: { path: "./out/note" }

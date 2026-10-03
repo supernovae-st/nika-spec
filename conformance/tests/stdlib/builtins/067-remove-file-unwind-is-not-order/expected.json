@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-012",
+      "category": "security_error"
+    }
+  ],
+  "note": "03 §unwind · an unwind edge is never in the precedence graph · the write and the removal of one path stay incomparable"
+}

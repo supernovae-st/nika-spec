@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-004",
+      "category": "security_error"
+    }
+  ],
+  "note": "01 §const · an object carrying both type and value is a typed constant whatever the TypeExpr · its string value ../escape is outside the write bound"
+}

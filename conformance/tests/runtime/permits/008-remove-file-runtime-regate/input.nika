@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: rt-permits-remove-file-regate
+permits:
+  tools: ["nika:remove_file"]
+  fs: { write: ["./out/**"] }
+inputs:
+  target: { type: string, required: true }
+tasks:
+  drop:
+    invoke:
+      tool: "nika:remove_file"
+      args: { path: "${{ inputs.target }}" }

@@ -108,6 +108,16 @@ requires a tool-invocation adapter; running an example that completes with
 executes the contract, report it as unsupported and unqualified, never as
 behavioral agreement.
 
+The `nika:remove_file` contracts (`stdlib/behavioral/015`–`019` and
+`permits/008`) assert task status, output and exact code only. The harness
+takes no independent disk inventory, stages no companion entries and removes
+its temporary directory before judging, so the returned path is not proof
+that the file is gone; the read-after case (`018`) is an indirect witness
+under its own read grant. Symlinks, FIFOs, no parent creation, unchanged
+bytes on refusal, the no-I/O default backend, cancellation and confinement
+are engine tests outside this corpus. Authoring a contract here does not
+mean an engine has run it.
+
 The [observation contracts](observation-contracts.md) now carry declarative
 success/refusal cases for these doors, including secret export delivery and
 masking. Discovery validates their closed fields and premises; it reports all

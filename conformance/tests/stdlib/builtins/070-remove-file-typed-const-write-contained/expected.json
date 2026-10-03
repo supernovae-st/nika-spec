@@ -1,0 +1,5 @@
+{
+  "valid": true,
+  "errors": [],
+  "note": "01 §const · the typed constant value out/note is inside ./out/** · a typed const is judged by its value, never refused wholesale"
+}

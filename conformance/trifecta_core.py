@@ -77,6 +77,7 @@ EGRESS_BUILTINS = {
     "nika:notify",          # net (webhook) · egress-capable unconditionally
     "nika:write",           # fs write
     "nika:edit",            # fs write
+    "nika:remove_file",     # fs write · removal is a write effect
     "nika:chart",           # fs write · the `out:` artifact (+ vega sibling)
     "nika:image_fx",        # fs write · the `out:` artifact
     "nika:image_generate",  # fs write · assets land in `output_dir:` (recursive)

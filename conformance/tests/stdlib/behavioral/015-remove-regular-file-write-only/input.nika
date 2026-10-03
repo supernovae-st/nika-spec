@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: Apache-2.0
+# Stdlib BEHAVIORAL · nika:write prepares a regular file, then an ordered
+# nika:remove_file reports the exact requested path. No read grant.
+# Authored contract · native observation pending.
+nika: rt-stdlib-remove-write-only
+permits:
+  tools: ["nika:write", "nika:remove_file"]
+  fs: { write: ["./out/**"] }
+tasks:
+  put:
+    invoke:
+      tool: "nika:write"
+      args: { path: "./out/note.txt", content: "temporary" }
+  drop:
+    with: { written: "${{ tasks.put.output }}" }
+    invoke:
+      tool: "nika:remove_file"
+      args: { path: "./out/note.txt" }

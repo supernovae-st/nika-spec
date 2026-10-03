@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-004",
+      "category": "security_error"
+    }
+  ],
+  "note": "01 §permits · a present block default-denies an omitted tool · the covering fs.write grant never grants the callable"
+}

@@ -42,12 +42,20 @@
 #   BUILTIN-SHAPE nika:write requires `content:` (a write with nothing to
 #                 write is an authoring bug) · nika:done is valid only
 #                 inside an agent tools whitelist · never a standalone
-#                 invoke (02 §loop semantics · NIKA-BUILTIN-DONE-001)
+#                 invoke (02 §loop semantics · NIKA-BUILTIN-DONE-001) ·
+#                 nika:remove_file takes exactly {path: string} naming a
+#                 file by its RAW spelling (NIKA-BUILTIN-001)
 #   PERMITS-FIT   when a permits: block is present, the body must FIT it
 #                 (01 §permits · default-deny once present) · statically
 #                 checkable surface: invoke tools + agent whitelists vs
 #                 permits.tools globs · exec: presence/argv-program vs
-#                 permits.exec · static fetch hosts vs permits.net.http
+#                 permits.exec · static fetch hosts vs permits.net.http ·
+#                 literal / bare-const write, edit and remove paths vs
+#                 permits.fs.write
+#   SHARED-MUTATION two write/edit/remove tasks on one known path with no
+#                 precedence path between them, or a for_each fan on one
+#                 known path (NIKA-SEC-012 · judged by the runner over its
+#                 own precedence graph · shared_mutation_errors below)
 #   ABSENT-PERMITS when the block is ABSENT, DeclaredPermits := ∅
 #                 (NEP-0003 · LAW-AUTH-0324) · any statically visible
 #                 effect is NIKA-AUTH-006 before any token · pure compute
@@ -352,7 +360,7 @@ _PURE_INTERNAL_TOOLS = {
 # law 3 · « the static judge cannot see a host computed at run time »).
 _ABSENT_NET_TOOLS = {"nika:fetch", "nika:notify"}
 _ABSENT_FS_READ_TOOLS = {"nika:read", "nika:glob", "nika:grep"}
-_ABSENT_FS_WRITE_TOOLS = {"nika:write", "nika:edit"}
+_ABSENT_FS_WRITE_TOOLS = {"nika:write", "nika:edit", "nika:remove_file"}
 
 
 def _static_str(v) -> str | None:
@@ -547,7 +555,7 @@ def absent_permits_errors(doc: dict, tasks: list) -> list[dict]:
 # results, with:/tasks.* derivations, and every default-less ref DEFER to
 # the run-time re-gate (law 4 · NIKA-SEC-004), never a check error.
 _TAINT_FS_READ_TOOLS = {"nika:read", "nika:glob", "nika:grep"}
-_TAINT_FS_WRITE_TOOLS = {"nika:write", "nika:edit"}
+_TAINT_FS_WRITE_TOOLS = {"nika:write", "nika:edit", "nika:remove_file"}
 _TAINT_NET_TOOLS = {"nika:fetch", "nika:notify"}
 # The exec re-entry class (10 §the permit-parameterization taint): a token
 # that re-enters a command interpreter is never covered by a program
@@ -616,9 +624,11 @@ def _taint_canonical_path(p: str) -> str:
     leading `..` escapes the base lexically and can never re-enter a
     declared glob — the comparison is the canonical string against the
     glob, never a raw prefix (`datasets/../datasets/q3.csv` IS inside
-    `datasets/**`; `../../etc/passwd` is not)."""
+    `datasets/**`; `../../etc/passwd` is not). POSIX keeps a leading `//`
+    as its own spelling; the engine folds it to `/`, and so does this form."""
     import posixpath
-    return posixpath.normpath(p)
+    norm = posixpath.normpath(p)
+    return "/" + norm.lstrip("/") if norm.startswith("//") else norm
 
 
 def _taint_canonical_host(url: str):
@@ -636,12 +646,24 @@ def _taint_canonical_host(url: str):
     return host
 
 
+def _segment_matches(seg: str, pat: str) -> bool:
+    """One segment against one bound segment, in the engine's grammar: no
+    `*` is literal equality · otherwise the FIRST `*` splits a prefix from
+    a suffix, and any later `*` is a literal suffix character. `?` and
+    brackets are literal too — fnmatch would grant `out/?.txt` → `out/a.txt`,
+    which the engine's bound grammar never does."""
+    if "*" not in pat:
+        return seg == pat
+    prefix, suffix = pat.split("*", 1)
+    return (len(seg) >= len(prefix) + len(suffix)
+            and seg.startswith(prefix) and seg.endswith(suffix))
+
+
 def _seg_match(vsegs: list, gsegs: list) -> bool:
-    """Segment-wise glob: `*`/`?` stop at `/` (fnmatch per segment), `**`
-    spans any depth — the engine's matcher, mirrored. A flat fnmatch let
-    `datasets/*.csv` admit `datasets/sub/deeper/x.csv` (the exact class
-    the engine's fail-open fix killed), refuter-proven live."""
-    import fnmatch
+    """Segment-wise glob: `*` stops at `/`, `**` spans any depth — the
+    engine's matcher, mirrored. A flat fnmatch let `datasets/*.csv` admit
+    `datasets/sub/deeper/x.csv` (the exact class the engine's fail-open fix
+    killed), refuter-proven live."""
     if not gsegs:
         return not vsegs
     g, rest = gsegs[0], gsegs[1:]
@@ -649,7 +671,18 @@ def _seg_match(vsegs: list, gsegs: list) -> bool:
         return any(_seg_match(vsegs[i:], rest) for i in range(len(vsegs) + 1))
     if not vsegs:
         return False
-    return fnmatch.fnmatchcase(vsegs[0], g) and _seg_match(vsegs[1:], rest)
+    return _segment_matches(vsegs[0], g) and _seg_match(vsegs[1:], rest)
+
+
+def _path_segments(p: str) -> list:
+    """The walked segments of a canonical path · empty and `.` dropped
+    (the root identity is compared separately) · adjacent `**` collapsed."""
+    out: list = []
+    for s in p.split("/"):
+        if s in ("", ".") or (s == "**" and out[-1:] == ["**"]):
+            continue
+        out.append(s)
+    return out
 
 
 def _taint_globbed(value: str, globs) -> bool:
@@ -661,16 +694,20 @@ def _taint_globbed(value: str, globs) -> bool:
     escape (leading `..`) can never re-enter a rooted bound even when the
     normalized glob is `**` — without that guard, normalizing `./**` to
     `**` turned an inert bound all-admitting (refuter counterexample
-    CX1: `../../etc/passwd` under `./**` read VALID)."""
-    import posixpath
-    vsegs = value.split("/")
+    CX1: `../../etc/passwd` under `./**` read VALID). An absolute path and
+    a relative bound are different trees: `**` never consumes the root
+    (`/outside/note` under `./**` is outside)."""
+    value = _taint_canonical_path(value)
+    vsegs = _path_segments(value)
     for g in globs or []:
         if not isinstance(g, str) or EXPR_BODY.search(g):
             continue
-        ng = posixpath.normpath(g)
+        ng = _taint_canonical_path(g)
+        if value.startswith("/") != ng.startswith("/"):
+            continue
         if value.startswith("..") and not ng.startswith(".."):
             continue
-        if _seg_match(vsegs, ng.split("/")):
+        if _seg_match(vsegs, _path_segments(ng)):
             return True
     return False
 
@@ -1307,6 +1344,158 @@ def lift_that_lifts_nothing_errors(doc: dict, tasks: list) -> list[dict]:
     return errs
 
 
+# ── nika:remove_file · exact regular-file removal (builtins-v0.1.md) ────
+# The args are exactly {path: string}. The path's shape is judged on its
+# RAW spelling before any normalization: a pure path API folds `out/.` to
+# `out`, which would turn a directory spelling into a file name. A
+# templated path defers its shape to the run's re-vet; a literal sibling
+# is still judged here (a dynamic path never hides `missing_ok: true`).
+def _remove_path_problem(raw: str) -> str | None:
+    import os
+    import pathlib
+    seps = {"/", os.sep}
+    if raw == "":
+        return "path is empty"
+    if raw[-1] in seps:
+        return f"path {raw!r} ends with a separator (it names a directory)"
+    leaf = re.split("|".join(re.escape(s) for s in sorted(seps)), raw)[-1]
+    if leaf in (".", ".."):
+        return f"path {raw!r} ends with {leaf!r} (it names a directory)"
+    if pathlib.PurePath(raw).name == "":
+        return f"path {raw!r} names a root or prefix, not a file"
+    return None
+
+
+def _remove_file_shape(args) -> list[str]:
+    if not isinstance(args, dict):
+        return ["takes an args object {path: string}"]
+    problems = [f"has no argument {k!r} (no recursive/glob/force/missing-ok/"
+                "destination option · the only argument is path)"
+                for k in sorted(str(k) for k in args if k != "path")]
+    if "path" not in args:
+        problems.append("requires path:")
+        return problems
+    v = args["path"]
+    if not isinstance(v, str):
+        problems.append(f"path must be a string, got {type(v).__name__}")
+    elif not EXPR_BODY.search(v):
+        problem = _remove_path_problem(v)
+        if problem:
+            problems.append(problem)
+    return problems
+
+
+# A WHOLE bare `${{ const.x }}` / `${{ inputs['x'] }}` reference, and
+# nothing else: no navigation, concatenation or other root. It names a
+# binding identity; it is not an interpolation engine.
+_BARE_BINDING = re.compile(
+    r"""^\$\{\{\s*(const|inputs)\s*(?:\.([A-Za-z_][A-Za-z0-9_]*)"""
+    r"""|\[\s*(?:'([^'\\]*)'|"([^"\\]*)")\s*\])\s*\}\}$""")
+
+
+def _bare_binding(v) -> tuple[str, str] | None:
+    m = _BARE_BINDING.match(v) if isinstance(v, str) else None
+    if m is None:
+        return None
+    return m.group(1), next(g for g in m.groups()[1:] if g is not None)
+
+
+def _const_string(decl) -> str | None:
+    """A constant's string value · a bare string, or a typed constant's
+    string `value:`. 01 §const's discriminator: an object carrying BOTH
+    `type` and `value` IS a typed constant, whatever its TypeExpr (string ·
+    an enum · a named type). Value/type conformance is NIKA-DEFAULT-001's,
+    never judged here. `{value}` without `type`, or `{type, default}`, is a
+    bare literal object constant, never unwrapped."""
+    if isinstance(decl, str):
+        return decl
+    if isinstance(decl, dict) and "type" in decl and "value" in decl \
+            and isinstance(decl["value"], str):
+        return decl["value"]
+    return None
+
+
+def _static_write_path(v, doc: dict) -> str | None:
+    """The check-time value of a write/edit/remove path: a literal, or a
+    whole bare const reference to a string. An input default is NOT
+    resolved here — the caller may replace it (NIKA-AUTH-008's ground)."""
+    if isinstance(v, str) and _is_static(v):
+        return v
+    ref = _bare_binding(v)
+    if ref is None or ref[0] != "const":
+        return None
+    return _const_string(_as_dict(doc.get("const")).get(ref[1]))
+
+
+def _mutation_key(t: dict, doc: dict):
+    """The known target of a write/edit/remove task: ("path", lexical
+    form), or ("binding", root.name) for an immutable reference with no
+    resolvable string. Anything else is unknown (None)."""
+    inv = t.get("invoke")
+    if not isinstance(inv, dict) or inv.get("tool") not in _ABSENT_FS_WRITE_TOOLS:
+        return None
+    if inv.get("tool") == "nika:remove_file" and _remove_file_shape(inv.get("args")):
+        return None  # a refused shape names no file (NIKA-BUILTIN-001 owns it)
+    v = _as_dict(inv.get("args")).get("path")
+    if isinstance(v, str) and _is_static(v):
+        return ("path", _taint_canonical_path(v))
+    ref = _bare_binding(v)
+    if ref is None:
+        return None
+    root, name = ref
+    decl = _as_dict(doc.get(root)).get(name)
+    if root == "const":
+        value = _const_string(decl)
+    else:
+        default = _as_dict(decl).get("default")
+        value = default if isinstance(default, str) else None
+    if value is not None:
+        return ("path", _taint_canonical_path(value))
+    return ("binding", f"{root}.{name}")
+
+
+def shared_mutation_errors(doc: dict, tasks: list, graph: dict,
+                           transitive_deps, *, pair_scan: bool = True) -> list[dict]:
+    """NIKA-SEC-012 · two write/edit/remove tasks on one known target with
+    no precedence path between them (incomparable in the closure of the
+    caller's precedence graph), or a for_each task on one known target.
+    `graph`/`transitive_deps` are the runner's own G_p (with: ∪ group
+    fold ∪ after:, unwind excluded · quoted CEL text is no edge). A cyclic
+    graph has no order to read: the pair scan is skipped, the fan is not."""
+    errs: list[dict] = []
+    keyed = [(tid, t, _mutation_key(t, doc)) for tid, t in tasks
+             if isinstance(t, dict)]
+    keyed = [(tid, t, k) for tid, t, k in keyed if k is not None]
+
+    def shown(k) -> str:
+        return f"path {k[1]!r}" if k[0] == "path" else f"binding {k[1]}"
+
+    for tid, t, k in keyed:
+        if "for_each" in t:
+            errs.append({"code": "NIKA-SEC-012", "namespace": "NIKA-SEC",
+                         "category": "security_error",
+                         "detail": f"task '{tid}' fans for_each onto one {shown(k)} · "
+                                   "every iteration mutates the same target · derive the "
+                                   "path from the item (NEP-0014 law 1)"})
+    if not pair_scan:
+        return errs
+    closure = {tid: transitive_deps(tid) for tid, _, _ in keyed if tid in graph}
+    for i, (a, _, ka) in enumerate(keyed):
+        for b, _, kb in keyed[i + 1:]:
+            if ka != kb or a not in closure or b not in closure:
+                continue
+            if a in closure[b] or b in closure[a]:
+                continue
+            errs.append({"code": "NIKA-SEC-012", "namespace": "NIKA-SEC",
+                         "category": "security_error",
+                         "detail": f"tasks '{a}' and '{b}' mutate one {shown(ka)} with no "
+                                   "precedence path between them (with: · group · after: "
+                                   "other than unwind) · "
+                                   "serialize them or make the targets disjoint "
+                                   "(NEP-0014 law 1)"})
+    return errs
+
+
 def deep_static_errors(doc: dict, base_dir=None) -> list[dict]:
     errs: list[dict] = []
     if not isinstance(doc, dict):
@@ -1489,6 +1678,12 @@ def deep_static_errors(doc: dict, base_dir=None) -> list[dict]:
             errs.append({"namespace": "NIKA-BUILTIN", "category": "validation_error",
                          "detail": f"task '{tid}' · nika:write requires a content: arg "
                                    "(a write with nothing to write · builtins-v0.1.md)"})
+        if tool == "nika:remove_file":
+            for problem in _remove_file_shape(args):
+                errs.append({"code": "NIKA-BUILTIN-001", "namespace": "NIKA-BUILTIN",
+                             "category": "validation_error",
+                             "detail": f"task '{tid}' · nika:remove_file {problem} "
+                                       "(builtins-v0.1.md §nika:remove_file)"})
         if tool == "nika:done":
             errs.append({"code": "NIKA-BUILTIN-DONE-001", "namespace": "NIKA-BUILTIN",
                          "category": "validation_error",
@@ -1544,6 +1739,8 @@ def deep_static_errors(doc: dict, base_dir=None) -> list[dict]:
         exec_rule = permits.get("exec", False)
         net = permits.get("net") if isinstance(permits.get("net"), dict) else {}
         hosts = net.get("http") if isinstance(net.get("http"), list) else None
+        fs = permits.get("fs") if isinstance(permits.get("fs"), dict) else {}
+        write_globs = fs.get("write") if isinstance(fs.get("write"), list) else []
 
         for tid, t in tasks:
             if "exec" in t:
@@ -1580,6 +1777,21 @@ def deep_static_errors(doc: dict, base_dir=None) -> list[dict]:
                                          "category": "security_error",
                                          "detail": f"task '{tid}' · fetch host '{host}' not in "
                                                    "permits.net.http allowlist"})
+                # The write direction of the exact-path mutators. fs.read never
+                # satisfies it, and the tool grant above stays independent. A
+                # removal whose shape is refused above names no file to fit.
+                if tool in _ABSENT_FS_WRITE_TOOLS and not (
+                        tool == "nika:remove_file"
+                        and _remove_file_shape(inv.get("args"))):
+                    path = _static_write_path(_as_dict(inv.get("args")).get("path"), doc)
+                    if path is not None and not _taint_globbed(path, write_globs):
+                        errs.append({"code": "NIKA-SEC-004", "namespace": "NIKA-SEC",
+                                     "category": "security_error",
+                                     "detail": f"task '{tid}' · {tool} path {path!r} "
+                                               f"(canonical {_taint_canonical_path(path)!r}) "
+                                               f"outside permits.fs.write {write_globs} "
+                                               "(01 §permits · a write grant must contain "
+                                               "the exact path)"})
             ag = t.get("agent")
             if isinstance(ag, dict):
                 for w in (ag.get("tools") or []):
@@ -1636,7 +1848,7 @@ def deep_static_errors(doc: dict, base_dir=None) -> list[dict]:
 # vocabulary · one voice with the engine's builtin_effect table · fs
 # split at its grain of harm: write).
 _EGRESS_NET_TOOLS = {"nika:fetch", "nika:notify"}
-_EGRESS_WRITE_TOOLS = {"nika:write", "nika:edit"}
+_EGRESS_WRITE_TOOLS = {"nika:write", "nika:edit", "nika:remove_file"}
 _HUMAN_GATE_TOOL = "nika:prompt"
 
 

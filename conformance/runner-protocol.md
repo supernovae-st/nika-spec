@@ -70,7 +70,7 @@ conformance/tests/core/      schema shape · DAG cross-refs · variables · erro
 conformance/tests/deep/      the deep-static layer · CEL EBNF parse · jq compile ·
                              durations · schema-meta · when-form · binding purity ·
                              builtin arg shapes (jq expression · wait XOR · write
-                             content · done placement)
+                             content · done placement · remove_file path)
 conformance/tests/stdlib/    stdlib static surface · provider prefixes · extract
                              modes · builtin names (canon.yaml-derived)
 ```
@@ -124,6 +124,13 @@ input premises are validated before classification. Valid cases are
 separate command adapter and its observation decoder/judge must be qualified
 before any of these cases can contribute an implementation result. Existing
 run and verify doors keep their own contracts unchanged.
+
+The run door judges task status, output and exact code; it has no
+filesystem-inventory assertion. A `nika:remove_file` fixture that reports
+its path therefore proves the builtin's reply, not that the file is absent.
+The read-after fixture is an indirect witness with its own read grant.
+Link, special-file, confinement and cancellation behavior needs engine
+tests; no fixture here may add setup keys or `exec:` staging to imitate them.
 
 The trace door is the reference engine's JSON report: `nika trace verify
 <journal> --json --color never` on one absolute journal path, read as one

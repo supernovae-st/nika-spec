@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-004",
+      "category": "security_error"
+    }
+  ],
+  "note": "builtins-v0.1.md §nika:remove_file · removal is a write effect · fs.read alone never satisfies it, and the tool grant does not imply a path grant"
+}

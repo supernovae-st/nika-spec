@@ -38,7 +38,7 @@ MAX_DEPTH = 64
 
 # the coarse effect table — one voice with deep_static.policy_errors
 NET_TOOLS = {"nika:fetch", "nika:notify"}
-WRITE_TOOLS = {"nika:write", "nika:edit"}
+WRITE_TOOLS = {"nika:write", "nika:edit", "nika:remove_file"}
 
 
 def _tasks(doc: dict):

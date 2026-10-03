@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: comp-011-remove-refused
+permits:
+  tools: ["nika:remove_file"]
+tasks:
+  call:
+    invoke:
+      workflow: "./child.nika"

@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-AUTH-006",
+      "category": "security_error"
+    }
+  ],
+  "note": "NEP-0003 · an absent permits: block is zero authority · a static removal path requires fs write"
+}

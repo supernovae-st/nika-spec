@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: Apache-2.0
+# put → (group fold) → stamp → (with) → drop: the removal is ordered after
+# the write transitively, with no direct edge between them. The two paths
+# are different spellings of one lexical key.
+nika: remove-file-ordered-mutations
+permits:
+  tools: ["nika:write", "nika:log", "nika:remove_file"]
+  fs: { write: ["./out/**"] }
+tasks:
+  put:
+    group: staged
+    invoke:
+      tool: "nika:write"
+      args: { path: "./out/note.txt", content: "draft" }
+  stamp:
+    with: { legs: "${{ group.staged }}" }
+    invoke:
+      tool: "nika:log"
+      args: { level: info, message: "staged ${{ with.legs }}" }
+  drop:
+    with: { logged: "${{ tasks.stamp.output }}" }
+    invoke:
+      tool: "nika:remove_file"
+      args: { path: "out/note.txt" }

@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+# nika:remove_file needs the tool grant and write authority for the exact
+# path. No read grant: removal never opens the file's content.
+nika: remove-file-write-only
+permits:
+  tools: ["nika:remove_file"]
+  fs: { write: ["./out/**"] }
+tasks:
+  drop:
+    invoke:
+      tool: "nika:remove_file"
+      args: { path: "./out/stale.txt" }

@@ -63,7 +63,8 @@ import sys, json, re, pathlib
 import yaml
 from jsonschema import Draft202012Validator
 
-from deep_static import deep_static_errors, consent_errors, net_before_exec_errors
+from deep_static import (deep_static_errors, consent_errors, net_before_exec_errors,
+                         shared_mutation_errors)
 from composition_core import composition_errors
 from trifecta_core import trifecta_errors
 from type_core import type_core_errors
@@ -999,6 +1000,11 @@ def cross_ref_errors(doc: dict) -> list[dict]:
                                        f"— '{target}' depends (transitively) on '{tid}' · the "
                                        "recovery await would deadlock · recover from an "
                                        "upstream or independent source (05 §recover)"})
+
+    # NIKA-SEC-012 · unordered shared mutations, judged over THIS G_p
+    # (a cyclic graph has no order to read · its fan check still runs).
+    errs.extend(shared_mutation_errors(doc, tasks, graph, _transitive_deps,
+                                       pair_scan=not (has_cycle or self_cycle)))
 
     # NIKA-VAR-001 + unclosed-`${{` · resolve every `${{ }}` reference statically
     def _keys(v) -> set:

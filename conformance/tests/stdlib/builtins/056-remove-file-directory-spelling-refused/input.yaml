@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: remove-file-directory-spelling-refused
+permits:
+  tools: ["nika:remove_file"]
+  fs: { write: ["./out/**"] }
+tasks:
+  drop:
+    invoke:
+      tool: "nika:remove_file"
+      args: { path: "./out/sub/" }

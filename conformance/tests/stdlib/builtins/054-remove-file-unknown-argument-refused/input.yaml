@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+# The path is caller-supplied (dynamic), but the literal sibling is not.
+nika: remove-file-unknown-argument-refused
+inputs:
+  target: { type: string, required: true }
+permits:
+  tools: ["nika:remove_file"]
+  fs: { write: ["./out/**"] }
+tasks:
+  drop:
+    invoke:
+      tool: "nika:remove_file"
+      args: { path: "${{ inputs.target }}", missing_ok: true }

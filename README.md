@@ -283,7 +283,7 @@ declaring it.
 |---|---|---|
 | **Core** | Parses and validates any workflow, builds the graph, resolves every reference, returns typed errors | Linters, editors, static analyzers |
 | **Runtime** | Core, plus executing the verbs | A working engine with its own providers and tools |
-| **Stdlib v0.1** | Runtime, plus the <!-- canon:providers -->17<!-- /canon --> providers, <!-- canon:extract_modes -->10<!-- /canon --> extract modes and <!-- canon:builtins -->28<!-- /canon --> builtins | A full engine, equivalent to the reference |
+| **Stdlib v0.1** | Runtime, plus the <!-- canon:providers -->17<!-- /canon --> providers, <!-- canon:extract_modes -->10<!-- /canon --> extract modes and <!-- canon:builtins -->29<!-- /canon --> builtins | A full engine, equivalent to the reference |
 
 1. **Learn the words.** [GLOSSARY.md](GLOSSARY.md) gives each term one
    meaning (oracle, gate, golden…).

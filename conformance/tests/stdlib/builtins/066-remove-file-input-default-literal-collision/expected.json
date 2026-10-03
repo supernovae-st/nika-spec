@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-012",
+      "category": "security_error"
+    }
+  ],
+  "note": "10 §the effect vocabulary (same-path mutations) · a bare input with a string default is keyed by that default in lexical normal form · it collides with the literal ./out/note"
+}

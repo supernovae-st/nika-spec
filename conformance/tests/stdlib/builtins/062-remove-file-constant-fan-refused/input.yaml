@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: remove-file-constant-fan-refused
+permits:
+  tools: ["nika:remove_file"]
+  fs: { write: ["./out/**"] }
+tasks:
+  drop:
+    for_each: { items: ["a", "b"] }
+    invoke:
+      tool: "nika:remove_file"
+      args: { path: "./out/note.txt" }
