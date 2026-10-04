@@ -1,4 +1,4 @@
 {
   "valid": true,
-  "note": "server names admit kebab-case (02-verbs §tool reference grammar) · kebab-case includes digit-initial segments: the vendored registry ships `21st` and the reference checker accepts it · the schema refusing what the catalog ships was the supernovae-st/nika#826 divergence."
+  "note": "server names admit kebab-case including a digit-initial segment (02-verbs §tool reference grammar · [a-z0-9][a-z0-9-]*) · precondition, explicit: this fixture's project declares exactly one test server, `21st`, in its adjacent .nika/mcp_servers.json (a static mock · network deny · its command is never run) · Check only: the verdict is membership in that declared registry, no transport is launched, and an engine adapter stages that file as the fixture's own context, never the caller's · the schema refusing a name the catalog ships was the supernovae-st/nika#826 divergence."
 }

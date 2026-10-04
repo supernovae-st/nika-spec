@@ -3,12 +3,12 @@ nika: review
 inputs:
   pr: { type: string, required: true }
 permits:
-  tools: ["nika:done", "nika:read"]
+  tools: ["nika:done"]
 tasks:
   review:
     agent:
       prompt: "Review ${{ inputs.pr }}"
-      tools: ["nika:read", "nika:done"]
+      tools: ["nika:done"]
       schema:
         type: object
         required: [findings]

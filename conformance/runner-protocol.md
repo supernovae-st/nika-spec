@@ -353,6 +353,27 @@ on **stdout** — `{"valid": bool, "errors": [{"code"|"namespace",
 free — the JSON is the verdict. An engine whose native output differs
 wraps itself in a small adapter script (the Bowtie harness pattern).
 
+**The fixture directory is the fixture's whole context.** Besides
+`input.yaml` and `expected.json`, a fixture directory may carry the files
+its workflow needs: a composition child (`child.nika`), an Agent Skill, or
+a project file such as `.nika/mcp_servers.json`, which declares the MCP
+servers that project knows (`core/verbs-shape/012` declares exactly one
+test server, `21st`, network deny, never launched). These files ARE the
+precondition of the verdict. The runner's working directory, the
+caller's HOME, a user registry or an ancestor project are not. The runner
+still passes only the path and changes nothing else about the call. An
+engine that reads its project from the working directory therefore
+materializes that context in its adapter: it stages the fixture's own
+files byte-exact into a private project, closes that project, and runs
+the engine there with a clean HOME and environment. It never adds a
+server, child or file the fixture does not declare, and never derives a
+registry from the tools a workflow mentions. A file the fixture lacks
+stays absent; a negative stays negative. The reference adapter does
+exactly this ([§the reference engine's adapter](#the-reference-engines-adapter--and-the-parity-it-measured)).
+The scope is static: a declared server is the context of a `check`
+verdict, never a running transport, and no fixture here qualifies MCP
+connectivity.
+
 ### Tier selection (the T0 dry-run contract · `--tier`)
 
 A fixture's `expected.json` MAY declare `"tier": "<name>"`; the runner
@@ -384,7 +405,19 @@ python3 conformance/runner.py run conformance/tests/core   --engine "python3 con
 
 [`adapters/nika-engine.py`](adapters/nika-engine.py) is that small
 adapter for the Rust reference engine (its `nika check --json` speaks a
-30-key report contract, not this wire shape). Run it:
+30-key report contract, not this wire shape). The engine accepts only a
+`.nika` file and reads its project from the working directory, so the
+adapter stages each fixture per call: the input's exact bytes as
+`project/input.nika` (hash-verified), the fixture's other regular files
+at their relative paths (never `expected.json`), an empty `nika.yaml`
+boundary, then `check --json <absolute path>` with cwd=project, a scratch
+HOME and an explicit environment. A symlink, a special file or a
+fixture-authored `nika.yaml` is a harness error, never followed or
+overwritten. Its offline selftest
+([`adapters/nika_engine_selftest.py`](adapters/nika_engine_selftest.py))
+drives a spy engine through `runner.py --engine` from two hostile working
+directories. It proves routing and isolation, not any fixture's verdict.
+Run it:
 
 ```bash
 NIKA_BIN=/path/to/nika python3 conformance/runner.py run conformance/tests/deep/composition \
