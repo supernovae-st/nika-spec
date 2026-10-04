@@ -1,0 +1,10 @@
+{
+  "mcp_servers_format": 1,
+  "servers": {
+    "21st": {
+      "command": "nika-conformance-never-run",
+      "args": [],
+      "network": "deny"
+    }
+  }
+}

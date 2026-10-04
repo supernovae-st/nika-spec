@@ -66,22 +66,103 @@ One more deliberate absence:
   one would add a second, guessable spelling of the same fact
   (`NIKA-BUILTIN-DONE-001` splits two ways · a guess is wrong for one).
 
-Exit 0 with a verdict on stdout · exit 3 when the engine emitted no JSON
-(the runner turns silence into a LOUD `harness_error`, never a pass).
+## The fixture context, staged · never the caller's
+
+The engine reads its project from the working directory, not from the
+workflow path: `.nika/mcp_servers.json`, an ancestor `nika.yaml`, HOME.
+So the adapter never hands the engine the caller's world. Per call:
+
+1. the input path and the engine binary resolve first (`NIKA_BIN`, else
+   `nika` on the caller's PATH), to absolute paths;
+2. a private scratch gets `project/` and `home/`. The input's EXACT bytes
+   become `project/input.nika` (the engine requires the `.nika` suffix;
+   `input.yaml` stays the canonical fixture and is never rewritten), and
+   the hash is verified;
+3. every other regular file of the fixture's OWN directory is copied
+   byte-exact to the same relative path: composition children, skills,
+   and a declared `.nika/mcp_servers.json` registry. `expected.json` is
+   the verdict, never an input, and is not copied. A symlink, a special
+   file, a missing file or a fixture-authored `nika.yaml` is never
+   invented, followed or overwritten: the call is a harness error;
+4. an EMPTY `project/nika.yaml` closes the upward project search;
+5. the binary runs `check --json <absolute project/input.nika>` with
+   cwd=project and an explicit environment (scratch HOME and TMPDIR,
+   `NIKA_KEYCHAIN=off`, the default PATH). No caller variable, no
+   provider key, no project/config override is inherited;
+6. only the owned scratch is removed afterwards.
+
+This is a harness boundary, not an OS sandbox: a HOME and a cwd do not
+confine a process.
+
+Exit 0 with a verdict on stdout · exit 3 when the engine emitted no JSON,
+timed out, or the fixture context could not be staged (the runner turns
+silence into a LOUD `harness_error`, never a pass).
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 _REPO = Path(__file__).resolve().parents[2]
 _REGISTRY = _REPO / "canon" / "diagnostics" / "registry.yaml"
 _CANON = _REPO / "canon.yaml"
+
+CHECK_TIMEOUT_S = 120
+# The verdict is the fixture's answer, never one of its inputs.
+NOT_STAGED = {"expected.json"}
+# A fixture directory is small; a larger tree means the input is not in one.
+MAX_FILES, MAX_BYTES = 256, 8 * 1024 * 1024
+
+
+class StageError(Exception):
+    """The fixture context cannot be staged as declared."""
+
+
+def _sha(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def stage(source: Path, project: Path) -> None:
+    """Copy the fixture's own directory into `project` (module docstring)."""
+    fixture = source.parent
+    if (fixture / "nika.yaml").exists() or (
+            (fixture / "input.nika").exists() and source.name != "input.nika"):
+        raise StageError("the fixture authors its own nika.yaml or input.nika · "
+                         "the staged project would overwrite it")
+    count = size = 0
+    for root, dirs, names in os.walk(fixture, followlinks=False):
+        for name in dirs + names:
+            p = Path(root) / name
+            mode = p.lstat().st_mode
+            if stat.S_ISDIR(mode):
+                continue
+            if not stat.S_ISREG(mode):
+                raise StageError(f"not a regular file: {p}")
+            if p == source or (Path(root) == fixture and name in NOT_STAGED):
+                continue
+            count, size = count + 1, size + p.lstat().st_size
+            if count > MAX_FILES or size > MAX_BYTES:
+                raise StageError(f"{fixture} is not a fixture directory (too large)")
+            dest = project / p.relative_to(fixture)
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            data = p.read_bytes()
+            dest.write_bytes(data)
+            if _sha(dest.read_bytes()) != _sha(data):
+                raise StageError(f"copy mismatch: {p}")
+    data = source.read_bytes()
+    staged = project / "input.nika"
+    staged.write_bytes(data)
+    if _sha(staged.read_bytes()) != _sha(data):
+        raise StageError("staged input bytes differ from the fixture")
+    (project / "nika.yaml").write_bytes(b"")
 
 
 # Every array the engine's `clean` is composed from (see the docstring
@@ -141,16 +222,36 @@ def main(argv: list[str]) -> int:
     if len(argv) < 2:
         print("usage: nika-engine.py [--] <workflow-path>", file=sys.stderr)
         return 2
-    path = argv[-1]
-    engine = os.environ.get("NIKA_BIN") or shutil.which("nika") or "nika"
-    try:
-        proc = subprocess.run(
-            [engine, "check", "--json", path],
-            capture_output=True, text=True, timeout=120,
-        )
-    except (FileNotFoundError, subprocess.TimeoutExpired) as e:
-        print(f"nika-engine adapter: {engine} · {e}", file=sys.stderr)
+    source = Path(argv[-1]).resolve()
+    found = os.environ.get("NIKA_BIN") or shutil.which("nika")
+    if not found or not source.is_file() or Path(argv[-1]).is_symlink():
+        print(f"nika-engine adapter: engine {found!r} or input {source} not found",
+              file=sys.stderr)
         return 3
+    engine = os.path.abspath(found)
+    scratch = Path(tempfile.mkdtemp(prefix="nika-engine-adapter-")).resolve()
+    try:
+        project, home, tmp = scratch / "project", scratch / "home", scratch / "tmp"
+        for d in (project, home, tmp):
+            d.mkdir()
+        try:
+            stage(source, project)
+        except (StageError, OSError) as e:
+            print(f"nika-engine adapter: cannot stage {source} · {e}", file=sys.stderr)
+            return 3
+        env = {"HOME": str(home), "TMPDIR": str(tmp), "PATH": os.defpath,
+               "NIKA_KEYCHAIN": "off"}
+        try:
+            proc = subprocess.run(
+                [engine, "check", "--json", str(project / "input.nika")],
+                cwd=project, env=env, stdin=subprocess.DEVNULL,
+                capture_output=True, text=True, timeout=CHECK_TIMEOUT_S,
+            )
+        except (OSError, subprocess.TimeoutExpired) as e:
+            print(f"nika-engine adapter: {engine} · {e}", file=sys.stderr)
+            return 3
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
     out = proc.stdout.strip()
     start = out.find("{")
     if start < 0:
