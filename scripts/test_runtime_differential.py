@@ -817,5 +817,186 @@ class SeparateDoorLaws(unittest.TestCase):
         self.assertIn("UNSUPPORTED", report)
 
 
+class HarnessMediaLaws(TraceDoorCase):
+    """Journal receipt assertions only: doubled verifier, no model or storage call."""
+
+    def image(self, storage="none"):
+        value = {"schema": "nika/harness-image-observation@1", "source": "harness_reported",
+                 "tool_call_id": "op", "mime_type": None, "received_bytes": None,
+                 "blob": None, "storage": storage, "storage_failure": None,
+                 "received_sha256": None, "reported_saved_path": "/must/not/be/opened.png",
+                 "file_verified": False, "permission_evidence": "separate permit_checked frames"}
+        if storage != "none":
+            value.update(mime_type="image/png", received_bytes=3, received_sha256="a" * 64)
+        if storage == "stored":
+            value["blob"] = {"hash": "blake3:" + "b" * 64, "mime_type": "image/png", "size": 3}
+        if storage == "failed":
+            value["storage_failure"] = "store refused"
+        return value
+
+    def claim(self, image, count=1, complete=True):
+        return {"a": {"observations": [{"attempt": 1, "iteration": None, "image": image}],
+                      "terminal_count": count, "complete": complete,
+                      "model": dict.fromkeys(runner.trace_media.MODEL_KEYS)}}
+
+    def frames(self, image, count=1, **model):
+        fields = {"task": "a", **model}
+        if count is not None:
+            fields["harness_media_count"] = count
+        return [event("workflow_started"), event("task_started", task="a", attempt=1),
+                event("agent_image_observed", task="a", attempt=1,
+                      harness_image=json.dumps(image)), event("task_completed", **fields)]
+
+    def read(self, frames, wanted):
+        raw = ("\n".join(json.dumps(row) for row in frames) + "\n").encode()
+        return runner.trace_media.compare_journal(raw, wanted, runner.strict_json, runner.json_equal)
+
+    def test_path_only_is_observed_without_any_storage_or_file_claim(self):
+        image = self.image()
+        wanted = self.claim(image)
+        runner.trace_media.validate_expected(wanted)
+        with patch("builtins.open", side_effect=AssertionError("must not open paths")), \
+                patch.object(pathlib.Path, "read_bytes", side_effect=AssertionError("must not open blobs")):
+            self.assertEqual(self.read(self.frames(image), wanted), [])
+        self.assertIsNone(wanted["a"]["observations"][0]["image"]["blob"])
+
+    def test_receipt_states_remain_distinct_and_linked(self):
+        for state in ["none", "unconfirmed", "failed", "stored"]:
+            with self.subTest(state=state):
+                image = self.image(state)
+                wanted = self.claim(image)
+                runner.trace_media.validate_expected(wanted)
+                self.assertEqual(self.read(self.frames(image), wanted), [])
+        self.assertTrue(self.read(self.frames(self.image("unconfirmed")),
+                                  self.claim(self.image("stored"))))
+
+    def test_missing_blob_never_supports_stored_evidence(self):
+        bad = self.image("stored")
+        bad["blob"] = None
+        self.assertFalse(runner.trace_media.image_valid(bad))
+        self.assertTrue(self.read(self.frames(bad), self.claim(self.image("stored"))))
+        wanted = self.claim(bad, complete=False)
+        wanted["a"]["observations"] = [None]
+        runner.trace_media.validate_expected(wanted)
+        self.assertEqual(self.read(self.frames(bad), wanted), [])
+
+    def test_failed_or_skipped_terminal_can_close_observations_without_claiming_success(self):
+        for terminal in ["task_failed", "task_skipped"]:
+            with self.subTest(terminal=terminal):
+                frames = self.frames(self.image("failed"))
+                frames[-1]["kind"] = terminal
+                self.assertEqual(self.read(frames, self.claim(self.image("failed"))), [])
+
+    def test_storage_link_requires_size_digest_and_mime_consistency(self):
+        for key, value in [("hash", "a" * 64), ("size", 4), ("size", True),
+                           ("mime_type", "image/jpeg")]:
+            with self.subTest(key=key, value=value):
+                bad = self.image("stored")
+                bad["blob"][key] = value
+                self.assertFalse(runner.trace_media.image_valid(bad))
+        for key, value in [("received_bytes", True), ("received_sha256", "xyz"),
+                           ("file_verified", True), ("source", "file_verified"),
+                           ("inline_bytes", "forbidden")]:
+            bad = self.image("stored")
+            bad[key] = value
+            self.assertFalse(runner.trace_media.image_valid(bad))
+
+    def test_absent_or_mismatched_terminal_count_is_incomplete(self):
+        for count in [None, 0, 2]:
+            with self.subTest(count=count):
+                wanted = self.claim(self.image(), count=count, complete=False)
+                runner.trace_media.validate_expected(wanted)
+                self.assertEqual(self.read(self.frames(self.image(), count=count), wanted), [])
+                self.assertTrue(self.read(self.frames(self.image(), count=count),
+                                          self.claim(self.image())))
+
+    def test_malformed_and_oversized_observations_cannot_be_complete(self):
+        for raw in ["{", '[]', '{"source":"x","source":"y"}', " " * (64 * 1024 + 1)]:
+            with self.subTest(raw=raw[:30]):
+                frames = self.frames(self.image())
+                frames[2] = event("agent_image_observed", task="a", attempt=1, harness_image=raw)
+                wanted = self.claim(self.image(), complete=False)
+                wanted["a"]["observations"] = [None]
+                self.assertEqual(self.read(frames, wanted), [])
+                self.assertTrue(self.read(frames, self.claim(self.image())))
+
+    def test_new_attempt_resets_the_observation_leg(self):
+        frames = self.frames(self.image("failed"))
+        frames += self.frames(self.image("stored"))[1:]
+        frames[4] = event("task_started", task="a", attempt=2)
+        frames[5] = event("agent_image_observed", task="a", attempt=2,
+                          harness_image=json.dumps(self.image("stored")))
+        wanted = self.claim(self.image("stored"))
+        wanted["a"]["observations"][0]["attempt"] = 2
+        self.assertEqual(self.read(frames, wanted), [])
+
+    def test_image_after_terminal_and_duplicate_terminal_leave_incomplete(self):
+        frames = self.frames(self.image())
+        frames.append(frames[-1])
+        self.assertEqual(self.read(frames, self.claim(self.image(), complete=False)), [])
+        frames = self.frames(self.image())
+        frames[2], frames[3] = frames[3], frames[2]
+        self.assertEqual(self.read(frames, self.claim(self.image(), complete=False)), [])
+
+    def test_model_selection_is_not_served_identity(self):
+        wanted = self.claim(self.image())
+        wanted["a"]["model"].update(model_reported="selected-model", model_reported_source="confirmed_selection")
+        frames = self.frames(self.image(), model_reported="selected-model",
+                             model_reported_source="confirmed_selection")
+        self.assertEqual(self.read(frames, wanted), [])
+        frames[-1]["fields"].append({"key": "model_served", "value": "selected-model"})
+        self.assertTrue(self.read(frames, wanted))
+
+    def test_unknown_and_mistyped_expectations_refuse_before_any_engine_call(self):
+        mutations = [lambda x: x["a"].update(complte=True),
+                     lambda x: x["a"].update(terminal_count=True),
+                     lambda x: x["a"].update(complete=1),
+                     lambda x: x["a"].update(terminal_count=None),
+                     lambda x: x["a"]["model"].update(model_served="selected-model"),
+                     lambda x: x["a"]["model"].update(model_reported_source="guessed"),
+                     lambda x: x["a"]["observations"][0].update(attempt=0),
+                     lambda x: x["a"]["observations"][0].update(iteration=True)]
+        for mutate in mutations:
+            wanted = self.claim(self.image())
+            mutate(wanted)
+            with self.assertRaises(runner.InvalidFixture):
+                self.outcome({"verdict": "clean", "harness_media": wanted})
+            self.assertEqual(self.calls, [])
+
+    def test_duplicate_fields_and_absent_task_do_not_agree(self):
+        frames = self.frames(self.image())
+        frames[2]["fields"].append({"key": "task", "value": "a"})
+        self.assertTrue(self.read(frames, self.claim(self.image())))
+        self.assertTrue(self.read([event("workflow_started")], self.claim(self.image())))
+
+    def test_full_command_door_still_requires_native_verifier(self):
+        self.journal.write_text("\n".join(json.dumps(x) for x in self.frames(self.image())) + "\n")
+        expected = {"verdict": "clean", "harness_media": self.claim(self.image())}
+        self.assertEqual(self.outcome(expected, self.reply(0, ladder(self.trace))), "AGREE")
+        self.assertEqual(len(self.calls), 1)
+        self.assertEqual(self.calls[0][1:3], ["trace", "verify"])
+        self.assertEqual(self.outcome(expected, self.reply(0, {})), "DIVERGE")
+        self.assertEqual(self.outcome(expected, self.reply(2, finish(self.trace, "broken", 2, BROKEN))), "DIVERGE")
+
+    def test_media_fixtures_have_exact_receipt_expectations_and_valid_link_bytes(self):
+        import hashlib
+        root = pathlib.Path(__file__).resolve().parents[1] / "conformance/tests/runtime/trace"
+        fixtures = sorted(root.glob("0[12]*-image-*/expected-verify.json"))
+        self.assertTrue(fixtures)
+        for path in fixtures:
+            with self.subTest(fixture=path.parent.name):
+                expected = runner.trace_expectation(path.read_text())
+                raw = path.with_name("trace.ndjson").read_bytes()
+                self.assertEqual(runner.trace_media.compare_journal(
+                    raw, expected["harness_media"], runner.strict_json, runner.json_equal), [])
+                previous = hashlib.sha256(b"nika-trace-v1").hexdigest()
+                for line in raw.splitlines():
+                    self.assertEqual(json.loads(line)["chain"], previous)
+                    previous = hashlib.sha256(line).hexdigest()
+                provenance = json.loads(path.with_name("provenance.json").read_text())
+                self.assertEqual(provenance["trace_sha256"], hashlib.sha256(raw).hexdigest())
+                self.assertIn("NOT an engine-produced", provenance["construction"])
+
+
 if __name__ == "__main__":
     unittest.main()

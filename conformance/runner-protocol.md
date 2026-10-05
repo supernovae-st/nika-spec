@@ -181,6 +181,19 @@ does not discharge item assertions, and a runner must not substitute its own
 page fold for the engine's public projection. Historical and new item
 vocabularies are described in [§17](../spec/17-trace.md).
 
+`expected-verify.json.harness_media` checks journaled image receipts, using
+exact frozen bytes as the prologue reader does. It is a closed, nonempty
+map of task ids to ordered observations, terminal count, completeness and
+model-report fields; the [trace fixture contract](tests/runtime/trace/README.md#harness-image-receipt-assertions)
+defines each member. A missing blob cannot prove a stored receipt, an absent
+terminal count cannot close observed frames, and a selected model is not an
+attested served model. Invalid expectations refuse before any command.
+The native verifier must still return its admitted verdict on the same
+journal. This assertion does not claim support for a media CLI projection,
+open a reported path or fetch a CAS blob. Actual storage availability and
+image decoding require a separate oracle; synthetic receipt fixtures do not
+prove that an engine or a model produced an image.
+
 The expectation document itself must be unambiguous JSON: duplicate object
 keys at any depth and non-JSON numeric constants are fixture errors. If
 `items` is present, it must be a nonempty task-id map; omit it to make no

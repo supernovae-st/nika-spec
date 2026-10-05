@@ -1,9 +1,11 @@
 # Trace verify contracts · LIVE (engine-consumed)
 
 The execution-half contracts of [17 · Trace](../../../spec/17-trace.md)
-(NEP-0007): a REAL journal (`trace.ndjson` · produced by a conformant
-engine · chained · byte-verifiable) plus the verify verdict the walk
-MUST reach. The static gate ignores this tier (no `input.yaml`); the
+(NEP-0007): a journal (`trace.ndjson` · chained · byte-verifiable)
+plus the verify verdict the walk MUST reach. A fixture is either an engine
+journal or an explicitly documented synthetic variant of one. A synthetic
+variant tests the reader; it is never evidence that an engine produced its
+added observations. The static gate ignores this tier (no `input.yaml`); the
 executable proof is engine-side (`nika trace verify` · the reference
 engine replays every fixture in its conformance battery and holds the
 verdict).
@@ -47,7 +49,8 @@ walk does not ·
   chain verdict. Its selftests include negative channel substitutions.
 
 Absent fields mean the fixture makes no claim there. The top-level expectation
-keys are closed to `verdict`, `cost_replay`, `prologue`, `items` and descriptive
+keys are closed to `verdict`, `cost_replay`, `prologue`, `items`,
+`harness_media` and descriptive
 `note`. Unknown assertions and misspellings are fixture errors before any engine
 invocation; an adapter cannot silently ignore a claim it does not implement.
 
@@ -82,6 +85,64 @@ initial event fails the prologue claim, without reclassifying the engine call
 as a crash. The prologue is read from the same journal bytes the engine
 commands read; a journal that changes while they run invalidates the
 measurement.
+
+### Harness-image receipt assertions
+
+`harness_media` is a nonempty task-id map. Each task has exactly these keys:
+
+```json
+{
+  "observations": [],
+  "terminal_count": 0,
+  "complete": true,
+  "model": {
+    "model_reported": null,
+    "model_reported_source": null,
+    "model_served": null
+  }
+}
+```
+
+`observations` is the ordered list of `{attempt, iteration, image}` rows in
+that task's current observation leg. `attempt` is a positive integer;
+`iteration` is null or a nonnegative integer. A null row explicitly expects a
+malformed observation frame; it can never support `complete: true`.
+`terminal_count` is a nonnegative integer or null for an absent/unusable count.
+`complete` requires a start, a terminal, an exact count, no malformed rows and
+no images after the terminal. A new task start/cache hit resets the leg.
+
+The image assertion is the closed `nika/harness-image-observation@1` receipt:
+`schema`, `source`, `tool_call_id`, `mime_type`, `received_bytes`, `blob`,
+`storage`, `storage_failure`, `received_sha256`, `reported_saved_path`,
+`file_verified` and `permission_evidence`. Source is `harness_reported`,
+`file_verified` is false, and permission evidence is the literal
+`separate permit_checked frames`. The nullable fields stay null when unknown.
+`storage: none` has no received bytes, digest, blob or storage failure.
+Received bytes use a nonnegative size and a lowercase hexadecimal SHA-256.
+`stored` additionally requires a `{hash, mime_type, size}` blob locator with a
+`blake3:` digest, matching size and compatible MIME; `failed` has a failure
+string and no blob; `unconfirmed` has neither blob nor store answer.
+Missing blob metadata never satisfies a stored-receipt assertion.
+The reader bounds each image JSON string to 64 KiB; malformed or larger
+observations remain incomplete, never truncated into complete evidence.
+
+The model object has exactly the keys shown. `model_reported_source` is null
+or `session_config`, `confirmed_selection`, `accepted_request`, `unspecified`;
+reported names are strings or null. This assertion version requires
+`model_served: null`: configuration/selection reports cannot satisfy a
+response identity attestation. An observed served-identity field diverges
+from this explicit absence claim; it is not silently discarded.
+
+Like `prologue`, this assertion reads the exact frozen journal bytes, after
+the native verifier reply is required. It does **not** test `trace outputs`
+or another engine UI projection. Neither the reader nor the fixture opens
+`reported_saved_path` or a blob locator. Even `storage: stored` checks a
+linked receipt only; current blob existence, successful image decoding,
+permission, invoice and served model require their own evidence.
+The image fixtures declare synthetic additions and their source digest in
+`provenance.json`. Their offline reader tests are not a live engine result.
+Unknown keys, impossible complete claims and ill-typed expectations fail
+before any engine command; they are never silently ignored.
 
 Fixtures `011` and `012` retain actual inline and paged item observations
 with `failed`, `cancelled` and `never_started` rows. `013` is the historical

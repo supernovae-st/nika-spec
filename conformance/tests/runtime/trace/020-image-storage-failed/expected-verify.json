@@ -1,0 +1,35 @@
+{
+  "verdict": "clean",
+  "harness_media": {
+    "think": {
+      "observations": [
+        {
+          "attempt": 1,
+          "iteration": null,
+          "image": {
+            "schema": "nika/harness-image-observation@1",
+            "source": "harness_reported",
+            "tool_call_id": "fixture-operation",
+            "mime_type": "image/png",
+            "received_bytes": 3,
+            "blob": null,
+            "storage": "failed",
+            "storage_failure": "fixture store refused",
+            "received_sha256": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
+            "reported_saved_path": null,
+            "file_verified": false,
+            "permission_evidence": "separate permit_checked frames"
+          }
+        }
+      ],
+      "terminal_count": 1,
+      "complete": true,
+      "model": {
+        "model_reported": null,
+        "model_reported_source": null,
+        "model_served": null
+      }
+    }
+  },
+  "note": "Synthetic additive receipt fixture; clean chain does not attest storage, an image file, permission or a served model."
+}
