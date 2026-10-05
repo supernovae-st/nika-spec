@@ -43,6 +43,8 @@ Exit 0 iff every fixture AGREEs.
 """
 from __future__ import annotations
 
+import trace_media
+
 import hashlib
 import json
 import math
@@ -564,7 +566,7 @@ def trace_expectation(raw: str) -> dict:
                               parse_constant=reject_constant, parse_float=finite_float)
         if not isinstance(expected, dict):
             raise ValueError("expectation must be an object")
-        unknown = set(expected) - {"verdict", "cost_replay", "prologue", "items", "note"}
+        unknown = set(expected) - {"verdict", "cost_replay", "prologue", "items", "harness_media", "note"}
         if unknown:
             raise ValueError(f"unknown trace assertion: {', '.join(sorted(unknown))}")
         verdict = expected.get("verdict")
@@ -580,6 +582,8 @@ def trace_expectation(raw: str) -> dict:
                 raise ValueError("unknown cost_replay claim")
         if "prologue" in expected:
             validate_prologue(expected["prologue"])
+        if "harness_media" in expected:
+            trace_media.validate_expected(expected["harness_media"])
         if "items" in expected:
             items = expected["items"]
             if not isinstance(items, dict) or not items:
@@ -975,6 +979,8 @@ def judge_trace(engine: str, d: pathlib.Path) -> list[str]:
         # This is a semantic assertion over recorded bytes, not a second
         # integrity verifier. The engine's verdict above remains mandatory.
         diffs += journal_prologue(frozen, expected["prologue"])
+    if "harness_media" in expected:
+        diffs += trace_media.compare_journal(frozen, expected["harness_media"], strict_json, json_equal)
     if "items" in expected:
         projection = subprocess.run(
             [engine, "trace", "outputs", trace, "--json", "--color", "never"],

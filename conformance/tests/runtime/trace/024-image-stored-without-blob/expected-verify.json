@@ -1,0 +1,18 @@
+{
+  "verdict": "clean",
+  "harness_media": {
+    "think": {
+      "observations": [
+        null
+      ],
+      "terminal_count": 1,
+      "complete": false,
+      "model": {
+        "model_reported": null,
+        "model_reported_source": null,
+        "model_served": null
+      }
+    }
+  },
+  "note": "Synthetic additive receipt fixture; clean chain does not attest storage, an image file, permission or a served model."
+}

@@ -1,0 +1,16 @@
+{
+  "construction": "synthetic additive journal variant; NOT an engine-produced media run",
+  "base_fixture": "conformance/tests/runtime/trace/001-golden-chained-journal",
+  "base_spec_commit": "28c737b94ac2b6941e88749502012b1fd837888e",
+  "source_trace_sha256": "12b59e5e39077ec657966c22fc7ad191107686509ac62fe00adcdadf0dfbd76f",
+  "mutations": [
+    "insert one agent_image_observed before think terminal",
+    "add terminal count when present",
+    "add reported selection only in stored case",
+    "recompute SHA-256 previous-line links"
+  ],
+  "receipt_bytes": "synthetic metadata; received_sha256 is SHA-256 of abc; mime is a claim, not a decoded image",
+  "blob": "synthetic locator; NO blob bundled or storage performed; availability and decoding NOT asserted",
+  "native_verify": "NOT_RUN; must qualify on integrated media candidate before publication",
+  "trace_sha256": "6d398fd31f858230fbfa52c3bbf260a1ccc3612faefc7266576653e8d92e7566"
+}
