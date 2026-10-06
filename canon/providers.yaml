@@ -1,5 +1,5 @@
 registry_document_format: 1
-$comment: 'C1 registry home for the 17 canonical providers · closes the canon.yaml providers
+$comment: 'C1 registry home for the canonical providers · closes the canon.yaml providers
   ledger exception (the providers home ruling · session K3 · D-2026-07-17-N6). Prose home
   stdlib/providers-v0.1.md · one row per provider prefix (the sole surface of the model field
   is the string <provider>/<name> · LAW-SURFACE-0501). kind (local|cloud|test) mirrors
@@ -53,6 +53,15 @@ providers:
       - LAW-SURFACE-0501
     introduced_in: C1
     kind: cloud
+  - id: scaleway
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0501
+    introduced_in: C1
+    kind: cloud
+    notes: A distinct OpenAI-compatible cloud provider prefix lets Scaleway and OpenAI coexist
+      with independent operator credentials and endpoints. Model names remain exact wire identifiers.
   - id: anthropic
     status: reserved
     owner: spec

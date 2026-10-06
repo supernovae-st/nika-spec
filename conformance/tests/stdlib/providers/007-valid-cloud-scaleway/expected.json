@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "Scaleway is a named cloud provider; its exact model identifier is not a DeepSeek-direct or OpenAI provider alias. This is static prefix conformance, never paid inference."
+}

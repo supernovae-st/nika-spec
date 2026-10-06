@@ -71,6 +71,7 @@ laws:
     diagnostics: []
     fixtures:
       - to-mint-c1/conformance/model/valid/provider-name-string
+      - conformance/tests/stdlib/providers/007-valid-cloud-scaleway
     negative_fixtures:
       - conformance/tests/stdlib/providers/002-model-missing-provider-prefix
     projections: ["prose:01-envelope", "prose:02-verbs", "schema", "cli:check", "lsp", "mcp", "sdk"]
