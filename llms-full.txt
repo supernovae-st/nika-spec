@@ -289,7 +289,7 @@ declaring it.
 |---|---|---|
 | **Core** | Parses and validates any workflow, builds the graph, resolves every reference, returns typed errors | Linters, editors, static analyzers |
 | **Runtime** | Core, plus executing the verbs | A working engine with its own providers and tools |
-| **Stdlib v0.1** | Runtime, plus the <!-- canon:providers -->17<!-- /canon --> providers, <!-- canon:extract_modes -->10<!-- /canon --> extract modes and <!-- canon:builtins -->29<!-- /canon --> builtins | A full engine, equivalent to the reference |
+| **Stdlib v0.1** | Runtime, plus the <!-- canon:providers -->18<!-- /canon --> providers, <!-- canon:extract_modes -->10<!-- /canon --> extract modes and <!-- canon:builtins -->29<!-- /canon --> builtins | A full engine, equivalent to the reference |
 
 1. **Learn the words.** [GLOSSARY.md](GLOSSARY.md) gives each term one
    meaning (oracle, gate, golden…).
@@ -352,7 +352,7 @@ travels. A language does:
 - **The language is the contract**; each runtime is an implementation.
 - **Your choice of model.** The same file runs on local and open-weight
   models (Ollama, llama.cpp, vLLM), on Mistral, Hugging Face, OpenAI, xAI,
-  Anthropic and the rest of a catalog of <!-- canon:providers -->17<!-- /canon -->
+  Anthropic and the rest of a catalog of <!-- canon:providers -->18<!-- /canon -->
   providers; `mock/echo` rehearses with no key and no network.
 
 Standards already work this way: SQL, GraphQL, OpenAPI, the Dockerfile,
@@ -668,7 +668,7 @@ tasks:
 > `ollama/qwen3.5:4b` · zero key, nothing leaves your machine
 > (`ollama pull qwen3.5:4b` first · or `lmstudio/…` · `llamacpp/…` ·
 > `vllm/…`). Prefer cloud? Swap the one `model:` line for any of the
-> <!-- canon:providers -->17<!-- /canon --> providers ·
+> <!-- canon:providers -->18<!-- /canon --> providers ·
 > `mistral/mistral-small` · `anthropic/claude-haiku-4-5` ·
 > `openai/gpt-5.2` · the rest of the file doesn't change.
 
@@ -877,7 +877,7 @@ a caller receives).
 - **[templates/](./templates/)**: writing your own? Instantiate a
   skeleton (6 valid, slot-marked) instead of starting blank, the
   deterministic path agents follow ([protocol](AGENTS.md))
-- **[stdlib/](./stdlib/)**: the <!-- canon:providers -->17<!-- /canon --> providers · <!-- canon:extract_modes -->10<!-- /canon --> extract modes · <!-- canon:builtins -->29<!-- /canon --> builtins
+- **[stdlib/](./stdlib/)**: the <!-- canon:providers -->18<!-- /canon --> providers · <!-- canon:extract_modes -->10<!-- /canon --> extract modes · <!-- canon:builtins -->29<!-- /canon --> builtins
 - **[examples/](./examples/)**: the numbered path + the jobs, all shipped and CI-gated (the count lives in [examples/manifest.yaml](./examples/manifest.yaml))
 - **[README.md](./README.md)**: why a language · repo layout · governance
 
@@ -1056,7 +1056,7 @@ outputs:                              # what the workflow returns · symmetric t
 | [16 projections](./16-projections.md) | The oracle surface · one canonical projection (graph_format:3) served byte-identical across CLI · LSP · MCP · the LSP semantic document (`semantic_document_format: 1`) wraps it with spans + one-word `reason` · the additive arc (holes · actions · capabilities over the frozen IR) |
 | [17 trace](./17-trace.md) | The run journal · NDJSON frames chained by sha256 (`trace_format: 2` · the prologue manifest · the closed kind vocabulary) · the REQUIRED permit-decision witness (NEP-0007 · granted and refused alike) · the differential check ⇔ run equivalence law · graved from an observed run |
 
-**Stdlib** (versioned independently · not a spec section) · [stdlib/](../stdlib/): **<!-- canon:providers -->17<!-- /canon --> providers · <!-- canon:extract_modes -->10<!-- /canon --> extract modes · <!-- canon:builtins -->29<!-- /canon --> builtins**.
+**Stdlib** (versioned independently · not a spec section) · [stdlib/](../stdlib/): **<!-- canon:providers -->18<!-- /canon --> providers · <!-- canon:extract_modes -->10<!-- /canon --> extract modes · <!-- canon:builtins -->29<!-- /canon --> builtins**.
 
 ---
 
@@ -1334,7 +1334,7 @@ Default model for any `infer:` or `agent:` verb in this workflow, as a single
 there is no separate `provider:` field). The provider prefix selects the
 backend and decides local-vs-cloud (`ollama/` · `lmstudio/` = local · the rest
 = cloud). See [stdlib/providers-v0.1.md](../stdlib/providers-v0.1.md) for the
-<!-- canon:providers -->17<!-- /canon -->-provider catalog.
+<!-- canon:providers -->18<!-- /canon -->-provider catalog.
 
 A task may override this. If absent · each `infer:`/`agent:` task must specify
 its own `model:`.
@@ -6125,7 +6125,7 @@ Three reasons ·
 
 The stdlib has **independent versioning** ·
 
-- `stdlib/providers-v0.1.md`, the <!-- canon:providers -->17<!-- /canon --> canonical providers for v0.1
+- `stdlib/providers-v0.1.md`, the <!-- canon:providers -->18<!-- /canon --> canonical providers for v0.1
 - `stdlib/extract-modes-v0.1.md`, the <!-- canon:extract_modes -->10<!-- /canon --> canonical extract modes for v0.1
 - `stdlib/builtins-v0.1.md`, the <!-- canon:builtins -->29<!-- /canon --> canonical builtins for v0.1
 
@@ -6269,7 +6269,7 @@ See [07-conformance.md](./07-conformance.md). In summary ·
 |---|---|
 | Core | None · only parse + DAG + variable + error · no execution needed |
 | Runtime | Must execute the 4 verbs · provider/tool implementations engine's choice |
-| Stdlib v0.1 | Must ship the <!-- canon:providers -->17<!-- /canon --> providers + <!-- canon:extract_modes -->10<!-- /canon --> extract modes + <!-- canon:builtins -->29<!-- /canon --> builtins |
+| Stdlib v0.1 | Must ship the <!-- canon:providers -->18<!-- /canon --> providers + <!-- canon:extract_modes -->10<!-- /canon --> extract modes + <!-- canon:builtins -->29<!-- /canon --> builtins |
 | Stdlib v0.1+media | RESERVED · enumerated when the media set publishes (stdlib v0.x · the 24 names are not yet normative) |
 
 A v0.1-compliant engine for a workflow author depends on which level they need.
@@ -6314,7 +6314,7 @@ Three nested levels · increasing scope ·
 |---|---|---|
 | **Core** | Parse + validate · DAG semantics · variable resolution · error structure | Linters · spec editors · static analyzers |
 | **Runtime** | Core + verb execution | Working engine (with own provider/tool impls) |
-| **Stdlib v0.1** | Runtime + the <!-- canon:providers -->17<!-- /canon --> providers + <!-- canon:extract_modes -->10<!-- /canon --> extract modes + <!-- canon:builtins -->29<!-- /canon --> builtins | Full reference-impl-equivalent engine |
+| **Stdlib v0.1** | Runtime + the <!-- canon:providers -->18<!-- /canon --> providers + <!-- canon:extract_modes -->10<!-- /canon --> extract modes + <!-- canon:builtins -->29<!-- /canon --> builtins | Full reference-impl-equivalent engine |
 
 A higher level **includes** the lower levels.
 
@@ -6374,7 +6374,7 @@ guarantees below) ·
 | **Energy ceiling** | the worst-case watt-hours over the same tasks, per scope class · the honesty law below | a sourced `Wh` per million OUTPUT tokens, catalog data |
 | **Secret leak** | every `secrets.X` that flows into an `exec` capture or a tool whose output is bound (the masking boundary · [04 §secrets](./04-variables.md)) | reference graph |
 | **Capability escape** | any effect outside a declared `permits:` block: a write outside `fs.write`, a fetch to an unlisted host, an `exec` under `exec: false`, an unlisted tool | `permits:` ([01](./01-envelope.md)) |
-| **Provider parity** | (`--providers`) that the workflow uses zero provider-specific fields → the same `schema:` runs identically on all <!-- canon:providers -->17<!-- /canon --> providers (incl. the 5 local) | the closed verb-field set |
+| **Provider parity** | (`--providers`) that the workflow uses zero provider-specific fields → the same `schema:` runs identically on all <!-- canon:providers -->18<!-- /canon --> providers (incl. the 5 local) | the closed verb-field set |
 
 This is the property no other AI workflow runner gives: **GitHub Actions,
 Temporal, and LangGraph tell you nothing (and charge you nothing back)
@@ -6542,7 +6542,7 @@ Runtime-compliant engines may bring **their own** provider implementations · to
 
 An engine claims « Stdlib v0.1-compliant » if it satisfies Runtime conformance PLUS ·
 
-1. **Ships all <!-- canon:providers -->17<!-- /canon --> canonical providers** (per [stdlib/providers-v0.1.md](../stdlib/providers-v0.1.md))
+1. **Ships all <!-- canon:providers -->18<!-- /canon --> canonical providers** (per [stdlib/providers-v0.1.md](../stdlib/providers-v0.1.md))
 2. **Ships all <!-- canon:extract_modes -->10<!-- /canon --> canonical extract modes** (per [stdlib/extract-modes-v0.1.md](../stdlib/extract-modes-v0.1.md))
 3. **Ships at least all <!-- canon:builtins -->29<!-- /canon --> canonical builtins** (the remaining deferred media builtins are optional · the byte-determinism clauses of `nika:image_fx` and `nika:chart` are part of the bar — an engine that cannot honor them is not conformant, no waiver)
 4. **Passes** all tests in `conformance/tests/stdlib/`
@@ -7238,7 +7238,7 @@ or a non-goal, with the line that says whose job it is.
 | H11 | Observability (OTel) | **OUT (mapping recommended)** | Engine concern (§Observability) · zero telemetry by default · local-first. The canonical mapping when an engine exports · **run = trace · task = span · retry attempts = span events**, recommended so two engines' traces line up · never required. |
 | H12 | Security in-language vs runtime | **WRITTEN** | Language-visible security is now FOUR surfaces · the `exec:` blocklist (MUST · + the argv form as the structural injection fix) · the `agent:` tools whitelist (default-deny MUST) · secrets masking + no-inline-literals (`secrets:` envelope) · and the workflow-level **`permits:`** capability boundary ([01 §permits](./01-envelope.md#permits--optional--the-declared-capability-boundary) · default-deny once present · enforced statically + at runtime · NIKA-SEC-004). Everything else, trust levels · spotlighting · canaries · taint tracking (the reference engine's Shield · NIKA-SEC family), is **runtime-side** and intentionally NOT in YAML v0.1. |
 | H13 | Packaging / distribution (registries · semver · signing) | **OUT** | The language has no versioning surface in the file (v1 forever · no slot · [01 §nika](./01-envelope.md)) · machine formats version independently. Workflow registries · package manifests · signing are ecosystem/engine concerns (the reference engine plans `nika-pck`) · not spec surface. |
-| H14 | Testing workflows (dry-run · mocks · goldens) | **IN (pieces)** | The `mock/` provider is one of the <!-- canon:providers -->17<!-- /canon --> (deterministic · no LLM call): `model: mock/echo` per task or via one `inputs.model` swap turns any workflow into a test. Golden runs reuse the conformance fixture pattern. `--dry-run` (parse + plan · execute nothing) is an engine CLI concern · MAY. A workflow without a test story is a script: the test story is · swap to `mock/`, assert with `nika:assert`/`schema:`. |
+| H14 | Testing workflows (dry-run · mocks · goldens) | **IN (pieces)** | The `mock/` provider is one of the <!-- canon:providers -->18<!-- /canon --> (deterministic · no LLM call): `model: mock/echo` per task or via one `inputs.model` swap turns any workflow into a test. Golden runs reuse the conformance fixture pattern. `--dry-run` (parse + plan · execute nothing) is an engine CLI concern · MAY. A workflow without a test story is a script: the test story is · swap to `mock/`, assert with `nika:assert`/`schema:`. |
 | H15 | Concurrency / rate governance | **PARTIAL** | In-language · `for_each.max_parallel` + `for_each.fail_fast` + wave-parallel scheduling (normative · [03 §execution model](./03-dag.md#dag-execution-model)). Per-provider rate limits · engine config (the engine MUST honor declared caps · how it throttles providers is its business). Cross-run/global scheduling · NEVER (§Multi-workflow orchestration). |
 | H16 | Interop (import/export GHA · LangGraph · Temporal) | **PROUD NON-GOAL** | Nika is a source language, not a compatibility layer: no importers/exporters, ever (a translated workflow is a worse workflow). **⚠️ AMENDED 2026-08-11 — the old wording said the interop boundaries are MCP and `exec:` « anything with a CLI ». That sentence manufactured the problem it pretended to solve: everything has a CLI, so it routed the world to the escape hatch.** The reach-for order is now a LADDER, and `exec:` is its last rung — see [§the interop ladder](#the-interop-ladder-normative) below. |
 | H17 | Step caching / memoization (`cache_key:`) | **OUT (durable-adjacent)** | A v0.1 run executes every non-skipped task: no memoize field. The dominant cacheable class (deterministic `exec:`/`invoke:`) collides with side effects, and `infer:` is non-deterministic (a wrong default poisons correctness). Lands as an additive task field WITH the durable-execution waypoint (a run store exists then · H1). Until then · cache at the tool layer (`nika:read`/`nika:write` a content-keyed path · HTTP caches honor ETags). |
@@ -11613,7 +11613,7 @@ external users · before the forever-clock).
 
 # Stdlib v0.1 · Providers
 
-> The canonical <!-- canon:providers -->17<!-- /canon --> providers shipped with v0.1-compliant engines. Each
+> The canonical <!-- canon:providers -->18<!-- /canon --> providers shipped with v0.1-compliant engines. Each
 > provider implements the same interface (LLM chat completion + optional
 > streaming + vision + structured output) against a different backend.
 > You select one with a single `model: <provider>/<name>` field.
@@ -11658,7 +11658,7 @@ tasks:
 
 ---
 
-## The 17 canonical providers
+## The canonical providers
 
 | Provider | Backend | Local? | Auth |
 |---|---|---|---|
@@ -11668,6 +11668,7 @@ tasks:
 | `localai` | LocalAI (`localhost:8080/v1` · OpenAI drop-in · multi-backend) | **local** | none |
 | `vllm` | vLLM OpenAI server (`localhost:8000/v1` · high-throughput · self-hosted) | **local** | none |
 | `mistral` | Mistral AI API (EU · sovereign-leaning) | cloud | `${{ secrets.* }}` |
+| `scaleway` | Scaleway Generative APIs (OpenAI-compatible, independent endpoint and credentials) | cloud | `${{ secrets.* }}` |
 | `anthropic` | Anthropic Claude API | cloud | `${{ secrets.* }}` |
 | `openai` | OpenAI API (+ the universal OpenAI-compat escape hatch · see below) | cloud | `${{ secrets.* }}` |
 | `openrouter` | OpenRouter gateway (one key · every major model · cross-vendor fallback) | cloud | `${{ secrets.* }}` |
@@ -11680,7 +11681,7 @@ tasks:
 | `xai` | xAI Grok API | cloud | `${{ secrets.* }}` |
 | `mock` | deterministic test fixture · no LLM call | test | none |
 
-A Stdlib v0.1-compliant engine MUST ship all **17** (5 local · 11 cloud · 1 test).
+A Stdlib v0.1-compliant engine MUST ship all providers listed in `canon.yaml` (local, cloud and test).
 Any *other* OpenAI-compatible local server (Jan · llamafile · KoboldCpp ·
 text-generation-webui · a custom one) routes through the **`openai` escape
 hatch** below (no new provider name needed).
@@ -11692,21 +11693,30 @@ hatch** below (no new provider name needed).
 > and the largest model-aggregation gateway deserves first-class one-field
 > selection. Together · Fireworks · custom gateways still use the escape hatch.
 
-## The three lists · three laws (why 17 · why the catalog knows more · why MCP never closes)
+`scaleway/<model>` uses the existing OpenAI-compatible wire with its own
+operator credentials and endpoint. It does not redirect `openai/<model>` or
+inherit a model publisher's prices. An implementation's catalog may describe
+supported models; registration of the prefix alone attests neither a live
+account nor a price. [Scaleway API](https://www.scaleway.com/en/developers/api/generative-apis)
+documents the default endpoint; [project-scoped requests](https://www.scaleway.com/en/docs/generative-apis/api-cli/using-generative-apis/)
+retain their explicit project path. Service model limits are published in
+[Scaleway's model catalog](https://www.scaleway.com/en/docs/generative-apis/reference-content/supported-models/).
+
+## The three lists · three laws (why the catalog knows more · why MCP never closes)
 
 Three different lists ride the tool/model surface, and each obeys a
 different law — naming them kills a recurring confusion:
 
-1. **The provider PREFIX list is CLOSED at <!-- canon:providers -->17<!-- /canon -->** — a
+1. **The provider PREFIX list is CLOSED at <!-- canon:providers -->18<!-- /canon -->** — a
    list may be closed in the language only because an escape hatch
    exists (§The `openai` escape hatch: any OpenAI-compatible server,
    today, without waiting for anyone). A closure with a door is a
    curation; without one it would be a wall.
 2. **The engine's CATALOG knows MORE than the language admits** (its
-   yellow-pages carry rows for endpoints beyond the 17 — reachable
+   yellow-pages carry rows for endpoints beyond the canonical registry — reachable
    through the hatch). That asymmetry is by design: the catalog records
    the world; the language admits a curated subset it can teach, test
-   and price. A provider absent from the 17 is not illegal — it is
+   and price. A provider absent from that registry is not illegal — it is
    un-blessed (no named prefix, no doc room), never unreachable.
 3. **MCP servers are OPEN, forever** — `mcp:<server>/<tool>` accepts
    any server because YOUR OWN server is the premise of the protocol.
@@ -11718,7 +11728,7 @@ The same rule read once more: **the spec closes only what it can refuse
 while a hatch keeps the closure honest; everything else is catalog
 knowledge.**
 
-## Registration policy · how the 17 grows (the post-freeze door)
+## Registration policy · how the registry grows (the post-freeze door)
 
 The prefix list is a **registry, not grammar**. `/spec/v1.0.0` freezes
 the FORM (`model: <provider>/<name>` · the refusal law `NIKA-PROVIDER`);
@@ -12286,7 +12296,7 @@ The reference engine implements `provider_options:` as best-effort pass-through.
 
 ---
 
-🦋 *<!-- canon:providers -->17<!-- /canon --> providers · 1 contract · sovereignty preserved.*
+🦋 *<!-- canon:providers -->18<!-- /canon --> providers · 1 contract · sovereignty preserved.*
 
 <!-- ═══ stdlib/extract-modes-v0.1.md ═══ -->
 
