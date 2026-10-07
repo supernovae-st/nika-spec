@@ -9,8 +9,8 @@ GitHub Issues, pull requests and releases remain the sources of live work.
 
 The Project overview begins with `project.product_brief` from the same manifest:
 the product goal, each component's role, the dated qualification boundary and
-links to the existing acceptance issues. Refresh this authored brief when a
-delivery changes the evidence; the projector publishes it with the operating
+links to the existing acceptance issues. Keep changing delivery status in the
+source-backed items rather than copying a snapshot into this brief; the projector publishes it with the operating
 guide. It neither creates a second backlog nor changes issue acceptance.
 
 The projector follows six laws:
@@ -68,3 +68,16 @@ API. Their complete browser recipe lives in `project-os.yaml`, and the
 live audit verifies every view property that GitHub does expose. View
 membership and layouts are API-verifiable; saved tab order remains a
 browser QA check because the API returns creation order.
+
+## Keeping the projection current
+
+`project.repositories` owns the public ecosystem list; the source lists reuse
+that YAML anchor. Private research and developer workspaces are not Project
+sources. Repository visibility is checked before any metadata or link mutation.
+
+The existing `project-os` workflow reconciles on source events, dispatch and its
+scheduled sweep. A successful offline audit is distinct from a successful live
+reconciliation. `--check` detects metadata drift as well as item drift, without
+writing. A manual board edit is not a durable fix: change the owning manifest or
+source item, preview, apply, then check again. Browser-only views remain with the
+UI guardian; it must use the current manifest and its declared preflight path.
