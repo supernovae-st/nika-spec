@@ -311,7 +311,7 @@ CONSTRUCTS = [
     ("outputs",       "typed workflow outputs (callable)", "/reference/yaml-syntax"),
     ("agent_tools",   "default-deny tool grants",          "/concepts/verbs"),
     ("capture",       "structured exec capture",           "/concepts/verbs"),
-    ("local_model",   "sovereign local model",             "/concepts/providers"),
+    ("local_model",   "local inference",                   "/concepts/providers"),
 ]
 
 
