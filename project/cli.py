@@ -20,7 +20,7 @@ from .github import (
     reconcile,
     update_project_metadata,
 )
-from .sources import desired_from_sources
+from .sources import desired_from_sources, ensure_public_repositories
 
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -159,6 +159,11 @@ def main(argv: list[str] | None = None) -> int:
     )
     client = GitHub(token)
     try:
+        # Validate all declared sources before linking or publishing metadata.
+        repositories = set(project_definition["repositories"])
+        for source in manifest["sources"].values():
+            repositories.update(source.get("repositories", []))
+        ensure_public_repositories(client, sorted(repositories))
         project = load_project(
             client,
             project_definition["organization"],
@@ -185,20 +190,18 @@ def main(argv: list[str] | None = None) -> int:
                     project_definition["repositories"],
                 )
             )
-            setup_actions.extend(
-                update_project_metadata(
-                    client,
-                    project,
-                    project_definition,
-                    render_readme(manifest),
-                )
-            )
         else:
             fields = project_fields(client, project["id"])
             for definition in manifest["fields"]:
                 if definition["name"] not in fields:
                     setup_actions.append(f"field missing: {definition['name']}")
 
+        setup_actions.extend(
+            update_project_metadata(
+                client, project, project_definition, render_readme(manifest),
+                apply=apply,
+            )
+        )
         desired, source_actions = desired_from_sources(
             client,
             manifest,

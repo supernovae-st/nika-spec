@@ -577,6 +577,8 @@ def update_project_metadata(
     project: dict[str, Any],
     definition: dict[str, Any],
     readme: str,
+    *,
+    apply: bool = True,
 ) -> list[str]:
     wanted = {
         "public": definition["public"],
@@ -585,6 +587,8 @@ def update_project_metadata(
     }
     if all(project.get(key) == value for key, value in wanted.items()):
         return []
+    if not apply:
+        return ["project metadata drift"]
     query = """
       mutation($project:ID!,$public:Boolean!,$short:String!,$readme:String!){
         updateProjectV2(input:{
