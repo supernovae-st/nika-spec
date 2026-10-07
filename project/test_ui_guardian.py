@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Tests for the Project OS browser-only guardian contract."""
+"""The retired UI guardian must not restore a duplicate planning surface."""
 
 from __future__ import annotations
 
@@ -34,22 +34,16 @@ class UiGuardianContractTests(unittest.TestCase):
     def test_canonical_guardian_contract_is_valid(self) -> None:
         self.assertEqual([], self.findings())
 
-    def test_missing_hard_boundary_is_rejected(self) -> None:
-        guardian = self.manifest["automation"]["ui_guardian"]
-        guardian["forbids"].remove("items")
-
+    def test_restored_ui_repairs_are_rejected(self) -> None:
+        self.manifest["automation"]["ui_guardian"]["repairs"] = ["views"]
         self.assertIn(
-            "UI guardian is missing forbidden surfaces ['items']",
-            self.findings(),
+            "retired UI guardian must have no repairs or cadence", self.findings()
         )
 
-    def test_workflows_are_observe_only(self) -> None:
-        guardian = self.manifest["automation"]["ui_guardian"]
-        guardian["repairs"].append("built_in_workflows")
-
+    def test_reactivated_publisher_is_rejected(self) -> None:
+        self.manifest["automation"]["publisher"] = "enabled"
         self.assertIn(
-            "UI guardian may repair only views and insights",
-            self.findings(),
+            "retired Project automation.publisher must be disabled", self.findings()
         )
 
 

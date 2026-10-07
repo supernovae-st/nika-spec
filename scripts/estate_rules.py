@@ -386,7 +386,7 @@ PATTERNS = [
     {
         "glob": "timeline/**",
         "class": "authored",
-        "evidence": "timeline.yaml (the SSOT — 'every provable claim … re-proven against its source of truth' per timeline.yml) + verify.py + project-board.py (writes OUTWARD to the org Projects board, never into this tree)",
+        "evidence": "timeline.yaml (the SSOT — 'every provable claim … re-proven against its source of truth' per timeline.yml) + verify.py + project archive (historical normalization only; planning moved to Linear)",
     },
     {
         "glob": "registry/**",
@@ -406,7 +406,7 @@ PATTERNS = [
     {
         "glob": ".github/**",
         "class": "authored",
-        "evidence": "6 hand-written SHA-pinned workflows (conformance · timeline · board · codeql · reuse · scorecard) + dependabot config — ZERO in-repo bot lanes: board.yml writes to the org Projects board, timeline.yml verifies read-only, nothing here rewrites tracked files; requirements.txt excepted in files:",
+        "evidence": "6 hand-written SHA-pinned workflows (conformance · timeline · board · codeql · reuse · scorecard) + dependabot config — ZERO in-repo bot lanes: board.yml verifies the retired Project archive offline, timeline.yml verifies read-only, nothing here rewrites tracked files; requirements.txt excepted in files:",
     },
     {
         "glob": "*",

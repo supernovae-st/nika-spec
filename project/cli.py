@@ -1,4 +1,4 @@
-"""Command line entry point for Nika Project OS."""
+"""Historical projector; current planning is in Linear, not GitHub Projects."""
 
 from __future__ import annotations
 
@@ -33,6 +33,8 @@ def load_yaml(path: pathlib.Path) -> dict[str, Any]:
 
 
 def render_readme(manifest: dict[str, Any]) -> str:
+    if manifest.get("lifecycle", {}).get("status") == "retired":
+        return manifest["project"]["product_brief"].strip()
     fields = manifest["fields"] + manifest.get("built_in_fields", [])
     views = manifest["views"]
     insights = manifest["insights"]
@@ -128,17 +130,19 @@ def render_readme(manifest: dict[str, Any]) -> str:
 
 
 def parser() -> argparse.ArgumentParser:
-    value = argparse.ArgumentParser(description="Reconcile Nika Project OS")
+    value = argparse.ArgumentParser(
+        description="Historical Nika Project (retired; current planning is in Linear)"
+    )
     mode = value.add_mutually_exclusive_group()
     mode.add_argument(
         "--apply",
         action="store_true",
-        help="apply the incremental repair",
+        help="retired compatibility flag; no writes are performed",
     )
     mode.add_argument(
         "--check",
         action="store_true",
-        help="report drift without writing (the default)",
+        help="retired compatibility flag; use project/verify.py --offline",
     )
     return value
 
@@ -146,12 +150,20 @@ def parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     arguments = parser().parse_args(argv)
     apply = arguments.apply
+    manifest = load_yaml(MANIFEST_PATH)
+    if manifest.get("lifecycle", {}).get("status") != "active":
+        print(
+            "project-os: retired; current planning is in "
+            "https://linear.app/nika-supernovae. "
+            "Use project/verify.py --offline for historical validation.",
+            file=sys.stderr,
+        )
+        return 2
     token = os.environ.get("BOARD_PROJECT_TOKEN", "")
     if not token:
         print("BOARD_PROJECT_TOKEN is not set", file=sys.stderr)
         return 2
 
-    manifest = load_yaml(MANIFEST_PATH)
     timeline = load_yaml(TIMELINE_PATH)
     project_definition = manifest["project"]
     field_definitions = (
