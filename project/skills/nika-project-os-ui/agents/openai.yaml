@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
 interface:
-  display_name: "Nika Project OS UI Guardian"
-  short_description: "Verify and repair GitHub Project UI drift"
-  default_prompt: "Use $nika-project-os-ui to verify and repair the browser-only views and Insights of the Nika Project OS."
+  display_name: "Nika Project Archive"
+  short_description: "Read historical GitHub Project records"
+  default_prompt: "Use $nika-project-os-ui to inspect a historical Nika Project record and distinguish it from current Linear planning."

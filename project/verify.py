@@ -227,33 +227,19 @@ def offline_findings(
         findings.append(
             "terminal source items must settle in place from actual state"
         )
+    lifecycle = manifest.get("lifecycle", {})
+    if lifecycle.get("status") != "retired":
+        findings.append("GitHub Project planning must remain retired")
+    if lifecycle.get("planning_url") != "https://linear.app/nika-supernovae":
+        findings.append("current planning must point to the Nika Linear workspace")
     automation = manifest.get("automation", {})
+    expected = {"status": "retired", "publisher": "disabled", "scheduler": "disabled"}
+    for key, value in expected.items():
+        if automation.get(key) != value:
+            findings.append(f"retired Project automation.{key} must be {value}")
     guardian = automation.get("ui_guardian", {})
-    if guardian.get("skill") != "nika-project-os-ui":
-        findings.append("UI guardian must use nika-project-os-ui")
-    if guardian.get("preflight") != "project/project-os-audit.nika":
-        findings.append("UI guardian must use the canonical Nika preflight")
-    if set(guardian.get("repairs", [])) != {"views", "insights"}:
-        findings.append("UI guardian may repair only views and insights")
-    if set(guardian.get("observes", [])) != {"built_in_workflows"}:
-        findings.append("built-in workflows must remain observe-only")
-    required_forbidden = {
-        "items",
-        "field_values",
-        "field_options",
-        "project_readme",
-        "project_description",
-        "repository_links",
-        "workflows",
-        "gate_dates",
-    }
-    missing_forbidden = sorted(
-        required_forbidden - set(guardian.get("forbids", []))
-    )
-    if missing_forbidden:
-        findings.append(
-            f"UI guardian is missing forbidden surfaces {missing_forbidden}"
-        )
+    if guardian.get("repairs") != [] or guardian.get("cadence") != "none":
+        findings.append("retired UI guardian must have no repairs or cadence")
 
     try:
         normalized = timeline_items(timeline)
@@ -366,6 +352,13 @@ def main(argv: list[str] | None = None) -> int:
     manifest = load(ROOT / "project" / "project-os.yaml")
     timeline = load(ROOT / "timeline" / "timeline.yaml")
     findings = offline_findings(manifest, timeline)
+    if not values.offline and manifest.get("lifecycle", {}).get("status") == "retired":
+        print(
+            "project verify: live Project audit is retired; use --offline. "
+            "Current planning: https://linear.app/nika-supernovae",
+            file=sys.stderr,
+        )
+        return 2
     if not values.offline:
         token = os.environ.get("BOARD_PROJECT_TOKEN", "")
         if not token:

@@ -1,83 +1,31 @@
-# 🦋 Nika Project OS
+# Nika planning has moved to Linear
 
-**One public operating surface. Zero second backlog.**
+[Linear](https://linear.app/nika-supernovae) owns current priorities and tasks.
+The former GitHub Project is a historical archive, not a second kanban.
+Public contributions remain welcome through GitHub issues and pull requests;
+code, review, CI and releases remain in their owning repositories.
 
-`project-os.yaml` is the projection contract. It declares the sources,
-field writers, visual grammar, eight lenses, six Pulse charts and automation.
-`timeline/timeline.yaml` remains the source of the record and gates.
-GitHub Issues, pull requests and releases remain the sources of live work.
+`project-os.yaml` records the archived fields, source identities and views.
+Their old status values are historical observations, not current progress.
+The reconciliation publisher, source-event triggers, schedule and browser
+repair instructions have been retired. The CLI refuses both `--apply` and
+`--check` before connecting to GitHub, including when a token is available.
+Do not recreate the board from an old checkout or scheduled UI guardian.
 
-The Project overview begins with `project.product_brief` from the same manifest:
-the product goal, each component's role, the dated qualification boundary and
-links to the existing acceptance issues. Keep changing delivery status in the
-source-backed items rather than copying a snapshot into this brief; the projector publishes it with the operating
-guide. It neither creates a second backlog nor changes issue acceptance.
+The source normalization and reconciliation libraries remain available for
+reading historical exports and their regression tests. They are not installed
+as a planning integration. Public release history and conditions remain in
+`timeline/timeline.yaml`; its existing validation and publication are separate
+from the retired Project.
 
-The projector follows six laws:
-
-1. Stable `SSOT ID` values match items across runs.
-2. A field has one writer.
-3. Reconciliation is incremental. It never wipes the Project.
-4. Unknown and retired items are retained as `◇ quarantined` or
-   `◌ orphaned`, so Insights history is not destroyed.
-5. Every projector-owned classification carries one stable semantic sigil.
-6. `Signal` is derived attention. `Priority` and `Effort` remain human choices.
-
-Closed sources settle in place. The reconciler reads each retained item's
-actual source state from the Project snapshot; a closed or merged source
-moves to its terminal Stage — `● settled · completed at source`,
-`● settled · merged at source` or `○ closed · not integrated` — with Signal
-`● settled`, leaving the active lenses. Closure is never shipment: `Proof`
-stays `◌ pending` until the record itself proves the work. A settled pull
-request clears `Review state` and `CI state`, which described its last open
-head and are not re-read after closure. A source that
-cannot be read keeps no lifecycle claim: the orphan is cleared to
-`? unknown`, never painted done.
-
-## 🚨 Signal
-
-| Value | Meaning |
-|---|---|
-| `🚨 attention` | blocked, failing or changes requested |
-| `👀 review` | a pull request needs a human decision |
-| `▶ active` | owned work is moving |
-| `⏭ queued` | ready for an owner or its turn |
-| `✓ ready` | approved and green, ready to integrate |
-| `● settled` | already part of the record |
-
-Run the offline audit:
+Run the retained offline checks:
 
 ```bash
 python3 project/verify.py --offline
+python3 timeline/verify.py --offline
+python3 -m unittest discover -s project -t . -p "test_*.py"
 ```
 
-Preview a live reconciliation without writing:
-
-```bash
-BOARD_PROJECT_TOKEN=... python3 -m project.cli --check
-```
-
-Apply the live reconciliation:
-
-```bash
-BOARD_PROJECT_TOKEN=... python3 -m project.cli --apply
-```
-
-GitHub does not expose view and Insights creation through its public
-API. Their complete browser recipe lives in `project-os.yaml`, and the
-live audit verifies every view property that GitHub does expose. View
-membership and layouts are API-verifiable; saved tab order remains a
-browser QA check because the API returns creation order.
-
-## Keeping the projection current
-
-`project.repositories` owns the public ecosystem list; the source lists reuse
-that YAML anchor. Private research and developer workspaces are not Project
-sources. Repository visibility is checked before any metadata or link mutation.
-
-The existing `project-os` workflow reconciles on source events, dispatch and its
-scheduled sweep. A successful offline audit is distinct from a successful live
-reconciliation. `--check` detects metadata drift as well as item drift, without
-writing. A manual board edit is not a durable fix: change the owning manifest or
-source item, preview, apply, then check again. Browser-only views remain with the
-UI guardian; it must use the current manifest and its declared preflight path.
+The `project-archive-audit` workflow runs these checks on relevant changes and
+manual dispatch. It has no Project token, scheduler or mutation job. The
+historical `.nika` audit remains an offline example.

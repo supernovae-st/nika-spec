@@ -30,6 +30,8 @@ class FreshnessTests(unittest.TestCase):
 
     def test_private_source_refuses_before_any_project_mutation(self) -> None:
         manifest = cli.load_yaml(cli.MANIFEST_PATH)
+        # Exercise the retained historical reconciliation implementation.
+        manifest["lifecycle"]["status"] = "active"
         manifest["sources"]["github_issues"]["repositories"] = ["private-repo"]
         client = MagicMock()
         client.rest.side_effect = lambda method, path: {

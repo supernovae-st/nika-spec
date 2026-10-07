@@ -1,12 +1,15 @@
-# Nika Project OS · projection contract
+# Historical GitHub Project projection, retired on 2026-10-07.
 # SPDX-License-Identifier: Apache-2.0
-#
-# This file defines the public GitHub Project surface. It is not a second
-# backlog. Every field names its writer, every view names its purpose, and
-# browser-only settings are explicit because GitHub does not expose view
-# creation or editing through the public API.
+# Fields, views and source identities below describe the preserved archive.
+# They are not a current planning contract or a recipe to restore the board.
 
 schema_version: 3
+
+lifecycle:
+  status: retired
+  retired_on: "2026-10-07"
+  planning_url: "https://linear.app/nika-supernovae"
+  reason: "Linear owns current priorities and tasks; GitHub keeps public contribution intake, code, review, CI and releases."
 
 visual_grammar:
   law: "Every projector-owned classification carries one stable semantic sigil. The sigil carries meaning; color only reinforces it."
@@ -31,43 +34,15 @@ project:
     - gh-nika
     - nika-estate
     - homebrew-tap
-  short_description: "One public operating surface for Nika · record, gates, issues, pull requests and releases · projected from their real sources."
+  short_description: "Historical archive · current planning moved to Linear · GitHub issues, code, review, CI and releases remain active."
   product_brief: |
-    ## From an intention to a reusable workflow and a result
+    ## Historical Nika Project
 
-    **Product goal:** describe the work in Nika, clarify what matters, inspect the
-    proposed workflow, then run it and inspect the result. Revise it in the same
-    conversation without losing earlier requirements or editing generated code
-    by hand. The language, engine, TUI and SDK share this product path.
-
-    **Architecture direction:** preserve the complete `.nika` document through
-    composition and revision. Reuse identified building blocks where they fit;
-    generate and repair the remaining parts. Language checks, contextual model
-    judgments and observed outcomes answer different questions. A retrieved
-    example or a confident verdict alone does not prove a correct result.
-
-    | Component | Responsibility | Public work and evidence |
-    |---|---|---|
-    | **Session / TUI** | Context, questions, proposal, revision, save, Run and inspection in one continuous workspace. | [Intent-to-run integration](https://github.com/supernovae-st/nika/pull/1764), [durable Session](https://github.com/supernovae-st/nika/issues/1464). |
-    | **Language / compiler** | Preserve source and semantics, assemble reusable parts, diagnose and repair incomplete candidates. | [Composition acceptance](https://github.com/supernovae-st/nika/issues/1666), [language specification](https://github.com/supernovae-st/nika-spec). |
-    | **Foundry / evaluation** | Supply reusable knowledge with provenance; measure actual reuse, fidelity and preparation time against independent obligations. | [Evaluation](https://github.com/supernovae-st/nika/issues/1656), [benchmark work](https://github.com/supernovae-st/nika/issues/457). |
-    | **Check / runtime** | Validate the program, execute the chosen revision and expose outputs, effects and diagnostics. | [Proof](https://github.com/supernovae-st/nika/issues/1669), [effect reliability](https://github.com/supernovae-st/nika/issues/1695). |
-    | **SDK / integrations** | Expose the same engine to clients, with explicit capabilities and compatible contracts. | [Compile and answer rounds](https://github.com/supernovae-st/nika-client/pull/150), [ecosystem tracking](https://github.com/supernovae-st/nika/issues/841). |
-    | **Docs / tools / distribution** | Keep published examples, editor support, plugins, actions and packages aligned with their actual release. | The repository field and the release lens identify each owning project. [Published engine artifacts](https://github.com/supernovae-st/nika/releases). |
-
-    Users choose their intelligence and access; this board imposes no preferred
-    provider. Available capabilities and tested routes come from the selected
-    implementation. Fast preparation and reliable outcomes remain measurements
-    to demonstrate, not guarantees inferred from an architecture diagram.
-
-    **Read current state from the items below.** PR checks apply to their exact
-    head; a merge establishes integration, a release establishes publication,
-    and a qualification receipt identifies the tested use cases. The integration
-    PRs above describe remaining limitations. Neither a closed issue nor a
-    passing mock test establishes general intent-to-result reliability.
-
-    [Earlier qualification, September 2026](https://github.com/supernovae-st/nika/blob/8e1683d2237e1bbfa7401b7ed853ab91a2e2e6c9/docs/qa/delivery-a-2026-09.md)
-    remains a historical receipt, not the current delivery status.
+    Current priorities and tasks are managed in [Linear](https://linear.app/nika-supernovae).
+    This GitHub Project preserves earlier records; its cards and views no longer
+    describe current activity. Public contributions remain welcome through
+    GitHub issues and pull requests. Code, reviews, checks and releases remain
+    in their owning repositories.
 
 sources:
   timeline:
@@ -323,28 +298,12 @@ insights:
   - { name: "🛡 Proof contract", chart: BAR, x: Proof }
 
 automation:
-  on_timeline_change: reconcile
-  on_issue_change: reconcile
-  on_pull_request_change: reconcile
-  on_release_change: reconcile
-  full_reconcile: "17 */6 * * *"
-  external_reproof: "17 6 * * 1"
-  browser_only:
-    - views
-    - insights
-    - built_in_workflows
+  status: retired
+  publisher: disabled
+  scheduler: disabled
   ui_guardian:
     skill: nika-project-os-ui
     preflight: project/project-os-audit.nika
-    cadence: daily
-    repairs: [views, insights]
-    observes: [built_in_workflows]
-    forbids:
-      - items
-      - field_values
-      - field_options
-      - project_readme
-      - project_description
-      - repository_links
-      - workflows
-      - gate_dates
+    cadence: none
+    repairs: []
+    observes: [archive]

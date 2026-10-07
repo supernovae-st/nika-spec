@@ -1,16 +1,8 @@
-# Nika Project OS · prove locally, then reconcile the public Project.
-#
-# timeline/timeline.yaml owns the record and gates. GitHub Issues, pull
-# requests and releases own live work. project/project-os.yaml owns only the
-# projection contract. The reconciler is incremental and never deletes a
-# Project item.
-#
-# SECURITY: zero interpolation of event data in run steps. Every third-party
-# action is SHA-pinned. BOARD_PROJECT_TOKEN reaches Python through env only.
-# GITHUB_TOKEN cannot write an organization Project, so a missing fine-grained
-# token renders a notice and skips the live leg without weakening the audit.
+# GitHub planning retired: Linear owns current priorities and tasks.
+# This workflow validates historical data and the public timeline offline.
+# It has no publisher, source-event trigger, scheduler or Project token.
 
-name: project-os
+name: project-archive-audit
 
 on:
   push:
@@ -24,31 +16,13 @@ on:
       - "timeline/**"
       - "project/**"
       - ".github/workflows/board.yml"
-  issues:
-    types:
-      - opened
-      - edited
-      - closed
-      - reopened
-      - assigned
-      - unassigned
-      - labeled
-      - unlabeled
-      - milestoned
-      - demilestoned
-  release:
-    types: [published, edited, deleted]
-  repository_dispatch:
-    types: [nika-project-os-sync]
-  schedule:
-    - cron: "17 */6 * * *"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: project-os
+  group: project-archive-audit
   cancel-in-progress: false
 
 jobs:
@@ -64,49 +38,10 @@ jobs:
         run: |
           set -euo pipefail
           python3 -m pip install --quiet --require-hashes -r .github/requirements.txt
-      - name: Prove Project OS offline
+      - name: Verify archived projection and live timeline offline
         run: |
           set -euo pipefail
           python3 project/verify.py --offline
           python3 timeline/verify.py --offline
           python3 -m unittest discover -s project -t . -p "test_*.py"
           ruff check project timeline/verify.py
-
-  reconcile:
-    if: github.event_name != 'pull_request'
-    needs: audit
-    runs-on: ubuntu-latest
-    # Initial historical repair can exceed 3,000 throttled field mutations.
-    # Keep it bounded while allowing the incremental projection to converge.
-    timeout-minutes: 45
-    steps:
-      - name: Guard on the Project token
-        id: guard
-        env:
-          BOARD_KEY: ${{ secrets.BOARD_PROJECT_TOKEN }}
-        run: |
-          set -euo pipefail
-          if [ -n "${BOARD_KEY:-}" ]; then
-            echo "ok=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "ok=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::BOARD_PROJECT_TOKEN unset · Project OS reconciliation skipped"
-          fi
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        if: steps.guard.outputs.ok == 'true'
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
-        if: steps.guard.outputs.ok == 'true'
-        with:
-          python-version: "3.12"
-      - name: Install the pinned projector environment
-        if: steps.guard.outputs.ok == 'true'
-        run: |
-          set -euo pipefail
-          python3 -m pip install --quiet --require-hashes -r .github/requirements.txt
-      - name: Reconcile Project OS
-        if: steps.guard.outputs.ok == 'true'
-        env:
-          BOARD_PROJECT_TOKEN: ${{ secrets.BOARD_PROJECT_TOKEN }}
-        run: |
-          set -euo pipefail
-          python3 -m project.cli --apply
