@@ -30,6 +30,15 @@ surfaces (the binary boundary · never linkage):
   prologue from the same frozen journal bytes, which must not change while
   the commands run.
 
+- the ACCESS door · an access-harness fixture that injects a route world
+  (`run.json` `access_routes`) runs through `runtime_access_adapter.py`: one
+  isolated stage of scripted ACP agents, product CLIs and loopback inference
+  endpoints, the same `nika run --json` of the unchanged workflow, then the
+  peers' own logs (`observed`) and the engine's `access_requirement` /
+  `access_selection` terminal fields (`receipt`) beside the run door's own
+  admission and execution judgment. `NIKA_ACCESS_EVIDENCE_DIR=<dir>` keeps
+  each stage, its raw engine output and an index outside the repository.
+
 Verdicts per fixture: AGREE · DIVERGE (each difference named) ·
 ENGINE-ERROR (crash / timeout / signal / no events / a journal changed under
 measurement — counted loud, never folded into divergence) · FIXTURE-ERROR
@@ -43,8 +52,10 @@ Exit 0 iff every fixture AGREEs.
 """
 from __future__ import annotations
 
+import runtime_access_adapter as access_adapter
 import trace_media
 
+import datetime
 import hashlib
 import json
 import math
@@ -61,6 +72,9 @@ SPEC_ROOT = pathlib.Path(__file__).resolve().parent.parent
 # Behavioral markers anywhere under tests/ include stdlib's run fixtures.
 # Discover malformed neighbors too; static expected.json/lints stay separate.
 RUNTIME = SPEC_ROOT / "conformance" / "tests"
+# Set by main from NIKA_ACCESS_EVIDENCE_DIR: where access stages are kept.
+ACCESS_EVIDENCE: pathlib.Path | None = None
+ENGINE_IDENTITY: dict[str, dict] = {}
 
 TERMINAL_TASK_KINDS = {
     "task_completed", "task_failed", "task_skipped", "task_cancelled",
@@ -151,18 +165,34 @@ def project(events: list[dict]) -> dict:
     return {"workflow_state": state, "tasks": tasks, "events": seen}
 
 
+def launch_args(run: dict) -> list[str]:
+    """run.json carries the launch invocation: `vars` and `inputs` both land on
+    --var (the flag sets a workflow `inputs:` value). (The inputs key was
+    authored ahead of the README — found live: two regate fixtures failed
+    VAR-001 because the harness never threaded it, and the divergence was the
+    harness's.)"""
+    args = []
+    for k, v in {**(run.get("vars") or {}), **(run.get("inputs") or {})}.items():
+        args += ["--var", f"{k}={v if isinstance(v, str) else json_text(v)}"]
+    return args
+
+
+class Differences(list):
+    """A judge's differences, carrying the observations that explain the run
+    (`notes` · printed beside the verdict, never part of it)."""
+
+    def __init__(self, diffs=(), notes=()):
+        super().__init__(diffs)
+        self.notes = list(notes)
+
+
 def judge_run(engine: str, d: pathlib.Path) -> list[str]:
     """Differences between the projected run and expected-run.json."""
-    expected, run = load_run_contract(d)
-    cmd = [engine, "run", str(d / "input.nika"), "--json"]
-    # run.json carries the launch invocation: `vars` and `inputs` both land
-    # on --var (the flag sets a workflow `inputs:` value) · `env` overlays
-    # the subprocess. (The inputs key was authored ahead of the README —
-    # found live: two regate fixtures failed VAR-001 because the harness
-    # never threaded it, and the divergence was the harness's.)
-    launch = {**(run.get("vars") or {}), **(run.get("inputs") or {})}
-    for k, v in launch.items():
-        cmd += ["--var", f"{k}={v if isinstance(v, str) else json_text(v)}"]
+    expected, run, access = load_run_contract(d)
+    if access is not None:
+        return judge_access(engine, d, expected, run, access)
+    # `env` overlays the subprocess environment.
+    cmd = [engine, "run", str(d / "input.nika"), "--json", *launch_args(run)]
     env = dict(os.environ)
     env.update({k: str(v) for k, v in (run.get("env") or {}).items()})
     with tempfile.TemporaryDirectory(prefix="nika-rt-") as scratch:
@@ -196,6 +226,90 @@ def judge_run(engine: str, d: pathlib.Path) -> list[str]:
         raise RuntimeError(f"no events on stdout (rc={proc.returncode} · "
                            f"stderr: {proc.stderr.strip()[:140]!r})")
     return diff_execution(expected, proc.returncode, events)
+
+
+def judge_access(engine: str, d: pathlib.Path, expected: dict, run: dict,
+                 access: access_adapter.Contract) -> Differences:
+    """One staged route world, one real run: the run door's own judgment, the
+    peers' observations and the engine's receipt, each difference named."""
+    engine = access_adapter.resolve_engine(engine)
+    if engine not in ENGINE_IDENTITY:
+        ENGINE_IDENTITY[engine] = access_adapter.engine_identity(engine)
+    args = (["--access", access.launch] if access.launch else []) + launch_args(run)
+    try:
+        rel = d.resolve().relative_to(RUNTIME)
+    except ValueError:
+        rel = pathlib.Path(d.name)
+    keep = ACCESS_EVIDENCE / rel if ACCESS_EVIDENCE is not None else None
+    with access_adapter.Stage(access) as stage:
+        try:
+            proc = stage.run(engine, args)
+        finally:
+            if keep is not None:
+                stage.keep(keep / "stage")
+        observation = stage.observe()
+        notes = access_adapter.notes(stage, proc, observation)
+    receipts, unsupported, events, stdout, crash = {}, [], None, "", None
+    try:
+        stdout, stderr = decoded(proc.stdout), decoded(proc.stderr)
+        events = parse_events(stdout)
+    except (InvalidEvidence, ValueError) as error:
+        diffs = [f"invalid engine evidence: {error}"]
+    else:
+        reply = subprocess.CompletedProcess(proc.args, proc.returncode, stdout, stderr)
+        if not stdout.strip():
+            # No evidence at all is no refusal and no run: loud, before any
+            # admission comparison could read it as a divergence.
+            diffs, crash = [], (f"no evidence on stdout (rc={proc.returncode} · "
+                                f"stderr: {stderr.strip()[:140]!r})")
+        elif "admission" in expected:
+            diffs = diff_admission(expected["admission"], reply, events)
+            if expected["admission"]["accepted"]:
+                diffs += diff_execution(expected, proc.returncode, events)
+        elif events:
+            diffs = diff_execution(expected, proc.returncode, events)
+        else:
+            diffs, crash = [], f"no events on stdout (rc={proc.returncode})"
+    if proc.returncode < 0:
+        crash = f"killed by signal {-proc.returncode}"  # a crash is loud, never a divergence
+    diffs += access_adapter.diff_observed(access.observed, observation)
+    if access.receipt is not None:
+        # The asserted facts are judged twice: on the routes' own records and on
+        # the engine's receipt.
+        diffs += access_adapter.diff_physical(access.receipt, observation)
+        if events is None:
+            diffs.append("receipt: no readable engine evidence")
+        else:
+            more, unsupported, receipts = access_adapter.judge_receipts(
+                access, events, event_fields, strict_json)
+            diffs += more
+    notes += access_adapter.refusal_witness(stdout, events, event_fields, strict_json)
+    # A premise the stage could not realize leaves the selection unexercised: the
+    # differences it caused are recorded, never reported as the engine's.
+    gap = (access_adapter.unstaged_premise(expected, stdout, events, observation, strict_json)
+           if events is not None else None)
+    if keep is not None:
+        keep.mkdir(parents=True, exist_ok=True)
+        (keep / "stdout.ndjson").write_bytes(proc.stdout)
+        (keep / "stderr.txt").write_bytes(proc.stderr)
+        inputs = {name: hashlib.sha256((d / name).read_bytes()).hexdigest()
+                  for name in ("input.nika", "run.json", "expected-run.json") if (d / name).exists()}
+        record = {"fixture": rel.as_posix(), "argv": [str(a) for a in proc.args],
+                  "exit": proc.returncode, "differences": diffs, "unsupported": unsupported,
+                  "unstaged_premise": gap, "engine_error": crash, "notes": notes,
+                  "inputs_sha256": inputs, "engine": ENGINE_IDENTITY[engine],
+                  "observation": observation.summary(), "receipts": receipts}
+        (keep / "record.json").write_text(json.dumps(record, indent=2, sort_keys=True) + "\n",
+                                          encoding="utf-8")
+    if crash is not None:
+        raise RuntimeError(crash)
+    if gap is not None:
+        raise UnsupportedFixture(gap)
+    if diffs:
+        return Differences(diffs + [f"unsupported · {note}" for note in unsupported], notes)
+    if unsupported:
+        raise UnsupportedFixture("; ".join(unsupported))
+    return Differences([], notes)
 
 
 def diff_execution(expected: dict, code: int, events: list[dict]) -> list[str]:
@@ -409,8 +523,9 @@ def fixture_door(directory: pathlib.Path) -> str:
     return "run" if claim == "expected-run.json" else "trace"
 
 
-def load_run_contract(directory: pathlib.Path) -> tuple[dict, dict]:
-    """Validate every run assertion and invocation before calling the engine."""
+def load_run_contract(directory: pathlib.Path) -> tuple[dict, dict, access_adapter.Contract | None]:
+    """Validate every run assertion and invocation before calling the engine;
+    an injected route world is validated whole by the access adapter."""
     if fixture_door(directory) != "run":
         raise InvalidFixture("run door requires expected-run.json")
     def reject_constant(value):
@@ -488,13 +603,32 @@ def load_run_contract(directory: pathlib.Path) -> tuple[dict, dict]:
                 raise ValueError(f"vars and inputs disagree for {key}")
     except (ValueError, TypeError, UnicodeError, OSError) as error:
         raise InvalidFixture(str(error)) from error
-    # Injected seats and routes, the run's receipt and the adapter's own route
-    # observations all need the separate harness adapter (access-harness/README).
-    unsupported = set(run) & {"access", "harness_attestations", "access_routes"}
+    # An injected route world runs through the access adapter, validated whole
+    # first: a malformed declaration is a fixture error, a premise it cannot
+    # stage is unsupported (access-harness/README).
+    if "access_routes" in run:
+        try:
+            access = access_adapter.contract(directory, expected, run)
+        except access_adapter.FixtureError as error:
+            raise InvalidFixture(str(error)) from error
+        except access_adapter.Unsupported as error:
+            raise UnsupportedFixture(str(error)) from error
+        if "harness_attestations" in run:
+            raise UnsupportedFixture(ATTESTATION_SEAM)
+        return expected, run, access
+    # Injected attestations have no seam on the reference engine, and a launch
+    # pin, a receipt or a route observation without a staged route world is not
+    # hermetic: the host's own routes would answer.
+    unsupported = set(run) & {"access", "harness_attestations"}
     unsupported |= set(expected) & {"receipt", "observed"}
     if unsupported:
-        raise UnsupportedFixture("injected harness/receipt adapter required: " + ", ".join(sorted(unsupported)))
-    return expected, run
+        raise UnsupportedFixture("needs an injected route world or an attestation seam: "
+                                 + ", ".join(sorted(unsupported)))
+    return expected, run, None
+
+
+ATTESTATION_SEAM = ("injected harness_attestations: the reference engine admits no attestation "
+                    "injection, so no adapter stages them")
 
 
 def diff_admission(expected: dict, proc, events: list[dict]) -> list[str]:
@@ -1435,11 +1569,19 @@ def selftest() -> int:
         ("conflicting input sources", valid_run, '{"vars":{"x":1},"inputs":{"x":true}}', InvalidFixture),
         ("null env", valid_run, '{"env":null}', InvalidFixture),
         ("injected harness", '{"admission":{"accepted":true}}', '{"harness_attestations":{}}', UnsupportedFixture),
-        ("access seat", valid_run, '{"access":"codex"}', UnsupportedFixture),
-        ("receipt", '{"admission":{"accepted":true},"receipt":{"tokens":null}}', '{}', UnsupportedFixture),
-        ("injected route world", valid_run, '{"access_routes":{"codex":{}}}', UnsupportedFixture),
-        ("route observation", '{"admission":{"accepted":true},"observed":{"acp_prompts":0}}', '{}',
-         UnsupportedFixture),
+        ("access seat without a route world", valid_run, '{"access":"codex"}', UnsupportedFixture),
+        ("receipt without a route world", '{"admission":{"accepted":true},"receipt":{"tokens":null}}',
+         '{}', UnsupportedFixture),
+        ("route world without its observed counts", valid_run, '{"access_routes":{"codex":{}}}',
+         InvalidFixture),
+        ("malformed route world", '{"admission":{"accepted":true},"observed":{"acp_prompts":0,'
+         '"api_inference_requests":0,"cli_invocations":0}}',
+         '{"access_routes":{"codex":{"acp":{"available":"yes"}}}}', InvalidFixture),
+        ("misspelled route side", '{"admission":{"accepted":true},"observed":{"acp_prompts":0,'
+         '"api_inference_requests":0,"cli_invocations":0}}',
+         '{"access_routes":{"codex":{"acpp":{"available":false}}}}', InvalidFixture),
+        ("route observation without a route world",
+         '{"admission":{"accepted":true},"observed":{"acp_prompts":0}}', '{}', UnsupportedFixture),
         ("misspelled observation", '{"admission":{"accepted":true},"observe":{}}', '{}', InvalidFixture),
     ]:
         with tempfile.TemporaryDirectory(prefix="nika-run-contract-selftest-") as scratch:
@@ -1465,13 +1607,28 @@ def selftest() -> int:
     return 1 if bad else 0
 
 
+def spec_identity() -> dict:
+    """The specification checkout judged: its commit and whether it carries changes."""
+    def git(*args):
+        return subprocess.run(["git", "-C", str(SPEC_ROOT), *args], capture_output=True,
+                              text=True, timeout=60).stdout
+    changes = git("status", "--porcelain").splitlines()
+    return {"head": git("rev-parse", "HEAD").strip(), "dirty": bool(changes), "changes": changes}
+
+
 def main(argv: list[str]) -> int:
+    global ACCESS_EVIDENCE
     if len(argv) > 1 and argv[1] == "--selftest":
         return selftest()
+    ENGINE_IDENTITY.clear()  # one sweep names only the binaries it judged
     engine = os.environ.get("NIKA_BIN") or shutil.which("nika") or "nika"
     root = RUNTIME
     if len(argv) > 1:
         root = SPEC_ROOT / "conformance" / "tests" / argv[1].removeprefix("conformance/tests/")
+    if os.environ.get(access_adapter.ENV_FILE):
+        stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%S.%fZ")
+        ACCESS_EVIDENCE = pathlib.Path(os.environ[access_adapter.ENV_FILE]).resolve() / stamp
+        ACCESS_EVIDENCE.mkdir(parents=True)
     markers = {"input.nika", "draft.nika", "run.json", "trace.ndjson"}
     dirs = sorted({p.parent for p in root.rglob("*") if p.is_file() and (
         p.name in markers or (p.name.startswith("expected-") and p.name != "expected-lints.json"))})
@@ -1479,6 +1636,7 @@ def main(argv: list[str]) -> int:
         print(f"FAIL  {root} · no runtime fixtures found")
         return 1
     agree = diverged = errors = fixture_errors = unsupported = 0
+    index = []
     for d in dirs:
         rel = d.relative_to(RUNTIME)
         try:
@@ -1487,15 +1645,19 @@ def main(argv: list[str]) -> int:
         except UnsupportedFixture as e:
             unsupported += 1
             print(f"UNSUPPORTED  {rel} · {e}")
+            index.append({"fixture": rel.as_posix(), "verdict": "UNSUPPORTED", "lines": [str(e)]})
             continue
         except InvalidFixture as e:
             fixture_errors += 1
             print(f"FIXTURE-ERROR  {rel} · {e}")
+            index.append({"fixture": rel.as_posix(), "verdict": "FIXTURE-ERROR", "lines": [str(e)]})
             continue
         except Exception as e:  # engine crash / timeout / no events — loud
             errors += 1
             print(f"ENGINE-ERROR  {rel} · {e}")
+            index.append({"fixture": rel.as_posix(), "verdict": "ENGINE-ERROR", "lines": [str(e)]})
             continue
+        notes = getattr(diffs, "notes", [])
         if diffs:
             diverged += 1
             print(f"DIVERGE   {rel}")
@@ -1504,9 +1666,24 @@ def main(argv: list[str]) -> int:
         else:
             agree += 1
             print(f"AGREE     {rel}")
+        for note in notes:
+            print(f"          · note · {note}")
+        index.append({"fixture": rel.as_posix(), "verdict": "DIVERGE" if diffs else "AGREE",
+                      "lines": list(diffs), "notes": notes})
+    for identity in ENGINE_IDENTITY.values():
+        print(f"\naccess adapter · engine {identity['path']} · sha256 {identity['sha256']} · "
+              f"{identity['version']}")
     print(f"\nruntime-differential · {agree + diverged + errors + fixture_errors + unsupported} fixtures · "
           f"{agree} agree · {diverged} diverge · {errors} engine-errors · "
           f"{fixture_errors} fixture-errors · {unsupported} unsupported")
+    if ACCESS_EVIDENCE is not None:
+        summary = {"root": root.relative_to(SPEC_ROOT).as_posix(), "spec": spec_identity(),
+                   "engines": list(ENGINE_IDENTITY.values()), "fixtures": index,
+                   "counts": {"agree": agree, "diverge": diverged, "engine_errors": errors,
+                              "fixture_errors": fixture_errors, "unsupported": unsupported}}
+        (ACCESS_EVIDENCE / "index.json").write_text(json.dumps(summary, indent=2) + "\n",
+                                                    encoding="utf-8")
+        print(f"evidence · {ACCESS_EVIDENCE}")
     return 1 if (diverged or errors or fixture_errors or unsupported) else 0
 
 

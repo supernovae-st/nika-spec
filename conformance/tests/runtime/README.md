@@ -52,9 +52,12 @@ The command runner validates assertion and invocation keys before execution.
 A pre-admission refusal requires a nonzero exit, the exact structured error
 code and each requested witness, with no workflow or task event. Compact
 check reports and error documents are not runtime events. A contract needing
-injected harness attestations or harness receipts is currently `UNSUPPORTED`
-by that runner, before any engine call; this is a nonzero suite result, never
-agreement. Malformed contracts at the supported run and verify doors are
+injected harness attestations is currently `UNSUPPORTED` by that runner,
+before any engine call; this is a nonzero suite result, never agreement. An
+injected route world (`access_routes`) and its receipt and observations run
+through the access adapter
+([contract](access-harness/README.md#the-command-adapter)). Malformed
+contracts at the supported run and verify doors are
 separately `FIXTURE-ERROR`; the separate doors named below are classified
 before their full contract is validated.
 
