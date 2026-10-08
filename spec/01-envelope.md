@@ -780,8 +780,9 @@ An empty `access: {}` or `reasoning: {}` selects nothing and is refused;
   may remain unknown.
 - **Judged before inference.** The static contract (the schema · `nika
   check`) is the shape only: the closed key sets, string values, a
-  nonempty kebab-case `via`, a nonempty `effort` without surrounding
-  whitespace, the `protocol` and `fallback` enums, no template · a
+  nonempty ASCII kebab-case `via`, a nonempty `effort` without surrounding
+  whitespace (the Unicode White_Space property · inner characters stay as
+  written), the `protocol` and `fallback` enums, no template · a
   violation is `NIKA-PARSE` · `validation_error`. Whether a route exists,
   speaks the protocol, serves the model or offers the effort is a runtime
   fact. The engine discovers it (an ACP handshake or a capability query is

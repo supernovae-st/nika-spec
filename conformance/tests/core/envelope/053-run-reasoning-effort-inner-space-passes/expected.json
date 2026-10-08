@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "LAW-GRAMMAR-0503 · only SURROUNDING whitespace is refused · inner characters are part of the verbatim native value; whether a route offers « extra high » is judged before inference, never here (the twin of 045)."
+}

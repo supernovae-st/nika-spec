@@ -291,7 +291,7 @@ class SchemaShape(unittest.TestCase):
         self.assertEqual(set(access["properties"]), {"via", "protocol", "fallback"})
         self.assertEqual(access["properties"]["protocol"]["enum"], ["api", "acp"])
         self.assertEqual(access["properties"]["fallback"]["enum"], ["none"])
-        self.assertEqual(access["properties"]["via"]["pattern"], "^[a-z][a-z0-9-]*$")
+        self.assertEqual(access["properties"]["via"]["pattern"], "^[a-z][a-z0-9-]*(?![\\s\\S])")
 
     def test_reasoning_requires_a_native_effort_and_lists_none(self):
         reasoning = SCHEMA["properties"]["run"]["properties"]["reasoning"]
@@ -301,6 +301,39 @@ class SchemaShape(unittest.TestCase):
         self.assertEqual(effort["type"], "string")
         # No universal scale: a value list here would be an invented catalog.
         self.assertFalse({"enum", "const", "examples", "default"} & set(effort))
+
+    def test_literal_rules_hold_on_every_edge(self):
+        """The schema implements the prose rules exactly, whatever a regex dialect does with $.
+
+        via: ASCII kebab-case, nothing after it. effort: nonempty, no surrounding
+        Unicode White_Space (inner characters kept), no template.
+        """
+        from jsonschema import Draft202012Validator
+        validator = Draft202012Validator(SCHEMA)
+        white_space = set(map(chr, [*range(0x09, 0x0E), 0x20, 0x85, 0xA0, 0x1680,
+                                    *range(0x2000, 0x200B), 0x2028, 0x2029, 0x202F, 0x205F,
+                                    0x3000]))
+
+        def admitted(run):
+            document = {"nika": "t", "tasks": {"a": {"infer": {"prompt": "hi"}}}, "run": run}
+            return not list(validator.iter_errors(document))
+
+        def kebab(text):
+            return bool(re.fullmatch(r"[a-z][a-z0-9-]*", text, flags=re.ASCII))
+
+        def verbatim(text):
+            core = text.strip("".join(white_space))
+            return bool(core) and core == text and "${{" not in text
+
+        for via in ["codex", "claude-code", "c0", "codex-", "codex\n", "\ncodex", "Codex",
+                    "co dex", "", "c\u00e9"]:
+            with self.subTest(via=via):
+                self.assertEqual(admitted({"access": {"via": via}}), kebab(via))
+        for effort in ["high", "x", "extra high", "a\nb", "high\n", "\nhigh", " high", "high ",
+                       "high\t", "high\u0085", "\u00a0high", "high\u3000", "high\u2029",
+                       "\ufeffhigh", "high\x1c", "${{ inputs.e }}", "", " "]:
+            with self.subTest(effort=effort):
+                self.assertEqual(admitted({"reasoning": {"effort": effort}}), verbatim(effort))
 
     def test_selection_is_declared_only_under_run(self):
         places = []

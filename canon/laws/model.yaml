@@ -406,7 +406,7 @@ laws:
     title: "run.access est un ensemble fermé {via, protocol, fallback} · chaque clé optionnelle, la déclaration non vide · via kebab-case non vide · protocol api | acp · fallback none · valeurs littérales"
     prose_projection:
       chapters: ["01-envelope"]
-      text: "La forme de run.access est TOUT son contrat statique : un mapping fermé {via, protocol, fallback} (une clé inconnue refuse dans les deux modes de parse, comme permits:) · chaque clé est optionnelle mais access: {} ne sélectionne rien et refuse · via est un id de route kebab-case non vide (une application d'agents ou un id de fournisseur API · ensemble ouvert jugé par le registre de routes du moteur) · protocol est l'enum fermée api | acp · fallback est l'enum fermée none — omis, il vaut none dès que access: est déclaré (une sélection explicite est exacte · les alternatives déclarées ne sont pas spécifiées, une valeur future est additive) · aucune valeur n'est un template ${{ }} (la sélection est résolue avant la première tâche, depuis le fichier seul) · protocol omis : la route se connecte comme avant la déclaration. Violation = NIKA-PARSE · validation_error. L'existence de la route, le protocole qu'elle parle et le modèle qu'elle sert ne sont PAS jugés ici (LAW-CONF-0501)."
+      text: "La forme de run.access est TOUT son contrat statique : un mapping fermé {via, protocol, fallback} (une clé inconnue refuse dans les deux modes de parse, comme permits:) · chaque clé est optionnelle mais access: {} ne sélectionne rien et refuse · via est un id de route kebab-case ASCII non vide, sans rien après lui (une application d'agents ou un id de fournisseur API · ensemble ouvert jugé par le registre de routes du moteur) · protocol est l'enum fermée api | acp · fallback est l'enum fermée none — omis, il vaut none dès que access: est déclaré (une sélection explicite est exacte · les alternatives déclarées ne sont pas spécifiées, une valeur future est additive) · aucune valeur n'est un template ${{ }} (la sélection est résolue avant la première tâche, depuis le fichier seul) · protocol omis : la route se connecte comme avant la déclaration. Violation = NIKA-PARSE · validation_error. L'existence de la route, le protocole qu'elle parle et le modèle qu'elle sert ne sont PAS jugés ici (LAW-CONF-0501)."
     inputs:
       - registry: surface
         id: run_access
@@ -460,6 +460,7 @@ laws:
       - conformance/tests/core/envelope/043-run-access-via-empty-refused
       - conformance/tests/core/envelope/046-run-access-protocol-native-refused
       - conformance/tests/core/envelope/047-run-access-fallback-unknown-refused
+      - conformance/tests/core/envelope/051-run-access-via-trailing-newline-refused
     projections: ["prose:01-envelope", "schema", "cli:check", "lsp", "mcp", "sdk"]
     implementation_surfaces:
       - engine:nika-vocab
@@ -483,7 +484,7 @@ laws:
     title: "run.reasoning est un ensemble fermé {effort} · effort requis · la valeur native exacte : string non vide, sans espace autour, littérale · aucune échelle universelle"
     prose_projection:
       chapters: ["01-envelope"]
-      text: "run.reasoning est un mapping fermé {effort} et effort y est requis (reasoning: {} refuse) · effort est la valeur NATIVE exacte que la route sélectionnée annonce pour le modèle sélectionné : une string non vide, sans espace autour (refusée plutôt que rognée — une normalisation silencieuse transmettrait une valeur que l'auteur n'a pas écrite), jamais un nombre coercé, jamais un template ${{ }} · il n'existe AUCUNE échelle d'effort universelle : la spec ne liste aucune valeur, une valeur n'est l'alias d'aucune valeur d'une autre route, et infer.thinking garde son propre sens (aucun des deux contrôles n'est traduit en l'autre) · reasoning omis : chaque route garde son effort par défaut, qui peut rester inconnu. Violation = NIKA-PARSE · validation_error. Que la route offre la valeur est jugé avant inférence, après la sélection du modèle (LAW-CONF-0501)."
+      text: "run.reasoning est un mapping fermé {effort} et effort y est requis (reasoning: {} refuse) · effort est la valeur NATIVE exacte que la route sélectionnée annonce pour le modèle sélectionné : une string non vide, sans espace autour au sens de la propriété Unicode White_Space (refusée plutôt que rognée — une normalisation silencieuse transmettrait une valeur que l'auteur n'a pas écrite ; les caractères intérieurs restent tels qu'écrits), jamais un nombre coercé, jamais un template ${{ }} · il n'existe AUCUNE échelle d'effort universelle : la spec ne liste aucune valeur, une valeur n'est l'alias d'aucune valeur d'une autre route, et infer.thinking garde son propre sens (aucun des deux contrôles n'est traduit en l'autre) · reasoning omis : chaque route garde son effort par défaut, qui peut rester inconnu. Violation = NIKA-PARSE · validation_error. Que la route offre la valeur est jugé avant inférence, après la sélection du modèle (LAW-CONF-0501)."
     inputs:
       - registry: surface
         id: run_reasoning
@@ -520,12 +521,14 @@ laws:
       - conformance/tests/core/envelope/033-run-access-acp-effort-passes
       - conformance/tests/core/envelope/034-run-access-seeded-virtual-passes
       - conformance/tests/core/envelope/036-run-reasoning-effort-alone-passes
+      - conformance/tests/core/envelope/053-run-reasoning-effort-inner-space-passes
     negative_fixtures:
       - conformance/tests/core/envelope/040-run-reasoning-unknown-key-refused
       - conformance/tests/core/envelope/042-run-reasoning-effort-not-a-string-refused
       - conformance/tests/core/envelope/044-run-reasoning-effort-empty-refused
       - conformance/tests/core/envelope/045-run-reasoning-effort-padded-refused
       - conformance/tests/core/envelope/048-run-reasoning-effort-template-refused
+      - conformance/tests/core/envelope/052-run-reasoning-effort-block-scalar-refused
     projections: ["prose:01-envelope", "schema", "cli:check", "lsp", "mcp", "sdk"]
     implementation_surfaces:
       - engine:nika-vocab

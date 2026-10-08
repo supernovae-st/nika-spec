@@ -18,7 +18,7 @@
     },
     "model": {
       "type": "string",
-      "description": "Default model · `<provider>/<name>` (e.g. ollama/qwen3.5:9b · anthropic/claude-sonnet-4-6 · mock/echo)."
+      "description": "Default model · `<provider>/<name>` (e.g. ollama/qwen3.5:9b · anthropic/claude-sonnet-4-6 · mock/echo). Names WHICH model answers; how the run reaches it and the native effort it asks for are `run.access` and `run.reasoning` (spec/01-envelope.md §run)."
     },
     "inputs": {
       "type": "object",
@@ -294,8 +294,8 @@
           "properties": {
             "via": {
               "type": "string",
-              "pattern": "^[a-z][a-z0-9-]*$",
-              "description": "The access route's id · an agent application (e.g. `codex` · `claude-code`) or an API provider id (e.g. `openai`) · kebab-case. An open set: the engine's route registry judges it before inference, and no catalog is frozen here. A literal, never a `${{ }}` template."
+              "pattern": "^[a-z][a-z0-9-]*(?![\\s\\S])",
+              "description": "The access route's id · an agent application (e.g. `codex` · `claude-code`) or an API provider id (e.g. `openai`) · ASCII kebab-case, nothing after it (the end is anchored with a lookahead so no validator admits a trailing newline). An open set: the engine's route registry judges it before inference, and no catalog is frozen here. A literal, never a `${{ }}` template."
             },
             "protocol": {
               "enum": [
@@ -322,12 +322,12 @@
           "properties": {
             "effort": {
               "type": "string",
-              "pattern": "^\\S(.*\\S)?$",
+              "pattern": "^[^\\t-\\r \\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000](?:[\\s\\S]*[^\\t-\\r \\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000])?(?![\\s\\S])",
               "not": {
                 "type": "string",
                 "pattern": "\\$\\{\\{"
               },
-              "description": "The EXACT native effort value the selected route advertises for the selected model (e.g. `high` where the route offers it) · forwarded as that route's own option, never translated · there is no universal effort scale. Nonempty, no surrounding whitespace, a literal (never a `${{ }}` template). A value the route does not offer refuses before inference; this schema does not judge which values a route offers."
+              "description": "The EXACT native effort value the selected route advertises for the selected model (e.g. `high` where the route offers it) · forwarded verbatim as that route's own option, never translated · there is no universal effort scale. Nonempty, no surrounding whitespace (the Unicode White_Space property, spelled out in the pattern so every validator agrees; inner characters are kept as written), a literal (never a `${{ }}` template). A value the route does not offer refuses before inference; this schema does not judge which values a route offers."
             }
           }
         }
