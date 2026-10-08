@@ -145,7 +145,10 @@ def main():
     if "silent" in PLAN:
         return PLAN["silent"]
     if "refuse" in PLAN:
-        print(json.dumps({"error": PLAN["refuse"]}), flush=True)
+        # The reference engine settles a pre-run refusal as one run_settled frame.
+        document = ({"kind": "run_settled", "cause": "refused", "status": "failed",
+                     "error": PLAN["refuse"]} if PLAN.get("settled") else {"error": PLAN["refuse"]})
+        print(json.dumps(document), flush=True)
         return PLAN.get("exit", 3)
     emit("workflow_started", [("workflow", "scripted")])
     for task, terminal in PLAN.get("tasks", {}).items():
@@ -484,6 +487,12 @@ class AdmissionLaws(ScriptedEngineCase):
         self.assertVerdict("017", self.refusal("NIKA-1800", "run.access.protocol: api is not spoken"),
                            "AGREE")
 
+    def test_a_settled_refusal_is_read_and_named(self):
+        plan = self.refusal("NIKA-1803", "codex is installed, but its ACP adapter is not", settled=True)
+        self.assertVerdict("012", plan, "AGREE",
+                           "engine refused before any workflow or task event, at settlement "
+                           "(cause refused): NIKA-1803")
+
     def test_the_launch_option_reaches_the_engine_verbatim(self):
         plan = self.refusal("NIKA-1801", "--access openai contradicts run.access.via: codex",
                             expect_argv=["run", "input.nika", "--json", "--access", "openai"])
@@ -565,6 +574,10 @@ class ApiAndDeathLaws(ScriptedEngineCase):
         price = {"code": None, "message": "price unknown: this host cannot obtain a fresh one-time "
                                           "choice; use an interactive local `nika run`"}
         self.assertVerdict("005", {"refuse": price}, "UNSUPPORTED", "interactive one-time choice")
+        https = {"code": None, "message": "unknown-cost admission requires an exact HTTPS route and model"}
+        self.assertVerdict("007", {"refuse": https}, "UNSUPPORTED", "refuses that plain-HTTP route")
+        self.assertVerdict("007", {"refuse": dict(https, code="NIKA-1800")}, "UNSUPPORTED")
+        self.assertVerdict("005", {"refuse": https, "settled": True}, "UNSUPPORTED")
         # An inference sent before the refusal is an effect: never an unstaged premise.
         self.assertVerdict("007", {"refuse": price, "steps": [{"do": "api"}]}, "DIVERGE",
                            "admission: accepted run has no workflow_started",

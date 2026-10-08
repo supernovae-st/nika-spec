@@ -209,9 +209,10 @@ declaration keeps the route's default and sends none.
   state. An `env` overlay beside the route world, an unbound route, or an
   unadvertised `default_model`. Also, after the run: an admitted-run
   fixture that the engine refused before any event because the staged
-  loopback endpoint is unpriced to it and its unknown-cost review needs a
-  fresh interactive choice. The adapter never answers or bypasses that
-  review; any request it observed keeps the divergence.
+  loopback endpoint has no known USD price for it. Its unknown-cost
+  admission refuses that plain-HTTP route, and a reviewable route would
+  still need a fresh interactive choice. The adapter never answers or
+  bypasses that review; any request it observed keeps the divergence.
 - `ENGINE-ERROR` · a crash, a signal, a timeout, or nothing at all on
   stdout, whatever the exit. An empty reply is no refusal and no run, so it
   never reaches the admission comparison.
