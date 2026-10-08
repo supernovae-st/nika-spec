@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "validation_error"
+    }
+  ],
+  "note": "LAW-GRAMMAR-0502 · access is a closed set {via, protocol, fallback} · transport: is not a key (protocol: is) · refused in both parse modes, like permits:."
+}

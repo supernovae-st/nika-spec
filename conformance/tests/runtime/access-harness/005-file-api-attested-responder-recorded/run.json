@@ -1,0 +1,10 @@
+{
+  "access_routes": {
+    "openai": {
+      "api": {
+        "configured": true,
+        "responder": "gpt-5.5-2026-09-30"
+      }
+    }
+  }
+}

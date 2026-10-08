@@ -1,0 +1,32 @@
+{
+  "admission": {
+    "accepted": true
+  },
+  "workflow_state": "success",
+  "tasks": {
+    "summarize": {
+      "status": "success"
+    }
+  },
+  "receipt": {
+    "access_via": "codex",
+    "protocol": "acp",
+    "requested_model": "openai/gpt-5.5",
+    "requested_effort": null,
+    "transmitted_model": "openai/gpt-5.5",
+    "transmitted_effort": null,
+    "configured_model": null,
+    "configured_effort": null,
+    "model_evidence": "accepted_request",
+    "responding_model": null
+  },
+  "observed": {
+    "acp_config_before_first_prompt": {
+      "model": "openai/gpt-5.5"
+    },
+    "acp_prompts": 1,
+    "api_inference_requests": 0,
+    "cli_invocations": 0
+  },
+  "note": "01 §run four facts · a session that only acknowledges the model request has not confirmed a configuration: the receipt records accepted_request and no configured_model. No effort was declared, so none is applied and the route default stays unknown (the twin of 003)."
+}

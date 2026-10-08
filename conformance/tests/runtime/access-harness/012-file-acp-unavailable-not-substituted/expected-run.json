@@ -1,0 +1,15 @@
+{
+  "admission": {
+    "accepted": false,
+    "error_code": "NIKA-1803",
+    "witness_contains": [
+      "codex"
+    ]
+  },
+  "observed": {
+    "acp_prompts": 0,
+    "api_inference_requests": 0,
+    "cli_invocations": 0
+  },
+  "note": "01 §run fallback: none · the ACP adapter for codex is absent while the direct codex CLI and an OpenAI API credential that serve the same model are both ready: refused at admission (NIKA-1803) · zero prompts, zero API calls, zero CLI runs."
+}

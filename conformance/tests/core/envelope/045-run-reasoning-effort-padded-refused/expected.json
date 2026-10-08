@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "validation_error"
+    }
+  ],
+  "note": "LAW-GRAMMAR-0503 · a native value is exact · surrounding whitespace is refused rather than trimmed, because a silent normalization would forward a value the author did not write."
+}

@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-run-access-unknown-key
+run:
+  access:
+    via: codex
+    transport: acp
+tasks:
+  greet:
+    infer:
+      prompt: "hi"

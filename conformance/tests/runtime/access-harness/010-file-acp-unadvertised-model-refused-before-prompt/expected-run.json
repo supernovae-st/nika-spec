@@ -1,0 +1,18 @@
+{
+  "admission": {
+    "accepted": true
+  },
+  "workflow_state": "failure",
+  "tasks": {
+    "summarize": {
+      "status": "failure",
+      "error_code": "NIKA-1805"
+    }
+  },
+  "observed": {
+    "acp_prompts": 0,
+    "api_inference_requests": 0,
+    "cli_invocations": 0
+  },
+  "note": "01 §run · the session advertises only openai/gpt-5.4 and the file names openai/gpt-5.5: refused at session configuration (NIKA-1805) with the offered models named, zero prompts · never served by the advertised neighbour."
+}

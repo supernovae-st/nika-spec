@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-run-access-native
+run:
+  access:
+    via: codex
+    protocol: native
+tasks:
+  greet:
+    infer:
+      prompt: "hi"

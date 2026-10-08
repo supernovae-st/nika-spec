@@ -8,7 +8,8 @@
 registry_document_format: 1
 $comment: 'C0 sandbox skeleton + canon-flip import 2026-07-17 · seed row = yaml_profile_strict (family exemplar
   · real R7 language-feature import owed at C1) · + 5 mcp.protocol.* runtime_capability rows imported verbatim from
-  canon.yaml mcp.protocol_versions · gate: ssot-compiler --check-canon.'
+  canon.yaml mcp.protocol_versions · + run.access / run.reasoning language_feature rows (C2 · the access contract
+  · spec/01-envelope.md §run) · gate: ssot-compiler --check-canon.'
 features:
   - id: yaml_profile_strict
     status: reserved
@@ -21,6 +22,35 @@ features:
     conformance_profile: core
     notes: 'Placeholder wiring explicite : la détection réelle R7 (dérivée du Semantic IR) remplace cette row à
       l''import C0. detection_law cite la loi anchor comme exemplaire de la famille yaml-profile.'
+  - id: run.access
+    status: active
+    owner: spec
+    law_ids:
+      - LAW-GRAMMAR-0502
+      - LAW-SURFACE-0503
+      - LAW-CONF-0501
+    introduced_in: C2
+    kind: language_feature
+    detection_law: LAW-GRAMMAR-0502
+    conformance_profile: core
+    notes: 'Détectée quand un workflow déclare run.access (spec/01-envelope.md §run). Feature de LANGAGE, pas une
+      capacité : Core juge la forme statique ; honorer la sélection (route · protocole · modèle) ou la refuser avant
+      inférence est le contrat Runtime de LAW-CONF-0501. Un moteur antérieur la refuse comme clé run inconnue,
+      jamais en l''ignorant.'
+  - id: run.reasoning
+    status: active
+    owner: spec
+    law_ids:
+      - LAW-GRAMMAR-0503
+      - LAW-SURFACE-0503
+      - LAW-CONF-0501
+    introduced_in: C2
+    kind: language_feature
+    detection_law: LAW-GRAMMAR-0503
+    conformance_profile: core
+    notes: 'Détectée quand un workflow déclare run.reasoning.effort (spec/01-envelope.md §run). Feature de LANGAGE,
+      pas une capacité : aucune valeur d''effort n''est listée par le registre ; l''offre de la route est découverte
+      avant inférence (LAW-CONF-0501). Un moteur antérieur la refuse comme clé run inconnue.'
   - id: mcp.protocol.2026_07_28
     status: reserved
     owner: engine

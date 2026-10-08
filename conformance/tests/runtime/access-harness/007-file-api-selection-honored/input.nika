@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: file-api-selection-honored
+model: openai/gpt-5.5
+run:
+  access:
+    via: openai
+    protocol: api
+    fallback: none
+tasks:
+  summarize:
+    infer:
+      prompt: "Summarize the supplied note in one sentence."

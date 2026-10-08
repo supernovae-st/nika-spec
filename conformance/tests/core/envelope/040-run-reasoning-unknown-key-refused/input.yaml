@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-run-reasoning-unknown-key
+run:
+  reasoning:
+    effort: high
+    budget_tokens: 4000
+tasks:
+  greet:
+    infer:
+      prompt: "hi"

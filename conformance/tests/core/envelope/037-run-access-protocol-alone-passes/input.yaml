@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-run-access-protocol-alone
+model: openai/gpt-5.5
+run:
+  access:
+    protocol: api
+tasks:
+  greet:
+    infer:
+      prompt: "hi"

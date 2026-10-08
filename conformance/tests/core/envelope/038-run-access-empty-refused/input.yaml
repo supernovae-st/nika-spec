@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-run-access-empty
+run:
+  access: {}
+tasks:
+  greet:
+    infer:
+      prompt: "hi"

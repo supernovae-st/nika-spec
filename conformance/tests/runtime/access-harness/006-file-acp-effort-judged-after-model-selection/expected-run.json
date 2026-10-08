@@ -1,0 +1,33 @@
+{
+  "admission": {
+    "accepted": true
+  },
+  "workflow_state": "success",
+  "tasks": {
+    "summarize": {
+      "status": "success"
+    }
+  },
+  "receipt": {
+    "access_via": "codex",
+    "protocol": "acp",
+    "requested_model": "openai/gpt-5.5",
+    "requested_effort": "high",
+    "transmitted_model": "openai/gpt-5.5",
+    "transmitted_effort": "high",
+    "configured_model": "openai/gpt-5.5",
+    "configured_effort": "high",
+    "model_evidence": "configured",
+    "responding_model": null
+  },
+  "observed": {
+    "acp_config_before_first_prompt": {
+      "model": "openai/gpt-5.5",
+      "effort": "high"
+    },
+    "acp_prompts": 1,
+    "api_inference_requests": 0,
+    "cli_invocations": 0
+  },
+  "note": "01 §run native effort · the session's default model does not offer high, the selected model does: the effort is judged against the options offered AFTER the model is selected · an engine judging the pre-selection options would refuse a lawful file."
+}

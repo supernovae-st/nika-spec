@@ -1,0 +1,25 @@
+{
+  "admission": {
+    "accepted": true
+  },
+  "workflow_state": "success",
+  "tasks": {
+    "summarize": {
+      "status": "success"
+    }
+  },
+  "receipt": {
+    "access_via": "openai",
+    "protocol": "api",
+    "requested_model": "openai/gpt-5.5",
+    "requested_effort": null,
+    "transmitted_model": "openai/gpt-5.5",
+    "responding_model": "gpt-5.5-2026-09-30"
+  },
+  "observed": {
+    "acp_prompts": 0,
+    "api_inference_requests": 1,
+    "cli_invocations": 0
+  },
+  "note": "01 §run four facts · only an identity the route ATTESTS fills responding_model, verbatim: the API answer names gpt-5.5-2026-09-30, so that string is recorded beside the requested openai/gpt-5.5, neither rewritten into the other. An ACP session names no responder, so 003 keeps responding_model null."
+}

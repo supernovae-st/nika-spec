@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-run-effort-number
+run:
+  reasoning:
+    effort: 3
+tasks:
+  greet:
+    infer:
+      prompt: "hi"

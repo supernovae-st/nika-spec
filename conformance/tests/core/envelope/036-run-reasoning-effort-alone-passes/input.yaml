@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-run-reasoning-alone
+model: anthropic/claude-sonnet-4-6
+run:
+  reasoning:
+    effort: high
+tasks:
+  greet:
+    infer:
+      prompt: "hi"

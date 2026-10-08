@@ -307,3 +307,310 @@ laws:
       - "SSOT-1 point 31 verbatim : « Cette fenêtre peut être découpée en commits et PRs, mais elle doit être fermée avant le freeze 1.0. » L'import ModelRef appartient à cette unique fenêtre."
     closure_gates:
       - modelref-import-complete
+
+  # ─────────── Contrat d'accès ratifié · run.access · run.reasoning (pré-freeze) ───────────
+  #
+  # Changement normatif pré-freeze (CONTRIBUTING : PR directe contre spec/ avec ses
+  # fixtures · la porte NEP reste dormante jusqu'au pré-freeze v1). Le contrat sépare
+  # l'identité du modèle (model:, LAW-SURFACE-0501 inchangée) de la route
+  # (run.access.via), du protocole (run.access.protocol), du fallback
+  # (run.access.fallback) et de l'effort natif (run.reasoning.effort). Prose :
+  # spec/01-envelope.md §run. Schema : schemas/workflow.schema.json properties.run.
+  # Le couplage entropy × clock reste la loi LAW-TEMPORAL-0435, intacte.
+
+  - id: LAW-SURFACE-0503
+    slug: model/access-and-effort-are-run-declarations
+    status: active
+    owner: spec
+    domain: SURFACE
+    title: "Route, protocole, fallback et effort natif sont des déclarations de run:, distinctes de l'identité du modèle · protocole api | acp · aucune dixième clé d'enveloppe · aucune clé par tâche"
+    prose_projection:
+      chapters: ["01-envelope"]
+      text: "model: reste la string <provider>/<name> (LAW-SURFACE-0501) et dit QUEL modèle répond · run.access dit COMMENT le run l'atteint (via: la route · protocol: api | acp · fallback: none) · run.reasoning.effort dit quel effort NATIF lui est demandé. Une épellation par sens : access et reasoning vivent sous run: — l'enveloppe garde ses neuf clés et aucune clé access:/reasoning: n'existe au niveau tâche (un run, une route, comme un run, une horloge) · le vocabulaire de protocole est exactement api | acp : « native » n'est pas une troisième famille d'accès (une CLI directe est une implémentation d'adaptateur, jamais un protocole sélectionnable, et ne satisfait jamais acp) · la spec ne fige aucun catalogue de routes, de modèles ni d'efforts · les identifiants, comptes et facturation d'une route restent dans sa propre configuration, jamais dans le fichier."
+    inputs:
+      - registry: surface
+        id: run_access
+        role: required
+      - registry: surface
+        id: run_reasoning
+        role: required
+      - registry: ir
+        id: access_protocol_vocabulary
+        role: ceiling
+    premises:
+      - operator: member_of
+        operands:
+          - registry: surface
+            id: run_access
+          - registry: ir
+            id: run_declaration_keys
+        quantifier: forall
+      - operator: member_of
+        operands:
+          - registry: surface
+            id: run_reasoning
+          - registry: ir
+            id: run_declaration_keys
+        quantifier: forall
+      - operator: subset_of
+        operands:
+          - registry: ir
+            id: access_protocol_values
+          - registry: ir
+            id: access_protocol_vocabulary
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: access_protocol_vocabulary
+      independent_judgment: true
+    domain_payload:
+      kind: surface
+      constraint: one_spelling_per_meaning
+      subject:
+        registry: surface
+        id: run_access
+    diagnostics: []
+    fixtures:
+      - conformance/tests/core/envelope/033-run-access-acp-effort-passes
+      - conformance/tests/core/envelope/036-run-reasoning-effort-alone-passes
+    negative_fixtures:
+      - conformance/tests/core/envelope/046-run-access-protocol-native-refused
+      - conformance/tests/core/envelope/049-access-top-level-key-refused
+      - conformance/tests/core/envelope/050-task-access-key-refused
+    projections: ["prose:01-envelope", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-vocab
+      - engine:nika-schema
+      - reference:runner.py
+      - cli:nika-check
+      - conformance:envelope-suite
+    introduced_in: C2
+    proof_obligations:
+      - "Le schema publie run.access et run.reasoning sous properties.run (additionalProperties: false) et nulle part ailleurs : une clé access: en tête d'enveloppe (049) ou au niveau tâche (050) refuse NIKA-PARSE · validation_error, la classe générique opérante (aucun code numéroté dédié n'est inventé ici)."
+      - "protocol: native refuse (046) : l'énumération publique est exactement api | acp. Le transport réel d'une ancienne exécution CLI directe reste nommé dans ses propres reçus ; il ne devient pas une valeur de sélection."
+    closure_gates:
+      - fixture-parity
+      - run-access-surface-closed
+
+  - id: LAW-GRAMMAR-0502
+    slug: model/run-access-closed-literal-shape
+    status: active
+    owner: spec
+    domain: GRAMMAR
+    title: "run.access est un ensemble fermé {via, protocol, fallback} · chaque clé optionnelle, la déclaration non vide · via kebab-case non vide · protocol api | acp · fallback none · valeurs littérales"
+    prose_projection:
+      chapters: ["01-envelope"]
+      text: "La forme de run.access est TOUT son contrat statique : un mapping fermé {via, protocol, fallback} (une clé inconnue refuse dans les deux modes de parse, comme permits:) · chaque clé est optionnelle mais access: {} ne sélectionne rien et refuse · via est un id de route kebab-case non vide (une application d'agents ou un id de fournisseur API · ensemble ouvert jugé par le registre de routes du moteur) · protocol est l'enum fermée api | acp · fallback est l'enum fermée none — omis, il vaut none dès que access: est déclaré (une sélection explicite est exacte · les alternatives déclarées ne sont pas spécifiées, une valeur future est additive) · aucune valeur n'est un template ${{ }} (la sélection est résolue avant la première tâche, depuis le fichier seul) · protocol omis : la route se connecte comme avant la déclaration. Violation = NIKA-PARSE · validation_error. L'existence de la route, le protocole qu'elle parle et le modèle qu'elle sert ne sont PAS jugés ici (LAW-CONF-0501)."
+    inputs:
+      - registry: surface
+        id: run_access
+        role: required
+    premises:
+      - operator: conforms_to
+        operands:
+          - registry: surface
+            id: run_access
+          - registry: ir
+            id: run_access_shape
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: run_access_shape
+      independent_judgment: true
+    domain_payload:
+      kind: grammar
+      position: run.access
+      field_rules:
+        - field: via
+          cardinality: optional
+          value_shape:
+            registry: ir
+            id: access_route_id_form
+        - field: protocol
+          cardinality: optional
+          value_shape:
+            registry: ir
+            id: access_protocol_vocabulary
+        - field: fallback
+          cardinality: optional
+          value_shape:
+            registry: ir
+            id: access_fallback_vocabulary
+    diagnostics: []
+    fixtures:
+      - conformance/tests/core/envelope/033-run-access-acp-effort-passes
+      - conformance/tests/core/envelope/034-run-access-seeded-virtual-passes
+      - conformance/tests/core/envelope/037-run-access-protocol-alone-passes
+    negative_fixtures:
+      - conformance/tests/core/envelope/038-run-access-empty-refused
+      - conformance/tests/core/envelope/039-run-access-unknown-key-refused
+      - conformance/tests/core/envelope/041-run-access-not-a-mapping-refused
+      - conformance/tests/core/envelope/043-run-access-via-empty-refused
+      - conformance/tests/core/envelope/046-run-access-protocol-native-refused
+      - conformance/tests/core/envelope/047-run-access-fallback-unknown-refused
+    projections: ["prose:01-envelope", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-vocab
+      - engine:nika-schema
+      - reference:runner.py
+      - cli:nika-check
+      - conformance:envelope-suite
+    introduced_in: C2
+    proof_obligations:
+      - "Chaque fixture négative isole une seule violation de forme (mapping vide · clé inconnue · scalaire au lieu d'un mapping · via vide · protocol hors enum · fallback hors enum) et le verdict de l'oracle de référence nomme ce chemin sous run.access ; sous le schema de base (clé fermée {entropy, clock}) les fixtures positives refusaient — le patch est donc nécessaire, pas cosmétique."
+      - "La coexistence avec entropy/clock (034) est légale et le couplage reste jugé à l'identique avec access: présent (035 · NIKA-PARSE-026 · LAW-TEMPORAL-0435)."
+    closure_gates:
+      - fixture-parity
+      - run-access-shape-closed
+
+  - id: LAW-GRAMMAR-0503
+    slug: model/run-reasoning-native-effort-shape
+    status: active
+    owner: spec
+    domain: GRAMMAR
+    title: "run.reasoning est un ensemble fermé {effort} · effort requis · la valeur native exacte : string non vide, sans espace autour, littérale · aucune échelle universelle"
+    prose_projection:
+      chapters: ["01-envelope"]
+      text: "run.reasoning est un mapping fermé {effort} et effort y est requis (reasoning: {} refuse) · effort est la valeur NATIVE exacte que la route sélectionnée annonce pour le modèle sélectionné : une string non vide, sans espace autour (refusée plutôt que rognée — une normalisation silencieuse transmettrait une valeur que l'auteur n'a pas écrite), jamais un nombre coercé, jamais un template ${{ }} · il n'existe AUCUNE échelle d'effort universelle : la spec ne liste aucune valeur, une valeur n'est l'alias d'aucune valeur d'une autre route, et infer.thinking garde son propre sens (aucun des deux contrôles n'est traduit en l'autre) · reasoning omis : chaque route garde son effort par défaut, qui peut rester inconnu. Violation = NIKA-PARSE · validation_error. Que la route offre la valeur est jugé avant inférence, après la sélection du modèle (LAW-CONF-0501)."
+    inputs:
+      - registry: surface
+        id: run_reasoning
+        role: required
+    premises:
+      - operator: conforms_to
+        operands:
+          - registry: surface
+            id: run_reasoning
+          - registry: ir
+            id: run_reasoning_shape
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: run_reasoning_shape
+      independent_judgment: true
+    domain_payload:
+      kind: grammar
+      position: run.reasoning
+      field_rules:
+        - field: effort
+          cardinality: required
+          value_shape:
+            registry: ir
+            id: native_effort_value
+    diagnostics: []
+    fixtures:
+      - conformance/tests/core/envelope/033-run-access-acp-effort-passes
+      - conformance/tests/core/envelope/034-run-access-seeded-virtual-passes
+      - conformance/tests/core/envelope/036-run-reasoning-effort-alone-passes
+    negative_fixtures:
+      - conformance/tests/core/envelope/040-run-reasoning-unknown-key-refused
+      - conformance/tests/core/envelope/042-run-reasoning-effort-not-a-string-refused
+      - conformance/tests/core/envelope/044-run-reasoning-effort-empty-refused
+      - conformance/tests/core/envelope/045-run-reasoning-effort-padded-refused
+      - conformance/tests/core/envelope/048-run-reasoning-effort-template-refused
+    projections: ["prose:01-envelope", "schema", "cli:check", "lsp", "mcp", "sdk"]
+    implementation_surfaces:
+      - engine:nika-vocab
+      - engine:nika-schema
+      - reference:runner.py
+      - cli:nika-check
+      - conformance:envelope-suite
+    introduced_in: C2
+    proof_obligations:
+      - "L'oracle statique ne juge que la forme : aucune liste de valeurs d'effort n'existe dans le schema, la prose ou le canon. Une valeur bien formée n'est pas une preuve qu'une route l'offre."
+      - "budget_tokens sous run.reasoning refuse (040) : le budget de infer.thinking n'est pas un effort de run et n'est jamais traduit en un."
+    closure_gates:
+      - fixture-parity
+      - run-reasoning-shape-closed
+
+  - id: LAW-CONF-0501
+    slug: model/declared-selection-honored-or-refused-before-inference
+    status: reserved
+    owner: spec
+    domain: CONF
+    title: "Une sélection déclarée est honorée exactement — route, protocole, modèle, effort natif appliqués avant le premier prompt — ou refusée avant toute inférence · fallback: none ne substitue jamais"
+    prose_projection:
+      chapters: ["01-envelope"]
+      text: "Le contrat Runtime de run.access / run.reasoning : le fichier seul sélectionne la route (aucune option de lancement supplémentaire · une option contradictoire refuse avant inférence) · le moteur découvre l'offre de la route (handshake ACP, requête de capacités : découverte, pas inférence) puis applique le modèle et l'effort par les propres méthodes de sélection de la session AVANT le premier prompt, juge l'effort contre les options offertes APRÈS la sélection du modèle, relit la configuration là où la route l'expose et refuse une relecture qui ne tient pas la sélection · une session qui ne fait qu'accuser réception du modèle produit une preuve accepted_request, jamais configured ni servi, et un effort qu'elle ne sait pas appliquer refuse · une sélection impossible (route inconnue ou indisponible · protocole non parlé · modèle non servi · effort non offert) refuse AVANT toute requête d'inférence — zéro prompt, zéro appel d'API, zéro CLI directe — avec un diagnostic nommant le champ, la valeur demandée et les choix disponibles · fallback: none (aussi le sens d'un fallback omis) : jamais d'autre route, protocole, modèle ou effort, ni avant l'admission ni pendant le run, même si une clé d'API ou une CLI directe est configurée · une CLI directe ne satisfait jamais acp · pour infer: la rencontre infer-grade de 02 tient toujours · quatre faits séparés : demandé, transmis, configuré, répondant attesté ou absent · la sélection déclarée entre dans l'identité de chaque tâche modèle : une reprise ne réutilise jamais un résultat obtenu sous une autre sélection."
+    inputs:
+      - registry: ir
+        id: declared_access_selection
+        role: required
+      - registry: ir
+        id: route_advertised_options
+        role: ceiling
+    premises:
+      - operator: subset_of
+        operands:
+          - registry: ir
+            id: declared_access_selection
+          - registry: ir
+            id: route_advertised_options
+        quantifier: forall
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: ir
+          id: route_advertised_options
+      independent_judgment: true
+    domain_payload:
+      kind: conformance
+      constraint: polarity_declared
+      subject:
+        registry: ir
+        id: access_selection_runtime_contract
+    diagnostics: []
+    fixtures:
+      - conformance/tests/runtime/access-harness/003-file-acp-selection-configured-before-prompt
+      - conformance/tests/runtime/access-harness/004-file-acp-ack-is-not-configuration
+      - conformance/tests/runtime/access-harness/005-file-api-attested-responder-recorded
+      - conformance/tests/runtime/access-harness/006-file-acp-effort-judged-after-model-selection
+      - conformance/tests/runtime/access-harness/007-file-api-selection-honored
+    negative_fixtures:
+      - conformance/tests/runtime/access-harness/008-file-acp-unsupported-effort-refused-before-prompt
+      - conformance/tests/runtime/access-harness/009-file-acp-effort-refused-after-model-selection
+      - conformance/tests/runtime/access-harness/010-file-acp-unadvertised-model-refused-before-prompt
+      - conformance/tests/runtime/access-harness/011-file-acp-unconfirmed-readback-refused
+      - conformance/tests/runtime/access-harness/012-file-acp-unavailable-not-substituted
+      - conformance/tests/runtime/access-harness/013-file-acp-session-death-not-rerouted
+      - conformance/tests/runtime/access-harness/014-file-acp-infer-without-one-shot-refused
+      - conformance/tests/runtime/access-harness/015-launch-access-contradicting-file-refused
+      - conformance/tests/runtime/access-harness/016-file-unknown-route-refused
+      - conformance/tests/runtime/access-harness/017-file-route-protocol-not-spoken-refused
+    projections: ["prose:01-envelope", "cli:run", "sdk", "docs"]
+    implementation_surfaces:
+      - engine:nika-providers
+      - engine:nika-harness
+      - engine:nika-runtime
+      - conformance:access-harness-suite
+    introduced_in: C2
+    proof_obligations:
+      - "Chaque fixture runtime déclare son monde de routes (access_routes : pair ACP scripté, CLI directe, clé d'API — jamais une découverte de l'hôte) et sépare le reçu du run (receipt) de l'observation indépendante de l'adaptateur (observed : prompts ACP, requêtes d'inférence API, invocations CLI). conformance/tests/test_access_contract.py dérive le verdict de chaque fixture de ses propres prémisses et prouve par mutation qu'un mensonge plausible (effort traduit, API substituée, accusé de réception promu en configuration) est attrapé."
+      - "Aucun adaptateur de commande qualifié n'exécute encore cette extension : chaque fixture est UNSUPPORTED, jamais un accord. Les refus enregistrent le code que le moteur de référence émet dans sa famille d'accès NIKA-18xx (codes numériques nus hors du motif diagCode du registre, d'où diagnostics: [] ici) ; aucun code n'est inventé par la spec."
+      - "DETTE déclarée (jamais fermée en silence) : la phrase « une reprise ne réutilise jamais un résultat obtenu sous une autre sélection » n'a pas encore de fixture exécutable — une fixture de la porte resume exige un journal qui enregistre la sélection, dont le format appartient au moteur. Elle est due avec ce format."
+    closure_gates:
+      - fixture-parity
+      - access-harness-adapter-qualified
+      - resume-selection-fixture-minted

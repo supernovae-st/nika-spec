@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-access-top-level
+access:
+  via: codex
+  protocol: acp
+tasks:
+  greet:
+    infer:
+      prompt: "hi"

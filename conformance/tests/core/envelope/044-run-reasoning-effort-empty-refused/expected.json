@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "validation_error"
+    }
+  ],
+  "note": "LAW-GRAMMAR-0503 · an empty effort is refused, never read as the route default · omit reasoning: to keep the default."
+}

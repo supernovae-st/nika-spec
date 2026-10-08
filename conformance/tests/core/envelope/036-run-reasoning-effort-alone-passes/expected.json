@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "LAW-GRAMMAR-0503 · an effort without an access declaration is legal · route resolution stays the engine's own, and the resolved route must offer this exact value or refuse before inference."
+}

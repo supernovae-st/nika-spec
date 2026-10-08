@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "validation_error"
+    }
+  ],
+  "note": "LAW-SURFACE-0503 · there is no task-level access: (nor reasoning:) · one run, one route · a task keeps only its model: override."
+}
