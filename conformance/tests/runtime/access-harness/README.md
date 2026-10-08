@@ -193,7 +193,9 @@ nothing otherwise. Both are compared verbatim. Over an API, every inference
 request body is compared in the route's wire form. That form is the binding
 table's explicit, route-bound mapping: the `openai` body names
 `openai/<name>` as `<name>`, and an id of another provider has no wire form
-there. An API reads back no configuration.
+there. An API reads back no configuration. A receipt asserting
+`requested_effort: null` also asserts that no effort travelled: an omitted
+declaration keeps the route's default and sends none.
 
 ### Outcomes
 

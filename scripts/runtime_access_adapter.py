@@ -699,6 +699,10 @@ def diff_physical(expected: dict, observation: Observation) -> list[str]:
     themselves recorded, not only on the engine's account of it: the ACP peer's
     selections and read-backs verbatim, an API endpoint's request body in its
     route's wire form."""
+    expected = dict(expected)
+    if expected.get("requested_effort", "") is None:
+        # No effort was asked: none may travel (01 §run · omitted keeps the route's default).
+        expected.setdefault("transmitted_effort", None)
     keys = [key for key in ("transmitted_model", "transmitted_effort", "configured_model",
                             "configured_effort") if key in expected]
     if not keys:

@@ -254,8 +254,8 @@ class ScriptedEngineCase(unittest.TestCase):
     def engine(self, plan: dict) -> str:
         return write_engine(self.tmp.name, plan)
 
-    def verdict(self, fixture: str, plan: dict) -> tuple[str, list[str]]:
-        directory = next(HARNESS.glob(f"{fixture}-*"))
+    def verdict(self, fixture, plan: dict) -> tuple[str, list[str]]:
+        directory = fixture if isinstance(fixture, pathlib.Path) else next(HARNESS.glob(f"{fixture}-*"))
         try:
             diffs = runner.judge_run(self.engine(plan), directory)
         except runner.UnsupportedFixture as error:
@@ -376,6 +376,33 @@ class AcpSelectionLaws(ScriptedEngineCase):
         self.assertVerdict("003", self.conformant(tasks=tasks), "DIVERGE")
         self.assertVerdict("003", self.conformant(tasks={}), "DIVERGE", "no terminal event")
         self.assertVerdict("003", self.conformant(settle=False), "DIVERGE", "run_settled")
+
+    def test_an_effort_the_file_never_asked_never_travels(self):
+        # A copy of 003 without run.reasoning: an options session that offers
+        # efforts, a file that asks none.
+        source = next(HARNESS.glob("003-*"))
+        fixture = pathlib.Path(self.tmp.name) / "no-effort"
+        fixture.mkdir(exist_ok=True)
+        (fixture / "input.nika").write_bytes((source / "input.nika").read_bytes().replace(
+            b"  reasoning:\n    effort: high\n", b""))
+        (fixture / "run.json").write_bytes((source / "run.json").read_bytes())
+        (fixture / "expected-run.json").write_text(json.dumps({
+            "admission": {"accepted": True}, "workflow_state": "success",
+            "tasks": {"summarize": {"status": "success"}},
+            "receipt": {"access_via": "codex", "protocol": "acp", "requested_model": MODEL,
+                        "requested_effort": None, "transmitted_model": MODEL,
+                        "configured_model": MODEL, "model_evidence": "configured",
+                        "responding_model": None},
+            "observed": {"acp_config_before_first_prompt": {"model": MODEL}, "acp_prompts": 1,
+                         "api_inference_requests": 0, "cli_invocations": 0}}))
+        receipt = selection(model=configured()["model"],
+                            effort={"configured": "low", "configured_source": "session_config"})
+        plan = {"steps": [session(("model", MODEL), ("prompt",))],
+                "tasks": success(receipt_fields(receipt, requirement(effort=None)))}
+        self.assertVerdict(fixture, plan, "AGREE")
+        plan["steps"] = [session(("model", MODEL), ("reasoning_effort", "high"), ("prompt",))]
+        self.assertVerdict(fixture, plan, "DIVERGE",
+                           "receipt.transmitted_effort · the ACP peer received 'high'")
 
     def test_the_peer_record_binds_the_receipt_even_when_the_applied_state_matches(self):
         # The last value sent is the transmitted one, even when the peer refused it.
@@ -521,10 +548,13 @@ class ApiAndDeathLaws(ScriptedEngineCase):
                                                             "stream": False}}]
                     self.assertVerdict(fixture, plan, "DIVERGE",
                                        f"the openai endpoint received model {body_model!r}")
+        # The file declared no effort (`requested_effort: null`): none may travel.
         plan = self.api()
         plan["steps"] = [{"do": "api", "body": {"model": "gpt-5.5", "messages": [], "stream": False,
                                                 "reasoning_effort": "high"}}]
-        self.assertVerdict("007", plan, "AGREE")
+        self.assertVerdict("007", plan, "DIVERGE",
+                           "the openai endpoint received reasoning_effort 'high'")
+        self.assertVerdict("007", self.api(), "AGREE")
 
     def test_a_model_listing_is_discovery_not_inference(self):
         plan = self.api()

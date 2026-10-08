@@ -272,7 +272,7 @@ patterns:
 - glob: "conformance/tests/**"
   class: authored
   match_count: 1147
-  aggregate_sha256: 078915daa70d9ff98566a9036f8530072726147590f5bd1ae7b792c2e45c960f
+  aggregate_sha256: 0b575b575fd541e3dec972359a619045b0295083e24581fc72008a7d4cc0bc2e
   evidence: "the executable law — the 5-tier fixture corpus (core · deep 001-022 · lints · runtime · stdlib): input + expected pairs written at spec-authoring time, consumed by conformance/runner.py; no generation markers"
 - glob: "conformance/.nika/**"
   class: testimonial
@@ -359,7 +359,7 @@ patterns:
 - glob: "scripts/**"
   class: authored
   match_count: 41
-  aggregate_sha256: 40d4d8a8d462a7edbc6f954f61edfff7790554d6d0aade5deb7496cb56efe164
+  aggregate_sha256: f3fe21399a866b6c8416c38be838dca7b6d509d789ef1e75d167acee79405c4f
   evidence: "the compiler + projectors humans wrote (ssot-compiler · canon/showcase/llms/starters/authoring/design projectors · gen-gate-matrix · gen-type-corpus · check-md-refs) — the tools that WRITE the generated surfaces; estate.py excepted in files: (the self row)"
 - glob: "timeline/**"
   class: authored
