@@ -998,5 +998,52 @@ class HarnessMediaLaws(TraceDoorCase):
                 self.assertIn("NOT an engine-produced", provenance["construction"])
 
 
+class AccessDispatchLaws(unittest.TestCase):
+    """An injected route world is judged by the access adapter, never by the plain run door."""
+
+    HARNESS = pathlib.Path(__file__).resolve().parents[1] / "conformance/tests/runtime/access-harness"
+
+    def test_a_route_world_goes_through_the_adapter_only(self):
+        fixture = next(self.HARNESS.glob("003-*"))
+        verdict = runner.Differences([], ["stage · note"])
+        with patch.object(runner, "judge_access", return_value=verdict) as access, \
+                patch.object(runner.subprocess, "run") as plain:
+            self.assertEqual(runner.judge_run("output-double", fixture), [])
+        plain.assert_not_called()
+        contract = access.call_args.args[4]
+        self.assertEqual(contract.declared, {"via": "codex", "protocol": "acp", "fallback": "none",
+                                             "effort": "high"})
+        self.assertEqual(contract.observed["acp_prompts"], 1)
+
+    def test_the_sweep_prints_notes_beside_the_verdict(self):
+        verdict = runner.Differences([], ["peers · acp 2 process(es)"])
+        fixture = next(self.HARNESS.glob("003-*"))
+        with patch.object(runner, "RUNTIME", fixture.parent), \
+                patch.object(runner, "judge_access", return_value=verdict), \
+                contextlib.redirect_stdout(io.StringIO()) as output:
+            self.assertEqual(runner.main(["runner", "runtime/access-harness/" + fixture.name]), 0)
+        self.assertIn("note · peers · acp 2 process(es)", output.getvalue())
+
+    def test_attestation_premises_stay_unsupported_before_any_call(self):
+        for number in ("001", "002", "014"):
+            fixture = next(self.HARNESS.glob(f"{number}-*"))
+            with self.subTest(fixture=fixture.name), patch.object(runner.subprocess, "run") as plain:
+                with self.assertRaises(runner.UnsupportedFixture):
+                    runner.judge_run("output-double", fixture)
+                plain.assert_not_called()
+
+
+def load_tests(loader, tests, pattern):
+    """CI runs this file: the access adapter's own laws ride along when it is run
+    directly (discovery already finds test_runtime_access_adapter.py itself)."""
+    if pattern is None:
+        adapter_spec = importlib.util.spec_from_file_location(
+            "test_runtime_access_adapter", pathlib.Path(__file__).with_name("test_runtime_access_adapter.py"))
+        module = importlib.util.module_from_spec(adapter_spec)
+        adapter_spec.loader.exec_module(module)
+        tests.addTests(loader.loadTestsFromModule(module))
+    return tests
+
+
 if __name__ == "__main__":
     unittest.main()

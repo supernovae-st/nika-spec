@@ -80,12 +80,14 @@ engine reporting its own success never discharges `observed`.
 
 | Field | Observation |
 |---|---|
-| `acp_config_before_first_prompt` | the model and effort the peer had received and accepted through its own selection methods when its first prompt arrived · an absent `effort` means none was applied |
-| `acp_prompts` | prompt requests received by the scripted ACP peer (session setup and configuration are discovery, never counted) |
-| `api_inference_requests` | inference requests received by the mock API endpoints |
-| `cli_invocations` | direct CLI processes started |
+| `acp_config_before_first_prompt` | the model and effort the peer had received and accepted through its own selection methods, and still held, when its first prompt arrived · a session default is never an applied value · an absent `effort` means none was applied |
+| `acp_prompts` | prompt requests received by the scripted ACP peers (session setup and configuration are discovery, never counted) |
+| `api_inference_requests` | requests received by the mock API endpoints, except a model listing (`GET /v1/models`, which is discovery) |
+| `cli_invocations` | direct CLI invocations: product-CLI processes started with any argv other than the route's exact discovery and sign-in probes (a version, a sign-in status or a capability listing), which are recorded separately and never counted |
 
-Counts are exact integers. A refusal before inference asserts zeros.
+Counts are exact integers. A refusal before inference asserts zeros. An
+argv the adapter does not list as a probe counts as a direct invocation,
+so a forbidden substitution cannot hide behind a probe-like command.
 
 ### `receipt` · the four facts kept apart
 
@@ -120,9 +122,117 @@ Recorded codes are the reference engine's execution-access family
 (`NIKA-1800`..`NIKA-1849`); the spec mints none of them. A transient session
 failure may be retried on the SAME declared route, never on another.
 
+## The command adapter
+
+[`scripts/runtime_access_adapter.py`](../../../../scripts/runtime_access_adapter.py)
+executes this extension for the reference engine, driven by
+[`scripts/runtime-differential.py`](../../../../scripts/runtime-differential.py).
+Its route registry is a closed binding table of the reference engine's
+facts (today `codex` for an agent application, `openai` for an API). A
+route a fixture stages outside that table is `UNSUPPORTED`. Another
+implementation needs its own admitted adapter, never a fallback.
+
+One fixture is one isolated stage: a private `HOME`, `TMPDIR`, project
+(the workflow's exact bytes) and `PATH` (the stage's `bin` before
+`/usr/bin:/bin`, refused when either system directory holds a registry
+binary), an explicit environment, and a fake key. The adapter then runs
+`nika run input.nika --json` once, adding `--access <access>` when
+`run.json` declares one. It reads two independent records.
+
+| Declared | Staged |
+|---|---|
+| `acp.available: true` | the route's ACP speaker: a scripted agent that answers `initialize` with an identity the engine's registry admits (never an audited completion profile's identity) |
+| `acp.available` or `cli.available` | the route's product CLI, present and signed in, because the reference engine asks it for the ACP route's sign-in too. Only `cli.available` opens its direct invocation, which then answers one scripted turn; otherwise it refuses |
+| `api` | a loopback inference endpoint; the engine's base-URL override always points at it, and only `configured: true` adds the fake key and a scripted answer |
+
+The scripted ACP agent offers each model of `acp.models` as one select
+value whose `value` and `name` are the fixture's model id verbatim. It
+derives no native, alias or display name: an engine that sends another
+spelling has sent another model. Options are `model` (category `model`)
+and the route's reasoning option (category `thought_level`), whose values
+are those offered for the current model. Without `default_model` the first
+advertised model is current. A model's current effort starts at its first
+offered value. An unoffered value is refused (`-32602`) and changes
+nothing. A model change keeps the current effort only when the new model
+offers it; otherwise the effort is reset and no longer counts as applied.
+An `unconfirmed` read-back answers with the configuration unchanged by the
+request. A `legacy` session advertises a model list, acknowledges
+`session/set_model` with `{}` and exposes no configuration option. A prompt
+answers one text chunk and `end_turn`, or, with `session_dies`, is logged
+and ends the process unanswered.
+
+The receipt is read from each asserted task's single terminal frame. The
+frame must carry `access_id`, `access_requirement` and an `access_selection`
+under `nika/access-selection@1`. That name pins the closed shape and
+vocabulary: an unknown key, a mistyped fact, an acknowledged request
+recorded as `configured`, a configured value without its source, or a
+responder that disagrees with its evidence is invalid evidence, a
+divergence. Another schema name has no admitted reading here
+(`UNSUPPORTED`, never hiding a divergence of the same run).
+
+| Receipt field | Engine record |
+|---|---|
+| `access_via` | `access_id` |
+| `protocol` | `access_selection.protocol` |
+| `requested_*` · `transmitted_*` · `configured_*` | `access_selection.model` / `.effort` · `requested` · `transmitted` · `configured` |
+| `model_evidence` | `access_selection.model.configured_source`: `confirmed_selection` reads `configured`, `accepted_request` reads `accepted_request`, any other value stays itself |
+| `responding_model` | `access_selection.responder.model` |
+
+The run's two records of one selection must also agree. The
+`access_requirement` restates the file's `run.access` and `run.reasoning`
+literally. Its effort is the selection's requested effort, its protocol is
+the one travelled, and its `via` is the `access_id` that served.
+
+An asserted `transmitted_*` or `configured_*` fact is also judged on the
+routes' own records, so a truthful-looking receipt cannot cover another
+transmission. Over ACP the record comes from the session the first prompt
+reached, else the last one opened. A dimension's transmitted value is the
+last value that session received for it, accepted or refused. Its configured
+value is the session's own read-back of a dimension that was sent, and
+nothing otherwise. Both are compared verbatim. Over an API, every inference
+request body is compared in the route's wire form. That form is the binding
+table's explicit, route-bound mapping: the `openai` body names
+`openai/<name>` as `<name>`, and an id of another provider has no wire form
+there. An API reads back no configuration.
+
+### Outcomes
+
+- `FIXTURE-ERROR` · a malformed declaration or expectation, before any
+  process starts: an unknown key, a mistyped value, missing `observed`
+  counts, an effort on a legacy session, a receipt on a refused admission.
+- `UNSUPPORTED` · a premise this adapter has no seam to stage. Injected
+  `harness_attestations` (the reference engine admits no injected
+  attestation). An `infer:` task on an agent-application route, whose
+  subscription-harness attestation premise only that injection could
+  state. An `env` overlay beside the route world, an unbound route, or an
+  unadvertised `default_model`. Also, after the run: an admitted-run
+  fixture that the engine refused before any event because the staged
+  loopback endpoint is unpriced to it and its unknown-cost review needs a
+  fresh interactive choice. The adapter never answers or bypasses that
+  review; any request it observed keeps the divergence.
+- `ENGINE-ERROR` · a crash, a signal, a timeout, or nothing at all on
+  stdout, whatever the exit. An empty reply is no refusal and no run, so it
+  never reaches the admission comparison.
+- `DIVERGE` · every difference named: the run door's admission and
+  execution judgment, each `observed` count and configuration, each
+  asserted receipt field and each record that disagrees.
+- `AGREE` · none of the above.
+
+The sweep prints the adapter's own notes beside each verdict: what was
+staged, every ACP process and selection outcome, the CLI probes apart from
+the direct invocations, the inference requests and the engine's refusal
+words. They explain a verdict and never change it. With
+`NIKA_ACCESS_EVIDENCE_DIR=<dir>`, each stage (wrappers, peer code,
+configuration, peer logs, engine traces), the raw engine output, a
+`record.json` and an `index.json` naming the engine binary's SHA-256 and
+the specification commit are kept outside the repository.
+
 ## Status
 
-No command adapter executes this extension yet: every fixture here is
-`UNSUPPORTED`, which is never agreement. The scripted ACP peer, mock API
-endpoint and CLI spawn counter belong to a separate adapter that must be
-qualified with adversarial observations before any result counts.
+The adapter's own laws (`scripts/test_runtime_access_adapter.py`, run by
+`scripts/test_runtime_differential.py`) drive scripted engine doubles
+through the real stage: a conformant double agrees, and each substitution,
+late or unconfirmed configuration, lost or repeated event, mislabelled
+receipt or crash is caught. These are adapter tests, never engine results.
+A fixture's engine result is only what a sweep against an identified binary
+reports.
