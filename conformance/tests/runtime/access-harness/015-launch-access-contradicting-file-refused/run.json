@@ -1,0 +1,25 @@
+{
+  "access": "openai",
+  "access_routes": {
+    "codex": {
+      "acp": {
+        "available": true,
+        "config": "options",
+        "models": {
+          "openai/gpt-5.5": {
+            "effort": [
+              "low",
+              "medium",
+              "high"
+            ]
+          }
+        }
+      }
+    },
+    "openai": {
+      "api": {
+        "configured": true
+      }
+    }
+  }
+}

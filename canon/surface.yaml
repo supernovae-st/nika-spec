@@ -24,6 +24,37 @@ surface:
       la spec verrouillait déjà « there is no nika: v2 — ever » et les cassures profondes vivent DANS v1
       en pré-1.0 ; le marqueur portait zéro bit comme version et porte désormais le champ le plus
       nécessaire du fichier. Tombstone · nika-version-marker-literal.'
+  - id: run_access
+    status: active
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0503
+      - LAW-GRAMMAR-0502
+    introduced_in: C2
+    spelling: run.access
+    kind: envelope-key
+    family: run
+    exposure: authorable
+    notes: 'Clé IMBRIQUÉE sous la clé d''enveloppe run: (l''enveloppe garde ses neuf clés · aucune clé access:
+      en tête ni par tâche). Mapping fermé {via, protocol, fallback} : via = la route (application d''agents ou
+      id de fournisseur API · ensemble ouvert jugé par le moteur, aucun catalogue figé) · protocol = api | acp
+      (aucune troisième famille « native ») · fallback = none (aussi le sens d''un fallback omis). Distinct de
+      l''identité du modèle (model:) · spec/01-envelope.md §run.'
+  - id: run_reasoning
+    status: active
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0503
+      - LAW-GRAMMAR-0503
+    introduced_in: C2
+    spelling: run.reasoning
+    kind: envelope-key
+    family: run
+    exposure: authorable
+    notes: 'Clé IMBRIQUÉE sous la clé d''enveloppe run:. Mapping fermé {effort}, effort requis : la valeur
+      NATIVE exacte que la route sélectionnée annonce pour le modèle sélectionné · aucune échelle universelle,
+      aucune traduction, aucune valeur listée par la spec · omis = l''effort par défaut de la route, qui peut
+      rester inconnu · spec/01-envelope.md §run.'
   - id: bool_primitive_spelling
     status: reserved
     owner: spec

@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-run-access-seeded-virtual
+model: openai/gpt-5.5
+run:
+  entropy:
+    seeded: 7
+  clock: virtual
+  access:
+    via: codex
+    protocol: acp
+  reasoning:
+    effort: high
+tasks:
+  greet:
+    infer:
+      prompt: "hi"

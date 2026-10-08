@@ -1,0 +1,12 @@
+{
+  "admission": {
+    "accepted": false,
+    "error_code": "NIKA-1800"
+  },
+  "observed": {
+    "acp_prompts": 0,
+    "api_inference_requests": 0,
+    "cli_invocations": 0
+  },
+  "note": "01 §run one run, one route · 02 §subscription harness · an infer: task over codex ACP needs an attested tool-free ACP one-shot; none is attested, so admission refuses (NIKA-1800) · the direct codex CLI one-shot does not satisfy protocol: acp, and an agent-grade session does not qualify infer:."
+}

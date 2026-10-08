@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "validation_error"
+    }
+  ],
+  "note": "LAW-GRAMMAR-0503 · reasoning is a closed set {effort} · a thinking budget is infer.thinking's own field and is never translated into a run-level effort."
+}

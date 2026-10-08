@@ -1,0 +1,18 @@
+{
+  "admission": {
+    "accepted": true
+  },
+  "workflow_state": "failure",
+  "tasks": {
+    "summarize": {
+      "status": "failure",
+      "error_code": "NIKA-1805"
+    }
+  },
+  "observed": {
+    "acp_prompts": 0,
+    "api_inference_requests": 0,
+    "cli_invocations": 0
+  },
+  "note": "01 §run applied then confirmed · the configuration read back does not hold the applied model and effort: refused (NIKA-1805) before the first prompt, never assumed applied."
+}

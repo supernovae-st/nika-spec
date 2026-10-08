@@ -1990,6 +1990,7 @@ laws:
       - conformance/tests/core/envelope/027-run-none-system-refused
       - conformance/tests/core/envelope/028-run-none-live-jitter-refused
       - conformance/tests/core/envelope/031-run-seeded-system-refused
+      - conformance/tests/core/envelope/035-run-access-ambient-virtual-still-refused
     projections: ["prose:01-envelope", "schema", "cli:check"]
     implementation_surfaces:
       - engine:nika-engine

@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-run-effort-template
+inputs:
+  effort:
+    type: string
+    required: false
+    default: "high"
+run:
+  reasoning:
+    effort: ${{ inputs.effort }}
+tasks:
+  greet:
+    infer:
+      prompt: "hi"

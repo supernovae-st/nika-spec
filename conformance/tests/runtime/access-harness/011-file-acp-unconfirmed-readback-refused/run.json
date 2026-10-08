@@ -1,0 +1,20 @@
+{
+  "access_routes": {
+    "codex": {
+      "acp": {
+        "available": true,
+        "config": "options",
+        "readback": "unconfirmed",
+        "models": {
+          "openai/gpt-5.5": {
+            "effort": [
+              "low",
+              "medium",
+              "high"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

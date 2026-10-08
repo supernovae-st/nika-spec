@@ -1,0 +1,16 @@
+{
+  "admission": {
+    "accepted": false,
+    "error_code": "NIKA-1800",
+    "witness_contains": [
+      "run.access.protocol",
+      "api"
+    ]
+  },
+  "observed": {
+    "acp_prompts": 0,
+    "api_inference_requests": 0,
+    "cli_invocations": 0
+  },
+  "note": "01 §run · codex is reached over ACP (or its direct CLI), never over an inference API: protocol: api on this route refuses at admission (NIKA-1800) · neither the ACP session nor the CLI stands in for the declared protocol."
+}

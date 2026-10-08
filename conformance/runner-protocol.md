@@ -91,9 +91,9 @@ expectation is well-formed but needs an adapter this command runner does
 not provide, or a well-framed engine reply it has no admitted reading for;
 it validates nothing more of that contract, is never `AGREE`, never hides a
 divergence of the same fixture, and makes the suite exit nonzero. Injected
-harness attestations and harness receipts currently require that separate
-adapter. Unknown assertion or invocation keys are fixture errors before
-engine calls.
+harness attestations, injected access routes, harness receipts and route
+observations currently require that separate adapter. Unknown assertion
+or invocation keys are fixture errors before engine calls.
 Behavioral discovery also reports missing inputs and ambiguous or misspelled
 expectation files; it must not select one of two competing claims. Resume,
 receipt-explanation and energy expectations are recognized only after their

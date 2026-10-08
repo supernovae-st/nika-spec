@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "LAW-GRAMMAR-0502 · every access key is optional on its own · protocol: api alone selects the route's inference API and leaves the route id to the engine."
+}

@@ -438,9 +438,10 @@ def load_run_contract(directory: pathlib.Path) -> tuple[dict, dict]:
     try:
         expected = read("expected-run.json")
         run = read("run.json") if (directory / "run.json").exists() else {}
-        keys(expected, {"workflow_state", "tasks", "events_include", "admission", "receipt", "note"},
-             "run assertion")
-        keys(run, {"vars", "inputs", "env", "access", "harness_attestations"}, "run invocation")
+        keys(expected, {"workflow_state", "tasks", "events_include", "admission", "receipt",
+                        "observed", "note"}, "run assertion")
+        keys(run, {"vars", "inputs", "env", "access", "harness_attestations", "access_routes"},
+             "run invocation")
         if not set(expected) - {"note"}:
             raise ValueError("run expectation has no assertions")
         if "workflow_state" in expected and expected["workflow_state"] not in {
@@ -487,9 +488,10 @@ def load_run_contract(directory: pathlib.Path) -> tuple[dict, dict]:
                 raise ValueError(f"vars and inputs disagree for {key}")
     except (ValueError, TypeError, UnicodeError, OSError) as error:
         raise InvalidFixture(str(error)) from error
-    unsupported = set(run) & {"access", "harness_attestations"}
-    if "receipt" in expected:
-        unsupported.add("receipt")
+    # Injected seats and routes, the run's receipt and the adapter's own route
+    # observations all need the separate harness adapter (access-harness/README).
+    unsupported = set(run) & {"access", "harness_attestations", "access_routes"}
+    unsupported |= set(expected) & {"receipt", "observed"}
     if unsupported:
         raise UnsupportedFixture("injected harness/receipt adapter required: " + ", ".join(sorted(unsupported)))
     return expected, run
@@ -1435,6 +1437,10 @@ def selftest() -> int:
         ("injected harness", '{"admission":{"accepted":true}}', '{"harness_attestations":{}}', UnsupportedFixture),
         ("access seat", valid_run, '{"access":"codex"}', UnsupportedFixture),
         ("receipt", '{"admission":{"accepted":true},"receipt":{"tokens":null}}', '{}', UnsupportedFixture),
+        ("injected route world", valid_run, '{"access_routes":{"codex":{}}}', UnsupportedFixture),
+        ("route observation", '{"admission":{"accepted":true},"observed":{"acp_prompts":0}}', '{}',
+         UnsupportedFixture),
+        ("misspelled observation", '{"admission":{"accepted":true},"observe":{}}', '{}', InvalidFixture),
     ]:
         with tempfile.TemporaryDirectory(prefix="nika-run-contract-selftest-") as scratch:
             fixture = pathlib.Path(scratch)

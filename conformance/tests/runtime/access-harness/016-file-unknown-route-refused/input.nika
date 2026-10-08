@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: file-unknown-route
+model: openai/gpt-5.5
+run:
+  access:
+    via: lighthouse
+    protocol: acp
+    fallback: none
+  reasoning:
+    effort: high
+tasks:
+  summarize:
+    agent:
+      prompt: "Summarize the supplied note in one sentence."

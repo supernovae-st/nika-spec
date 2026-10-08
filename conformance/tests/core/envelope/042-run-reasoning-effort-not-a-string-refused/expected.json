@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "validation_error"
+    }
+  ],
+  "note": "LAW-GRAMMAR-0503 · effort is the route's native value as a string · a number is not coerced (quote it when a route's native value is digit-shaped)."
+}

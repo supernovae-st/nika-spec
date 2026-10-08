@@ -1,0 +1,33 @@
+{
+  "admission": {
+    "accepted": true
+  },
+  "workflow_state": "success",
+  "tasks": {
+    "summarize": {
+      "status": "success"
+    }
+  },
+  "receipt": {
+    "access_via": "codex",
+    "protocol": "acp",
+    "requested_model": "openai/gpt-5.5",
+    "requested_effort": "high",
+    "transmitted_model": "openai/gpt-5.5",
+    "transmitted_effort": "high",
+    "configured_model": "openai/gpt-5.5",
+    "configured_effort": "high",
+    "model_evidence": "configured",
+    "responding_model": null
+  },
+  "observed": {
+    "acp_config_before_first_prompt": {
+      "model": "openai/gpt-5.5",
+      "effort": "high"
+    },
+    "acp_prompts": 1,
+    "api_inference_requests": 0,
+    "cli_invocations": 0
+  },
+  "note": "01 §run · LAW-CONF-0501 · the file alone selects codex over ACP: an ordinary run with no launch option applies the exact model and native effort as the session's own options and reads them back BEFORE the first prompt. The peer attests no responder, so responding_model stays null — configured is not served."
+}

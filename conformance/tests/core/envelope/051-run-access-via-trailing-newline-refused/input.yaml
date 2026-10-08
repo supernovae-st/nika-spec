@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-run-access-via-newline
+run:
+  access:
+    via: "codex\n"
+    protocol: acp
+tasks:
+  greet:
+    infer:
+      prompt: "hi"

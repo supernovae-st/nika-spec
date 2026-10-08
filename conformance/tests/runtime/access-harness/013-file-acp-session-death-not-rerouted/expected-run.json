@@ -1,0 +1,22 @@
+{
+  "admission": {
+    "accepted": true
+  },
+  "workflow_state": "failure",
+  "tasks": {
+    "summarize": {
+      "status": "failure",
+      "error_code": "NIKA-1804"
+    }
+  },
+  "observed": {
+    "acp_config_before_first_prompt": {
+      "model": "openai/gpt-5.5",
+      "effort": "high"
+    },
+    "acp_prompts": 1,
+    "api_inference_requests": 0,
+    "cli_invocations": 0
+  },
+  "note": "01 §run fallback: none survives admission · the session dies after its first prompt: the task fails (NIKA-1804, transient — a retry stays on the same declared route) and neither the ready API nor the direct CLI is tried."
+}

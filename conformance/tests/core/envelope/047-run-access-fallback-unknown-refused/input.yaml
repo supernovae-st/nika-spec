@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-run-access-fallback-api
+run:
+  access:
+    via: codex
+    protocol: acp
+    fallback: api
+tasks:
+  greet:
+    infer:
+      prompt: "hi"
