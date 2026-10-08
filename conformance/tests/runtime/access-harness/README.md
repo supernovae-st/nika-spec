@@ -193,7 +193,9 @@ nothing otherwise. Both are compared verbatim. Over an API, every inference
 request body is compared in the route's wire form. That form is the binding
 table's explicit, route-bound mapping: the `openai` body names
 `openai/<name>` as `<name>`, and an id of another provider has no wire form
-there. An API reads back no configuration.
+there. An API reads back no configuration. A receipt asserting
+`requested_effort: null` also asserts that no effort travelled: an omitted
+declaration keeps the route's default and sends none.
 
 ### Outcomes
 
@@ -207,9 +209,10 @@ there. An API reads back no configuration.
   state. An `env` overlay beside the route world, an unbound route, or an
   unadvertised `default_model`. Also, after the run: an admitted-run
   fixture that the engine refused before any event because the staged
-  loopback endpoint is unpriced to it and its unknown-cost review needs a
-  fresh interactive choice. The adapter never answers or bypasses that
-  review; any request it observed keeps the divergence.
+  loopback endpoint has no known USD price for it. Its unknown-cost
+  admission refuses that plain-HTTP route, and a reviewable route would
+  still need a fresh interactive choice. The adapter never answers or
+  bypasses that review; any request it observed keeps the divergence.
 - `ENGINE-ERROR` · a crash, a signal, a timeout, or nothing at all on
   stdout, whatever the exit. An empty reply is no refusal and no run, so it
   never reaches the admission comparison.

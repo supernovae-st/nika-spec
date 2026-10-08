@@ -145,7 +145,10 @@ def main():
     if "silent" in PLAN:
         return PLAN["silent"]
     if "refuse" in PLAN:
-        print(json.dumps({"error": PLAN["refuse"]}), flush=True)
+        # The reference engine settles a pre-run refusal as one run_settled frame.
+        document = ({"kind": "run_settled", "cause": "refused", "status": "failed",
+                     "error": PLAN["refuse"]} if PLAN.get("settled") else {"error": PLAN["refuse"]})
+        print(json.dumps(document), flush=True)
         return PLAN.get("exit", 3)
     emit("workflow_started", [("workflow", "scripted")])
     for task, terminal in PLAN.get("tasks", {}).items():
@@ -254,8 +257,8 @@ class ScriptedEngineCase(unittest.TestCase):
     def engine(self, plan: dict) -> str:
         return write_engine(self.tmp.name, plan)
 
-    def verdict(self, fixture: str, plan: dict) -> tuple[str, list[str]]:
-        directory = next(HARNESS.glob(f"{fixture}-*"))
+    def verdict(self, fixture, plan: dict) -> tuple[str, list[str]]:
+        directory = fixture if isinstance(fixture, pathlib.Path) else next(HARNESS.glob(f"{fixture}-*"))
         try:
             diffs = runner.judge_run(self.engine(plan), directory)
         except runner.UnsupportedFixture as error:
@@ -377,6 +380,33 @@ class AcpSelectionLaws(ScriptedEngineCase):
         self.assertVerdict("003", self.conformant(tasks={}), "DIVERGE", "no terminal event")
         self.assertVerdict("003", self.conformant(settle=False), "DIVERGE", "run_settled")
 
+    def test_an_effort_the_file_never_asked_never_travels(self):
+        # A copy of 003 without run.reasoning: an options session that offers
+        # efforts, a file that asks none.
+        source = next(HARNESS.glob("003-*"))
+        fixture = pathlib.Path(self.tmp.name) / "no-effort"
+        fixture.mkdir(exist_ok=True)
+        (fixture / "input.nika").write_bytes((source / "input.nika").read_bytes().replace(
+            b"  reasoning:\n    effort: high\n", b""))
+        (fixture / "run.json").write_bytes((source / "run.json").read_bytes())
+        (fixture / "expected-run.json").write_text(json.dumps({
+            "admission": {"accepted": True}, "workflow_state": "success",
+            "tasks": {"summarize": {"status": "success"}},
+            "receipt": {"access_via": "codex", "protocol": "acp", "requested_model": MODEL,
+                        "requested_effort": None, "transmitted_model": MODEL,
+                        "configured_model": MODEL, "model_evidence": "configured",
+                        "responding_model": None},
+            "observed": {"acp_config_before_first_prompt": {"model": MODEL}, "acp_prompts": 1,
+                         "api_inference_requests": 0, "cli_invocations": 0}}))
+        receipt = selection(model=configured()["model"],
+                            effort={"configured": "low", "configured_source": "session_config"})
+        plan = {"steps": [session(("model", MODEL), ("prompt",))],
+                "tasks": success(receipt_fields(receipt, requirement(effort=None)))}
+        self.assertVerdict(fixture, plan, "AGREE")
+        plan["steps"] = [session(("model", MODEL), ("reasoning_effort", "high"), ("prompt",))]
+        self.assertVerdict(fixture, plan, "DIVERGE",
+                           "receipt.transmitted_effort · the ACP peer received 'high'")
+
     def test_the_peer_record_binds_the_receipt_even_when_the_applied_state_matches(self):
         # The last value sent is the transmitted one, even when the peer refused it.
         plan = self.conformant(steps=[session(("model", MODEL), ("reasoning_effort", "high"),
@@ -457,6 +487,12 @@ class AdmissionLaws(ScriptedEngineCase):
         self.assertVerdict("017", self.refusal("NIKA-1800", "run.access.protocol: api is not spoken"),
                            "AGREE")
 
+    def test_a_settled_refusal_is_read_and_named(self):
+        plan = self.refusal("NIKA-1803", "codex is installed, but its ACP adapter is not", settled=True)
+        self.assertVerdict("012", plan, "AGREE",
+                           "engine refused before any workflow or task event, at settlement "
+                           "(cause refused): NIKA-1803")
+
     def test_the_launch_option_reaches_the_engine_verbatim(self):
         plan = self.refusal("NIKA-1801", "--access openai contradicts run.access.via: codex",
                             expect_argv=["run", "input.nika", "--json", "--access", "openai"])
@@ -521,10 +557,13 @@ class ApiAndDeathLaws(ScriptedEngineCase):
                                                             "stream": False}}]
                     self.assertVerdict(fixture, plan, "DIVERGE",
                                        f"the openai endpoint received model {body_model!r}")
+        # The file declared no effort (`requested_effort: null`): none may travel.
         plan = self.api()
         plan["steps"] = [{"do": "api", "body": {"model": "gpt-5.5", "messages": [], "stream": False,
                                                 "reasoning_effort": "high"}}]
-        self.assertVerdict("007", plan, "AGREE")
+        self.assertVerdict("007", plan, "DIVERGE",
+                           "the openai endpoint received reasoning_effort 'high'")
+        self.assertVerdict("007", self.api(), "AGREE")
 
     def test_a_model_listing_is_discovery_not_inference(self):
         plan = self.api()
@@ -535,12 +574,24 @@ class ApiAndDeathLaws(ScriptedEngineCase):
         price = {"code": None, "message": "price unknown: this host cannot obtain a fresh one-time "
                                           "choice; use an interactive local `nika run`"}
         self.assertVerdict("005", {"refuse": price}, "UNSUPPORTED", "interactive one-time choice")
+        https = {"code": None, "message": "unknown-cost admission requires an exact HTTPS route and model"}
+        self.assertVerdict("007", {"refuse": https}, "UNSUPPORTED", "refuses that plain-HTTP route")
+        self.assertVerdict("007", {"refuse": dict(https, code="NIKA-1800")}, "UNSUPPORTED")
+        self.assertVerdict("005", {"refuse": https, "settled": True}, "UNSUPPORTED")
         # An inference sent before the refusal is an effect: never an unstaged premise.
         self.assertVerdict("007", {"refuse": price, "steps": [{"do": "api"}]}, "DIVERGE",
                            "admission: accepted run has no workflow_started",
                            "peers · api inference requests 1")
         other = {"code": None, "message": "price known: a different refusal"}
         self.assertVerdict("005", {"refuse": other}, "DIVERGE", "admission")
+
+    def test_unknown_cost_is_not_an_unstaged_premise_for_an_acp_only_fixture(self):
+        refusal = {"code": "NIKA-1800", "message":
+                   "unknown-cost admission requires an exact HTTPS route and model"}
+        for settled in (False, True):
+            with self.subTest(settled=settled):
+                self.assertVerdict("003", {"refuse": refusal, "settled": settled},
+                                   "DIVERGE", "admission")
 
     def test_a_dead_session_fails_on_its_route_and_nowhere_else(self):
         died = {"state": "failure", "tasks": failure("NIKA-1804"),

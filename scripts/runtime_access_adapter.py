@@ -112,11 +112,12 @@ API_ROUTES = {
 REGISTRY_BINARIES = ("gemini", "qwen", "kimi", "opencode", "codex", "codex-acp", "copilot",
                      "grok", "claude", "claude-agent-acp")
 SYSTEM_PATH = ("/usr/bin", "/bin")
-# The reference engine's machine refusal when a Run's route has an unknown USD
-# price and its host offers no fresh interactive choice (an unpriced endpoint,
-# such as the stage's loopback one, needs that review). Recognized only to
-# classify a run that did nothing: it is never read as agreement.
-UNKNOWN_PRICE_REFUSAL = "price unknown:"
+# The reference engine's machine refusals of a Run whose API route has no known
+# USD price: its unknown-cost admission refuses a route it cannot review (the
+# stage's plain-HTTP loopback endpoint is one), and a reviewable one still
+# needs a fresh interactive choice the host may not offer. Recognized only to
+# classify a run that did nothing: never read as agreement.
+UNKNOWN_PRICE_REFUSALS = ("price unknown:", "unknown-cost admission")
 ATTESTATION_GAP = (
     "an infer: task on an agent-application route rests on the subscription-harness "
     "attestation premise (02 §Subscription harness access); run.json states that premise "
@@ -699,6 +700,10 @@ def diff_physical(expected: dict, observation: Observation) -> list[str]:
     themselves recorded, not only on the engine's account of it: the ACP peer's
     selections and read-backs verbatim, an API endpoint's request body in its
     route's wire form."""
+    expected = dict(expected)
+    if expected.get("requested_effort", "") is None:
+        # No effort was asked: none may travel (01 §run · omitted keeps the route's default).
+        expected.setdefault("transmitted_effort", None)
     keys = [key for key in ("transmitted_model", "transmitted_effort", "configured_model",
                             "configured_effort") if key in expected]
     if not keys:
@@ -891,44 +896,64 @@ def judge_receipts(access: Contract, events: list[dict], event_fields, strict_js
     return diffs, unsupported, decoded
 
 
+def _executed(events: list[dict]) -> bool:
+    return any(str(event.get("kind", "")).startswith(("workflow_", "task_")) for event in events)
+
+
+def pre_run_error(stdout: str, events: list[dict] | None, strict_json) -> tuple[dict | None, str]:
+    """The engine's own refusal before any workflow or task event: a bare machine
+    error document, or the error a lone settlement carries."""
+    if events is None or _executed(events):
+        return None, ""
+    for event in events:
+        if event.get("kind") == "run_settled" and isinstance(event.get("error"), dict):
+            return event["error"], f"at settlement (cause {event.get('cause')})"
+    try:
+        document = strict_json(stdout)
+    except ValueError:
+        return None, ""
+    if isinstance(document, dict) and isinstance(document.get("error"), dict):
+        return document["error"], "as a bare error document"
+    return None, ""
+
+
 def unstaged_premise(expected: dict, stdout: str, events: list[dict] | None,
                      observation: Observation, strict_json) -> str | None:
-    """A run the fixture wanted, refused before any event because the stage's
-    unpriced endpoint needs the engine's interactive cost review, with nothing
-    physically sent anywhere: the requirement was never exercised. Any effect
-    keeps the divergence."""
-    if (expected.get("admission") or {}).get("accepted") is not True or events \
+    """A run the fixture wanted, refused before any workflow or task event because
+    the stage's unpriced endpoint meets the engine's unknown-cost admission, with
+    nothing physically sent anywhere: the requirement was never exercised. Any
+    effect keeps the divergence. An ACP-only fixture has no unpriced API premise
+    to excuse: such a refusal is an engine divergence."""
+    if (expected.get("admission") or {}).get("accepted") is not True \
+            or (expected.get("observed") or {}).get("api_inference_requests", 0) == 0 \
             or any(observation.counts().values()):
         return None
-    try:
-        error = strict_json(stdout).get("error")
-    except (ValueError, AttributeError):
-        return None
+    error, _ = pre_run_error(stdout, events, strict_json)
     message = error.get("message") if isinstance(error, dict) else None
-    if not isinstance(message, str) or not message.startswith(UNKNOWN_PRICE_REFUSAL):
+    if not isinstance(message, str) or not (message.startswith(UNKNOWN_PRICE_REFUSALS[0])
+                                            or UNKNOWN_PRICE_REFUSALS[1] in message):
         return None
-    return ("the staged loopback endpoint is unpriced to the reference engine, whose "
-            "unknown-cost Run review needs a fresh interactive one-time choice; this "
-            "noninteractive adapter declares none and never answers or bypasses that review, "
-            f"so the selection was not exercised (engine: {message})")
+    return ("the staged loopback endpoint has no known USD price for the reference engine: its "
+            "unknown-cost admission refuses that plain-HTTP route, and a reviewable route would "
+            "still need a fresh interactive one-time choice; this noninteractive adapter declares "
+            "none and never answers or bypasses that review, so the selection was not exercised "
+            f"(engine: {message})")
 
 
 # ----------------------------------------------------------- notes · evidence
 
 def refusal_witness(stdout: str, events: list[dict] | None, event_fields, strict_json) -> list[str]:
     """Where and why the engine refused, in its own words (informational)."""
+    error, where = pre_run_error(stdout, events, strict_json)
+    if error is not None:
+        return [f"engine refused before any workflow or task event, {where}: {error.get('code')} · "
+                f"{str(error.get('message'))[:240]}"]
     if not events:
         try:
             document = strict_json(stdout)
         except ValueError:
             return []
-        if not isinstance(document, dict):
-            return []
-        error = document.get("error")
-        if isinstance(error, dict):
-            return [f"engine refused before any event: {error.get('code')} · "
-                    f"{str(error.get('message'))[:240]}"]
-        if "clean" in document:
+        if isinstance(document, dict) and "clean" in document:
             return [f"engine's embedded check answered before any event (clean="
                     f"{document['clean']}): {stdout.strip()[:240]}"]
         return []
