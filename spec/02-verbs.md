@@ -67,7 +67,7 @@ research:
       system: "You are a senior software architect."
       model: mistral/mistral-large         # override default · <provider>/<name>
       temperature: 0.3
-      max_tokens: 2000
+      max_tokens: 16384                  # room for the thinking budget and the answer
       schema:                            # optional · structured output
         type: object
         required: [summary, paragraphs]
@@ -90,7 +90,7 @@ research:
 | `system` | no | string | System prompt |
 | `model` | no | string | Override workflow default · `<provider>/<name>` · see stdlib/providers-v0.1.md |
 | `temperature` | no | number 0-2 | Sampling temperature |
-| `max_tokens` | no | integer | Max output tokens · provider-dependent default · an answer the provider cuts at this cap fails (`NIKA-INFER-005`) |
+| `max_tokens` | no | integer | Max output tokens · provider-dependent default · an answer the provider cuts at this cap fails (`NIKA-INFER-005`) · a model that reasons before it answers draws its reasoning from this budget: give it room (16,384), or a low `run.reasoning.effort` its route documents; too little returns an empty answer (`NIKA-INFER-004`) |
 | `schema` | no | object | raw JSON Schema · structured output validation — the **out-of-core hatch**; the typed door is task-level `returns:` ([09](./09-types.md) · both on one task = `NIKA-TYPE-003`). Numeric facts (`0\|1\|3`, counts, coded levels) are `type: integer` with a numeric `enum` — never `enum: ["0","1","3"]`. Models emit JSON numbers; a string-digit enum can reject the call before coerce (reference engine hint `digit-string-enum`). The model extracts facts; `nika:jq` or `nika:decide` is the law ([11](./11-decision.md) · `examples/13-extract-then-law.nika`) |
 | `thinking` | no | object | Extended thinking · `{ enabled, budget_tokens }` |
 | `vision` | no | array | Image inputs · each `{ source: file|url, path|url, … }` |
