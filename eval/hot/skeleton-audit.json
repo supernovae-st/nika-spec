@@ -47,7 +47,7 @@
       "negative_fixture": "templates/agent-loop.negative.yaml",
       "golden": "templates/agent-loop.nika.golden.json",
       "stdlib_quality_notes": "deliberate EXPLORE; not HOT default",
-      "sha256_file": "sha256:4bac2151575df3fc3342ea19cdadf5b5e416eeaaa528bc3ec5f012acfb98da8e",
+      "sha256_file": "sha256:07f50946522b131d310c8c3bb4adbdb296f6fb4947bd3b9f96a62c12478d13f9",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
     },
     {
@@ -182,7 +182,7 @@
       "negative_fixture": "templates/bounded-batch.negative.yaml",
       "golden": "templates/bounded-batch.nika.golden.json",
       "stdlib_quality_notes": "boundedness law",
-      "sha256_file": "sha256:5333556fdb46fd16bd6e48f9a267d470558f6e663e2510df6322066eb75833d2",
+      "sha256_file": "sha256:7e3fff2c6b9281e8d0951d95b8d5f541ba592eb37c1f60cfd02d364c8f994e8a",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
     },
     {
@@ -229,7 +229,7 @@
       "negative_fixture": "templates/chain.negative.yaml",
       "golden": "templates/chain.nika.golden.json",
       "stdlib_quality_notes": "dangerous over-broad HOT; read\u2192LLM\u2192write",
-      "sha256_file": "sha256:c09adee68ad5548be7f3de4ea3d749293fb8312d8fd32d42f181a21307bce520",
+      "sha256_file": "sha256:64735853af14a0e4c815061021e2643eb61000fbf55fdebebff7b703cca6f5a3",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
     },
     {
@@ -280,7 +280,7 @@
       "negative_fixture": "templates/classify-and-route.negative.yaml",
       "golden": "templates/classify-and-route.nika.golden.json",
       "stdlib_quality_notes": "decision motif + nika:decide; class \u2260 authority",
-      "sha256_file": "sha256:4528338b033f53a849ca0c7fa7f0151792442ace3789f890b3ef230beb3d737c",
+      "sha256_file": "sha256:96fed8925d6f3627420062d0322951e9bd2f7f92a18c6766203c4087ff56776d",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
     },
     {
@@ -329,7 +329,7 @@
       "negative_fixture": "templates/corpus-qa.negative.yaml",
       "golden": "templates/corpus-qa.nika.golden.json",
       "stdlib_quality_notes": "retrieve \u2192 answer/unknown",
-      "sha256_file": "sha256:0c219f7765a1df77ae6af91281129f82a1e677496e348bbb2d0a34e5141cce72",
+      "sha256_file": "sha256:94800ff9d49245928078a5d49f5edab447bbb4d92de2a1c2f71dec6543ac1145",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
     },
     {
@@ -421,7 +421,7 @@
       "negative_fixture": "templates/docker-report.negative.yaml",
       "golden": "templates/docker-report.nika.golden.json",
       "stdlib_quality_notes": "ops-specific complete; fan-in exec",
-      "sha256_file": "sha256:6e2a3211a39b960cc170efe70964a5e0b50bf99eeba78752cae27acadb64e9c6",
+      "sha256_file": "sha256:99202ab4581a7caa96cf6f020ff24241be38896719880fddaf6e7610ba5c04f8",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
     },
     {
@@ -469,7 +469,7 @@
       "negative_fixture": "templates/document-to-fields.negative.yaml",
       "golden": "templates/document-to-fields.nika.golden.json",
       "stdlib_quality_notes": "extract + anchors; no effect",
-      "sha256_file": "sha256:a3916e19ae3dc85f95413690768e25fbdc7e0cc01dabf823891b5b619d98f837",
+      "sha256_file": "sha256:1d649e3b5797ff0da02321070c46b324c920fecb4a5e7ac1b23633427ef0cffb",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
     },
     {
@@ -566,7 +566,7 @@
       "negative_fixture": "templates/evaluate-and-optimize.negative.yaml",
       "golden": "templates/evaluate-and-optimize.nika.golden.json",
       "stdlib_quality_notes": "bounded revise rounds",
-      "sha256_file": "sha256:6abb970d905444b07d0df63e6330f7eb6d0a6c636cc49a0f19c5d9d817552513",
+      "sha256_file": "sha256:8d02a96613beef73d6fa767c29a511b6150275e54a8ef2381b6a014d7c988ef0",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
     },
     {
@@ -618,7 +618,7 @@
       "negative_fixture": "templates/fanout.negative.yaml",
       "golden": "templates/fanout.nika.golden.json",
       "stdlib_quality_notes": "bounded collection",
-      "sha256_file": "sha256:e45da5bcc8080771eb279b8a347715f5ba50bb428bb7b9493167a909c21729db",
+      "sha256_file": "sha256:55c233b7f44623d4c199e7aeb46459ea89536e3b8c1b6021e1808a94be2720c4",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
     },
     {
@@ -759,7 +759,7 @@
       "negative_fixture": "templates/media-asset-pack.negative.yaml",
       "golden": "templates/media-asset-pack.nika.golden.json",
       "stdlib_quality_notes": "generation pack; not per-SaaS clone",
-      "sha256_file": "sha256:9358b5a04ba81ec9b3c3b9c7195f3f87e1777274d1721ce4428cffb0c901d519",
+      "sha256_file": "sha256:ee2202976f5a29e2185a24ef44633c7b7d6cfdf32d25cb7afe72e01f1ba02443",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
     },
     {
@@ -813,7 +813,7 @@
       "negative_fixture": "templates/parallel-review.negative.yaml",
       "golden": "templates/parallel-review.nika.golden.json",
       "stdlib_quality_notes": "conjunction not vibe-majority",
-      "sha256_file": "sha256:d02b45349edb57fe66b0692584c822f5bab0a7620c0d5d6ec445d96d332f43db",
+      "sha256_file": "sha256:f55c7aab68d91a5cffd0eb49f6ba9c5b56b690eff0063161236f119ffbc3aec5",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
     },
     {
@@ -862,7 +862,7 @@
       "negative_fixture": "templates/project-public-fields.negative.yaml",
       "golden": "templates/project-public-fields.nika.golden.json",
       "stdlib_quality_notes": "redact then optional infer",
-      "sha256_file": "sha256:c4bc776cf730f13543c0379eec178ebf90dfb465c51b1d356ed6628c0f4fc614",
+      "sha256_file": "sha256:26415ba1fb7ca62d794b7bf4ca45eb6165c3fc2a22f64bf8fbd2c5786fd6ba75",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
     },
     {
@@ -1049,7 +1049,7 @@
       "negative_fixture": "templates/website-brief.negative.yaml",
       "golden": "templates/website-brief.nika.golden.json",
       "stdlib_quality_notes": "HOT-A candidate; URL/host baked in const+permits \u2014 structure vs data gap",
-      "sha256_file": "sha256:52ff867ab56ab2aef8c3a86a69cccaab0c68681bdf96dec53bf2f8cdc37d4bac",
+      "sha256_file": "sha256:aa433cb4d9323118cd6734a3bebd432f90d7ed1031b2a5f0e2134be3676d5693",
       "why_metadata_not_derived": "classification and motif labels are authored; tools/tasks/recover derived from source text"
     }
   ]

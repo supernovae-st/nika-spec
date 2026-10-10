@@ -19,7 +19,7 @@ templates:
     law_ids: []
     introduced_in: C0
     source_path: templates/agent-loop.nika
-    source_digest: sha256:4bac2151575df3fc3342ea19cdadf5b5e416eeaaa528bc3ec5f012acfb98da8e
+    source_digest: sha256:07f50946522b131d310c8c3bb4adbdb296f6fb4947bd3b9f96a62c12478d13f9
     category: agent-loop
     tags: [research, review]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
@@ -43,7 +43,7 @@ templates:
     law_ids: []
     introduced_in: C0
     source_path: templates/chain.nika
-    source_digest: sha256:c09adee68ad5548be7f3de4ea3d749293fb8312d8fd32d42f181a21307bce520
+    source_digest: sha256:64735853af14a0e4c815061021e2643eb61000fbf55fdebebff7b703cca6f5a3
     category: linear
     tags: [content]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
@@ -55,7 +55,7 @@ templates:
     law_ids: []
     introduced_in: 0.113.0
     source_path: templates/classify-and-route.nika
-    source_digest: sha256:4528338b033f53a849ca0c7fa7f0151792442ace3789f890b3ef230beb3d737c
+    source_digest: sha256:96fed8925d6f3627420062d0322951e9bd2f7f92a18c6766203c4087ff56776d
     category: decision-routing
     tags: [operations]
     notes: 'Typed facts become an EvidenceSnapshot consumed by nika:decide · the model extracts evidence, while
@@ -66,7 +66,7 @@ templates:
     law_ids: []
     introduced_in: 0.113.0
     source_path: templates/corpus-qa.nika
-    source_digest: sha256:0c219f7765a1df77ae6af91281129f82a1e677496e348bbb2d0a34e5141cce72
+    source_digest: sha256:94800ff9d49245928078a5d49f5edab447bbb4d92de2a1c2f71dec6543ac1145
     category: retrieval
     tags: [knowledge]
     notes: 'Conflicting duplicate ids refuse before indexing, while identical duplicates keep sort-and-unique
@@ -77,7 +77,7 @@ templates:
     law_ids: []
     introduced_in: C0
     source_path: templates/docker-report.nika
-    source_digest: sha256:6e2a3211a39b960cc170efe70964a5e0b50bf99eeba78752cae27acadb64e9c6
+    source_digest: sha256:99202ab4581a7caa96cf6f020ff24241be38896719880fddaf6e7610ba5c04f8
     category: parallel-fan-in
     tags: [operations, report]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
@@ -89,7 +89,7 @@ templates:
     law_ids: []
     introduced_in: 0.113.0
     source_path: templates/document-to-fields.nika
-    source_digest: sha256:a3916e19ae3dc85f95413690768e25fbdc7e0cc01dabf823891b5b619d98f837
+    source_digest: sha256:1d649e3b5797ff0da02321070c46b324c920fecb4a5e7ac1b23633427ef0cffb
     category: structured-extraction
     tags: [documents]
     notes: 'Whitespace is trimmed and refused before inference when empty · typed field extraction keeps an exact
@@ -112,7 +112,7 @@ templates:
     law_ids: []
     introduced_in: 0.113.0
     source_path: templates/evaluate-and-optimize.nika
-    source_digest: sha256:6abb970d905444b07d0df63e6330f7eb6d0a6c636cc49a0f19c5d9d817552513
+    source_digest: sha256:8d02a96613beef73d6fa767c29a511b6150275e54a8ef2381b6a014d7c988ef0
     category: bounded-loop
     tags: [quality]
     notes: 'Two revision rounds are unrolled in the DAG, then a score-only evaluator measures optimize_2 · the bound
@@ -123,7 +123,7 @@ templates:
     law_ids: []
     introduced_in: C0
     source_path: templates/fanout.nika
-    source_digest: sha256:e45da5bcc8080771eb279b8a347715f5ba50bb428bb7b9493167a909c21729db
+    source_digest: sha256:55c233b7f44623d4c199e7aeb46459ea89536e3b8c1b6021e1808a94be2720c4
     category: fanout
     tags: [batch]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
@@ -159,7 +159,7 @@ templates:
     law_ids: []
     introduced_in: C0
     source_path: templates/media-asset-pack.nika
-    source_digest: sha256:9358b5a04ba81ec9b3c3b9c7195f3f87e1777274d1721ce4428cffb0c901d519
+    source_digest: sha256:ee2202976f5a29e2185a24ef44633c7b7d6cfdf32d25cb7afe72e01f1ba02443
     category: linear
     tags: [media]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
@@ -171,7 +171,7 @@ templates:
     law_ids: []
     introduced_in: C0
     source_path: templates/website-brief.nika
-    source_digest: sha256:52ff867ab56ab2aef8c3a86a69cccaab0c68681bdf96dec53bf2f8cdc37d4bac
+    source_digest: sha256:aa433cb4d9323118cd6734a3bebd432f90d7ed1031b2a5f0e2134be3676d5693
     category: linear
     tags: [website]
     notes: 'Import-c0 (canon-flip) · canon.yaml templates → row (SSOT-2 A.2: the registry is the sole official template
@@ -183,7 +183,7 @@ templates:
     law_ids: []
     introduced_in: 0.120.0-dev
     source_path: templates/bounded-batch.nika
-    source_digest: sha256:5333556fdb46fd16bd6e48f9a267d470558f6e663e2510df6322066eb75833d2
+    source_digest: sha256:7e3fff2c6b9281e8d0951d95b8d5f541ba592eb37c1f60cfd02d364c8f994e8a
     category: bounded-batch
     tags: [authoring, bounded]
     notes: 'admit a finite batch before starting model calls'
@@ -223,7 +223,7 @@ templates:
     law_ids: []
     introduced_in: 0.120.0-dev
     source_path: templates/project-public-fields.nika
-    source_digest: sha256:c4bc776cf730f13543c0379eec178ebf90dfb465c51b1d356ed6628c0f4fc614
+    source_digest: sha256:26415ba1fb7ca62d794b7bf4ca45eb6165c3fc2a22f64bf8fbd2c5786fd6ba75
     category: project-public-fields
     tags: [authoring, bounded]
     notes: 'select allowed fields before sending data to a model'
@@ -233,7 +233,7 @@ templates:
     law_ids: []
     introduced_in: 0.120.0-dev
     source_path: templates/parallel-review.nika
-    source_digest: sha256:d02b45349edb57fe66b0692584c822f5bab0a7620c0d5d6ec445d96d332f43db
+    source_digest: sha256:f55c7aab68d91a5cffd0eb49f6ba9c5b56b690eff0063161236f119ffbc3aec5
     category: parallel-review
     tags: [authoring, bounded]
     notes: 'collect independent reviews with a deterministic conjunction'
