@@ -1627,7 +1627,7 @@ diagnostics:
     terminal: true
     payload_schema: to-mint-c1/diagnostics/payloads/budget_error.schema.json
     span_required: true
-    teaching: 'NIKA-INFER-005 one scale up: a final message the provider cut is not a completion — raise the turn''s max_tokens or recover the partial explicitly through on_error:.'
+    teaching: 'NIKA-INFER-005 one scale up: a final message the provider cut is not a completion — an agent turn runs under the provider''s own output cap, so ask for a shorter final message, or recover the partial explicitly through on_error:.'
     notes: 'the final-turn twin of NIKA-INFER-005 · category: budget_error · transient: false (canon.yaml verbatim) · a cut turn that carries tool calls is not final and stays in the loop · law_ids empty until the freeze batch.'
   - id: NIKA-MCP-001
     status: reserved
