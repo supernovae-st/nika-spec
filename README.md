@@ -86,6 +86,7 @@ You need `git` and Python 3. No engine, no API key, no model call.
      greet:                    # one task, one verb
        infer:
          prompt: "Say hello in French, in one short sentence."
+         # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low
          max_tokens: 2048
 
    outputs:

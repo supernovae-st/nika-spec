@@ -327,7 +327,7 @@
     "near-misses.json": "sha256:236233b578e04c440b0e6ac4f02ba85a5094fdd177bbb8bb413113280ebc998a",
     "edits.json": "sha256:948d610fef658805213470d402f09ba888dfeb6890b2c730ba71b2b0c67884cf",
     "composition-fixtures.json": "sha256:cce8c723cb7802b36d9ce4cbc75ec1b429a8a23017cbdf2106326090734b22e7",
-    "skeleton-audit.json": "sha256:112d5823b2515d6d4e5f751ed6a530ae8381f9fd86653b2b73a58105719007c8",
+    "skeleton-audit.json": "sha256:caeca322f1c26ff979326503e1fdbb1f883d4bb4ab3e9b40b3092f73503a4392",
     "complex/": "sha256:c3c50e456694e422a7b0bf0215ac8c5bbeefba78e1ad45caa6edc75a0374dda0"
   },
   "initial_freeze": {
