@@ -43,7 +43,7 @@ foundation:
   - file: examples/17-tts-self.nika
     sha256_16: 37d15028add0d76f
   - file: examples/18-bounded-batch.nika
-    sha256_16: 0c6afc217ea29285
+    sha256_16: 563c11f84f611c97
   - file: examples/19-validate-records.nika
     sha256_16: a6b661ce018b8347
   - file: examples/20-snapshot-diff.nika
@@ -51,9 +51,9 @@ foundation:
   - file: examples/21-deduplicate-records.nika
     sha256_16: 05f1df531e6b9406
   - file: examples/22-project-public-fields.nika
-    sha256_16: d147845ba5ddc48a
+    sha256_16: 140c4e51dad3153c
   - file: examples/23-parallel-review.nika
-    sha256_16: 7e7974e6d678f2d0
+    sha256_16: 61b2048186af38bf
   - file: examples/24-recover-optional-file.nika
     sha256_16: 7a9edfa98599d11a
   - file: examples/25-aggregate-by-key.nika
