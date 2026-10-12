@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-PROMPT-003",
+      "category": "validation_error"
+    }
+  ],
+  "note": "02-verbs §Prompt files · the bytes must be valid UTF-8 (Latin-1 é is not; any extension names a prompt file) · the twin of 015."
+}

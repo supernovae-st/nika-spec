@@ -1,0 +1,8 @@
+{
+ "lints": [
+  {
+   "rule": "egress/001",
+   "task": "brief"
+  }
+ ]
+}

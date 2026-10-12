@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-PROMPT-001",
+      "category": "validation_error"
+    }
+  ],
+  "note": "02-verbs §Prompt files · a glob names no single file · refused at the path law."
+}

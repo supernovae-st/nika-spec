@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-VAR-021",
+      "category": "validation_error"
+    }
+  ],
+  "note": "02-verbs §Prompt files · one templating law: the file's text is judged as the same text written inline, so a tasks.* read outside with: is refused · the twin of 017."
+}

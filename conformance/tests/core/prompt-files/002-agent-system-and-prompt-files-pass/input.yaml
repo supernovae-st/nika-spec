@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-agent-prompt-files
+permits:
+  tools: ["nika:done"]
+  fs: { read: ["prompts/**"] }   # the prompt text reaches the model · a read inside the boundary
+tasks:
+  review:
+    agent:
+      system: { file: "./prompts/editor.md" }
+      prompt: { file: "prompts/brief.md" }
+      tools: ["nika:done"]

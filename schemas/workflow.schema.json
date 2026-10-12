@@ -589,11 +589,11 @@
       "additionalProperties": false,
       "properties": {
         "prompt": {
-          "type": "string"
+          "$ref": "#/$defs/promptText"
         },
         "system": {
           "description": "System prompt · the standing instruction, sent ahead of `prompt:` and unchanged by it.",
-          "type": "string"
+          "$ref": "#/$defs/promptText"
         },
         "model": {
           "type": "string"
@@ -807,11 +807,11 @@
       "additionalProperties": false,
       "properties": {
         "prompt": {
-          "type": "string"
+          "$ref": "#/$defs/promptText"
         },
         "system": {
           "description": "System prompt · the standing instruction, sent ahead of `prompt:` and unchanged by any turn of the loop.",
-          "type": "string"
+          "$ref": "#/$defs/promptText"
         },
         "model": {
           "type": "string"
@@ -898,6 +898,28 @@
           }
         }
       }
+    },
+    "promptText": {
+      "description": "A prompt or system text · a string, or the text of a project file named as `{ file: <path> }` (spec 02 §Prompt files: a static relative path inside the naming file's directory tree, read at compose time inside `permits.fs.read`, UTF-8, at most 65,536 bytes, interpolated exactly as inline text).",
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "file"
+          ],
+          "properties": {
+            "file": {
+              "description": "The project file whose text is the field's value · relative to the workflow file that names it.",
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
     },
     "onError": {
       "type": "object",

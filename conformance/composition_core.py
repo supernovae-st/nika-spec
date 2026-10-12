@@ -117,6 +117,55 @@ def _load_child(base_dir, target: str):
         return None, None
 
 
+def _child_prompt_errors(root, cpath, child: dict, where: str) -> list[dict]:
+    """A child's prompt files under the project root: the path law with
+    containment (NIKA-PROMPT-001), then, inside the child's own read
+    boundary, the link, the read and the cap (002 · 003)."""
+    from deep_static import _prompt_file_refs, _prompt_path_reason, _skill_path_admitted, \
+        _PROMPT_CAP
+    import os
+    errs: list[dict] = []
+    root = root.resolve()
+    naming = os.path.relpath(cpath.parent, root).replace(os.sep, "/")
+    permits = child.get("permits") if isinstance(child, dict) else None
+    for _tid, task in _tasks(child):
+        if not isinstance(task, dict):
+            continue
+        for verb, field, raw in _prompt_file_refs(task):
+            reason = _prompt_path_reason(raw, naming)
+            here = f"{where} · child {cpath.name} {verb}.{field} file {raw!r}"
+            if reason is not None:
+                errs.append(_err("NIKA-PROMPT-001", f"{here} breaks the path law ({reason})"))
+                continue
+            if not isinstance(permits, dict) or not _skill_path_admitted(raw, permits):
+                continue  # the child's own boundary refuses it · never opened here
+            import posixpath
+            path, linked = root, False
+            for seg in posixpath.normpath(posixpath.join(naming, raw)).split("/"):
+                path = path / seg
+                if path.is_symlink():
+                    linked = True
+                    break
+            if linked:
+                errs.append(_err("NIKA-PROMPT-001", f"{here} resolves through a symbolic link"))
+                continue
+            try:
+                size = path.stat().st_size if path.is_file() else None
+                data = path.read_bytes() if size is not None and size <= _PROMPT_CAP else None
+            except OSError:
+                size, data = None, None
+            if size is None:
+                errs.append(_err("NIKA-PROMPT-002", f"{here} is missing or not a regular file"))
+            elif data is None:
+                errs.append(_err("NIKA-PROMPT-003", f"{here} holds {size} bytes, over the cap"))
+            else:
+                try:
+                    data.decode("utf-8")
+                except UnicodeDecodeError:
+                    errs.append(_err("NIKA-PROMPT-003", f"{here} is not valid UTF-8"))
+    return errs
+
+
 def _typed_call(parent_task: dict, args, child: dict, where: str) -> list[dict]:
     """COMP-004 · parent args fit child inputs · child outputs fit
     parent returns — the assignable relation of spec 09, composed. The child's
@@ -259,6 +308,10 @@ def composition_errors(doc: dict, base_dir=None) -> list[dict]:
             continue
         if child is None:
             continue  # no reader available · single-doc laws only
+        # 02 §Prompt files · a child's prompt files are contained by the PROJECT
+        # root (the root workflow's folder here), not by the child's folder;
+        # the child's own read boundary is the child's check, never opened here.
+        errs.extend(_child_prompt_errors(base_dir, cpath, child, where))
         # COMP-003 · acyclic (walk DOWN from the child, its own doc)
         errs.extend(_acyclic(base_dir, target, child))
         # COMP-004 · typed call

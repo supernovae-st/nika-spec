@@ -20,6 +20,8 @@ it:
 
 Fixture classes by directory prefix (the corpus naming is the family):
   nf*      native-first pair        → MEASURED (exact ordered rule+task)
+  eg*      egress advisory pair     → MEASURED (the same `hints[]` door ·
+           kind egress · a prompt or system text holding a private key)
   clean-*  global silence           → MEASURED AT THE DOOR (hints must be
            empty · the one-obvious-way half of that silence stays
            command-unverifiable until the door exists)
@@ -129,7 +131,7 @@ def main() -> int:
         expected = json.loads((d / "expected-lints.json").read_text())["lints"]
         exp_pairs = [(e["rule"], e["task"]) for e in expected]
         name = d.name
-        if not (name.startswith("nf") or name.startswith("clean-")):
+        if not (name.startswith(("nf", "eg")) or name.startswith("clean-")):
             nodoor += 1
             print(f"NODOOR    {name} · expects {exp_pairs or 'silence'} · "
                   "one-obvious-way has no command surface")

@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-prompt-file-not-utf8
+permits:
+  fs: { read: ["prompts/**"] }   # the prompt text reaches the model · a read inside the boundary
+tasks:
+  brief:
+    infer:
+      prompt: { file: "prompts/latin1.txt" }

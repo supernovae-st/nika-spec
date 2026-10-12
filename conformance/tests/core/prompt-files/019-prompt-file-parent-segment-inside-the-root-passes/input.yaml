@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-prompt-file-inside-root
+permits:
+  fs: { read: ["prompts/**"] }
+tasks:
+  brief:
+    infer:
+      prompt: { file: "prompts/drafts/../brief.md" }

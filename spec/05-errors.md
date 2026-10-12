@@ -116,6 +116,7 @@ stay internal machinery per §Taxonomy ownership.
 | `NIKA-IMPL` | Engine internal errors | 001-099 |
 | `NIKA-YAML` | YAML profile refusals (anchors · aliases · merge keys · tags · caps · encoding — the R11 law set · [01 §YAML profile](./01-envelope.md#yaml-profile-normative) · pedagogical upgrades of the `NIKA-PARSE` floor) | 001-099 |
 | `NIKA-COMP` | Composition (`invoke: workflow:` · [14-composition](./14-composition.md)) | 001-099 |
+| `NIKA-PROMPT` | Prompt files · a `prompt:`/`system:` read from a project file (`{ file: }` · [02 §Prompt files](./02-verbs.md#prompt-files---file--normative)) | 001-099 |
 | `NIKA-DECIDE` | Decision bundles + evidence (`nika:decide` · [11-decision](./11-decision.md)) | 001-099 |
 | `NIKA-PORT` | Gateway artifacts (deployment bundle · lowering · fidelity · [12-gateway](./12-gateway.md)) | 001-099 |
 | `NIKA-ASSERT` | assertion obligations ([15-proof](./15-proof.md)) · ⚰️ the `assert:` ENVELOPE KEY was removed 2026-08-11 · the range stays RESERVED, unemitted, for the day a property returns as an addition | 001-099 |
@@ -216,6 +217,9 @@ these from this file alone.
 | `NIKA-AGENT-004` | a `skills:` file is not a valid Agent Skill (no/unterminated/non-mapping frontmatter · missing/empty `name`/`description`) | `validation_error` | false |
 | `NIKA-AGENT-005` | the provider reported no token usage for a priced model — every budget and ledger reads the turn as free, so the loop fails closed (the usage-absence gate · R3-F1) | `budget_error` | false |
 | `NIKA-AGENT-006` | the agent's final message (no tool calls) stopped at the output cap (`max_tokens`) — the cut message is preserved at `error.details.partial_output`, never the task output (the rule of `NIKA-INFER-005`) | `budget_error` | false |
+| `NIKA-PROMPT-001` | the path of a prompt file breaks the path law: a `${{ }}` template or a glob, an absolute path, a backslash, a drive or a URI scheme, a `..` or a hidden segment, or a symbolic link — judged before the read boundary and before any read ([02 §Prompt files](./02-verbs.md#prompt-files---file--normative)) | `validation_error` | false |
+| `NIKA-PROMPT-002` | a prompt file inside the read boundary is missing, unreadable or not a regular file at compose time — an ungranted path is `NIKA-AUTH-006` / `NIKA-SEC-004` before the file is opened | `validation_error` | false |
+| `NIKA-PROMPT-003` | a prompt file is not valid UTF-8 or holds more than 65,536 bytes | `validation_error` | false |
 | `NIKA-MCP-001` | MCP server not configured / not reachable at call time | `tool_error` | engine-assessed |
 | `NIKA-MCP-002` | MCP tool call failed (transport · tool-side error) | `tool_error` | engine-assessed |
 | `NIKA-SEC-001` | `exec:` blocklist hit | `security_error` | false |

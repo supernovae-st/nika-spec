@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-004",
+      "category": "security_error"
+    }
+  ],
+  "note": "02-verbs §Prompt files · a declared read boundary that does not admit the path refuses it before the read · the twin of 001."
+}
