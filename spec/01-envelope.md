@@ -1008,6 +1008,39 @@ compatibility matrix.
 
 ---
 
+## The project's missed slots · `manqué` (normative)
+
+A `nika.yaml` beat (`arm:`) states, with no default, what a slot the firer missed becomes when the
+firer comes back. The machine that fires the beat applies it; the project file only states it
+(08 §A5).
+
+| `manqué:` | What fires | What each run receives |
+|---|---|---|
+| `sauter` | nothing: every missed slot is skipped | none |
+| `rattraper` | the latest missed slot, once | that slot's instant |
+| `{ rattraper: N }` | up to the N latest missed slots, one run each, oldest first | its own slot's instant |
+| `rattraper-une-fois` | one run for the whole silence | the latest slot's instant, and the missed range: the first and the last missed slot and their count |
+
+`N` is a whole number from 1; anything else is refused when the project is checked. Before
+anything is armed, the activation shows the worst spend the law allows, « jusqu'à N × plafond »
+(one `plafond` for `rattraper` and for `rattraper-une-fois`).
+
+`rattraper` replays one slot as if it had fired on time. `rattraper-une-fois` runs once on behalf
+of the whole silence, and is told how long that silence was.
+
+```yaml
+arm:
+  - workflow: workflows/daily-report.nika
+    cadence: "TZ=Europe/Paris 0 9 * * 1-5"
+    plafond: 0.50
+    manqué: { rattraper: 3 }   # back after a week away: the 3 latest missed days run, oldest first
+
+  - workflow: workflows/outage-digest.nika
+    cadence: "TZ=Europe/Paris 0 8 * * *"
+    plafond: 0.80
+    manqué: rattraper-une-fois  # one digest that covers every missed day, told the range it covers
+```
+
 ## Examples
 
 ### Minimal

@@ -51,6 +51,7 @@ jobs:
           python conformance/runner.py all
           python conformance/tests/test_access_contract.py
           python conformance/source_naming_selftest.py
+          python conformance/project_missed_slots_selftest.py
           python conformance/corpus_contract_selftest.py
           python conformance/authoring_contract_selftest.py
           python conformance/type_core_selftest.py
