@@ -1,0 +1,11 @@
+{
+  "tier": "t0",
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "validation_error"
+    }
+  ],
+  "note": "03-dag.md \u00a7for_each.max_items \u00b7 a literal list longer than the cap is refused at parse: the run would refuse it before its first item, never truncate."
+}

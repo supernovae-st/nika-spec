@@ -4,8 +4,8 @@ permits:
   tools: ["nika:hash"]
 secrets:
   release_key:
-    source: vault
-    key: prod/nika/release-ed25519
+    source: env
+    key: NIKA_RELEASE_ED25519
 const:
   release_pub: "MCowBQYDK2VwAyEAexamplepublickeybytesbase64"
 tasks:

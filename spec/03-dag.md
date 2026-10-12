@@ -59,6 +59,7 @@ my_task:                        # the map KEY is the identity · snake_case · u
   for_each:                     # optional · map this task over a collection (local namespaces)
     items: ${{ with.pages }}    #   the collection · evaluated ONCE, before the fan-out
     max_parallel: 5             #   optional · cap concurrent iterations
+    max_items: 500              #   optional · refuse a longer collection
     fail_fast: false            #   optional · false = finish the batch
   retry:                        # optional · retry policy (see 05-errors.md)
     max_attempts: 3
@@ -381,8 +382,9 @@ notify:
 ```
 
 `when:` decides **whether an admitted task runs**. It is evaluated *after*
-the gate (§gate algebra) and it reads **local namespaces only** ·
-`inputs` · `const` · `with` · and the `for_each` locals `item` / `index`.
+the gate (§gate algebra) and before any fan-out, and it reads **local
+namespaces only** · `inputs` · `const` · `with`. The `for_each` locals
+`item` / `index` are not bound yet (`NIKA-VAR-001` · §for_each below).
 A `tasks.*` reference inside `when:` is refused at parse time
 (`NIKA-VAR-021` · « hoist it into `with:` » — the binding creates the edge,
 `when:` reads the binding).
@@ -688,6 +690,29 @@ for_each:
 - **Use cases** · rate-limiting provider APIs · avoiding resource
   exhaustion · compliance with concurrency limits.
 
+#### `for_each.max_items:` · *optional · refuse a longer collection*
+
+```yaml
+for_each:
+  items: ${{ with.rows }}
+  max_items: 500               # more than 500 rows is a refusal, never a truncation
+```
+
+- **Positive integer** · `1` to `n` · the shape of `max_parallel`, on the
+  count axis.
+- **The run refuses a longer collection before its first item** · the task
+  fails before it starts with `NIKA-VAR-006`, and the message names the
+  count and the cap. Nothing is truncated: a collection AT the cap runs
+  every item.
+- **A literal list longer than the cap is refused at parse**
+  (`NIKA-PARSE` · `validation_error`): the file already shows the
+  contradiction.
+- **Use cases** · bound the work a run fans out over an upstream list whose
+  size the author does not control (a page of search results, a feed) ·
+  make a runaway collection a visible refusal instead of a long, costly run.
+- The cap is part of the task's identity on resume: changing it changes
+  what the fan refuses.
+
 #### `for_each.fail_fast:` · *optional · abort-on-error policy*
 
 ```yaml
@@ -909,9 +934,10 @@ sleeps · wall-clock). If exceeded · the task fails with a typed timeout error
 timeout already covered the retries by definition).
 
 On an `infer:`/`agent:` task the declared `timeout:` also **governs the
-provider HTTP deadline** — and when none is declared the default is per
-provider class (local ≥300s · cloud 30s · 600s transport ceiling on a
-fully-silent connection). One place specs it ·
+provider HTTP deadline**. When none is declared, a buffered provider call
+gets 600s, local and cloud alike, and a streaming call has no total
+deadline: the transport's idle-read guard reaps a stalled stream. One place
+specs it ·
 [stdlib/providers-v0.1.md §Transport deadline](../stdlib/providers-v0.1.md#transport-deadline--the-task-timeout-governs-the-provider-call).
 
 **Format · Go-duration / Kubernetes-style string** `[0-9]+(\.[0-9]+)?(ns|us|µs|ms|s|m|h)`.
@@ -1778,7 +1804,7 @@ that paints run state onto this graph joins the two by task `id`.
 
 ## Forward-compat
 
-v1 ships with these task fields · `with` · `after` · `when` · `for_each` · `retry` · `on_error` · `timeout` · `extract` · `returns` · `lift` · plus the verb selector. (`max_parallel` and `fail_fast` are sub-fields of `for_each`; `on_finally` is dead — cleanup is a task on an `unwind` edge.) Additional fields may be added in minor bumps (additive only). (Output *shape* is per-verb · not a task field · see [02-verbs.md](./02-verbs.md#what--tasksidoutput--holds--per-verb).)
+v1 ships with these task fields · `with` · `after` · `when` · `for_each` · `retry` · `on_error` · `timeout` · `extract` · `returns` · `lift` · plus the verb selector. (`max_parallel`, `max_items` and `fail_fast` are sub-fields of `for_each`; `on_finally` is dead — cleanup is a task on an `unwind` edge.) Additional fields may be added in minor bumps (additive only). (Output *shape* is per-verb · not a task field · see [02-verbs.md](./02-verbs.md#what--tasksidoutput--holds--per-verb).)
 
 Out of scope for v1 · `parallel:` for explicit concurrency control · `include:` for sub-workflow composition (workaround · `exec: nika run sub.yaml`). See [08-out-of-scope.md](./08-out-of-scope.md).
 

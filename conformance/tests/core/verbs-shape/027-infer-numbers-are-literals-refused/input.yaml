@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: templated-cap
+inputs:
+  cap: { type: integer, default: 500, required: false }
+tasks:
+  answer:
+    infer:
+      prompt: "hi"
+      max_tokens: "${{ inputs.cap }}"

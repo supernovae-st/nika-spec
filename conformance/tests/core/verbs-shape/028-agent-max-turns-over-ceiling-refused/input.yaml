@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: long-loop
+tasks:
+  work:
+    agent:
+      prompt: "hi"
+      max_turns: 1001

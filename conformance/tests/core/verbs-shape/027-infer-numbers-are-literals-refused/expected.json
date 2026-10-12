@@ -1,0 +1,11 @@
+{
+  "tier": "t0",
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "validation_error"
+    }
+  ],
+  "note": "02-verbs.md \u00a7infer \u00b7 max_tokens is a literal integer: a ${{ }} reference is refused at parse, as the parser refuses it."
+}
