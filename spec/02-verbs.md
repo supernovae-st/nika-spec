@@ -133,7 +133,7 @@ permits:
   `workflows/` names `../prompts/brief.md` at the project root, and a `..`
   that climbs past the root is refused. Resolved, inside the boundary, no
   component between the project root and the file is a symbolic link. A
-  broken path law is `NIKA-PROMPT-001`.
+  broken path law is `NIKA-FILE-001`.
 - **The authority law.** The file's text reaches the model provider, so the
   read is the class of `nika:read` and of a `skills:` file: the path as the
   naming workflow writes it must be admitted by that workflow's declared
@@ -144,8 +144,8 @@ permits:
   states.
 - **The read law.** The file is read at **compose time**, before the run and
   never mid-run. A missing, unreadable or non-regular file is
-  `NIKA-PROMPT-002`. Its bytes MUST be valid UTF-8 and at most **65,536**;
-  otherwise `NIKA-PROMPT-003`.
+  `NIKA-FILE-002`. Its bytes MUST be valid UTF-8 and at most **65,536**;
+  otherwise `NIKA-FILE-003`.
 - **One templating law.** The file's text is interpolated exactly as the same
   text written inline in the field: the same `${{ … }}` scopes and the same
   VAR laws ([04](./04-variables.md)), judged statically at check. A `${{`
@@ -190,7 +190,7 @@ A v0.1-compliant engine MUST ·
 - Validate the response against `schema` if present · MAY auto-retry validation failures internally before surfacing `NIKA-INFER-002` (engine-configurable · the same rule as [05 §structured output](./05-errors.md#structured-output-validation))
 - **Fail an answer cut at the output cap** · when the provider reports that it stopped at `max_tokens` (Anthropic `max_tokens` · OpenAI-compatible `length` · Gemini `MAX_TOKENS`), the task fails with `NIKA-INFER-005` (`budget_error` · not transient): the visible text received is preserved at `error.details.partial_output` and the stop reason at `error.details.stop_reason`. A cut answer is never the task output and is never validated against `schema:` (it would fail `NIKA-INFER-002` and hide its cause); an empty visible answer stays `NIKA-INFER-004`. On a route that reasons by default the cap also pays for the reasoning. A partial answer that is acceptable is recovered explicitly through `on_error:`
 - **Reject** any unknown field with a clear error (`NIKA-PARSE-005`) — the choice this line used to leave open is closed by [07 §unknown key](./07-conformance.md#an-unknown-key-is-an-error-at-every-level-normative--d-2026-08-11-n20): a key can REMOVE authority, so accept-and-warn fails open
-- Resolve a `{ file: }` prompt or system at compose time under [§Prompt files](#prompt-files---file--normative) · the path law (`NIKA-PROMPT-001`), the read boundary before the read (`NIKA-AUTH-006` · `NIKA-SEC-004`), the read law (`NIKA-PROMPT-002` · `NIKA-PROMPT-003`) and the inline templating law over the text · never start a run with an unread or unjudged prompt file
+- Resolve a `{ file: }` prompt or system at compose time under [§Prompt files](#prompt-files---file--normative) · the path law (`NIKA-FILE-001`), the read boundary before the read (`NIKA-AUTH-006` · `NIKA-SEC-004`), the read law (`NIKA-FILE-002` · `NIKA-FILE-003`) and the inline templating law over the text · never start a run with an unread or unjudged prompt file
 
 ### Subscription harness access (normative)
 

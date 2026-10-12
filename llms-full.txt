@@ -2440,7 +2440,7 @@ permits:
   `workflows/` names `../prompts/brief.md` at the project root, and a `..`
   that climbs past the root is refused. Resolved, inside the boundary, no
   component between the project root and the file is a symbolic link. A
-  broken path law is `NIKA-PROMPT-001`.
+  broken path law is `NIKA-FILE-001`.
 - **The authority law.** The file's text reaches the model provider, so the
   read is the class of `nika:read` and of a `skills:` file: the path as the
   naming workflow writes it must be admitted by that workflow's declared
@@ -2451,8 +2451,8 @@ permits:
   states.
 - **The read law.** The file is read at **compose time**, before the run and
   never mid-run. A missing, unreadable or non-regular file is
-  `NIKA-PROMPT-002`. Its bytes MUST be valid UTF-8 and at most **65,536**;
-  otherwise `NIKA-PROMPT-003`.
+  `NIKA-FILE-002`. Its bytes MUST be valid UTF-8 and at most **65,536**;
+  otherwise `NIKA-FILE-003`.
 - **One templating law.** The file's text is interpolated exactly as the same
   text written inline in the field: the same `${{ … }}` scopes and the same
   VAR laws ([04](./04-variables.md)), judged statically at check. A `${{`
@@ -2497,7 +2497,7 @@ A v0.1-compliant engine MUST ·
 - Validate the response against `schema` if present · MAY auto-retry validation failures internally before surfacing `NIKA-INFER-002` (engine-configurable · the same rule as [05 §structured output](./05-errors.md#structured-output-validation))
 - **Fail an answer cut at the output cap** · when the provider reports that it stopped at `max_tokens` (Anthropic `max_tokens` · OpenAI-compatible `length` · Gemini `MAX_TOKENS`), the task fails with `NIKA-INFER-005` (`budget_error` · not transient): the visible text received is preserved at `error.details.partial_output` and the stop reason at `error.details.stop_reason`. A cut answer is never the task output and is never validated against `schema:` (it would fail `NIKA-INFER-002` and hide its cause); an empty visible answer stays `NIKA-INFER-004`. On a route that reasons by default the cap also pays for the reasoning. A partial answer that is acceptable is recovered explicitly through `on_error:`
 - **Reject** any unknown field with a clear error (`NIKA-PARSE-005`) — the choice this line used to leave open is closed by [07 §unknown key](./07-conformance.md#an-unknown-key-is-an-error-at-every-level-normative--d-2026-08-11-n20): a key can REMOVE authority, so accept-and-warn fails open
-- Resolve a `{ file: }` prompt or system at compose time under [§Prompt files](#prompt-files---file--normative) · the path law (`NIKA-PROMPT-001`), the read boundary before the read (`NIKA-AUTH-006` · `NIKA-SEC-004`), the read law (`NIKA-PROMPT-002` · `NIKA-PROMPT-003`) and the inline templating law over the text · never start a run with an unread or unjudged prompt file
+- Resolve a `{ file: }` prompt or system at compose time under [§Prompt files](#prompt-files---file--normative) · the path law (`NIKA-FILE-001`), the read boundary before the read (`NIKA-AUTH-006` · `NIKA-SEC-004`), the read law (`NIKA-FILE-002` · `NIKA-FILE-003`) and the inline templating law over the text · never start a run with an unread or unjudged prompt file
 
 ### Subscription harness access (normative)
 
@@ -5865,7 +5865,7 @@ stay internal machinery per §Taxonomy ownership.
 | `NIKA-IMPL` | Engine internal errors | 001-099 |
 | `NIKA-YAML` | YAML profile refusals (anchors · aliases · merge keys · tags · caps · encoding — the R11 law set · [01 §YAML profile](./01-envelope.md#yaml-profile-normative) · pedagogical upgrades of the `NIKA-PARSE` floor) | 001-099 |
 | `NIKA-COMP` | Composition (`invoke: { workflow: <path> }` · [14-composition](./14-composition.md)) | 001-099 |
-| `NIKA-PROMPT` | Prompt files · a `prompt:`/`system:` read from a project file (`{ file: }` · [02 §Prompt files](./02-verbs.md#prompt-files---file--normative)) | 001-099 |
+| `NIKA-FILE` | Project files · content a workflow reads by path from a project file (a `prompt:`/`system:` `{ file: }` · [02 §Prompt files](./02-verbs.md#prompt-files---file--normative)) | 001-099 |
 | `NIKA-DECIDE` | Decision bundles + evidence (`nika:decide` · [11-decision](./11-decision.md)) | 001-099 |
 | `NIKA-PORT` | Gateway artifacts (deployment bundle · lowering · fidelity · [12-gateway](./12-gateway.md)) | 001-099 |
 | `NIKA-ASSERT` | assertion obligations ([15-proof](./15-proof.md)) · ⚰️ the `assert:` ENVELOPE KEY was removed 2026-08-11 · the range stays RESERVED, unemitted, for the day a property returns as an addition | 001-099 |
@@ -5966,9 +5966,9 @@ these from this file alone.
 | `NIKA-AGENT-004` | a `skills:` file is not a valid Agent Skill (no/unterminated/non-mapping frontmatter · missing/empty `name`/`description`) | `validation_error` | false |
 | `NIKA-AGENT-005` | the provider reported no token usage for a priced model — every budget and ledger reads the turn as free, so the loop fails closed (the usage-absence gate · R3-F1) | `budget_error` | false |
 | `NIKA-AGENT-006` | the agent's final message (no tool calls) stopped at the output cap (`max_tokens`) — the cut message is preserved at `error.details.partial_output`, never the task output (the rule of `NIKA-INFER-005`) | `budget_error` | false |
-| `NIKA-PROMPT-001` | the path of a prompt file breaks the path law: a `${{ }}` template or a glob, an absolute path, a backslash, a drive or a URI scheme, a `..` or a hidden segment, or a symbolic link — judged before the read boundary and before any read ([02 §Prompt files](./02-verbs.md#prompt-files---file--normative)) | `validation_error` | false |
-| `NIKA-PROMPT-002` | a prompt file inside the read boundary is missing, unreadable or not a regular file at compose time — an ungranted path is `NIKA-AUTH-006` / `NIKA-SEC-004` before the file is opened | `validation_error` | false |
-| `NIKA-PROMPT-003` | a prompt file is not valid UTF-8 or holds more than 65,536 bytes | `validation_error` | false |
+| `NIKA-FILE-001` | the path of a prompt file breaks the path law: a `${{ }}` template or a glob, an absolute path, a backslash, a drive or a URI scheme, a `..` or a hidden segment, or a symbolic link — judged before the read boundary and before any read ([02 §Prompt files](./02-verbs.md#prompt-files---file--normative)) | `validation_error` | false |
+| `NIKA-FILE-002` | a prompt file inside the read boundary is missing, unreadable or not a regular file at compose time — an ungranted path is `NIKA-AUTH-006` / `NIKA-SEC-004` before the file is opened | `validation_error` | false |
+| `NIKA-FILE-003` | a prompt file is not valid UTF-8 or holds more than 65,536 bytes | `validation_error` | false |
 | `NIKA-MCP-001` | MCP server not configured / not reachable at call time | `tool_error` | engine-assessed |
 | `NIKA-MCP-002` | MCP tool call failed (transport · tool-side error) | `tool_error` | engine-assessed |
 | `NIKA-SEC-001` | `exec:` blocklist hit | `security_error` | false |
