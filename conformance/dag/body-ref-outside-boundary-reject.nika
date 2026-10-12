@@ -9,6 +9,6 @@ tasks:
       command: ["echo", "hello"]
 
   consumer:
-    # Missing: with: { greeting: ${{ tasks.producer.output }} }
+    # Missing: with: { greeting: "${{ tasks.producer.output }}" }
     exec:
       command: ["echo", "${{ tasks.producer.output }}"]
