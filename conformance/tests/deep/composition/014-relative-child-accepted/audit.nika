@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: comp-audit-child
+inputs:
+  url: { type: string }
+tasks:
+  audit:
+    infer: { prompt: "Audit ${{ inputs.url }}" }
+outputs:
+  report: ${{ tasks.audit.output }}

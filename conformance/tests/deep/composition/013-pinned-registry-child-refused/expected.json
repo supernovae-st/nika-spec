@@ -1,0 +1,1 @@
+{"valid": false, "errors": [{"code": "NIKA-COMP-001", "category": "validation_error"}], "note": "spec 14 \u00a7the form \u00b7 a pinned registry child is well-formed but does not run yet: the check refuses it as the run does \u00b7 the twin of 014 (a check that passed it promised a run that refuses)."}

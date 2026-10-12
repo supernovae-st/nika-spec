@@ -745,7 +745,8 @@ diagnostics:
     namespace: COMP
     plane: unclassified
     condition: 'invoke.workflow: target is not statically resolvable (templated · malformed · unpinned registry
-      ref) — a call graph you cannot draw before the run cannot be bounded (spec 14)'
+      ref · a pinned registry ref until registry children run) — a call graph you cannot draw before the run cannot
+      be bounded (spec 14)'
     outcome_class: failure
     cause: validation_error
     retryable: false

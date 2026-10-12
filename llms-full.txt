@@ -5711,7 +5711,7 @@ these from this file alone.
 | `NIKA-PARSE-026` | a declared `entropy` × `clock` contradiction — `ambient × virtual` cannot be both live and reproducible ([01 §determinism](./01-envelope.md)) | `validation_error` | false |
 | `NIKA-PARSE-027` | the other declared contradiction — an `entropy: none` or `seeded` run declaring `clock: system`: a reproducible run cannot read the wall clock ([01 §determinism](./01-envelope.md)) | `validation_error` | false |
 | `NIKA-PARSE-028` | `entropy: none` while a structural randomness source is consumed (a live retry `jitter` · `nika:uuid`) — the claim and the run disagree ([01 §determinism](./01-envelope.md)) | `validation_error` | false |
-| `NIKA-COMP-001` | an `invoke: workflow:` target is not statically resolvable (templated · malformed · unpinned registry ref · [14 §form](./14-composition.md#the-form-normative)) | `validation_error` | false |
+| `NIKA-COMP-001` | an `invoke: workflow:` target is not statically resolvable (templated · malformed · unpinned registry ref · a pinned registry ref until registry children run · [14 §form](./14-composition.md#the-form-normative)) | `validation_error` | false |
 | `NIKA-COMP-002` | the child workflow's effect boundary exceeds `Authority(parent) ∩ declared` ([14 laws 3/4](./14-composition.md#the-ten-laws-normative--g22--constitution-103)) | `security_error` | false |
 | `NIKA-COMP-003` | the static call graph is not acyclic (self-launch · cycle · [14 law 7](./14-composition.md#the-ten-laws-normative--g22--constitution-103) · `NIKA-SEC-003` is the runtime backstop) | `validation_error` | false |
 | `NIKA-COMP-004` | the typed call does not compose (args ⋢ inputs, or outputs ⋢ returns · [14 law 2](./14-composition.md#the-ten-laws-normative--g22--constitution-103)) | `validation_error` | false |
@@ -9018,6 +9018,14 @@ tasks:
   `registry:owner/name@version`. A `${{ }}`-templated target is refused
   at check — a call graph you cannot draw before the run is a call
   graph you cannot bound (`NIKA-COMP-001`).
+- **A registry child does not run yet, so the check refuses it.** A
+  pinned `registry:owner/name@version` target is well-formed, but no
+  registry child is resolved before the run: its contract, its effects
+  and its place in the call graph cannot be judged, and the run refuses
+  it. Until registry children run, a check refuses a pinned registry
+  target with `NIKA-COMP-001`, naming the target, as the run does; a
+  filesystem child is the form today. A check that accepted it promised
+  a run that refuses.
 
 ## The CallableContract (normative · G20)
 
@@ -9045,7 +9053,8 @@ today's separate invoke/agent/LSP tables ends here.
 A composition is well-formed iff **all ten** hold:
 
 1. **Static target** — the callee is resolvable before the run (path or
-   pinned registry ref · never templated).
+   pinned registry ref · never templated · a pinned registry ref is
+   refused until registry children run, [§the form](#the-form-normative)).
 2. **Typed call** — the parent's `args:` fit the child's `inputs:` and
    the child's `outputs:` fit the parent's `returns:` (the assignable
    relation of [09](./09-types.md) · one type core, composed).
@@ -9101,7 +9110,7 @@ the top-level form.
 
 | Code | Category | Meaning |
 |---|---|---|
-| `NIKA-COMP-001` | `validation_error` | a `workflow:` target is not statically resolvable (templated · malformed · unpinned registry ref) |
+| `NIKA-COMP-001` | `validation_error` | a `workflow:` target is not statically resolvable (templated · malformed · unpinned registry ref · a pinned registry ref until registry children run) |
 | `NIKA-COMP-002` | `security_error` | the child's effect boundary exceeds the parent ∩ declared (law 3/4) |
 | `NIKA-COMP-003` | `validation_error` | the static call graph is not acyclic (self-launch · cycle · law 7) |
 | `NIKA-COMP-004` | `validation_error` | the typed call does not compose (args ⋢ inputs, or outputs ⋢ returns · law 2) |

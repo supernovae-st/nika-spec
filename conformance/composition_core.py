@@ -5,7 +5,8 @@
 # child files (a fixture-dir reader threads the base_dir):
 #
 #   NIKA-COMP-001  the workflow: target is not statically resolvable
-#                  (templated · malformed · unpinned registry ·
+#                  (templated · malformed · unpinned registry · a pinned
+#                  registry ref until registry children run ·
 #                  unreadable/unparseable child)
 #   NIKA-COMP-002  the child's effect boundary exceeds the parent
 #                  (coarse effect classes · exec/net/write/tools · the
@@ -235,6 +236,13 @@ def composition_errors(doc: dict, base_dir=None) -> list[dict]:
                 errs.append(_err("NIKA-COMP-001",
                                  f"{where} · registry target must be pinned "
                                  "registry:owner/name@version (spec 14)"))
+            else:
+                # A pinned ref is well-formed, but no registry child runs yet:
+                # the check says what the run says (spec 14 §the form).
+                errs.append(_err("NIKA-COMP-001",
+                                 f"{where} · `{target}` — a registry child does not "
+                                 "run yet; call a filesystem child today (spec 14 "
+                                 "§the form)"))
             continue
         if classify_path(target) != KIND_PROGRAM:
             errs.append(_err("NIKA-COMP-001",

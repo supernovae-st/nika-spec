@@ -40,7 +40,8 @@ def call(target, args=None, returns=None, permits=None):
 # ── COMP-001 · single-doc, no reader needed ─────────────────────────────
 law("templated target → COMP-001", "NIKA-COMP-001" in codes(call("./sub-${{ inputs.x }}.yaml")))
 law("unpinned registry → COMP-001", "NIKA-COMP-001" in codes(call("registry:acme/audit")))
-law("pinned registry → clean (single doc)", not codes(call("registry:acme/audit@1.0.0")))
+law("pinned registry → COMP-001 until registry children run",
+    "NIKA-COMP-001" in codes(call("registry:acme/audit@1.0.0")))
 law("a bare tool: invoke is not composition", not codes(
     {"nika": "v1", "workflow": {"id": "p"},
      "tasks": {"t": {"invoke": {"tool": "nika:read", "args": {"path": "x"}}}}}))
