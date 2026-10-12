@@ -344,7 +344,7 @@ patterns:
 - glob: "design/**"
   class: authored
   match_count: 3
-  aggregate_sha256: 295ca5573944874164888208cdf48788ca986bde5f881ae0a23926ee9a71a388
+  aggregate_sha256: af9bc6ab8285db091f466f02da0471af215a92d56f466103b3af993313402c0a
   evidence: "the design SSOTs (tokens.yaml · motion.yaml — design-projector.py projects them OUTWARD to consumers, nothing writes them here) + v1-constitution.md"
 - glob: "reference/**"
   class: authored
