@@ -7,7 +7,7 @@
 #   sealed outcome_class enum) · the 15 ledger sections (canon/EXCEPTIONS.md ·
 #   SSOT-1 §18) stay AUTHORED and are carried verbatim — editing those is legal.
 # regenerate: python3 scripts/ssot-compiler.py --emit-canon
-# body-sha256: 176a74da420e79c22db39f1f29e87f066a3374a644d3de751447297db242c518
+# body-sha256: 9b6e12bcd3beab7982585908bef021bc1dabc716dffe3bb72e382f32a046e64e
 #   (digest of every byte below the end-of-header line · detached self-hash per PAA-006)
 # ---- end generated header (SSOT-1 §21-23 · the canon flip · C0)
 # nika canonical registry · the single source of truth for Nika canonical facts
@@ -76,7 +76,7 @@ counts:
   severity: 4
   # ---- extended 2026-07-06 · the MCP oracle surface
   mcp_tools: 9
-  mcp_protocol_versions: 5
+  mcp_protocol_versions: 4
 
 # ------------------------------------------- outcome transitions (spec 13 · W5)
 # THE normative (class × cause) table — machine-readable so the reference
@@ -525,11 +525,10 @@ mcp:
       - nika_tools
       - nika_inspect
   protocol_versions:
-    count: 5
-    latest: "2026-07-28"
+    count: 4
+    latest: "2025-11-25"
     reference: crates/nika-mcp/src/protocol.rs
     items:
-      - "2026-07-28"
       - "2025-11-25"
       - "2025-06-18"
       - "2025-03-26"

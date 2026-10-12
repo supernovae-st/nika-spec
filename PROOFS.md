@@ -205,6 +205,8 @@ error_codes (83)                → canon/diagnostics/registry.yaml  id+namespac
                                   row non-terminal : hint advisory, jamais un échec du workflow)
 mcp.protocol_versions (5)       → canon/features.yaml       runtime_capability · id bijectif
                                   mcp.protocol.<v · tirets→underscores> · detection_law LAW-CONF-0510
+                                  (− 2026-07-28 · retirée 2026-10-12 : le moteur ne l'a jamais
+                                  parlée · pas de handshake dans cette révision · voir canon.yaml)
 error_namespaces (22 · partiel) → dérivés des rows (20/22 · IMPL+PROVIDER declared-empty · CF-09)
 outcome_transitions.classes     → COHÉRENT (canon == enum scellé outcome_class == lois gates R5 ·
                                   terminal jamais une classe per LAW-OUTCOME-0231)
