@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: comp-013-pinned-registry
+tasks:
+  call:
+    invoke:
+      workflow: "registry:acme/audit@1.2.0"
+      args: { url: "https://example.com" }
+    returns: { object: { report: string } }
