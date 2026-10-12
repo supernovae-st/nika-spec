@@ -1,0 +1,13 @@
+{
+  "workflow_state": "success",
+  "tasks": {
+    "rows": {
+      "status": "success",
+      "output": [
+        {"nom": "Dupont, Jean", "montant": "10,50"},
+        {"nom": "Martin", "montant": "3"}
+      ]
+    }
+  },
+  "note": "builtins-v0.1.md §convert · the semicolon outnumbers the comma on the first line outside quotes, so it separates; cells stay strings. Authored contract · reference engine observation pending."
+}

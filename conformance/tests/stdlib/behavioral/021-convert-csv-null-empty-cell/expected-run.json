@@ -1,0 +1,10 @@
+{
+  "workflow_state": "success",
+  "tasks": {
+    "csv": {
+      "status": "success",
+      "output": "a,b,c\nA,,true\n"
+    }
+  },
+  "note": "builtins-v0.1.md §convert · a null is an empty cell, never the text null. Authored contract · reference engine observation pending."
+}

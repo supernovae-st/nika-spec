@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+# Stdlib BEHAVIORAL · emitting CSV writes a JSON null as an empty cell, as
+# an absent key already is, never the text `null` (builtins-v0.1.md
+# §convert · CSV cells). A boolean keeps its JSON spelling.
+nika: rt-stdlib-convert-csv-null
+permits: { tools: ["nika:convert"] }
+const:
+  rows: [ {"a": "A", "b": null, "c": true} ]
+tasks:
+  csv:
+    invoke:
+      tool: "nika:convert"
+      args: { input: "${{ const.rows }}", from: json, to: csv }

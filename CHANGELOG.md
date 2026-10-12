@@ -13,6 +13,29 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed · everyday builtin contracts (2026-10-12)
+
+- `nika:notify` shapes its `webhook` body for the chat receivers it recognizes
+  from `target:`. A Slack incoming webhook gets `{ text, mrkdwn: false }` and a
+  Discord webhook `{ content, allowed_mentions }`, with each medium's markdown,
+  link and mention controls neutralized. Every other target keeps
+  `{ message, severity, data? }`. A refused delivery names the receiver's
+  answer, with the target's parts withheld, and carries `details.status_code`.
+- The `nika:fetch` page modes (`markdown`, `article`, `text`) return a body
+  served as text that is not a page (CSV, plain text, JSON, XML, YAML) as served,
+  with a stated charset rule. `body:` sent as JSON says so with
+  `content-type: application/json` unless `headers:` names a content type.
+- `nika:prompt`: every configuration error is `NIKA-BUILTIN-PROMPT-002`, judged
+  before anyone is asked and never a pause. `PROMPT-001` names only the
+  unanswerable prompt. A `confirm` default written as an answer word
+  (`yes`, `n`) reads as that answer.
+- `nika:convert` states that CSV cells are strings, counts the field separator
+  (a semicolon or tab that outnumbers the comma separates) and writes a `null`
+  as an empty cell. `nika:edit` refuses an empty `find:` (`EDIT-001`).
+- Five command-level behavioral fixtures cover the convert, prompt and edit
+  rules. The fetch observation contract admits `raw`/`jq` only, and notify
+  has no receiver contract, so their rules have no fixture yet.
+
 ### Fixed · runtime assertion coverage (2026-09-28)
 
 - Admission refusals now assert the structured error, witness, nonzero exit
