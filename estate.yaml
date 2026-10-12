@@ -54,7 +54,7 @@ files:
   evidence: "its own header: 'Bump deliberately: edit this' · the already-published nika-spec rev the shared estate tool is mirrored from (path tools/estate/scripts/estate.py), and the INPUT the mirror gate compares against; names f14f6872 (PR #315) and records historical nika-estate 247deb86 as the upgrade from 74287c75"
 - path: "SSOT.md"
   class: authored
-  sha256: c8dbd2fd9651d1d4c5bdf80b6454499259f242792fa3efea316d55321059392f
+  sha256: 066e94274a9bc5301871359a11bef7484159110947d548ffdd3949051d8ceabf
   evidence: "the map of where every fact lives — prose and judgments are authored, but it carries ONE generated island (the estate:map markers · §9): scripts/ssot-map-projector.py --write derives the gated-surfaces table from THIS manifest, and --check (exit 5 · conformance.yml 'Projection gates') refuses a hand edit inside the markers — the canon.yaml hybrid, inverted"
 - path: "VERSION"
   class: authored
@@ -62,7 +62,7 @@ files:
   evidence: "hand-set pack version (currently 0.2.0-draft) — no lane advances it; the derivations' INPUT (showcase-projector.py reads it as pack_version)"
 - path: "canon.yaml"
   class: generated
-  sha256: eab29ae34de759aba73dec29a5fe3f7e3d2404563cf9ac9bb95f01420aa02012
+  sha256: 45862079eac8c50cee5014a945af7e88af6bc2ee3c30ce51ca9648c30101acd8
   evidence: "its own header: 'GENERATED · canon.yaml is a generated projection since the C0 flip — manual edits of a generated surface make CI red (ssot-compiler --check-canon · rc=5)' + a detached body-sha256 self-hash per PAA-006"
   derivation:
     tool: "python3 scripts/ssot-compiler.py --emit-canon (ssot-compiler 0.2.0-sandbox · SSOT-1 §21-23, the canon flip)"
@@ -89,7 +89,7 @@ files:
     - "schemas/registries.schema.json"
 - path: "canon/ssot.lock"
   class: generated
-  sha256: f521cdfd1ff7faef4f2b5b7bc61cde813045a00b35998fc1c0319e0a9a367151
+  sha256: 2d5648064c11bf1e8a6e1a64baaee7128f65beafe6b395e875b5f753210f4252
   evidence: "single-line canonical JSON carrying generator identity ('ssot-compiler' 0.2.0-sandbox + its own source_sha256), the 27 leaf digests and law_count — no human writes a lock"
   derivation:
     tool: "python3 scripts/ssot-compiler.py (write mode · leaf digests only, digest-dag layer 1, own digest DETACHED per PAA-006)"
@@ -100,7 +100,7 @@ files:
     - "canon/laws-index.json (leaf-hashed)"
 - path: "canon/ssot.lock.sha256"
   class: generated
-  sha256: ad9e95fd51dd465b9a9228ff08ff98f4f9f6a941c199451fea1a0781ef4c6916
+  sha256: ebb97457d0261e2c2649c4feb2d65626c8c931022c427b5365eb90da155fe791
   evidence: "the lock's own digest, DETACHED into a sidecar per PAA-006 (a file cannot contain its own hash) — written by the compiler alongside the lock"
   derivation:
     tool: "python3 scripts/ssot-compiler.py (write mode · the detached-sidecar emission)"
@@ -349,7 +349,7 @@ patterns:
 - glob: "reference/**"
   class: authored
   match_count: 7
-  aggregate_sha256: 00088b95d53f784ae732853f6cc7f47f9bfda37c8cfbb3eacdf1e352f9a7c0d6
+  aggregate_sha256: 9eaa2e878624319d519a3b4d4b3918f2b30fcd9cc4f7ed2c0f2120ce341cfc19
   evidence: "the executable reference semantics (semantics.py — the model that DEFINES gate-matrix outcomes · values_core.py · differential.py · generate.py · selftest.py) — hand-written Python, ruff-gated"
 - glob: "schemas/**"
   class: authored
