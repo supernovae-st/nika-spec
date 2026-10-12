@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-FILE-002",
+      "category": "validation_error"
+    }
+  ],
+  "note": "02-verbs §Project files · a missing schema file inside the boundary is refused at compose time."
+}

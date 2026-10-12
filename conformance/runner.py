@@ -64,7 +64,7 @@ import yaml
 from jsonschema import Draft202012Validator
 
 from deep_static import (deep_static_errors, consent_errors, net_before_exec_errors,
-                         compose_prompt_files,
+                         compose_project_files,
                          shared_mutation_errors)
 from composition_core import composition_errors
 from trifecta_core import trifecta_errors
@@ -1180,9 +1180,9 @@ def validate_workflow(doc: dict, validator: Draft202012Validator,
                           f"(as a key) · got keys: {got}")
         errs.append({"namespace": "NIKA-PARSE", "category": "validation_error",
                      "detail": detail})
-    # 02 §Prompt files · compose first: a prompt file's text is judged by every
+    # 02 §Project files · compose first: a prompt file's text is judged by every
     # text law exactly as inline text; the boundary still reads the file names.
-    composed, prompt_errs = compose_prompt_files(doc, base_dir)
+    composed, prompt_errs = compose_project_files(doc, base_dir)
     errs.extend(prompt_errs)
     errs.extend(cross_ref_errors(composed))
     errs.extend(interpolation_errors(composed))

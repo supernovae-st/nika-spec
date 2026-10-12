@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "validation_error"
+    }
+  ],
+  "note": "02-verbs §Project files · a schema mapping that holds file is the file form, closed: another key beside it is refused."
+}

@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-AUTH-006",
+      "category": "security_error"
+    }
+  ],
+  "note": "02-verbs §Project files · the schema reaches the model: its read needs fs.read, and an absent block grants nothing."
+}

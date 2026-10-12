@@ -2396,20 +2396,22 @@ research:
 
 | Field | Required | Type | Notes |
 |---|---|---|---|
-| `prompt` | yes | string, or `{ file: <path> }` | User prompt · may use `${{ ... }}` substitution · or the text of a project file ([§Prompt files](#prompt-files---file--normative)) |
-| `system` | no | string, or `{ file: <path> }` | System prompt · or the text of a project file ([§Prompt files](#prompt-files---file--normative)) |
+| `prompt` | yes | string, or `{ file: <path> }` | User prompt · may use `${{ ... }}` substitution · or the text of a project file ([§Project files](#project-files---file--normative)) |
+| `system` | no | string, or `{ file: <path> }` | System prompt · or the text of a project file ([§Project files](#project-files---file--normative)) |
 | `model` | no | string | Override workflow default · `<provider>/<name>` · see stdlib/providers-v0.1.md |
 | `temperature` | no | number 0-2 | Sampling temperature |
 | `max_tokens` | no | integer | Max output tokens · provider-dependent default · an answer the provider cuts at this cap fails (`NIKA-INFER-005`) · a model that reasons before it answers draws its reasoning from this budget: give it room (16,384), or a low `run.reasoning.effort` its route documents; too little returns an empty answer (`NIKA-INFER-004`) |
-| `schema` | no | object | raw JSON Schema · structured output validation — the **out-of-core hatch**; the typed door is task-level `returns:` ([09](./09-types.md) · both on one task = `NIKA-TYPE-003`). Numeric facts (`0\|1\|3`, counts, coded levels) are `type: integer` with a numeric `enum` — never `enum: ["0","1","3"]`. Models emit JSON numbers; a string-digit enum can reject the call before coerce (reference engine hint `digit-string-enum`). The model extracts facts; `nika:jq` or `nika:decide` is the law ([11](./11-decision.md) · `examples/13-extract-then-law.nika`) |
+| `schema` | no | object, or `{ file: <path> }` | raw JSON Schema, inline or kept in a project file ([§Project files](#project-files---file--normative)) · structured output validation — the **out-of-core hatch**; the typed door is task-level `returns:` ([09](./09-types.md) · both on one task = `NIKA-TYPE-003`). Numeric facts (`0\|1\|3`, counts, coded levels) are `type: integer` with a numeric `enum` — never `enum: ["0","1","3"]`. Models emit JSON numbers; a string-digit enum can reject the call before coerce (reference engine hint `digit-string-enum`). The model extracts facts; `nika:jq` or `nika:decide` is the law ([11](./11-decision.md) · `examples/13-extract-then-law.nika`) |
 | `thinking` | no | object | Extended thinking · `{ enabled, budget_tokens }` |
 | `vision` | no | array | Image inputs · each `{ source: file|url, path|url, … }` |
 
-### Prompt files · `{ file: }` (normative)
+### Project files · `{ file: }` (normative)
 
-A prompt kept beside the workflow is part of the program when the field names
-it: `prompt:` and `system:` (of `infer:` and of `agent:`) take either a string
-or the closed mapping `{ file: "<path>" }`, whose text is the field's value.
+A prompt or a schema kept beside the workflow is part of the program when the
+field names it. `prompt:` and `system:` (of `infer:` and of `agent:`) take
+either a string or the closed mapping `{ file: "<path>" }`, whose text is the
+field's value. `schema:` (of `infer:` and of `agent:`) takes either a JSON
+Schema written inline or the same mapping, whose file holds the schema.
 
 ```yaml
 tasks:
@@ -2417,16 +2419,20 @@ tasks:
     infer:
       system: { file: "./prompts/editor.md" }
       prompt: { file: "./prompts/brief.md" }   # may use ${{ inputs.topic }} like inline text
+      schema: { file: "./schemas/brief.json" } # one JSON Schema, judged as if written inline
 ```
 
 ```yaml
 permits:
-  fs: { read: ["./prompts/**"] }               # the text reaches the model · a read inside the boundary
+  fs: { read: ["./prompts/**", "./schemas/**"] } # the files reach the model · reads inside the boundary
 ```
 
 - **The shape is closed.** The mapping carries exactly one key, `file`, a
   non-empty string. Another key is `NIKA-PARSE-005`; any other shape is the
-  field's type error.
+  field's type error. Under `schema:`, a mapping that holds `file` is the file
+  form, never an inline schema, so `file` beside any other key is refused
+  there too. Written inline, `{ file }` alone would constrain nothing (an
+  unknown keyword), so no meaningful schema is lost.
 - **The path law.** The path is static (no `${{ }}`, no glob) and relative
   (no leading `/`, no `\`, no drive letter, no URI scheme). It resolves from
   the directory of the workflow file that names it, like a `skills:` path and
@@ -2444,9 +2450,10 @@ permits:
   that climbs past the root is refused. Resolved, inside the boundary, no
   component between the project root and the file is a symbolic link. A
   broken path law is `NIKA-FILE-001`.
-- **The authority law.** The file's text reaches the model provider, so the
-  read is the class of `nika:read` and of a `skills:` file: the path as the
-  naming workflow writes it must be admitted by that workflow's declared
+- **The authority law.** The file's content reaches the model provider (a
+  text is sent, a schema shapes the reply it asks for), so the read is the
+  class of `nika:read` and of a `skills:` file: the path as the naming
+  workflow writes it must be admitted by that workflow's declared
   `permits.fs.read` boundary (a child that names `../prompts/brief.md`
   grants that path), judged
   **before** the read (`NIKA-AUTH-006` under an absent block · `NIKA-SEC-004`
@@ -2456,31 +2463,41 @@ permits:
   never mid-run. A missing, unreadable or non-regular file is
   `NIKA-FILE-002`. Its bytes MUST be valid UTF-8 and at most **65,536**;
   otherwise `NIKA-FILE-003`.
-- **One templating law.** The file's text is interpolated exactly as the same
-  text written inline in the field: the same `${{ … }}` scopes and the same
-  VAR laws ([04](./04-variables.md)), judged statically at check. A `${{`
-  inside a file is never literal, and a secret reaching the provider through
-  a file meets the same secret-flow laws as one written inline
-  ([10](./10-authority.md)).
-- **Program text, bound by its bytes.** The text is the field's value for
-  every purpose: the Semantic IR carries it as resolved text, so the semantic
-  identity and the task's resume identity commit to it ([15](./15-proof.md))
-  and editing the file re-runs the task; the trace records the path and the
-  digest of the bytes read; a consent preview shows the text as it shows an
-  inline prompt; a run bound to an admitted world refuses a prompt file whose
-  digest moved, as it refuses a moved child.
+- **One templating law.** A prompt or system file's text is interpolated
+  exactly as the same text written inline in the field: the same `${{ … }}`
+  scopes and the same VAR laws ([04](./04-variables.md)), judged statically at
+  check. A `${{` inside such a file is never literal, and a secret reaching the
+  provider through a file meets the same secret-flow laws as one written
+  inline ([10](./10-authority.md)).
+- **The schema content law.** A schema file holds exactly one JSON Schema:
+  JSON text, or YAML under the profile of
+  [01](./01-envelope.md#yaml-profile-normative), whose value is a mapping. Every
+  `$ref` it holds is a fragment of the file itself (`#…`): a reference to
+  another file or to a URL would reach content the read boundary never judged.
+  A schema file that parses as neither, holds no mapping, or holds a `$ref`
+  that leaves it is `NIKA-TYPE-007`. The schema it holds is then judged by
+  every law the same schema written inline meets, and like an inline schema it
+  is never interpolated: a `${{` in it is text.
+- **Program bytes, bound by their digest.** The content is the field's value
+  for every purpose: the Semantic IR carries it resolved (a text as text, a
+  schema as the schema), so the semantic identity and the task's resume
+  identity commit to it ([15](./15-proof.md)) and editing the file re-runs the
+  task; the trace records the path and the digest of the bytes read; a consent
+  preview shows the content as it shows the inline field; a run bound to an
+  admitted world refuses a project file whose digest moved, as it refuses a
+  moved child.
 - **A door that reads no files says so.** A checker that judges a source
   without its files (an editor buffer, a source string) still judges the
-  field's shape and path law, names each prompt file it did not read, and
-  never reports their read, authority or templating laws as held.
-- **Registry packages carry their prompt files.** A registry child's prompt
-  file resolves inside its own package, pinned by the package digest, never
-  in the caller's tree.
+  field's shape and path law, names each project file it did not read, and
+  never reports their read, authority, templating or content laws as held.
+- **Registry packages carry their project files.** A registry child's
+  project file resolves inside its own package, pinned by the package digest,
+  never in the caller's tree.
 
 Order of judgment: the shape, the path as written and its containment,
 then the authority law, then the resolution (no symbolic link) and the read
-law, then the templating law over the text. An ungranted path is never
-opened.
+law, then the templating law over a text or the content law over a schema.
+An ungranted path is never opened.
 
 **A private key in a prompt is flagged (normative for linters ·
 advisory).** A conformant linter warns `egress/001 private-key-in-prompt`
@@ -2500,7 +2517,7 @@ A v0.1-compliant engine MUST ·
 - Validate the response against `schema` if present · MAY auto-retry validation failures internally before surfacing `NIKA-INFER-002` (engine-configurable · the same rule as [05 §structured output](./05-errors.md#structured-output-validation))
 - **Fail an answer cut at the output cap** · when the provider reports that it stopped at `max_tokens` (Anthropic `max_tokens` · OpenAI-compatible `length` · Gemini `MAX_TOKENS`), the task fails with `NIKA-INFER-005` (`budget_error` · not transient): the visible text received is preserved at `error.details.partial_output` and the stop reason at `error.details.stop_reason`. A cut answer is never the task output and is never validated against `schema:` (it would fail `NIKA-INFER-002` and hide its cause); an empty visible answer stays `NIKA-INFER-004`. On a route that reasons by default the cap also pays for the reasoning. A partial answer that is acceptable is recovered explicitly through `on_error:`
 - **Reject** any unknown field with a clear error (`NIKA-PARSE-005`) — the choice this line used to leave open is closed by [07 §unknown key](./07-conformance.md#an-unknown-key-is-an-error-at-every-level-normative--d-2026-08-11-n20): a key can REMOVE authority, so accept-and-warn fails open
-- Resolve a `{ file: }` prompt or system at compose time under [§Prompt files](#prompt-files---file--normative) · the path law (`NIKA-FILE-001`), the read boundary before the read (`NIKA-AUTH-006` · `NIKA-SEC-004`), the read law (`NIKA-FILE-002` · `NIKA-FILE-003`) and the inline templating law over the text · never start a run with an unread or unjudged prompt file
+- Resolve a `{ file: }` prompt, system or schema at compose time under [§Project files](#project-files---file--normative) · the path law (`NIKA-FILE-001`), the read boundary before the read (`NIKA-AUTH-006` · `NIKA-SEC-004`), the read law (`NIKA-FILE-002` · `NIKA-FILE-003`), then the inline templating law over a text or the schema content law over a schema (`NIKA-TYPE-007`) · never start a run with an unread or unjudged project file
 
 ### Subscription harness access (normative)
 
@@ -2755,7 +2772,7 @@ research:
 
 | Field | Required | Type | Notes |
 |---|---|---|---|
-| `system` | no | string, or `{ file: <path> }` | System prompt · or the text of a project file ([§Prompt files](#prompt-files---file--normative)) |
+| `system` | no | string, or `{ file: <path> }` | System prompt · or the text of a project file ([§Project files](#project-files---file--normative)) |
 | `prompt` | yes | string, or `{ file: <path> }` | Initial user message (same field name and forms as `infer:` · consistent) |
 | `model` | no | string | Override workflow default · `<provider>/<name>` |
 | `tools` | no | array | Tool whitelist · glob patterns · **default-deny** · if absent the agent gets NO tools (pure conversation · least-privilege). Grant explicitly. |
@@ -2763,7 +2780,7 @@ research:
 | `max_turns` | no | integer | Loop limit · default 10 |
 | `max_tokens_total` | no | integer | Cumulative token budget · default engine-configurable |
 | `temperature` | no | number 0-2 | Sampling temperature |
-| `schema` | no | object | raw JSON Schema · validates the agent's **final message** as structured output (same contract as `infer.schema:` · the out-of-core hatch — the typed door is `returns:` · [09](./09-types.md)) · `.output` becomes the matching object |
+| `schema` | no | object, or `{ file: <path> }` | raw JSON Schema, inline or kept in a project file ([§Project files](#project-files---file--normative)) · validates the agent's **final message** as structured output (same contract as `infer.schema:` · the out-of-core hatch — the typed door is `returns:` · [09](./09-types.md)) · `.output` becomes the matching object |
 
 ### Loop semantics
 
@@ -5912,7 +5929,7 @@ stay internal machinery per §Taxonomy ownership.
 | `NIKA-IMPL` | Engine internal errors | 001-099 |
 | `NIKA-YAML` | YAML profile refusals (anchors · aliases · merge keys · tags · caps · encoding — the R11 law set · [01 §YAML profile](./01-envelope.md#yaml-profile-normative) · pedagogical upgrades of the `NIKA-PARSE` floor) | 001-099 |
 | `NIKA-COMP` | Composition (`invoke: { workflow: <path> }` · [14-composition](./14-composition.md)) | 001-099 |
-| `NIKA-FILE` | Project files · content a workflow reads by path from a project file (a `prompt:`/`system:` `{ file: }` · [02 §Prompt files](./02-verbs.md#prompt-files---file--normative)) | 001-099 |
+| `NIKA-FILE` | Project files · content a workflow reads by path from a project file (a `prompt:`/`system:`/`schema:` `{ file: }` · [02 §Project files](./02-verbs.md#project-files---file--normative)) | 001-099 |
 | `NIKA-DECIDE` | Decision bundles + evidence (`nika:decide` · [11-decision](./11-decision.md)) | 001-099 |
 | `NIKA-PORT` | Gateway artifacts (deployment bundle · lowering · fidelity · [12-gateway](./12-gateway.md)) | 001-099 |
 | `NIKA-ASSERT` | assertion obligations ([15-proof](./15-proof.md)) · ⚰️ the `assert:` ENVELOPE KEY was removed 2026-08-11 · the range stays RESERVED, unemitted, for the day a property returns as an addition | 001-099 |
@@ -5981,6 +5998,7 @@ these from this file alone.
 | `NIKA-TYPE-004` | `returns:` type unreachable from the declared `decode:` (an object contract over `decode: text` · …) | `validation_error` | false |
 | `NIKA-TYPE-005` | a secret-carrying type in a lowered position (reserved with `secret<T>` · W4) | `security_error` | false |
 | `NIKA-TYPE-006` | regex pattern outside the locked dialect (backreference · lookaround · named group · inline flags · lazy/possessive · `\b` · `\p` — [09 §the regex dialect](./09-types.md#the-regex-dialect-normative--locked)) | `validation_error` | false |
+| `NIKA-TYPE-007` | a schema file (`schema: { file: }`) holds no JSON Schema: it parses as neither JSON nor YAML under the profile, holds no mapping, or holds a `$ref` that leaves the file (only a local `#…` fragment) — judged at compose time, after the read law ([02 §Project files](./02-verbs.md#project-files---file--normative)) | `validation_error` | false |
 | `NIKA-TYPE-101` | run-time contract violation — the decoded value does not fit `returns:` (`exec:`/`invoke:` lane · `infer:`/`agent:` stay `NIKA-INFER-002`-class) | `validation_error` | false |
 | `NIKA-DEFAULT-001` | a `default:` that does not conform to its own `type:` — the declaration would hand a caller a value its type forbids ([09 §types](./09-types.md)) | `validation_error` | false |
 | `NIKA-VAR-001` | unresolved reference (unknown namespace entry · undeclared `inputs`/`const`/`secrets`/`with` key) | `variable_error` | false |
@@ -6013,9 +6031,9 @@ these from this file alone.
 | `NIKA-AGENT-004` | a `skills:` file is not a valid Agent Skill (no/unterminated/non-mapping frontmatter · missing/empty `name`/`description`) | `validation_error` | false |
 | `NIKA-AGENT-005` | the provider reported no token usage for a priced model — every budget and ledger reads the turn as free, so the loop fails closed (the usage-absence gate · R3-F1) | `budget_error` | false |
 | `NIKA-AGENT-006` | the agent's final message (no tool calls) stopped at the output cap (`max_tokens`) — the cut message is preserved at `error.details.partial_output`, never the task output (the rule of `NIKA-INFER-005`) | `budget_error` | false |
-| `NIKA-FILE-001` | the path of a prompt file breaks the path law: a `${{ }}` template or a glob, an absolute path, a backslash, a drive or a URI scheme, a `..` or a hidden segment, or a symbolic link — judged before the read boundary and before any read ([02 §Prompt files](./02-verbs.md#prompt-files---file--normative)) | `validation_error` | false |
-| `NIKA-FILE-002` | a prompt file inside the read boundary is missing, unreadable or not a regular file at compose time — an ungranted path is `NIKA-AUTH-006` / `NIKA-SEC-004` before the file is opened | `validation_error` | false |
-| `NIKA-FILE-003` | a prompt file is not valid UTF-8 or holds more than 65,536 bytes | `validation_error` | false |
+| `NIKA-FILE-001` | the path of a project file (a `prompt:`/`system:`/`schema:` `{ file: }`) breaks the path law: a `${{ }}` template or a glob, an absolute path, a backslash, a drive or a URI scheme, a `..` or a hidden segment, or a symbolic link — judged before the read boundary and before any read ([02 §Project files](./02-verbs.md#project-files---file--normative)) | `validation_error` | false |
+| `NIKA-FILE-002` | a project file inside the read boundary is missing, unreadable or not a regular file at compose time — an ungranted path is `NIKA-AUTH-006` / `NIKA-SEC-004` before the file is opened | `validation_error` | false |
+| `NIKA-FILE-003` | a project file is not valid UTF-8 or holds more than 65,536 bytes | `validation_error` | false |
 | `NIKA-MCP-001` | MCP server not configured / not reachable at call time | `tool_error` | engine-assessed |
 | `NIKA-MCP-002` | MCP tool call failed (transport · tool-side error) | `tool_error` | engine-assessed |
 | `NIKA-SEC-001` | `exec:` blocklist hit | `security_error` | false |

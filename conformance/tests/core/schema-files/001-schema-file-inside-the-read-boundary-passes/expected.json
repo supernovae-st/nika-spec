@@ -1,0 +1,5 @@
+{
+  "valid": true,
+  "errors": [],
+  "note": "02-verbs §Project files · a schema file inside the read boundary is read at compose time and judged as the same schema inline."
+}

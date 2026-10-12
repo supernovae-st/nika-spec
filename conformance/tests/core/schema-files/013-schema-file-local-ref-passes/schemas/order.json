@@ -1,0 +1,16 @@
+{
+  "$defs": {
+    "id": {
+      "type": "string"
+    }
+  },
+  "type": "object",
+  "properties": {
+    "order": {
+      "$ref": "#/$defs/id"
+    }
+  },
+  "required": [
+    "order"
+  ]
+}

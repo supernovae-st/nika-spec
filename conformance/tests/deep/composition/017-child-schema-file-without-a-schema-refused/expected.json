@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-TYPE-007",
+      "category": "validation_error"
+    }
+  ],
+  "note": "02-verbs §Project files · a child's schema file meets the content law, from a child as from the root."
+}

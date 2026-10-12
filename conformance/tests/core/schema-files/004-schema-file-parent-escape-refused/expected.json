@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-FILE-001",
+      "category": "validation_error"
+    }
+  ],
+  "note": "02-verbs §Project files · a .. that climbs past the project root is refused before any read."
+}

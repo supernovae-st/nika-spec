@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "kind": "spec-language-knowledge",
   "owner": "supernovae-st/nika-spec",
-  "revision": "f401be8c35e8788def6705f5517d4ade21924256",
+  "revision": "a4796d976534bddb28562df157ac2afcaadd787c",
   "inputs": {
-    "schemas/workflow.schema.json": "1878c7f5c2d31b195c53c616b593bb918b6115b57bd12783b91bef4c9db86de8",
+    "schemas/workflow.schema.json": "54ca6bca6ce158d67a8adaaa5840bed7cc505e3c59f66300633227d4e948dffc",
     "templates/agent-loop.nika": "07f50946522b131d310c8c3bb4adbdb296f6fb4947bd3b9f96a62c12478d13f9",
     "templates/aggregate-by-key.nika": "a7a34d9415e3187ff32607d79272da49e790500f1998593730c5047dc8a111fd",
     "templates/api-upload-and-create.nika": "1e06897b41686f7c51f97e70893bd16e09dba869df85378cb3c89913e1d20952",
@@ -1658,6 +1658,17 @@
           "required": true,
           "declaration": {
             "description": "The project file whose text is the field's value · relative to the workflow file that names it.",
+            "type": "string",
+            "minLength": 1
+          },
+          "siblings": []
+        },
+        {
+          "pointer": "/$defs/schemaContract/oneOf/0/properties/file",
+          "context": "/$defs/schemaContract/oneOf/0",
+          "required": true,
+          "declaration": {
+            "description": "The project file holding the schema · relative to the workflow file that names it.",
             "type": "string",
             "minLength": 1
           },
@@ -5328,8 +5339,8 @@
           "context": "/$defs/infer",
           "required": false,
           "declaration": {
-            "type": "object",
-            "description": "JSON Schema · the structured-output contract the model's reply must satisfy. The out-of-core hatch; the typed door is task-level `returns:` (both on one task is NIKA-TYPE-003)."
+            "description": "JSON Schema · the structured-output contract the model's reply must satisfy, inline or the schema of a project file. The out-of-core hatch; the typed door is task-level `returns:` (both on one task is NIKA-TYPE-003).",
+            "$ref": "#/$defs/schemaContract"
           },
           "siblings": [
             "max_tokens",
@@ -5346,8 +5357,8 @@
           "context": "/$defs/agent",
           "required": false,
           "declaration": {
-            "type": "object",
-            "description": "JSON Schema · the contract the agent's FINAL message must satisfy. The out-of-core hatch; the typed door is task-level `returns:` (both on one task is NIKA-TYPE-003)."
+            "description": "JSON Schema · the contract the agent's FINAL message must satisfy, inline or the schema of a project file. The out-of-core hatch; the typed door is task-level `returns:` (both on one task is NIKA-TYPE-003).",
+            "$ref": "#/$defs/schemaContract"
           },
           "siblings": [
             "max_tokens_total",

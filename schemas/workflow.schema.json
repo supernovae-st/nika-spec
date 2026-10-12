@@ -618,8 +618,8 @@
           "description": "Max output tokens · a literal non-negative integer: a `${{ }}` reference is refused at parse (spec/02-verbs.md §infer)."
         },
         "schema": {
-          "type": "object",
-          "description": "JSON Schema · the structured-output contract the model's reply must satisfy. The out-of-core hatch; the typed door is task-level `returns:` (both on one task is NIKA-TYPE-003)."
+          "description": "JSON Schema · the structured-output contract the model's reply must satisfy, inline or the schema of a project file. The out-of-core hatch; the typed door is task-level `returns:` (both on one task is NIKA-TYPE-003).",
+          "$ref": "#/$defs/schemaContract"
         },
         "thinking": {
           "description": "Extended thinking · `{ enabled, budget_tokens }` — reasoning the model may spend before it answers (spec/02-verbs.md §infer).",
@@ -854,8 +854,8 @@
           "description": "Sampling temperature for every turn of the loop · 0 is the steadiest the provider offers, 2 the loosest. A literal number in 0-2: a `${{ }}` reference is refused at parse."
         },
         "schema": {
-          "type": "object",
-          "description": "JSON Schema · the contract the agent's FINAL message must satisfy. The out-of-core hatch; the typed door is task-level `returns:` (both on one task is NIKA-TYPE-003)."
+          "description": "JSON Schema · the contract the agent's FINAL message must satisfy, inline or the schema of a project file. The out-of-core hatch; the typed door is task-level `returns:` (both on one task is NIKA-TYPE-003).",
+          "$ref": "#/$defs/schemaContract"
         }
       }
     },
@@ -903,7 +903,7 @@
       }
     },
     "promptText": {
-      "description": "A prompt or system text · a string, or the text of a project file named as `{ file: <path> }` (spec 02 §Prompt files: a static relative path inside the naming file's directory tree, read at compose time inside `permits.fs.read`, UTF-8, at most 65,536 bytes, interpolated exactly as inline text).",
+      "description": "A prompt or system text · a string, or the text of a project file named as `{ file: <path> }` (spec 02 §Project files: a static relative path inside the naming file's directory tree, read at compose time inside `permits.fs.read`, UTF-8, at most 65,536 bytes, interpolated exactly as inline text).",
       "oneOf": [
         {
           "type": "string"
@@ -920,6 +920,33 @@
               "type": "string",
               "minLength": 1
             }
+          }
+        }
+      ]
+    },
+    "schemaContract": {
+      "description": "A JSON Schema · written inline, or the schema a project file holds, named as `{ file: <path> }` (spec 02 §Project files: a static relative path inside the naming file's directory tree, read at compose time inside `permits.fs.read`, UTF-8, at most 65,536 bytes, one JSON Schema as JSON or YAML whose `$ref`s are local). A mapping that holds `file` is the file form, closed.",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "file"
+          ],
+          "properties": {
+            "file": {
+              "description": "The project file holding the schema · relative to the workflow file that names it.",
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "not": {
+            "required": [
+              "file"
+            ]
           }
         }
       ]

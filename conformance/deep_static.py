@@ -411,8 +411,8 @@ def _task_required_absent(t: dict) -> set[str]:
         for sk in _static_skill_paths(ag):
             req.add("fs")
             break
-    # 02 §Prompt files · a lawful prompt file's text reaches the model: an fs read.
-    if _static_prompt_paths(t):
+    # 02 §Project files · a lawful prompt file's text reaches the model: an fs read.
+    if _static_file_paths(t):
         req.add("fs")
     return req
 
@@ -441,17 +441,18 @@ def _skill_path_admitted(path: str, permits: dict) -> bool:
     return _taint_globbed(posixpath.normpath(path), reads)
 
 
-# 02 §Prompt files · `prompt:` / `system:` of infer and agent may name a project
-# file as `{ file: <path> }`. The file's text reaches the model, so a lawful
-# path is an fs read requirement exactly like a skills: entry, judged BEFORE
-# the read; its text is then judged by every text law as inline text.
-_PROMPT_VERBS = ("infer", "agent")
-_PROMPT_FIELDS = ("prompt", "system")
-_PROMPT_CAP = 65536
+# 02 §Project files · `prompt:` / `system:` / `schema:` of infer and agent may
+# name a project file as `{ file: <path> }`. The file's content reaches the
+# model, so a lawful path is an fs read requirement exactly like a skills:
+# entry, judged BEFORE the read; a text is then judged by every text law as
+# inline text, a schema by every schema law as an inline schema.
+_FILE_VERBS = ("infer", "agent")
+_FILE_FIELDS = ("prompt", "system", "schema")
+_FILE_CAP = 65536
 _URI_OR_DRIVE = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:")
 
 
-def _prompt_path_reason(raw, naming_rel: str = ".") -> str | None:
+def _file_path_reason(raw, naming_rel: str = ".") -> str | None:
     """Why a prompt file's path breaks the lexical path law or climbs past the
     project root (the naming file sits at `naming_rel` inside it), or None."""
     if not isinstance(raw, str) or not raw:
@@ -481,38 +482,91 @@ def _prompt_path_reason(raw, naming_rel: str = ".") -> str | None:
     return None
 
 
-def _prompt_file_refs(t: dict) -> list[tuple[str, str, object]]:
-    """Every `{ file: … }` prompt or system of a task · (verb, field, path)."""
+def _project_file_refs(t: dict) -> list[tuple[str, str, object]]:
+    """Every `{ file: … }` prompt, system or schema of a task · (verb, field, path)."""
     out: list[tuple[str, str, object]] = []
-    for verb in _PROMPT_VERBS:
+    for verb in _FILE_VERBS:
         body = t.get(verb)
         if not isinstance(body, dict):
             continue
-        for field in _PROMPT_FIELDS:
+        for field in _FILE_FIELDS:
             value = body.get(field)
             if isinstance(value, dict) and set(value) == {"file"}:
                 out.append((verb, field, value.get("file")))
     return out
 
 
-def _static_prompt_paths(t: dict) -> list[str]:
-    """The prompt files of a task whose path keeps the lexical law: the reads
+def _static_file_paths(t: dict) -> list[str]:
+    """The project files of a task whose path keeps the lexical law: the reads
     the boundary judges (a broken path is NIKA-FILE-001, never a boundary
     question)."""
-    return [raw for _, _, raw in _prompt_file_refs(t) if _prompt_path_reason(raw) is None]
+    return [raw for _, _, raw in _project_file_refs(t) if _file_path_reason(raw) is None]
 
 
-def _prompt_err(number: str, detail: str) -> dict:
+def _file_err(number: str, detail: str) -> dict:
     return {"code": f"NIKA-FILE-{number}", "namespace": "NIKA-FILE",
             "category": "validation_error",
-            "detail": f"{detail} · 02-verbs §Prompt files · check≡run"}
+            "detail": f"{detail} · 02-verbs §Project files · check≡run"}
 
 
-def compose_prompt_files(doc: dict, base_dir=None) -> tuple:
-    """02 §Prompt files · the compose step. Returns the document with every
-    admitted, readable prompt file replaced by its text, so the templating,
-    VAR and secret-flow laws judge it exactly as inline text, and the
-    NIKA-FILE findings. A path that breaks the lexical law is
+def _leaving_ref(value):
+    """The first `$ref` of a schema that is not a fragment of the file itself."""
+    if isinstance(value, dict):
+        ref = value.get("$ref")
+        if isinstance(ref, str) and not ref.startswith("#"):
+            return ref
+        for item in value.values():
+            found = _leaving_ref(item)
+            if found is not None:
+                return found
+    elif isinstance(value, list):
+        for item in value:
+            found = _leaving_ref(item)
+            if found is not None:
+                return found
+    return None
+
+
+def schema_content(text: str) -> tuple:
+    """02 §Project files · the schema content law. Returns (schema, None) for
+    the JSON Schema a schema file holds, or (None, why) when it holds none:
+    JSON text, else YAML under the profile of 01; a mapping; every `$ref` a
+    local fragment. Whether the mapping is a valid JSON Schema is the inline
+    schema's own law (SCHEMA-META), judged on the composed document."""
+    import json
+    import yaml
+    import yaml_profile_core
+    try:
+        value = json.loads(text)
+    except ValueError:
+        refused = yaml_profile_core.profile_errors(text)
+        if refused:
+            return None, f"neither JSON nor YAML the profile admits ({refused[0].get('code')})"
+        try:
+            value = yaml.safe_load(text)
+        except yaml.YAMLError:
+            return None, "neither JSON nor YAML"
+    if not isinstance(value, dict):
+        return None, "no mapping"
+    leaving = _leaving_ref(value)
+    if leaving is not None:
+        return None, f"a $ref that leaves the file ({leaving!r})"
+    return value, None
+
+
+def _type_007(detail: str) -> dict:
+    return {"code": "NIKA-TYPE-007", "namespace": "NIKA-TYPE",
+            "category": "validation_error",
+            "detail": f"{detail} · 02-verbs §Project files · check≡run"}
+
+
+def compose_project_files(doc: dict, base_dir=None) -> tuple:
+    """02 §Project files · the compose step. Returns the document with every
+    admitted, readable project file replaced by its content (a prompt or
+    system file by its text, so the templating, VAR and secret-flow laws
+    judge it exactly as inline text; a schema file by the schema it holds,
+    so every inline schema law judges it), and the NIKA-FILE and
+    NIKA-TYPE-007 findings. A path that breaks the lexical law is
     NIKA-FILE-001 at once; a lawful path the read boundary does not admit
     is never opened (NIKA-AUTH-006 / NIKA-SEC-004 are the boundary's).
     Without a base_dir only the lexical law is judged."""
@@ -523,11 +577,11 @@ def compose_prompt_files(doc: dict, base_dir=None) -> tuple:
     composed = copy.deepcopy(doc)
     permits = doc.get("permits")
     for (tid, t), (_, kept) in zip(iter_tasks(doc), iter_tasks(composed)):
-        for verb, field, raw in _prompt_file_refs(t):
+        for verb, field, raw in _project_file_refs(t):
             where = f"task '{tid}' {verb}.{field} file {raw!r}"
-            reason = _prompt_path_reason(raw)
+            reason = _file_path_reason(raw)
             if reason is not None:
-                errs.append(_prompt_err("001", f"{where} breaks the path law ({reason})"))
+                errs.append(_file_err("001", f"{where} breaks the path law ({reason})"))
                 continue
             if base_dir is None:
                 continue
@@ -542,25 +596,32 @@ def compose_prompt_files(doc: dict, base_dir=None) -> tuple:
                     linked = True
                     break
             if linked:
-                errs.append(_prompt_err("001", f"{where} resolves through a symbolic link"))
+                errs.append(_file_err("001", f"{where} resolves through a symbolic link"))
                 continue
             try:
                 if not path.is_file():
                     raise OSError("not a regular file")
                 size = path.stat().st_size
-                data = path.read_bytes() if size <= _PROMPT_CAP else None
+                data = path.read_bytes() if size <= _FILE_CAP else None
             except OSError:
-                errs.append(_prompt_err(
+                errs.append(_file_err(
                     "002", f"{where} is missing, unreadable or not a regular file"))
                 continue
             if data is None:
-                errs.append(_prompt_err(
+                errs.append(_file_err(
                     "003", f"{where} holds {size} bytes, over the 65,536-byte cap"))
                 continue
             try:
                 text = data.decode("utf-8")
             except UnicodeDecodeError:
-                errs.append(_prompt_err("003", f"{where} is not valid UTF-8"))
+                errs.append(_file_err("003", f"{where} is not valid UTF-8"))
+                continue
+            if field == "schema":
+                schema, why = schema_content(text)
+                if why is not None:
+                    errs.append(_type_007(f"{where} holds no JSON Schema ({why})"))
+                    continue
+                kept[verb][field] = schema
                 continue
             kept[verb][field] = text
     return composed, errs
@@ -617,7 +678,7 @@ def _infer_permits_block(tasks: list) -> dict:
                     keep(tools, _static_str(w))
             for sk in _static_skill_paths(ag):
                 keep(reads, sk)
-        for pf in _static_prompt_paths(t):
+        for pf in _static_file_paths(t):
             keep(reads, pf)
     block: dict = {}
     if tools:
@@ -1941,14 +2002,14 @@ def deep_static_errors(doc: dict, base_dir=None) -> list[dict]:
                                      "detail": f"task '{tid}' · skills: path '{sk}' outside "
                                                "permits.fs.read (02 §Agent Skills · the skill "
                                                "text reaches the model · grant the path)"})
-            # 02 §Prompt files · the prompt file read is inside permits.fs.read,
+            # 02 §Project files · the prompt file read is inside permits.fs.read,
             # judged BEFORE the file is opened.
-            for pf in _static_prompt_paths(t):
+            for pf in _static_file_paths(t):
                 if not _skill_path_admitted(pf, permits):
                     errs.append({"code": "NIKA-SEC-004", "namespace": "NIKA-SEC",
                                  "category": "security_error",
                                  "detail": f"task '{tid}' · prompt file '{pf}' outside "
-                                           "permits.fs.read (02 §Prompt files · the text "
+                                           "permits.fs.read (02 §Project files · the text "
                                            "reaches the model · grant the path)"})
 
     return errs

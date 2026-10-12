@@ -1115,6 +1115,22 @@ diagnostics:
       mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true
       is the unhandled-floor (05 §workflow-level semantics: an unrecovered terminal error fails the workflow) ·
       span obligation not stated by the source → span_required false.'
+  - id: NIKA-TYPE-007
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: TYPE
+    plane: check
+    condition: 'a schema file (schema: { file: }) holds no JSON Schema: it parses as neither JSON nor YAML under the profile, holds no mapping, or holds a $ref that leaves the file — judged at compose time, after the read law (spec 02 §Project files)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: false
+    teaching: 'a schema file (schema: { file: }) holds no JSON Schema: it parses as neither JSON nor YAML under the profile, holds no mapping, or holds a $ref that leaves the file — judged at compose time, after the read law (spec 02 §Project files)'
+    notes: 'schema files (spec 02 §Project files · 2026-10-12) · category: validation_error · transient: false (canon.yaml + spec/05-errors.md verbatim) · judged at check and compose time, before any task runs.'
   - id: NIKA-TYPE-101
     status: reserved
     owner: spec
@@ -2713,15 +2729,15 @@ diagnostics:
     introduced_in: C2
     namespace: FILE
     plane: check
-    condition: 'the path of a prompt file breaks the path law (a ${{ }} template or a glob, absolute, a backslash, a drive or a URI scheme, a .. or a hidden segment, or a symbolic link) — judged before the read boundary and before any read (spec 02 §Prompt files)'
+    condition: 'the path of a project file breaks the path law (a ${{ }} template or a glob, absolute, a backslash, a drive or a URI scheme, a .. or a hidden segment, or a symbolic link) — judged before the read boundary and before any read (spec 02 §Project files)'
     outcome_class: failure
     cause: validation_error
     retryable: false
     terminal: true
     payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
     span_required: false
-    teaching: 'the path of a prompt file breaks the path law (a ${{ }} template or a glob, absolute, a backslash, a drive or a URI scheme, a .. or a hidden segment, or a symbolic link) — judged before the read boundary and before any read (spec 02 §Prompt files)'
-    notes: 'prompt files (spec 02 §Prompt files · 2026-10-12) · minted in the PROMPT namespace and renamed the same day, before any engine emitted it: one FILE namespace for every project file a workflow reads by path · category: validation_error · transient: false (canon.yaml + spec/05-errors.md verbatim) · judged at check and compose time, before any task runs.'
+    teaching: 'the path of a project file breaks the path law (a ${{ }} template or a glob, absolute, a backslash, a drive or a URI scheme, a .. or a hidden segment, or a symbolic link) — judged before the read boundary and before any read (spec 02 §Project files)'
+    notes: 'prompt files (spec 02 §Project files · 2026-10-12) · minted in the PROMPT namespace and renamed the same day, before any engine emitted it: one FILE namespace for every project file a workflow reads by path · category: validation_error · transient: false (canon.yaml + spec/05-errors.md verbatim) · judged at check and compose time, before any task runs.'
   - id: NIKA-FILE-002
     status: reserved
     owner: spec
@@ -2729,15 +2745,15 @@ diagnostics:
     introduced_in: C2
     namespace: FILE
     plane: check
-    condition: 'a prompt file inside the read boundary is missing, unreadable or not a regular file at compose time (spec 02 §Prompt files)'
+    condition: 'a project file inside the read boundary is missing, unreadable or not a regular file at compose time (spec 02 §Project files)'
     outcome_class: failure
     cause: validation_error
     retryable: false
     terminal: true
     payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
     span_required: false
-    teaching: 'a prompt file inside the read boundary is missing, unreadable or not a regular file at compose time (spec 02 §Prompt files)'
-    notes: 'prompt files (spec 02 §Prompt files · 2026-10-12) · minted in the PROMPT namespace and renamed the same day, before any engine emitted it: one FILE namespace for every project file a workflow reads by path · category: validation_error · transient: false (canon.yaml + spec/05-errors.md verbatim) · judged at check and compose time, before any task runs.'
+    teaching: 'a project file inside the read boundary is missing, unreadable or not a regular file at compose time (spec 02 §Project files)'
+    notes: 'prompt files (spec 02 §Project files · 2026-10-12) · minted in the PROMPT namespace and renamed the same day, before any engine emitted it: one FILE namespace for every project file a workflow reads by path · category: validation_error · transient: false (canon.yaml + spec/05-errors.md verbatim) · judged at check and compose time, before any task runs.'
   - id: NIKA-FILE-003
     status: reserved
     owner: spec
@@ -2745,12 +2761,12 @@ diagnostics:
     introduced_in: C2
     namespace: FILE
     plane: check
-    condition: 'a prompt file is not valid UTF-8 or holds more than 65,536 bytes (spec 02 §Prompt files)'
+    condition: 'a project file is not valid UTF-8 or holds more than 65,536 bytes (spec 02 §Project files)'
     outcome_class: failure
     cause: validation_error
     retryable: false
     terminal: true
     payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
     span_required: false
-    teaching: 'a prompt file is not valid UTF-8 or holds more than 65,536 bytes (spec 02 §Prompt files)'
-    notes: 'prompt files (spec 02 §Prompt files · 2026-10-12) · minted in the PROMPT namespace and renamed the same day, before any engine emitted it: one FILE namespace for every project file a workflow reads by path · category: validation_error · transient: false (canon.yaml + spec/05-errors.md verbatim) · judged at check and compose time, before any task runs.'
+    teaching: 'a project file is not valid UTF-8 or holds more than 65,536 bytes (spec 02 §Project files)'
+    notes: 'prompt files (spec 02 §Project files · 2026-10-12) · minted in the PROMPT namespace and renamed the same day, before any engine emitted it: one FILE namespace for every project file a workflow reads by path · category: validation_error · transient: false (canon.yaml + spec/05-errors.md verbatim) · judged at check and compose time, before any task runs.'

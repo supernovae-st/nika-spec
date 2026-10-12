@@ -1,0 +1,4 @@
+type: object
+properties:
+  order: { type: string }
+required: [order]

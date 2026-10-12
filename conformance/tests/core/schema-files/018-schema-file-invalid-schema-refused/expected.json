@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "validation_error"
+    }
+  ],
+  "note": "02-verbs §Project files · the schema a file holds meets the inline schema's own law: a mapping that is no valid JSON Schema is refused as inline."
+}

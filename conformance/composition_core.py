@@ -118,11 +118,12 @@ def _load_child(base_dir, target: str):
 
 
 def _child_prompt_errors(root, cpath, child: dict, where: str) -> list[dict]:
-    """A child's prompt files under the project root: the path law with
+    """A child's project files under the project root: the path law with
     containment (NIKA-FILE-001), then, inside the child's own read
-    boundary, the link, the read and the cap (002 · 003)."""
-    from deep_static import _prompt_file_refs, _prompt_path_reason, _skill_path_admitted, \
-        _PROMPT_CAP
+    boundary, the link, the read and the cap (002 · 003), and a schema
+    file's content (NIKA-TYPE-007)."""
+    from deep_static import _project_file_refs, _file_path_reason, _skill_path_admitted, \
+        _FILE_CAP, schema_content
     import os
     errs: list[dict] = []
     root = root.resolve()
@@ -131,8 +132,8 @@ def _child_prompt_errors(root, cpath, child: dict, where: str) -> list[dict]:
     for _tid, task in _tasks(child):
         if not isinstance(task, dict):
             continue
-        for verb, field, raw in _prompt_file_refs(task):
-            reason = _prompt_path_reason(raw, naming)
+        for verb, field, raw in _project_file_refs(task):
+            reason = _file_path_reason(raw, naming)
             here = f"{where} · child {cpath.name} {verb}.{field} file {raw!r}"
             if reason is not None:
                 errs.append(_err("NIKA-FILE-001", f"{here} breaks the path law ({reason})"))
@@ -151,7 +152,7 @@ def _child_prompt_errors(root, cpath, child: dict, where: str) -> list[dict]:
                 continue
             try:
                 size = path.stat().st_size if path.is_file() else None
-                data = path.read_bytes() if size is not None and size <= _PROMPT_CAP else None
+                data = path.read_bytes() if size is not None and size <= _FILE_CAP else None
             except OSError:
                 size, data = None, None
             if size is None:
@@ -160,9 +161,13 @@ def _child_prompt_errors(root, cpath, child: dict, where: str) -> list[dict]:
                 errs.append(_err("NIKA-FILE-003", f"{here} holds {size} bytes, over the cap"))
             else:
                 try:
-                    data.decode("utf-8")
+                    text = data.decode("utf-8")
                 except UnicodeDecodeError:
                     errs.append(_err("NIKA-FILE-003", f"{here} is not valid UTF-8"))
+                    continue
+                why = schema_content(text)[1] if field == "schema" else None
+                if why is not None:
+                    errs.append(_err("NIKA-TYPE-007", f"{here} holds no JSON Schema ({why})"))
     return errs
 
 
@@ -308,7 +313,7 @@ def composition_errors(doc: dict, base_dir=None) -> list[dict]:
             continue
         if child is None:
             continue  # no reader available · single-doc laws only
-        # 02 §Prompt files · a child's prompt files are contained by the PROJECT
+        # 02 §Project files · a child's prompt files are contained by the PROJECT
         # root (the root workflow's folder here), not by the child's folder;
         # the child's own read boundary is the child's check, never opened here.
         errs.extend(_child_prompt_errors(base_dir, cpath, child, where))
