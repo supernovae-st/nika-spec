@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "kind": "spec-language-knowledge",
   "owner": "supernovae-st/nika-spec",
-  "revision": "3b450171b6e896be8d195e55151b1bb6db470562",
+  "revision": "a4796d976534bddb28562df157ac2afcaadd787c",
   "inputs": {
     "schemas/workflow.schema.json": "54ca6bca6ce158d67a8adaaa5840bed7cc505e3c59f66300633227d4e948dffc",
     "templates/agent-loop.nika": "07f50946522b131d310c8c3bb4adbdb296f6fb4947bd3b9f96a62c12478d13f9",
