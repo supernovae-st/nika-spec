@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-TYPE-007",
+      "category": "validation_error"
+    }
+  ],
+  "note": "02-verbs §Project files · a schema file must hold a mapping, as the inline field is an object."
+}

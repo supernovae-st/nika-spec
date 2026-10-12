@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-TYPE-007",
+      "category": "validation_error"
+    }
+  ],
+  "note": "02-verbs §Project files · a YAML schema file meets the YAML profile: an anchor or an alias is refused."
+}

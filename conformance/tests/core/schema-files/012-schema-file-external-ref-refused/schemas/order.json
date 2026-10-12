@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "properties": {
+    "order": {
+      "$ref": "https://example.com/order.json"
+    }
+  }
+}

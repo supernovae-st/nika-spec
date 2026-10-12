@@ -1,4 +1,4 @@
 {
   "valid": true,
-  "note": "02-verbs \u00a7Prompt files \u00b7 a child in workflows/ names ../prompts/brief.md at the project root: containment is the project root, not the child's folder \u00b7 the twin of 016."
+  "note": "02-verbs \u00a7Project files \u00b7 a child in workflows/ names ../prompts/brief.md at the project root: containment is the project root, not the child's folder \u00b7 the twin of 016."
 }

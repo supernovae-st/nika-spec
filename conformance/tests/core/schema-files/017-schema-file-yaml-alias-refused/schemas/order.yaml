@@ -1,0 +1,4 @@
+type: object
+properties:
+  order: &id { type: string }
+  copy: *id

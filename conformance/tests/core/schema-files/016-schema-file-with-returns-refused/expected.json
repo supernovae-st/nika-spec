@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-TYPE-003",
+      "category": "validation_error"
+    }
+  ],
+  "note": "02-verbs §Project files · returns: and schema: on one task stay one contract too many, whatever form the schema takes."
+}

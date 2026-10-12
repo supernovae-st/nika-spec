@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-schema-file-invalid-schema
+permits:
+  fs: { read: ["schemas/**"] }
+tasks:
+  extract:
+    infer:
+      prompt: "Find the order number in: order 42 shipped"
+      schema: { file: "schemas/order.json" }

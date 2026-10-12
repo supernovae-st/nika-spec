@@ -6,5 +6,5 @@
       "category": "validation_error"
     }
   ],
-  "note": "02-verbs §Prompt files · an absolute path is refused before the read boundary is consulted, so no host file is opened."
+  "note": "02-verbs §Project files · an absolute path is refused before the read boundary is consulted, so no host file is opened."
 }

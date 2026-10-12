@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-FILE-003",
+      "category": "validation_error"
+    }
+  ],
+  "note": "02-verbs §Project files · a schema file over 65,536 bytes is refused, as a prompt file is."
+}
