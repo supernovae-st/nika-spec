@@ -27,8 +27,8 @@ A task **must** specify exactly one of these. Multiple verbs on a single task is
 > **Where did `fetch` go?** Fetching a URL is *calling a tool*, not a
 > distinct execution model, so it is the `nika:fetch` builtin, reached
 > through `invoke:` (the extract modes become its `mode` argument). Same
-> reason a DB query (`invoke: mcp:postgres/query`) or a file write
-> (`invoke: nika:write`) is not its own verb. See
+> reason a DB query (`invoke: { tool: "mcp:postgres/query" }`) or a file
+> write (`invoke: { tool: "nika:write" }`) is not its own verb. See
 > [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md).
 
 ### What `${{ tasks.<id>.output }}` holds · per verb
@@ -315,7 +315,8 @@ The engine MUST ·
   `stdout` / `stderr` / `combined` capture modes (unless `on_error:` recovers ·
   [05](./05-errors.md)), **EXCEPT `capture: structured`**, where a non-zero
   exit is **data, not failure** · the task succeeds and `exit_code` is the
-  workflow's to branch on (`when: ${{ tasks.test.output.exit_code != 0 }}`) ·
+  workflow's to branch on (bind `with: { code: "${{ tasks.test.output.exit_code }}" }`,
+  then `when: "${{ with.code != 0 }}"`) ·
   the one-obvious-way split · default modes for « must succeed » · structured
   for « inspect the outcome »
 
@@ -557,9 +558,11 @@ skill author's surface — a consumer MUST tolerate them.
 
 ```yaml
 review:
+    with:
+      diff: ${{ tasks.diff.output }}    # the binding is the edge · the body reads the local name
     agent:
       system: "You are a code reviewer."
-      prompt: "Review the diff · ${{ tasks.diff.output }}"
+      prompt: "Review the diff · ${{ with.diff }}"
       skills:
         - ".agents/skills/code-review/SKILL.md"
         - "docs/skills/security-pass/SKILL.md"
@@ -648,7 +651,7 @@ The engine MUST ·
 
 ## Forward-compat
 
-The 4 verb names are **ratified by the [v1 constitution](../design/v1-constitution.md)**, and the count is **4, absolute** — under the constitutional hierarchy of **three atomic calls and one bounded controller**: call a model once (`infer`), apply a typed callable once (`invoke`), run a host process once (`exec`), and orchestrate a bounded sequence of the atomic calls (`agent`). Every other capability is either an **invoke-able callable** (an HTTP fetch → `invoke: nika:fetch` · a database query → `invoke: mcp:postgres/query` · a file write → `invoke: nika:write` · cognitive recall → `invoke: nika:connectome/recall`) or a **DAG control-flow construct** (iteration → `for_each` · branching → `when`). There is no `nika: v2` — ever: while the reference engine is pre-1.0 a verb change would be a break INSIDE `v1` (per the [pre-1.0 stability contract](./00-overview.md#pre-10-stability-contract)), and after engine 1.0.0 the verb set is frozen with the rest of the grammar, so a fifth verb is effectively never.
+The 4 verb names are **ratified by the [v1 constitution](../design/v1-constitution.md)**, and the count is **4, absolute** — under the constitutional hierarchy of **three atomic calls and one bounded controller**: call a model once (`infer`), apply a typed callable once (`invoke`), run a host process once (`exec`), and orchestrate a bounded sequence of the atomic calls (`agent`). Every other capability is either an **invoke-able callable** (an HTTP fetch → `invoke: { tool: "nika:fetch" }` · a database query → `invoke: { tool: "mcp:postgres/query" }` · a file write → `invoke: { tool: "nika:write" }` · cognitive recall → `invoke: { tool: "nika:connectome/recall" }`, the reserved future shape) or a **DAG control-flow construct** (iteration → `for_each` · branching → `when`). There is no `nika: v2` — ever: while the reference engine is pre-1.0 a verb change would be a break INSIDE `v1` (per the [pre-1.0 stability contract](./00-overview.md#pre-10-stability-contract)), and after engine 1.0.0 the verb set is frozen with the rest of the grammar, so a fifth verb is effectively never.
 
 ### The closure argument · why no case forces a 5th verb
 
