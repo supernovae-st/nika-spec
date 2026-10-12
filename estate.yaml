@@ -354,7 +354,7 @@ patterns:
 - glob: "schemas/**"
   class: authored
   match_count: 5
-  aggregate_sha256: 02322921b95596350e97e49f1c9e2de56548d6e62dce98cc093f01f12002fe0d
+  aggregate_sha256: f411153997beb813cb3d39ac2d9f46894ece0ce17e545ad045196711033eebaf
   evidence: "workflow.schema.json's own $comment: 'INTERIM hand-derived schema · prose spec is the single source of truth · regenerate + diff against engine nika-schema at GA' — authored today, generated at GA; law.schema.json + registries.schema.json are the sealed R2 design-pack contracts (consumed as-is, byte-identical per PROOFS.md §P0)"
 - glob: "scripts/**"
   class: authored
