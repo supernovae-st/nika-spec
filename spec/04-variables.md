@@ -411,8 +411,20 @@ secrets:
     source: vault
     key: prod/anthropic/api-key
     egress: [{ to: "nika:fetch", host: "api.anthropic.com" }]
-headers:
-  Authorization: "Bearer ${{ secrets.api_key }}"
+
+permits:
+  tools: ["nika:fetch"]
+  net:
+    http: ["api.anthropic.com"]
+
+tasks:
+  models:
+    invoke:
+      tool: "nika:fetch"
+      args:
+        url: "https://api.anthropic.com/v1/models"
+        headers:                  # the one sanctioned sink
+          Authorization: "Bearer ${{ secrets.api_key }}"
 ```
 
 A secret is always a **reference to a store** (the local `nika-vault` by

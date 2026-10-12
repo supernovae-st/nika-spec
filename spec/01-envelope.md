@@ -462,7 +462,7 @@ stay a documented follow-up covered by the static guards above.
 ```yaml
 permits:                          # the workflow's entire blast radius, declared in-file
   fs:   { read: ["./data/**"], write: ["./out/**"] }   # path globs (gitignore-style)
-  net:  { http: ["api.example.com", "*.github.com"] }  # host allowlist — the SSRF boundary, in-file
+  net:  { http: ["api.example.com", "api.github.com"] }  # host allowlist · exact names (a `*.` entry is NIKA-AUTH-010)
   exec: false                     # may this workflow run shells? false | true | ["git", "cargo"] (program allowlist)
   tools: ["nika:read", "nika:write", "mcp:browser/*"]  # the builtin/MCP surface it may invoke
   env:  ["CI_COMMIT_SHA"]         # engine env names passed through to child processes · exact names · composed, never inherited
@@ -929,8 +929,8 @@ number, boolean, or date, **quote it**. When in doubt, quote.
 contains `:` `#` `[` `{` `,` or `>` so YAML does not misparse it ·
 
 ```yaml
-when: "${{ tasks.x.status == 'ok' && tasks.y.count > 3 }}"   # quoted · contains > and :
-prompt: ${{ inputs.topic }}                                  # bare ok · no special chars
+when: "${{ with.status == 'ok' && with.count > 3 }}"   # quoted · contains > · reads the task's own with: names
+prompt: ${{ inputs.topic }}                            # bare ok · no special chars
 ```
 
 A conformant engine parses YAML 1.2. Authoring tools (and the AI writing
@@ -1035,7 +1035,12 @@ inputs:
     description: "Subject to research"
   output_path:
     type: string
-    default: "./brief.md"
+    default: "./briefs/brief.md"
+
+permits:                          # a caller's path stays inside fs.write (the taint law · 10 §NEP-0004)
+  tools: ["nika:write"]
+  fs:
+    write: ["./briefs/*.md"]
 
 tasks:
   research:
