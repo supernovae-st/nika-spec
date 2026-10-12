@@ -59,7 +59,7 @@ How each one holds that promise:
   credentials; skeletons keep their authored `model: mock/echo`. Choose
   provider and access explicitly for a real run; `--model mock/echo`
   always keeps the rehearsal available.
-- **`on_error: recover:`** — where a template reads a file, calls an API or
+- **`on_error: { recover: … }`** — where a template reads a file, calls an API or
   shells out, a literal recovery value stands in until you wire the real
   thing. Every one of those blocks says, in place, to delete it once the
   source is real — a rehearsal value left in production hides failures.
@@ -84,7 +84,7 @@ The machine source for both fields is `canon/templates/registry.yaml`.
 | « take data, produce words, save them » | [`chain`](chain.nika) | `linear` | `content` | deterministic gather · one model job · explicit persist |
 | « watch X, act when Y » | [`gate-and-act`](gate-and-act.nika) | `conditional-gate` | `monitoring` | jq extraction · CEL skip-gate · often zero model calls |
 | « do this for EVERY item » | [`fanout`](fanout.nika) | `fanout` | `batch` | runtime collection · the full leash (`for_each.max_parallel` · `for_each.fail_fast` · retry) |
-| « only what changed since last run » / « survive bad input » | [`etl-state`](etl-state.nika) | `state-resume` | `etl` | state read→parse→diff→write · `on_error: on_codes:` quarantine |
+| « only what changed since last run » / « survive bad input » | [`etl-state`](etl-state.nika) | `state-resume` | `etl` | state read→parse→diff→write · `on_error: { on_codes: […], recover: … }` quarantine |
 | « research / review / open-ended » | [`agent-loop`](agent-loop.nika) | `agent-loop` | `research` · `review` | plan-then-execute · default-deny tools · budgets · engine-owned typed result |
 | « anything irreversible (deploy · send · publish) » | [`human-gated-ship`](human-gated-ship.nika) | `human-gate` | `release` | parallel gates (`nika:grep` evidence · `exec:` command) · assert · a BLOCKING `nika:prompt` · `after: {…: terminal}` record |
 | « understand a site (domain · theme · assets) from a URL » | [`website-brief`](website-brief.nika) | `linear` | `website` | fetch `traverse:` crawl · one typed infer · explicit persist · zero exec |
@@ -152,8 +152,8 @@ place — two are the checker naming a real pause, one is the checker's limit:
   completes the lethal trifecta and lights `NIKA-SEC-009` (measured on
   0.118.7 for both · the human-gated-ship negative pins it).
 - **`etl-state`** also carries `[inputs]` on its cursor file, and that hint
-  is wrong about the run: the `on_error: on_codes: [NIKA-BUILTIN-READ-001]`
-  recover carries the first run (measured). The checker names static
+  is wrong about the run: the `on_error: { on_codes: [NIKA-BUILTIN-READ-001], recover: … }`
+  carries the first run (measured). The checker names static
   `nika:read` paths without modelling recovery — a checker limitation, and
   the template says which of its two hints that is.
 - **`fanout`** and **`api-upload-and-create`** used to carry

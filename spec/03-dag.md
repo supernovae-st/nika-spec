@@ -52,10 +52,11 @@ my_task:                        # the map KEY is the identity · snake_case · u
     data: ${{ tasks.task_a.output }}
     opts: { foo: "bar" }        # literals are fine — only tasks.* refs create edges
     legs: ${{ group.probes }}   # a fan-in fold · one edge per declared member
-  group: probes                 # optional · fan-in MEMBERSHIP · this task joins the set
+    pages: ${{ tasks.task_c.output }}   # the collection for_each maps over
+  group: reports                # optional · fan-in MEMBERSHIP · this task joins a set (never the one it folds)
   after:                        # optional · the CONTROL boundary · {producer: predicate}
     task_b: success             # predicate ∈ success | failure | skipped | terminal | unwind
-  when: ${{ inputs.enabled }}   # optional · LOCAL business condition · evaluated POST-gate
+  when: "${{ inputs.enabled == true }}"   # optional · LOCAL business condition · evaluated POST-gate · an explicit relation
   for_each:                     # optional · map this task over a collection (local namespaces)
     items: ${{ with.pages }}    #   the collection · evaluated ONCE, before the fan-out
     max_parallel: 5             #   optional · cap concurrent iterations
@@ -131,7 +132,7 @@ field's shape ·
 |---|---|---|
 | `.output` · `.<named binding>` | **value** | `success` **or** `skipped` (the value of a skipped task is defined-`null` · [04](./04-variables.md#defined-null-reads-normative--the-branch-join-unlock)) |
 | `.status` · `.duration_ms` · `.started_at` · `.ended_at` | **terminal-observation** | **any** terminal state (`success` · `failure` · `skipped` · `cancelled`) — you asked to OBSERVE the outcome, so every outcome admits |
-| `.error` | **failure-observation** | `failure` **or** `skipped` — a skip may carry a PRESERVED error (`on_error: skip` · [05 §Fields](./05-errors.md)); a decision-skip's error reads defined-`null`. A recovered task settles `success` · the edge does not admit |
+| `.error` | **failure-observation** | `failure` **or** `skipped` — a skip may carry a PRESERVED error (`on_error: { skip: true }` · [05 §Fields](./05-errors.md)); a decision-skip's error reads defined-`null`. A recovered task settles `success` · the edge does not admit |
 
 An expression with N references creates **N edges** (the graph is what CAN
 be required · the trace records what actually was). Two edges from the same
@@ -189,7 +190,7 @@ report:
 ```
 
 (The `.status` binding is a terminal-observation edge — same pass-set as
-`after: terminal`, so the two edges agree. §gate algebra makes this
+`after: { pipeline: terminal }`, so the two edges agree. §gate algebra makes this
 composition law precise.)
 
 **Do not restate a `with:` edge.** An `after:` entry on a producer you
@@ -202,6 +203,9 @@ next to a value edge) changes nothing and the reference linter warns
 ### `group` · *optional · fan-in MEMBERSHIP — the plural of a data edge*
 
 ```yaml
+permits:
+  exec: ["./hygiene.sh", "./machete.sh", "./licenses.sh"]   # the programs the legs run · nika:jq is pure, no grant
+
 tasks:
   leg_hygiene:  { group: probes, exec: { command: ["./hygiene.sh"] } }
   leg_machete:  { group: probes, exec: { command: ["./machete.sh"] } }
@@ -514,8 +518,8 @@ the meaning of an expression that parses today. The conditional `?:`, the
 
 ```yaml
 # pick a model / a path / a prompt by condition — anywhere a value is taken
-model:  ${{ inputs.env == 'prod' ? 'mistral/mistral-large' : 'ollama/qwen3.5:9b' }}
-prompt: ${{ has(inputs.style) ? inputs.style : 'be concise' }}
+model:  "${{ inputs.env == 'prod' ? 'mistral/mistral-large' : 'ollama/qwen3.5:9b' }}"   # quoted · ` : ` would end a YAML key
+prompt: "${{ has(inputs.style) ? inputs.style : 'be concise' }}"
 when:   ${{ with.scan_log.contains('ERROR') }}      # branch on substring · the log arrived via with:
 ```
 
@@ -772,8 +776,8 @@ for_each:
   `on_error: { recover: … }` substitutes its recovery value instead.
 - **Where `.output` is observable** · the positional array is the
   task's `.output` only when the **parent settles `success`**, i.e.
-  every element either succeeded, was `on_error: skip`-ped (→ `null` at
-  its index) or `on_error: recover`-ed (→ the recovery value). That is
+  every element either succeeded, was skipped by `on_error: { skip: true }`
+  (→ `null` at its index) or recovered by `on_error: { recover: … }` (→ the recovery value). That is
   the zip-sound surface a downstream task reads. An **UNRECOVERED**
   iteration error transitions the parent to `failure` (per `fail_fast`),
   and the failed parent's `.output` is **`null`**: NOT a partial array ·
@@ -781,7 +785,7 @@ for_each:
   (a downstream task on a plain value edge from the failed parent is
   cancelled · the positional array is observable only on a `success`
   settle). To keep the array across a partial failure, handle errors per
-  iteration (`on_error: skip` is the « process N · report which failed ·
+  iteration (`on_error: { skip: true }` is the « process N · report which failed ·
   don't abort » idiom).
 - The collection MUST be an array (a literal list or an upstream array
   imported through `with:`). A non-array collection (object · string ·
@@ -1377,6 +1381,9 @@ tasks:
 ### Parallel fan-out
 
 ```yaml
+permits:
+  exec: ["./prepare.sh"]
+
 tasks:
   setup:
     exec: { command: ["./prepare.sh"] }
@@ -1405,9 +1412,12 @@ three (value edges — the bindings are the fan-in).
 ### Conditional branch
 
 ```yaml
+permits:
+  exec: ["./check-env.sh", "./build.sh", "./deploy.sh"]
+
 tasks:
   check:
-    exec: { command: ["./check-env.sh"], capture: structured }
+    exec: { command: ["./check-env.sh"], decode: json }   # prints {"env": "production"} · decoded, .env is a field
 
   build_prod:
     with: { env_name: "${{ tasks.check.output.env }}" }
@@ -1433,6 +1443,11 @@ branch's binding is `null` · [04 §defined-null](./04-variables.md)).
 ### Map fan-out (`for_each`)
 
 ```yaml
+permits:
+  tools: ["nika:fetch"]
+  net:
+    http: ["example.com"]        # every page the sitemap lists must sit on this host (checked at run)
+
 tasks:
   discover:
     invoke:
@@ -1468,6 +1483,9 @@ runtime: no static enumeration.
 ### Run-whatever-happened (the report pattern)
 
 ```yaml
+permits:
+  exec: ["./run-pipeline.sh"]
+
 tasks:
   pipeline:
     exec: { command: ["./run-pipeline.sh"] }
@@ -1513,6 +1531,9 @@ Cleanup is a **task**, not a nested block. It declares itself with the
 `unwind` predicate on `after:` ·
 
 ```yaml
+permits:
+  exec: true                                    # a shell: command needs the shell grant, not a program list
+
 tasks:
   process:
     exec:
@@ -1527,7 +1548,7 @@ tasks:
     after: { drop_temp: unwind }                # cleanup chains like anything else
     invoke:
       tool: nika:emit
-      args: { event: "task_completed", task_id: "process" }
+      args: { event_type: "task_completed", payload: { task_id: "process" } }
 ```
 
 > **Why this replaced `on_finally:`.** The old shape nested a *list of
@@ -1806,7 +1827,7 @@ that paints run state onto this graph joins the two by task `id`.
 
 v1 ships with these task fields · `with` · `after` · `when` · `for_each` · `retry` · `on_error` · `timeout` · `extract` · `returns` · `lift` · plus the verb selector. (`max_parallel`, `max_items` and `fail_fast` are sub-fields of `for_each`; `on_finally` is dead — cleanup is a task on an `unwind` edge.) Additional fields may be added in minor bumps (additive only). (Output *shape* is per-verb · not a task field · see [02-verbs.md](./02-verbs.md#what--tasksidoutput--holds--per-verb).)
 
-Out of scope for v1 · `parallel:` for explicit concurrency control · `include:` for sub-workflow composition (workaround · `exec: nika run sub.yaml`). See [08-out-of-scope.md](./08-out-of-scope.md).
+Out of scope for v1 · `parallel:` for explicit concurrency control · `include:` for textual composition (the call half ships as `invoke: { workflow: <path> }` · [14](./14-composition.md)). See [08-out-of-scope.md](./08-out-of-scope.md).
 
 ---
 

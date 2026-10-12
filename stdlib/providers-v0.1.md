@@ -384,6 +384,7 @@ infer:
 ```yaml
 infer:
   model: anthropic/claude-sonnet-4-6
+  prompt: "Plan the migration"
   thinking:
     enabled: true
     budget_tokens: 4000
