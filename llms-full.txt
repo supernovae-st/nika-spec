@@ -2664,7 +2664,7 @@ The teaching shape is
 (`nika:done` first so `mock/echo` closes at turn one). See
 [stdlib/builtins-v0.1.md](../stdlib/builtins-v0.1.md) §`nika:compose`.
 Do not confuse this loop intrinsic with parent→child composition
-(`invoke: { workflow: }` · [14](./14-composition.md) · lesson 10).
+(`invoke: { workflow: "./child.nika" }` · [14](./14-composition.md) · lesson 10).
 
 **Termination outcomes (normative)** ·
 
@@ -8989,7 +8989,8 @@ So the trace format bumps:
 > whole receipt exists, « proven » is not a word this contract lets an
 > implementation use.
 >
-> This chapter is **parent→child** composition (`invoke: { workflow: }`
+> This chapter is **parent→child** composition
+> (`invoke: { workflow: "./child.nika" }`
 > · lesson 10). The agent loop's self-check builtin `nika:compose` is a
 > different door (ADR-096 · loop-only · lesson 15). Do not fuse them.
 
