@@ -2,7 +2,7 @@
   "valid": false,
   "errors": [
     {
-      "code": "NIKA-PROMPT-002",
+      "code": "NIKA-FILE-002",
       "category": "validation_error"
     }
   ],

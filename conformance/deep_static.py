@@ -497,13 +497,13 @@ def _prompt_file_refs(t: dict) -> list[tuple[str, str, object]]:
 
 def _static_prompt_paths(t: dict) -> list[str]:
     """The prompt files of a task whose path keeps the lexical law: the reads
-    the boundary judges (a broken path is NIKA-PROMPT-001, never a boundary
+    the boundary judges (a broken path is NIKA-FILE-001, never a boundary
     question)."""
     return [raw for _, _, raw in _prompt_file_refs(t) if _prompt_path_reason(raw) is None]
 
 
 def _prompt_err(number: str, detail: str) -> dict:
-    return {"code": f"NIKA-PROMPT-{number}", "namespace": "NIKA-PROMPT",
+    return {"code": f"NIKA-FILE-{number}", "namespace": "NIKA-FILE",
             "category": "validation_error",
             "detail": f"{detail} · 02-verbs §Prompt files · check≡run"}
 
@@ -512,8 +512,8 @@ def compose_prompt_files(doc: dict, base_dir=None) -> tuple:
     """02 §Prompt files · the compose step. Returns the document with every
     admitted, readable prompt file replaced by its text, so the templating,
     VAR and secret-flow laws judge it exactly as inline text, and the
-    NIKA-PROMPT findings. A path that breaks the lexical law is
-    NIKA-PROMPT-001 at once; a lawful path the read boundary does not admit
+    NIKA-FILE findings. A path that breaks the lexical law is
+    NIKA-FILE-001 at once; a lawful path the read boundary does not admit
     is never opened (NIKA-AUTH-006 / NIKA-SEC-004 are the boundary's).
     Without a base_dir only the lexical law is judged."""
     import copy

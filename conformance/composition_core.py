@@ -56,7 +56,7 @@ def _workflow_target(task: dict):
 
 def _err(code: str, detail: str) -> dict:
     cat = "security_error" if code == "NIKA-COMP-002" else "validation_error"
-    return {"code": code, "namespace": "NIKA-COMP", "category": cat, "detail": detail}
+    return {"code": code, "namespace": code.rsplit("-", 1)[0], "category": cat, "detail": detail}
 
 
 def _effect_classes(doc: dict) -> set[str]:
@@ -119,7 +119,7 @@ def _load_child(base_dir, target: str):
 
 def _child_prompt_errors(root, cpath, child: dict, where: str) -> list[dict]:
     """A child's prompt files under the project root: the path law with
-    containment (NIKA-PROMPT-001), then, inside the child's own read
+    containment (NIKA-FILE-001), then, inside the child's own read
     boundary, the link, the read and the cap (002 · 003)."""
     from deep_static import _prompt_file_refs, _prompt_path_reason, _skill_path_admitted, \
         _PROMPT_CAP
@@ -135,7 +135,7 @@ def _child_prompt_errors(root, cpath, child: dict, where: str) -> list[dict]:
             reason = _prompt_path_reason(raw, naming)
             here = f"{where} · child {cpath.name} {verb}.{field} file {raw!r}"
             if reason is not None:
-                errs.append(_err("NIKA-PROMPT-001", f"{here} breaks the path law ({reason})"))
+                errs.append(_err("NIKA-FILE-001", f"{here} breaks the path law ({reason})"))
                 continue
             if not isinstance(permits, dict) or not _skill_path_admitted(raw, permits):
                 continue  # the child's own boundary refuses it · never opened here
@@ -147,7 +147,7 @@ def _child_prompt_errors(root, cpath, child: dict, where: str) -> list[dict]:
                     linked = True
                     break
             if linked:
-                errs.append(_err("NIKA-PROMPT-001", f"{here} resolves through a symbolic link"))
+                errs.append(_err("NIKA-FILE-001", f"{here} resolves through a symbolic link"))
                 continue
             try:
                 size = path.stat().st_size if path.is_file() else None
@@ -155,14 +155,14 @@ def _child_prompt_errors(root, cpath, child: dict, where: str) -> list[dict]:
             except OSError:
                 size, data = None, None
             if size is None:
-                errs.append(_err("NIKA-PROMPT-002", f"{here} is missing or not a regular file"))
+                errs.append(_err("NIKA-FILE-002", f"{here} is missing or not a regular file"))
             elif data is None:
-                errs.append(_err("NIKA-PROMPT-003", f"{here} holds {size} bytes, over the cap"))
+                errs.append(_err("NIKA-FILE-003", f"{here} holds {size} bytes, over the cap"))
             else:
                 try:
                     data.decode("utf-8")
                 except UnicodeDecodeError:
-                    errs.append(_err("NIKA-PROMPT-003", f"{here} is not valid UTF-8"))
+                    errs.append(_err("NIKA-FILE-003", f"{here} is not valid UTF-8"))
     return errs
 
 
