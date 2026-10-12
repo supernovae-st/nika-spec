@@ -5,6 +5,11 @@
 # révisions du protocole MCP (canon.yaml mcp.protocol_versions · engine-verified) entrent
 # en runtime_capability rows · l'id encode la révision (bijection tirets→underscores ·
 # le shape scellé n'a pas de champ valeur) · parité gardée par `ssot-compiler --check-canon`.
+# 2026-10-12 : la row mcp.protocol.2026_07_28 est retirée. Le moteur la listait mais ne
+# l'a jamais parlée : la révision finale 2026-07-28 n'a pas de handshake (server/discover
+# remplace initialize) et aucune de ses obligations n'est implémentée. Un moteur qui épingle
+# ce canon répond 2025-11-25 à initialize.
+# Pas de tombstone : l'id reviendra avec le même sens quand le moteur la parlera.
 registry_document_format: 1
 $comment: 'C0 sandbox skeleton + canon-flip import 2026-07-17 · seed row = yaml_profile_strict (family exemplar
   · real R7 language-feature import owed at C1) · + 5 mcp.protocol.* runtime_capability rows imported verbatim from
@@ -51,19 +56,6 @@ features:
     notes: 'Détectée quand un workflow déclare run.reasoning.effort (spec/01-envelope.md §run). Feature de LANGAGE,
       pas une capacité : aucune valeur d''effort n''est listée par le registre ; l''offre de la route est découverte
       avant inférence (LAW-CONF-0501). Un moteur antérieur la refuse comme clé run inconnue.'
-  - id: mcp.protocol.2026_07_28
-    status: reserved
-    owner: engine
-    law_ids:
-      - LAW-CONF-0510
-    introduced_in: C0
-    kind: runtime_capability
-    detection_law: LAW-CONF-0510
-    conformance_profile: runtime
-    notes: Import-c0 (canon-flip) · MCP protocol revision « 2026-07-28 » verbatim (canon.yaml mcp.protocol_versions
-      · engine-verified per crates/nika-mcp/src/protocol.rs SUPPORTED array) · the featureRow shape has no value
-      field → the id encodes the revision (dots/dashes → underscores · bijective) · detection = the engine manifest
-      surface law (LAW-CONF-0510). latest per canon.yaml.
   - id: mcp.protocol.2025_11_25
     status: reserved
     owner: engine

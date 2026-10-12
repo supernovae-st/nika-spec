@@ -13,6 +13,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed · the MCP revisions the canon claims (2026-10-12)
+
+- `canon.yaml` `mcp.protocol_versions` no longer lists `2026-07-28`, and its
+  latest is `2025-11-25`. The engine listed that revision but never spoke it:
+  the final 2026-07-28 text has no `initialize` handshake (`server/discover`
+  replaces it) and none of its requirements were implemented. The
+  `mcp.protocol.2026_07_28` row leaves `canon/features.yaml` with no
+  tombstone, because the same id will return with the same meaning when the
+  engine speaks that revision. It pairs with an engine change under which
+  `initialize` answers `2025-11-25`; the engine repins this canon with it.
+
 ### Changed · everyday builtin contracts (2026-10-12)
 
 - `nika:notify` shapes its `webhook` body for the chat receivers it recognizes
