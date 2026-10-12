@@ -42,7 +42,7 @@ DSL. See [03-dag.md](./03-dag.md#expression-language--a-documented-subset-of-cel
 ```
 ${{ inputs.X }}            typed workflow input          (declared in envelope `inputs:` · supplied by the caller at launch, or by its own `default:`)
 ${{ const.X }}             named constant                 (declared in envelope `const:` · a fixed value baked into the workflow)
-${{ secrets.X }}           masked secret reference        (vault-backed · never in logs)
+${{ secrets.X }}           masked secret reference        (a reference to a store · never in logs)
 ${{ with.X }}              task-level scope               (declared per-task `with:` block · the bindings ARE the data edges)
 ${{ tasks.X.output }}      task record reference          (or .status · .error · .duration_ms · the CLOSED projection set · BOUNDARY surfaces only — see below)
 ```
@@ -408,8 +408,8 @@ closed object is `NIKA-VAR-003` (the same code · one voice), and only
 ```yaml
 secrets:
   api_key:
-    source: vault
-    key: prod/anthropic/api-key
+    source: env
+    key: ANTHROPIC_API_KEY
     egress: [{ to: "nika:fetch", host: "api.anthropic.com" }]
 
 permits:

@@ -306,7 +306,7 @@ CONSTRUCTS = [
     ("extract",       "jq extraction bindings",            "/concepts/bindings"),
     ("schema",        "typed (structured) output",         "/concepts/verbs"),
     ("thinking",      "extended thinking budget",          "/concepts/verbs"),
-    ("secrets",       "vault-backed secrets",              "/reference/yaml-syntax"),
+    ("secrets",       "masked secret references",          "/reference/yaml-syntax"),
     ("typed_inputs",  "typed workflow inputs",             "/reference/yaml-syntax"),
     ("outputs",       "typed workflow outputs (callable)", "/reference/yaml-syntax"),
     ("agent_tools",   "default-deny tool grants",          "/concepts/verbs"),

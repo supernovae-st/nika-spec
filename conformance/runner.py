@@ -974,6 +974,23 @@ def cross_ref_errors(doc: dict) -> list[dict]:
                                       "binding references item/index — the collection "
                                       "is evaluated BEFORE iterations exist (circular)"})
 
+    # NIKA-PARSE · for_each.max_items is the fan's hard ceiling: a LITERAL list
+    # longer than the cap is a contradiction the file already shows, refused at
+    # parse (03 §for_each.max_items · the run refuses a longer resolved
+    # collection before its first item, NIKA-VAR-006).
+    for tid, t in tasks:
+        fe_block = t.get("for_each")
+        if not isinstance(fe_block, dict):
+            continue
+        cap, listed = fe_block.get("max_items"), fe_block.get("items")
+        if (isinstance(cap, int) and not isinstance(cap, bool)
+                and isinstance(listed, list) and len(listed) > cap):
+            errs.append({
+                "namespace": "NIKA-PARSE", "category": "validation_error",
+                "detail": f"task '{tid}' for_each.items lists {len(listed)} items but "
+                          f"max_items: {cap} caps the fan — the run refuses rather than "
+                          "truncating; raise the cap or shorten the list (03 §for_each)"})
+
     # NIKA-DAG-004 · on_error.recover references a task DOWNSTREAM of the
     # declaring task — the recovery-time await would deadlock (05 §recover
     # resolution · the recovery surface is exempt from EDGES, not from

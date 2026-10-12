@@ -28,6 +28,10 @@ SCHEMA = json.loads((ROOT / "schemas/workflow.schema.json").read_text(encoding="
 ENVELOPE = ROOT / "conformance/tests/core/envelope"
 HARNESS = ROOT / "conformance/tests/runtime/access-harness"
 FIRST_ACCESS_FIXTURE = 33
+# An access fixture is one whose document declares the `run:` block or an `access:` key: the
+# envelope's later fixtures for other laws (the retired version tag, a withdrawn secret source)
+# are not the access contract's to cite.
+ACCESS_SUBJECT = re.compile(r"^\s*(run|access):", re.M)
 ENVELOPE_KEYS = {"nika", "model", "inputs", "const", "secrets", "permits", "run", "tasks", "outputs"}
 ACCESS_LAWS = {"LAW-SURFACE-0503", "LAW-GRAMMAR-0502", "LAW-GRAMMAR-0503", "LAW-CONF-0501"}
 # The reference engine's execution-access family (NIKA-1800..1849). A refusal
@@ -360,8 +364,10 @@ class StaticFixtures(unittest.TestCase):
         self.validator = Draft202012Validator(SCHEMA)
         self.canon = runner.load_canon()
         self.laws = laws()
-        self.fixtures = sorted(d for d in ENVELOPE.iterdir()
-                               if d.name[:3].isdigit() and int(d.name[:3]) >= FIRST_ACCESS_FIXTURE)
+        self.fixtures = sorted(
+            d for d in ENVELOPE.iterdir()
+            if d.name[:3].isdigit() and int(d.name[:3]) >= FIRST_ACCESS_FIXTURE
+            and ACCESS_SUBJECT.search((d / "input.yaml").read_text(encoding="utf-8")))
 
     def test_every_access_fixture_meets_its_verdict(self):
         self.assertTrue(self.fixtures)

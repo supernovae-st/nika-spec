@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: vault-withdrawn
+secrets:
+  api_key:
+    source: vault
+    key: prod/api
+tasks:
+  greet:
+    infer:
+      prompt: "hi"

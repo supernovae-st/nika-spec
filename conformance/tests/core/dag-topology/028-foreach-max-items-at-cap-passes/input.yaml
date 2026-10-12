@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: fan-cap-at
+permits:
+  exec: ["echo"]
+tasks:
+  each:
+    for_each:
+      items: ["a", "b"]
+      max_items: 2
+    exec:
+      command: ["echo", "${{ item }}"]
