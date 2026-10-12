@@ -62,7 +62,7 @@ files:
   evidence: "hand-set pack version (currently 0.2.0-draft) — no lane advances it; the derivations' INPUT (showcase-projector.py reads it as pack_version)"
 - path: "canon.yaml"
   class: generated
-  sha256: 72319dacd06a92ef83cf75e3612a37d13d20e22555c57040c59b10cbcc058ce8
+  sha256: ea3768f3cfb60e9219ab25c93877e260740744370fae969868a4e2dabf1e278d
   evidence: "its own header: 'GENERATED · canon.yaml is a generated projection since the C0 flip — manual edits of a generated surface make CI red (ssot-compiler --check-canon · rc=5)' + a detached body-sha256 self-hash per PAA-006"
   derivation:
     tool: "python3 scripts/ssot-compiler.py --emit-canon (ssot-compiler 0.2.0-sandbox · SSOT-1 §21-23, the canon flip)"
@@ -89,7 +89,7 @@ files:
     - "schemas/registries.schema.json"
 - path: "canon/ssot.lock"
   class: generated
-  sha256: 744fd8d7b11ef43452394b1243b432bd21da3af1d2c1ed561becd5d43e41e9d8
+  sha256: 5cb83695cd5d534ab945b7a7b0f75568d802c60f673806ca1def954fd4e3320a
   evidence: "single-line canonical JSON carrying generator identity ('ssot-compiler' 0.2.0-sandbox + its own source_sha256), the 27 leaf digests and law_count — no human writes a lock"
   derivation:
     tool: "python3 scripts/ssot-compiler.py (write mode · leaf digests only, digest-dag layer 1, own digest DETACHED per PAA-006)"
@@ -100,7 +100,7 @@ files:
     - "canon/laws-index.json (leaf-hashed)"
 - path: "canon/ssot.lock.sha256"
   class: generated
-  sha256: 82adf3d95a99e0a36b18ce0971b62b1829d059e1268d8438731b67be55483688
+  sha256: d28af38d55cca7ac181c766e76d13ca0e6d7c79e881d701fdbffd14517b96f19
   evidence: "the lock's own digest, DETACHED into a sidecar per PAA-006 (a file cannot contain its own hash) — written by the compiler alongside the lock"
   derivation:
     tool: "python3 scripts/ssot-compiler.py (write mode · the detached-sidecar emission)"
@@ -235,7 +235,7 @@ patterns:
 - glob: "canon/**"
   class: authored
   match_count: 14
-  aggregate_sha256: 18f321e5e70e5ef412500da33387a31b645562265955ac95a0fc299eebd3699a
+  aggregate_sha256: 079fc11f9dd5fe9e8d3b52b8e143cd428ca51ff2039899167e0b736dc9c7c299
   evidence: "the registries humans edit (surface · builtins · features · conformance · grammar · types · providers · migrations · projections · tombstones · snippets · templates · diagnostics) + canon/EXCEPTIONS.md (the §18 exception ledger) — the SOURCES the compiler seals; ssot.lock + sidecar excepted in files:"
 - glob: "conformance/tests/runtime/gates/**"
   class: generated
