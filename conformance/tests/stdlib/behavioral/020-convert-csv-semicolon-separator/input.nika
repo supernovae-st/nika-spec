@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+# Stdlib BEHAVIORAL · nika:convert counts the CSV field separator on the
+# first line outside quotes (builtins-v0.1.md §convert · CSV cells): a
+# European spreadsheet export separates with `;` and writes decimals with
+# `,`, so the semicolon outnumbers the comma and separates. Every cell is a
+# string. A quoted cell keeps its comma.
+nika: rt-stdlib-convert-csv-semicolon
+permits: { tools: ["nika:convert"] }
+const:
+  export: "nom;montant\n\"Dupont, Jean\";10,50\nMartin;3\n"
+tasks:
+  rows:
+    invoke:
+      tool: "nika:convert"
+      args: { input: "${{ const.export }}", from: csv, to: json }

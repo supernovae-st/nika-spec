@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+# Stdlib BEHAVIORAL · a prompt configuration error is the parse error
+# NIKA-BUILTIN-PROMPT-002, never the unanswerable NIKA-BUILTIN-PROMPT-001
+# that may become a durable pause (builtins-v0.1.md §prompt): no answer
+# repairs an unknown mode. The mode arrives resolved, so the run judges it.
+nika: rt-stdlib-prompt-unknown-mode
+permits: { tools: ["nika:prompt"] }
+inputs:
+  mode: { type: string }
+tasks:
+  pick:
+    invoke:
+      tool: "nika:prompt"
+      args: { mode: "${{ inputs.mode }}", message: "Which title?", default: "a" }

@@ -1,0 +1,10 @@
+{
+  "workflow_state": "failure",
+  "tasks": {
+    "pick": {
+      "status": "failure",
+      "error_code": "NIKA-BUILTIN-PROMPT-002"
+    }
+  },
+  "note": "builtins-v0.1.md §prompt · an unknown mode is a configuration error: it fails at once and never pauses for an answer. Authored contract · reference engine observation pending."
+}
