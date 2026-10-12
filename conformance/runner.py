@@ -506,6 +506,10 @@ def _unclosed_expr_errors(value, where: str) -> list[dict]:
     return errs
 
 
+# 04 §`run` · the facts of this run, the CLOSED set the engine sets.
+RUN_FACTS = ("scheduled_for", "missed")
+
+
 def _resolution_errors(value, scopes: dict, where: str) -> list[dict]:
     """NIKA-VAR-001 · unresolved `${{ }}` references per 04-variables.md ·
     namespace roots resolve against declared envelope/task scopes ·
@@ -533,6 +537,11 @@ def _resolution_errors(value, scopes: dict, where: str) -> list[dict]:
                     var_err(f"tasks.{seg} references a non-existent task")
             elif root == "group":
                 continue  # the fan-in reader · judged by NIKA-DAG-008 / VAR-021
+            elif root == "run":
+                # the facts of this run · the CLOSED set (04 §run)
+                if seg and seg not in RUN_FACTS:
+                    var_err(f"run.{seg} is not a fact of the run · the closed set is "
+                            f"{' · '.join(RUN_FACTS)}")
             elif seg:  # dotted unknown root · not one of the 6 namespaces
                 var_err(f"'{root}.{seg}' uses an undefined namespace '{root}'")
             # bare unknown identifiers are tolerated (conservative · CEL terms)

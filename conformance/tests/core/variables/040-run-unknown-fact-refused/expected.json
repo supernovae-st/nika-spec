@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-VAR",
+      "category": "variable_error"
+    }
+  ],
+  "note": "04-variables.md \u00a7`run` \u00b7 the set is CLOSED \u00b7 run.started is not a fact of the run \u00b7 unresolved reference (\u00a7Resolution order \u00b7 NIKA-VAR-001)."
+}

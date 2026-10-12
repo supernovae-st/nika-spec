@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: case-040-run-unknown-fact-refused
+tasks:
+  report:
+    exec:
+      command: ["echo", "${{ run.started }}"]
+permits:
+  exec: ["echo"]

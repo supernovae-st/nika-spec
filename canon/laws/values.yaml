@@ -258,3 +258,59 @@ laws:
     closure_gates:
       - no-alias-zero
       - no-second-syntax
+
+  # ───────────────── décision du 2026-10-12 · les faits du run, sixième espace de noms ─────────────────
+
+  - id: LAW-SURFACE-0203
+    slug: values/run-facts-closed-namespace
+    status: active
+    owner: spec
+    domain: SURFACE
+    title: "Les faits d'une execution forment un sixieme espace de noms, en lecture seule et ferme"
+    prose_projection:
+      chapters: ["04-variables", "01-envelope", "17-trace"]
+      text: "Decision du 2026-10-12 verbatim : « every run receives `run.scheduled_for`, the instant of its slot ». Orthographe ratifiee le meme jour : un sixieme espace de noms d'execution, en lecture seule, « run » : ${{ run.scheduled_for }} (RFC 3339 UTC, toujours present : l'instant du creneau, l'instant de nika test --at, sinon le debut du run) et, sous rattraper-une-fois, ${{ run.missed }} = { first, last, count } ; le prologue workflow_started journalise les deux ; une tache de date garde le vrai debut du run. L'ensemble est FERME : toute autre reference run.X est non resolue (NIKA-VAR-001)."
+    inputs:
+      - registry: surface
+        id: namespace_run
+        role: required
+    premises:
+      - operator: present
+        operands:
+          - registry: surface
+            id: namespace_run
+        quantifier: exactly_one
+    conclusion:
+      verdict: admit
+    canonicalization:
+      order_sensitive: false
+      normalization: ["none"]
+    judgment:
+      generated_facts:
+        - registry: surface
+          id: namespace_run
+      independent_judgment: true
+    domain_payload:
+      kind: surface
+      constraint: family_membership
+      subject:
+        registry: surface
+        id: namespace_run
+    diagnostics: ["NIKA-VAR-001"]
+    fixtures:
+      - conformance/tests/core/variables/039-run-facts-valid
+      - conformance/tests/core/variables/040-run-unknown-fact-refused
+    projections: ["prose:04-variables", "prose:01-envelope", "prose:17-trace", "cli:check", "docs"]
+    implementation_surfaces:
+      - engine:nika-schema
+      - engine:nika-check
+      - engine:nika-runtime
+      - reference:runner.py
+      - conformance:variables-suite
+    introduced_in: "0.123"
+    proof_obligations:
+      - "Decision du 2026-10-12 verbatim : « every run receives `run.scheduled_for`, the instant of its slot ». Le registre surface porte exactement une row namespace d'orthographe run, et canon.yaml compte six espaces de noms."
+      - "L'ensemble run est ferme : run.scheduled_for et run.missed sont les seuls faits ; la fixture 040 prouve qu'une autre reference est refusee NIKA-VAR-001."
+    closure_gates:
+      - run-facts-closed
+      - six-namespaces-counted

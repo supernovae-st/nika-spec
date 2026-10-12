@@ -263,7 +263,7 @@ Two more rules at work, each beside its chapter:
 1. **Envelope** · `nika: <name>` and the nine keys above
 2. **The <!-- canon:verbs -->4<!-- /canon --> verbs** · `infer` · `exec` · `invoke` · `agent`
 3. **DAG shape** · tasks, `with:` data edges, `after:` control edges, `when`, `for_each`
-4. **Variables** · one `${{ … }}` syntax over <!-- canon:namespaces -->5<!-- /canon --> namespaces: `inputs` · `const` · `secrets` · `with` · `tasks`
+4. **Variables** · one `${{ … }}` syntax over <!-- canon:namespaces -->6<!-- /canon --> namespaces: `inputs` · `const` · `secrets` · `with` · `tasks` · `run`
 5. **Error model** · `NIKA-<NS>-<NNN>` codes, retry, structured output
 
 As concepts, these five are locked for the life of the language; until the
@@ -879,7 +879,7 @@ contract, the runtime is an implementation detail.
 
 You touched all 5 pillars · the **envelope** (`nika: <name>` + `tasks:`) · the
 **4 verbs** · the **DAG** (`with:`/`after:` edges + task outputs) · **variables**
-(`${{ }}` · <!-- canon:namespaces -->5<!-- /canon --> namespaces) · and the start of the **error model** (engines
+(`${{ }}` · <!-- canon:namespaces -->6<!-- /canon --> namespaces) · and the start of the **error model** (engines
 return `NIKA-<NS>-<NNN>` codes · see [spec/05-errors.md](./spec/05-errors.md)) ·
 plus the workflow's **`outputs:`** return contract (what `nika run` prints + what
 a caller receives).
@@ -948,8 +948,8 @@ Standards work · SQL · GraphQL · OpenAPI · Dockerfile · GitHub Actions YAML
 
 3.  DAG SHAPE       tasks · with (data edges) · after (control) · when · for_each
 
-4.  VARIABLES       ${{ ... }} = CEL · ONE syntax · 5 namespaces
-                    inputs · const · secrets · with · tasks
+4.  VARIABLES       ${{ ... }} = CEL · ONE syntax · 6 namespaces
+                    inputs · const · secrets · with · tasks · run
 
 5.  ERROR MODEL     NIKA-<NS>-<NNN> codes · retry semantics · structured output
 ```
@@ -1060,7 +1060,7 @@ outputs:                              # what the workflow returns · symmetric t
 | [01 envelope](./01-envelope.md) | The header · the 9 keys · `nika:` (the mark AND the name) · typed `inputs` · `const` · `secrets` |
 | [02 verbs](./02-verbs.md) | The 4 verbs · signatures · semantics |
 | [03 DAG](./03-dag.md) | Tasks · `with:` data edges · `after:` control · `when` · `for_each` · the four graphs |
-| [04 variables](./04-variables.md) | `${{ inputs · const · secrets · with · tasks }}` · <!-- canon:namespaces -->5<!-- /canon --> namespaces |
+| [04 variables](./04-variables.md) | `${{ inputs · const · secrets · with · tasks · run }}` · <!-- canon:namespaces -->6<!-- /canon --> namespaces |
 | [05 errors](./05-errors.md) | Error codes · retry · structured output schemas |
 | [06 stdlib contract](./06-stdlib-contract.md) | How the stdlib versions independently |
 | [07 conformance](./07-conformance.md) | What « v0.1-compliant » means |
@@ -2161,16 +2161,19 @@ firer comes back. The machine that fires the beat applies it; the project file o
 | `manqué:` | What fires | What each run receives |
 |---|---|---|
 | `sauter` | nothing: every missed slot is skipped | none |
-| `rattraper` | the latest missed slot, once | that slot's instant |
-| `{ rattraper: N }` | up to the N latest missed slots, one run each, oldest first | its own slot's instant |
-| `rattraper-une-fois` | one run for the whole silence | the latest slot's instant, and the missed range: the first and the last missed slot and their count |
+| `rattraper` | the latest missed slot, once | that slot's instant, as `${{ run.scheduled_for }}` |
+| `{ rattraper: N }` | up to the N latest missed slots, one run each, oldest first | its own slot's instant, as `${{ run.scheduled_for }}` |
+| `rattraper-une-fois` | one run for the whole silence | the latest slot's instant as `${{ run.scheduled_for }}`, and the missed range as `${{ run.missed }}`: the first and the last missed slot and their count |
 
 `N` is a whole number from 1; anything else is refused when the project is checked. Before
 anything is armed, the activation shows the worst spend the law allows, « jusqu'à N × plafond »
 (one `plafond` for `rattraper` and for `rattraper-une-fois`).
 
 `rattraper` replays one slot as if it had fired on time. `rattraper-une-fois` runs once on behalf
-of the whole silence, and is told how long that silence was.
+of the whole silence, and is told how long that silence was. A run fired on time is told its slot
+the same way, and a run started by hand its own start; the run's real start stays what the clock
+gives, so a date window computed from « now » shifts on a late run while one computed from
+`run.scheduled_for` does not ([04 §`run`](./04-variables.md)).
 
 ```yaml
 arm:
@@ -3531,11 +3534,11 @@ prompt: "${{ has(inputs.style) ? inputs.style : 'be concise' }}"
 when:   ${{ with.scan_log.contains('ERROR') }}      # branch on substring · the log arrived via with:
 ```
 
-**Namespaces are CEL variables** · the <!-- canon:namespaces -->5<!-- /canon --> namespaces (`inputs`
-· `const` · `secrets` · `with` · `tasks`) are bound as top-level CEL variables — `tasks.*` on the
+**Namespaces are CEL variables** · the <!-- canon:namespaces -->6<!-- /canon --> namespaces (`inputs`
+· `const` · `secrets` · `with` · `tasks` · `run`) are bound as top-level CEL variables — `tasks.*` on the
 boundary surfaces only. **Inside a `for_each` task body, two
 more scoped CEL variables are bound** · `item` (the current element) and `index`
-(its 0-based position), available ONLY within that task (the <!-- canon:namespaces -->5<!-- /canon --> namespaces are
+(its 0-based position), available ONLY within that task (the <!-- canon:namespaces -->6<!-- /canon --> namespaces are
 global · `item`/`index` are for_each-local · see `for_each` below).
 
 #### The binding is the edge — no invisible edges
@@ -4882,7 +4885,7 @@ DSL. See [03-dag.md](./03-dag.md#expression-language--a-documented-subset-of-cel
 
 ---
 
-## The 5 namespaces
+## The 6 namespaces
 
 ```
 ${{ inputs.X }}            typed workflow input          (declared in envelope `inputs:` · supplied by the caller at launch, or by its own `default:`)
@@ -4890,15 +4893,17 @@ ${{ const.X }}             named constant                 (declared in envelope 
 ${{ secrets.X }}           masked secret reference        (a reference to a store · never in logs)
 ${{ with.X }}              task-level scope               (declared per-task `with:` block · the bindings ARE the data edges)
 ${{ tasks.X.output }}      task record reference          (or .status · .error · .duration_ms · the CLOSED projection set · BOUNDARY surfaces only — see below)
+${{ run.scheduled_for }}   a fact of this run             (or .missed · the CLOSED set below · set by the engine, never declared or supplied)
 ```
 
-Five namespaces. That's it.
+Six namespaces. That's it.
 
 The first three — `inputs` · `const` · `secrets` — are the **value
 authorities**, the closed family every workflow value is declared under
-(LAW-SURFACE-0201 · one authority, one spelling, no alias). `with` and
-`tasks` are the **runtime namespaces** (task-scope bindings and settled task
-records) — legal in `${{ }}`, never value authorities.
+(LAW-SURFACE-0201 · one authority, one spelling, no alias). `with`,
+`tasks` and `run` are the **runtime namespaces** (task-scope bindings,
+settled task records, and the facts of the run itself) — legal in `${{ }}`,
+never value authorities.
 
 > **⚰️ `config` was the fourth, and it is dead (2026-08-12).** Measured:
 > **zero** usage in real work; its `default:` was its **only** possible
@@ -4957,8 +4962,8 @@ summarize:
 ```
 
 The task body is a **pure function of its declared inputs** (`with` · the
-three value authorities `inputs` · `const` · `secrets` · the loop
-locals): every cross-task dependency is
+three value authorities `inputs` · `const` · `secrets` · the run's facts
+`run` · the loop locals): every cross-task dependency is
 visible at the boundary, named, and typed by its edge role. Nothing else
 reads another task.
 
@@ -4984,11 +4989,11 @@ reads another task.
 > extra identifiers are in scope: `${{ item }}` (the current element) and
 > `${{ index }}` (its 0-based position). They are **loop-scoped locals**, alive
 > only within that task's body, not global namespaces. So the count stays
-> « <!-- canon:namespaces -->5<!-- /canon --> namespaces » + the for-each locals where a loop is present.
+> « <!-- canon:namespaces -->6<!-- /canon --> namespaces » + the for-each locals where a loop is present.
 
 **Shadowing is structurally impossible.** Every namespace is reached
 through its explicit prefix (`inputs.` · `const.` · `secrets.` ·
-`with.` · `tasks.`): an `inputs.item` and the loop-local `item` never collide
+`with.` · `tasks.` · `run.`): an `inputs.item` and the loop-local `item` never collide
 (one is `inputs.item` · the other is bare `item`), a task may be named
 `item` (`tasks.item.output` is unambiguous), and `with.X` never hides an
 `inputs.X`. The only bare identifiers in the language are the two
@@ -5295,6 +5300,48 @@ masked references in `secrets`.
 > declared** — the `egress:` list on the secret (the example above · full
 > grammar in [01-envelope §egress](./01-envelope.md)): declassification is
 > the owner's act, co-located with the data, never a property of the sink.
+
+### `${{ run.X }}` · the facts of this run
+
+Every run is told which instant it serves: a run fired for a project's
+schedule slot (01 §The project's missed slots) is told that slot. The engine
+sets these facts before the first task and they never change during the
+run; nothing declares or supplies them. The set is CLOSED:
+
+| reference | type | value |
+|---|---|---|
+| `${{ run.scheduled_for }}` | string (RFC 3339, UTC), always set | the instant of the slot this run serves when it was fired for one; under `nika test --at`, that instant; otherwise the run's start as the run clock gives it |
+| `${{ run.missed }}` | object `{ first, last, count }` or `null` | under `manqué: rattraper-une-fois`, the silence the run covers: the first and the last missed slot (RFC 3339, UTC) and their count; `null` otherwise |
+
+```yaml
+tasks:
+  report:
+    exec:
+      # the day the slot was for, also when the run catches up a missed slot
+      command: ["./report.sh", "--day", "${{ run.scheduled_for }}"]
+```
+
+A reference outside the closed set (`${{ run.started }}`) is an unresolved
+reference: `NIKA-VAR-001`, as for any name the namespaces do not define.
+A child workflow a run calls ([14](./14-composition.md)) serves the same
+instant: it is told its caller's `run.scheduled_for` and `run.missed`, as it
+inherits its caller's deadline and budget (14, law 6). They are not inputs:
+the child declares nothing and the call passes nothing, so the call stays
+typed by its `args:` alone.
+`run` reads like the value authorities: legal in every value position and
+in `when:`, read-only, and never a data edge. The namespace is not the `run:`
+envelope block ([01 §`run`](./01-envelope.md)): that block declares how the
+run keeps time and entropy; `${{ run.X }}` reads what the engine tells the run.
+
+The real start of the run stays what the clock gives: a date task (`now`,
+`nika:date`) still reads when the run actually started. A slot replayed
+late runs today and is told, by `run.scheduled_for`, which day it was for,
+and a run started by hand is told its own start;
+a workflow that computes « yesterday » or « this week » should compute it
+from `run.scheduled_for` when it is armed with a catch-up policy, and the
+project check teaches that. The run's journal records the facts, and where
+`run.scheduled_for` came from, in its `workflow_started` frame
+([17 §the prologue](./17-trace.md)).
 
 ---
 
@@ -5636,8 +5683,8 @@ field is a node the graph did not need.
 When a task is admitted · the engine resolves `${{ ... }}` references in this order ·
 
 1. **Boundary first** · the `with:` bindings materialize (their `tasks.X.field` references read the settled records — this is where the data edges deliver)
-2. **`when:`** evaluates over the local namespaces (`inputs` · `const` · `with` · loop locals)
-3. **Body** · verb-field expressions resolve (`inputs.X` · `const.X` · `secrets.X` · `with.X` · loop locals — never `tasks.*`)
+2. **`when:`** evaluates over the local namespaces (`inputs` · `const` · `with` · `run` · loop locals)
+3. **Body** · verb-field expressions resolve (`inputs.X` · `const.X` · `secrets.X` · `with.X` · `run.X` · loop locals — never `tasks.*`)
 4. **Single-pass** · a substitution result is NOT re-evaluated (no nested substitution)
 
 If a reference is unresolved · the engine raises a `NIKA-VAR-001` (undefined
@@ -5734,7 +5781,7 @@ Reasons ·
 
 ## Forward-compat
 
-The `${{ ... }}` substitution surface and the <!-- canon:namespaces -->5<!-- /canon --> namespaces are locked at v1. **Template pipe-filters (`${{ inputs.x | json }}` · `| upper`) are NOT a growth path** (they would duplicate builtins + push CEL toward a string-DSL). Data transforms live in the `nika:jq` builtin; the `${{ }}` surface grows only with CEL-native features: the conditional `?:`, the `has()` presence macro, and the `contains`/`startsWith`/`endsWith` string tests ship in `cel-subset/0.1` ([03 §grammar](./03-dag.md)); `all`/`exists` and `matches()` regex stay reserved for a later additive minor. jq is the single extraction-and-transform language (`extract:` + `nika:jq`).
+The `${{ ... }}` substitution surface is locked at v1, and its <!-- canon:namespaces -->6<!-- /canon --> namespaces grow only by an explicit decision (`run`, the sixth, carries what a scheduled run is told: §`run` above). **Template pipe-filters (`${{ inputs.x | json }}` · `| upper`) are NOT a growth path** (they would duplicate builtins + push CEL toward a string-DSL). Data transforms live in the `nika:jq` builtin; the `${{ }}` surface grows only with CEL-native features: the conditional `?:`, the `has()` presence macro, and the `contains`/`startsWith`/`endsWith` string tests ship in `cel-subset/0.1` ([03 §grammar](./03-dag.md)); `all`/`exists` and `matches()` regex stay reserved for a later additive minor. jq is the single extraction-and-transform language (`extract:` + `nika:jq`).
 
 Out of scope for v0.1 (deferred · see [`08-out-of-scope.md`](./08-out-of-scope.md)) ·
 - Expression language (no arithmetic in templates)

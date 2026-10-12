@@ -257,7 +257,7 @@ Two more rules at work, each beside its chapter:
 1. **Envelope** · `nika: <name>` and the nine keys above
 2. **The <!-- canon:verbs -->4<!-- /canon --> verbs** · `infer` · `exec` · `invoke` · `agent`
 3. **DAG shape** · tasks, `with:` data edges, `after:` control edges, `when`, `for_each`
-4. **Variables** · one `${{ … }}` syntax over <!-- canon:namespaces -->5<!-- /canon --> namespaces: `inputs` · `const` · `secrets` · `with` · `tasks`
+4. **Variables** · one `${{ … }}` syntax over <!-- canon:namespaces -->6<!-- /canon --> namespaces: `inputs` · `const` · `secrets` · `with` · `tasks` · `run`
 5. **Error model** · `NIKA-<NS>-<NNN>` codes, retry, structured output
 
 As concepts, these five are locked for the life of the language; until the
