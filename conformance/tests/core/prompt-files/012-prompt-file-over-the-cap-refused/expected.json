@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-PROMPT-003",
+      "category": "validation_error"
+    }
+  ],
+  "note": "02-verbs §Prompt files · 65,537 bytes, one over the 65,536-byte cap · the twin of 013."
+}

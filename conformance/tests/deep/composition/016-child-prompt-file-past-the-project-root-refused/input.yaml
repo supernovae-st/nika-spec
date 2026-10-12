@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: comp-016-child-prompt-escape
+tasks:
+  call:
+    invoke:
+      workflow: "./workflows/brief.nika"
+    returns: { object: { brief: string } }

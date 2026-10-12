@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "kind": "spec-language-knowledge",
   "owner": "supernovae-st/nika-spec",
-  "revision": "b1924ea049543c024244e9f0b3addcb223aff1c6",
+  "revision": "9157d005a46b180da281cebf1b7012b0f16a7f02",
   "inputs": {
-    "schemas/workflow.schema.json": "3f544367a5673f0cc511f38e536ba7165cb643bfd9ea35886e507cebcd2d9462",
+    "schemas/workflow.schema.json": "7e43a7c3beb496a13c233ecf2cea23d6e32cbd93732a5d566e6ae9ba12528bb7",
     "templates/agent-loop.nika": "07f50946522b131d310c8c3bb4adbdb296f6fb4947bd3b9f96a62c12478d13f9",
     "templates/aggregate-by-key.nika": "a7a34d9415e3187ff32607d79272da49e790500f1998593730c5047dc8a111fd",
     "templates/api-upload-and-create.nika": "1e06897b41686f7c51f97e70893bd16e09dba869df85378cb3c89913e1d20952",
@@ -1645,6 +1645,25 @@
           "matchKind": "literal-key-occurrence"
         }
       ]
+    },
+    {
+      "id": "language:word:file",
+      "name": "file",
+      "docsPath": "reference/language/words/file",
+      "contracts": [
+        {
+          "pointer": "/$defs/promptText/oneOf/1/properties/file",
+          "context": "/$defs/promptText/oneOf/1",
+          "required": true,
+          "declaration": {
+            "description": "The project file whose text is the field's value · relative to the workflow file that names it.",
+            "type": "string",
+            "minLength": 1
+          },
+          "siblings": []
+        }
+      ],
+      "examples": []
     },
     {
       "id": "language:word:for_each",
@@ -4530,7 +4549,7 @@
           "context": "/$defs/infer",
           "required": true,
           "declaration": {
-            "type": "string"
+            "$ref": "#/$defs/promptText"
           },
           "siblings": [
             "max_tokens",
@@ -4547,7 +4566,7 @@
           "context": "/$defs/agent",
           "required": true,
           "declaration": {
-            "type": "string"
+            "$ref": "#/$defs/promptText"
           },
           "siblings": [
             "max_tokens_total",
@@ -5838,7 +5857,7 @@
           "required": false,
           "declaration": {
             "description": "System prompt · the standing instruction, sent ahead of `prompt:` and unchanged by it.",
-            "type": "string"
+            "$ref": "#/$defs/promptText"
           },
           "siblings": [
             "max_tokens",
@@ -5856,7 +5875,7 @@
           "required": false,
           "declaration": {
             "description": "System prompt · the standing instruction, sent ahead of `prompt:` and unchanged by any turn of the loop.",
-            "type": "string"
+            "$ref": "#/$defs/promptText"
           },
           "siblings": [
             "max_tokens_total",

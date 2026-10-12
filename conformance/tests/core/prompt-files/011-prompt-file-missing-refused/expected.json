@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-PROMPT-002",
+      "category": "validation_error"
+    }
+  ],
+  "note": "02-verbs §Prompt files · inside the boundary, a file that does not resolve at compose time is refused · never start a run with an unread prompt."
+}

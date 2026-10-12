@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-prompt-file-passes
+permits:
+  fs: { read: ["prompts/**"] }   # the prompt text reaches the model · a read inside the boundary
+tasks:
+  brief:
+    infer:
+      prompt: { file: "prompts/brief.md" }

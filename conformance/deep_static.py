@@ -411,6 +411,9 @@ def _task_required_absent(t: dict) -> set[str]:
         for sk in _static_skill_paths(ag):
             req.add("fs")
             break
+    # 02 §Prompt files · a lawful prompt file's text reaches the model: an fs read.
+    if _static_prompt_paths(t):
+        req.add("fs")
     return req
 
 
@@ -436,6 +439,131 @@ def _skill_path_admitted(path: str, permits: dict) -> bool:
     fs = permits.get("fs") if isinstance(permits.get("fs"), dict) else {}
     reads = fs.get("read") if isinstance(fs.get("read"), list) else []
     return _taint_globbed(posixpath.normpath(path), reads)
+
+
+# 02 §Prompt files · `prompt:` / `system:` of infer and agent may name a project
+# file as `{ file: <path> }`. The file's text reaches the model, so a lawful
+# path is an fs read requirement exactly like a skills: entry, judged BEFORE
+# the read; its text is then judged by every text law as inline text.
+_PROMPT_VERBS = ("infer", "agent")
+_PROMPT_FIELDS = ("prompt", "system")
+_PROMPT_CAP = 65536
+_URI_OR_DRIVE = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:")
+
+
+def _prompt_path_reason(raw, naming_rel: str = ".") -> str | None:
+    """Why a prompt file's path breaks the lexical path law or climbs past the
+    project root (the naming file sits at `naming_rel` inside it), or None."""
+    if not isinstance(raw, str) or not raw:
+        return "the path is empty"
+    if "${{" in raw:
+        return "a ${{ }} template"
+    if _SKILL_GLOB.search(raw):
+        return "a glob"
+    if raw.startswith("/"):
+        return "an absolute path"
+    if "\\" in raw:
+        return "a backslash"
+    if _URI_OR_DRIVE.match(raw):
+        return "a drive or a URI scheme"
+    segments = raw.split("/")
+    if segments[0] == ".":
+        segments = segments[1:]
+    for seg in segments:
+        if seg == "":
+            return "an empty segment"
+        if seg != ".." and seg.startswith("."):
+            return "a hidden or . segment"
+    import posixpath
+    joined = posixpath.normpath(posixpath.join(naming_rel, raw))
+    if joined == ".." or joined.startswith("../"):
+        return "a .. that climbs past the project root"
+    return None
+
+
+def _prompt_file_refs(t: dict) -> list[tuple[str, str, object]]:
+    """Every `{ file: … }` prompt or system of a task · (verb, field, path)."""
+    out: list[tuple[str, str, object]] = []
+    for verb in _PROMPT_VERBS:
+        body = t.get(verb)
+        if not isinstance(body, dict):
+            continue
+        for field in _PROMPT_FIELDS:
+            value = body.get(field)
+            if isinstance(value, dict) and set(value) == {"file"}:
+                out.append((verb, field, value.get("file")))
+    return out
+
+
+def _static_prompt_paths(t: dict) -> list[str]:
+    """The prompt files of a task whose path keeps the lexical law: the reads
+    the boundary judges (a broken path is NIKA-PROMPT-001, never a boundary
+    question)."""
+    return [raw for _, _, raw in _prompt_file_refs(t) if _prompt_path_reason(raw) is None]
+
+
+def _prompt_err(number: str, detail: str) -> dict:
+    return {"code": f"NIKA-PROMPT-{number}", "namespace": "NIKA-PROMPT",
+            "category": "validation_error",
+            "detail": f"{detail} · 02-verbs §Prompt files · check≡run"}
+
+
+def compose_prompt_files(doc: dict, base_dir=None) -> tuple:
+    """02 §Prompt files · the compose step. Returns the document with every
+    admitted, readable prompt file replaced by its text, so the templating,
+    VAR and secret-flow laws judge it exactly as inline text, and the
+    NIKA-PROMPT findings. A path that breaks the lexical law is
+    NIKA-PROMPT-001 at once; a lawful path the read boundary does not admit
+    is never opened (NIKA-AUTH-006 / NIKA-SEC-004 are the boundary's).
+    Without a base_dir only the lexical law is judged."""
+    import copy
+    errs: list[dict] = []
+    if not isinstance(doc, dict):
+        return doc, errs
+    composed = copy.deepcopy(doc)
+    permits = doc.get("permits")
+    for (tid, t), (_, kept) in zip(iter_tasks(doc), iter_tasks(composed)):
+        for verb, field, raw in _prompt_file_refs(t):
+            where = f"task '{tid}' {verb}.{field} file {raw!r}"
+            reason = _prompt_path_reason(raw)
+            if reason is not None:
+                errs.append(_prompt_err("001", f"{where} breaks the path law ({reason})"))
+                continue
+            if base_dir is None:
+                continue
+            if not isinstance(permits, dict) or not _skill_path_admitted(raw, permits):
+                continue  # the boundary refuses (AUTH-006 · SEC-004) · never opened
+            import posixpath
+            path = Path(base_dir)
+            linked = False
+            for seg in posixpath.normpath(raw).split("/"):
+                path = path / seg
+                if path.is_symlink():
+                    linked = True
+                    break
+            if linked:
+                errs.append(_prompt_err("001", f"{where} resolves through a symbolic link"))
+                continue
+            try:
+                if not path.is_file():
+                    raise OSError("not a regular file")
+                size = path.stat().st_size
+                data = path.read_bytes() if size <= _PROMPT_CAP else None
+            except OSError:
+                errs.append(_prompt_err(
+                    "002", f"{where} is missing, unreadable or not a regular file"))
+                continue
+            if data is None:
+                errs.append(_prompt_err(
+                    "003", f"{where} holds {size} bytes, over the 65,536-byte cap"))
+                continue
+            try:
+                text = data.decode("utf-8")
+            except UnicodeDecodeError:
+                errs.append(_prompt_err("003", f"{where} is not valid UTF-8"))
+                continue
+            kept[verb][field] = text
+    return composed, errs
 
 
 def _infer_permits_block(tasks: list) -> dict:
@@ -489,6 +617,8 @@ def _infer_permits_block(tasks: list) -> dict:
                     keep(tools, _static_str(w))
             for sk in _static_skill_paths(ag):
                 keep(reads, sk)
+        for pf in _static_prompt_paths(t):
+            keep(reads, pf)
     block: dict = {}
     if tools:
         block["tools"] = sorted(tools)
@@ -1811,6 +1941,15 @@ def deep_static_errors(doc: dict, base_dir=None) -> list[dict]:
                                      "detail": f"task '{tid}' · skills: path '{sk}' outside "
                                                "permits.fs.read (02 §Agent Skills · the skill "
                                                "text reaches the model · grant the path)"})
+            # 02 §Prompt files · the prompt file read is inside permits.fs.read,
+            # judged BEFORE the file is opened.
+            for pf in _static_prompt_paths(t):
+                if not _skill_path_admitted(pf, permits):
+                    errs.append({"code": "NIKA-SEC-004", "namespace": "NIKA-SEC",
+                                 "category": "security_error",
+                                 "detail": f"task '{tid}' · prompt file '{pf}' outside "
+                                           "permits.fs.read (02 §Prompt files · the text "
+                                           "reaches the model · grant the path)"})
 
     return errs
 

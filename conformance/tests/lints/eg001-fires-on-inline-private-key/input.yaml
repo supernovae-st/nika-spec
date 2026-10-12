@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: eg-inline-key
+tasks:
+  brief:
+    infer:
+      prompt: |
+        Sign the release with this key:
+        -----BEGIN PRIVATE KEY-----
+        not-a-key
+        -----END PRIVATE KEY-----

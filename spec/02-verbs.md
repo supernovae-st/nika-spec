@@ -86,14 +86,100 @@ research:
 
 | Field | Required | Type | Notes |
 |---|---|---|---|
-| `prompt` | yes | string | User prompt · may use `${{ ... }}` substitution |
-| `system` | no | string | System prompt |
+| `prompt` | yes | string, or `{ file: <path> }` | User prompt · may use `${{ ... }}` substitution · or the text of a project file ([§Prompt files](#prompt-files---file--normative)) |
+| `system` | no | string, or `{ file: <path> }` | System prompt · or the text of a project file ([§Prompt files](#prompt-files---file--normative)) |
 | `model` | no | string | Override workflow default · `<provider>/<name>` · see stdlib/providers-v0.1.md |
 | `temperature` | no | number 0-2 | Sampling temperature |
 | `max_tokens` | no | integer | Max output tokens · provider-dependent default · an answer the provider cuts at this cap fails (`NIKA-INFER-005`) · a model that reasons before it answers draws its reasoning from this budget: give it room (16,384), or a low `run.reasoning.effort` its route documents; too little returns an empty answer (`NIKA-INFER-004`) |
 | `schema` | no | object | raw JSON Schema · structured output validation — the **out-of-core hatch**; the typed door is task-level `returns:` ([09](./09-types.md) · both on one task = `NIKA-TYPE-003`). Numeric facts (`0\|1\|3`, counts, coded levels) are `type: integer` with a numeric `enum` — never `enum: ["0","1","3"]`. Models emit JSON numbers; a string-digit enum can reject the call before coerce (reference engine hint `digit-string-enum`). The model extracts facts; `nika:jq` or `nika:decide` is the law ([11](./11-decision.md) · `examples/13-extract-then-law.nika`) |
 | `thinking` | no | object | Extended thinking · `{ enabled, budget_tokens }` |
 | `vision` | no | array | Image inputs · each `{ source: file|url, path|url, … }` |
+
+### Prompt files · `{ file: }` (normative)
+
+A prompt kept beside the workflow is part of the program when the field names
+it: `prompt:` and `system:` (of `infer:` and of `agent:`) take either a string
+or the closed mapping `{ file: "<path>" }`, whose text is the field's value.
+
+```yaml
+tasks:
+  brief:
+    infer:
+      system: { file: "./prompts/editor.md" }
+      prompt: { file: "./prompts/brief.md" }   # may use ${{ inputs.topic }} like inline text
+```
+
+```yaml
+permits:
+  fs: { read: ["./prompts/**"] }               # the text reaches the model · a read inside the boundary
+```
+
+- **The shape is closed.** The mapping carries exactly one key, `file`, a
+  non-empty string. Another key is `NIKA-PARSE-005`; any other shape is the
+  field's type error.
+- **The path law.** The path is static (no `${{ }}`, no glob) and relative
+  (no leading `/`, no `\`, no drive letter, no URI scheme). It resolves from
+  the directory of the workflow file that names it, like a `skills:` path and
+  a composed child's target ([14](./14-composition.md)), never from the
+  working directory. A leading `./` is allowed; an empty segment, any other
+  `.` segment and a hidden name (a segment beginning with `.` other than
+  `..`, such as `.env` or `.ssh`) are not.
+- **Containment by the project root.** Joined to the naming file's folder
+  and normalized lexically, the path stays inside the **project root**: the
+  folder holding the project file (`nika.yaml`) that governs the run, or the
+  root the run admitted, or, when no project file governs it, the root
+  workflow's own folder; a registry package's root is its package. A `..`
+  segment is allowed while the path stays inside, so a child in
+  `workflows/` names `../prompts/brief.md` at the project root, and a `..`
+  that climbs past the root is refused. Resolved, inside the boundary, no
+  component between the project root and the file is a symbolic link. A
+  broken path law is `NIKA-PROMPT-001`.
+- **The authority law.** The file's text reaches the model provider, so the
+  read is the class of `nika:read` and of a `skills:` file: the path as the
+  naming workflow writes it must be admitted by that workflow's declared
+  `permits.fs.read` boundary (a child that names `../prompts/brief.md`
+  grants that path), judged
+  **before** the read (`NIKA-AUTH-006` under an absent block · `NIKA-SEC-004`
+  outside a declared one), exactly as [§Agent Skills](#agent-skills--skills)
+  states.
+- **The read law.** The file is read at **compose time**, before the run and
+  never mid-run. A missing, unreadable or non-regular file is
+  `NIKA-PROMPT-002`. Its bytes MUST be valid UTF-8 and at most **65,536**;
+  otherwise `NIKA-PROMPT-003`.
+- **One templating law.** The file's text is interpolated exactly as the same
+  text written inline in the field: the same `${{ … }}` scopes and the same
+  VAR laws ([04](./04-variables.md)), judged statically at check. A `${{`
+  inside a file is never literal, and a secret reaching the provider through
+  a file meets the same secret-flow laws as one written inline
+  ([10](./10-authority.md)).
+- **Program text, bound by its bytes.** The text is the field's value for
+  every purpose: the Semantic IR carries it as resolved text, so the semantic
+  identity and the task's resume identity commit to it ([15](./15-proof.md))
+  and editing the file re-runs the task; the trace records the path and the
+  digest of the bytes read; a consent preview shows the text as it shows an
+  inline prompt; a run bound to an admitted world refuses a prompt file whose
+  digest moved, as it refuses a moved child.
+- **A door that reads no files says so.** A checker that judges a source
+  without its files (an editor buffer, a source string) still judges the
+  field's shape and path law, names each prompt file it did not read, and
+  never reports their read, authority or templating laws as held.
+- **Registry packages carry their prompt files.** A registry child's prompt
+  file resolves inside its own package, pinned by the package digest, never
+  in the caller's tree.
+
+Order of judgment: the shape, the path as written and its containment,
+then the authority law, then the resolution (no symbolic link) and the read
+law, then the templating law over the text. An ungranted path is never
+opened.
+
+**A private key in a prompt is flagged (normative for linters ·
+advisory).** A conformant linter warns `egress/001 private-key-in-prompt`
+when a `prompt:` or `system:` text, inline or the text of a prompt file,
+holds a PEM private-key block (a line `-----BEGIN … PRIVATE KEY-----`): a
+credential bound for the model provider. The rule judges inline text and
+file text alike, never one more strictly than the other, and refuses
+nothing; a secret the provider needs belongs in `secrets:`, whose egress
+laws apply ([10](./10-authority.md)).
 
 ### Conformance
 
@@ -104,6 +190,7 @@ A v0.1-compliant engine MUST ·
 - Validate the response against `schema` if present · MAY auto-retry validation failures internally before surfacing `NIKA-INFER-002` (engine-configurable · the same rule as [05 §structured output](./05-errors.md#structured-output-validation))
 - **Fail an answer cut at the output cap** · when the provider reports that it stopped at `max_tokens` (Anthropic `max_tokens` · OpenAI-compatible `length` · Gemini `MAX_TOKENS`), the task fails with `NIKA-INFER-005` (`budget_error` · not transient): the visible text received is preserved at `error.details.partial_output` and the stop reason at `error.details.stop_reason`. A cut answer is never the task output and is never validated against `schema:` (it would fail `NIKA-INFER-002` and hide its cause); an empty visible answer stays `NIKA-INFER-004`. On a route that reasons by default the cap also pays for the reasoning. A partial answer that is acceptable is recovered explicitly through `on_error:`
 - **Reject** any unknown field with a clear error (`NIKA-PARSE-005`) — the choice this line used to leave open is closed by [07 §unknown key](./07-conformance.md#an-unknown-key-is-an-error-at-every-level-normative--d-2026-08-11-n20): a key can REMOVE authority, so accept-and-warn fails open
+- Resolve a `{ file: }` prompt or system at compose time under [§Prompt files](#prompt-files---file--normative) · the path law (`NIKA-PROMPT-001`), the read boundary before the read (`NIKA-AUTH-006` · `NIKA-SEC-004`), the read law (`NIKA-PROMPT-002` · `NIKA-PROMPT-003`) and the inline templating law over the text · never start a run with an unread or unjudged prompt file
 
 ### Subscription harness access (normative)
 
@@ -357,8 +444,8 @@ research:
 
 | Field | Required | Type | Notes |
 |---|---|---|---|
-| `system` | no | string | System prompt |
-| `prompt` | yes | string | Initial user message (same field name as `infer:` · consistent) |
+| `system` | no | string, or `{ file: <path> }` | System prompt · or the text of a project file ([§Prompt files](#prompt-files---file--normative)) |
+| `prompt` | yes | string, or `{ file: <path> }` | Initial user message (same field name and forms as `infer:` · consistent) |
 | `model` | no | string | Override workflow default · `<provider>/<name>` |
 | `tools` | no | array | Tool whitelist · glob patterns · **default-deny** · if absent the agent gets NO tools (pure conversation · least-privilege). Grant explicitly. |
 | `skills` | no | array | [Agent Skill](https://agentskills.io) file paths (each an agentskills.io-shape `SKILL.md`) · **explicit static paths only** — no globs, no `${{ }}` templates (the `permits:` explicitness law) · loaded at **compose time**, **inside `permits.fs.read`** (the text reaches the model), and injected into the system context (§Agent Skills below) |

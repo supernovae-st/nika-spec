@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-AUTH-006",
+      "category": "security_error"
+    }
+  ],
+  "note": "02-verbs §Prompt files · the text reaches the model, so the read is the nika:read class: under an absent block it is an effect with zero authority, judged BEFORE the file beside this fixture is opened · the twin of 001."
+}

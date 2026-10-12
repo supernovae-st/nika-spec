@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: comp-brief-child
+permits:
+  fs: { read: ["../prompts/**"] }
+tasks:
+  brief:
+    infer:
+      prompt: { file: "../prompts/brief.md" }
+outputs:
+  brief: ${{ tasks.brief.output }}

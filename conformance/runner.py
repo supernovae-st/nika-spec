@@ -64,6 +64,7 @@ import yaml
 from jsonschema import Draft202012Validator
 
 from deep_static import (deep_static_errors, consent_errors, net_before_exec_errors,
+                         compose_prompt_files,
                          shared_mutation_errors)
 from composition_core import composition_errors
 from trifecta_core import trifecta_errors
@@ -1153,18 +1154,25 @@ def validate_workflow(doc: dict, validator: Draft202012Validator,
                           f"(as a key) · got keys: {got}")
         errs.append({"namespace": "NIKA-PARSE", "category": "validation_error",
                      "detail": detail})
-    errs.extend(cross_ref_errors(doc))
-    errs.extend(interpolation_errors(doc))
-    errs.extend(deep_static_errors(doc, base_dir=base_dir))
-    errs.extend(type_core_errors(doc))
-    errs.extend(values_core_errors(doc))
-    errs.extend(consent_errors(doc))
-    errs.extend(net_before_exec_errors(doc))
-    errs.extend(trifecta_errors(doc))
-    errs.extend(secret_output_errors(doc))
+    # 02 §Prompt files · compose first: a prompt file's text is judged by every
+    # text law exactly as inline text; the boundary still reads the file names.
+    composed, prompt_errs = compose_prompt_files(doc, base_dir)
+    errs.extend(prompt_errs)
+    errs.extend(cross_ref_errors(composed))
+    errs.extend(interpolation_errors(composed))
+    for err in deep_static_errors(doc, base_dir=base_dir) + (
+            deep_static_errors(composed, base_dir=base_dir) if composed is not doc else []):
+        if err not in errs:
+            errs.append(err)
+    errs.extend(type_core_errors(composed))
+    errs.extend(values_core_errors(composed))
+    errs.extend(consent_errors(composed))
+    errs.extend(net_before_exec_errors(composed))
+    errs.extend(trifecta_errors(composed))
+    errs.extend(secret_output_errors(composed))
     errs.extend(composition_errors(doc, base_dir))
     if canon is not None:
-        errs.extend(stdlib_surface_errors(doc, canon))
+        errs.extend(stdlib_surface_errors(composed, canon))
     return {"valid": not errs, "errors": errs}
 
 

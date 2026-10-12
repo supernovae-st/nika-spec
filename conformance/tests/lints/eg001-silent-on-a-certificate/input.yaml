@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: eg-certificate
+tasks:
+  brief:
+    infer:
+      prompt: |
+        Check this certificate:
+        -----BEGIN CERTIFICATE-----
+        not-a-cert
+        -----END CERTIFICATE-----
