@@ -1,0 +1,10 @@
+{
+  "workflow_state": "success",
+  "tasks": {
+    "approve": {
+      "status": "success",
+      "output": true
+    }
+  },
+  "note": "builtins-v0.1.md §prompt · the unattended confirm uses its default, the word yes read as true. Authored contract · reference engine observation pending."
+}

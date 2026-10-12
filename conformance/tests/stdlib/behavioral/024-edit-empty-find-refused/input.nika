@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: Apache-2.0
+# Stdlib BEHAVIORAL · an empty `find:` names nothing to edit
+# (builtins-v0.1.md §edit · NIKA-BUILTIN-EDIT-001), refused before the file
+# is read: replacing it would write the replacement between every byte. The
+# value arrives resolved from an input left empty, so the run judges it.
+nika: rt-stdlib-edit-empty-find
+permits:
+  tools: ["nika:write", "nika:edit"]
+  fs: { write: ["./out/**"], read: ["./out/**"] }
+inputs:
+  old: { type: string }
+tasks:
+  put:
+    invoke:
+      tool: "nika:write"
+      args: { path: "./out/conf.txt", content: "price: 10", create_dirs: true }
+  change:
+    with:
+      written: ${{ tasks.put.output }}
+    invoke:
+      tool: "nika:edit"
+      args: { path: "./out/conf.txt", find: "${{ inputs.old }}", replace: "price: 12" }

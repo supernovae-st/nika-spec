@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+# Stdlib BEHAVIORAL · YAML 1.2 reads an unquoted `yes` as a string, and a
+# confirm default written as a person answers a confirm reads as that
+# answer (builtins-v0.1.md §prompt): with no human to answer, the run
+# confirms.
+nika: rt-stdlib-prompt-confirm-word
+permits: { tools: ["nika:prompt"] }
+tasks:
+  approve:
+    invoke:
+      tool: "nika:prompt"
+      args: { message: "Ship the weekly report?", default: yes }

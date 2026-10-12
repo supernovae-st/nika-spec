@@ -1,0 +1,14 @@
+{
+  "workflow_state": "failure",
+  "tasks": {
+    "put": {
+      "status": "success",
+      "output": "./out/conf.txt"
+    },
+    "change": {
+      "status": "failure",
+      "error_code": "NIKA-BUILTIN-EDIT-001"
+    }
+  },
+  "note": "builtins-v0.1.md §edit · an empty find is the authoring bug EDIT-001, refused before the file is read. Authored contract · reference engine observation pending."
+}
