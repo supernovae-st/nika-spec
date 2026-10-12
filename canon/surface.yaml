@@ -355,3 +355,15 @@ surface:
     exposure: authorable
     notes: Import-c0 (canon-flip) · live v1 namespace per canon.yaml (spec/04-variables.md) · the task-record/out
       projection trees are governed by LAW-SURFACE-0221 + LAW-SURFACE-0222.
+  - id: namespace_run
+    status: active
+    owner: spec
+    law_ids:
+      - LAW-SURFACE-0203
+    introduced_in: '0.123'
+    spelling: run
+    kind: namespace
+    family: namespace
+    exposure: authorable
+    notes: Decision of 2026-10-12 · the facts of this run, a read-only runtime namespace the engine sets before the
+      first task (spec/04-variables.md) · the CLOSED set run.scheduled_for · run.missed · any other run.X is NIKA-VAR-001.

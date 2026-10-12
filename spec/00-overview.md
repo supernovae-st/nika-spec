@@ -46,8 +46,8 @@ Standards work · SQL · GraphQL · OpenAPI · Dockerfile · GitHub Actions YAML
 
 3.  DAG SHAPE       tasks · with (data edges) · after (control) · when · for_each
 
-4.  VARIABLES       ${{ ... }} = CEL · ONE syntax · 5 namespaces
-                    inputs · const · secrets · with · tasks
+4.  VARIABLES       ${{ ... }} = CEL · ONE syntax · 6 namespaces
+                    inputs · const · secrets · with · tasks · run
 
 5.  ERROR MODEL     NIKA-<NS>-<NNN> codes · retry semantics · structured output
 ```
@@ -158,7 +158,7 @@ outputs:                              # what the workflow returns · symmetric t
 | [01 envelope](./01-envelope.md) | The header · the 9 keys · `nika:` (the mark AND the name) · typed `inputs` · `const` · `secrets` |
 | [02 verbs](./02-verbs.md) | The 4 verbs · signatures · semantics |
 | [03 DAG](./03-dag.md) | Tasks · `with:` data edges · `after:` control · `when` · `for_each` · the four graphs |
-| [04 variables](./04-variables.md) | `${{ inputs · const · secrets · with · tasks }}` · <!-- canon:namespaces -->5<!-- /canon --> namespaces |
+| [04 variables](./04-variables.md) | `${{ inputs · const · secrets · with · tasks · run }}` · <!-- canon:namespaces -->6<!-- /canon --> namespaces |
 | [05 errors](./05-errors.md) | Error codes · retry · structured output schemas |
 | [06 stdlib contract](./06-stdlib-contract.md) | How the stdlib versions independently |
 | [07 conformance](./07-conformance.md) | What « v0.1-compliant » means |

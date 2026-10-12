@@ -7,7 +7,7 @@
 #   sealed outcome_class enum) · the 15 ledger sections (canon/EXCEPTIONS.md ·
 #   SSOT-1 §18) stay AUTHORED and are carried verbatim — editing those is legal.
 # regenerate: python3 scripts/ssot-compiler.py --emit-canon
-# body-sha256: 9b6e12bcd3beab7982585908bef021bc1dabc716dffe3bb72e382f32a046e64e
+# body-sha256: e4b852e8f8ce20728457104f2ec638e5aad095dd90072b17ffc40d3fda4c1a6a
 #   (digest of every byte below the end-of-header line · detached self-hash per PAA-006)
 # ---- end generated header (SSOT-1 §21-23 · the canon flip · C0)
 # nika canonical registry · the single source of truth for Nika canonical facts
@@ -58,7 +58,7 @@ schema_version: 1
 # fast grep-based projection checks (the projector reads `count:` lines).
 counts:
   verbs: 4
-  namespaces: 5
+  namespaces: 6
   builtins: 29
   providers: 18
   extract_modes: 10
@@ -111,7 +111,8 @@ verbs:
     - { name: agent,  semantic: "Multi-turn agentic loop · tool calling · guardrails" }
 
 # ---------------------------------------------------------------- namespaces
-# The 5 substitution namespaces · LOCKED at v1 (spec/04-variables.md · the
+# The 6 substitution namespaces · the first five LOCKED at v1, the sixth added by the decision of
+# 2026-10-12 (run, the facts of this run · spec/04-variables.md) (spec/04-variables.md · the
 # three value authorities inputs/const/secrets — the E-split family
 # (R3a · LAW-SURFACE-0201) that succeeded the dead vars/env spellings at C2 ·
 # config, the fourth, died at the envelope nuke 2026-08-12 (a deployment knob
@@ -119,7 +120,7 @@ verbs:
 # namespaces with/tasks · loop-locals item/index are for_each-scoped locals ·
 # NOT a namespace).
 namespaces:
-  count: 5
+  count: 6
   immutable: true
   reference: spec/04-variables.md
   items:
@@ -128,6 +129,7 @@ namespaces:
     - secrets
     - with
     - tasks
+    - run
 
 # ---------------------------------------------------------------- builtins
 # Post atomic-language audit · 42→27→26→25→22 (-20 · -48% · zero functional loss) → 23 (compose added 2026-06-13 · ADR-093 · agent-loop self-check intrinsic, loop-only like done) → 24 (image_generate added 2026-07-05 · the first stdlib §Media graduate · openai/gemini/mock · assets land on disk, never inline) → 25 (tts_generate added 2026-07-05 · §Audio · local/openai/elevenlabs/mock · sovereign-first) → 26 (image_fx added 2026-07-09 · §Media graduate #3 · the `image editing` deferred row · deterministic artistic effects · byte-identical artifacts · recipe-in-chunk · zero-dep) → 27 (chart added 2026-07-09 · §Media graduate #4 · deterministic zero-dep renderer · byte-identical SVG · sha256 → trace chain).

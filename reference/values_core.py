@@ -66,8 +66,9 @@ VALUE_AUTHORITIES = ("inputs", "const", "secrets")
 # the runtime / local namespaces · legal in ${{ }}, never value authorities.
 # `group` is the fan-in reader (03 §group) — the PLURAL of `tasks`, same
 # runtime family, so the value-authority family and the namespace count are
-# both untouched by it.
-RUNTIME_NAMESPACES = frozenset({"tasks", "group", "with", "item", "index"})
+# both untouched by it. `run` is the sixth namespace (04 §run · decision
+# 03): the facts of this run, set by the engine, read-only, never an authority.
+RUNTIME_NAMESPACES = frozenset({"tasks", "group", "with", "item", "index", "run"})
 # the dead forms · each carries its own teaching (LAW-GRAMMAR-0201 · 0202)
 DEAD_FORMS = {"vars": "NIKA-VALUES-001", "env": "NIKA-VALUES-002"}
 

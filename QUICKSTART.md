@@ -249,7 +249,7 @@ contract, the runtime is an implementation detail.
 
 You touched all 5 pillars · the **envelope** (`nika: <name>` + `tasks:`) · the
 **4 verbs** · the **DAG** (`with:`/`after:` edges + task outputs) · **variables**
-(`${{ }}` · <!-- canon:namespaces -->5<!-- /canon --> namespaces) · and the start of the **error model** (engines
+(`${{ }}` · <!-- canon:namespaces -->6<!-- /canon --> namespaces) · and the start of the **error model** (engines
 return `NIKA-<NS>-<NNN>` codes · see [spec/05-errors.md](./spec/05-errors.md)) ·
 plus the workflow's **`outputs:`** return contract (what `nika run` prints + what
 a caller receives).

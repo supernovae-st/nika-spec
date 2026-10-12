@@ -1017,16 +1017,19 @@ firer comes back. The machine that fires the beat applies it; the project file o
 | `manqué:` | What fires | What each run receives |
 |---|---|---|
 | `sauter` | nothing: every missed slot is skipped | none |
-| `rattraper` | the latest missed slot, once | that slot's instant |
-| `{ rattraper: N }` | up to the N latest missed slots, one run each, oldest first | its own slot's instant |
-| `rattraper-une-fois` | one run for the whole silence | the latest slot's instant, and the missed range: the first and the last missed slot and their count |
+| `rattraper` | the latest missed slot, once | that slot's instant, as `${{ run.scheduled_for }}` |
+| `{ rattraper: N }` | up to the N latest missed slots, one run each, oldest first | its own slot's instant, as `${{ run.scheduled_for }}` |
+| `rattraper-une-fois` | one run for the whole silence | the latest slot's instant as `${{ run.scheduled_for }}`, and the missed range as `${{ run.missed }}`: the first and the last missed slot and their count |
 
 `N` is a whole number from 1; anything else is refused when the project is checked. Before
 anything is armed, the activation shows the worst spend the law allows, « jusqu'à N × plafond »
 (one `plafond` for `rattraper` and for `rattraper-une-fois`).
 
 `rattraper` replays one slot as if it had fired on time. `rattraper-une-fois` runs once on behalf
-of the whole silence, and is told how long that silence was.
+of the whole silence, and is told how long that silence was. A run fired on time is told its slot
+the same way, and a run started by hand its own start; the run's real start stays what the clock
+gives, so a date window computed from « now » shifts on a late run while one computed from
+`run.scheduled_for` does not ([04 §`run`](./04-variables.md)).
 
 ```yaml
 arm:

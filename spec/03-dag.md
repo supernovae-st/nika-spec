@@ -523,11 +523,11 @@ prompt: "${{ has(inputs.style) ? inputs.style : 'be concise' }}"
 when:   ${{ with.scan_log.contains('ERROR') }}      # branch on substring · the log arrived via with:
 ```
 
-**Namespaces are CEL variables** · the <!-- canon:namespaces -->5<!-- /canon --> namespaces (`inputs`
-· `const` · `secrets` · `with` · `tasks`) are bound as top-level CEL variables — `tasks.*` on the
+**Namespaces are CEL variables** · the <!-- canon:namespaces -->6<!-- /canon --> namespaces (`inputs`
+· `const` · `secrets` · `with` · `tasks` · `run`) are bound as top-level CEL variables — `tasks.*` on the
 boundary surfaces only. **Inside a `for_each` task body, two
 more scoped CEL variables are bound** · `item` (the current element) and `index`
-(its 0-based position), available ONLY within that task (the <!-- canon:namespaces -->5<!-- /canon --> namespaces are
+(its 0-based position), available ONLY within that task (the <!-- canon:namespaces -->6<!-- /canon --> namespaces are
 global · `item`/`index` are for_each-local · see `for_each` below).
 
 #### The binding is the edge — no invisible edges
