@@ -374,7 +374,7 @@ infer:
   prompt: "..."
 ```
 
-**Models** · `claude-sonnet-5-5` · `claude-opus-5-5` · `claude-haiku-5-5` · (and any newer · model name pass-through · `nika catalog` lists the ones the engine prices).
+**Models** · `claude-sonnet-5-5` · `claude-opus-5-5` · `claude-haiku-5-5` · (and any newer · model name pass-through · `nika catalog` lists the ones the engine knows, and `nika check` reports whether it prices one).
 
 **Auth** · `ANTHROPIC_API_KEY` env var · OR engine config.
 
@@ -494,7 +494,7 @@ NIM).
 
 **Models** · catalog ids are `org/model`: the workflow form is
 `nvidia/<org>/<model>`. E.g. `nvidia/nvidia/nemotron-3-super-120b-a12b` ·
-`nvidia/nvidia/nemotron-3-nano-30b-a3b` · `nvidia/deepseek-ai/deepseek-r1`.
+`nvidia/nvidia/nemotron-3-nano-30b-a3b` · `nvidia/meta/llama-3.1-70b-instruct`.
 
 **Auth** · `NVIDIA_API_KEY` env var (`nvapi-…` from build.nvidia.com ·
 free developer tier · ~40 RPM baseline).
@@ -513,7 +513,7 @@ fully local via `ollama/…`.
 
 ```yaml
 infer:
-  model: moonshot/kimi-k3
+  model: moonshot/kimi-k2
   prompt: "..."
 ```
 
@@ -525,10 +525,12 @@ a self-host path is first-class · see the sovereignty note below). Added
 2026-07-17 (ADR-105 · the frontier open-weight access category · the
 openrouter and ADR-104 precedent applied).
 
-**Models** · `moonshot/kimi-k3` (default · thinking · frontier) ·
-`moonshot/kimi-k2.6` (the cheaper seat) · `moonshot/kimi-k2.7-code` /
-`moonshot/kimi-k2.7-code-highspeed` (coding) · the model name passes through
-verbatim.
+**Models** · the engine 0.123.0 catalog lists `moonshot/kimi-k2` (its
+default) and `moonshot/kimi-k2.5`; any other Kimi name (`kimi-k3` ·
+`kimi-k2.6` · `kimi-k2.7-code` · `kimi-k2.7-code-highspeed`) passes through
+verbatim. **Engine 0.123.0 prices no Moonshot model**: `nika check` counts
+the task as unpriced, and a run capped with `--max-cost-usd` refuses to
+start (`NIKA-1709`). Drop the cap, or pick a priced seat for a capped run.
 
 **Auth** · `MOONSHOT_API_KEY` env var (`sk-…`).
 
@@ -610,7 +612,7 @@ infer:
   prompt: "..."
 ```
 
-**Models** · `grok-4.7` · `grok-4.3` · `grok-3` · (pass-through).
+**Models** · `grok-4.7` · `grok-4.3` · (pass-through).
 
 **Auth** · `XAI_API_KEY` env var.
 

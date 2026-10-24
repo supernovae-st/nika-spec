@@ -164,13 +164,22 @@ engine at its next `SPEC_PIN` bump.
 ### Fixed · model ids a reader can paste (2026-10-24)
 
 - The swap hints, the chapter examples, the QUICKSTART and the providers
-  stdlib name ids the 0.123.0 catalog resolves and prices:
-  `groq/llama-3.3-70b-versatile` (`groq/llama-3.3-70b` is refused: Cerebras
-  serves that model), `mistral/mistral-large-latest` and
+  stdlib name ids the 0.123.0 catalog resolves and prices, Moonshot aside
+  (below): `groq/llama-3.3-70b-versatile` (`groq/llama-3.3-70b` is
+  refused: Cerebras serves that model), `mistral/mistral-large-latest` and
   `mistral/mistral-small-latest` (the bare names are uncatalogued and
-  unpriced, so a `--max-cost-usd` run refuses them with `NIKA-1709`), and
-  current Anthropic, DeepSeek, Gemini and xAI ids in place of retired ones.
-  Names stay pass-through; `nika catalog` lists what an engine prices.
+  unpriced, so a `--max-cost-usd` run refuses them with `NIKA-1709`),
+  current Anthropic, DeepSeek, Gemini and xAI ids in place of retired ones,
+  and `nvidia/meta/llama-3.1-70b-instruct` in place of the unpriced
+  `nvidia/deepseek-ai/deepseek-r1`.
+- The Moonshot section's example and default were `moonshot/kimi-k3`, which
+  the catalog does not list. It now names the two ids the catalog lists,
+  `moonshot/kimi-k2` (its default) and `moonshot/kimi-k2.5`, and says that
+  engine 0.123.0 prices no Moonshot model, so a `--max-cost-usd` run refuses
+  any of them with `NIKA-1709`.
+- Names stay pass-through. `nika catalog` lists the ids an engine knows,
+  priced or not (it lists `xai/grok-3`, which 0.123.0 does not price);
+  `nika check` reports whether a task's model is priced.
 
 ---
 
