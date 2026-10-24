@@ -27,6 +27,18 @@ engine at its next `SPEC_PIN` bump.
 - `verify.py` refuses an `amended:` note that is not `YYYY-MM-DD · <note>`,
   is out of date order or is dated ahead of today.
 
+### Fixed · the schema address editors use (2026-10-24)
+
+- 07 §Editor tooling shows the modeline at the schema's own `$id`,
+  `https://nika.sh/spec/v1/workflow.schema.json`, which the examples, the
+  templates and `nika init` already use, and names `nika spec --schema`
+  for offline use. The per-minor address it describes as the target
+  (`nika.sh/schema/v0.1/…`) is marked as not served: it answers 404, and a
+  reader who copied it got no schema. The normative paragraph keeps its
+  law and its two causes.
+- `llms.txt` gives agents the same address, and both llms files now carry
+  17 · Trace, which they left out.
+
 ### Fixed · pre-commit hooks a consumer can install (2026-10-24)
 
 - `nika-check-strict` ran `nika check --strict`, a flag the engine rejects,

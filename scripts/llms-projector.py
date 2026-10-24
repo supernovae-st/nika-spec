@@ -48,6 +48,7 @@ FULL_ORDER = [
     "spec/14-composition.md",
     "spec/15-proof.md",
     "spec/16-projections.md",
+    "spec/17-trace.md",
     "conformance/runner-protocol.md",
     "CONFORMANT_IMPLEMENTATIONS.md",
     "governance/nep-0000-the-nep-process.md",
@@ -85,8 +86,8 @@ def build_llms_txt(c: dict) -> str:
 > spec · AGPL-3.0 reference engine in Rust (single static binary).
 
 Workflow files are `*.nika`. The JSON Schema gives any editor
-autocomplete + validation via a `yaml-language-server` modeline:
-`{RAW}/schemas/workflow.schema.json`
+autocomplete + validation via a `yaml-language-server` modeline at its own
+`$id`: `https://nika.sh/spec/v1/workflow.schema.json` (offline: `nika spec --schema`)
 
 ## Spec
 
@@ -107,6 +108,7 @@ autocomplete + validation via a `yaml-language-server` modeline:
 - [Composition]({RAW}/spec/14-composition.md): cross-file composition rules
 - [Proof]({RAW}/spec/15-proof.md): receipts · hash chain · replay
 - [Projections]({RAW}/spec/16-projections.md): derived surfaces · one source, many views
+- [Trace]({RAW}/spec/17-trace.md): the run journal · NDJSON frames chained by sha256 · the closed kind vocabulary · the permit witness
 
 ## Standard
 
@@ -123,7 +125,7 @@ one claim form, one governance door.
 ## Reference
 
 - [Canonical registry]({RAW}/canon.yaml): the machine-readable single source of truth
-- [JSON Schema]({RAW}/schemas/workflow.schema.json): editor autocomplete + validation
+- [JSON Schema]({RAW}/schemas/workflow.schema.json): the schema source · editors point at its `$id`, https://nika.sh/spec/v1/workflow.schema.json
 - [Builtins]({RAW}/stdlib/builtins-v0.1.md): the {c["builtins"]} canonical builtins
 - [Providers]({RAW}/stdlib/providers-v0.1.md): the {c["providers"]}-provider catalog (local-first)
 - [Quickstart]({RAW}/QUICKSTART.md): author + check + run a first workflow

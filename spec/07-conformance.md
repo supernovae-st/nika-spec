@@ -164,34 +164,44 @@ this prose spec (kept in sync · the prose is normative on conflict).
 Editors (VS Code · Zed · JetBrains · Neovim) pick it up via the standard
 `yaml.schemas` association (or a `# yaml-language-server: $schema=…` modeline)
 to give **autocomplete + inline validation** as you type, the same DX as
-GitHub Actions and Docker Compose. A working modeline today:
+GitHub Actions and Docker Compose. A working modeline today, at the address
+the schema names as its own `$id` (the examples and templates carry it, and
+`nika init` writes it into the editor settings):
 
 ```yaml
-# yaml-language-server: $schema=https://raw.githubusercontent.com/supernovae-st/nika-spec/main/schemas/workflow.schema.json
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
 nika: my-workflow
 ```
 
+Offline, `nika spec --schema` prints the schema at the spec commit the
+engine embeds, byte for byte.
+
 #### The address MUST become versioned and immutable (normative · D-2026-08-11-N24)
 
-⚠️ **The modeline above points at a moving branch, and that is a defect with
-two independent causes.**
+⚠️ **The modeline above names the whole v1 family, not one schema revision,
+and that is a defect with two independent causes.** (Until 2026-10-24 this page
+showed the `raw.githubusercontent.com/supernovae-st/nika-spec/main/…` form,
+which carries both causes.)
 
 *The first is ours.* Since [§unknown key](#an-unknown-key-is-an-error-at-every-level-normative--d-2026-08-11-n20)
 an unknown key is an error, so this schema's `additionalProperties: false` is
 no longer a lint preference — it is the accepted surface of the language. Served
-from `main`, that surface moves under every editor in the world **while no file
-has changed**. A workflow that validated on Monday shows red on Tuesday because
-a schema it never named was edited. This is precisely the drift the strict rule
-exists to prevent, arriving through the back door.
+at one moving address, that surface moves under every editor in the world
+**while no file has changed**. A workflow that validated on Monday shows red on
+Tuesday because a schema it never named was edited. This is precisely the drift
+the strict rule exists to prevent, arriving through the back door.
 
-*The second is the host's.* `raw.githubusercontent.com` fronts a cache that
-serves stale bytes: a schema can be correct at the commit and wrong at the
-reader for an unspecified window. **Immutable upstream is not immutable at the
-point of use** — measured in this workspace, 2026-08-07.
+*The second is the host's.* A cache in front of the address serves stale bytes:
+a schema can be correct at the commit and wrong at the reader for an
+unspecified window. **Immutable upstream is not immutable at the point of
+use** — measured on `raw.githubusercontent.com` in this workspace,
+2026-08-07.
 
-**The shape.** One address per minor, frozen forever ·
+**The shape.** One address per minor, frozen forever. This address is the
+target and is **not served** (it answers 404 today) ·
 
 ```yaml
+# the target shape · not served yet
 # yaml-language-server: $schema=https://nika.sh/schema/v0.1/workflow.schema.json
 nika: my-workflow
 ```

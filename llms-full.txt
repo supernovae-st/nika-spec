@@ -6841,34 +6841,44 @@ this prose spec (kept in sync · the prose is normative on conflict).
 Editors (VS Code · Zed · JetBrains · Neovim) pick it up via the standard
 `yaml.schemas` association (or a `# yaml-language-server: $schema=…` modeline)
 to give **autocomplete + inline validation** as you type, the same DX as
-GitHub Actions and Docker Compose. A working modeline today:
+GitHub Actions and Docker Compose. A working modeline today, at the address
+the schema names as its own `$id` (the examples and templates carry it, and
+`nika init` writes it into the editor settings):
 
 ```yaml
-# yaml-language-server: $schema=https://raw.githubusercontent.com/supernovae-st/nika-spec/main/schemas/workflow.schema.json
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
 nika: my-workflow
 ```
 
+Offline, `nika spec --schema` prints the schema at the spec commit the
+engine embeds, byte for byte.
+
 #### The address MUST become versioned and immutable (normative · D-2026-08-11-N24)
 
-⚠️ **The modeline above points at a moving branch, and that is a defect with
-two independent causes.**
+⚠️ **The modeline above names the whole v1 family, not one schema revision,
+and that is a defect with two independent causes.** (Until 2026-10-24 this page
+showed the `raw.githubusercontent.com/supernovae-st/nika-spec/main/…` form,
+which carries both causes.)
 
 *The first is ours.* Since [§unknown key](#an-unknown-key-is-an-error-at-every-level-normative--d-2026-08-11-n20)
 an unknown key is an error, so this schema's `additionalProperties: false` is
 no longer a lint preference — it is the accepted surface of the language. Served
-from `main`, that surface moves under every editor in the world **while no file
-has changed**. A workflow that validated on Monday shows red on Tuesday because
-a schema it never named was edited. This is precisely the drift the strict rule
-exists to prevent, arriving through the back door.
+at one moving address, that surface moves under every editor in the world
+**while no file has changed**. A workflow that validated on Monday shows red on
+Tuesday because a schema it never named was edited. This is precisely the drift
+the strict rule exists to prevent, arriving through the back door.
 
-*The second is the host's.* `raw.githubusercontent.com` fronts a cache that
-serves stale bytes: a schema can be correct at the commit and wrong at the
-reader for an unspecified window. **Immutable upstream is not immutable at the
-point of use** — measured in this workspace, 2026-08-07.
+*The second is the host's.* A cache in front of the address serves stale bytes:
+a schema can be correct at the commit and wrong at the reader for an
+unspecified window. **Immutable upstream is not immutable at the point of
+use** — measured on `raw.githubusercontent.com` in this workspace,
+2026-08-07.
 
-**The shape.** One address per minor, frozen forever ·
+**The shape.** One address per minor, frozen forever. This address is the
+target and is **not served** (it answers 404 today) ·
 
 ```yaml
+# the target shape · not served yet
 # yaml-language-server: $schema=https://nika.sh/schema/v0.1/workflow.schema.json
 nika: my-workflow
 ```
@@ -9977,6 +9987,352 @@ them is a reservation, never a promise they exist.
 - [05 · Errors](./05-errors.md) — the diagnostics lane (judgment lives there, not here)
 - [10 · Authority](./10-authority.md) — the flow laws the projection also obeys (structure only)
 - [15 · Proof](./15-proof.md) — the semantic identity the projected graph commits to
+
+<!-- ═══ spec/17-trace.md ═══ -->
+
+# 17 · Trace
+
+> Every run leaves a journal · one NDJSON file, one event per line, each
+> line chained to the last by hash. The trace is the run's flight
+> recorder (`nika trace show|replay|verify`), the resume substrate, and
+> the stream the receipt folds FROM ([15](./15-proof.md)). This chapter
+> makes the dialect NORMATIVE: `trace_format: 2`, the frame grammar, the
+> chain law, the kind vocabulary, and the permit-decision witness
+> (NEP-0007) · the trace stops being an engine-private dialect. What is
+> written here is the OBSERVED wire, grave-not-invented: the conformance
+> golden is a real run's journal, byte-verifiable.
+
+---
+
+## The journal (normative)
+
+One run → at most one journal file · `<trace-dir>/<ISO-compact>-<short
+-id>.ndjson` (production: `.nika/traces/`). Three laws shape it:
+
+- **Lazy open** · file creation waits for the FIRST emitted frame (a run
+  refused before its prologue · audit refusal · composition failure ·
+  leaves no file).
+- **Infallible rider** · journal I/O failure never changes the run's
+  verdict or its primary output; the error surfaces AFTER the run as a
+  note. The journal tees BESIDE the chosen primary lane, byte-identical
+  with or without it.
+- **Append-only** · frames are written in emission order and never
+  rewritten; the chain (below) makes any rewrite evident.
+
+## The frame (normative)
+
+One event per line · one JSON object · the member set:
+
+| Key | Type | Meaning |
+|---|---|---|
+| `chain` | string | sha256 hex of the PREVIOUS line's exact bytes (the chain law below) |
+| `id` | object | `{ "uuid": "<UUIDv7>" }` · unique per frame · time-ordered |
+| `timestamp` | integer | unix epoch **nanoseconds** |
+| `kind` | string | the closed-per-minor kind vocabulary (below) |
+| `fields` | array | ordered `{ "key": string, "value": any }` pairs · the frame's payload |
+| `run` | string \| null | the run correlation id when one is set |
+| `correlation` | string \| null | causal correlation across runs when one is set |
+
+Field VALUES are JSON values (string · number · object-as-string when a
+payload is itself serialized · the observed `permits_json` and `outcome`
+carry serialized JSON as a string, so the frame grammar stays flat).
+Sensitive payloads are hashed by the emitter, never carried raw.
+**Additive law** · a reader MUST ignore an unknown member and an unknown
+`fields` key (report « unrecorded », never guess); an unknown `kind` is
+tolerated by verifiers (the walk continues · the chain still binds it).
+
+## The chain (normative)
+
+The first line's `chain` is the sha256 of the GENESIS tag; every later
+line's `chain` is the sha256 hex of the previous line's EXACT bytes.
+After the run, the last line's hash is the journal's HEAD · printed at
+run end and carried by the seal. Verification recomputes the walk:
+any byte edit, insertion, deletion, or reorder breaks every subsequent
+link (`nika trace verify` · FORGED). The chain proves INTEGRITY of the
+sequence; it does not prove authorship (the seal and anchor rails of
+[15](./15-proof.md) carry authenticity).
+
+## `trace_format: 2` (normative · the version)
+
+The dialect version rides the FIRST frame (the prologue's
+`trace_format` field). It versions the JOURNAL WIRE · orthogonal to
+the language (v1 · never typed in the file · [01 §nika](./01-envelope.md)),
+`receipt_format: 1` (the folded receipt) and
+`graph_format: 3` (the projection). Version 2 is THIS chapter. A wire
+change that breaks a version-2 reader MUST bump it; additive fields and
+additive kinds MUST NOT.
+
+## The prologue (normative · `workflow_started`)
+
+The first frame is `workflow_started`, and it is the run's MANIFEST.
+Version-2 fields (the observed set):
+
+| Field | Meaning |
+|---|---|
+| `workflow` | the workflow id |
+| `permits` | the boundary posture, human-readable (`declared boundary · default-deny` \| the zero-authority note) |
+| `permits_json` | the DECLARED `permits:` block, serialized verbatim · the boundary the run was judged under |
+| `workflow_sha256` / `workflow_sha256_lf` | the source bytes' digest (raw · LF-normalized) |
+| `semantic_hash` | the semantic identity ([15](./15-proof.md) · H(domain ‖ version ‖ JCS(IR))) |
+| `sandbox` | the OS-confinement backend the run selected (`seatbelt` · `landlock` · `noop`, loudly) |
+| `trace_format` | this dialect's version · `2` |
+| `engine_version` | the emitting engine |
+| `platform` | `os/arch` |
+
+An engine MAY add fields (additive law); it MUST NOT drop these.
+
+**The prologue is the run's BOOT MANIFEST** (normative) · beyond the
+identity above it names the CONTRACT the run booted under, so the
+journal self-describes what it ran by rather than leaving a reader to
+infer it ·
+
+| Field | Meaning |
+|---|---|
+| `spec_pin` | the spec commit this engine's conformance was proven at |
+| `stamper_kind` | the event-identity seam the `run:` declaration resolved to · `deterministic` \| `system` |
+| `clock` | the resolved run clock ([01](./01-envelope.md) §`run`) · `virtual` \| `system` |
+| `seed` | present exactly under a determinism demand (`seeded: N` → `N` · `none` → the zero stream); an ambient run carries **no** seed claim |
+| `scheduled_for` | on every run: the value of `${{ run.scheduled_for }}` ([04](./04-variables.md)), RFC 3339 UTC |
+| `scheduled_for_source` | where `scheduled_for` came from · `slot` (the run was fired for a schedule slot) \| `at` (`nika test --at`) \| `start` (the run's own start) |
+| `missed` | present exactly under `manqué: rattraper-une-fois`: the silence the run covers, `{ first, last, count }`, the value of `${{ run.missed }}` |
+
+**A manifest claims only what exists.** Where a fact has no recording
+surface the field is ABSENT and a reader says « unrecorded » — never a
+guessed value, never a fabricated zero. Absence is the honest claim,
+and the additive law above already makes it readable by older readers.
+
+## The kind vocabulary (normative · closed per minor)
+
+Version 2 names exactly these kinds · additive per minor, never
+re-meant:
+
+`workflow_started` · `workflow_completed` · `workflow_failed` ·
+`workflow_cancelled` · `workflow_paused` · `task_scheduled` ·
+`task_started` · `task_completed` · `task_failed` · `task_skipped` · `task_items` ·
+`task_retrying` · `task_recovered` · `task_cancelled` ·
+`task_cache_hit` · `verb_invoked` · `tool_invoked` ·
+`checkpoint_written` · `cost_incurred` · `infer_chunk` ·
+`permit_checked` · `lift` · `run_sealed` ·
+`agent_tools_selected` · `agent_nudge` · `agent_stalled` ·
+`agent_compose_checked` · `agent_budget_checkpoint` · `agent_image_observed`
+
+Per-task terminal frames carry the task's witness fields (the observed
+`task_completed`: `task` · `note` · `duration_ms` · `def_hash` ·
+`input_hash` · `output` · `outcome` · the outcome record serialized).
+
+A `for_each` task's terminal frame (`task_completed` · `task_failed`)
+additionally carries **`items`** inline (additive · reference engine 0.118): ONE
+JSON array text · one row per item in input order · `index` · `item` (the
+item's identity, bounded) · `status` ∈ `ok` · `recovered` · `failed` ·
+`cancelled` · `never_started` · `code` and `message` when an error was recorded. Failures
+2..N reach the journal with their own codes; the items a stopped batch
+never started are named as such.
+
+`cancelled` means an iteration began execution but was abandoned without a
+recorded terminal outcome. `never_started` is reserved for iterations whose
+execution never began. A producer MUST retain an already recorded `ok`,
+`recovered` or `failed` outcome when another iteration stops the batch. It MUST
+NOT relabel pending started iterations as `never_started` to fill the table.
+These are execution-observation states, not evidence that a provider accepted
+a request, that no physical request was sent, or that an external effect was
+rolled back. Cost evidence remains a separate observation.
+
+The `cancelled` item status and its paged count below extend the reference
+engine's 0.121 vocabulary at the next engine MINOR. They do not introduce a
+workflow syntax version or a new trace envelope version. An older reader may
+preserve an unfamiliar inline row as uninterpreted data, or report a table as
+unrecorded; it MUST NOT reinterpret `cancelled` as `never_started`, success or
+zero spend. A chain verdict alone does not prove support for the item vocabulary.
+
+The workflow terminal frames (`workflow_completed` · `workflow_failed` ·
+`workflow_cancelled`) additionally carry the run's **summary** (additive ·
+reference engine 0.118) beside the cost fields (`total_cost_usd` ·
+`unpriced_calls` · `cost_by_source` · `pricing_as_of`): `status` ·
+`elapsed_ms` (the run clock, read through the engine's clock seam) ·
+`tasks_total` · `tasks_ok` · `tasks_failed` · `tasks_recovered` ·
+`tasks_skipped` · `tasks_cancelled` · what a human card computes, so a
+machine reader never re-derives it from the task frames.
+
+### Paged item evidence
+
+A large item table MAY instead be emitted as ordered **`task_items`**
+frames before its task terminal. Each page carries `task`, a zero-based
+integer `page`, and `items` as JSON array text containing whole rows with
+the same shape and global indexes as the inline table. Each page is a
+normal event with its own identity and chain link. It is not a task
+terminal and does not change task state, spend or execution authority.
+
+The terminal then omits inline `items` and closes the page set with:
+
+| Field | Meaning |
+|---|---|
+| `items_pages` | Number of pages, indexed contiguously from zero |
+| `items_total` | Number of rows, indexed contiguously from zero |
+| `items_ok` | Rows whose status is `ok` or `recovered` |
+| `items_recovered` | Recovered rows, a subset of `items_ok` |
+| `items_failed` | Failed rows |
+| `items_cancelled` | Started rows abandoned without a recorded terminal outcome |
+| `items_never_started` | Rows that never started |
+
+A reader folds pages by task and observation leg, preserving input order.
+It exposes a complete table only after a terminal whose page count, row
+count and status counts match the collected rows. Missing, repeated,
+reordered or malformed pages must not become a complete table. A new task
+start clears pending pages for that task; pages cannot leak into a resumed
+observation. The chain walk still judges the original physical frames;
+materializing a table never rewrites or rehashes those frames.
+
+New producers include `items_cancelled`, including zero, in every paged
+terminal. A reader MAY accept its absence in a historical terminal only when
+the collected rows contain no `cancelled` status. A missing count beside a
+cancelled row, an unknown status, or a mismatch in any status count MUST leave
+the table incomplete. `items_ok + items_failed + items_cancelled +
+items_never_started` equals `items_total`; `items_recovered` remains a subset
+of `items_ok` and is not added a second time.
+
+The implementation chooses when to page. Every encoded page still obeys
+the journal's line bound in [15 §the verifier is a fortress](./15-proof.md),
+including JSON escaping and the event envelope. Paging does not relax the
+limits for an individual oversized row, a task output or the whole journal;
+it never truncates rows to manufacture complete evidence. Inline tables
+remain valid. An older verifier can ignore the new kind and still check
+the chain; an older item reader may report the paged table as unrecorded.
+
+### Harness image observations (additive)
+
+`agent_image_observed` is diagnostic Agent-class evidence, never a task
+terminal, permission decision, invoice or proof of a peer's saved file. Each
+frame carries `task`, `attempt`, optional `iteration`, and `harness_image`: one
+compact JSON observation with source, received-byte digest/size/MIME, the
+local blob locator when stored, and `storage`: `stored`, `failed`, `none`
+(path-only) or `unconfirmed` (bytes received, no store answer observed, for
+instance a cancelled task; a blob may or may not exist). It carries no inline
+image payload. A peer-reported savedPath stays a claim, never file authority.
+
+A task terminal (completed, failed or skipped) carries `harness_media_count`,
+closing the image sequence of that observation leg; it carries no aggregate of
+the rows, so a large fan-out keeps every observation in its own bounded frame.
+A reader claiming complete image evidence checks the count against the frames
+it folded; a missing count after frames, a mismatch or a malformed frame leaves
+the evidence incomplete. A UI sample names the exact total and any missing
+evidence. Existing 1 MiB journal-line limits are unchanged.
+
+A harness task terminal MAY carry `model_reported` and `model_reported_source`
+(`session_config` · `confirmed_selection` · `accepted_request` ·
+`unspecified`): the session model the harness reported. It is not
+`model_served`, which stays a response attestation.
+
+## The permit witness (normative · REQUIRED · NEP-0007)
+
+Every permit decision taken at the dispatch boundary is a
+`permit_checked` frame · granted AND refused alike: the exec program
+gate, the tool grant, the taint re-gate ([10](./10-authority.md) ·
+NEP-0004), the environment composition (NEP-0005 · the passed names),
+and the data-as-code sink (NEP-0006). The per-operation fs/net
+enforcement decisions live inside the builtin sinks (their refusals
+surface as typed task failures; their allow-side witness is the
+declared v1 residual · NEP-0007 law 2). The frame's fields name the `gate` (the
+bound consulted), the `decision` (`allow` \| `deny`), the `why` (the
+law applied), and the `task`. This is a CONFORMANCE requirement on the
+ENGINE, not a wire bump: the frame grammar is unchanged (one more kind
+in the stream), so `trace_format` stays 2. A journal from an OLDER
+conformant engine simply lacks the frames: `nika trace verify` reports
+a run that exercised effects with zero permit-decision frames as a
+FINDING (the witness is absent · the journal is old or the engine is
+not NEP-0007-conformant) · never FORGED (the chain still holds), never
+a crash.
+
+The witness is what makes invariant 4 · judged = executed = attested ·
+CHECKABLE: the static judge's verdicts, the runtime's decisions, and
+the journal's frames speak the same boundary, and the conformance
+differential replays the same inputs through checker and engine and
+FAILS on any verdict divergence.
+
+## The end of the run (normative · the teardown seal and `incomplete`)
+
+The chain proves the sequence; the run's END is a separate claim, and
+it has three parts.
+
+**1 · The seal binds the teardown.** A `run_sealed` frame's `covers`
+object carries the classic four — the chain `head`, the frame `events`
+count, the `workflow` hash, the `engine` — and extends **additively**
+with the teardown facts: `receipt_digest` (the receipt folded at the
+seal instant, over this seal's own pre-seal chain facts), `budgets`
+(the consumed ρ, present only when metered — never a fabricated zero),
+and `effects` (the exercised ε beside the declared bound). A seal
+without teardown facts stays **byte-identical** to the classic
+four-field form and verifies exactly as before; a seal that carries
+them binds them under the same signature. One signature surface, not a
+second artifact.
+
+A failed run owes the same seal an **attested quarantine**: when it
+dies after producing partly-written outputs, the teardown names those
+artifacts and marks them quarantined, and a quarantined artifact
+re-entering as a later run's input is a finding. v1 owes the NAMING and
+the CONTAINMENT — not the undoing. Compensating actions across services
+are a different problem and stay out; what a half-written file must
+never do is pass for a whole one.
+
+**2 · A journal with no terminal frame is `incomplete`.** A chain walk
+that reaches no lifecycle-terminal frame (`workflow_completed` ·
+`workflow_failed` · `workflow_cancelled` · `workflow_paused` ·
+`run_sealed`) classifies the journal **`incomplete`** — and that
+classification is the READER's, never a frame the dying process emits.
+A process killed mid-flight cannot attest its own death: any protocol
+that asks it to is vacuous exactly when it matters, so the verifier —
+the only party guaranteed to exist at reading time — carries the name.
+
+`incomplete` is **never** success and **never** silently equal to
+failure or to forgery: the chain still binds, so the journal is
+honestly what it is — a run whose end is unknown. Before it had a
+name, « no verdict » was routinely read as « fine ». The verifier's
+exit says it too: `incomplete` exits on its own class (5), never on
+the ladder a finished walk climbs (0) and never as forgery (2).
+
+**3 · Judged ≠ booted is a refusal.** A check report stamped with the
+semantic hash of the workflow it judged must match the workflow the run
+is booting. On mismatch the run REFUSES **before its first frame** —
+zero events, no file (the lazy-open law above) — rather than producing
+a journal a reader must later distrust. The grain is SEMANTIC: a
+cosmetic edit (whitespace · a comment) re-keys nothing and never
+refuses; a content edit does, structure-preserving or not. An
+UNSTAMPED report skips the clause — the stamp is the producer's opt-in,
+and the trust backstops stand either way.
+
+## The fold law (pointer)
+
+Every proof consumer reads THIS stream: the receipt folds from it
+([15](./15-proof.md)), `--resume` replans from it, `nika trace
+show|replay` renders it, the verify walk re-hashes it. One stream, no
+side-channel.
+
+**Resuming across engine versions is judged, never assumed**
+(normative) · a journal records the `engine_version` that wrote it. A
+resume under a DIFFERENT engine is either an explicit refusal naming
+both versions, or a compatibility the operator DECLARES — and the
+declaration must name the recorded version exactly (a journal from
+before versioning is named `unrecorded`). A blanket force is not
+available, because a blanket force is precisely the silent degradation
+this law retires: the old implicit fallback quietly replanned an empty
+plan and called it a resume. The declared compatibility is journaled on
+the new run's boot manifest, so the attestation says under whose
+authority the versions were crossed.
+
+## Conformance
+
+A v1-conformant engine MUST ·
+
+1. Write one chained NDJSON journal per run that emits at least one frame (lazy open · append-only · infallible rider)
+2. Open with the version-2 prologue (the manifest fields above · `trace_format: 2`)
+3. Chain every line to the previous line's exact bytes (genesis-tagged · the head reported at run end)
+4. Emit a terminal workflow frame (`workflow_completed` \| `workflow_failed` \| `workflow_cancelled` \| `workflow_paused`) and a terminal task frame per settled task
+5. Emit a `permit_checked` frame for every permit decision, granted and refused alike (NEP-0007 · the witness)
+6. Tolerate unknown members, fields, and kinds when READING a journal (the additive law · report « unrecorded », never guess)
+7. Classify a journal reaching no lifecycle-terminal frame as `incomplete` when READING it — never as success, never as forgery (§the end of the run)
+
+---
+
+🦋 *Related · [15 · Proof](./15-proof.md) · [10 · Authority](./10-authority.md) · [07 · Conformance](./07-conformance.md)*
 
 <!-- ═══ conformance/runner-protocol.md ═══ -->
 
