@@ -230,8 +230,10 @@ def offline_findings(
     lifecycle = manifest.get("lifecycle", {})
     if lifecycle.get("status") != "retired":
         findings.append("GitHub Project planning must remain retired")
-    if lifecycle.get("planning_url") != "https://linear.app/nika-supernovae":
-        findings.append("current planning must point to the Nika Linear workspace")
+    if lifecycle.get("public_intake_url") != "https://github.com/supernovae-st/nika/issues":
+        findings.append("the retired Project must point readers at the public issues")
+    if "planning_url" in lifecycle:
+        findings.append("a public archive names no private planning workspace")
     automation = manifest.get("automation", {})
     expected = {"status": "retired", "publisher": "disabled", "scheduler": "disabled"}
     for key, value in expected.items():
@@ -355,7 +357,7 @@ def main(argv: list[str] | None = None) -> int:
     if not values.offline and manifest.get("lifecycle", {}).get("status") == "retired":
         print(
             "project verify: live Project audit is retired; use --offline. "
-            "Current planning: https://linear.app/nika-supernovae",
+            "Public issues and pull requests: https://github.com/supernovae-st/nika/issues",
             file=sys.stderr,
         )
         return 2

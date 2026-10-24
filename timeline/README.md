@@ -12,6 +12,18 @@ This proves publication state, not complete assets, binary bytes, signatures,
 registry convergence or installation. The engine's release barrier owns those
 checks; this timeline does not implement another release verifier.
 
+## Gates and their amendments
+
+A gate states conditions, never a date. When its standing changes, the gate
+is not rewritten: it gains a dated `amended:` note, `YYYY-MM-DD · <note>`,
+appended after the earlier ones. `verify.py` refuses a note whose date is not
+a calendar day, comes before the previous note, or lies ahead of today, since
+a future date would turn a condition into a schedule.
+
+Since 2026-10-23 (the entry `reference-release-maintenance`), engine 0.123.0
+is the maintained reference release and no gate is scheduled; each gate that
+planned a 1.0 carries a note saying so.
+
 ```sh
 python3 -m unittest discover -s timeline -p 'test_*.py'
 python3 timeline/verify.py

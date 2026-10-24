@@ -151,11 +151,11 @@ showcase:
   - file: examples/invoice-chaser.nika
     name: invoice-chaser
     constructs: [local_model, outputs, when, with]
-    sha256_16: 42693a6d66bb46e4
+    sha256_16: 346382218b89663a
   - file: examples/localization-factory.nika
     name: localization-factory
     constructs: [fail_fast, for_each, local_model, max_parallel, on_error, outputs, with]
-    sha256_16: 2a425dcbb53364bf
+    sha256_16: db85f860ff4ed46e
   - file: examples/meeting-actions.nika
     name: meeting-actions
     constructs: [local_model, outputs, schema, typed_inputs, with]
@@ -171,7 +171,7 @@ showcase:
   - file: examples/pr-review-fanout.nika
     name: pr-review-fanout
     constructs: [agent_tools, fail_fast, for_each, local_model, max_parallel, on_error, outputs, schema, when, with]
-    sha256_16: 8d62bcca0cb5f59e
+    sha256_16: 09a5dd34c2e2e96e
   - file: examples/price-watch.nika
     name: price-watch
     constructs: [extract, on_error, outputs, secrets, when, with]
@@ -179,7 +179,7 @@ showcase:
   - file: examples/release-notes.nika
     name: release-notes
     constructs: [local_model, on_error, outputs, schema, secrets, typed_inputs, when, with]
-    sha256_16: ffe7ca04cfaa4c83
+    sha256_16: 1e179c7ac0571dab
   - file: examples/release-radar.nika
     name: release-radar
     constructs: [extract, local_model, on_error, outputs, when, with]
@@ -203,15 +203,15 @@ showcase:
   - file: examples/social-repurpose.nika
     name: social-repurpose
     constructs: [local_model, outputs, with]
-    sha256_16: 63e47fe91e083cd0
+    sha256_16: 8519e2f8d7f6fe52
   - file: examples/standup-digest.nika
     name: standup-digest
     constructs: [local_model, on_error, outputs, with]
-    sha256_16: ea5544a01491be55
+    sha256_16: 80a8a71d2d893efa
   - file: examples/support-triage.nika
     name: support-triage
     constructs: [local_model, outputs, schema, secrets, when, with]
-    sha256_16: c0b5415a170bb026
+    sha256_16: e0aec8779d8c38dd
   - file: examples/transcript-shownotes.nika
     name: transcript-shownotes
     constructs: [local_model, outputs, schema, with]

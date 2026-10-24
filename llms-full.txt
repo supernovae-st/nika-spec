@@ -35,16 +35,16 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" alt="Apache-2.0"></a>
 </p>
 
-<!-- engine clips on this page (GIFs) are served from supernovae-st/nika main: they exist only there until the next engine release · at the next lockstep bump, pin them to that release tag -->
+<!-- engine clips on this page (GIFs) are pinned to the v0.123.0 tag of supernovae-st/nika, the release they ship with · move the pin with the next engine release whose media changes -->
 <p align="center"><b>Watch a workflow drawn as a graph, then lit up in the order it will run.</b></p>
 <p align="center">
-  <a href="https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/dag-execution.optimized.gif">
-    <img src="https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/dag-execution.optimized.gif"
+  <a href="https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/media/gifs/dag-execution.optimized.gif">
+    <img src="https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/media/gifs/dag-execution.optimized.gif"
          alt="A pull-request review workflow from this repository's examples, drawn by nika inspect as a graph of tasks colored by verb, then lit wave by wave in the order nika check plans"
          width="960">
   </a>
 </p>
-<p align="center"><sub>A workflow is a graph: <a href="examples/pr-review-fanout.nika"><code>examples/pr-review-fanout.nika</code></a>, drawn by <code>nika inspect</code>, planned by <code>nika check</code>. Notice the tasks that share a wave, and the review that fans out once per changed file. The graph and the waves are the commands' own output (nika 0.121.0); the lighting illustrates the plan.</sub></p>
+<p align="center"><sub>A workflow is a graph: <a href="examples/pr-review-fanout.nika"><code>examples/pr-review-fanout.nika</code></a>, drawn by <code>nika inspect</code>, planned by <code>nika check</code>. Notice the tasks that share a wave, and the review that fans out once per changed file. The graph and the waves are the commands' own output, captured with nika 0.121.0; 0.123.0 draws the same graph and the same waves. The lighting illustrates the plan.</sub></p>
 
 ## What is Nika?
 
@@ -76,8 +76,13 @@ You need `git` and Python 3. No engine, no API key, no model call.
 
    ```sh
    git clone https://github.com/supernovae-st/nika-spec && cd nika-spec
+   python3 -m venv .venv && . .venv/bin/activate
    pip install -r conformance/requirements.txt
    ```
+
+   The virtual environment keeps the checker's two packages (PyYAML and
+   jsonschema) out of your system Python, which Homebrew and most Linux
+   distributions refuse to change (PEP 668).
 
 2. **Save the smallest complete workflow as `hello.nika`.**
 
@@ -117,7 +122,7 @@ You need `git` and Python 3. No engine, no API key, no model call.
 > **Have the engine?** Install it with `brew install supernovae-st/tap/nika`
 > and audit the same file. `nika check` is the static audit that runs before
 > any model is called; `--model mock/echo` rehearses with no key and no
-> network. The report ends with its verdict (nika 0.121.0):
+> network. The report ends with its verdict (nika 0.123.0):
 >
 > ```console
 > $ nika check hello.nika --model mock/echo
@@ -141,13 +146,13 @@ can do in one file.
 **Watch one file use all nine keys and every verb, labelled key by key.**
 
 <p align="center">
-  <a href="https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/spec-anatomy.optimized.gif">
-    <img src="https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/spec-anatomy.optimized.gif"
+  <a href="https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/media/gifs/spec-anatomy.optimized.gif">
+    <img src="https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/media/gifs/spec-anatomy.optimized.gif"
          alt="One .nika file using all nine envelope keys, each labelled in the spec's own words, with four tasks that each bind one verb; nika check says run ready and the file folds to a labelled skeleton"
          width="860">
   </a>
 </p>
-<p align="center"><sub>Notice that every label is the spec's own wording, read from <code>nika spec</code>, and that each task binds exactly one verb. The verdict is the real <code>nika check</code> on that file (nika 0.121.0): run ready. The framing and the final fold are illustration.</sub></p>
+<p align="center"><sub>Notice that every label is the spec's own wording, read from <code>nika spec</code>, and that each task binds exactly one verb. The verdict is the real <code>nika check</code> on that file, captured with nika 0.121.0; 0.123.0 gives the same verdict, run ready. The framing and the final fold are illustration.</sub></p>
 
 ```mermaid
 flowchart LR
@@ -239,24 +244,26 @@ on captured output.
 **Watch the check catch two mistakes before anything runs.**
 
 <p align="center">
-  <a href="https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/static-check-fix.optimized.gif">
-    <img src="https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/static-check-fix.optimized.gif"
+  <a href="https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/media/gifs/static-check-fix.optimized.gif">
+    <img src="https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/media/gifs/static-check-fix.optimized.gif"
          alt="nika check catches two defects in a pull-request review workflow; after the fix, the re-check comes back clean and ready to run"
          width="860">
   </a>
 </p>
-<p align="center"><sub><b>Checked before it runs.</b> <code>nika check</code> audits the plan, permits, cost, secrets and types without calling a model (<a href="spec/07-conformance.md">spec/07</a>). Notice the misspelled task name it catches (<i>did you mean <code>assess</code>?</i>), the fix, and the re-check that ends <i>run ready</i>. The output is captured from the real CLI (nika 0.121.0) and the fix is a real diff.</sub></p>
+<p align="center"><sub><b>Checked before it runs.</b> <code>nika check</code> audits the plan, permits, cost, secrets and types without calling a model (<a href="spec/07-conformance.md">spec/07</a>). Notice the misspelled task name it catches (<i>did you mean <code>assess</code>?</i>), the fix, and the re-check that ends <i>run ready</i>. The output is captured from the real CLI with nika 0.121.0, and 0.123.0 prints the same findings and the same verdict; the fix is a real diff.</sub></p>
 
 Two more rules at work, each beside its chapter:
 
 - **The file is the boundary.** `permits:` lists what a workflow may reach,
   run and read. Anything outside is refused
   ([spec/10](spec/10-authority.md)).
-  ▶ [Watch the boundary catch an escape](https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/permits-audit.optimized.gif)
+  ▶ [Watch the boundary catch an escape](https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/media/gifs/permits-audit.optimized.gif)
+  (captured with nika 0.121.0)
 - **Failure is part of the plan.** Errors carry stable codes.
   `on_error: recover` names the fallback; the trace records what failed
   ([spec/05](spec/05-errors.md)).
-  ▶ [Watch a run recover when its live feed goes missing](https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/on-error-recover.optimized.gif)
+  ▶ [Watch a run recover when its live feed goes missing](https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/media/gifs/on-error-recover.optimized.gif)
+  (captured with nika 0.121.0)
 
 ### The <!-- canon:pillars -->5<!-- /canon --> pillars · immutable forever
 
@@ -266,10 +273,10 @@ Two more rules at work, each beside its chapter:
 4. **Variables** · one `${{ … }}` syntax over <!-- canon:namespaces -->6<!-- /canon --> namespaces: `inputs` · `const` · `secrets` · `with` · `tasks` · `run`
 5. **Error model** · `NIKA-<NS>-<NNN>` codes, retry, structured output
 
-As concepts, these five are locked for the life of the language; until the
-reference engine reaches 1.0.0, their exact spellings can still change (see
-[Status](#status)). Providers, builtins and extract modes live in the
-[stdlib](stdlib/) and evolve on their own.
+As concepts, these five are locked for the life of the language; their
+spellings change only through a recorded fix (see [Status](#status)).
+Providers, builtins and extract modes live in the [stdlib](stdlib/) and
+evolve on their own.
 
 ## Who this is for
 
@@ -321,10 +328,14 @@ declaring it.
 ## Reference implementation
 
 [supernovae-st/nika](https://github.com/supernovae-st/nika) is the reference
-engine: one Rust binary, AGPL-3.0-or-later. Install it with
-`brew install supernovae-st/tap/nika`, then check and run any workflow.
+engine: one Rust binary, AGPL-3.0-or-later. Its 0.123.0 release is the
+open-source reference release. Install it with
+`brew install supernovae-st/tap/nika` (or
+`curl -LsSf https://nika.sh/install.sh | sh`), then check and run any
+workflow.
 
-▶ [Watch it audit a meeting-notes workflow, then run it on a local model](https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/nika-hero.optimized.gif)
+▶ [Watch it audit a meeting-notes workflow, then run it on a local model](https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/media/gifs/nika-hero.optimized.gif)
+(captured with nika 0.121.0)
 
 - **The spec travels inside it.** The binary embeds this repository's
   chapters, schema and examples at the commit its `SPEC_PIN` names, so
@@ -380,7 +391,9 @@ The full boundary, including what Nika deliberately does not do, is in
 Every spec version ships a pack of canonical workflows: a numbered learning
 path, and real jobs you can copy.
 
-▶ [Watch `nika try` list the jobs this pack ships](https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/workflow-gallery.optimized.gif)
+▶ [Watch `nika try` list the jobs this pack ships](https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/media/gifs/workflow-gallery.optimized.gif)
+(captured with nika 0.121.0, which listed 35 jobs; 0.123.0 lists 36, adding
+`remove-owned-file`)
 
 - **Every example is a test.** CI validates each one as a conformance
   input, so an example that breaks the rules breaks the build.
@@ -440,19 +453,19 @@ flowchart LR
 | provenance | [`ESTATE_PIN`](ESTATE_PIN) here, and in the engine, the docs, the site and the registry | the shared provenance verifier is mirrored byte for byte from a published spec commit; the CI `mirror` job compares against exactly that commit |
 
 An engine release names its spec commit twice, and the two must agree. For
-example, at engine v0.118.7 (the last line runs in your clone of this
-repository):
+example, at engine v0.123.0, the reference release (the last line runs in
+your clone of this repository):
 
 ```sh
-curl -sS https://raw.githubusercontent.com/supernovae-st/nika/v0.118.7/SPEC_PIN | grep -v '^#'
-curl -sS https://raw.githubusercontent.com/supernovae-st/nika/v0.118.7/crates/nika-pack/pack/SPEC_SHA
-git log -1 --format='%h %ad %s' --date=short 14bf49f435dc613da08187e4e4822948db267232
+curl -sS https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/SPEC_PIN | grep -v '^#'
+curl -sS https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/crates/nika-pack/pack/SPEC_SHA
+git log -1 --format='%h %ad %s' --date=short 6390b08eb9791ce49c63ee17f8466fab118cadb8
 ```
 
 ```
-14bf49f435dc613da08187e4e4822948db267232
-14bf49f435dc613da08187e4e4822948db267232
-14bf49f 2026-09-05 fix(stdlib): define hash null and selector validation (#304)
+6390b08eb9791ce49c63ee17f8466fab118cadb8
+6390b08eb9791ce49c63ee17f8466fab118cadb8
+6390b08 2026-10-19 fix(conformance): refresh the pricing trace witnesses for the new table (#390)
 ```
 
 </details>
@@ -505,9 +518,10 @@ nika-spec/
 - **Changing the language.** Anything that changes the language surface,
   the stdlib contract, what the suite means or the trace formats is a pull
   request against [`spec/`](spec/) that lands with its conformance tests.
-  At the v1 pre-freeze this becomes a NEP, a Nika Enhancement Proposal
-  ([NEP-0000](governance/nep-0000-the-nep-process.md)), for everyone,
-  maintainers included.
+  The NEP process (Nika Enhancement Proposals ·
+  [NEP-0000](governance/nep-0000-the-nep-process.md)) is built and
+  dormant: it would bind everyone, maintainers included, from a v1
+  pre-freeze, and none is scheduled in the maintained line.
 - **The bar.** CI runs `python3 conformance/runner.py all`, the selftests
   and every generated-file check. Sign off each commit (`git commit -s`,
   the [DCO](https://developercertificate.org)). If you touch `README.md` or
@@ -527,16 +541,21 @@ Not sure an idea deserves a proposal? Pressure-test it first in the engine's
 | [`scripts/showcase-projector.py`](scripts/showcase-projector.py) | turns the [`examples/`](examples/) jobs into the docs' example pages and the website's explorer |
 | [`conformance/runner.py`](conformance/runner.py) | the static checker: core, stdlib and deep tests, plus every example as a conformance input (the CI gate) |
 | [`conformance/run.sh`](conformance/run.sh) | the engine-side runner: `PASS` · `DRIFT` · `BUG` · `DIVERGENT` per file, against its declared intent |
-| [`.pre-commit-hooks.yaml`](.pre-commit-hooks.yaml) | pre-commit hooks for repositories that consume this spec (`nika-check` · `nika-check-strict`) |
+| [`.pre-commit-hooks.yaml`](.pre-commit-hooks.yaml) | pre-commit hooks for repositories that consume this spec: `nika-check` (the engine ships the maintained one, pinned at its release tag) and `nika-check-strict` (`nika check --native-strict`, pinned at a commit of this repository) |
 
 </details>
 
 ## Status
 
-- **A draft on its way to v0.1.0 GA.** The spec's version is in
-  [`VERSION`](VERSION); the spec badge above reads it live. GA follows the
-  spec review, the examples, the conformance suite and the schemas; it is
-  gated on readiness, not on a date.
+- **The reference release.** Engine 0.123.0 (2026-10-23) is the
+  open-source reference release, and it embeds this spec at commit
+  [`6390b08`](https://github.com/supernovae-st/nika-spec/commit/6390b08eb9791ce49c63ee17f8466fab118cadb8),
+  the commit its `SPEC_PIN` names. After 0.123 the project is maintained:
+  security fixes, bug fixes and compatibility. No 1.0 release is
+  scheduled.
+- **Spec version.** [`VERSION`](VERSION) reads `0.2.0-draft`, and the
+  spec badge above reads it live. [CHANGELOG.md](CHANGELOG.md) marks what
+  engine 0.123.0 embeds and what landed after it.
 - **Checked today.** The chapters, [`workflow.schema.json`](schemas/workflow.schema.json),
   the static tests (core, deep, stdlib surface and the value-authority
   lanes) and every example run in CI; `python3 conformance/runner.py all`
@@ -545,23 +564,26 @@ Not sure an idea deserves a proposal? Pressure-test it first in the engine's
   beyond `mock/echo`) is still pending
   ([spec/07 §Suite status](spec/07-conformance.md#suite-status--v01-honest)).
 - **Stable where it counts.** The language family is v1, forever: there is
-  no `nika: v2`. Until the reference engine ships 1.0.0, breaking changes
-  land inside v1; from engine 1.0.0 on, the language only grows, additively.
-  The engine versions separately.
+  no `nika: v2`. A change inside v1 is a fix, recorded in
+  [CHANGELOG.md](CHANGELOG.md) with its conformance tests. The engine
+  versions separately.
 - **History you can check.** Every dated claim about the language is
   re-proven weekly in CI against its source
   ([`timeline/timeline.yaml`](timeline/timeline.yaml), git tags, the GitHub
-  and crates.io APIs) and shown with the next milestones at
-  [nika.sh/timeline](https://nika.sh/timeline).
+  and crates.io APIs) and rendered at
+  [docs.nika.sh/reference/timeline](https://docs.nika.sh/reference/timeline).
+  Its forward gates are the earlier plan, kept as history: each carries a
+  dated note, and none is scheduled (the 2026-10-23 entry says why).
 
 ## Governance
 
 - **Editor:** SuperNovae Studio (Thibaut Melen and Nicolas).
-- **How it evolves:** until the v1 pre-freeze, a pull request against
-  [`spec/`](spec/) with its tests. The NEP process
+- **How it evolves:** a pull request against [`spec/`](spec/) with its
+  tests. The NEP process
   ([NEP-0000](governance/nep-0000-the-nep-process.md) ·
-  [template](governance/nep-template.md)) is built and dormant; it becomes
-  binding at the freeze.
+  [template](governance/nep-template.md)) is built and dormant; it would
+  bind from a v1 pre-freeze, and none is scheduled after the 0.123
+  reference release.
 - **Where it is discussed:** in the proposal's public pull request. There is
   no private track.
 - **Decisions:** accepted and rejected NEPs both stay published in
@@ -582,7 +604,7 @@ Not sure an idea deserves a proposal? Pressure-test it first in the engine's
 | 🦋 | [nika](https://github.com/supernovae-st/nika) | The engine and CLI: write, check, run and verify AI workflows |
 | 📖 | [nika-docs](https://github.com/supernovae-st/nika-docs) | The documentation, live at [docs.nika.sh](https://docs.nika.sh) |
 | 📜 | **[nika-spec](https://github.com/supernovae-st/nika-spec)** | **The language specification and the suite that proves an engine follows it** |
-| 🧩 | [nika-vscode](https://github.com/supernovae-st/nika-vscode) | The editor extension: your workflow as a live graph, errors as you type |
+| 🧩 | [nika-vscode](https://github.com/supernovae-st/nika-vscode) | The editor extension, frozen at 0.120 and not qualified with 0.123: use `nika lsp` and the JSON Schema |
 | 🟦 | [nika-client](https://github.com/supernovae-st/nika-client) | Run and verify workflows from TypeScript |
 | ✅ | [nika-action](https://github.com/supernovae-st/nika-action) | A GitHub Action that posts a `nika check` verdict on your pull requests |
 | 🚀 | [nika-actions-starter](https://github.com/supernovae-st/nika-actions-starter) | A ready template: workflows, editor setup and CI from the first push |
@@ -598,12 +620,14 @@ Not sure an idea deserves a proposal? Pressure-test it first in the engine's
 - **Every way to use Nika, on one page:** install paths, editors, agents,
   skills, MCP, CI and SDKs, at
   [docs.nika.sh/integrations/everywhere](https://docs.nika.sh/integrations/everywhere)
-- **[nika.sh](https://nika.sh):** the website, with
-  [templates](https://nika.sh/templates), the
-  [timeline](https://nika.sh/timeline) and the living
-  [map of the ecosystem](https://nika.sh/map)
+- **[nika.sh](https://nika.sh):** the website. The
+  [templates](https://docs.nika.sh/guides/templates), the
+  [timeline](https://docs.nika.sh/reference/timeline) and the
+  [map of the ecosystem](https://docs.nika.sh/reference/knowledge-system)
+  live in the docs
 - **From TypeScript:** [nika-client](https://github.com/supernovae-st/nika-client)
-  is published on npm as `@supernovae-st/nika`
+  is published on npm as `@supernovae-st/nika` (0.123.0, which bundles
+  engine 0.123.0)
 
 ## Security
 
@@ -636,9 +660,9 @@ AGPL-3.0-or-later.
 >
 > **Status** · authoring, static checking AND execution all work TODAY:
 > `brew install supernovae-st/tap/nika`, then `nika check` + `nika run` on
-> any file in this page. The spec text itself is v0.2.0-draft (GA hardening)
-> in progress); the language family v1 is already frozen — there is no
-> `nika: v2`, ever.
+> any file in this page. The spec text itself is v0.2.0-draft, the version
+> engine 0.123.0 embeds; the language family v1 is already frozen — there is
+> no `nika: v2`, ever.
 
 ---
 
@@ -670,7 +694,7 @@ tasks:
 > (`ollama pull qwen3.5:4b` first · or `lmstudio/…` · `llamacpp/…` ·
 > `vllm/…`). Prefer cloud? Swap the one `model:` line for any of the
 > <!-- canon:providers -->18<!-- /canon --> providers ·
-> `mistral/mistral-small` · `anthropic/claude-haiku-4-5` ·
+> `mistral/mistral-small-latest` · `anthropic/claude-haiku-4-5` ·
 > `openai/gpt-5.2` · the rest of the file doesn't change.
 
 ---
@@ -741,8 +765,8 @@ caller never overrides is a `const:` entry instead (a bare literal ·
 `${{ const.X }}`). A value the **deployment** supplies is an `inputs:` entry
 carrying `required: false` and a `default:` — same namespace, same read.
 
-There are 5 variable namespaces · the three value authorities `inputs` ·
-`const` · `secrets` plus the runtime `with` · `tasks`.
+There are <!-- canon:namespaces -->6<!-- /canon --> variable namespaces · the three value authorities
+`inputs` · `const` · `secrets` plus the runtime `with` · `tasks` · `run`.
 See [spec/04-variables.md](./spec/04-variables.md).
 
 ---
@@ -888,7 +912,7 @@ a caller receives).
 
 - **[spec/](./spec/)**: the full specification (~30 pages · the contract)
 - **[templates/](./templates/)**: writing your own? Instantiate a
-  skeleton (6 valid, slot-marked) instead of starting blank, the
+  skeleton (<!-- canon:templates -->22<!-- /canon --> valid, slot-marked) instead of starting blank, the
   deterministic path agents follow ([protocol](AGENTS.md))
 - **[stdlib/](./stdlib/)**: the <!-- canon:providers -->18<!-- /canon --> providers · <!-- canon:extract_modes -->10<!-- /canon --> extract modes · <!-- canon:builtins -->29<!-- /canon --> builtins
 - **[examples/](./examples/)**: the numbered path + the jobs, all shipped and CI-gated (the count lives in [examples/manifest.yaml](./examples/manifest.yaml))
@@ -960,6 +984,15 @@ These 5 pillars are **locked forever** at v1. Everything else (providers · buil
 
 ## Pre-1.0 stability contract
 
+> **Amended 2026-10-23 · the maintained reference.** Engine 0.123.0 is the
+> open-source reference release and embeds this spec at commit `6390b08`.
+> After it the project is maintained (security fixes, bug fixes and
+> compatibility) and no engine 1.0.0 is scheduled, so the freeze this
+> section waits for is not planned. In the maintained line the grammar
+> changes only through recorded fixes ([CHANGELOG.md](../CHANGELOG.md)),
+> each landing with its conformance fixtures in one atomic window, as
+> below. The contract is kept as written: it is how the language was built.
+
 > **v1 names the first stable family of the language. Its public
 > stability begins at engine 1.0.0 — not before.**
 
@@ -1015,7 +1048,7 @@ tasks:
 ```yaml
 nika: scrape-and-summarize
 
-model: mistral/mistral-large
+model: mistral/mistral-large-latest
 permits:                        # the file's whole reach · absent = no authority (NIKA-AUTH-006)
   tools: ["nika:fetch", "nika:write"]
   net:
@@ -1132,7 +1165,7 @@ different operational cost, and v1 does not pretend to it.
 
 ## Frozen language envelope
 
-The **language** envelope is frozen at **v1** forever. **There is no `nika: v2` — ever.** Because that was true, the version slot carried no bits, and the envelope nuke gave it away: `nika:` now holds the file's NAME. **Nothing was lost.** v1 names the one language family; deep grammar changes happen INSIDE `v1` while the reference engine is pre-1.0 (per the [pre-1.0 stability contract](#pre-10-stability-contract) above), and after engine 1.0.0 changes are additive only (feature-detected · no version marker in the file at all). (This is the **language** family, independent of any engine version: the reference engine ships its own semver toward a 1.0 release, which does not touch v1.)
+The **language** envelope is frozen at **v1** forever. **There is no `nika: v2` — ever.** Because that was true, the version slot carried no bits, and the envelope nuke gave it away: `nika:` now holds the file's NAME. **Nothing was lost.** v1 names the one language family; deep grammar changes happen INSIDE `v1` while the reference engine is pre-1.0 (per the [pre-1.0 stability contract](#pre-10-stability-contract) above), and after engine 1.0.0 changes are additive only (feature-detected · no version marker in the file at all). (This is the **language** family, independent of any engine version: the reference engine ships its own semver, which does not touch v1. Amended 2026-10-23: no engine 1.0 release is scheduled after the 0.123 reference release; see the amendment to the stability contract above.)
 
 In practice · we expect v1 to last 10+ years.
 
@@ -2375,7 +2408,7 @@ research:
     infer:
       prompt: "Research Rust async runtimes 2026 in 5 paragraphs"
       system: "You are a senior software architect."
-      model: mistral/mistral-large         # override default · <provider>/<name>
+      model: mistral/mistral-large-latest  # override default · <provider>/<name>
       temperature: 0.3
       max_tokens: 16384                  # room for the thinking budget and the answer
       schema:                            # optional · structured output
@@ -2751,7 +2784,7 @@ research:
     agent:
       system: "You are a research assistant. Use tools to gather info."
       prompt: "Research the topic · ${{ inputs.topic }} · and produce a markdown brief"
-      model: mistral/mistral-large
+      model: mistral/mistral-large-latest
       tools:                            # whitelist · default-deny (no tools if omitted)
         - "nika:fetch"
         - "nika:write"
@@ -3546,7 +3579,7 @@ the meaning of an expression that parses today. The conditional `?:`, the
 
 ```yaml
 # pick a model / a path / a prompt by condition — anywhere a value is taken
-model:  "${{ inputs.env == 'prod' ? 'mistral/mistral-large' : 'ollama/qwen3.5:9b' }}"   # quoted · ` : ` would end a YAML key
+model:  "${{ inputs.env == 'prod' ? 'mistral/mistral-large-latest' : 'ollama/qwen3.5:9b' }}"   # quoted · ` : ` would end a YAML key
 prompt: "${{ has(inputs.style) ? inputs.style : 'be concise' }}"
 when:   ${{ with.scan_log.contains('ERROR') }}      # branch on substring · the log arrived via with:
 ```
@@ -4707,7 +4740,7 @@ workflow whose conformance report is clean.
       "permits": ["fs.read:README.md"], "cost_interval": null
     },
     {
-      "id": "think", "kind": "task", "verb": "infer", "model": "mistral/mistral-small",
+      "id": "think", "kind": "task", "verb": "infer", "model": "mistral/mistral-small-latest",
       "when": null, "fan_out": null, "permits": [],
       "cost_interval": [0.0002, 0.0031],
       "timeout_ms": 60000, "outputs": ["summary"]
@@ -6841,34 +6874,52 @@ this prose spec (kept in sync · the prose is normative on conflict).
 Editors (VS Code · Zed · JetBrains · Neovim) pick it up via the standard
 `yaml.schemas` association (or a `# yaml-language-server: $schema=…` modeline)
 to give **autocomplete + inline validation** as you type, the same DX as
-GitHub Actions and Docker Compose. A working modeline today:
+GitHub Actions and Docker Compose. The modeline in use today names the
+address the schema gives as its own `$id` (the examples and templates carry
+it, and `nika init` writes it into the editor settings):
 
 ```yaml
-# yaml-language-server: $schema=https://raw.githubusercontent.com/supernovae-st/nika-spec/main/schemas/workflow.schema.json
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
 nika: my-workflow
 ```
 
+⚠️ **That address serves a copy published with the website, and the copy
+can lag this repository.** On 2026-10-24 it served the revision of
+2026-09-18, which predates `nika:remove_file`, the `{ file: }` form of
+`prompt:`, `system:` and `schema:`, and `for_each.max_items`: an editor
+reading it flags a valid workflow that uses them. For the exact schema an
+engine embeds, `nika spec --schema` prints it offline, byte for byte, and the
+address pinned at the embedded spec commit serves the same bytes online; for
+engine 0.123.0 (spec `6390b08`) that is
+`https://raw.githubusercontent.com/supernovae-st/nika-spec/6390b08eb9791ce49c63ee17f8466fab118cadb8/schemas/workflow.schema.json`.
+
 #### The address MUST become versioned and immutable (normative · D-2026-08-11-N24)
 
-⚠️ **The modeline above points at a moving branch, and that is a defect with
-two independent causes.**
+⚠️ **The `$id` modeline above names the whole v1 family, not one schema
+revision, and that is a defect with two independent causes.** (Until
+2026-10-24 this page showed the
+`raw.githubusercontent.com/supernovae-st/nika-spec/main/…` form, which
+carries both causes.)
 
 *The first is ours.* Since [§unknown key](#an-unknown-key-is-an-error-at-every-level-normative--d-2026-08-11-n20)
 an unknown key is an error, so this schema's `additionalProperties: false` is
 no longer a lint preference — it is the accepted surface of the language. Served
-from `main`, that surface moves under every editor in the world **while no file
-has changed**. A workflow that validated on Monday shows red on Tuesday because
-a schema it never named was edited. This is precisely the drift the strict rule
-exists to prevent, arriving through the back door.
+at one moving address, that surface moves under every editor in the world
+**while no file has changed**. A workflow that validated on Monday shows red on
+Tuesday because a schema it never named was edited. This is precisely the drift
+the strict rule exists to prevent, arriving through the back door.
 
-*The second is the host's.* `raw.githubusercontent.com` fronts a cache that
-serves stale bytes: a schema can be correct at the commit and wrong at the
-reader for an unspecified window. **Immutable upstream is not immutable at the
-point of use** — measured in this workspace, 2026-08-07.
+*The second is the host's.* A cache in front of the address serves stale bytes:
+a schema can be correct at the commit and wrong at the reader for an
+unspecified window. **Immutable upstream is not immutable at the point of
+use** — measured on `raw.githubusercontent.com` in this workspace,
+2026-08-07.
 
-**The shape.** One address per minor, frozen forever ·
+**The shape.** One address per minor, frozen forever. This address is the
+target and is **not served** (it answers 404 today) ·
 
 ```yaml
+# the target shape · not served yet
 # yaml-language-server: $schema=https://nika.sh/schema/v0.1/workflow.schema.json
 nika: my-workflow
 ```
@@ -6876,7 +6927,7 @@ nika: my-workflow
 This is what JSON Schema, OpenAPI, Kubernetes and CWL all do, and it composes
 with the `nika:` mark the envelope already carries. A file written in 2027
 still reads in 2030 against **its own** schema. Until the address ships, the
-modeline above is the pragmatic form and this paragraph is the standing debt —
+`$id` modeline is the pragmatic form and this paragraph is the standing debt —
 stated, not hidden.
 
 This is also what makes a Nika file
@@ -9978,6 +10029,352 @@ them is a reservation, never a promise they exist.
 - [10 · Authority](./10-authority.md) — the flow laws the projection also obeys (structure only)
 - [15 · Proof](./15-proof.md) — the semantic identity the projected graph commits to
 
+<!-- ═══ spec/17-trace.md ═══ -->
+
+# 17 · Trace
+
+> Every run leaves a journal · one NDJSON file, one event per line, each
+> line chained to the last by hash. The trace is the run's flight
+> recorder (`nika trace show|replay|verify`), the resume substrate, and
+> the stream the receipt folds FROM ([15](./15-proof.md)). This chapter
+> makes the dialect NORMATIVE: `trace_format: 2`, the frame grammar, the
+> chain law, the kind vocabulary, and the permit-decision witness
+> (NEP-0007) · the trace stops being an engine-private dialect. What is
+> written here is the OBSERVED wire, grave-not-invented: the conformance
+> golden is a real run's journal, byte-verifiable.
+
+---
+
+## The journal (normative)
+
+One run → at most one journal file · `<trace-dir>/<ISO-compact>-<short
+-id>.ndjson` (production: `.nika/traces/`). Three laws shape it:
+
+- **Lazy open** · file creation waits for the FIRST emitted frame (a run
+  refused before its prologue · audit refusal · composition failure ·
+  leaves no file).
+- **Infallible rider** · journal I/O failure never changes the run's
+  verdict or its primary output; the error surfaces AFTER the run as a
+  note. The journal tees BESIDE the chosen primary lane, byte-identical
+  with or without it.
+- **Append-only** · frames are written in emission order and never
+  rewritten; the chain (below) makes any rewrite evident.
+
+## The frame (normative)
+
+One event per line · one JSON object · the member set:
+
+| Key | Type | Meaning |
+|---|---|---|
+| `chain` | string | sha256 hex of the PREVIOUS line's exact bytes (the chain law below) |
+| `id` | object | `{ "uuid": "<UUIDv7>" }` · unique per frame · time-ordered |
+| `timestamp` | integer | unix epoch **nanoseconds** |
+| `kind` | string | the closed-per-minor kind vocabulary (below) |
+| `fields` | array | ordered `{ "key": string, "value": any }` pairs · the frame's payload |
+| `run` | string \| null | the run correlation id when one is set |
+| `correlation` | string \| null | causal correlation across runs when one is set |
+
+Field VALUES are JSON values (string · number · object-as-string when a
+payload is itself serialized · the observed `permits_json` and `outcome`
+carry serialized JSON as a string, so the frame grammar stays flat).
+Sensitive payloads are hashed by the emitter, never carried raw.
+**Additive law** · a reader MUST ignore an unknown member and an unknown
+`fields` key (report « unrecorded », never guess); an unknown `kind` is
+tolerated by verifiers (the walk continues · the chain still binds it).
+
+## The chain (normative)
+
+The first line's `chain` is the sha256 of the GENESIS tag; every later
+line's `chain` is the sha256 hex of the previous line's EXACT bytes.
+After the run, the last line's hash is the journal's HEAD · printed at
+run end and carried by the seal. Verification recomputes the walk:
+any byte edit, insertion, deletion, or reorder breaks every subsequent
+link (`nika trace verify` · FORGED). The chain proves INTEGRITY of the
+sequence; it does not prove authorship (the seal and anchor rails of
+[15](./15-proof.md) carry authenticity).
+
+## `trace_format: 2` (normative · the version)
+
+The dialect version rides the FIRST frame (the prologue's
+`trace_format` field). It versions the JOURNAL WIRE · orthogonal to
+the language (v1 · never typed in the file · [01 §nika](./01-envelope.md)),
+`receipt_format: 1` (the folded receipt) and
+`graph_format: 3` (the projection). Version 2 is THIS chapter. A wire
+change that breaks a version-2 reader MUST bump it; additive fields and
+additive kinds MUST NOT.
+
+## The prologue (normative · `workflow_started`)
+
+The first frame is `workflow_started`, and it is the run's MANIFEST.
+Version-2 fields (the observed set):
+
+| Field | Meaning |
+|---|---|
+| `workflow` | the workflow id |
+| `permits` | the boundary posture, human-readable (`declared boundary · default-deny` \| the zero-authority note) |
+| `permits_json` | the DECLARED `permits:` block, serialized verbatim · the boundary the run was judged under |
+| `workflow_sha256` / `workflow_sha256_lf` | the source bytes' digest (raw · LF-normalized) |
+| `semantic_hash` | the semantic identity ([15](./15-proof.md) · H(domain ‖ version ‖ JCS(IR))) |
+| `sandbox` | the OS-confinement backend the run selected (`seatbelt` · `landlock` · `noop`, loudly) |
+| `trace_format` | this dialect's version · `2` |
+| `engine_version` | the emitting engine |
+| `platform` | `os/arch` |
+
+An engine MAY add fields (additive law); it MUST NOT drop these.
+
+**The prologue is the run's BOOT MANIFEST** (normative) · beyond the
+identity above it names the CONTRACT the run booted under, so the
+journal self-describes what it ran by rather than leaving a reader to
+infer it ·
+
+| Field | Meaning |
+|---|---|
+| `spec_pin` | the spec commit this engine's conformance was proven at |
+| `stamper_kind` | the event-identity seam the `run:` declaration resolved to · `deterministic` \| `system` |
+| `clock` | the resolved run clock ([01](./01-envelope.md) §`run`) · `virtual` \| `system` |
+| `seed` | present exactly under a determinism demand (`seeded: N` → `N` · `none` → the zero stream); an ambient run carries **no** seed claim |
+| `scheduled_for` | on every run: the value of `${{ run.scheduled_for }}` ([04](./04-variables.md)), RFC 3339 UTC |
+| `scheduled_for_source` | where `scheduled_for` came from · `slot` (the run was fired for a schedule slot) \| `at` (`nika test --at`) \| `start` (the run's own start) |
+| `missed` | present exactly under `manqué: rattraper-une-fois`: the silence the run covers, `{ first, last, count }`, the value of `${{ run.missed }}` |
+
+**A manifest claims only what exists.** Where a fact has no recording
+surface the field is ABSENT and a reader says « unrecorded » — never a
+guessed value, never a fabricated zero. Absence is the honest claim,
+and the additive law above already makes it readable by older readers.
+
+## The kind vocabulary (normative · closed per minor)
+
+Version 2 names exactly these kinds · additive per minor, never
+re-meant:
+
+`workflow_started` · `workflow_completed` · `workflow_failed` ·
+`workflow_cancelled` · `workflow_paused` · `task_scheduled` ·
+`task_started` · `task_completed` · `task_failed` · `task_skipped` · `task_items` ·
+`task_retrying` · `task_recovered` · `task_cancelled` ·
+`task_cache_hit` · `verb_invoked` · `tool_invoked` ·
+`checkpoint_written` · `cost_incurred` · `infer_chunk` ·
+`permit_checked` · `lift` · `run_sealed` ·
+`agent_tools_selected` · `agent_nudge` · `agent_stalled` ·
+`agent_compose_checked` · `agent_budget_checkpoint` · `agent_image_observed`
+
+Per-task terminal frames carry the task's witness fields (the observed
+`task_completed`: `task` · `note` · `duration_ms` · `def_hash` ·
+`input_hash` · `output` · `outcome` · the outcome record serialized).
+
+A `for_each` task's terminal frame (`task_completed` · `task_failed`)
+additionally carries **`items`** inline (additive · reference engine 0.118): ONE
+JSON array text · one row per item in input order · `index` · `item` (the
+item's identity, bounded) · `status` ∈ `ok` · `recovered` · `failed` ·
+`cancelled` · `never_started` · `code` and `message` when an error was recorded. Failures
+2..N reach the journal with their own codes; the items a stopped batch
+never started are named as such.
+
+`cancelled` means an iteration began execution but was abandoned without a
+recorded terminal outcome. `never_started` is reserved for iterations whose
+execution never began. A producer MUST retain an already recorded `ok`,
+`recovered` or `failed` outcome when another iteration stops the batch. It MUST
+NOT relabel pending started iterations as `never_started` to fill the table.
+These are execution-observation states, not evidence that a provider accepted
+a request, that no physical request was sent, or that an external effect was
+rolled back. Cost evidence remains a separate observation.
+
+The `cancelled` item status and its paged count below extend the reference
+engine's 0.121 vocabulary at the next engine MINOR. They do not introduce a
+workflow syntax version or a new trace envelope version. An older reader may
+preserve an unfamiliar inline row as uninterpreted data, or report a table as
+unrecorded; it MUST NOT reinterpret `cancelled` as `never_started`, success or
+zero spend. A chain verdict alone does not prove support for the item vocabulary.
+
+The workflow terminal frames (`workflow_completed` · `workflow_failed` ·
+`workflow_cancelled`) additionally carry the run's **summary** (additive ·
+reference engine 0.118) beside the cost fields (`total_cost_usd` ·
+`unpriced_calls` · `cost_by_source` · `pricing_as_of`): `status` ·
+`elapsed_ms` (the run clock, read through the engine's clock seam) ·
+`tasks_total` · `tasks_ok` · `tasks_failed` · `tasks_recovered` ·
+`tasks_skipped` · `tasks_cancelled` · what a human card computes, so a
+machine reader never re-derives it from the task frames.
+
+### Paged item evidence
+
+A large item table MAY instead be emitted as ordered **`task_items`**
+frames before its task terminal. Each page carries `task`, a zero-based
+integer `page`, and `items` as JSON array text containing whole rows with
+the same shape and global indexes as the inline table. Each page is a
+normal event with its own identity and chain link. It is not a task
+terminal and does not change task state, spend or execution authority.
+
+The terminal then omits inline `items` and closes the page set with:
+
+| Field | Meaning |
+|---|---|
+| `items_pages` | Number of pages, indexed contiguously from zero |
+| `items_total` | Number of rows, indexed contiguously from zero |
+| `items_ok` | Rows whose status is `ok` or `recovered` |
+| `items_recovered` | Recovered rows, a subset of `items_ok` |
+| `items_failed` | Failed rows |
+| `items_cancelled` | Started rows abandoned without a recorded terminal outcome |
+| `items_never_started` | Rows that never started |
+
+A reader folds pages by task and observation leg, preserving input order.
+It exposes a complete table only after a terminal whose page count, row
+count and status counts match the collected rows. Missing, repeated,
+reordered or malformed pages must not become a complete table. A new task
+start clears pending pages for that task; pages cannot leak into a resumed
+observation. The chain walk still judges the original physical frames;
+materializing a table never rewrites or rehashes those frames.
+
+New producers include `items_cancelled`, including zero, in every paged
+terminal. A reader MAY accept its absence in a historical terminal only when
+the collected rows contain no `cancelled` status. A missing count beside a
+cancelled row, an unknown status, or a mismatch in any status count MUST leave
+the table incomplete. `items_ok + items_failed + items_cancelled +
+items_never_started` equals `items_total`; `items_recovered` remains a subset
+of `items_ok` and is not added a second time.
+
+The implementation chooses when to page. Every encoded page still obeys
+the journal's line bound in [15 §the verifier is a fortress](./15-proof.md),
+including JSON escaping and the event envelope. Paging does not relax the
+limits for an individual oversized row, a task output or the whole journal;
+it never truncates rows to manufacture complete evidence. Inline tables
+remain valid. An older verifier can ignore the new kind and still check
+the chain; an older item reader may report the paged table as unrecorded.
+
+### Harness image observations (additive)
+
+`agent_image_observed` is diagnostic Agent-class evidence, never a task
+terminal, permission decision, invoice or proof of a peer's saved file. Each
+frame carries `task`, `attempt`, optional `iteration`, and `harness_image`: one
+compact JSON observation with source, received-byte digest/size/MIME, the
+local blob locator when stored, and `storage`: `stored`, `failed`, `none`
+(path-only) or `unconfirmed` (bytes received, no store answer observed, for
+instance a cancelled task; a blob may or may not exist). It carries no inline
+image payload. A peer-reported savedPath stays a claim, never file authority.
+
+A task terminal (completed, failed or skipped) carries `harness_media_count`,
+closing the image sequence of that observation leg; it carries no aggregate of
+the rows, so a large fan-out keeps every observation in its own bounded frame.
+A reader claiming complete image evidence checks the count against the frames
+it folded; a missing count after frames, a mismatch or a malformed frame leaves
+the evidence incomplete. A UI sample names the exact total and any missing
+evidence. Existing 1 MiB journal-line limits are unchanged.
+
+A harness task terminal MAY carry `model_reported` and `model_reported_source`
+(`session_config` · `confirmed_selection` · `accepted_request` ·
+`unspecified`): the session model the harness reported. It is not
+`model_served`, which stays a response attestation.
+
+## The permit witness (normative · REQUIRED · NEP-0007)
+
+Every permit decision taken at the dispatch boundary is a
+`permit_checked` frame · granted AND refused alike: the exec program
+gate, the tool grant, the taint re-gate ([10](./10-authority.md) ·
+NEP-0004), the environment composition (NEP-0005 · the passed names),
+and the data-as-code sink (NEP-0006). The per-operation fs/net
+enforcement decisions live inside the builtin sinks (their refusals
+surface as typed task failures; their allow-side witness is the
+declared v1 residual · NEP-0007 law 2). The frame's fields name the `gate` (the
+bound consulted), the `decision` (`allow` \| `deny`), the `why` (the
+law applied), and the `task`. This is a CONFORMANCE requirement on the
+ENGINE, not a wire bump: the frame grammar is unchanged (one more kind
+in the stream), so `trace_format` stays 2. A journal from an OLDER
+conformant engine simply lacks the frames: `nika trace verify` reports
+a run that exercised effects with zero permit-decision frames as a
+FINDING (the witness is absent · the journal is old or the engine is
+not NEP-0007-conformant) · never FORGED (the chain still holds), never
+a crash.
+
+The witness is what makes invariant 4 · judged = executed = attested ·
+CHECKABLE: the static judge's verdicts, the runtime's decisions, and
+the journal's frames speak the same boundary, and the conformance
+differential replays the same inputs through checker and engine and
+FAILS on any verdict divergence.
+
+## The end of the run (normative · the teardown seal and `incomplete`)
+
+The chain proves the sequence; the run's END is a separate claim, and
+it has three parts.
+
+**1 · The seal binds the teardown.** A `run_sealed` frame's `covers`
+object carries the classic four — the chain `head`, the frame `events`
+count, the `workflow` hash, the `engine` — and extends **additively**
+with the teardown facts: `receipt_digest` (the receipt folded at the
+seal instant, over this seal's own pre-seal chain facts), `budgets`
+(the consumed ρ, present only when metered — never a fabricated zero),
+and `effects` (the exercised ε beside the declared bound). A seal
+without teardown facts stays **byte-identical** to the classic
+four-field form and verifies exactly as before; a seal that carries
+them binds them under the same signature. One signature surface, not a
+second artifact.
+
+A failed run owes the same seal an **attested quarantine**: when it
+dies after producing partly-written outputs, the teardown names those
+artifacts and marks them quarantined, and a quarantined artifact
+re-entering as a later run's input is a finding. v1 owes the NAMING and
+the CONTAINMENT — not the undoing. Compensating actions across services
+are a different problem and stay out; what a half-written file must
+never do is pass for a whole one.
+
+**2 · A journal with no terminal frame is `incomplete`.** A chain walk
+that reaches no lifecycle-terminal frame (`workflow_completed` ·
+`workflow_failed` · `workflow_cancelled` · `workflow_paused` ·
+`run_sealed`) classifies the journal **`incomplete`** — and that
+classification is the READER's, never a frame the dying process emits.
+A process killed mid-flight cannot attest its own death: any protocol
+that asks it to is vacuous exactly when it matters, so the verifier —
+the only party guaranteed to exist at reading time — carries the name.
+
+`incomplete` is **never** success and **never** silently equal to
+failure or to forgery: the chain still binds, so the journal is
+honestly what it is — a run whose end is unknown. Before it had a
+name, « no verdict » was routinely read as « fine ». The verifier's
+exit says it too: `incomplete` exits on its own class (5), never on
+the ladder a finished walk climbs (0) and never as forgery (2).
+
+**3 · Judged ≠ booted is a refusal.** A check report stamped with the
+semantic hash of the workflow it judged must match the workflow the run
+is booting. On mismatch the run REFUSES **before its first frame** —
+zero events, no file (the lazy-open law above) — rather than producing
+a journal a reader must later distrust. The grain is SEMANTIC: a
+cosmetic edit (whitespace · a comment) re-keys nothing and never
+refuses; a content edit does, structure-preserving or not. An
+UNSTAMPED report skips the clause — the stamp is the producer's opt-in,
+and the trust backstops stand either way.
+
+## The fold law (pointer)
+
+Every proof consumer reads THIS stream: the receipt folds from it
+([15](./15-proof.md)), `--resume` replans from it, `nika trace
+show|replay` renders it, the verify walk re-hashes it. One stream, no
+side-channel.
+
+**Resuming across engine versions is judged, never assumed**
+(normative) · a journal records the `engine_version` that wrote it. A
+resume under a DIFFERENT engine is either an explicit refusal naming
+both versions, or a compatibility the operator DECLARES — and the
+declaration must name the recorded version exactly (a journal from
+before versioning is named `unrecorded`). A blanket force is not
+available, because a blanket force is precisely the silent degradation
+this law retires: the old implicit fallback quietly replanned an empty
+plan and called it a resume. The declared compatibility is journaled on
+the new run's boot manifest, so the attestation says under whose
+authority the versions were crossed.
+
+## Conformance
+
+A v1-conformant engine MUST ·
+
+1. Write one chained NDJSON journal per run that emits at least one frame (lazy open · append-only · infallible rider)
+2. Open with the version-2 prologue (the manifest fields above · `trace_format: 2`)
+3. Chain every line to the previous line's exact bytes (genesis-tagged · the head reported at run end)
+4. Emit a terminal workflow frame (`workflow_completed` \| `workflow_failed` \| `workflow_cancelled` \| `workflow_paused`) and a terminal task frame per settled task
+5. Emit a `permit_checked` frame for every permit decision, granted and refused alike (NEP-0007 · the witness)
+6. Tolerate unknown members, fields, and kinds when READING a journal (the additive law · report « unrecorded », never guess)
+7. Classify a journal reaching no lifecycle-terminal frame as `incomplete` when READING it — never as success, never as forgery (§the end of the run)
+
+---
+
+🦋 *Related · [15 · Proof](./15-proof.md) · [10 · Authority](./10-authority.md) · [07 · Conformance](./07-conformance.md)*
+
 <!-- ═══ conformance/runner-protocol.md ═══ -->
 
 # Conformance runner protocol
@@ -10495,22 +10892,46 @@ workflow, any backend ») on this suite's own fixture
 `stdlib/providers/005-valid-parameterized-model`. A rung that cannot
 decide must not refuse.
 
-### Native CLI (planned)
+**Re-measured 2026-10-24 · engine 0.123.0 · 414 of 421** (the released
+binary, `nika 0.123.0 (0bfde3765)`, on fixtures byte-identical to
+`6390b08`, the commit it embeds): core 247/248 · deep 50/50 · stdlib
+100/106 · values 10/10 · types 4/4 · gates 3/3. The seven reds are named:
+
+- `core/envelope/055-secret-source-vault-withdrawn-refused` · the engine
+  still admits a `source: vault` secret, which
+  [01](../spec/01-envelope.md) withdrew until an engine resolves it.
+- `stdlib/001` · `stdlib/providers/001 · 002 · 006` · the MODELS rung now
+  emits `NIKA-PROVIDER` as a bare code, with no number and no category.
+  The [matching rule](#matching-rule-an-expected-entry-vs-the-emitted-set)
+  matches an expected namespace only through a code that starts with
+  `NIKA-PROVIDER-` (05 numbers them 001-099) or an emitted namespace, so
+  the fixtures' `NIKA-PROVIDER` expectation finds no match.
+- `stdlib/hash/002 · 003` · `nika:hash` takes only `content`, `algo` and
+  `encoding` in this engine, so it refuses the signing arguments with
+  `NIKA-BUILTIN-001` (`key` and `op` in 002; `op`, `public_key` and
+  `signature` in 003). 002 is also refused with `NIKA-SEC-006`: its secret
+  key reaches `nika:hash` with no `egress:` sanction, which
+  [01 §egress](../spec/01-envelope.md#egress--optional--sanctioned-destinations-declassification)
+  refuses by default. That cause is the fixture's: it is not whole-spec
+  legal until the key carries `egress: [{ to: "nika:hash" }]`.
+
+The behavioral differential agrees wherever it measures: 170 fixtures ·
+124 agree · 0 diverge · 0 engine errors · 46 UNSUPPORTED (no qualified
+adapter for their contract yet).
+[`CONFORMANT_IMPLEMENTATIONS.md`](../CONFORMANT_IMPLEMENTATIONS.md) carries
+the row.
+
+### No native conformance command
+
+The reference engine has no `conformance` subcommand: `nika conformance`
+is an unrecognized subcommand in 0.123.0, and the maintained 0.123 line
+plans none. Any engine, the reference one included, is measured from
+outside, by this repository's runners:
 
 ```bash
-nika conformance run conformance/tests/core      # one level
-# any engine · same fixtures
-<engine> conformance run conformance/tests/core
-```
-
-Output (planned) ·
-
-```
-PASS  core/envelope/001-valid-minimal
-PASS  core/dag-topology/003-when-reference-without-depends-on (NIKA-DAG-003)
-FAIL  core/dag-topology/001-cycle (expected NIKA-DAG-001, got NIKA-PARSE-007)
-...
-Summary · 13/14 passed · 1 failed
+conformance/run.sh <engine>                                  # every corpus file vs its # Expected: header
+NIKA_BIN=<engine> sh scripts/parity-sweep.sh                 # the static tiers through the adapter
+NIKA_BIN=<engine> python3 scripts/runtime-differential.py    # the behavioral tier
 ```
 
 ## Adoption
@@ -10536,13 +10957,45 @@ conformance · open a PR on `supernovae-st/nika-spec` to be listed in
 
 | Implementation | Language | Core | Runtime | Stdlib | Spec commit | Verified |
 |---|---|---|---|---|---|---|
-| [nika](https://github.com/supernovae-st/nika) (reference engine · 0.106.1) | Rust | ✅ **131/131** core fixtures — BY COMMAND, never linkage (the Bowtie adapter · `NIKA_BIN=… sh scripts/parity-sweep.sh` · full static sweep 213/217, every remaining divergence a NAMED engine owe: the codeless rungs [nika#761](https://github.com/supernovae-st/nika/issues/761)) | ✅ **56/56** behavioral fixtures by command (`NIKA_BIN=… python3 scripts/runtime-differential.py` · the run + trace doors) | ✅ static surface 28/32 (the 4 reds are the [#761](https://github.com/supernovae-st/nika/issues/761) codeless MODELS rung) · lints 4/4 at the only door + 25 NO-DOOR ([#763](https://github.com/supernovae-st/nika/issues/763)) · behavioral half pending | `63a6295` | 2026-07-30 |
+| [nika](https://github.com/supernovae-st/nika) (reference engine · **0.123.0**, the maintained reference release) | Rust | ⚠️ **247/248** core fixtures by command (`NIKA_BIN=… sh scripts/parity-sweep.sh` · full static sweep **414/421**: core 247/248 · deep 50/50 · stdlib 100/106 · values 10/10 · types 4/4 · gates 3/3). The one core red: `core/envelope/055-secret-source-vault-withdrawn-refused`, a `source: vault` secret the engine still admits after 01 withdrew it | **124/124 measured agree** · 0 diverge · 0 engine errors (`NIKA_BIN=… python3 scripts/runtime-differential.py` · the run, trace and access doors); 46 of the 170 behavioral fixtures are UNSUPPORTED by this runner (no qualified adapter yet), named and never counted as passes | ⚠️ static surface **100/106**: `stdlib/001` and `stdlib/providers/001 · 002 · 006` (a bare `NIKA-PROVIDER` code with no number, which the runner's matching rule cannot match to the expected namespace), `stdlib/hash/002 · 003` (the signing arguments of `nika:hash`, spec-ahead of this engine, refused with `NIKA-BUILTIN-001`: `key` and `op` in 002, `op`, `public_key` and `signature` in 003; 002 is also refused with `NIKA-SEC-006`: its secret key reaches `nika:hash` with no `egress:` sanction, which [01 §egress](spec/01-envelope.md#egress--optional--sanctioned-destinations-declassification) refuses, so that cause is the fixture's) · lints **7/7** at the only door + 25 NO-DOOR (`NIKA_BIN=… python3 scripts/lints-differential.py`) | `6390b08` | 2026-10-24 |
+| [nika](https://github.com/supernovae-st/nika) (reference engine · 0.106.1 · superseded by the row above) | Rust | ✅ **131/131** core fixtures — BY COMMAND, never linkage (the Bowtie adapter · `NIKA_BIN=… sh scripts/parity-sweep.sh` · full static sweep 213/217, every remaining divergence a NAMED engine owe: the codeless rungs [nika#761](https://github.com/supernovae-st/nika/issues/761)) | ✅ **56/56** behavioral fixtures by command (`NIKA_BIN=… python3 scripts/runtime-differential.py` · the run + trace doors) | ✅ static surface 28/32 (the 4 reds are the [#761](https://github.com/supernovae-st/nika/issues/761) codeless MODELS rung) · lints 4/4 at the only door + 25 NO-DOOR ([#763](https://github.com/supernovae-st/nika/issues/763)) · behavioral half pending | `63a6295` | 2026-07-30 |
+
+The 0.123.0 row was replayed with the released binary (`nika 0.123.0
+(0bfde3765)`) on `main` at `7937fc9`, whose conformance tree is
+byte-identical to `6390b08`, the commit engine 0.123.0 embeds (its
+`SPEC_PIN`). It earns
+no level claim at that commit: Core has one red, and the Runtime and
+Stdlib v0.1 levels include Core ([07 §Level 2](spec/07-conformance.md#level-2--runtime-conformance)).
+Every red is named above, and the behavior this runner measures agrees.
+
+`conformance/run.sh nika` over its 106-file corpus at `6390b08` (macOS
+arm64) gives 90 PASS · 10 DRIFT · 0 DIVERGENT · 6 BUG. Seven DRIFTs come
+from the macOS exec sandbox refusing the confined process (`NIKA-SEC-001`
+where the file expects `NIKA-EXEC-001`). Four files are refused at check
+by the reference oracle as well, before anything runs. Three use shapes
+the language no longer accepts: `verbs/timeout-per-iteration` sets
+`fail_fast` on the task instead of inside `for_each:` (`NIKA-PARSE-005`),
+and `dag/foreach-fail-fast-false` and `dag/foreach-fail-fast-true` run
+`exec:` with no `permits:` block (`NIKA-AUTH-006`) over a `const.items`
+written as a typed declaration, an object where `for_each` needs an array
+(the engine adds `NIKA-VAR-006`). Their bodies lag the spec, not their
+expected-result headers, and the exec sandbox plays no part: they can be
+repaired statically on any platform. The fourth,
+`envelope/trifecta-human-gate-dominates`, broke the consent law
+(`NIKA-SEC-014`) and is repaired after the pin. Five remain divergences to
+triage: `dag/foreach-empty-skips`, `dag/when-false-skips`,
+`envelope/permits-empty-default-deny`, `envelope/sec-exec-blocklist-rm-rf`
+and `verbs/agent-injection-contained`.
 
 ## How to be listed
 
-1. Run the suite against your engine ·
-   `<engine> conformance run conformance/tests/<level>` (or validate each
-   fixture per the [runner protocol](conformance/runner-protocol.md)).
+1. Run the suite against your engine: `conformance/run.sh <your-engine>`
+   scores every corpus file against the intent its `# Expected:` header
+   declares, or `python3 conformance/runner.py run conformance/tests/<level>
+   --engine "<adapter>"` drives the declarative fixtures through a small
+   adapter (see the [runner protocol](conformance/runner-protocol.md)
+   §Third-party mode). There is no built-in `conformance` subcommand to
+   call on an engine.
 2. Open a PR on [supernovae-st/nika-spec](https://github.com/supernovae-st/nika-spec)
    adding a row · include the spec commit you ran against and a reproducible
    command or CI link.
@@ -10562,6 +11015,13 @@ conformance · open a PR on `supernovae-st/nika-spec` to be listed in
 - **Status**: Active · **DORMANT until the v1 pre-freeze** (process NEP · never Final)
 - **Type**: Process
 - **Created**: 2026-07-18
+
+> **Status note · 2026-10-23.** Engine 0.123.0 is the open-source
+> reference release, and the project is maintained after it (security
+> fixes, bug fixes and compatibility). No pre-freeze is scheduled, so this
+> process stays dormant: a change to the spec is a pull request against
+> `spec/` with its fixtures. The process below is unchanged and ready if
+> a future change needs a proposal.
 
 > **Dormant, and this is what wakes it: the pre-freeze of the language
 > at v1.** A proposal process only has meaning against something FROZEN.
@@ -12104,8 +12564,8 @@ infer:
 fields let you write the silent-nonsense combination `provider: anthropic` +
 `model: gpt-4o`. One `<provider>/<name>` string is atomic, self-documenting,
 trivially swappable, and the industry standard. The same open model served by
-different backends disambiguates cleanly · `groq/qwen3.5-32b` vs
-`ollama/qwen3.5:27b`.
+different backends disambiguates cleanly · `groq/llama-3.3-70b-versatile` vs
+`ollama/llama3.3:70b`.
 
 **Parameterize it** · combine with typed inputs to run one workflow
 against any backend ·
@@ -12116,7 +12576,7 @@ inputs:
 tasks:
   x:
     infer: { model: "${{ inputs.model }}", prompt: "..." }
-# nika run flow.yaml --var model=mistral/mistral-large   ← same workflow, cloud
+# nika run flow.nika --var model=mistral/mistral-large-latest   ← same workflow, cloud
 ```
 
 ---
@@ -12446,11 +12906,11 @@ infer:
 
 ```yaml
 infer:
-  model: anthropic/claude-3-5-sonnet
+  model: anthropic/claude-sonnet-5-5
   prompt: "..."
 ```
 
-**Models** · `claude-3-5-sonnet` · `claude-3-5-haiku` · `claude-3-opus` · (and any newer · model name pass-through).
+**Models** · `claude-sonnet-5-5` · `claude-opus-5-5` · `claude-haiku-5-5` · (and any newer · model name pass-through · `nika catalog` lists the ones the engine knows, and `nika check` reports whether it prices one).
 
 **Auth** · `ANTHROPIC_API_KEY` env var · OR engine config.
 
@@ -12570,7 +13030,7 @@ NIM).
 
 **Models** · catalog ids are `org/model`: the workflow form is
 `nvidia/<org>/<model>`. E.g. `nvidia/nvidia/nemotron-3-super-120b-a12b` ·
-`nvidia/nvidia/nemotron-3-nano-30b-a3b` · `nvidia/deepseek-ai/deepseek-r1`.
+`nvidia/nvidia/nemotron-3-nano-30b-a3b` · `nvidia/meta/llama-3.1-70b-instruct`.
 
 **Auth** · `NVIDIA_API_KEY` env var (`nvapi-…` from build.nvidia.com ·
 free developer tier · ~40 RPM baseline).
@@ -12589,7 +13049,7 @@ fully local via `ollama/…`.
 
 ```yaml
 infer:
-  model: moonshot/kimi-k3
+  model: moonshot/kimi-k2
   prompt: "..."
 ```
 
@@ -12601,10 +13061,12 @@ a self-host path is first-class · see the sovereignty note below). Added
 2026-07-17 (ADR-105 · the frontier open-weight access category · the
 openrouter and ADR-104 precedent applied).
 
-**Models** · `moonshot/kimi-k3` (default · thinking · frontier) ·
-`moonshot/kimi-k2.6` (the cheaper seat) · `moonshot/kimi-k2.7-code` /
-`moonshot/kimi-k2.7-code-highspeed` (coding) · the model name passes through
-verbatim.
+**Models** · the engine 0.123.0 catalog lists `moonshot/kimi-k2` (its
+default) and `moonshot/kimi-k2.5`; any other Kimi name (`kimi-k3` ·
+`kimi-k2.6` · `kimi-k2.7-code` · `kimi-k2.7-code-highspeed`) passes through
+verbatim. **Engine 0.123.0 prices no Moonshot model**: `nika check` counts
+the task as unpriced, and a run capped with `--max-cost-usd` refuses to
+start (`NIKA-1709`). Drop the cap, or pick a priced seat for a capped run.
 
 **Auth** · `MOONSHOT_API_KEY` env var (`sk-…`).
 
@@ -12650,11 +13112,11 @@ infer:
 
 ```yaml
 infer:
-  model: deepseek/deepseek-chat
+  model: deepseek/deepseek-flash
   prompt: "..."
 ```
 
-**Models** · `deepseek-chat` · `deepseek-reasoner` · (pass-through).
+**Models** · `deepseek-flash` · `deepseek-v4-pro` · (pass-through).
 
 **Auth** · `DEEPSEEK_API_KEY` env var.
 
@@ -12666,11 +13128,11 @@ infer:
 
 ```yaml
 infer:
-  model: gemini/gemini-2.0-flash
+  model: gemini/gemini-2.5-flash
   prompt: "..."
 ```
 
-**Models** · `gemini-2.0-flash` · `gemini-2.0-pro` · `gemini-1.5-pro` · (pass-through).
+**Models** · `gemini-2.5-flash` · `gemini-2.5-pro` · `gemini-3.1-flash-lite` · (pass-through).
 
 **Auth** · `GEMINI_API_KEY` env var (`NIKA_GEMINI_API_KEY` overrides it · the engine reads the NIKA-prefixed name first).
 
@@ -12682,11 +13144,11 @@ infer:
 
 ```yaml
 infer:
-  model: xai/grok-2-latest
+  model: xai/grok-4.7
   prompt: "..."
 ```
 
-**Models** · `grok-2-latest` · `grok-vision-latest` · (pass-through).
+**Models** · `grok-4.7` · `grok-4.3` · (pass-through).
 
 **Auth** · `XAI_API_KEY` env var.
 
@@ -12739,7 +13201,7 @@ When using the same workflow with different providers ·
 - The **structured output** uses JSON Schema (engine adapts to provider's native mechanism · JSON mode · function calling · etc.)
 - The **vision input** is provider-agnostic in the workflow · the engine adapts
 
-A workflow can switch providers with one line change (`model: ollama/qwen3.5:9b` → `model: mistral/mistral-large`, or any other `<provider>/<name>`) for most use cases.
+A workflow can switch providers with one line change (`model: ollama/qwen3.5:9b` → `model: mistral/mistral-large-latest`, or any other `<provider>/<name>`) for most use cases.
 
 ---
 
@@ -12750,7 +13212,7 @@ New providers MAY enter stdlib v0.x. Provider-specific options that don't map to
 ```yaml
 # Forward-compat (post-v0.1)
 infer:
-  model: anthropic/claude-3-5-sonnet
+  model: anthropic/claude-sonnet-5-5
   provider_options:
     cache_control: { type: "ephemeral" }
     beta: ["custom-feature"]

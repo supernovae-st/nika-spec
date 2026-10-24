@@ -2,4 +2,4 @@
 interface:
   display_name: "Nika Project Archive"
   short_description: "Read historical GitHub Project records"
-  default_prompt: "Use $nika-project-os-ui to inspect a historical Nika Project record and distinguish it from current Linear planning."
+  default_prompt: "Use $nika-project-os-ui to inspect a historical Nika Project record and distinguish it from current planning, which is tracked privately."

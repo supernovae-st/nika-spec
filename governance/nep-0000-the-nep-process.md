@@ -7,6 +7,13 @@
 - **Type**: Process
 - **Created**: 2026-07-18
 
+> **Status note · 2026-10-23.** Engine 0.123.0 is the open-source
+> reference release, and the project is maintained after it (security
+> fixes, bug fixes and compatibility). No pre-freeze is scheduled, so this
+> process stays dormant: a change to the spec is a pull request against
+> `spec/` with its fixtures. The process below is unchanged and ready if
+> a future change needs a proposal.
+
 > **Dormant, and this is what wakes it: the pre-freeze of the language
 > at v1.** A proposal process only has meaning against something FROZEN.
 > Before the freeze there is nothing to propose *against* — a new law is

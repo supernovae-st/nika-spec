@@ -155,6 +155,7 @@ jobs:
         run: |
           python scripts/canon-projectors.py --check
           python scripts/showcase-projector.py --check
+          python scripts/tests/test_showcase_projector.py
           python scripts/llms-projector.py --check
           python scripts/ssot-map-projector.py --check
           python scripts/ssot-map-projector.py --selftest

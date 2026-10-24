@@ -13,6 +13,251 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+Changes merged after the spec commit engine 0.123.0 embeds. They reach the
+engine at its next `SPEC_PIN` bump.
+
+### Changed · the timeline records the reference release (2026-10-24)
+
+- `timeline/timeline.yaml` gains two dated entries, each re-proven by
+  `timeline/verify.py`: the Connectome stops being a launch condition
+  (2026-10-08, D-2026-10-08-N1) and 0.123 becomes the reference release with
+  the project in maintenance (2026-10-23). The forward gates keep their
+  titles, conditions and notes; each gains a dated `amended:` note, and the
+  ones that planned a 1.0 now say it is not scheduled.
+- `verify.py` refuses an `amended:` note that is not `YYYY-MM-DD · <note>`,
+  is out of date order or is dated ahead of today.
+
+### Fixed · the retired Project archive points at the public door (2026-10-24)
+
+- `project/` sent readers to a private planning workspace that outside
+  readers cannot open (its README, manifest, CLI, verifier and skill). It
+  now says planning is tracked privately and points at the public issues;
+  the offline verifier requires that door and refuses a private planning
+  URL, and a test keeps every file of the archive free of one. The
+  timeline links in the archive's projections go to the docs page.
+
+### Changed · the maintained line in the governing texts (2026-10-24)
+
+- 00 §Pre-1.0 stability contract gains a dated amendment: engine 0.123.0
+  is the reference release, no engine 1.0.0 is scheduled, and in the
+  maintained line the grammar changes only through recorded fixes, each
+  with its fixtures. The contract below it is kept as written, and the
+  overview no longer says the engine's semver runs toward a 1.0 release.
+- NEP-0000 carries a dated status note (dormant, no pre-freeze scheduled),
+  CONTRIBUTING names the door in use, and SECURITY stops promising fixes
+  to a "latest tagged release" this repository never had.
+- The closing section of this file (Why no 0.0.x) and `schemas/README.md`
+  still planned a `0.1.0` GA. Each gains a dated note that no GA is
+  scheduled; the plan is kept as history.
+
+### Changed · the README describes the reference release (2026-10-24)
+
+- Status names engine 0.123.0 as the open-source reference release, the
+  spec commit it embeds (`6390b08`) and the maintenance that follows; it
+  no longer promises a v0.1.0 GA or ties the language's stability to an
+  engine 1.0.0, which is not scheduled. The timeline link goes to the docs
+  page that renders it, with its forward gates labelled as history.
+- The engine clips load from the `v0.123.0` tag instead of a moving
+  `main`. Each caption keeps its true capture version (0.121.0) and says
+  what 0.123.0 prints for the same commands, checked by re-running them;
+  the text capture of `nika check hello.nika` is re-taken on 0.123.0. The
+  four clips the README links rather than embeds are labelled with their
+  capture version too, and the gallery link adds that 0.123.0 lists 36
+  jobs where the clip, captured with 0.121.0, shows 35.
+- The family table describes the editor extension as the other
+  repositories do: frozen at 0.120 and not qualified with 0.123, with
+  `nika lsp` and the JSON Schema to use instead.
+- Step 1 creates a virtual environment first: on Homebrew Python a bare
+  `pip install` stops with `externally-managed-environment`.
+- The pin example reads engine v0.123.0 (`6390b08`), and the related links
+  skip the nika.sh pages that only redirect to the docs.
+
+### Fixed · QUICKSTART counts (2026-10-24)
+
+- The QUICKSTART said 5 variable namespaces two sections before saying 6
+  (`run` joined on 2026-10-12) and 6 templates where the pack ships 22.
+  Both now carry canon markers, so the projector keeps them true. Its
+  status line names the spec version engine 0.123.0 embeds instead of an
+  unbalanced « GA hardening » note.
+
+### Fixed · the schema address editors use (2026-10-24)
+
+- 07 §Editor tooling shows the modeline at the schema's own `$id`,
+  `https://nika.sh/spec/v1/workflow.schema.json`, which the examples, the
+  templates and `nika init` already use. It says that this address serves
+  a copy published with the website, and that the copy can lag: on
+  2026-10-24 it served the 2026-09-18 revision, which flags
+  `nika:remove_file`, the `{ file: }` forms and `for_each.max_items` in a
+  valid workflow. For the exact schema an engine embeds it names
+  `nika spec --schema` offline and the address pinned at the spec commit
+  online (`6390b08` for engine 0.123.0). The per-minor address it describes
+  as the target (`nika.sh/schema/v0.1/…`) is marked as not served: it
+  answers 404, and a reader who copied it got no schema. The normative
+  paragraph keeps its law and its two causes.
+- `llms.txt` gives agents the same address with the same warning, and both
+  llms files now carry 17 · Trace, which they left out.
+
+### Fixed · pre-commit hooks a consumer can install (2026-10-24)
+
+- `nika-check-strict` ran `nika check --strict`, a flag the engine rejects,
+  so the hook failed on every commit; it runs `nika check --native-strict`.
+  The usage comment pinned `rev: v0.1.0`, a tag this repository never had:
+  it now points `nika-check` at the engine's maintained hook (`v0.123.0`)
+  and says to pin this repository's hooks at a commit SHA.
+
+### Fixed · the human-gate twin obeys the consent law (2026-10-24)
+
+- `conformance/envelope/trifecta-human-gate-dominates.nika` declares
+  `check-pass (static only)`, yet both the reference oracle and engine
+  0.123.0 refused it with `NIKA-SEC-014`: a « no » skips `ingest`, the
+  skipped value reads null on the `with:` edge, and `exfil` still attempted
+  its notify. `exfil` now consumes the gate's answer itself; both oracles
+  accept the file, and `conformance/run.sh` scores the trifecta pair
+  PASS=2. The registry records the rest of the corpus run.
+
+### Changed · engine 0.123.0 in the conformance registry (2026-10-24)
+
+- `CONFORMANT_IMPLEMENTATIONS.md` lists the reference release, measured with
+  the released binary at `6390b08`: static sweep 414/421 (core 247/248),
+  runtime differential 124 agree · 0 diverge · 46 unsupported of 170,
+  lints 7/7. It earns no level claim at that commit, and each red is named
+  with every cause the binary reports: `stdlib/hash/002` is refused for its
+  signing arguments and, with `NIKA-SEC-006`, for a secret key with no
+  `egress:` sanction, a cause that is the fixture's. The `conformance/run.sh`
+  corpus run is recorded file by file; the three corpus files both oracles
+  refuse at check use shapes the language no longer accepts and can be
+  repaired statically. The 0.106.1 row stays as history.
+- "How to be listed" and the runner protocol stop pointing at a native
+  `conformance` subcommand: no engine ships one, 0.123.0 included, and the
+  maintained line plans none. The suite is driven by `conformance/run.sh`,
+  `scripts/parity-sweep.sh` and `scripts/runtime-differential.py`.
+
+### Fixed · the lints differential measures again (2026-10-24)
+
+- `scripts/lints-differential.py` handed the engine `input.yaml`, which the
+  engine has refused as a program since the `.nika` hard cut. The reply was
+  a parse-fatal report with no hints, read as silence: the clean fixtures
+  "agreed" without being measured and the firing ones diverged. Fixtures
+  are now staged as `input.nika` with their side files in a throwaway
+  directory, a parse-fatal report counts as an engine error, and the
+  `egress` hints the eg001 fixtures expect are read through the same door.
+  On engine 0.123.0: 7 measured, 7 agree, 25 NO-DOOR.
+
+### Fixed · the showcase tiers the docs count (2026-10-24)
+
+- `scripts/showcase-projector.py` reads each job's tier from its
+  `# showcase · T<n>` banner. It sliced the tier from a `t2-` filename
+  prefix that the flat `examples/` path no longer has, so the projected
+  `_showcase.mdx` always said 0 starters, 0 chains, 0 fan-outs and 0 epics.
+  A job without the banner now stops the projector, in CI too, and a test
+  pins the reading.
+
+### Fixed · two jobs on their refused paths (2026-10-24)
+
+- `examples/release-notes.nika` no longer drafts notes from a sample log when
+  `git log` fails. Where git cannot be read (no such tag, not a repository,
+  or a refused command, as under the macOS sandbox in 0.123.0), `history`
+  recovers a notice that names the failure, and `notes`, `changelog` and
+  `announce` close on it; before, the sample commits reached
+  `out/CHANGELOG.md` and, with `announce=true`, the team. The sample log is
+  now an explicit rehearsal (`--var rehearse=true`), never announced.
+  `changelog` and `announce` bind the whole `notes` value before reading a
+  field of it, and each effect consumes the gate's answer itself, so
+  `nika check` reports no hint.
+- `examples/pr-review-fanout.nika`: `reviews` closes when `files` is skipped.
+  A « no » at the gate made the fan-out fail (`NIKA-VAR-006`, for_each over
+  null), blocked `merged`, `summary` and `save`, and exited 1. Both answers
+  now exit 0; the graph and its waves are unchanged.
+
+### Fixed · model ids a reader can paste (2026-10-24)
+
+- The swap hints, the chapter examples, the QUICKSTART and the providers
+  stdlib name ids the 0.123.0 catalog resolves and prices, Moonshot aside
+  (below): `groq/llama-3.3-70b-versatile` (`groq/llama-3.3-70b` is
+  refused: Cerebras serves that model), `mistral/mistral-large-latest` and
+  `mistral/mistral-small-latest` (the bare names are uncatalogued and
+  unpriced, so a `--max-cost-usd` run refuses them with `NIKA-1709`),
+  current Anthropic, DeepSeek, Gemini and xAI ids in place of retired ones,
+  and `nvidia/meta/llama-3.1-70b-instruct` in place of the unpriced
+  `nvidia/deepseek-ai/deepseek-r1`.
+- The Moonshot section's example and default were `moonshot/kimi-k3`, which
+  the catalog does not list. It now names the two ids the catalog lists,
+  `moonshot/kimi-k2` (its default) and `moonshot/kimi-k2.5`, and says that
+  engine 0.123.0 prices no Moonshot model, so a `--max-cost-usd` run refuses
+  any of them with `NIKA-1709`.
+- Names stay pass-through. `nika catalog` lists the ids an engine knows,
+  priced or not (it lists `xai/grok-3`, which 0.123.0 does not price);
+  `nika check` reports whether a task's model is priced.
+
+---
+
+## [0.2.0-draft] — 2026-10-19 · embedded in engine 0.123.0 (spec `6390b08`)
+
+The reference engine 0.123.0 (published 2026-10-23) embeds this spec at
+commit `6390b08eb9791ce49c63ee17f8466fab118cadb8`: its `SPEC_PIN` and the
+pack's `SPEC_SHA` both name it, and `nika check --json` reports it offline
+as `spec_sha`.
+`VERSION` reads `0.2.0-draft`. Engine 0.123.0 is the open-source reference
+release; after it the project is maintained (security fixes, bug fixes and
+compatibility). Every entry from here down to `[0.1.0-draft]` is in that
+pack. This repository carries no release tag; the commit is the identity.
+
+### Also in this pack · merged without an entry (2026-10-12 → 2026-10-19)
+
+- **A registry child is refused at check until it can run** (#376): a
+  pinned `registry:owner/name@version` child passed the check, yet no
+  registry child resolves before the run, which refuses it. The check now
+  refuses it with `NIKA-COMP-001`, as the run does; a filesystem child is
+  the form today. The verbs and composition chapters, lessons 10 and 15
+  and the authoring guide show a child call with its target instead of an
+  empty `invoke: { workflow: }`, and the failure text of `NIKA-SEC-001`
+  shows a complete `on_error: { recover: … }`.
+- **A prompt or system text may live in a project file** (#377): `prompt:`
+  and `system:` on `infer` and `agent` accept `{ file: <path> }`, a new
+  language form. The path is static and relative, stays inside the project
+  root and is read at compose time under the workflow's `permits.fs.read`;
+  the text is judged exactly as the same text written inline (02 §Project
+  files). Its three codes became `NIKA-FILE-001/002/003` in #383. A linter
+  warns `egress/001 private-key-in-prompt` on a PEM private key in a
+  prompt, inline or from a file.
+- **The project schema states what both `nika.yaml` readers accept**
+  (#378): `schemas/project.schema.json`, which
+  `nika spec --schema --project` prints, now refuses what both readers
+  refuse: a beat without `plafond` and `manqué`, a plafond or ceiling of
+  zero, a `décalage` other than `hash`, a `jusqu_au` that is not an ISO
+  date, a suspension without its reason and date, and empty `traces` or
+  `registry` blocks. It spells the project name as the readers do, and its
+  cadence examples carry their zone.
+- **The chapters show only examples the checker accepts** (#380): every
+  complete workflow passes `nika check`, inline forms are the mappings the
+  parser reads, and the QUICKSTART teaches `permits:` at the first step that
+  needs it and cites `NIKA-VAR-021`.
+- **The workflow schema tells the parser's truth** (#381): `when:` reads
+  `inputs`, `const` and `with`; the `infer` and `agent` numbers are literals
+  with the parser's bounds; `for_each.max_items` is documented; the withdrawn
+  `vault` secret source left the enum and the examples; a retired version tag
+  such as `v1` is refused; 03 and the providers stdlib state the 600 s
+  deadline of a buffered call.
+- **A beat says what it catches up** (#382): `rattraper` fires the latest
+  missed slot, `{ rattraper: N }` up to the N latest, `rattraper-une-fois`
+  one run for the whole silence, `sauter` none; activation shows the worst
+  spend the policy allows.
+- **One `NIKA-FILE` namespace** (#383): the prompt-file codes become
+  `NIKA-FILE-001/002/003`, for every project file a workflow reads by path.
+- **A sixth namespace, `run`** (#385): read-only facts tell a run the instant
+  it serves (`run.scheduled_for`) and the silence it covers (`run.missed`).
+- **A structured-output schema may live in a project file** (#386):
+  `schema: { file: <path> }` on `infer` and `agent`, under the project-file
+  laws (`NIKA-TYPE-007` otherwise).
+- **Provider presentation order** (#387): `presentation.providers_order`
+  lists the local providers first, then Mistral, Hugging Face, OpenAI, xAI
+  and Anthropic, then the rest alphabetically.
+- **An operator stop, in flight** (#388): 13 states that an MCP call under
+  way is stopped and named in `stopped_calls`, while other in-flight work
+  completes and is counted.
+- **Pricing witnesses** (#390): the three cost-replay trace witnesses are
+  re-recorded for the 2026-10-12 pricing table (`nika/model-pricing@1.3`).
+
 ### Fixed · the MCP revisions the canon claims (2026-10-12)
 
 - `canon.yaml` `mcp.protocol_versions` no longer lists `2026-07-28`, and its
@@ -1039,6 +1284,12 @@ cost-aware model routing (per-task cheap-vs-expensive switching).
 ---
 
 ## Why no « 0.0.x »
+
+> **Note · 2026-10-23.** No GA release is scheduled. Engine 0.123.0, the
+> open-source reference release, embeds this spec at `6390b08` (`VERSION`
+> reads `0.2.0-draft`), and after it the project is maintained: security
+> fixes, bug fixes and compatibility. The GA plan below is kept as history;
+> it is how the first draft meant to release.
 
 This spec starts at v0.1.0-draft because it **derives from empirical
 examples**, not from scratch · an earlier Nika prototype already ran 26

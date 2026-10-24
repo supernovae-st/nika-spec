@@ -31,7 +31,7 @@ nika: support-triage
 # The house seat — a THINKING model: the think block and the JSON both count
 # against `max_tokens` (engine#428), so the triage ceiling below covers the
 # reasoning AND the board, not the board alone.
-model: ollama/qwen3.5:4b   # local · zero key · swap for groq/llama-3.3-70b (triage wants speed)
+model: ollama/qwen3.5:4b   # local · zero key · swap for groq/llama-3.3-70b-versatile (triage wants speed)
 
 const:
   queue_path: "examples/fixtures/support-queue.json"

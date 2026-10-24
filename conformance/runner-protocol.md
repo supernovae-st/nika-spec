@@ -513,22 +513,46 @@ workflow, any backend ») on this suite's own fixture
 `stdlib/providers/005-valid-parameterized-model`. A rung that cannot
 decide must not refuse.
 
-### Native CLI (planned)
+**Re-measured 2026-10-24 · engine 0.123.0 · 414 of 421** (the released
+binary, `nika 0.123.0 (0bfde3765)`, on fixtures byte-identical to
+`6390b08`, the commit it embeds): core 247/248 · deep 50/50 · stdlib
+100/106 · values 10/10 · types 4/4 · gates 3/3. The seven reds are named:
+
+- `core/envelope/055-secret-source-vault-withdrawn-refused` · the engine
+  still admits a `source: vault` secret, which
+  [01](../spec/01-envelope.md) withdrew until an engine resolves it.
+- `stdlib/001` · `stdlib/providers/001 · 002 · 006` · the MODELS rung now
+  emits `NIKA-PROVIDER` as a bare code, with no number and no category.
+  The [matching rule](#matching-rule-an-expected-entry-vs-the-emitted-set)
+  matches an expected namespace only through a code that starts with
+  `NIKA-PROVIDER-` (05 numbers them 001-099) or an emitted namespace, so
+  the fixtures' `NIKA-PROVIDER` expectation finds no match.
+- `stdlib/hash/002 · 003` · `nika:hash` takes only `content`, `algo` and
+  `encoding` in this engine, so it refuses the signing arguments with
+  `NIKA-BUILTIN-001` (`key` and `op` in 002; `op`, `public_key` and
+  `signature` in 003). 002 is also refused with `NIKA-SEC-006`: its secret
+  key reaches `nika:hash` with no `egress:` sanction, which
+  [01 §egress](../spec/01-envelope.md#egress--optional--sanctioned-destinations-declassification)
+  refuses by default. That cause is the fixture's: it is not whole-spec
+  legal until the key carries `egress: [{ to: "nika:hash" }]`.
+
+The behavioral differential agrees wherever it measures: 170 fixtures ·
+124 agree · 0 diverge · 0 engine errors · 46 UNSUPPORTED (no qualified
+adapter for their contract yet).
+[`CONFORMANT_IMPLEMENTATIONS.md`](../CONFORMANT_IMPLEMENTATIONS.md) carries
+the row.
+
+### No native conformance command
+
+The reference engine has no `conformance` subcommand: `nika conformance`
+is an unrecognized subcommand in 0.123.0, and the maintained 0.123 line
+plans none. Any engine, the reference one included, is measured from
+outside, by this repository's runners:
 
 ```bash
-nika conformance run conformance/tests/core      # one level
-# any engine · same fixtures
-<engine> conformance run conformance/tests/core
-```
-
-Output (planned) ·
-
-```
-PASS  core/envelope/001-valid-minimal
-PASS  core/dag-topology/003-when-reference-without-depends-on (NIKA-DAG-003)
-FAIL  core/dag-topology/001-cycle (expected NIKA-DAG-001, got NIKA-PARSE-007)
-...
-Summary · 13/14 passed · 1 failed
+conformance/run.sh <engine>                                  # every corpus file vs its # Expected: header
+NIKA_BIN=<engine> sh scripts/parity-sweep.sh                 # the static tiers through the adapter
+NIKA_BIN=<engine> python3 scripts/runtime-differential.py    # the behavioral tier
 ```
 
 ## Adoption
