@@ -27,6 +27,17 @@ engine at its next `SPEC_PIN` bump.
 - `verify.py` refuses an `amended:` note that is not `YYYY-MM-DD · <note>`,
   is out of date order or is dated ahead of today.
 
+### Changed · the maintained line in the governing texts (2026-10-24)
+
+- 00 §Pre-1.0 stability contract gains a dated amendment: engine 0.123.0
+  is the reference release, no engine 1.0.0 is scheduled, and in the
+  maintained line the grammar changes only through recorded fixes, each
+  with its fixtures. The contract below it is kept as written, and the
+  overview no longer says the engine's semver runs toward a 1.0 release.
+- NEP-0000 carries a dated status note (dormant, no pre-freeze scheduled),
+  CONTRIBUTING names the door in use, and SECURITY stops promising fixes
+  to a "latest tagged release" this repository never had.
+
 ### Changed · the README describes the reference release (2026-10-24)
 
 - Status names engine 0.123.0 as the open-source reference release, the
