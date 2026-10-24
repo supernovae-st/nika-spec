@@ -8,8 +8,9 @@ schema_version: 3
 lifecycle:
   status: retired
   retired_on: "2026-10-07"
-  planning_url: "https://linear.app/nika-supernovae"
-  reason: "Linear owns current priorities and tasks; GitHub keeps public contribution intake, code, review, CI and releases."
+  planning: private
+  public_intake_url: "https://github.com/supernovae-st/nika/issues"
+  reason: "The maintainers track current priorities and tasks privately; GitHub keeps public contribution intake, code, review, CI and releases."
 
 visual_grammar:
   law: "Every projector-owned classification carries one stable semantic sigil. The sigil carries meaning; color only reinforces it."
@@ -34,11 +35,12 @@ project:
     - gh-nika
     - nika-estate
     - homebrew-tap
-  short_description: "Historical archive · current planning moved to Linear · GitHub issues, code, review, CI and releases remain active."
+  short_description: "Historical archive · current planning is tracked privately · GitHub issues, code, review, CI and releases remain active."
   product_brief: |
     ## Historical Nika Project
 
-    Current priorities and tasks are managed in [Linear](https://linear.app/nika-supernovae).
+    Current priorities and tasks are tracked privately by the maintainers;
+    public issues go to https://github.com/supernovae-st/nika/issues.
     This GitHub Project preserves earlier records; its cards and views no longer
     describe current activity. Public contributions remain welcome through
     GitHub issues and pull requests. Code, reviews, checks and releases remain

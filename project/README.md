@@ -1,9 +1,10 @@
-# Nika planning has moved to Linear
+# The Nika GitHub Project is retired
 
-[Linear](https://linear.app/nika-supernovae) owns current priorities and tasks.
+Current priorities and tasks are tracked privately by the maintainers.
 The former GitHub Project is a historical archive, not a second kanban.
-Public contributions remain welcome through GitHub issues and pull requests;
-code, review, CI and releases remain in their owning repositories.
+Public contributions remain welcome through GitHub issues and pull requests
+(<https://github.com/supernovae-st/nika/issues>); code, review, CI and
+releases remain in their owning repositories.
 
 `project-os.yaml` records the archived fields, source identities and views.
 Their old status values are historical observations, not current progress.

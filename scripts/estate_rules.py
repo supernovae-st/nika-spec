@@ -386,7 +386,7 @@ PATTERNS = [
     {
         "glob": "timeline/**",
         "class": "authored",
-        "evidence": "timeline.yaml (the SSOT — 'every provable claim … re-proven against its source of truth' per timeline.yml) + verify.py + project archive (historical normalization only; planning moved to Linear)",
+        "evidence": "timeline.yaml (the SSOT — 'every provable claim … re-proven against its source of truth' per timeline.yml) + verify.py + project archive (historical normalization only; current planning is tracked privately)",
     },
     {
         "glob": "registry/**",

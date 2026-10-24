@@ -11,6 +11,9 @@ from project import cli, verify
 
 import yaml
 
+# Spelled in two halves so this guard does not match its own source.
+PRIVATE_HOST = "linear" + ".app"
+
 
 class RetirementTests(unittest.TestCase):
     def test_every_cli_mode_stops_before_client_creation(self) -> None:
@@ -21,7 +24,8 @@ class RetirementTests(unittest.TestCase):
                  contextlib.redirect_stderr(io.StringIO()) as message:
                 self.assertEqual(cli.main(arguments), 2)
                 self.assertIn("retired", message.getvalue())
-                self.assertIn("https://linear.app/nika-supernovae", message.getvalue())
+                self.assertIn("https://github.com/supernovae-st/nika/issues", message.getvalue())
+                self.assertNotIn(PRIVATE_HOST, message.getvalue())
                 client.assert_not_called()
 
     def test_manifest_cannot_silently_reactivate_missing_lifecycle(self) -> None:
@@ -41,6 +45,24 @@ class RetirementTests(unittest.TestCase):
             self.assertEqual(verify.main([]), 2)
             self.assertIn("retired", message.getvalue())
             client.assert_not_called()
+
+    def test_live_verifier_names_the_public_door(self) -> None:
+        with patch.dict(os.environ, {"BOARD_PROJECT_TOKEN": "test-token"}), \
+             patch("project.verify.GitHub"), \
+             contextlib.redirect_stderr(io.StringIO()) as message:
+            self.assertEqual(verify.main([]), 2)
+        self.assertIn("https://github.com/supernovae-st/nika/issues", message.getvalue())
+        self.assertNotIn(PRIVATE_HOST, message.getvalue())
+
+    def test_public_archive_links_no_private_workspace(self) -> None:
+        # The archive ships in a public repository: a link to a private
+        # planning workspace is a dead end for every outside reader.
+        for path in sorted((cli.ROOT / "project").rglob("*")):
+            if path.is_file() and path.suffix in {".py", ".md", ".yaml", ".nika"}:
+                with self.subTest(path=path.name):
+                    text = path.read_text(encoding="utf-8")
+                    self.assertFalse(PRIVATE_HOST in text,
+                                     f"{path.name} links the private planning workspace")
 
     def test_workflow_only_validates_offline(self) -> None:
         # BaseLoader preserves GitHub's YAML `on` key as a string.

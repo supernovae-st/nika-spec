@@ -27,6 +27,15 @@ engine at its next `SPEC_PIN` bump.
 - `verify.py` refuses an `amended:` note that is not `YYYY-MM-DD · <note>`,
   is out of date order or is dated ahead of today.
 
+### Fixed · the retired Project archive points at the public door (2026-10-24)
+
+- `project/` sent readers to a private planning workspace that outside
+  readers cannot open (its README, manifest, CLI, verifier and skill). It
+  now says planning is tracked privately and points at the public issues;
+  the offline verifier requires that door and refuses a private planning
+  URL, and a test keeps every file of the archive free of one. The
+  timeline links in the archive's projections go to the docs page.
+
 ### Changed · the maintained line in the governing texts (2026-10-24)
 
 - 00 §Pre-1.0 stability contract gains a dated amendment: engine 0.123.0
