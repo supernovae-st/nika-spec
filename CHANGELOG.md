@@ -27,6 +27,15 @@ engine at its next `SPEC_PIN` bump.
 - `verify.py` refuses an `amended:` note that is not `YYYY-MM-DD · <note>`,
   is out of date order or is dated ahead of today.
 
+### Fixed · the showcase tiers the docs count (2026-10-24)
+
+- `scripts/showcase-projector.py` reads each job's tier from its
+  `# showcase · T<n>` banner. It sliced the tier from a `t2-` filename
+  prefix that the flat `examples/` path no longer has, so the projected
+  `_showcase.mdx` always said 0 starters, 0 chains, 0 fan-outs and 0 epics.
+  A job without the banner now stops the projector, in CI too, and a test
+  pins the reading.
+
 ### Fixed · two jobs on their refused paths (2026-10-24)
 
 - `examples/release-notes.nika` no longer drafts notes from a sample log when
