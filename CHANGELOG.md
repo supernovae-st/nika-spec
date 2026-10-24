@@ -13,6 +13,53 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+Changes merged after the spec commit engine 0.123.0 embeds. They reach the
+engine at its next `SPEC_PIN` bump.
+
+---
+
+## [0.2.0-draft] — 2026-10-19 · embedded in engine 0.123.0 (spec `6390b08`)
+
+The reference engine 0.123.0 (published 2026-10-23) embeds this spec at
+commit `6390b08eb9791ce49c63ee17f8466fab118cadb8`: its `SPEC_PIN` and the
+pack's `SPEC_SHA` both name it, and `nika spec` prints it offline.
+`VERSION` reads `0.2.0-draft`. Engine 0.123.0 is the open-source reference
+release; after it the project is maintained (security fixes, bug fixes and
+compatibility). Every entry from here down to `[0.1.0-draft]` is in that
+pack. This repository carries no release tag; the commit is the identity.
+
+### Also in this pack · merged without an entry (2026-10-12 → 2026-10-19)
+
+- **The chapters show only examples the checker accepts** (#380): every
+  complete workflow passes `nika check`, inline forms are the mappings the
+  parser reads, and the QUICKSTART teaches `permits:` at the first step that
+  needs it and cites `NIKA-VAR-021`.
+- **The workflow schema tells the parser's truth** (#381): `when:` reads
+  `inputs`, `const` and `with`; the `infer` and `agent` numbers are literals
+  with the parser's bounds; `for_each.max_items` is documented; the withdrawn
+  `vault` secret source left the enum and the examples; a retired version tag
+  such as `v1` is refused; 03 and the providers stdlib state the 600 s
+  deadline of a buffered call.
+- **A beat says what it catches up** (#382): `rattraper` fires the latest
+  missed slot, `{ rattraper: N }` up to the N latest, `rattraper-une-fois`
+  one run for the whole silence, `sauter` none; activation shows the worst
+  spend the policy allows.
+- **One `NIKA-FILE` namespace** (#383): the prompt-file codes become
+  `NIKA-FILE-001/002/003`, for every project file a workflow reads by path.
+- **A sixth namespace, `run`** (#385): read-only facts tell a run the instant
+  it serves (`run.scheduled_for`) and the silence it covers (`run.missed`).
+- **A structured-output schema may live in a project file** (#386):
+  `schema: { file: <path> }` on `infer` and `agent`, under the project-file
+  laws (`NIKA-TYPE-007` otherwise).
+- **Provider presentation order** (#387): `presentation.providers_order`
+  lists the local providers first, then Mistral, Hugging Face, OpenAI, xAI
+  and Anthropic, then the rest alphabetically.
+- **An operator stop, in flight** (#388): 13 states that an MCP call under
+  way is stopped and named in `stopped_calls`, while other in-flight work
+  completes and is counted.
+- **Pricing witnesses** (#390): the three cost-replay trace witnesses are
+  re-recorded for the 2026-10-12 pricing table (`nika/model-pricing@1.3`).
+
 ### Fixed · the MCP revisions the canon claims (2026-10-12)
 
 - `canon.yaml` `mcp.protocol_versions` no longer lists `2026-07-28`, and its
