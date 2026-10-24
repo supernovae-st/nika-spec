@@ -1,12 +1,22 @@
 # pre-commit hooks for Nika workflows · https://pre-commit.com
 #
-# Usage in a consumer repo's .pre-commit-config.yaml ·
+# The maintained `nika-check` hook ships with the engine. Pin its release:
+#
+#   repos:
+#     - repo: https://github.com/supernovae-st/nika
+#       rev: v0.123.0
+#       hooks:
+#         - id: nika-check
+#
+# This manifest adds `nika-check-strict`. The spec repository carries no
+# release tag, so pin a full commit SHA of this repository that holds the
+# hook (pre-commit accepts a commit SHA as `rev:`):
 #
 #   repos:
 #     - repo: https://github.com/supernovae-st/nika-spec
-#       rev: v0.1.0
+#       rev: <full commit SHA>
 #       hooks:
-#         - id: nika-check
+#         - id: nika-check-strict
 #
 # Requires the `nika` binary on PATH (https://nika.sh/install).
 - id: nika-check
@@ -16,8 +26,8 @@
   language: system
   files: '\.nika$'
 - id: nika-check-strict
-  name: nika check --strict (warnings fail too)
-  description: Strict validation of .nika workflows (errors AND warnings fail the commit).
-  entry: nika check --strict
+  name: nika check --native-strict (native-first hints fail too)
+  description: Validate .nika workflows and fail while a native-first hint remains (a builtin covers what a task runs a program for).
+  entry: nika check --native-strict
   language: system
   files: '\.nika$'

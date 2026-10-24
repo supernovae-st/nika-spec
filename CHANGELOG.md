@@ -27,6 +27,14 @@ engine at its next `SPEC_PIN` bump.
 - `verify.py` refuses an `amended:` note that is not `YYYY-MM-DD · <note>`,
   is out of date order or is dated ahead of today.
 
+### Fixed · pre-commit hooks a consumer can install (2026-10-24)
+
+- `nika-check-strict` ran `nika check --strict`, a flag the engine rejects,
+  so the hook failed on every commit; it runs `nika check --native-strict`.
+  The usage comment pinned `rev: v0.1.0`, a tag this repository never had:
+  it now points `nika-check` at the engine's maintained hook (`v0.123.0`)
+  and says to pin this repository's hooks at a commit SHA.
+
 ### Changed · engine 0.123.0 in the conformance registry (2026-10-24)
 
 - `CONFORMANT_IMPLEMENTATIONS.md` lists the reference release, measured with

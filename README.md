@@ -521,7 +521,7 @@ Not sure an idea deserves a proposal? Pressure-test it first in the engine's
 | [`scripts/showcase-projector.py`](scripts/showcase-projector.py) | turns the [`examples/`](examples/) jobs into the docs' example pages and the website's explorer |
 | [`conformance/runner.py`](conformance/runner.py) | the static checker: core, stdlib and deep tests, plus every example as a conformance input (the CI gate) |
 | [`conformance/run.sh`](conformance/run.sh) | the engine-side runner: `PASS` · `DRIFT` · `BUG` · `DIVERGENT` per file, against its declared intent |
-| [`.pre-commit-hooks.yaml`](.pre-commit-hooks.yaml) | pre-commit hooks for repositories that consume this spec (`nika-check` · `nika-check-strict`) |
+| [`.pre-commit-hooks.yaml`](.pre-commit-hooks.yaml) | pre-commit hooks for repositories that consume this spec: `nika-check` (the engine ships the maintained one, pinned at its release tag) and `nika-check-strict` (`nika check --native-strict`, pinned at a commit of this repository) |
 
 </details>
 
