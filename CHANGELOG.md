@@ -16,6 +16,23 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Changes merged after the spec commit engine 0.123.0 embeds. They reach the
 engine at its next `SPEC_PIN` bump.
 
+### Fixed · two jobs on their refused paths (2026-10-24)
+
+- `examples/release-notes.nika` no longer drafts notes from a sample log when
+  `git log` fails. Where git cannot be read (no such tag, not a repository,
+  or a refused command, as under the macOS sandbox in 0.123.0), `history`
+  recovers a notice that names the failure, and `notes`, `changelog` and
+  `announce` close on it; before, the sample commits reached
+  `out/CHANGELOG.md` and, with `announce=true`, the team. The sample log is
+  now an explicit rehearsal (`--var rehearse=true`), never announced.
+  `changelog` and `announce` bind the whole `notes` value before reading a
+  field of it, and each effect consumes the gate's answer itself, so
+  `nika check` reports no hint.
+- `examples/pr-review-fanout.nika`: `reviews` closes when `files` is skipped.
+  A « no » at the gate made the fan-out fail (`NIKA-VAR-006`, for_each over
+  null), blocked `merged`, `summary` and `save`, and exited 1. Both answers
+  now exit 0; the graph and its waves are unchanged.
+
 ---
 
 ## [0.2.0-draft] — 2026-10-19 · embedded in engine 0.123.0 (spec `6390b08`)

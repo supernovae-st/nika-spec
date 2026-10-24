@@ -171,7 +171,7 @@ showcase:
   - file: examples/pr-review-fanout.nika
     name: pr-review-fanout
     constructs: [agent_tools, fail_fast, for_each, local_model, max_parallel, on_error, outputs, schema, when, with]
-    sha256_16: 8d62bcca0cb5f59e
+    sha256_16: 09a5dd34c2e2e96e
   - file: examples/price-watch.nika
     name: price-watch
     constructs: [extract, on_error, outputs, secrets, when, with]
@@ -179,7 +179,7 @@ showcase:
   - file: examples/release-notes.nika
     name: release-notes
     constructs: [local_model, on_error, outputs, schema, secrets, typed_inputs, when, with]
-    sha256_16: ffe7ca04cfaa4c83
+    sha256_16: 1e179c7ac0571dab
   - file: examples/release-radar.nika
     name: release-radar
     constructs: [extract, local_model, on_error, outputs, when, with]
