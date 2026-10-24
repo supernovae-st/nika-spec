@@ -40,7 +40,7 @@ tasks:
 > (`ollama pull qwen3.5:4b` first · or `lmstudio/…` · `llamacpp/…` ·
 > `vllm/…`). Prefer cloud? Swap the one `model:` line for any of the
 > <!-- canon:providers -->18<!-- /canon --> providers ·
-> `mistral/mistral-small` · `anthropic/claude-haiku-4-5` ·
+> `mistral/mistral-small-latest` · `anthropic/claude-haiku-4-5` ·
 > `openai/gpt-5.2` · the rest of the file doesn't change.
 
 ---

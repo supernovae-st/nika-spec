@@ -33,6 +33,17 @@ engine at its next `SPEC_PIN` bump.
   null), blocked `merged`, `summary` and `save`, and exited 1. Both answers
   now exit 0; the graph and its waves are unchanged.
 
+### Fixed · model ids a reader can paste (2026-10-24)
+
+- The swap hints, the chapter examples, the QUICKSTART and the providers
+  stdlib name ids the 0.123.0 catalog resolves and prices:
+  `groq/llama-3.3-70b-versatile` (`groq/llama-3.3-70b` is refused: Cerebras
+  serves that model), `mistral/mistral-large-latest` and
+  `mistral/mistral-small-latest` (the bare names are uncatalogued and
+  unpriced, so a `--max-cost-usd` run refuses them with `NIKA-1709`), and
+  current Anthropic, DeepSeek, Gemini and xAI ids in place of retired ones.
+  Names stay pass-through; `nika catalog` lists what an engine prices.
+
 ---
 
 ## [0.2.0-draft] — 2026-10-19 · embedded in engine 0.123.0 (spec `6390b08`)

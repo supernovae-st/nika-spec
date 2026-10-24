@@ -28,8 +28,8 @@ infer:
 fields let you write the silent-nonsense combination `provider: anthropic` +
 `model: gpt-4o`. One `<provider>/<name>` string is atomic, self-documenting,
 trivially swappable, and the industry standard. The same open model served by
-different backends disambiguates cleanly · `groq/qwen3.5-32b` vs
-`ollama/qwen3.5:27b`.
+different backends disambiguates cleanly · `groq/llama-3.3-70b-versatile` vs
+`ollama/llama3.3:70b`.
 
 **Parameterize it** · combine with typed inputs to run one workflow
 against any backend ·
@@ -40,7 +40,7 @@ inputs:
 tasks:
   x:
     infer: { model: "${{ inputs.model }}", prompt: "..." }
-# nika run flow.yaml --var model=mistral/mistral-large   ← same workflow, cloud
+# nika run flow.nika --var model=mistral/mistral-large-latest   ← same workflow, cloud
 ```
 
 ---
@@ -370,11 +370,11 @@ infer:
 
 ```yaml
 infer:
-  model: anthropic/claude-3-5-sonnet
+  model: anthropic/claude-sonnet-5-5
   prompt: "..."
 ```
 
-**Models** · `claude-3-5-sonnet` · `claude-3-5-haiku` · `claude-3-opus` · (and any newer · model name pass-through).
+**Models** · `claude-sonnet-5-5` · `claude-opus-5-5` · `claude-haiku-5-5` · (and any newer · model name pass-through · `nika catalog` lists the ones the engine prices).
 
 **Auth** · `ANTHROPIC_API_KEY` env var · OR engine config.
 
@@ -574,11 +574,11 @@ infer:
 
 ```yaml
 infer:
-  model: deepseek/deepseek-chat
+  model: deepseek/deepseek-flash
   prompt: "..."
 ```
 
-**Models** · `deepseek-chat` · `deepseek-reasoner` · (pass-through).
+**Models** · `deepseek-flash` · `deepseek-v4-pro` · (pass-through).
 
 **Auth** · `DEEPSEEK_API_KEY` env var.
 
@@ -590,11 +590,11 @@ infer:
 
 ```yaml
 infer:
-  model: gemini/gemini-2.0-flash
+  model: gemini/gemini-2.5-flash
   prompt: "..."
 ```
 
-**Models** · `gemini-2.0-flash` · `gemini-2.0-pro` · `gemini-1.5-pro` · (pass-through).
+**Models** · `gemini-2.5-flash` · `gemini-2.5-pro` · `gemini-3.1-flash-lite` · (pass-through).
 
 **Auth** · `GEMINI_API_KEY` env var (`NIKA_GEMINI_API_KEY` overrides it · the engine reads the NIKA-prefixed name first).
 
@@ -606,11 +606,11 @@ infer:
 
 ```yaml
 infer:
-  model: xai/grok-2-latest
+  model: xai/grok-4.7
   prompt: "..."
 ```
 
-**Models** · `grok-2-latest` · `grok-vision-latest` · (pass-through).
+**Models** · `grok-4.7` · `grok-4.3` · `grok-3` · (pass-through).
 
 **Auth** · `XAI_API_KEY` env var.
 
@@ -663,7 +663,7 @@ When using the same workflow with different providers ·
 - The **structured output** uses JSON Schema (engine adapts to provider's native mechanism · JSON mode · function calling · etc.)
 - The **vision input** is provider-agnostic in the workflow · the engine adapts
 
-A workflow can switch providers with one line change (`model: ollama/qwen3.5:9b` → `model: mistral/mistral-large`, or any other `<provider>/<name>`) for most use cases.
+A workflow can switch providers with one line change (`model: ollama/qwen3.5:9b` → `model: mistral/mistral-large-latest`, or any other `<provider>/<name>`) for most use cases.
 
 ---
 
@@ -674,7 +674,7 @@ New providers MAY enter stdlib v0.x. Provider-specific options that don't map to
 ```yaml
 # Forward-compat (post-v0.1)
 infer:
-  model: anthropic/claude-3-5-sonnet
+  model: anthropic/claude-sonnet-5-5
   provider_options:
     cache_control: { type: "ephemeral" }
     beta: ["custom-feature"]

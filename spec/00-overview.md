@@ -113,7 +113,7 @@ tasks:
 ```yaml
 nika: scrape-and-summarize
 
-model: mistral/mistral-large
+model: mistral/mistral-large-latest
 permits:                        # the file's whole reach · absent = no authority (NIKA-AUTH-006)
   tools: ["nika:fetch", "nika:write"]
   net:
