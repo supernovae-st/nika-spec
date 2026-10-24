@@ -91,6 +91,16 @@ engine at its next `SPEC_PIN` bump.
   it now points `nika-check` at the engine's maintained hook (`v0.123.0`)
   and says to pin this repository's hooks at a commit SHA.
 
+### Fixed · the human-gate twin obeys the consent law (2026-10-24)
+
+- `conformance/envelope/trifecta-human-gate-dominates.nika` declares
+  `check-pass (static only)`, yet both the reference oracle and engine
+  0.123.0 refused it with `NIKA-SEC-014`: a « no » skips `ingest`, the
+  skipped value reads null on the `with:` edge, and `exfil` still attempted
+  its notify. `exfil` now consumes the gate's answer itself; both oracles
+  accept the file, and `conformance/run.sh` scores the trifecta pair
+  PASS=2. The registry records the rest of the corpus run.
+
 ### Changed · engine 0.123.0 in the conformance registry (2026-10-24)
 
 - `CONFORMANT_IMPLEMENTATIONS.md` lists the reference release, measured with

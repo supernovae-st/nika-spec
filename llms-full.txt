@@ -10939,11 +10939,24 @@ conformance · open a PR on `supernovae-st/nika-spec` to be listed in
 | [nika](https://github.com/supernovae-st/nika) (reference engine · 0.106.1 · superseded by the row above) | Rust | ✅ **131/131** core fixtures — BY COMMAND, never linkage (the Bowtie adapter · `NIKA_BIN=… sh scripts/parity-sweep.sh` · full static sweep 213/217, every remaining divergence a NAMED engine owe: the codeless rungs [nika#761](https://github.com/supernovae-st/nika/issues/761)) | ✅ **56/56** behavioral fixtures by command (`NIKA_BIN=… python3 scripts/runtime-differential.py` · the run + trace doors) | ✅ static surface 28/32 (the 4 reds are the [#761](https://github.com/supernovae-st/nika/issues/761) codeless MODELS rung) · lints 4/4 at the only door + 25 NO-DOOR ([#763](https://github.com/supernovae-st/nika/issues/763)) · behavioral half pending | `63a6295` | 2026-07-30 |
 
 The 0.123.0 row was replayed with the released binary (`nika 0.123.0
-(0bfde3765)`) on a checkout whose conformance fixtures are byte-identical to
-`6390b08`, the commit engine 0.123.0 embeds (its `SPEC_PIN`). It earns
+(0bfde3765)`) on `main` at `7937fc9`, whose conformance tree is
+byte-identical to `6390b08`, the commit engine 0.123.0 embeds (its
+`SPEC_PIN`). It earns
 no level claim at that commit: Core has one red, and the Runtime and
 Stdlib v0.1 levels include Core ([07 §Level 2](spec/07-conformance.md#level-2--runtime-conformance)).
 Every red is named above, and the behavior this runner measures agrees.
+
+`conformance/run.sh nika` over its 106-file corpus at `6390b08` (macOS
+arm64) gives 90 PASS · 10 DRIFT · 0 DIVERGENT · 6 BUG. Seven DRIFTs come
+from the macOS exec sandbox refusing the confined process (`NIKA-SEC-001`
+where the file expects `NIKA-EXEC-001`). Four files are refused by the
+reference oracle as well, so their headers lag the spec:
+`dag/foreach-fail-fast-false`, `dag/foreach-fail-fast-true`,
+`verbs/timeout-per-iteration` and `envelope/trifecta-human-gate-dominates`
+(repaired after the pin). Five remain divergences to triage:
+`dag/foreach-empty-skips`, `dag/when-false-skips`,
+`envelope/permits-empty-default-deny`, `envelope/sec-exec-blocklist-rm-rf`
+and `verbs/agent-injection-contained`.
 
 ## How to be listed
 

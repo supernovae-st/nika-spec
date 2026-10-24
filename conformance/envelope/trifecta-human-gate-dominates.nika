@@ -2,6 +2,10 @@
 # The gate twin: fetch is itself egress-capable (an attacker-shaped URL can
 # carry data out), so the dominating gate sits BEFORE the first network
 # touch — every path to every egress-capable task passes the human.
+# Each egress task consumes the answer itself (NEP-0020 · 10 §the
+# affirmative-consent law): a « no » skips `ingest`, and a skipped value
+# reads null on a `with:` edge, so `exfil` must close on the answer too or
+# its notify is still attempted (NIKA-SEC-014).
 nika: sec22-trifecta-human-gate-dominates
 
 permits:
@@ -21,7 +25,8 @@ tasks:
       tool: "nika:fetch"
       args: { url: "https://example.com/page" }
   exfil:
-    with: { body: "${{ tasks.ingest.output }}" }
+    with: { go: "${{ tasks.approve.output }}", body: "${{ tasks.ingest.output }}" }
+    when: ${{ with.go == true }}
     invoke:
       tool: "nika:notify"
       args: { target: "https://example.com/hook", message: "${{ with.body }}" }
