@@ -178,7 +178,8 @@ engine at its next `SPEC_PIN` bump.
 
 The reference engine 0.123.0 (published 2026-10-23) embeds this spec at
 commit `6390b08eb9791ce49c63ee17f8466fab118cadb8`: its `SPEC_PIN` and the
-pack's `SPEC_SHA` both name it, and `nika spec` prints it offline.
+pack's `SPEC_SHA` both name it, and `nika check --json` reports it offline
+as `spec_sha`.
 `VERSION` reads `0.2.0-draft`. Engine 0.123.0 is the open-source reference
 release; after it the project is maintained (security fixes, bug fixes and
 compatibility). Every entry from here down to `[0.1.0-draft]` is in that
@@ -186,6 +187,30 @@ pack. This repository carries no release tag; the commit is the identity.
 
 ### Also in this pack · merged without an entry (2026-10-12 → 2026-10-19)
 
+- **A registry child is refused at check until it can run** (#376): a
+  pinned `registry:owner/name@version` child passed the check, yet no
+  registry child resolves before the run, which refuses it. The check now
+  refuses it with `NIKA-COMP-001`, as the run does; a filesystem child is
+  the form today. The verbs and composition chapters, lessons 10 and 15
+  and the authoring guide show a child call with its target instead of an
+  empty `invoke: { workflow: }`, and the failure text of `NIKA-SEC-001`
+  shows a complete `on_error: { recover: … }`.
+- **A prompt or system text may live in a project file** (#377): `prompt:`
+  and `system:` on `infer` and `agent` accept `{ file: <path> }`, a new
+  language form. The path is static and relative, stays inside the project
+  root and is read at compose time under the workflow's `permits.fs.read`;
+  the text is judged exactly as the same text written inline (02 §Project
+  files). Its three codes became `NIKA-FILE-001/002/003` in #383. A linter
+  warns `egress/001 private-key-in-prompt` on a PEM private key in a
+  prompt, inline or from a file.
+- **The project schema states what both `nika.yaml` readers accept**
+  (#378): `schemas/project.schema.json`, which
+  `nika spec --schema --project` prints, now refuses what both readers
+  refuse: a beat without `plafond` and `manqué`, a plafond or ceiling of
+  zero, a `décalage` other than `hash`, a `jusqu_au` that is not an ISO
+  date, a suspension without its reason and date, and empty `traces` or
+  `registry` blocks. It spells the project name as the readers do, and its
+  cadence examples carry their zone.
 - **The chapters show only examples the checker accepts** (#380): every
   complete workflow passes `nika check`, inline forms are the mappings the
   parser reads, and the QUICKSTART teaches `permits:` at the first step that
