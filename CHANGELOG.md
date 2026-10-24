@@ -27,6 +27,14 @@ engine at its next `SPEC_PIN` bump.
 - `verify.py` refuses an `amended:` note that is not `YYYY-MM-DD · <note>`,
   is out of date order or is dated ahead of today.
 
+### Fixed · QUICKSTART counts (2026-10-24)
+
+- The QUICKSTART said 5 variable namespaces two sections before saying 6
+  (`run` joined on 2026-10-12) and 6 templates where the pack ships 22.
+  Both now carry canon markers, so the projector keeps them true. Its
+  status line names the spec version engine 0.123.0 embeds instead of an
+  unbalanced « GA hardening » note.
+
 ### Fixed · the schema address editors use (2026-10-24)
 
 - 07 §Editor tooling shows the modeline at the schema's own `$id`,
