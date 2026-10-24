@@ -29,16 +29,16 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" alt="Apache-2.0"></a>
 </p>
 
-<!-- engine clips on this page (GIFs) are served from supernovae-st/nika main: they exist only there until the next engine release · at the next lockstep bump, pin them to that release tag -->
+<!-- engine clips on this page (GIFs) are pinned to the v0.123.0 tag of supernovae-st/nika, the release they ship with · move the pin with the next engine release whose media changes -->
 <p align="center"><b>Watch a workflow drawn as a graph, then lit up in the order it will run.</b></p>
 <p align="center">
-  <a href="https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/dag-execution.optimized.gif">
-    <img src="https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/dag-execution.optimized.gif"
+  <a href="https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/media/gifs/dag-execution.optimized.gif">
+    <img src="https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/media/gifs/dag-execution.optimized.gif"
          alt="A pull-request review workflow from this repository's examples, drawn by nika inspect as a graph of tasks colored by verb, then lit wave by wave in the order nika check plans"
          width="960">
   </a>
 </p>
-<p align="center"><sub>A workflow is a graph: <a href="examples/pr-review-fanout.nika"><code>examples/pr-review-fanout.nika</code></a>, drawn by <code>nika inspect</code>, planned by <code>nika check</code>. Notice the tasks that share a wave, and the review that fans out once per changed file. The graph and the waves are the commands' own output (nika 0.121.0); the lighting illustrates the plan.</sub></p>
+<p align="center"><sub>A workflow is a graph: <a href="examples/pr-review-fanout.nika"><code>examples/pr-review-fanout.nika</code></a>, drawn by <code>nika inspect</code>, planned by <code>nika check</code>. Notice the tasks that share a wave, and the review that fans out once per changed file. The graph and the waves are the commands' own output, captured with nika 0.121.0; 0.123.0 draws the same graph and the same waves. The lighting illustrates the plan.</sub></p>
 
 ## What is Nika?
 
@@ -70,8 +70,13 @@ You need `git` and Python 3. No engine, no API key, no model call.
 
    ```sh
    git clone https://github.com/supernovae-st/nika-spec && cd nika-spec
+   python3 -m venv .venv && . .venv/bin/activate
    pip install -r conformance/requirements.txt
    ```
+
+   The virtual environment keeps the checker's two packages (PyYAML and
+   jsonschema) out of your system Python, which Homebrew and most Linux
+   distributions refuse to change (PEP 668).
 
 2. **Save the smallest complete workflow as `hello.nika`.**
 
@@ -111,7 +116,7 @@ You need `git` and Python 3. No engine, no API key, no model call.
 > **Have the engine?** Install it with `brew install supernovae-st/tap/nika`
 > and audit the same file. `nika check` is the static audit that runs before
 > any model is called; `--model mock/echo` rehearses with no key and no
-> network. The report ends with its verdict (nika 0.121.0):
+> network. The report ends with its verdict (nika 0.123.0):
 >
 > ```console
 > $ nika check hello.nika --model mock/echo
@@ -135,13 +140,13 @@ can do in one file.
 **Watch one file use all nine keys and every verb, labelled key by key.**
 
 <p align="center">
-  <a href="https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/spec-anatomy.optimized.gif">
-    <img src="https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/spec-anatomy.optimized.gif"
+  <a href="https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/media/gifs/spec-anatomy.optimized.gif">
+    <img src="https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/media/gifs/spec-anatomy.optimized.gif"
          alt="One .nika file using all nine envelope keys, each labelled in the spec's own words, with four tasks that each bind one verb; nika check says run ready and the file folds to a labelled skeleton"
          width="860">
   </a>
 </p>
-<p align="center"><sub>Notice that every label is the spec's own wording, read from <code>nika spec</code>, and that each task binds exactly one verb. The verdict is the real <code>nika check</code> on that file (nika 0.121.0): run ready. The framing and the final fold are illustration.</sub></p>
+<p align="center"><sub>Notice that every label is the spec's own wording, read from <code>nika spec</code>, and that each task binds exactly one verb. The verdict is the real <code>nika check</code> on that file, captured with nika 0.121.0; 0.123.0 gives the same verdict, run ready. The framing and the final fold are illustration.</sub></p>
 
 ```mermaid
 flowchart LR
@@ -233,24 +238,24 @@ on captured output.
 **Watch the check catch two mistakes before anything runs.**
 
 <p align="center">
-  <a href="https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/static-check-fix.optimized.gif">
-    <img src="https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/static-check-fix.optimized.gif"
+  <a href="https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/media/gifs/static-check-fix.optimized.gif">
+    <img src="https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/media/gifs/static-check-fix.optimized.gif"
          alt="nika check catches two defects in a pull-request review workflow; after the fix, the re-check comes back clean and ready to run"
          width="860">
   </a>
 </p>
-<p align="center"><sub><b>Checked before it runs.</b> <code>nika check</code> audits the plan, permits, cost, secrets and types without calling a model (<a href="spec/07-conformance.md">spec/07</a>). Notice the misspelled task name it catches (<i>did you mean <code>assess</code>?</i>), the fix, and the re-check that ends <i>run ready</i>. The output is captured from the real CLI (nika 0.121.0) and the fix is a real diff.</sub></p>
+<p align="center"><sub><b>Checked before it runs.</b> <code>nika check</code> audits the plan, permits, cost, secrets and types without calling a model (<a href="spec/07-conformance.md">spec/07</a>). Notice the misspelled task name it catches (<i>did you mean <code>assess</code>?</i>), the fix, and the re-check that ends <i>run ready</i>. The output is captured from the real CLI with nika 0.121.0, and 0.123.0 prints the same findings and the same verdict; the fix is a real diff.</sub></p>
 
 Two more rules at work, each beside its chapter:
 
 - **The file is the boundary.** `permits:` lists what a workflow may reach,
   run and read. Anything outside is refused
   ([spec/10](spec/10-authority.md)).
-  ▶ [Watch the boundary catch an escape](https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/permits-audit.optimized.gif)
+  ▶ [Watch the boundary catch an escape](https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/media/gifs/permits-audit.optimized.gif)
 - **Failure is part of the plan.** Errors carry stable codes.
   `on_error: recover` names the fallback; the trace records what failed
   ([spec/05](spec/05-errors.md)).
-  ▶ [Watch a run recover when its live feed goes missing](https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/on-error-recover.optimized.gif)
+  ▶ [Watch a run recover when its live feed goes missing](https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/media/gifs/on-error-recover.optimized.gif)
 
 ### The <!-- canon:pillars -->5<!-- /canon --> pillars · immutable forever
 
@@ -260,10 +265,10 @@ Two more rules at work, each beside its chapter:
 4. **Variables** · one `${{ … }}` syntax over <!-- canon:namespaces -->6<!-- /canon --> namespaces: `inputs` · `const` · `secrets` · `with` · `tasks` · `run`
 5. **Error model** · `NIKA-<NS>-<NNN>` codes, retry, structured output
 
-As concepts, these five are locked for the life of the language; until the
-reference engine reaches 1.0.0, their exact spellings can still change (see
-[Status](#status)). Providers, builtins and extract modes live in the
-[stdlib](stdlib/) and evolve on their own.
+As concepts, these five are locked for the life of the language; their
+spellings change only through a recorded fix (see [Status](#status)).
+Providers, builtins and extract modes live in the [stdlib](stdlib/) and
+evolve on their own.
 
 ## Who this is for
 
@@ -315,10 +320,13 @@ declaring it.
 ## Reference implementation
 
 [supernovae-st/nika](https://github.com/supernovae-st/nika) is the reference
-engine: one Rust binary, AGPL-3.0-or-later. Install it with
-`brew install supernovae-st/tap/nika`, then check and run any workflow.
+engine: one Rust binary, AGPL-3.0-or-later. Its 0.123.0 release is the
+open-source reference release. Install it with
+`brew install supernovae-st/tap/nika` (or
+`curl -LsSf https://nika.sh/install.sh | sh`), then check and run any
+workflow.
 
-▶ [Watch it audit a meeting-notes workflow, then run it on a local model](https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/nika-hero.optimized.gif)
+▶ [Watch it audit a meeting-notes workflow, then run it on a local model](https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/media/gifs/nika-hero.optimized.gif)
 
 - **The spec travels inside it.** The binary embeds this repository's
   chapters, schema and examples at the commit its `SPEC_PIN` names, so
@@ -374,7 +382,7 @@ The full boundary, including what Nika deliberately does not do, is in
 Every spec version ships a pack of canonical workflows: a numbered learning
 path, and real jobs you can copy.
 
-▶ [Watch `nika try` list the jobs this pack ships](https://raw.githubusercontent.com/supernovae-st/nika/main/media/gifs/workflow-gallery.optimized.gif)
+▶ [Watch `nika try` list the jobs this pack ships](https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/media/gifs/workflow-gallery.optimized.gif)
 
 - **Every example is a test.** CI validates each one as a conformance
   input, so an example that breaks the rules breaks the build.
@@ -434,19 +442,19 @@ flowchart LR
 | provenance | [`ESTATE_PIN`](ESTATE_PIN) here, and in the engine, the docs, the site and the registry | the shared provenance verifier is mirrored byte for byte from a published spec commit; the CI `mirror` job compares against exactly that commit |
 
 An engine release names its spec commit twice, and the two must agree. For
-example, at engine v0.118.7 (the last line runs in your clone of this
-repository):
+example, at engine v0.123.0, the reference release (the last line runs in
+your clone of this repository):
 
 ```sh
-curl -sS https://raw.githubusercontent.com/supernovae-st/nika/v0.118.7/SPEC_PIN | grep -v '^#'
-curl -sS https://raw.githubusercontent.com/supernovae-st/nika/v0.118.7/crates/nika-pack/pack/SPEC_SHA
-git log -1 --format='%h %ad %s' --date=short 14bf49f435dc613da08187e4e4822948db267232
+curl -sS https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/SPEC_PIN | grep -v '^#'
+curl -sS https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/crates/nika-pack/pack/SPEC_SHA
+git log -1 --format='%h %ad %s' --date=short 6390b08eb9791ce49c63ee17f8466fab118cadb8
 ```
 
 ```
-14bf49f435dc613da08187e4e4822948db267232
-14bf49f435dc613da08187e4e4822948db267232
-14bf49f 2026-09-05 fix(stdlib): define hash null and selector validation (#304)
+6390b08eb9791ce49c63ee17f8466fab118cadb8
+6390b08eb9791ce49c63ee17f8466fab118cadb8
+6390b08 2026-10-19 fix(conformance): refresh the pricing trace witnesses for the new table (#390)
 ```
 
 </details>
@@ -499,9 +507,10 @@ nika-spec/
 - **Changing the language.** Anything that changes the language surface,
   the stdlib contract, what the suite means or the trace formats is a pull
   request against [`spec/`](spec/) that lands with its conformance tests.
-  At the v1 pre-freeze this becomes a NEP, a Nika Enhancement Proposal
-  ([NEP-0000](governance/nep-0000-the-nep-process.md)), for everyone,
-  maintainers included.
+  The NEP process (Nika Enhancement Proposals ·
+  [NEP-0000](governance/nep-0000-the-nep-process.md)) is built and
+  dormant: it would bind everyone, maintainers included, from a v1
+  pre-freeze, and none is scheduled in the maintained line.
 - **The bar.** CI runs `python3 conformance/runner.py all`, the selftests
   and every generated-file check. Sign off each commit (`git commit -s`,
   the [DCO](https://developercertificate.org)). If you touch `README.md` or
@@ -527,10 +536,15 @@ Not sure an idea deserves a proposal? Pressure-test it first in the engine's
 
 ## Status
 
-- **A draft on its way to v0.1.0 GA.** The spec's version is in
-  [`VERSION`](VERSION); the spec badge above reads it live. GA follows the
-  spec review, the examples, the conformance suite and the schemas; it is
-  gated on readiness, not on a date.
+- **The reference release.** Engine 0.123.0 (2026-10-23) is the
+  open-source reference release, and it embeds this spec at commit
+  [`6390b08`](https://github.com/supernovae-st/nika-spec/commit/6390b08eb9791ce49c63ee17f8466fab118cadb8),
+  the commit its `SPEC_PIN` names. After 0.123 the project is maintained:
+  security fixes, bug fixes and compatibility. No 1.0 release is
+  scheduled.
+- **Spec version.** [`VERSION`](VERSION) reads `0.2.0-draft`, and the
+  spec badge above reads it live. [CHANGELOG.md](CHANGELOG.md) marks what
+  engine 0.123.0 embeds and what landed after it.
 - **Checked today.** The chapters, [`workflow.schema.json`](schemas/workflow.schema.json),
   the static tests (core, deep, stdlib surface and the value-authority
   lanes) and every example run in CI; `python3 conformance/runner.py all`
@@ -539,23 +553,26 @@ Not sure an idea deserves a proposal? Pressure-test it first in the engine's
   beyond `mock/echo`) is still pending
   ([spec/07 §Suite status](spec/07-conformance.md#suite-status--v01-honest)).
 - **Stable where it counts.** The language family is v1, forever: there is
-  no `nika: v2`. Until the reference engine ships 1.0.0, breaking changes
-  land inside v1; from engine 1.0.0 on, the language only grows, additively.
-  The engine versions separately.
+  no `nika: v2`. A change inside v1 is a fix, recorded in
+  [CHANGELOG.md](CHANGELOG.md) with its conformance tests. The engine
+  versions separately.
 - **History you can check.** Every dated claim about the language is
   re-proven weekly in CI against its source
   ([`timeline/timeline.yaml`](timeline/timeline.yaml), git tags, the GitHub
-  and crates.io APIs) and shown with the next milestones at
-  [nika.sh/timeline](https://nika.sh/timeline).
+  and crates.io APIs) and rendered at
+  [docs.nika.sh/reference/timeline](https://docs.nika.sh/reference/timeline).
+  Its forward gates are the earlier plan, kept as history: each carries a
+  dated note, and none is scheduled (the 2026-10-23 entry says why).
 
 ## Governance
 
 - **Editor:** SuperNovae Studio (Thibaut Melen and Nicolas).
-- **How it evolves:** until the v1 pre-freeze, a pull request against
-  [`spec/`](spec/) with its tests. The NEP process
+- **How it evolves:** a pull request against [`spec/`](spec/) with its
+  tests. The NEP process
   ([NEP-0000](governance/nep-0000-the-nep-process.md) ·
-  [template](governance/nep-template.md)) is built and dormant; it becomes
-  binding at the freeze.
+  [template](governance/nep-template.md)) is built and dormant; it would
+  bind from a v1 pre-freeze, and none is scheduled after the 0.123
+  reference release.
 - **Where it is discussed:** in the proposal's public pull request. There is
   no private track.
 - **Decisions:** accepted and rejected NEPs both stay published in
@@ -592,12 +609,14 @@ Not sure an idea deserves a proposal? Pressure-test it first in the engine's
 - **Every way to use Nika, on one page:** install paths, editors, agents,
   skills, MCP, CI and SDKs, at
   [docs.nika.sh/integrations/everywhere](https://docs.nika.sh/integrations/everywhere)
-- **[nika.sh](https://nika.sh):** the website, with
-  [templates](https://nika.sh/templates), the
-  [timeline](https://nika.sh/timeline) and the living
-  [map of the ecosystem](https://nika.sh/map)
+- **[nika.sh](https://nika.sh):** the website. The
+  [templates](https://docs.nika.sh/guides/templates), the
+  [timeline](https://docs.nika.sh/reference/timeline) and the
+  [map of the ecosystem](https://docs.nika.sh/reference/knowledge-system)
+  live in the docs
 - **From TypeScript:** [nika-client](https://github.com/supernovae-st/nika-client)
-  is published on npm as `@supernovae-st/nika`
+  is published on npm as `@supernovae-st/nika` (0.123.0, which bundles
+  engine 0.123.0)
 
 ## Security
 

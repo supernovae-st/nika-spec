@@ -27,6 +27,22 @@ engine at its next `SPEC_PIN` bump.
 - `verify.py` refuses an `amended:` note that is not `YYYY-MM-DD · <note>`,
   is out of date order or is dated ahead of today.
 
+### Changed · the README describes the reference release (2026-10-24)
+
+- Status names engine 0.123.0 as the open-source reference release, the
+  spec commit it embeds (`6390b08`) and the maintenance that follows; it
+  no longer promises a v0.1.0 GA or ties the language's stability to an
+  engine 1.0.0, which is not scheduled. The timeline link goes to the docs
+  page that renders it, with its forward gates labelled as history.
+- The engine clips load from the `v0.123.0` tag instead of a moving
+  `main`. Each caption keeps its true capture version (0.121.0) and says
+  what 0.123.0 prints for the same commands, checked by re-running them;
+  the text capture of `nika check hello.nika` is re-taken on 0.123.0.
+- Step 1 creates a virtual environment first: on Homebrew Python a bare
+  `pip install` stops with `externally-managed-environment`.
+- The pin example reads engine v0.123.0 (`6390b08`), and the related links
+  skip the nika.sh pages that only redirect to the docs.
+
 ### Fixed · QUICKSTART counts (2026-10-24)
 
 - The QUICKSTART said 5 variable namespaces two sections before saying 6
