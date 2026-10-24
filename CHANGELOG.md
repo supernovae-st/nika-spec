@@ -57,7 +57,13 @@ engine at its next `SPEC_PIN` bump.
 - The engine clips load from the `v0.123.0` tag instead of a moving
   `main`. Each caption keeps its true capture version (0.121.0) and says
   what 0.123.0 prints for the same commands, checked by re-running them;
-  the text capture of `nika check hello.nika` is re-taken on 0.123.0.
+  the text capture of `nika check hello.nika` is re-taken on 0.123.0. The
+  four clips the README links rather than embeds are labelled with their
+  capture version too, and the gallery link adds that 0.123.0 lists 36
+  jobs where the clip, captured with 0.121.0, shows 35.
+- The family table describes the editor extension as the other
+  repositories do: frozen at 0.120 and not qualified with 0.123, with
+  `nika lsp` and the JSON Schema to use instead.
 - Step 1 creates a virtual environment first: on Homebrew Python a bare
   `pip install` stops with `externally-managed-environment`.
 - The pin example reads engine v0.123.0 (`6390b08`), and the related links

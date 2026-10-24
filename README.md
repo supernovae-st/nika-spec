@@ -252,10 +252,12 @@ Two more rules at work, each beside its chapter:
   run and read. Anything outside is refused
   ([spec/10](spec/10-authority.md)).
   ▶ [Watch the boundary catch an escape](https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/media/gifs/permits-audit.optimized.gif)
+  (captured with nika 0.121.0)
 - **Failure is part of the plan.** Errors carry stable codes.
   `on_error: recover` names the fallback; the trace records what failed
   ([spec/05](spec/05-errors.md)).
   ▶ [Watch a run recover when its live feed goes missing](https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/media/gifs/on-error-recover.optimized.gif)
+  (captured with nika 0.121.0)
 
 ### The <!-- canon:pillars -->5<!-- /canon --> pillars · immutable forever
 
@@ -327,6 +329,7 @@ open-source reference release. Install it with
 workflow.
 
 ▶ [Watch it audit a meeting-notes workflow, then run it on a local model](https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/media/gifs/nika-hero.optimized.gif)
+(captured with nika 0.121.0)
 
 - **The spec travels inside it.** The binary embeds this repository's
   chapters, schema and examples at the commit its `SPEC_PIN` names, so
@@ -383,6 +386,8 @@ Every spec version ships a pack of canonical workflows: a numbered learning
 path, and real jobs you can copy.
 
 ▶ [Watch `nika try` list the jobs this pack ships](https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/media/gifs/workflow-gallery.optimized.gif)
+(captured with nika 0.121.0, which listed 35 jobs; 0.123.0 lists 36, adding
+`remove-owned-file`)
 
 - **Every example is a test.** CI validates each one as a conformance
   input, so an example that breaks the rules breaks the build.
@@ -593,7 +598,7 @@ Not sure an idea deserves a proposal? Pressure-test it first in the engine's
 | 🦋 | [nika](https://github.com/supernovae-st/nika) | The engine and CLI: write, check, run and verify AI workflows |
 | 📖 | [nika-docs](https://github.com/supernovae-st/nika-docs) | The documentation, live at [docs.nika.sh](https://docs.nika.sh) |
 | 📜 | **[nika-spec](https://github.com/supernovae-st/nika-spec)** | **The language specification and the suite that proves an engine follows it** |
-| 🧩 | [nika-vscode](https://github.com/supernovae-st/nika-vscode) | The editor extension: your workflow as a live graph, errors as you type |
+| 🧩 | [nika-vscode](https://github.com/supernovae-st/nika-vscode) | The editor extension, frozen at 0.120 and not qualified with 0.123: use `nika lsp` and the JSON Schema |
 | 🟦 | [nika-client](https://github.com/supernovae-st/nika-client) | Run and verify workflows from TypeScript |
 | ✅ | [nika-action](https://github.com/supernovae-st/nika-action) | A GitHub Action that posts a `nika check` verdict on your pull requests |
 | 🚀 | [nika-actions-starter](https://github.com/supernovae-st/nika-actions-starter) | A ready template: workflows, editor setup and CI from the first push |
