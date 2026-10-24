@@ -198,7 +198,7 @@ def gate_body(gate: dict[str, Any], ssot_id: str) -> str:
     lines.extend(
         [
             "",
-            "SSOT: [`timeline/timeline.yaml`](https://github.com/supernovae-st/nika-spec/blob/main/timeline/timeline.yaml) · rendered: https://nika.sh/timeline#gates",
+            "SSOT: [`timeline/timeline.yaml`](https://github.com/supernovae-st/nika-spec/blob/main/timeline/timeline.yaml) · rendered: https://docs.nika.sh/reference/timeline#gates",
             "",
             "_Projected from the record; hand edits are overwritten. When this gate flips, the record gains a dated proven entry and this issue closes itself._",
         ]

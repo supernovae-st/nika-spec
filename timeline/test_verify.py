@@ -1,6 +1,6 @@
 """Publication-state proof is not an HTTP-success or artifact-integrity claim."""
 import copy
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 import importlib.util
 import io
 from pathlib import Path
@@ -65,6 +65,43 @@ class ReleaseEvidenceTests(unittest.TestCase):
                 self.assertEqual(VERIFY.main(["--offline"] if offline else []), 0)
             self.assertEqual("every provable claim holds" in output.getvalue(), not offline)
             self.assertEqual("external claims remain unproved" in output.getvalue(), offline)
+
+
+class GateAmendmentTests(unittest.TestCase):
+    """A gate's `amended:` notes are dated, ordered and never ahead of today."""
+
+    today = VERIFY.date(2026, 10, 24)
+
+    def problems(self, amended):
+        return VERIFY.amendment_findings({"id": "rc", "amended": amended}, self.today)
+
+    def test_dated_ordered_notes_pass(self):
+        self.assertEqual(VERIFY.amendment_findings({"id": "rc"}, self.today), [])
+        self.assertEqual(self.problems(["2026-10-08 · retired", "2026-10-23 · not scheduled"]), [])
+        self.assertEqual(self.problems(["2026-10-24 · same day as today"]), [])
+
+    def test_shape_refusals(self):
+        for amended in [None, "2026-10-23 · a bare string", [], {}, [None], [42],
+                        ["not dated"], ["2026-10-23 no separator"], ["2026-10-23 · "],
+                        ["23-10-2026 · day first"]]:
+            with self.subTest(amended=amended):
+                self.assertTrue(self.problems(amended))
+
+    def test_impossible_future_and_unordered_dates_refuse(self):
+        for amended in [["2026-02-30 · no such day"], ["2026-10-25 · tomorrow"],
+                        ["2026-10-23 · later", "2026-10-08 · earlier"]]:
+            with self.subTest(amended=amended):
+                self.assertTrue(self.problems(amended))
+
+    def test_main_counts_a_bad_amendment_as_bad_shape(self):
+        doc = {"evidence_classes": {}, "gates": [
+            {"id": "rc", "conditions": ["x"], "amended": ["2999-01-01 · a schedule in disguise"]}]}
+        output, errors = io.StringIO(), io.StringIO()
+        with redirect_stdout(output), redirect_stderr(errors), \
+             patch.object(VERIFY.yaml, "safe_load", return_value=doc):
+            self.assertEqual(VERIFY.main(["--offline"]), 1)
+        self.assertIn("BAD-SHAPE", output.getvalue())
+        self.assertIn("ahead of today", output.getvalue())
 
 
 class ApiAuthorityTests(unittest.TestCase):

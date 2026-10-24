@@ -18,7 +18,7 @@
 # a provable claim failed to resolve · exit 2 = harness error.
 
 import json
-from datetime import datetime
+from datetime import date, datetime, timezone
 import os
 import pathlib
 import re
@@ -41,6 +41,7 @@ PROVABLE = {"git-tag", "github-release", "github-commit", "github-pr", "crates-i
 UNPROVABLE = {"testimony", "private-archive"}
 RECORDED = {"scorecard"}
 STABLE_ID = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+AMENDMENT = re.compile(r"^(\d{4}-\d{2}-\d{2}) · \S")
 
 
 def github_api_origin(url: str) -> bool:
@@ -79,6 +80,36 @@ def http_ok(url: str) -> bool:
             return 200 <= r.status < 300
     except Exception:
         return False
+
+
+def amendment_findings(gate: dict, today: date) -> list[str]:
+    """A gate is never rewritten: a change in its standing is an `amended:`
+    note, `YYYY-MM-DD · <note>`, appended in date order. The date records
+    when the plan changed, so it is a real calendar day and never ahead of
+    today: a future one would smuggle a schedule into a gate."""
+    if "amended" not in gate:
+        return []
+    notes = gate["amended"]
+    if not isinstance(notes, list) or not notes:
+        return ["`amended:` must be a non-empty list of dated notes"]
+    problems: list[str] = []
+    previous = None
+    for note in notes:
+        match = AMENDMENT.match(note) if isinstance(note, str) else None
+        if not match:
+            problems.append(f"amendment {note!r} must read 'YYYY-MM-DD · <note>'")
+            continue
+        try:
+            day = date.fromisoformat(match.group(1))
+        except ValueError:
+            problems.append(f"amendment date {match.group(1)} is not a calendar day")
+            continue
+        if day > today:
+            problems.append(f"amendment date {day} is ahead of today: a gate has conditions, never a schedule")
+        if previous is not None and day < previous:
+            problems.append(f"amendment {day} follows {previous}: notes are appended in date order")
+        previous = day
+    return problems
 
 
 def check(entry: dict, offline: bool) -> tuple[str, str]:
@@ -185,6 +216,7 @@ def main(argv: list[str]) -> int:
                 continue
             v, d = check(e, offline)
             rows.append((v, e.get("title") or e.get("id") or e.get("version", "?"), d))
+    today = datetime.now(timezone.utc).date()
     for g in doc.get("gates", []):
         stable_id = g.get("id")
         if not stable_id or not STABLE_ID.fullmatch(stable_id):
@@ -198,6 +230,8 @@ def main(argv: list[str]) -> int:
             rows.append(("BAD-SHAPE", g.get("id", "?"), "a gate carries a DATE — the future has conditions, never dates"))
         if not g.get("conditions"):
             rows.append(("BAD-SHAPE", g.get("id", "?"), "a gate needs conditions"))
+        for problem in amendment_findings(g, today):
+            rows.append(("BAD-SHAPE", g.get("id", "?"), problem))
     counts: dict[str, int] = {}
     failed = 0
     for v, title, detail in rows:

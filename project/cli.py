@@ -1,4 +1,4 @@
-"""Historical projector; current planning is in Linear, not GitHub Projects."""
+"""Historical projector; current planning is tracked privately, not in GitHub Projects."""
 
 from __future__ import annotations
 
@@ -121,7 +121,7 @@ def render_readme(manifest: dict[str, Any]) -> str:
             "- Priority and Effort remain explicit human decisions.",
             "- Views and Insights are browser-only GitHub state. Their exact recipe is versioned in [`project/project-os.yaml`](https://github.com/supernovae-st/nika-spec/blob/main/project/project-os.yaml).",
             "",
-            "📜 Record: [`timeline/timeline.yaml`](https://github.com/supernovae-st/nika-spec/blob/main/timeline/timeline.yaml) · rendered timeline: https://nika.sh/timeline",
+            "📜 Record: [`timeline/timeline.yaml`](https://github.com/supernovae-st/nika-spec/blob/main/timeline/timeline.yaml) · rendered timeline: https://docs.nika.sh/reference/timeline",
         ]
     )
     product_brief = manifest["project"].get("product_brief", "").strip()
@@ -131,7 +131,7 @@ def render_readme(manifest: dict[str, Any]) -> str:
 
 def parser() -> argparse.ArgumentParser:
     value = argparse.ArgumentParser(
-        description="Historical Nika Project (retired; current planning is in Linear)"
+        description="Historical Nika Project (retired; current planning is tracked privately)"
     )
     mode = value.add_mutually_exclusive_group()
     mode.add_argument(
@@ -153,8 +153,8 @@ def main(argv: list[str] | None = None) -> int:
     manifest = load_yaml(MANIFEST_PATH)
     if manifest.get("lifecycle", {}).get("status") != "active":
         print(
-            "project-os: retired; current planning is in "
-            "https://linear.app/nika-supernovae. "
+            "project-os: retired; current planning is tracked privately. "
+            "Public issues and pull requests: https://github.com/supernovae-st/nika/issues. "
             "Use project/verify.py --offline for historical validation.",
             file=sys.stderr,
         )

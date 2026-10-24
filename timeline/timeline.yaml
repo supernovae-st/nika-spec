@@ -27,7 +27,7 @@
 # silently rewrites.
 
 schema_version: 1
-last_updated: "2026-09-25"
+last_updated: "2026-10-24"
 verifier: timeline/verify.py
 
 evidence_classes:
@@ -450,6 +450,19 @@ entries:
     component: engine
     evidence: { class: github-release, repo: supernovae-st/nika, tag: v0.122.0 }
 
+  - id: connectome-retired-as-launch-condition
+    date: "2026-10-08"
+    type: milestone
+    title: "The Connectome stops being a launch condition"
+    detail: >-
+      Decision D-2026-10-08-N1 retires the Connectome umbrella and its
+      whole-before-1.0 gate. Each memory, retrieval or cognition capability
+      meets its own release acceptance under its own owner, and no other
+      orchestrator replaces the umbrella. The engine roadmap records the
+      decision from this commit on (merged 2026-10-09).
+    component: standard
+    evidence: { class: github-commit, repo: supernovae-st/nika, sha: 5167aaf5d66f71fb6a31c43e4a8f413712026c19 }
+
   - id: release-0-123-0
     date: "2026-10-23"
     type: release
@@ -461,14 +474,38 @@ entries:
     component: engine
     evidence: { class: github-release, repo: supernovae-st/nika, tag: v0.123.0 }
 
+  - id: reference-release-maintenance
+    date: "2026-10-23"
+    type: milestone
+    title: "0.123 is the reference release · the project moves to maintenance"
+    detail: >-
+      Engine 0.123.0 is the open-source reference release: the Rust engine,
+      the `nika` command line and its terminal workspace, and the TypeScript
+      SDK (`@supernovae-st/nika` 0.123.0). It embeds this specification at
+      commit `6390b08`. From here the project is maintained: security fixes,
+      bug fixes and compatibility, with no major new features and no hosted
+      service. The gates below are kept as the earlier plan, each with a
+      dated `amended:` note; they are not commitments, and no 1.0 release
+      is scheduled.
+    component: standard
+    evidence: { class: github-release, repo: supernovae-st/nika, tag: v0.123.0 }
+
 gates:
   # The future · conditions, never dates. A gate flips when its
   # conditions hold — the timeline gains a dated entry at that moment.
+  #
+  # A gate is never rewritten either. A change in its standing is a dated
+  # `amended:` note, appended in date order and never ahead of today
+  # (verify.py refuses one that is): the notes record what happened to the
+  # plan, never when it will land. Since 2026-10-23 (the entry
+  # reference-release-maintenance) no gate below is scheduled.
   - id: rc
     title: "1.0.0-rc.N · design partners"
     conditions:
       - "the release-candidate gate is green"
       - "design partners run real workflows and their feedback rounds land"
+    amended:
+      - "2026-10-23 · not scheduled: 0.123.0 is the maintained reference release and no 1.0.0 is planned"
 
   - id: scorecard-10
     title: "OpenSSF Scorecard 10/10"
@@ -477,6 +514,8 @@ gates:
       - "a second reviewer so code-review and branch-protection clear"
       - "the best-practices badge earned"
     note: "The declared pre-condition of the official 1.0."
+    amended:
+      - "2026-10-23 · historical plan: the 1.0 it conditioned is not scheduled after the 0.123 reference release"
 
   - id: contract-system
     title: "The contract system · everything carries a contract"
@@ -485,6 +524,8 @@ gates:
       - "every composition is proven, and unknown information stays visible: Unknown is never dressed as success"
       - "every dynamic verification is attributable, and no capability exercises more authority than its type announces"
     note: "The five-law constitution, ratified 2026-07-20 · lands before 1.0."
+    amended:
+      - "2026-10-23 · historical plan, not scheduled after the 0.123 reference release"
 
   - id: connectome
     title: "The Connectome · memory enters the contract"
@@ -494,6 +535,9 @@ gates:
       - "the zero-LLM write path holds: memory is written by deterministic code, never by a model's output"
       - "the store is exportable on open standards, and its digest is pinned in receipts, so recall is replayable"
     note: "Lands whole before 1.0 · a declared pre-condition of the official launch."
+    amended:
+      - "2026-10-08 · retired as a launch condition (D-2026-10-08-N1): each memory, retrieval or cognition capability meets its own release acceptance (the entry connectome-retired-as-launch-condition)"
+      - "2026-10-23 · historical plan, not scheduled after the 0.123 reference release"
 
   - id: hundred-year
     title: "Built for a hundred years · the standard's machinery"
@@ -505,6 +549,8 @@ gates:
       - "the checker is deterministic by construction: same input, same diagnostics, same order, proven in CI"
       - "succession is written down: named successors, key escrow, the project survives its maintainer"
     note: "Lands before 1.0 · a standard is judged by what outlives its author."
+    amended:
+      - "2026-10-23 · historical plan, not scheduled after the 0.123 reference release"
 
   - id: v1
     title: "1.0.0 · the first official launch"
@@ -514,6 +560,9 @@ gates:
       - "a launch crafted to the same bar as the language"
       - "the Scorecard bar met (10/10)"
       - "the contract system, the Connectome and the hundred-year machinery land first: 1.0 is the culmination, not the start"
+    amended:
+      - "2026-10-08 · the Connectome condition is retired (D-2026-10-08-N1)"
+      - "2026-10-23 · not scheduled: 0.123.0 is the maintained reference release and no 1.0.0 is planned"
 
   - id: second-implementation
     title: "The second independent implementation"
@@ -521,6 +570,8 @@ gates:
       - "an engine we did not write passes the public suite (Core level) at a pinned spec commit"
       - "its row lands in CONFORMANT_IMPLEMENTATIONS.md with a reproducible command"
     note: "The north metric of the standard track: 0 → 1 → 3."
+    amended:
+      - "2026-10-23 · still open, as an observation rather than a plan: it flips when an engine the maintainers did not write lands its row"
 
   - id: spec-freeze
     title: "/spec/v1.0.0 · the freeze"
@@ -528,3 +579,5 @@ gates:
       - "the grammar refonte lands and its cascade is green"
       - "the reserve/specify/refuse checklist is fully resolved"
       - "exit criteria published · six months of zero normative change outside the NEP door proves the freeze"
+    amended:
+      - "2026-10-23 · not scheduled: the spec is maintained at the commit engine 0.123.0 embeds and changes through recorded fixes"
