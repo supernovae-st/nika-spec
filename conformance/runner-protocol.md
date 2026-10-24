@@ -522,10 +522,19 @@ binary, `nika 0.123.0 (0bfde3765)`, on fixtures byte-identical to
   still admits a `source: vault` secret, which
   [01](../spec/01-envelope.md) withdrew until an engine resolves it.
 - `stdlib/001` · `stdlib/providers/001 · 002 · 006` · the MODELS rung now
-  carries `NIKA-PROVIDER`, so the namespace matches, but as a bare code
-  with no category; the fixtures expect `validation_error`.
-- `stdlib/hash/002 · 003` · `nika:hash` refuses the `key` and `op`
-  arguments with `NIKA-BUILTIN-001`.
+  emits `NIKA-PROVIDER` as a bare code, with no number and no category.
+  The [matching rule](#matching-rule-an-expected-entry-vs-the-emitted-set)
+  matches an expected namespace only through a code that starts with
+  `NIKA-PROVIDER-` (05 numbers them 001-099) or an emitted namespace, so
+  the fixtures' `NIKA-PROVIDER` expectation finds no match.
+- `stdlib/hash/002 · 003` · `nika:hash` takes only `content`, `algo` and
+  `encoding` in this engine, so it refuses the signing arguments with
+  `NIKA-BUILTIN-001` (`key` and `op` in 002; `op`, `public_key` and
+  `signature` in 003). 002 is also refused with `NIKA-SEC-006`: its secret
+  key reaches `nika:hash` with no `egress:` sanction, which
+  [01 §egress](../spec/01-envelope.md#egress--optional--sanctioned-destinations-declassification)
+  refuses by default. That cause is the fixture's: it is not whole-spec
+  legal until the key carries `egress: [{ to: "nika:hash" }]`.
 
 The behavioral differential agrees wherever it measures: 170 fixtures ·
 124 agree · 0 diverge · 0 engine errors · 46 UNSUPPORTED (no qualified

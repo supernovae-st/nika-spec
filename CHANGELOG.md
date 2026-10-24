@@ -117,8 +117,13 @@ engine at its next `SPEC_PIN` bump.
 - `CONFORMANT_IMPLEMENTATIONS.md` lists the reference release, measured with
   the released binary at `6390b08`: static sweep 414/421 (core 247/248),
   runtime differential 124 agree · 0 diverge · 46 unsupported of 170,
-  lints 7/7. It earns no level claim at that commit, and each red is named.
-  The 0.106.1 row stays as history.
+  lints 7/7. It earns no level claim at that commit, and each red is named
+  with every cause the binary reports: `stdlib/hash/002` is refused for its
+  signing arguments and, with `NIKA-SEC-006`, for a secret key with no
+  `egress:` sanction, a cause that is the fixture's. The `conformance/run.sh`
+  corpus run is recorded file by file; the three corpus files both oracles
+  refuse at check use shapes the language no longer accepts and can be
+  repaired statically. The 0.106.1 row stays as history.
 - "How to be listed" and the runner protocol stop pointing at a native
   `conformance` subcommand: no engine ships one, 0.123.0 included, and the
   maintained line plans none. The suite is driven by `conformance/run.sh`,
