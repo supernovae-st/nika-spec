@@ -81,13 +81,18 @@ engine at its next `SPEC_PIN` bump.
 
 - 07 §Editor tooling shows the modeline at the schema's own `$id`,
   `https://nika.sh/spec/v1/workflow.schema.json`, which the examples, the
-  templates and `nika init` already use, and names `nika spec --schema`
-  for offline use. The per-minor address it describes as the target
-  (`nika.sh/schema/v0.1/…`) is marked as not served: it answers 404, and a
-  reader who copied it got no schema. The normative paragraph keeps its
-  law and its two causes.
-- `llms.txt` gives agents the same address, and both llms files now carry
-  17 · Trace, which they left out.
+  templates and `nika init` already use. It says that this address serves
+  a copy published with the website, and that the copy can lag: on
+  2026-10-24 it served the 2026-09-18 revision, which flags
+  `nika:remove_file`, the `{ file: }` forms and `for_each.max_items` in a
+  valid workflow. For the exact schema an engine embeds it names
+  `nika spec --schema` offline and the address pinned at the spec commit
+  online (`6390b08` for engine 0.123.0). The per-minor address it describes
+  as the target (`nika.sh/schema/v0.1/…`) is marked as not served: it
+  answers 404, and a reader who copied it got no schema. The normative
+  paragraph keeps its law and its two causes.
+- `llms.txt` gives agents the same address with the same warning, and both
+  llms files now carry 17 · Trace, which they left out.
 
 ### Fixed · pre-commit hooks a consumer can install (2026-10-24)
 

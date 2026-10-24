@@ -7,7 +7,13 @@
 
 Workflow files are `*.nika`. The JSON Schema gives any editor
 autocomplete + validation via a `yaml-language-server` modeline at its own
-`$id`: `https://nika.sh/spec/v1/workflow.schema.json` (offline: `nika spec --schema`)
+`$id`: `https://nika.sh/spec/v1/workflow.schema.json`. That address serves a
+copy published with the website, and the copy can lag: on 2026-10-24 it
+served the 2026-09-18 revision, without `nika:remove_file`, the `{ file: }`
+form of `prompt:`, `system:` and `schema:`, or `for_each.max_items`. For the
+exact schema an engine embeds, run `nika spec --schema`, or read it at that
+spec commit (`6390b08` for engine 0.123.0):
+`https://raw.githubusercontent.com/supernovae-st/nika-spec/6390b08eb9791ce49c63ee17f8466fab118cadb8/schemas/workflow.schema.json`
 
 ## Spec
 

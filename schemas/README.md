@@ -4,6 +4,11 @@
 > like `yaml-language-server` (VS Code · Cursor · etc.) for autocompletion
 > and validation in editors.
 
+> **Note · 2026-10-24.** The `$id` address in §How to use serves a copy
+> published with the website, and the copy can lag: that day it served the
+> 2026-09-18 revision
+> ([07 §Editor tooling](../spec/07-conformance.md#editor-tooling--the-canonical-json-schema)).
+
 ---
 
 ## Status · `workflow.schema.json` SHIPPED (interim · hand-derived) · `project.schema.json` SHIPPED (engine-emitted) · rest pending
