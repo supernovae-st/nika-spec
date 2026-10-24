@@ -27,6 +27,17 @@ engine at its next `SPEC_PIN` bump.
 - `verify.py` refuses an `amended:` note that is not `YYYY-MM-DD · <note>`,
   is out of date order or is dated ahead of today.
 
+### Fixed · the lints differential measures again (2026-10-24)
+
+- `scripts/lints-differential.py` handed the engine `input.yaml`, which the
+  engine has refused as a program since the `.nika` hard cut. The reply was
+  a parse-fatal report with no hints, read as silence: the clean fixtures
+  "agreed" without being measured and the firing ones diverged. Fixtures
+  are now staged as `input.nika` with their side files in a throwaway
+  directory, a parse-fatal report counts as an engine error, and the
+  `egress` hints the eg001 fixtures expect are read through the same door.
+  On engine 0.123.0: 7 measured, 7 agree, 25 NO-DOOR.
+
 ### Fixed · the showcase tiers the docs count (2026-10-24)
 
 - `scripts/showcase-projector.py` reads each job's tier from its
