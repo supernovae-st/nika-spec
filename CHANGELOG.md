@@ -16,6 +16,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Changes merged after the spec commit engine 0.123.0 embeds. They reach the
 engine at its next `SPEC_PIN` bump.
 
+### Changed · the timeline records the reference release (2026-10-24)
+
+- `timeline/timeline.yaml` gains two dated entries, each re-proven by
+  `timeline/verify.py`: the Connectome stops being a launch condition
+  (2026-10-08, D-2026-10-08-N1) and 0.123 becomes the reference release with
+  the project in maintenance (2026-10-23). The forward gates keep their
+  titles, conditions and notes; each gains a dated `amended:` note, and the
+  ones that planned a 1.0 now say it is not scheduled.
+- `verify.py` refuses an `amended:` note that is not `YYYY-MM-DD · <note>`,
+  is out of date order or is dated ahead of today.
+
 ### Fixed · two jobs on their refused paths (2026-10-24)
 
 - `examples/release-notes.nika` no longer drafts notes from a sample log when
