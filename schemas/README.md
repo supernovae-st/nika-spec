@@ -4,6 +4,13 @@
 > like `yaml-language-server` (VS Code · Cursor · etc.) for autocompletion
 > and validation in editors.
 
+> **Note · 2026-10-23.** No GA release is scheduled after the 0.123
+> reference release: engine 0.123.0 embeds this spec at `6390b08`, and the
+> project is maintained after it (security fixes, bug fixes and
+> compatibility). The GA wording below (« at engine GA », « v0.1.0 GA ») is
+> kept as history. `workflow.schema.json` stays the hand-derived source the
+> engine copies byte for byte, which `nika spec --schema` prints.
+
 > **Note · 2026-10-24.** The `$id` address in §How to use serves a copy
 > published with the website, and the copy can lag: that day it served the
 > 2026-09-18 revision

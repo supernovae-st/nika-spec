@@ -46,6 +46,9 @@ engine at its next `SPEC_PIN` bump.
 - NEP-0000 carries a dated status note (dormant, no pre-freeze scheduled),
   CONTRIBUTING names the door in use, and SECURITY stops promising fixes
   to a "latest tagged release" this repository never had.
+- The closing section of this file (Why no 0.0.x) and `schemas/README.md`
+  still planned a `0.1.0` GA. Each gains a dated note that no GA is
+  scheduled; the plan is kept as history.
 
 ### Changed · the README describes the reference release (2026-10-24)
 
@@ -1281,6 +1284,12 @@ cost-aware model routing (per-task cheap-vs-expensive switching).
 ---
 
 ## Why no « 0.0.x »
+
+> **Note · 2026-10-23.** No GA release is scheduled. Engine 0.123.0, the
+> open-source reference release, embeds this spec at `6390b08` (`VERSION`
+> reads `0.2.0-draft`), and after it the project is maintained: security
+> fixes, bug fixes and compatibility. The GA plan below is kept as history;
+> it is how the first draft meant to release.
 
 This spec starts at v0.1.0-draft because it **derives from empirical
 examples**, not from scratch · an earlier Nika prototype already ran 26
