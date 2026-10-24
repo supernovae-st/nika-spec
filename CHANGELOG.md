@@ -27,6 +27,18 @@ engine at its next `SPEC_PIN` bump.
 - `verify.py` refuses an `amended:` note that is not `YYYY-MM-DD · <note>`,
   is out of date order or is dated ahead of today.
 
+### Changed · engine 0.123.0 in the conformance registry (2026-10-24)
+
+- `CONFORMANT_IMPLEMENTATIONS.md` lists the reference release, measured with
+  the released binary at `6390b08`: static sweep 414/421 (core 247/248),
+  runtime differential 124 agree · 0 diverge · 46 unsupported of 170,
+  lints 7/7. It earns no level claim at that commit, and each red is named.
+  The 0.106.1 row stays as history.
+- "How to be listed" and the runner protocol stop pointing at a native
+  `conformance` subcommand: no engine ships one, 0.123.0 included, and the
+  maintained line plans none. The suite is driven by `conformance/run.sh`,
+  `scripts/parity-sweep.sh` and `scripts/runtime-differential.py`.
+
 ### Fixed · the lints differential measures again (2026-10-24)
 
 - `scripts/lints-differential.py` handed the engine `input.yaml`, which the
