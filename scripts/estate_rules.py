@@ -108,7 +108,7 @@ FILES = [
         "derivation": {
             "tool": "python3 scripts/llms-projector.py --write",
             "gate": ".github/workflows/conformance.yml step 'Projection gates' → scripts/llms-projector.py --check",
-            "inputs": ["README.md · QUICKSTART.md · spec/00-16 · stdlib/ · registry/ · GLOSSARY.md (the ordered normative reading path, concatenated)"],
+            "inputs": ["README.md · QUICKSTART.md · spec/00-17 · conformance/runner-protocol.md · CONFORMANT_IMPLEMENTATIONS.md · governance/nep-0000-the-nep-process.md · governance/certifications.md · GLOSSARY.md · stdlib/ (builtins · providers · extract-modes) · registry/registry-v0.1.md (scripts/llms-projector.py FULL_ORDER: the ordered normative reading path, concatenated)"],
         },
     },
     {
@@ -344,7 +344,7 @@ PATTERNS = [
     {
         "glob": "spec/**",
         "class": "authored",
-        "evidence": "the normative prose law (00-overview → 16-projections) — THE spec; no generation markers",
+        "evidence": "the normative prose law (00-overview → 17-trace) — THE spec; no generation markers",
         "note": "spec/00-04 · 06-08 carry tool-maintained '<!-- canon:KEY -->N<!-- /canon -->' count markers inside the authored prose (canon-projectors.py TARGET 0 · --check gated) — the class stays authored",
     },
     {
