@@ -27,7 +27,7 @@
 # silently rewrites.
 
 schema_version: 1
-last_updated: "2026-10-24"
+last_updated: "2026-10-25"
 verifier: timeline/verify.py
 
 evidence_classes:
@@ -489,6 +489,17 @@ entries:
       is scheduled.
     component: standard
     evidence: { class: github-release, repo: supernovae-st/nika, tag: v0.123.0 }
+
+  - id: release-0-123-1
+    date: "2026-10-25"
+    type: release
+    version: "0.123.1"
+    title: "0.123.1 · engine release published"
+    detail: >-
+      Published on GitHub at `2026-10-25T11:12:44Z` as release `423342111`,
+      from engine commit `cc7b519648a2223b378d971929df40b675457883`.
+    component: engine
+    evidence: { class: github-release, repo: supernovae-st/nika, tag: v0.123.1 }
 
 gates:
   # The future · conditions, never dates. A gate flips when its
