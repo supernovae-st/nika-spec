@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: release-banner
+run:
+  access:
+    via: codex
+    protocol: acp
+permits:
+  fs: { read: ["./out/**"], write: ["./out/**"] }
+  tools: ["nika:image_fx"]
+tasks:
+  banner:
+    agent:
+      prompt: "Draw a 16:9 release banner, no text"
+      images:
+        save: "./out/banner.png"
+  halftone:
+    with:
+      banner: ${{ tasks.banner.output.images[0].path }}
+    invoke:
+      tool: "nika:image_fx"
+      args: { input: "${{ with.banner }}", out: "./out/banner-halftone.png", ops: [{ halftone: {} }] }

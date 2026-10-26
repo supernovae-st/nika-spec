@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: agent-images-outside-write
+permits:
+  fs: { write: ["./out/**"] }
+tasks:
+  banner:
+    agent:
+      prompt: "Draw a release banner"
+      images:
+        save: "./banner.png"

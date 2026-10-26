@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: release-banner
+permits:
+  fs: { write: ["./out/**"] }
+tasks:
+  banner:
+    agent:
+      prompt: "Draw a release banner"
+      images:
+        copy_from: "~/.codex/generated_images"

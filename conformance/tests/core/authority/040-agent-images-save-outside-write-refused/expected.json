@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-004",
+      "category": "security_error"
+    }
+  ],
+  "note": "02-verbs.md §Harness images · 01 §permits · a literal images.save path is judged against permits.fs.write before any byte is written."
+}
