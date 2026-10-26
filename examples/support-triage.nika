@@ -19,12 +19,12 @@
 #   you want. Swap the host in `permits.net.http` if you escalate somewhere else.
 #
 # Run · nika run examples/support-triage.nika
-#   Offline rehearsal (zero key, deterministic) · add `--model mock/echo`:
+#   Mock rehearsal (zero key, deterministic) · add `--model mock/echo`:
 #   the sample queue ships with the repo and mock answers with a minimal
-#   one-ticket board graded `low`, so the escalation gate stays closed and
-#   the run is green with no key at all. The sample DOES carry an outage
-#   ticket, so a real model opens that gate — which is when the secret above
-#   starts to matter.
+#   one-ticket board graded `low`, so the escalation gate stays closed, no
+#   webhook is called and the run is green with no key at all. The sample
+#   DOES carry an outage ticket, so a real model opens that gate — which is
+#   when the secret above starts to matter.
 
 nika: support-triage
 

@@ -333,7 +333,9 @@ workflow.
 
 - **The spec travels inside it.** The binary embeds this repository's
   chapters, schema and examples at the commit its `SPEC_PIN` names, so
-  `nika spec --canon`, `nika spec --schema` and `nika try` work offline.
+  `nika spec --canon` and `nika spec --schema` work offline and `nika try`
+  needs no download. A `nika try` rehearsal runs on the mock model (zero
+  keys, no model call); a fetch step still reaches its host.
 - **Editors and agents can ask it questions.** `nika mcp` serves a read-only
   MCP server with <!-- canon:mcp_tools -->9<!-- /canon --> tools
   (`nika_check` · `nika_explain` · `nika_schema` · `nika_examples` ·
@@ -359,7 +361,8 @@ travels. A language does:
 - **Your choice of model.** The same file runs on local and open-weight
   models (Ollama, llama.cpp, vLLM), on Mistral, Hugging Face, OpenAI, xAI,
   Anthropic and the rest of a catalog of <!-- canon:providers -->18<!-- /canon -->
-  providers; `mock/echo` rehearses with no key and no network.
+  providers; `mock/echo` rehearses with no key and no model call, and a
+  fetch step still reaches its host.
 
 Standards already work this way: SQL, GraphQL, OpenAPI, the Dockerfile,
 GitHub Actions YAML. SQL is to PostgreSQL what Nika is to its reference
@@ -392,7 +395,8 @@ path, and real jobs you can copy.
 - **Every example is a test.** CI validates each one as a conformance
   input, so an example that breaks the rules breaks the build.
 - **The engine carries the pack of its version.** `nika try` rehearses these
-  workflows offline, with the examples of the language version the binary
+  workflows on the mock model (zero keys, no model call; a fetch step still
+  reaches its host), with the examples of the language version the binary
   speaks.
 - **The docs and the website render these files**, never copies of them.
 - **The pack is verifiable end to end.**
