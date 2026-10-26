@@ -1,0 +1,11 @@
+{
+  "tier": "t0",
+  "valid": false,
+  "errors": [
+    {
+      "namespace": "NIKA-PARSE",
+      "category": "validation_error"
+    }
+  ],
+  "note": "02-verbs.md §Harness images · images: carries save: only; a key naming a path the application reports is unknown and refused (the engine never opens such a path)."
+}

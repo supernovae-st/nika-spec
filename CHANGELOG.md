@@ -16,6 +16,38 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Changes merged after the spec commit engine 0.123.0 embeds. They reach the
 engine at its next `SPEC_PIN` bump.
 
+### Added · an agent application's images as task values (2026-10-26)
+
+- `agent:` gains `images:` ([02 §Harness images](./spec/02-verbs.md#harness-images--images-normative)).
+  On a seat (`run.access.protocol: acp`), the images the application
+  generates during the task's turn become `.output.images`, beside the final
+  message at `.output.message`; each entry carries `index`, `path`, `sha256`,
+  `size_bytes`, `mime_type`, `width` and `height`. Only bytes received on the
+  task's own session count. A path the application reports, such as a folder
+  of generated images that every session shares, is never opened. Before,
+  a workflow had to ask the application to copy its image out of that shared
+  folder, and the copy could be another session's image.
+- `images: { save: <path> }` has the engine write the received bytes in the
+  project, judged against `permits.fs.write` before any byte
+  (`NIKA-AUTH-006` · `NIKA-SEC-004`). A task whose session delivered no image
+  fails the new `NIKA-AGENT-007` instead of succeeding with nothing written.
+  The trace observation of a written image carries `saved_path`
+  ([17](./spec/17-trace.md#harness-image-observations-additive)).
+- `images:` on a route without a seat is refused before the first request.
+- Fixtures: `core/verbs-shape/029`, `030`, `core/authority/039`, `040`. The
+  reference runner judges a literal `images.save` path as an fs write.
+
+### Changed · structured output on a subscription seat (2026-10-26)
+
+- The `structured_output` property of the
+  [subscription harness meet](./spec/02-verbs.md#subscription-harness-access-normative)
+  is met by the adapter's own level or, for JSON and JSON Schema, by the
+  engine validating the terminal answer under the `schema` law: an answer
+  that does not validate is never the task output (`NIKA-INFER-002`), and
+  each repair is a new request that meets the four properties again.
+  A seat whose adapter enforces no schema can now serve an `infer:` task
+  with `schema:` instead of refusing it before any request.
+
 ### Fixed · a mock rehearsal is not called offline (2026-10-26)
 
 - `--model mock/echo` replaces the model, not the network: a `nika:fetch`

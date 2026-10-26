@@ -411,10 +411,23 @@ def _task_required_absent(t: dict) -> set[str]:
         for sk in _static_skill_paths(ag):
             req.add("fs")
             break
+        # 02 §Harness images · a literal images.save path is an fs write the
+        # engine performs for the task: under an absent block it is
+        # NIKA-AUTH-006 before any byte is written (a rendered one defers to
+        # the runtime boundary, law 3).
+        if _static_str(_agent_images_save(ag)) is not None:
+            req.add("fs")
     # 02 §Project files · a lawful prompt file's text reaches the model: an fs read.
     if _static_file_paths(t):
         req.add("fs")
     return req
+
+
+def _agent_images_save(agent: dict):
+    """The `images.save` value of an agent body (02 §Harness images), or
+    None when the task declares no save path."""
+    images = agent.get("images")
+    return images.get("save") if isinstance(images, dict) else None
 
 
 def _static_skill_paths(agent: dict) -> list[str]:
@@ -678,6 +691,7 @@ def _infer_permits_block(tasks: list) -> dict:
                     keep(tools, _static_str(w))
             for sk in _static_skill_paths(ag):
                 keep(reads, sk)
+            keep(writes, _static_str(_agent_images_save(ag)))
         for pf in _static_file_paths(t):
             keep(reads, pf)
     block: dict = {}
@@ -1995,6 +2009,17 @@ def deep_static_errors(doc: dict, base_dir=None) -> list[dict]:
                 # 02 §Agent Skills · the skill read is inside permits.fs.read
                 # and judged BEFORE the file is opened (an ungranted path
                 # never leaks whether it exists).
+                # 02 §Harness images · the engine's write of the received
+                # bytes is judged against permits.fs.write before any byte.
+                save = _static_write_path(_agent_images_save(ag), doc)
+                if save is not None and not _taint_globbed(save, write_globs):
+                    errs.append({"code": "NIKA-SEC-004", "namespace": "NIKA-SEC",
+                                 "category": "security_error",
+                                 "detail": f"task '{tid}' · images.save path {save!r} "
+                                           f"(canonical {_taint_canonical_path(save)!r}) "
+                                           f"outside permits.fs.write {write_globs} "
+                                           "(02 §Harness images · a write grant must "
+                                           "contain the exact path)"})
                 for sk in _static_skill_paths(ag):
                     if not _skill_path_admitted(sk, permits):
                         errs.append({"code": "NIKA-SEC-004", "namespace": "NIKA-SEC",

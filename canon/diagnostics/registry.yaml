@@ -1646,6 +1646,22 @@ diagnostics:
     span_required: true
     teaching: 'NIKA-INFER-005 one scale up: a final message the provider cut is not a completion — an agent turn runs under the provider''s own output cap, so ask for a shorter final message, or recover the partial explicitly through on_error:.'
     notes: 'the final-turn twin of NIKA-INFER-005 · category: budget_error · transient: false (canon.yaml verbatim) · a cut turn that carries tool calls is not final and stays in the loop · law_ids empty until the freeze batch.'
+  - id: NIKA-AGENT-007
+    status: reserved
+    owner: spec
+    law_ids: []
+    introduced_in: C2
+    namespace: AGENT
+    plane: run
+    condition: 'an agent task declaring images save completed without receiving image bytes on its own session (no image, or only a path the application reported, which is never opened)'
+    outcome_class: failure
+    cause: validation_error
+    retryable: false
+    terminal: true
+    payload_schema: to-mint-c1/diagnostics/payloads/validation_error.schema.json
+    span_required: true
+    teaching: 'The declared images save had nothing to write: ask the application for an image in the prompt, or drop save: and read images from .output when none is expected. A path the application reports is never opened.'
+    notes: 'the harness-images law (02 §Harness images) · category: validation_error · transient: false (canon.yaml verbatim) · minted with the images: field · law_ids empty until the freeze batch.'
   - id: NIKA-MCP-001
     status: reserved
     owner: spec

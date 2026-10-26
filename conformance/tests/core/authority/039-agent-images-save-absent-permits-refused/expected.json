@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-AUTH-006",
+      "category": "security_error"
+    }
+  ],
+  "note": "02-verbs.md §Harness images · NEP-0003 · an absent permits: block is zero authority · a literal images.save path requires fs write."
+}

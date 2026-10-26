@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "02-verbs.md §Harness images · an agent: task on a seat MAY declare images: { save: <path> } inside permits.fs.write · .output becomes { message, images } and a later task binds images[0].path."
+}
