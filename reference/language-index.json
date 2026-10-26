@@ -2,31 +2,31 @@
   "schemaVersion": 1,
   "kind": "spec-language-knowledge",
   "owner": "supernovae-st/nika-spec",
-  "revision": "a4796d976534bddb28562df157ac2afcaadd787c",
+  "revision": "2ed0865503dedc935deb34c1c1911490d058e4c0",
   "inputs": {
     "schemas/workflow.schema.json": "54ca6bca6ce158d67a8adaaa5840bed7cc505e3c59f66300633227d4e948dffc",
-    "templates/agent-loop.nika": "07f50946522b131d310c8c3bb4adbdb296f6fb4947bd3b9f96a62c12478d13f9",
+    "templates/agent-loop.nika": "9343b4d43c45c3f1cef68b5a2ec3c13449a09a272ca443a7561c98ba77e3f1bc",
     "templates/aggregate-by-key.nika": "a7a34d9415e3187ff32607d79272da49e790500f1998593730c5047dc8a111fd",
-    "templates/api-upload-and-create.nika": "1e06897b41686f7c51f97e70893bd16e09dba869df85378cb3c89913e1d20952",
+    "templates/api-upload-and-create.nika": "d78fe72bda643e088c9e992a33b32647d083f00c772c49babe7764efc353263b",
     "templates/bounded-batch.nika": "7e3fff2c6b9281e8d0951d95b8d5f541ba592eb37c1f60cfd02d364c8f994e8a",
-    "templates/chain.nika": "64735853af14a0e4c815061021e2643eb61000fbf55fdebebff7b703cca6f5a3",
-    "templates/classify-and-route.nika": "96fed8925d6f3627420062d0322951e9bd2f7f92a18c6766203c4087ff56776d",
-    "templates/corpus-qa.nika": "94800ff9d49245928078a5d49f5edab447bbb4d92de2a1c2f71dec6543ac1145",
+    "templates/chain.nika": "fbb0d8e9923f4a969f3ab6973163a5ce9788c28ed6ed7bb7bdbe8d701ba3db94",
+    "templates/classify-and-route.nika": "5a35b2ea754854c4f1311eec1133818a815311fb6d96240d3ecdf2b3e17b5a73",
+    "templates/corpus-qa.nika": "417553323db31637f4d730806067cc9b2a7b846972d050fdf5f417f97538243c",
     "templates/deduplicate-records.nika": "268f72d69e07053f22042ff69e34071092c9c349be060fed7811763bf083c073",
-    "templates/docker-report.nika": "99202ab4581a7caa96cf6f020ff24241be38896719880fddaf6e7610ba5c04f8",
-    "templates/document-to-fields.nika": "1d649e3b5797ff0da02321070c46b324c920fecb4a5e7ac1b23633427ef0cffb",
-    "templates/etl-state.nika": "64d090ea10a33ab224d16feea6b80bbfeb4e1c8396d514361ae0740399958136",
-    "templates/evaluate-and-optimize.nika": "8d02a96613beef73d6fa767c29a511b6150275e54a8ef2381b6a014d7c988ef0",
-    "templates/fanout.nika": "55c233b7f44623d4c199e7aeb46459ea89536e3b8c1b6021e1808a94be2720c4",
-    "templates/gate-and-act.nika": "4870c70f7a6198f86b1da8587e7e1345bbece86ce07446d74e16866cbe514610",
+    "templates/docker-report.nika": "e8c850a92440e375e5c38aeae53db0c727bfb93bc9a2a8b6378316699103710a",
+    "templates/document-to-fields.nika": "d54bbc141a9c70a2d5b1e56f225d208ed8f96007bef5d5722276ffb8f5be092b",
+    "templates/etl-state.nika": "d1fcef0314c2c1a90dfe918b3d579eee222d1921c86f9868217b881a105af1da",
+    "templates/evaluate-and-optimize.nika": "6b54bbd3bb9b2f63da1650bcef0898900e487d1abaae3550dd1a5ab15d6cf459",
+    "templates/fanout.nika": "6f4c83ee33bb9d07622401399046eb8971dbf696324492c3be6b335b4b30b54c",
+    "templates/gate-and-act.nika": "05a3d401c5935f0df1287910bf8004b68ddd37f327530b88fb7c11543399c119",
     "templates/human-gated-ship.nika": "e447e644d2e34327ab03f5fee8bed54fd0cfc2293e1379e3dcdb3a6b050bf65c",
-    "templates/media-asset-pack.nika": "ee2202976f5a29e2185a24ef44633c7b7d6cfdf32d25cb7afe72e01f1ba02443",
+    "templates/media-asset-pack.nika": "e19744a7f57bce62a9c7007b8ce8f5032cc8458fe5d6d533512203fb81d400cf",
     "templates/parallel-review.nika": "f55c7aab68d91a5cffd0eb49f6ba9c5b56b690eff0063161236f119ffbc3aec5",
     "templates/project-public-fields.nika": "26415ba1fb7ca62d794b7bf4ca45eb6165c3fc2a22f64bf8fbd2c5786fd6ba75",
     "templates/recover-optional-file.nika": "923ed35265aadfbf46cb6be76e86655d0cc03c37950128d3c05664e665c467de",
     "templates/snapshot-diff.nika": "ec5772c13742e1ce2a8555663ce1d6832a17f35aa52c679b91b1750f81b86837",
     "templates/validate-records.nika": "fa9c9f0ea60b2d73b45d14ea5f55053b70ff01eadf70f11ab5aab6f53cb41d2c",
-    "templates/website-brief.nika": "aa433cb4d9323118cd6734a3bebd432f90d7ed1031b2a5f0e2134be3676d5693"
+    "templates/website-brief.nika": "6da78c0395d964990099f59b5887b46fb4ad89c5f527074def7451d630aac30f"
   },
   "words": [
     {
@@ -163,9 +163,9 @@
         },
         {
           "path": "templates/corpus-qa.nika",
-          "line": 47,
-          "startLine": 44,
-          "endLine": 53,
+          "line": 48,
+          "startLine": 45,
+          "endLine": 54,
           "excerpt": "        message: \"One corpus id names conflicting source text\"\n\n  index_once:\n    after:\n      duplicates_consistent: success\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ const.documents }}\n        expression: \"sort_by(.id) | unique_by(.id)\"",
           "matchKind": "literal-key-occurrence"
         },
@@ -179,9 +179,9 @@
         },
         {
           "path": "templates/document-to-fields.nika",
-          "line": 55,
-          "startLine": 52,
-          "endLine": 61,
+          "line": 56,
+          "startLine": 53,
+          "endLine": 62,
           "excerpt": "  extract:\n    with:\n      document: ${{ tasks.normalize_document.output }}\n    after:\n      document_nonempty: success\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 600                # SLOT: extraction spend ceiling\n      prompt: |\n        Extract only facts explicitly present in this document. For every",
           "matchKind": "literal-key-occurrence"
         },
@@ -195,9 +195,9 @@
         },
         {
           "path": "templates/fanout.nika",
-          "line": 156,
-          "startLine": 153,
-          "endLine": 162,
+          "line": 157,
+          "startLine": 154,
+          "endLine": 163,
           "excerpt": "        message: \"the fan-in law drifted from its hand-computed fixture\"\n\n  survivors:\n    after:\n      law_holds: success            # state, no data · the law is proven before it meets real data\n    with:\n      process: ${{ tasks.process.output }}\n    invoke:                         # the null-aware fan-in · order preserved\n      tool: \"nika:jq\"\n      args:",
           "matchKind": "literal-key-occurrence"
         },
@@ -284,9 +284,9 @@
       "examples": [
         {
           "path": "templates/agent-loop.nika",
-          "line": 76,
-          "startLine": 73,
-          "endLine": 82,
+          "line": 77,
+          "startLine": 74,
+          "endLine": 83,
           "excerpt": "      # and the assert below only proves non-emptiness. The goal rides in.\n      goal: ${{ inputs.goal }}\n      steps: ${{ tasks.plan.output.steps }}\n    agent:\n      # Describe the job in the prompt; declare its result shape in schema:.\n      # The granted nika:done sentinel is required to finish this loop.\n      # Text-only plans receive feedback within the turn/token budgets.\n      # The engine validates the final result and can request a schema\n      # repair within its configured retry allowance and task budgets.\n      # A valid result shape does not prove the promised work was performed;",
           "matchKind": "literal-key-occurrence"
         }
@@ -314,9 +314,9 @@
       "examples": [
         {
           "path": "templates/agent-loop.nika",
-          "line": 126,
-          "startLine": 123,
-          "endLine": 132,
+          "line": 127,
+          "startLine": 124,
+          "endLine": 133,
           "excerpt": "      has_findings: ${{ size(tasks.execute.output.findings) > 0 }}   # the check crosses as ONE boundary expression · SLOT: your law\n    invoke:\n      tool: \"nika:assert\"\n      args:\n        condition: \"${{ with.has_findings }}\"\n        message: \"Agent returned no findings, do not trust an empty run\"   # SLOT\n\noutputs:\n  findings:\n    value: ${{ tasks.execute.output.findings }}",
           "matchKind": "literal-key-occurrence"
         },
@@ -346,25 +346,25 @@
         },
         {
           "path": "templates/chain.nika",
-          "line": 48,
-          "startLine": 45,
-          "endLine": 54,
+          "line": 49,
+          "startLine": 46,
+          "endLine": 55,
           "excerpt": "  gather:\n    invoke:                         # SLOT: the fact source · nika:read / nika:fetch / exec\n      tool: \"nika:read\"\n      args: { path: \"${{ const.source }}\" }\n    on_error:\n      # Offline rehearsal. A freshly scaffolded directory has no README, and a\n      # skeleton that dies on its first run teaches nothing — so a not-found\n      # recovers into a literal standing in for the real document. `on_codes:`\n      # keeps that narrow: ONLY not-found is forgiven, a permission error\n      # still fails loudly. Delete this block once the source really exists.",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/classify-and-route.nika",
-          "line": 96,
-          "startLine": 93,
-          "endLine": 102,
+          "line": 97,
+          "startLine": 94,
+          "endLine": 103,
           "excerpt": "      facts: ${{ tasks.extract_facts.output }}\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ with.facts }}\n        expression: '{t: \"2027-01-01T00:00:00Z\", evidence: [{key: \"urgency\", value: .urgency, source: \"classifier\", observed_at: \"2027-01-01T00:00:00Z\", digest: \"runtime-urgency\", confidentiality: \"internal\", integrity: \"observed\", quality: {freshness: \"fresh\", completeness: \"complete\", independence_group: \"classifier\"}}]}'\n\n  decide:\n    with:\n      evidence: ${{ tasks.snapshot.output }}",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/corpus-qa.nika",
-          "line": 33,
-          "startLine": 30,
-          "endLine": 39,
+          "line": 34,
+          "startLine": 31,
+          "endLine": 40,
           "excerpt": "  conflicting_ids:\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ const.documents }}\n        expression: 'sort_by(.id) | group_by(.id) | map(select((map(.text) | unique | length) > 1) | .[0].id)'\n\n  duplicates_consistent:\n    with:\n      conflicting_ids: ${{ tasks.conflicting_ids.output }}",
           "matchKind": "literal-key-occurrence"
         },
@@ -378,17 +378,17 @@
         },
         {
           "path": "templates/docker-report.nika",
-          "line": 90,
-          "startLine": 87,
-          "endLine": 96,
+          "line": 91,
+          "startLine": 88,
+          "endLine": 97,
           "excerpt": "      diagnose: ${{ tasks.diagnose.output }}\n    invoke:\n      tool: \"nika:write\"\n      args:\n        path: \"./docker-health.md\"  # SLOT: same path as permits.fs.write\n        content: \"${{ with.diagnose }}\"\n    on_error:\n      # Golden rehearsal · `nika test` refuses effects (NIKA-452) — the pin\n      # lane recovers into this marker (outputs.report pins it · honest and\n      # deterministic). Never fires on a successful real write. Delete once",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/document-to-fields.nika",
-          "line": 39,
-          "startLine": 36,
-          "endLine": 45,
+          "line": 40,
+          "startLine": 37,
+          "endLine": 46,
           "excerpt": "  normalize_document:\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ const.document }}\n        expression: 'gsub(\"^\\\\s+|\\\\s+$\"; \"\")'\n\n  document_nonempty:\n    with:\n      document: ${{ tasks.normalize_document.output }}",
           "matchKind": "literal-key-occurrence"
         },
@@ -402,9 +402,9 @@
         },
         {
           "path": "templates/fanout.nika",
-          "line": 84,
-          "startLine": 81,
-          "endLine": 90,
+          "line": 85,
+          "startLine": 82,
+          "endLine": 91,
           "excerpt": "  discover:\n    invoke:                         # SLOT: glob / fetch sitemap / exec + jq split\n      tool: \"nika:glob\"\n      args: { pattern: \"${{ const.collection_source }}/*.md\" }\n\n  # `discover` hands back PATH STRINGS — a prompt that interpolates the raw\n  # item shows the model a FILENAME, never the file (measured: a green run\n  # whose fluent « report » was invented from the names alone — check, mock\n  # rehearsal and run all green around it). Reading the item is its own fan.\n  # Delete this task — and fan `process` over `discover` — when your items",
           "matchKind": "literal-key-occurrence"
         },
@@ -426,9 +426,9 @@
         },
         {
           "path": "templates/media-asset-pack.nika",
-          "line": 72,
-          "startLine": 69,
-          "endLine": 78,
+          "line": 73,
+          "startLine": 70,
+          "endLine": 79,
           "excerpt": "      brief_image_prompt: ${{ tasks.brief.output.image_prompt }}\n    invoke:\n      tool: \"nika:image_generate\"\n      args:\n        provider: mock              # SLOT: local | openai | gemini | xai (local/mock first)\n        prompt: \"${{ with.brief_image_prompt }}\"\n        output_dir: \"${{ const.out_dir }}\"\n        filename_prefix: \"asset\"    # SLOT: filename stem\n    on_error:\n      # Golden rehearsal · the image tool is an EFFECT, refused under",
           "matchKind": "literal-key-occurrence"
         },
@@ -474,10 +474,10 @@
         },
         {
           "path": "templates/website-brief.nika",
-          "line": 49,
-          "startLine": 46,
-          "endLine": 55,
-          "excerpt": "  crawl_site:\n    invoke:\n      tool: \"nika:fetch\"\n      args:\n        url: \"${{ const.site_url }}\"\n        traverse: { max_pages: 5 }  # SLOT: crawl bound · 1..=25 (robots honored)\n    on_error:\n      # Offline rehearsal · a literal standing in for the crawl digest, so the\n      # brief step runs with no network at all. Delete once the site is real.\n      recover: \"REHEARSAL DIGEST · Example Co · a small tool company · plain blue and white pages · buttons, a pricing table, one logo.\"",
+          "line": 50,
+          "startLine": 47,
+          "endLine": 56,
+          "excerpt": "  crawl_site:\n    invoke:\n      tool: \"nika:fetch\"\n      args:\n        url: \"${{ const.site_url }}\"\n        traverse: { max_pages: 5 }  # SLOT: crawl bound · 1..=25 (robots honored)\n    on_error:\n      # Rehearsal stand-in · when the crawl fails (no network, a dead host),\n      # this literal stands in for the crawl digest so the brief step still\n      # runs. Delete once the site is real.",
           "matchKind": "literal-key-occurrence"
         }
       ]
@@ -586,9 +586,9 @@
       "examples": [
         {
           "path": "templates/fanout.nika",
-          "line": 119,
-          "startLine": 116,
-          "endLine": 125,
+          "line": 120,
+          "startLine": 117,
+          "endLine": 126,
           "excerpt": "    timeout: \"60s\"                  # SLOT: per-iteration bound\n    retry:\n      max_attempts: 3\n      backoff_strategy: exponential\n      jitter: true\n    on_error:\n      recover: null                 # a failed item yields null at its index · the batch lives\n    infer:                          # SLOT: the per-item job (any verb)\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 2000              # SLOT: the per-ITEM ceiling · think + answer · multiply by the fan width",
           "matchKind": "literal-key-occurrence"
         },
@@ -717,9 +717,9 @@
         },
         {
           "path": "templates/fanout.nika",
-          "line": 56,
-          "startLine": 53,
-          "endLine": 62,
+          "line": 57,
+          "startLine": 54,
+          "endLine": 63,
           "excerpt": "  # A `timeout:` is a deadline, and a deadline needs a clock. Declaring it says\n  # out loud which one: `system` is the ambient wall clock (the honest default);\n  # `virtual` drives a simulated clock for deterministic tests.\n  clock: system\n\nconst:\n  collection_source: \"./items\"      # SLOT: where the collection comes from\n  # Known answers for the fan-in law — computed by hand, never by a model.\n  # `prove` feeds them through the SAME jq `survivors` uses; a drift between\n  # the two is a red assert, not a quietly wrong report.",
           "matchKind": "literal-key-occurrence"
         },
@@ -779,9 +779,9 @@
       "examples": [
         {
           "path": "templates/docker-report.nika",
-          "line": 51,
-          "startLine": 48,
-          "endLine": 57,
+          "line": 52,
+          "startLine": 49,
+          "endLine": 58,
           "excerpt": "      # SLOT: argv ARRAY form — one program, exactly these arguments. The array\n      # is why there is no shell here: no word-splitting, no globbing, nothing\n      # to quote wrong. `permits.exec` above is the provable allowlist.\n      command: [\"docker\", \"ps\", \"--all\", \"--format\", \"{{.Names}}\\t{{.Status}}\\t{{.Image}}\"]\n    on_error:\n      # Offline rehearsal · a host with no daemon answers with a literal that\n      # LOOKS like the real thing, so `diagnose` reads the same shape either\n      # way. Delete this once the daemon is really there.\n      recover: \"REHEARSAL\\tno docker daemon on this host\\tn/a\"\n",
           "matchKind": "literal-key-occurrence"
         },
@@ -867,7 +867,7 @@
           "line": 39,
           "startLine": 36,
           "endLine": 45,
-          "excerpt": "# Run · nika run <file>          # offline rehearsal · no key exported\nnika: api-upload-and-create-template       # SLOT: kebab-case workflow id\n\nconst:\n  api_base: \"https://api.example.com\"     # SLOT: the product API base\n  asset_path: \"./out/assets/asset-1.png\"  # SLOT: the file to upload\n\nsecrets:\n  API_KEY:\n    source: env",
+          "excerpt": "# Run · nika run <file>          # rehearsal · no key exported, so nothing is sent\nnika: api-upload-and-create-template       # SLOT: kebab-case workflow id\n\nconst:\n  api_base: \"https://api.example.com\"     # SLOT: the product API base\n  asset_path: \"./out/assets/asset-1.png\"  # SLOT: the file to upload\n\nsecrets:\n  API_KEY:\n    source: env",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -880,26 +880,26 @@
         },
         {
           "path": "templates/chain.nika",
-          "line": 31,
-          "startLine": 28,
-          "endLine": 37,
-          "excerpt": "# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n\nconst:\n  source: \"./README.md\"             # SLOT: your input · README.md exists in most repos\n  destination: \"./output.md\"        # SLOT: where the result lands\n\npermits:                            # the blast radius · default-deny once present\n  tools: [\"nika:read\", \"nika:write\"]\n  # Two literal paths, one each way. `check` can read these (they come from",
+          "line": 32,
+          "startLine": 29,
+          "endLine": 38,
+          "excerpt": "# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo\n\nconst:\n  source: \"./README.md\"             # SLOT: your input · README.md exists in most repos\n  destination: \"./output.md\"        # SLOT: where the result lands\n\npermits:                            # the blast radius · default-deny once present\n  tools: [\"nika:read\", \"nika:write\"]\n  # Two literal paths, one each way. `check` can read these (they come from",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/classify-and-route.nika",
-          "line": 18,
-          "startLine": 15,
-          "endLine": 24,
-          "excerpt": "# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n\nconst:\n  request: \"<SLOT: the request to classify and route>\"\n  bundle:\n    decision_bundle_format: 1\n    manifest:\n      id: incident-route\n      version: \"1.0.0\"",
+          "line": 19,
+          "startLine": 16,
+          "endLine": 25,
+          "excerpt": "# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo\n\nconst:\n  request: \"<SLOT: the request to classify and route>\"\n  bundle:\n    decision_bundle_format: 1\n    manifest:\n      id: incident-route\n      version: \"1.0.0\"",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/corpus-qa.nika",
-          "line": 19,
-          "startLine": 16,
-          "endLine": 25,
-          "excerpt": "# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n\nconst:\n  query: \"<SLOT: the question to answer from the corpus>\"\n  documents:                         # SLOT: replace with retrieved source chunks\n    - { id: handbook, text: \"Support hours are 09:00 to 17:00 UTC.\" }\n    - { id: security, text: \"Security incidents are reported within one hour.\" }\n    - { id: handbook, text: \"Support hours are 09:00 to 17:00 UTC.\" }\n",
+          "line": 20,
+          "startLine": 17,
+          "endLine": 26,
+          "excerpt": "# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo\n\nconst:\n  query: \"<SLOT: the question to answer from the corpus>\"\n  documents:                         # SLOT: replace with retrieved source chunks\n    - { id: handbook, text: \"Support hours are 09:00 to 17:00 UTC.\" }\n    - { id: security, text: \"Security incidents are reported within one hour.\" }\n    - { id: handbook, text: \"Support hours are 09:00 to 17:00 UTC.\" }\n",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -912,10 +912,10 @@
         },
         {
           "path": "templates/document-to-fields.nika",
-          "line": 19,
-          "startLine": 16,
-          "endLine": 25,
-          "excerpt": "# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n\nconst:\n  # NOT a slot, deliberately. This literal is the REHEARSAL FIXTURE the\n  # skeleton's own `nika:assert` step reads — hole it and the template\n  # stops rehearsing green, without closing anything: this workflow\n  # persists nothing, so it leaves behind no file that reads like a\n  # result (#1066's actual failure mode). Replace it with your document,\n  # or bind this const to a `nika:read` / `nika:fetch` task's output.",
+          "line": 20,
+          "startLine": 17,
+          "endLine": 26,
+          "excerpt": "# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo\n\nconst:\n  # NOT a slot, deliberately. This literal is the REHEARSAL FIXTURE the\n  # skeleton's own `nika:assert` step reads — hole it and the template\n  # stops rehearsing green, without closing anything: this workflow\n  # persists nothing, so it leaves behind no file that reads like a\n  # result (#1066's actual failure mode). Replace it with your document,\n  # or bind this const to a `nika:read` / `nika:fetch` task's output.",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -928,17 +928,17 @@
         },
         {
           "path": "templates/evaluate-and-optimize.nika",
-          "line": 31,
-          "startLine": 28,
-          "endLine": 37,
-          "excerpt": "# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n\nconst:\n  brief: \"<SLOT: the deliverable to draft, critique and revise>\"\n\npermits: {}\n\ntasks:\n  draft:",
+          "line": 32,
+          "startLine": 29,
+          "endLine": 38,
+          "excerpt": "# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo\n\nconst:\n  brief: \"<SLOT: the deliverable to draft, critique and revise>\"\n\npermits: {}\n\ntasks:\n  draft:",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/fanout.nika",
-          "line": 58,
-          "startLine": 55,
-          "endLine": 64,
+          "line": 59,
+          "startLine": 56,
+          "endLine": 65,
           "excerpt": "  # `virtual` drives a simulated clock for deterministic tests.\n  clock: system\n\nconst:\n  collection_source: \"./items\"      # SLOT: where the collection comes from\n  # Known answers for the fan-in law — computed by hand, never by a model.\n  # `prove` feeds them through the SAME jq `survivors` uses; a drift between\n  # the two is a red assert, not a quietly wrong report.\n  law_cases: [\"kept\", null, \"also kept\"]\n",
           "matchKind": "literal-key-occurrence"
         },
@@ -947,7 +947,7 @@
           "line": 28,
           "startLine": 25,
           "endLine": 34,
-          "excerpt": "# Run · nika run <file>          # offline rehearsal · the gate stays closed\nnika: gate-and-act-template       # SLOT: kebab-case workflow id\n\nconst:\n  source_url: \"https://api.example.com/v1/value\"   # SLOT: what to watch\n  threshold: 100                    # SLOT: the trigger condition value\n\npermits:                            # the blast radius · default-deny once present\n  tools: [\"nika:fetch\", \"nika:notify\"]\n  net:",
+          "excerpt": "# Run · nika run <file>          # rehearsal · the fetch fails, the gate stays closed\nnika: gate-and-act-template       # SLOT: kebab-case workflow id\n\nconst:\n  source_url: \"https://api.example.com/v1/value\"   # SLOT: what to watch\n  threshold: 100                    # SLOT: the trigger condition value\n\npermits:                            # the blast radius · default-deny once present\n  tools: [\"nika:fetch\", \"nika:notify\"]\n  net:",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -960,10 +960,10 @@
         },
         {
           "path": "templates/media-asset-pack.nika",
-          "line": 32,
-          "startLine": 29,
-          "endLine": 38,
-          "excerpt": "# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n\nconst:\n  subject: \"<SLOT: what the asset is about>\"\n  out_dir: \"./out/assets\"           # SLOT: where assets land\n\npermits:                            # the blast radius · default-deny once present\n  tools: [\"nika:image_generate\", \"nika:jq\", \"nika:write\"]\n  fs:",
+          "line": 33,
+          "startLine": 30,
+          "endLine": 39,
+          "excerpt": "# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo\n\nconst:\n  subject: \"<SLOT: what the asset is about>\"\n  out_dir: \"./out/assets\"           # SLOT: where assets land\n\npermits:                            # the blast radius · default-deny once present\n  tools: [\"nika:image_generate\", \"nika:jq\", \"nika:write\"]\n  fs:",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -1008,10 +1008,10 @@
         },
         {
           "path": "templates/website-brief.nika",
-          "line": 33,
-          "startLine": 30,
-          "endLine": 39,
-          "excerpt": "# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n\nconst:\n  site_url: \"https://example.com\"   # SLOT: the site to understand\n  out_path: \"./out/brief.json\"      # SLOT: where the brief lands\n\npermits:                            # the blast radius · default-deny once present\n  tools: [\"nika:fetch\", \"nika:write\"]\n  net: { http: [\"example.com\"] }    # SLOT: the host from const.site_url. ONE entry is",
+          "line": 34,
+          "startLine": 31,
+          "endLine": 40,
+          "excerpt": "# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo\n\nconst:\n  site_url: \"https://example.com\"   # SLOT: the site to understand\n  out_path: \"./out/brief.json\"      # SLOT: where the brief lands\n\npermits:                            # the blast radius · default-deny once present\n  tools: [\"nika:fetch\", \"nika:write\"]\n  net: { http: [\"example.com\"] }    # SLOT: the host from const.site_url. ONE entry is",
           "matchKind": "literal-key-occurrence"
         }
       ]
@@ -1094,9 +1094,9 @@
       "examples": [
         {
           "path": "templates/agent-loop.nika",
-          "line": 41,
-          "startLine": 38,
-          "endLine": 47,
+          "line": 42,
+          "startLine": 39,
+          "endLine": 48,
           "excerpt": "    # A `required:` input still carries a `default:` here so the skeleton\n    # RUNS the moment it is scaffolded. Replace the default with your job;\n    # `--var goal=…` overrides it at any time.\n    default: \"<SLOT: what the agent must accomplish>\"\n    description: \"What the agent must accomplish\"   # SLOT\n\npermits:                            # the blast radius · default-deny once present\n  # Exactly what the body invokes: `nika:assert` (the confirm task) plus the\n  # two the agent may call. No `fs:` — see the note on `tools:` below.\n  tools: [\"nika:assert\", \"nika:done\", \"nika:jq\"]",
           "matchKind": "literal-key-occurrence"
         }
@@ -1151,17 +1151,17 @@
       "examples": [
         {
           "path": "templates/agent-loop.nika",
-          "line": 42,
-          "startLine": 39,
-          "endLine": 48,
+          "line": 43,
+          "startLine": 40,
+          "endLine": 49,
           "excerpt": "    # RUNS the moment it is scaffolded. Replace the default with your job;\n    # `--var goal=…` overrides it at any time.\n    default: \"<SLOT: what the agent must accomplish>\"\n    description: \"What the agent must accomplish\"   # SLOT\n\npermits:                            # the blast radius · default-deny once present\n  # Exactly what the body invokes: `nika:assert` (the confirm task) plus the\n  # two the agent may call. No `fs:` — see the note on `tools:` below.\n  tools: [\"nika:assert\", \"nika:done\", \"nika:jq\"]\n",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/docker-report.nika",
-          "line": 103,
-          "startLine": 100,
-          "endLine": 103,
+          "line": 104,
+          "startLine": 101,
+          "endLine": 104,
           "excerpt": "outputs:\n  report:\n    value: ${{ tasks.keep.output }}\n    description: \"Where the report landed — nika:write hands back the path it wrote\"",
           "matchKind": "literal-key-occurrence"
         },
@@ -1486,9 +1486,9 @@
       "examples": [
         {
           "path": "templates/docker-report.nika",
-          "line": 35,
-          "startLine": 32,
-          "endLine": 41,
+          "line": 36,
+          "startLine": 33,
+          "endLine": 42,
           "excerpt": "model: mock/echo\n\npermits:                            # the blast radius · default-deny once present\n  exec:\n    - \"docker\"                      # SLOT: the ONE program the reads may launch\n  tools:\n    - \"nika:write\"\n  fs:\n    write:\n      - \"./docker-health.md\"        # SLOT: where the report lands (must match `keep`)",
           "matchKind": "literal-key-occurrence"
         },
@@ -1552,9 +1552,9 @@
       "examples": [
         {
           "path": "templates/document-to-fields.nika",
-          "line": 52,
-          "startLine": 49,
-          "endLine": 58,
+          "line": 53,
+          "startLine": 50,
+          "endLine": 59,
           "excerpt": "        condition: ${{ size(with.document) > 0 }}\n        message: \"Document is empty after whitespace is trimmed\"\n\n  extract:\n    with:\n      document: ${{ tasks.normalize_document.output }}\n    after:\n      document_nonempty: success\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low",
           "matchKind": "literal-key-occurrence"
         },
@@ -1563,7 +1563,7 @@
           "line": 58,
           "startLine": 55,
           "endLine": 64,
-          "excerpt": "        url: \"${{ const.source_url }}\"\n        mode: jq\n        jq: \".\"\n    extract:\n      value: \".value\"               # SLOT: the jq path to the watched field\n    on_error:\n      # Offline rehearsal · a sample UNDER the threshold — the gate stays\n      # closed, the skeleton runs green before you wire the real source.\n      recover: { value: 42 }\n",
+          "excerpt": "        url: \"${{ const.source_url }}\"\n        mode: jq\n        jq: \".\"\n    extract:\n      value: \".value\"               # SLOT: the jq path to the watched field\n    on_error:\n      # Rehearsal stand-in · the placeholder host resolves nowhere, so a sample\n      # UNDER the threshold takes over — the gate stays closed, the skeleton\n      # runs green before you wire the real source.\n      recover: { value: 42 }",
           "matchKind": "literal-key-occurrence"
         }
       ]
@@ -1599,9 +1599,9 @@
         },
         {
           "path": "templates/fanout.nika",
-          "line": 99,
-          "startLine": 96,
-          "endLine": 105,
+          "line": 100,
+          "startLine": 97,
+          "endLine": 106,
           "excerpt": "    for_each:\n      items: ${{ with.discover }}\n      max_parallel: 8\n      fail_fast: false\n    on_error:\n      recover: null                 # an unreadable item yields null · the batch lives\n    invoke:\n      tool: \"nika:read\"\n      args: { path: \"${{ item }}\" }\n",
           "matchKind": "literal-key-occurrence"
         },
@@ -1746,9 +1746,9 @@
         },
         {
           "path": "templates/fanout.nika",
-          "line": 96,
-          "startLine": 93,
-          "endLine": 102,
+          "line": 97,
+          "startLine": 94,
+          "endLine": 103,
           "excerpt": "  read:\n    with:\n      discover: ${{ tasks.discover.output }}\n    for_each:\n      items: ${{ with.discover }}\n      max_parallel: 8\n      fail_fast: false\n    on_error:\n      recover: null                 # an unreadable item yields null · the batch lives\n    invoke:",
           "matchKind": "literal-key-occurrence"
         },
@@ -1830,17 +1830,17 @@
         },
         {
           "path": "templates/chain.nika",
-          "line": 40,
-          "startLine": 37,
-          "endLine": 46,
+          "line": 41,
+          "startLine": 38,
+          "endLine": 47,
           "excerpt": "  # Two literal paths, one each way. `check` can read these (they come from\n  # `const:`) and proves them against the boundary before anything runs — keep\n  # them in step with the two `const:` entries above.\n  fs:\n    read: [\"./README.md\"]     # SLOT: same path as const.source\n    write: [\"./output.md\"]    # SLOT: same path as const.destination\n\ntasks:\n  gather:\n    invoke:                         # SLOT: the fact source · nika:read / nika:fetch / exec",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/docker-report.nika",
-          "line": 39,
-          "startLine": 36,
-          "endLine": 45,
+          "line": 40,
+          "startLine": 37,
+          "endLine": 46,
           "excerpt": "    - \"docker\"                      # SLOT: the ONE program the reads may launch\n  tools:\n    - \"nika:write\"\n  fs:\n    write:\n      - \"./docker-health.md\"        # SLOT: where the report lands (must match `keep`)\n\ntasks:\n  # The reads run IN PARALLEL (no edges between them) — the\n  # scheduler proves it from the DAG, nobody orders it.",
           "matchKind": "literal-key-occurrence"
         },
@@ -1854,9 +1854,9 @@
         },
         {
           "path": "templates/fanout.nika",
-          "line": 67,
-          "startLine": 64,
-          "endLine": 73,
+          "line": 68,
+          "startLine": 65,
+          "endLine": 74,
           "excerpt": "\npermits:\n  tools: [\"nika:assert\", \"nika:glob\", \"nika:jq\", \"nika:read\"]\n  fs:\n    # TWO entries, and both earn their place. `nika:glob` is gated on the\n    # DIRECTORY it walks, not on the files it returns — measured: with\n    # `./items/*.md` here (the pattern) the run dies `NIKA-SEC-004 ·\n    # ./items resolves outside the declared permits.fs.read boundary`,\n    # because `*` never crosses `/` and so never matches `./items` itself.\n    # And `nika:read` is gated on the FILES — a directory grant does not",
           "matchKind": "literal-key-occurrence"
         },
@@ -1870,9 +1870,9 @@
         },
         {
           "path": "templates/media-asset-pack.nika",
-          "line": 38,
-          "startLine": 35,
-          "endLine": 44,
+          "line": 39,
+          "startLine": 36,
+          "endLine": 45,
           "excerpt": "\npermits:                            # the blast radius · default-deny once present\n  tools: [\"nika:image_generate\", \"nika:jq\", \"nika:write\"]\n  fs:\n    write:\n      # Two entries, and both earn their place: `check` judges the `output_dir:`\n      # ARGUMENT (`./out/assets`), while the RUN gates every FINAL file path under\n      # it — the asset, its provenance manifest, and manifest.json. Grant only the\n      # directory and the file sails through check, then dies at run on the first\n      # asset. `*` is one segment and never crosses `/`, which is all this needs:",
           "matchKind": "literal-key-occurrence"
         },
@@ -1886,9 +1886,9 @@
         },
         {
           "path": "templates/website-brief.nika",
-          "line": 42,
-          "startLine": 39,
-          "endLine": 48,
+          "line": 43,
+          "startLine": 40,
+          "endLine": 49,
           "excerpt": "  net: { http: [\"example.com\"] }    # SLOT: the host from const.site_url. ONE entry is\n                                    #   enough — `traverse:` is a same-origin BFS (+ the\n                                    #   robots probe), so the crawl never leaves this host.\n  fs: { write: [\"./out/brief.json\"] }   # SLOT: the one file · keep in step with const.out_path\n                                        #   (the infer step needs no grant — it is pure compute)\n\ntasks:\n  crawl_site:\n    invoke:\n      tool: \"nika:fetch\"",
           "matchKind": "literal-key-occurrence"
         }
@@ -2049,9 +2049,9 @@
       "examples": [
         {
           "path": "templates/agent-loop.nika",
-          "line": 51,
-          "startLine": 48,
-          "endLine": 57,
+          "line": 52,
+          "startLine": 49,
+          "endLine": 58,
           "excerpt": "\ntasks:\n  plan:\n    infer:\n      prompt: \"Break '${{ inputs.goal }}' into at most 4 concrete steps.\"   # SLOT\n      # SLOT: the spend ceiling for the planning call. Size it for the SEAT,\n      # not for the answer: a reasoning model spends tokens thinking before\n      # it emits the first brace, and a ceiling that cuts it off mid-thought\n      # fails NIKA-INFER-002 (\"no JSON value found · the reply was cut off at\n      # the token limit\"). Measured — 400 starves qwen3.5:4b on this prompt.",
           "matchKind": "literal-key-occurrence"
         },
@@ -2065,65 +2065,65 @@
         },
         {
           "path": "templates/chain.nika",
-          "line": 64,
-          "startLine": 61,
-          "endLine": 70,
+          "line": 65,
+          "startLine": 62,
+          "endLine": 71,
           "excerpt": "  think:\n    with:\n      gather: ${{ tasks.gather.output }}\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 800               # SLOT: the spend ceiling · sized for the SEAT, not the answer\n      # The marker below is a VALUE, not a comment. The parser drops\n      # comments, so a `# SLOT:` line could never make `check` refuse —\n      # which is how an unfilled scaffold ran green and left a file that\n      # read like a result (#1066). Replace the line, keep the binding.",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/classify-and-route.nika",
-          "line": 76,
-          "startLine": 73,
-          "endLine": 82,
+          "line": 77,
+          "startLine": 74,
+          "endLine": 83,
           "excerpt": "\ntasks:\n  extract_facts:\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 300                # SLOT: classification spend ceiling\n      prompt: |\n        Extract the urgency fact from this request. Use 1 only for an active\n        widespread outage, otherwise use 0.\n",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/corpus-qa.nika",
-          "line": 96,
-          "startLine": 93,
-          "endLine": 102,
+          "line": 97,
+          "startLine": 94,
+          "endLine": 103,
           "excerpt": "    with:\n      hits: ${{ tasks.retrieve.output }}\n    when: ${{ size(with.hits) > 0 }}\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 500                # SLOT: answer spend ceiling\n      prompt: |\n        Answer from these passages only and cite their ids.\n        Question: ${{ const.query }}\n        Passages: ${{ with.hits }}",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/docker-report.nika",
-          "line": 68,
-          "startLine": 65,
-          "endLine": 74,
+          "line": 69,
+          "startLine": 66,
+          "endLine": 75,
           "excerpt": "    with:\n      ps: ${{ tasks.ps.output }}\n      df: ${{ tasks.df.output }}\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 2000              # SLOT: the spend ceiling for this call · think block + report\n      # SLOT: what should the model DO with the readings? Keep slot markers out\n      # of the block below — everything indented under `prompt: |` is prompt\n      # TEXT, and a stray comment line is sent to the model verbatim.\n      prompt: |",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/document-to-fields.nika",
-          "line": 57,
-          "startLine": 54,
-          "endLine": 63,
+          "line": 58,
+          "startLine": 55,
+          "endLine": 64,
           "excerpt": "      document: ${{ tasks.normalize_document.output }}\n    after:\n      document_nonempty: success\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 600                # SLOT: extraction spend ceiling\n      prompt: |\n        Extract only facts explicitly present in this document. For every\n        value, copy the shortest exact source fragment that anchors it.\n",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/evaluate-and-optimize.nika",
-          "line": 38,
-          "startLine": 35,
-          "endLine": 44,
+          "line": 39,
+          "startLine": 36,
+          "endLine": 45,
           "excerpt": "\ntasks:\n  draft:\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 300               # SLOT: the draft ceiling · sized for the SEAT (see CEILINGS)\n      prompt: \"Draft this deliverable: ${{ const.brief }}\"\n      schema:\n        type: object\n        additionalProperties: false",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/fanout.nika",
-          "line": 123,
-          "startLine": 120,
-          "endLine": 129,
+          "line": 124,
+          "startLine": 121,
+          "endLine": 130,
           "excerpt": "      jitter: true\n    on_error:\n      recover: null                 # a failed item yields null at its index · the batch lives\n    infer:                          # SLOT: the per-item job (any verb)\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 2000              # SLOT: the per-ITEM ceiling · think + answer · multiply by the fan width\n      # The marker below is a VALUE, not a comment. The parser drops\n      # comments, so a `# SLOT:` line could never make `check` refuse —\n      # which is how an unfilled scaffold ran green and left a file that\n      # read like a result (#1066). Replace the line, keep the binding.",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/media-asset-pack.nika",
-          "line": 51,
-          "startLine": 48,
-          "endLine": 57,
+          "line": 52,
+          "startLine": 49,
+          "endLine": 58,
           "excerpt": "\ntasks:\n  brief:\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 600\n      # SLOT: the creative direction · style · constraints. Keep slot markers\n      # out of the block below — it is prompt TEXT, not YAML, so a stray\n      # comment line is sent to the model verbatim.\n      prompt: |",
           "matchKind": "literal-key-occurrence"
         },
@@ -2145,9 +2145,9 @@
         },
         {
           "path": "templates/website-brief.nika",
-          "line": 60,
-          "startLine": 57,
-          "endLine": 66,
+          "line": 62,
+          "startLine": 59,
+          "endLine": 68,
           "excerpt": "  brief:\n    with:\n      crawl_site: ${{ tasks.crawl_site.output }}\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 1200\n      # SLOT: the one model job · what should the brief capture? Keep slot\n      # markers out of the block below — it is prompt TEXT, not YAML, so a\n      # stray comment line is sent to the model verbatim.\n      prompt: |",
           "matchKind": "literal-key-occurrence"
         }
@@ -2204,10 +2204,10 @@
       "examples": [
         {
           "path": "templates/agent-loop.nika",
-          "line": 34,
-          "startLine": 31,
-          "endLine": 40,
-          "excerpt": "# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n\ninputs:\n  goal:\n    type: string\n    required: true\n    # A `required:` input still carries a `default:` here so the skeleton\n    # RUNS the moment it is scaffolded. Replace the default with your job;\n    # `--var goal=…` overrides it at any time.",
+          "line": 35,
+          "startLine": 32,
+          "endLine": 41,
+          "excerpt": "# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo\n\ninputs:\n  goal:\n    type: string\n    required: true\n    # A `required:` input still carries a `default:` here so the skeleton\n    # RUNS the moment it is scaffolded. Replace the default with your job;\n    # `--var goal=…` overrides it at any time.",
           "matchKind": "literal-key-occurrence"
         }
       ]
@@ -2280,9 +2280,9 @@
       "examples": [
         {
           "path": "templates/agent-loop.nika",
-          "line": 124,
-          "startLine": 121,
-          "endLine": 130,
+          "line": 125,
+          "startLine": 122,
+          "endLine": 131,
           "excerpt": "      # (as above) or in a `nika:jq` law. No static law catches an INVENTED\n      # answer: that gap closes upstream, by binding the goal into the agent.\n      has_findings: ${{ size(tasks.execute.output.findings) > 0 }}   # the check crosses as ONE boundary expression · SLOT: your law\n    invoke:\n      tool: \"nika:assert\"\n      args:\n        condition: \"${{ with.has_findings }}\"\n        message: \"Agent returned no findings, do not trust an empty run\"   # SLOT\n\noutputs:",
           "matchKind": "literal-key-occurrence"
         },
@@ -2312,25 +2312,25 @@
         },
         {
           "path": "templates/chain.nika",
-          "line": 46,
-          "startLine": 43,
-          "endLine": 52,
+          "line": 47,
+          "startLine": 44,
+          "endLine": 53,
           "excerpt": "\ntasks:\n  gather:\n    invoke:                         # SLOT: the fact source · nika:read / nika:fetch / exec\n      tool: \"nika:read\"\n      args: { path: \"${{ const.source }}\" }\n    on_error:\n      # Offline rehearsal. A freshly scaffolded directory has no README, and a\n      # skeleton that dies on its first run teaches nothing — so a not-found\n      # recovers into a literal standing in for the real document. `on_codes:`",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/classify-and-route.nika",
-          "line": 94,
-          "startLine": 91,
-          "endLine": 100,
+          "line": 95,
+          "startLine": 92,
+          "endLine": 101,
           "excerpt": "  snapshot:\n    with:\n      facts: ${{ tasks.extract_facts.output }}\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ with.facts }}\n        expression: '{t: \"2027-01-01T00:00:00Z\", evidence: [{key: \"urgency\", value: .urgency, source: \"classifier\", observed_at: \"2027-01-01T00:00:00Z\", digest: \"runtime-urgency\", confidentiality: \"internal\", integrity: \"observed\", quality: {freshness: \"fresh\", completeness: \"complete\", independence_group: \"classifier\"}}]}'\n\n  decide:",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/corpus-qa.nika",
-          "line": 31,
-          "startLine": 28,
-          "endLine": 37,
+          "line": 32,
+          "startLine": 29,
+          "endLine": 38,
           "excerpt": "\ntasks:\n  conflicting_ids:\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ const.documents }}\n        expression: 'sort_by(.id) | group_by(.id) | map(select((map(.text) | unique | length) > 1) | .[0].id)'\n\n  duplicates_consistent:",
           "matchKind": "literal-key-occurrence"
         },
@@ -2344,17 +2344,17 @@
         },
         {
           "path": "templates/docker-report.nika",
-          "line": 88,
-          "startLine": 85,
-          "endLine": 94,
+          "line": 89,
+          "startLine": 86,
+          "endLine": 95,
           "excerpt": "  keep:\n    with:\n      diagnose: ${{ tasks.diagnose.output }}\n    invoke:\n      tool: \"nika:write\"\n      args:\n        path: \"./docker-health.md\"  # SLOT: same path as permits.fs.write\n        content: \"${{ with.diagnose }}\"\n    on_error:\n      # Golden rehearsal · `nika test` refuses effects (NIKA-452) — the pin",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/document-to-fields.nika",
-          "line": 37,
-          "startLine": 34,
-          "endLine": 43,
+          "line": 38,
+          "startLine": 35,
+          "endLine": 44,
           "excerpt": "\ntasks:\n  normalize_document:\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ const.document }}\n        expression: 'gsub(\"^\\\\s+|\\\\s+$\"; \"\")'\n\n  document_nonempty:",
           "matchKind": "literal-key-occurrence"
         },
@@ -2368,9 +2368,9 @@
         },
         {
           "path": "templates/fanout.nika",
-          "line": 82,
-          "startLine": 79,
-          "endLine": 88,
+          "line": 83,
+          "startLine": 80,
+          "endLine": 89,
           "excerpt": "\ntasks:\n  discover:\n    invoke:                         # SLOT: glob / fetch sitemap / exec + jq split\n      tool: \"nika:glob\"\n      args: { pattern: \"${{ const.collection_source }}/*.md\" }\n\n  # `discover` hands back PATH STRINGS — a prompt that interpolates the raw\n  # item shows the model a FILENAME, never the file (measured: a green run\n  # whose fluent « report » was invented from the names alone — check, mock",
           "matchKind": "literal-key-occurrence"
         },
@@ -2392,9 +2392,9 @@
         },
         {
           "path": "templates/media-asset-pack.nika",
-          "line": 70,
-          "startLine": 67,
-          "endLine": 76,
+          "line": 71,
+          "startLine": 68,
+          "endLine": 77,
           "excerpt": "  render:\n    with:\n      brief_image_prompt: ${{ tasks.brief.output.image_prompt }}\n    invoke:\n      tool: \"nika:image_generate\"\n      args:\n        provider: mock              # SLOT: local | openai | gemini | xai (local/mock first)\n        prompt: \"${{ with.brief_image_prompt }}\"\n        output_dir: \"${{ const.out_dir }}\"\n        filename_prefix: \"asset\"    # SLOT: filename stem",
           "matchKind": "literal-key-occurrence"
         },
@@ -2440,10 +2440,10 @@
         },
         {
           "path": "templates/website-brief.nika",
-          "line": 47,
-          "startLine": 44,
-          "endLine": 53,
-          "excerpt": "\ntasks:\n  crawl_site:\n    invoke:\n      tool: \"nika:fetch\"\n      args:\n        url: \"${{ const.site_url }}\"\n        traverse: { max_pages: 5 }  # SLOT: crawl bound · 1..=25 (robots honored)\n    on_error:\n      # Offline rehearsal · a literal standing in for the crawl digest, so the",
+          "line": 48,
+          "startLine": 45,
+          "endLine": 54,
+          "excerpt": "\ntasks:\n  crawl_site:\n    invoke:\n      tool: \"nika:fetch\"\n      args:\n        url: \"${{ const.site_url }}\"\n        traverse: { max_pages: 5 }  # SLOT: crawl bound · 1..=25 (robots honored)\n    on_error:\n      # Rehearsal stand-in · when the crawl fails (no network, a dead host),",
           "matchKind": "literal-key-occurrence"
         }
       ]
@@ -2474,9 +2474,9 @@
       "examples": [
         {
           "path": "templates/agent-loop.nika",
-          "line": 112,
-          "startLine": 109,
-          "endLine": 118,
+          "line": 113,
+          "startLine": 110,
+          "endLine": 119,
           "excerpt": "          findings:\n            type: array\n            minItems: 1               # an empty list is a schema miss, never a green run\n            items: { type: string, minLength: 1 }\n\n  confirm:\n    with:\n      # The schema above already refuses an empty list and an empty string;\n      # this assert is the trust boundary downstream code can SEE, and the\n      # place for YOUR law once the goal fixes one (a count · a required id ·",
           "matchKind": "literal-key-occurrence"
         },
@@ -2506,17 +2506,17 @@
         },
         {
           "path": "templates/document-to-fields.nika",
-          "line": 73,
-          "startLine": 70,
-          "endLine": 79,
+          "line": 74,
+          "startLine": 71,
+          "endLine": 80,
           "excerpt": "          fields:\n            type: array\n            minItems: 1\n            items:\n              type: object\n              additionalProperties: false\n              required: [name, value, anchor]\n              properties:\n                name: { type: string, minLength: 1 }\n                value: { type: string, minLength: 1 }",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/fanout.nika",
-          "line": 97,
-          "startLine": 94,
-          "endLine": 103,
+          "line": 98,
+          "startLine": 95,
+          "endLine": 104,
           "excerpt": "    with:\n      discover: ${{ tasks.discover.output }}\n    for_each:\n      items: ${{ with.discover }}\n      max_parallel: 8\n      fail_fast: false\n    on_error:\n      recover: null                 # an unreadable item yields null · the batch lives\n    invoke:\n      tool: \"nika:read\"",
           "matchKind": "literal-key-occurrence"
         },
@@ -2571,9 +2571,9 @@
       "examples": [
         {
           "path": "templates/fanout.nika",
-          "line": 120,
-          "startLine": 117,
-          "endLine": 126,
+          "line": 121,
+          "startLine": 118,
+          "endLine": 127,
           "excerpt": "    retry:\n      max_attempts: 3\n      backoff_strategy: exponential\n      jitter: true\n    on_error:\n      recover: null                 # a failed item yields null at its index · the batch lives\n    infer:                          # SLOT: the per-item job (any verb)\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 2000              # SLOT: the per-ITEM ceiling · think + answer · multiply by the fan width\n      # The marker below is a VALUE, not a comment. The parser drops",
           "matchKind": "literal-key-occurrence"
         },
@@ -2819,9 +2819,9 @@
       "examples": [
         {
           "path": "templates/classify-and-route.nika",
-          "line": 38,
-          "startLine": 35,
-          "endLine": 44,
+          "line": 39,
+          "startLine": 36,
+          "endLine": 45,
           "excerpt": "      urgency_step:\n        kind: bucket\n        min: 0\n        max: 1\n        edges: [1]\n        values: [0, 10000]\n    rules:\n      dimensions:\n        incident_priority:\n          terms:",
           "matchKind": "literal-key-occurrence"
         }
@@ -2853,9 +2853,9 @@
       "examples": [
         {
           "path": "templates/fanout.nika",
-          "line": 118,
-          "startLine": 115,
-          "endLine": 124,
+          "line": 119,
+          "startLine": 116,
+          "endLine": 125,
           "excerpt": "      fail_fast: false\n    timeout: \"60s\"                  # SLOT: per-iteration bound\n    retry:\n      max_attempts: 3\n      backoff_strategy: exponential\n      jitter: true\n    on_error:\n      recover: null                 # a failed item yields null at its index · the batch lives\n    infer:                          # SLOT: the per-item job (any verb)\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low",
           "matchKind": "literal-key-occurrence"
         },
@@ -2945,9 +2945,9 @@
         },
         {
           "path": "templates/fanout.nika",
-          "line": 98,
-          "startLine": 95,
-          "endLine": 104,
+          "line": 99,
+          "startLine": 96,
+          "endLine": 105,
           "excerpt": "      discover: ${{ tasks.discover.output }}\n    for_each:\n      items: ${{ with.discover }}\n      max_parallel: 8\n      fail_fast: false\n    on_error:\n      recover: null                 # an unreadable item yields null · the batch lives\n    invoke:\n      tool: \"nika:read\"\n      args: { path: \"${{ item }}\" }",
           "matchKind": "literal-key-occurrence"
         },
@@ -2990,9 +2990,9 @@
       "examples": [
         {
           "path": "templates/agent-loop.nika",
-          "line": 59,
-          "startLine": 56,
-          "endLine": 65,
+          "line": 60,
+          "startLine": 57,
+          "endLine": 66,
           "excerpt": "      # fails NIKA-INFER-002 (\"no JSON value found · the reply was cut off at\n      # the token limit\"). Measured — 400 starves qwen3.5:4b on this prompt.\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 2000\n      schema:\n        type: object\n        additionalProperties: false\n        required: [steps]\n        properties:\n          steps: { type: array, items: { type: string } }",
           "matchKind": "literal-key-occurrence"
         },
@@ -3006,65 +3006,65 @@
         },
         {
           "path": "templates/chain.nika",
-          "line": 66,
-          "startLine": 63,
-          "endLine": 72,
+          "line": 67,
+          "startLine": 64,
+          "endLine": 73,
           "excerpt": "      gather: ${{ tasks.gather.output }}\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 800               # SLOT: the spend ceiling · sized for the SEAT, not the answer\n      # The marker below is a VALUE, not a comment. The parser drops\n      # comments, so a `# SLOT:` line could never make `check` refuse —\n      # which is how an unfilled scaffold ran green and left a file that\n      # read like a result (#1066). Replace the line, keep the binding.\n      prompt: |\n        <SLOT: what should the model do with the gathered text?>",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/classify-and-route.nika",
-          "line": 78,
-          "startLine": 75,
-          "endLine": 84,
+          "line": 79,
+          "startLine": 76,
+          "endLine": 85,
           "excerpt": "  extract_facts:\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 300                # SLOT: classification spend ceiling\n      prompt: |\n        Extract the urgency fact from this request. Use 1 only for an active\n        widespread outage, otherwise use 0.\n\n        ${{ const.request }}\n      schema:",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/corpus-qa.nika",
-          "line": 98,
-          "startLine": 95,
-          "endLine": 104,
+          "line": 99,
+          "startLine": 96,
+          "endLine": 105,
           "excerpt": "    when: ${{ size(with.hits) > 0 }}\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 500                # SLOT: answer spend ceiling\n      prompt: |\n        Answer from these passages only and cite their ids.\n        Question: ${{ const.query }}\n        Passages: ${{ with.hits }}\n      schema:\n        type: object",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/docker-report.nika",
-          "line": 70,
-          "startLine": 67,
-          "endLine": 76,
+          "line": 71,
+          "startLine": 68,
+          "endLine": 77,
           "excerpt": "      df: ${{ tasks.df.output }}\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 2000              # SLOT: the spend ceiling for this call · think block + report\n      # SLOT: what should the model DO with the readings? Keep slot markers out\n      # of the block below — everything indented under `prompt: |` is prompt\n      # TEXT, and a stray comment line is sent to the model verbatim.\n      prompt: |\n        You are reading a Docker host's state. Containers (name·status·image):\n        ${{ with.ps }}",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/document-to-fields.nika",
-          "line": 59,
-          "startLine": 56,
-          "endLine": 65,
+          "line": 60,
+          "startLine": 57,
+          "endLine": 66,
           "excerpt": "      document_nonempty: success\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 600                # SLOT: extraction spend ceiling\n      prompt: |\n        Extract only facts explicitly present in this document. For every\n        value, copy the shortest exact source fragment that anchors it.\n\n        ${{ with.document }}\n      schema:",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/evaluate-and-optimize.nika",
-          "line": 40,
-          "startLine": 37,
-          "endLine": 46,
+          "line": 41,
+          "startLine": 38,
+          "endLine": 47,
           "excerpt": "  draft:\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 300               # SLOT: the draft ceiling · sized for the SEAT (see CEILINGS)\n      prompt: \"Draft this deliverable: ${{ const.brief }}\"\n      schema:\n        type: object\n        additionalProperties: false\n        required: [text]\n        properties:",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/fanout.nika",
-          "line": 125,
-          "startLine": 122,
-          "endLine": 131,
+          "line": 126,
+          "startLine": 123,
+          "endLine": 132,
           "excerpt": "      recover: null                 # a failed item yields null at its index · the batch lives\n    infer:                          # SLOT: the per-item job (any verb)\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 2000              # SLOT: the per-ITEM ceiling · think + answer · multiply by the fan width\n      # The marker below is a VALUE, not a comment. The parser drops\n      # comments, so a `# SLOT:` line could never make `check` refuse —\n      # which is how an unfilled scaffold ran green and left a file that\n      # read like a result (#1066). Replace the line, keep the binding.\n      prompt: |\n        <SLOT: what to do with each item>",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/media-asset-pack.nika",
-          "line": 53,
-          "startLine": 50,
-          "endLine": 59,
+          "line": 54,
+          "startLine": 51,
+          "endLine": 60,
           "excerpt": "  brief:\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 600\n      # SLOT: the creative direction · style · constraints. Keep slot markers\n      # out of the block below — it is prompt TEXT, not YAML, so a stray\n      # comment line is sent to the model verbatim.\n      prompt: |\n        Write one vivid, concrete image prompt for: ${{ const.subject }}.\n        No text in the image · no watermark · a calm central zone.",
           "matchKind": "literal-key-occurrence"
         },
@@ -3086,9 +3086,9 @@
         },
         {
           "path": "templates/website-brief.nika",
-          "line": 62,
-          "startLine": 59,
-          "endLine": 68,
+          "line": 64,
+          "startLine": 61,
+          "endLine": 70,
           "excerpt": "      crawl_site: ${{ tasks.crawl_site.output }}\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 1200\n      # SLOT: the one model job · what should the brief capture? Keep slot\n      # markers out of the block below — it is prompt TEXT, not YAML, so a\n      # stray comment line is sent to the model verbatim.\n      prompt: |\n        From this site crawl, produce a creative brief: the domain of\n        activity, the dominant visual theme, the audience, the usable",
           "matchKind": "literal-key-occurrence"
         }
@@ -3123,9 +3123,9 @@
       "examples": [
         {
           "path": "templates/agent-loop.nika",
-          "line": 100,
-          "startLine": 97,
-          "endLine": 106,
+          "line": 101,
+          "startLine": 98,
+          "endLine": 107,
           "excerpt": "        - \"nika:jq\"\n        - \"nika:done\"               # explicit completion · loop-owned\n      max_turns: 15                 # SLOT: the loop bound\n      max_tokens_total: 80000       # SLOT: cumulative input + output tokens\n      schema:                       # SLOT: the typed final-message contract\n        # Closed on purpose: declare every allowed result field here.\n        # Keep extra fields out of the result; schema repair is bounded,\n        # and exhausting that allowance is a failure.\n        type: object\n        additionalProperties: false",
           "matchKind": "literal-key-occurrence"
         }
@@ -3161,9 +3161,9 @@
       "examples": [
         {
           "path": "templates/agent-loop.nika",
-          "line": 99,
-          "startLine": 96,
-          "endLine": 105,
+          "line": 100,
+          "startLine": 97,
+          "endLine": 106,
           "excerpt": "        # boundary` — measured, mid-loop, after the turns are paid for.\n        - \"nika:jq\"\n        - \"nika:done\"               # explicit completion · loop-owned\n      max_turns: 15                 # SLOT: the loop bound\n      max_tokens_total: 80000       # SLOT: cumulative input + output tokens\n      schema:                       # SLOT: the typed final-message contract\n        # Closed on purpose: declare every allowed result field here.\n        # Keep extra fields out of the result; schema repair is bounded,\n        # and exhausting that allowance is a failure.\n        type: object",
           "matchKind": "literal-key-occurrence"
         }
@@ -3200,9 +3200,9 @@
       "examples": [
         {
           "path": "templates/classify-and-route.nika",
-          "line": 37,
-          "startLine": 34,
-          "endLine": 43,
+          "line": 38,
+          "startLine": 35,
+          "endLine": 44,
           "excerpt": "    transforms:\n      urgency_step:\n        kind: bucket\n        min: 0\n        max: 1\n        edges: [1]\n        values: [0, 10000]\n    rules:\n      dimensions:\n        incident_priority:",
           "matchKind": "literal-key-occurrence"
         }
@@ -3292,10 +3292,10 @@
       "examples": [
         {
           "path": "templates/agent-loop.nika",
-          "line": 32,
-          "startLine": 29,
-          "endLine": 38,
-          "excerpt": "# This skeleton keeps its authored offline model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n\ninputs:\n  goal:\n    type: string\n    required: true\n    # A `required:` input still carries a `default:` here so the skeleton",
+          "line": 33,
+          "startLine": 30,
+          "endLine": 39,
+          "excerpt": "# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` rehearses on the mock\n# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo\n\ninputs:\n  goal:\n    type: string\n    required: true\n    # A `required:` input still carries a `default:` here so the skeleton",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -3308,66 +3308,66 @@
         },
         {
           "path": "templates/chain.nika",
-          "line": 29,
-          "startLine": 26,
-          "endLine": 35,
-          "excerpt": "# This skeleton keeps its authored offline model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n\nconst:\n  source: \"./README.md\"             # SLOT: your input · README.md exists in most repos\n  destination: \"./output.md\"        # SLOT: where the result lands\n\npermits:                            # the blast radius · default-deny once present",
+          "line": 30,
+          "startLine": 27,
+          "endLine": 36,
+          "excerpt": "# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` rehearses on the mock\n# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo\n\nconst:\n  source: \"./README.md\"             # SLOT: your input · README.md exists in most repos\n  destination: \"./output.md\"        # SLOT: where the result lands\n\npermits:                            # the blast radius · default-deny once present",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/classify-and-route.nika",
-          "line": 16,
-          "startLine": 13,
-          "endLine": 22,
-          "excerpt": "# This skeleton keeps its authored offline model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n\nconst:\n  request: \"<SLOT: the request to classify and route>\"\n  bundle:\n    decision_bundle_format: 1\n    manifest:",
+          "line": 17,
+          "startLine": 14,
+          "endLine": 23,
+          "excerpt": "# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` rehearses on the mock\n# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo\n\nconst:\n  request: \"<SLOT: the request to classify and route>\"\n  bundle:\n    decision_bundle_format: 1\n    manifest:",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/corpus-qa.nika",
-          "line": 17,
-          "startLine": 14,
-          "endLine": 23,
-          "excerpt": "# This skeleton keeps its authored offline model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n\nconst:\n  query: \"<SLOT: the question to answer from the corpus>\"\n  documents:                         # SLOT: replace with retrieved source chunks\n    - { id: handbook, text: \"Support hours are 09:00 to 17:00 UTC.\" }\n    - { id: security, text: \"Security incidents are reported within one hour.\" }",
+          "line": 18,
+          "startLine": 15,
+          "endLine": 24,
+          "excerpt": "# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` rehearses on the mock\n# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo\n\nconst:\n  query: \"<SLOT: the question to answer from the corpus>\"\n  documents:                         # SLOT: replace with retrieved source chunks\n    - { id: handbook, text: \"Support hours are 09:00 to 17:00 UTC.\" }\n    - { id: security, text: \"Security incidents are reported within one hour.\" }",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/docker-report.nika",
-          "line": 32,
-          "startLine": 29,
-          "endLine": 38,
-          "excerpt": "# This skeleton keeps its authored offline model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n\npermits:                            # the blast radius · default-deny once present\n  exec:\n    - \"docker\"                      # SLOT: the ONE program the reads may launch\n  tools:\n    - \"nika:write\"",
+          "line": 33,
+          "startLine": 30,
+          "endLine": 39,
+          "excerpt": "# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` rehearses on the mock\n# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo\n\npermits:                            # the blast radius · default-deny once present\n  exec:\n    - \"docker\"                      # SLOT: the ONE program the reads may launch\n  tools:\n    - \"nika:write\"",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/document-to-fields.nika",
-          "line": 17,
-          "startLine": 14,
-          "endLine": 23,
-          "excerpt": "# This skeleton keeps its authored offline model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n\nconst:\n  # NOT a slot, deliberately. This literal is the REHEARSAL FIXTURE the\n  # skeleton's own `nika:assert` step reads — hole it and the template\n  # stops rehearsing green, without closing anything: this workflow\n  # persists nothing, so it leaves behind no file that reads like a",
+          "line": 18,
+          "startLine": 15,
+          "endLine": 24,
+          "excerpt": "# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` rehearses on the mock\n# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo\n\nconst:\n  # NOT a slot, deliberately. This literal is the REHEARSAL FIXTURE the\n  # skeleton's own `nika:assert` step reads — hole it and the template\n  # stops rehearsing green, without closing anything: this workflow\n  # persists nothing, so it leaves behind no file that reads like a",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/evaluate-and-optimize.nika",
-          "line": 29,
-          "startLine": 26,
-          "endLine": 35,
-          "excerpt": "# This skeleton keeps its authored offline model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n\nconst:\n  brief: \"<SLOT: the deliverable to draft, critique and revise>\"\n\npermits: {}\n",
+          "line": 30,
+          "startLine": 27,
+          "endLine": 36,
+          "excerpt": "# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` rehearses on the mock\n# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo\n\nconst:\n  brief: \"<SLOT: the deliverable to draft, critique and revise>\"\n\npermits: {}\n",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/fanout.nika",
-          "line": 50,
-          "startLine": 47,
-          "endLine": 56,
-          "excerpt": "# This skeleton keeps its authored offline model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n\nrun:\n  # A `timeout:` is a deadline, and a deadline needs a clock. Declaring it says\n  # out loud which one: `system` is the ambient wall clock (the honest default);\n  # `virtual` drives a simulated clock for deterministic tests.\n  clock: system",
+          "line": 51,
+          "startLine": 48,
+          "endLine": 57,
+          "excerpt": "# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` rehearses on the mock\n# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo\n\nrun:\n  # A `timeout:` is a deadline, and a deadline needs a clock. Declaring it says\n  # out loud which one: `system` is the ambient wall clock (the honest default);\n  # `virtual` drives a simulated clock for deterministic tests.\n  clock: system",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/media-asset-pack.nika",
-          "line": 30,
-          "startLine": 27,
-          "endLine": 36,
-          "excerpt": "# This skeleton keeps its authored offline model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n\nconst:\n  subject: \"<SLOT: what the asset is about>\"\n  out_dir: \"./out/assets\"           # SLOT: where assets land\n\npermits:                            # the blast radius · default-deny once present",
+          "line": 31,
+          "startLine": 28,
+          "endLine": 37,
+          "excerpt": "# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` rehearses on the mock\n# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo\n\nconst:\n  subject: \"<SLOT: what the asset is about>\"\n  out_dir: \"./out/assets\"           # SLOT: where assets land\n\npermits:                            # the blast radius · default-deny once present",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -3388,10 +3388,10 @@
         },
         {
           "path": "templates/website-brief.nika",
-          "line": 31,
-          "startLine": 28,
-          "endLine": 37,
-          "excerpt": "# This skeleton keeps its authored offline model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n\nconst:\n  site_url: \"https://example.com\"   # SLOT: the site to understand\n  out_path: \"./out/brief.json\"      # SLOT: where the brief lands\n\npermits:                            # the blast radius · default-deny once present",
+          "line": 32,
+          "startLine": 29,
+          "endLine": 38,
+          "excerpt": "# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` rehearses on the mock\n# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo\n\nconst:\n  site_url: \"https://example.com\"   # SLOT: the site to understand\n  out_path: \"./out/brief.json\"      # SLOT: where the brief lands\n\npermits:                            # the blast radius · default-deny once present",
           "matchKind": "literal-key-occurrence"
         }
       ]
@@ -3460,9 +3460,9 @@
         },
         {
           "path": "templates/website-brief.nika",
-          "line": 39,
-          "startLine": 36,
-          "endLine": 45,
+          "line": 40,
+          "startLine": 37,
+          "endLine": 46,
           "excerpt": "\npermits:                            # the blast radius · default-deny once present\n  tools: [\"nika:fetch\", \"nika:write\"]\n  net: { http: [\"example.com\"] }    # SLOT: the host from const.site_url. ONE entry is\n                                    #   enough — `traverse:` is a same-origin BFS (+ the\n                                    #   robots probe), so the crawl never leaves this host.\n  fs: { write: [\"./out/brief.json\"] }   # SLOT: the one file · keep in step with const.out_path\n                                        #   (the infer step needs no grant — it is pure compute)\n\ntasks:",
           "matchKind": "literal-key-occurrence"
         }
@@ -3503,7 +3503,7 @@
           "line": 27,
           "startLine": 24,
           "endLine": 33,
-          "excerpt": "#\n# Run · nika run <file> --model mock/echo                    # offline rehearsal\n#     · nika run <file> --var goal=\"triage the open bugs\"    # a real seat\nnika: agent-loop-template       # SLOT: kebab-case workflow id\n\n# This skeleton keeps its authored offline model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n",
+          "excerpt": "#\n# Run · nika run <file> --model mock/echo                    # offline rehearsal\n#     · nika run <file> --var goal=\"triage the open bugs\"    # a real seat\nnika: agent-loop-template       # SLOT: kebab-case workflow id\n\n# This skeleton keeps its authored mock model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` rehearses on the mock\n# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -3519,7 +3519,7 @@
           "line": 37,
           "startLine": 34,
           "endLine": 43,
-          "excerpt": "#   is: the block only forgives the not-configured case).\n#\n# Run · nika run <file>          # offline rehearsal · no key exported\nnika: api-upload-and-create-template       # SLOT: kebab-case workflow id\n\nconst:\n  api_base: \"https://api.example.com\"     # SLOT: the product API base\n  asset_path: \"./out/assets/asset-1.png\"  # SLOT: the file to upload\n\nsecrets:",
+          "excerpt": "#   is: the block only forgives the not-configured case).\n#\n# Run · nika run <file>          # rehearsal · no key exported, so nothing is sent\nnika: api-upload-and-create-template       # SLOT: kebab-case workflow id\n\nconst:\n  api_base: \"https://api.example.com\"     # SLOT: the product API base\n  asset_path: \"./out/assets/asset-1.png\"  # SLOT: the file to upload\n\nsecrets:",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -3535,7 +3535,7 @@
           "line": 24,
           "startLine": 21,
           "endLine": 30,
-          "excerpt": "# Needs · nothing. Scaffolds and runs green in an empty directory.\n#\n# Run · nika run <file> --model mock/echo    # offline rehearsal · zero keys\nnika: chain-template       # SLOT: kebab-case workflow id\n\n# This skeleton keeps its authored offline model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n",
+          "excerpt": "# Needs · nothing. Scaffolds and runs green in an empty directory.\n#\n# Run · nika run <file> --model mock/echo    # offline rehearsal · zero keys\nnika: chain-template       # SLOT: kebab-case workflow id\n\n# This skeleton keeps its authored mock model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` rehearses on the mock\n# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -3543,7 +3543,7 @@
           "line": 11,
           "startLine": 8,
           "endLine": 17,
-          "excerpt": "#\n# Needs · nothing. Runs offline in an empty directory with mock/echo.\n# Run · nika run <file> --model mock/echo\nnika: classify-and-route       # SLOT: kebab-case workflow id\n\n# This skeleton keeps its authored offline model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n",
+          "excerpt": "#\n# Needs · nothing. Runs offline in an empty directory with mock/echo.\n# Run · nika run <file> --model mock/echo\nnika: classify-and-route       # SLOT: kebab-case workflow id\n\n# This skeleton keeps its authored mock model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` rehearses on the mock\n# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -3551,7 +3551,7 @@
           "line": 12,
           "startLine": 9,
           "endLine": 18,
-          "excerpt": "#\n# Needs · nothing. Runs offline in an empty directory with mock/echo.\n# Run · nika run <file> --model mock/echo\nnika: corpus-qa       # SLOT: kebab-case workflow id\n\n# This skeleton keeps its authored offline model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n",
+          "excerpt": "#\n# Needs · nothing. Runs offline in an empty directory with mock/echo.\n# Run · nika run <file> --model mock/echo\nnika: corpus-qa       # SLOT: kebab-case workflow id\n\n# This skeleton keeps its authored mock model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` rehearses on the mock\n# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -3567,7 +3567,7 @@
           "line": 27,
           "startLine": 24,
           "endLine": 33,
-          "excerpt": "#   then delete the two `on_error:` blocks so a broken daemon is loud.\n#\n# Run · nika run <file> --model mock/echo    # offline rehearsal · no daemon\nnika: docker-report-template       # SLOT: kebab-case workflow id\n\n# This skeleton keeps its authored offline model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n",
+          "excerpt": "#   then delete the two `on_error:` blocks so a broken daemon is loud.\n#\n# Run · nika run <file> --model mock/echo    # offline rehearsal · no daemon\nnika: docker-report-template       # SLOT: kebab-case workflow id\n\n# This skeleton keeps its authored mock model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` rehearses on the mock\n# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -3575,7 +3575,7 @@
           "line": 12,
           "startLine": 9,
           "endLine": 18,
-          "excerpt": "#\n# Needs · nothing. Runs offline in an empty directory with mock/echo.\n# Run · nika run <file> --model mock/echo\nnika: document-to-fields       # SLOT: kebab-case workflow id\n\n# This skeleton keeps its authored offline model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n",
+          "excerpt": "#\n# Needs · nothing. Runs offline in an empty directory with mock/echo.\n# Run · nika run <file> --model mock/echo\nnika: document-to-fields       # SLOT: kebab-case workflow id\n\n# This skeleton keeps its authored mock model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` rehearses on the mock\n# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -3591,7 +3591,7 @@
           "line": 24,
           "startLine": 21,
           "endLine": 30,
-          "excerpt": "#     nika check <file> --model <provider/model>\n#\n# Run · nika run <file> --model mock/echo\nnika: evaluate-and-optimize       # SLOT: kebab-case workflow id\n\n# This skeleton keeps its authored offline model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n",
+          "excerpt": "#     nika check <file> --model <provider/model>\n#\n# Run · nika run <file> --model mock/echo\nnika: evaluate-and-optimize       # SLOT: kebab-case workflow id\n\n# This skeleton keeps its authored mock model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` rehearses on the mock\n# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -3599,7 +3599,7 @@
           "line": 45,
           "startLine": 42,
           "endLine": 51,
-          "excerpt": "#\n# Run · nika run <file> --model mock/echo                            # offline rehearsal\n#       nika run <file> --model <provider/model> --max-cost-usd 0.25     # a real seat · the fan's cap\nnika: fanout-template       # SLOT: kebab-case workflow id\n\n# This skeleton keeps its authored offline model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n",
+          "excerpt": "#\n# Run · nika run <file> --model mock/echo                            # offline rehearsal\n#       nika run <file> --model <provider/model> --max-cost-usd 0.25     # a real seat · the fan's cap\nnika: fanout-template       # SLOT: kebab-case workflow id\n\n# This skeleton keeps its authored mock model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` rehearses on the mock\n# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -3607,7 +3607,7 @@
           "line": 26,
           "startLine": 23,
           "endLine": 32,
-          "excerpt": "#   `on_error:` so a dead source is loud.\n#\n# Run · nika run <file>          # offline rehearsal · the gate stays closed\nnika: gate-and-act-template       # SLOT: kebab-case workflow id\n\nconst:\n  source_url: \"https://api.example.com/v1/value\"   # SLOT: what to watch\n  threshold: 100                    # SLOT: the trigger condition value\n\npermits:                            # the blast radius · default-deny once present",
+          "excerpt": "#   `on_error:` so a dead source is loud.\n#\n# Run · nika run <file>          # rehearsal · the fetch fails, the gate stays closed\nnika: gate-and-act-template       # SLOT: kebab-case workflow id\n\nconst:\n  source_url: \"https://api.example.com/v1/value\"   # SLOT: what to watch\n  threshold: 100                    # SLOT: the trigger condition value\n\npermits:                            # the blast radius · default-deny once present",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -3623,7 +3623,7 @@
           "line": 25,
           "startLine": 22,
           "endLine": 31,
-          "excerpt": "# Needs · nothing. Scaffolds and runs green in an empty directory.\n#\n# Run · nika run <file> --model mock/echo    # offline rehearsal · assets land in ./out/assets\nnika: media-asset-pack-template       # SLOT: kebab-case workflow id\n\n# This skeleton keeps its authored offline model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n",
+          "excerpt": "# Needs · nothing. Scaffolds and runs green in an empty directory.\n#\n# Run · nika run <file> --model mock/echo    # offline rehearsal · assets land in ./out/assets\nnika: media-asset-pack-template       # SLOT: kebab-case workflow id\n\n# This skeleton keeps its authored mock model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` rehearses on the mock\n# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -3671,7 +3671,7 @@
           "line": 26,
           "startLine": 23,
           "endLine": 32,
-          "excerpt": "#\n# Run · nika run <file> --model mock/echo    # rehearsal · green even with no network\n#   (on a networked machine the crawl really fetches const.site_url — it is permitted)\nnika: website-brief-template       # SLOT: kebab-case workflow id\n\n# This skeleton keeps its authored offline model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n",
+          "excerpt": "#\n# Run · nika run <file> --model mock/echo    # rehearsal · green even with no network\n#   (on a networked machine the crawl really fetches const.site_url — it is permitted)\nnika: website-brief-template       # SLOT: kebab-case workflow id\n\n# This skeleton keeps its authored mock model. Creating a workflow does\n# not select a paid provider from ambient credentials. Choose a different\n# model explicitly for a real run; `--model mock/echo` rehearses on the mock\n# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo",
           "matchKind": "literal-key-occurrence"
         }
       ]
@@ -3795,9 +3795,9 @@
         },
         {
           "path": "templates/chain.nika",
-          "line": 58,
-          "startLine": 55,
-          "endLine": 64,
+          "line": 59,
+          "startLine": 56,
+          "endLine": 65,
           "excerpt": "      # In an EMPTY directory check prints one [inputs] hint that this read\n      # would fail — the run does not: this recover carries it (measured ·\n      # rc=0 · « 1 recovered »). The hint retires once your source exists.\n      on_codes: [NIKA-BUILTIN-READ-001]\n      recover: \"REHEARSAL · no source document here yet.\"\n\n  think:\n    with:\n      gather: ${{ tasks.gather.output }}\n    infer:",
           "matchKind": "literal-key-occurrence"
         },
@@ -3863,22 +3863,22 @@
           "line": 83,
           "startLine": 80,
           "endLine": 89,
-          "excerpt": "          - { name: title, value: \"Rehearsal item\" }   # SLOT: the metadata fields\n        mode: jq\n        jq: \"{ id: .id, url: .url }\"   # SLOT: the fields downstream needs\n    on_error:\n      # Offline rehearsal, NARROWED to the one thing it may forgive: the key is\n      # not configured. A `secrets:` entry whose env var is unset fails\n      # NIKA-VAR-001 before any byte leaves (measured on 0.118.7 · the run\n      # settles « 1 recovered » on that code) — that absence IS the rehearsal\n      # switch. Everything else stays loud: a wired key the API rejects is\n      # NIKA-BUILTIN-FETCH-001 naming the 401 (measured), a dead endpoint too.",
+          "excerpt": "          - { name: title, value: \"Rehearsal item\" }   # SLOT: the metadata fields\n        mode: jq\n        jq: \"{ id: .id, url: .url }\"   # SLOT: the fields downstream needs\n    on_error:\n      # The rehearsal, NARROWED to the one thing it may forgive: the key is\n      # not configured. A `secrets:` entry whose env var is unset fails\n      # NIKA-VAR-001 before any byte leaves (measured on 0.118.7 · the run\n      # settles « 1 recovered » on that code) — that absence IS the rehearsal\n      # switch. Everything else stays loud: a wired key the API rejects is\n      # NIKA-BUILTIN-FETCH-001 naming the 401 (measured), a dead endpoint too.",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/chain.nika",
-          "line": 49,
-          "startLine": 46,
-          "endLine": 55,
+          "line": 50,
+          "startLine": 47,
+          "endLine": 56,
           "excerpt": "    invoke:                         # SLOT: the fact source · nika:read / nika:fetch / exec\n      tool: \"nika:read\"\n      args: { path: \"${{ const.source }}\" }\n    on_error:\n      # Offline rehearsal. A freshly scaffolded directory has no README, and a\n      # skeleton that dies on its first run teaches nothing — so a not-found\n      # recovers into a literal standing in for the real document. `on_codes:`\n      # keeps that narrow: ONLY not-found is forgiven, a permission error\n      # still fails loudly. Delete this block once the source really exists.\n      # In an EMPTY directory check prints one [inputs] hint that this read",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/docker-report.nika",
-          "line": 52,
-          "startLine": 49,
-          "endLine": 58,
+          "line": 53,
+          "startLine": 50,
+          "endLine": 59,
           "excerpt": "      # is why there is no shell here: no word-splitting, no globbing, nothing\n      # to quote wrong. `permits.exec` above is the provable allowlist.\n      command: [\"docker\", \"ps\", \"--all\", \"--format\", \"{{.Names}}\\t{{.Status}}\\t{{.Image}}\"]\n    on_error:\n      # Offline rehearsal · a host with no daemon answers with a literal that\n      # LOOKS like the real thing, so `diagnose` reads the same shape either\n      # way. Delete this once the daemon is really there.\n      recover: \"REHEARSAL\\tno docker daemon on this host\\tn/a\"\n\n  df:",
           "matchKind": "literal-key-occurrence"
         },
@@ -3892,9 +3892,9 @@
         },
         {
           "path": "templates/fanout.nika",
-          "line": 100,
-          "startLine": 97,
-          "endLine": 106,
+          "line": 101,
+          "startLine": 98,
+          "endLine": 107,
           "excerpt": "      items: ${{ with.discover }}\n      max_parallel: 8\n      fail_fast: false\n    on_error:\n      recover: null                 # an unreadable item yields null · the batch lives\n    invoke:\n      tool: \"nika:read\"\n      args: { path: \"${{ item }}\" }\n\n  process:",
           "matchKind": "literal-key-occurrence"
         },
@@ -3903,7 +3903,7 @@
           "line": 60,
           "startLine": 57,
           "endLine": 66,
-          "excerpt": "        jq: \".\"\n    extract:\n      value: \".value\"               # SLOT: the jq path to the watched field\n    on_error:\n      # Offline rehearsal · a sample UNDER the threshold — the gate stays\n      # closed, the skeleton runs green before you wire the real source.\n      recover: { value: 42 }\n\n  act:\n    with:",
+          "excerpt": "        jq: \".\"\n    extract:\n      value: \".value\"               # SLOT: the jq path to the watched field\n    on_error:\n      # Rehearsal stand-in · the placeholder host resolves nowhere, so a sample\n      # UNDER the threshold takes over — the gate stays closed, the skeleton\n      # runs green before you wire the real source.\n      recover: { value: 42 }\n\n  act:",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -3916,9 +3916,9 @@
         },
         {
           "path": "templates/media-asset-pack.nika",
-          "line": 77,
-          "startLine": 74,
-          "endLine": 83,
+          "line": 78,
+          "startLine": 75,
+          "endLine": 84,
           "excerpt": "        prompt: \"${{ with.brief_image_prompt }}\"\n        output_dir: \"${{ const.out_dir }}\"\n        filename_prefix: \"asset\"    # SLOT: filename stem\n    on_error:\n      # Golden rehearsal · the image tool is an EFFECT, refused under\n      # `nika test` even on `provider: mock` (the plane simulates the\n      # model, not effects). The literal keeps the shape `manifest` reads\n      # (`.images` · `.prompt`) intact — a recover value interpolates `with.`\n      # (measured on 0.118.7), so the rehearsal manifest still records the\n      # brief. Delete once a real seat renders.",
           "matchKind": "literal-key-occurrence"
         },
@@ -3932,10 +3932,10 @@
         },
         {
           "path": "templates/website-brief.nika",
-          "line": 52,
-          "startLine": 49,
-          "endLine": 58,
-          "excerpt": "      args:\n        url: \"${{ const.site_url }}\"\n        traverse: { max_pages: 5 }  # SLOT: crawl bound · 1..=25 (robots honored)\n    on_error:\n      # Offline rehearsal · a literal standing in for the crawl digest, so the\n      # brief step runs with no network at all. Delete once the site is real.\n      recover: \"REHEARSAL DIGEST · Example Co · a small tool company · plain blue and white pages · buttons, a pricing table, one logo.\"\n\n  brief:\n    with:",
+          "line": 53,
+          "startLine": 50,
+          "endLine": 59,
+          "excerpt": "      args:\n        url: \"${{ const.site_url }}\"\n        traverse: { max_pages: 5 }  # SLOT: crawl bound · 1..=25 (robots honored)\n    on_error:\n      # Rehearsal stand-in · when the crawl fails (no network, a dead host),\n      # this literal stands in for the crawl digest so the brief step still\n      # runs. Delete once the site is real.\n      recover: \"REHEARSAL DIGEST · Example Co · a small tool company · plain blue and white pages · buttons, a pricing table, one logo.\"\n\n  brief:",
           "matchKind": "literal-key-occurrence"
         }
       ]
@@ -4012,9 +4012,9 @@
       "examples": [
         {
           "path": "templates/agent-loop.nika",
-          "line": 130,
-          "startLine": 127,
-          "endLine": 133,
+          "line": 131,
+          "startLine": 128,
+          "endLine": 134,
           "excerpt": "        condition: \"${{ with.has_findings }}\"\n        message: \"Agent returned no findings, do not trust an empty run\"   # SLOT\n\noutputs:\n  findings:\n    value: ${{ tasks.execute.output.findings }}\n    description: \"The agent's typed findings\"   # SLOT",
           "matchKind": "literal-key-occurrence"
         },
@@ -4044,25 +4044,25 @@
         },
         {
           "path": "templates/chain.nika",
-          "line": 92,
-          "startLine": 89,
-          "endLine": 93,
+          "line": 93,
+          "startLine": 90,
+          "endLine": 94,
           "excerpt": "      # block once pointed at real data, so a genuine write failure is loud.\n      recover: \"REHEARSAL · write refused under nika test — the real run persists to the destination\"\n\noutputs:\n  result: ${{ tasks.think.output }}  # SLOT: the callable contract",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/classify-and-route.nika",
-          "line": 134,
-          "startLine": 131,
-          "endLine": 136,
+          "line": 135,
+          "startLine": 132,
+          "endLine": 137,
           "excerpt": "        condition: ${{ with.receipt.outcome == \"human_required\" }}\n        message: \"Urgent fixture must abstain to manual review\"\n\noutputs:\n  queue: ${{ tasks.queue.output }}\n  receipt: ${{ tasks.decide.output }}",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/corpus-qa.nika",
-          "line": 121,
-          "startLine": 118,
-          "endLine": 122,
+          "line": 122,
+          "startLine": 119,
+          "endLine": 123,
           "excerpt": "        input: { hits: \"${{ with.hits }}\", answer: \"${{ with.answer }}\" }\n        expression: 'if (.hits | length) == 0 then {known: false, answer: \"I do not know from this corpus.\", citations: []} else {known: true, answer: .answer.answer, citations: .answer.citations} end'\n\noutputs:\n  result: ${{ tasks.finalize.output }}",
           "matchKind": "literal-key-occurrence"
         },
@@ -4076,17 +4076,17 @@
         },
         {
           "path": "templates/docker-report.nika",
-          "line": 100,
-          "startLine": 97,
-          "endLine": 103,
+          "line": 101,
+          "startLine": 98,
+          "endLine": 104,
           "excerpt": "      # the report really lands, so a genuine write failure is loud.\n      recover: \"REHEARSAL · write refused under nika test — the real run lands ./docker-health.md\"\n\noutputs:\n  report:\n    value: ${{ tasks.keep.output }}\n    description: \"Where the report landed — nika:write hands back the path it wrote\"",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/document-to-fields.nika",
-          "line": 101,
-          "startLine": 98,
-          "endLine": 102,
+          "line": 102,
+          "startLine": 99,
+          "endLine": 103,
           "excerpt": "        condition: ${{ with.anchors_present }}\n        message: \"Document extraction returned no anchored fields\"\n\noutputs:\n  fields: ${{ tasks.extract.output.fields }}",
           "matchKind": "literal-key-occurrence"
         },
@@ -4100,25 +4100,25 @@
         },
         {
           "path": "templates/evaluate-and-optimize.nika",
-          "line": 140,
-          "startLine": 137,
-          "endLine": 142,
+          "line": 141,
+          "startLine": 138,
+          "endLine": 143,
           "excerpt": "          score: { type: integer, minimum: 0, maximum: 100 }\n          reason: { type: string, minLength: 1 }\n\noutputs:\n  result: ${{ tasks.optimize_2.output.text }}\n  final_score: ${{ tasks.final_evaluate.output.score }}",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/fanout.nika",
-          "line": 179,
-          "startLine": 176,
-          "endLine": 180,
+          "line": 180,
+          "startLine": 177,
+          "endLine": 181,
           "excerpt": "      prompt: |\n        Merge these results into one report · ${{ with.survivors }}\n\noutputs:\n  report: ${{ tasks.merge.output }}",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/gate-and-act.nika",
-          "line": 78,
-          "startLine": 75,
-          "endLine": 79,
+          "line": 79,
+          "startLine": 76,
+          "endLine": 80,
           "excerpt": "        message: \"Threshold crossed · ${{ with.value }}\"   # SLOT\n        severity: warning\n\noutputs:\n  value: ${{ tasks.check.value }}",
           "matchKind": "literal-key-occurrence"
         },
@@ -4132,9 +4132,9 @@
         },
         {
           "path": "templates/media-asset-pack.nika",
-          "line": 119,
-          "startLine": 116,
-          "endLine": 120,
+          "line": 120,
+          "startLine": 117,
+          "endLine": 121,
           "excerpt": "      # fires on a successful real write. Delete once wired.\n      recover: \"REHEARSAL · write refused under nika test — the real run lands the manifest\"\n\noutputs:\n  manifest: ${{ tasks.manifest.output }}  # SLOT: the callable contract",
           "matchKind": "literal-key-occurrence"
         },
@@ -4180,9 +4180,9 @@
         },
         {
           "path": "templates/website-brief.nika",
-          "line": 101,
-          "startLine": 98,
-          "endLine": 102,
+          "line": 103,
+          "startLine": 100,
+          "endLine": 104,
           "excerpt": "      # Delete once wired, so a genuine write failure is loud.\n      recover: \"REHEARSAL · write refused under nika test — the real run persists the brief\"\n\noutputs:\n  brief: ${{ tasks.brief.output }}   # SLOT: the callable contract",
           "matchKind": "literal-key-occurrence"
         }
@@ -4223,17 +4223,17 @@
       "examples": [
         {
           "path": "templates/chain.nika",
-          "line": 82,
-          "startLine": 79,
-          "endLine": 88,
+          "line": 83,
+          "startLine": 80,
+          "endLine": 89,
           "excerpt": "    invoke:\n      tool: \"nika:write\"\n      args:\n        path: \"${{ const.destination }}\"   # SLOT: destination · same path as permits.fs.write\n        content: \"${{ with.think }}\"       # ALWAYS pass content · a write without it writes nothing\n    on_error:\n      # Golden rehearsal. Under `nika test` the mock plane simulates the\n      # MODEL, not effects — this write is refused (NIKA-452) so the pin\n      # lane needs this recover to walk its own scaffold. `nika run` never\n      # fires it on success (a recover only runs on failure). Delete this",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/docker-report.nika",
-          "line": 91,
-          "startLine": 88,
-          "endLine": 97,
+          "line": 92,
+          "startLine": 89,
+          "endLine": 98,
           "excerpt": "    invoke:\n      tool: \"nika:write\"\n      args:\n        path: \"./docker-health.md\"  # SLOT: same path as permits.fs.write\n        content: \"${{ with.diagnose }}\"\n    on_error:\n      # Golden rehearsal · `nika test` refuses effects (NIKA-452) — the pin\n      # lane recovers into this marker (outputs.report pins it · honest and\n      # deterministic). Never fires on a successful real write. Delete once\n      # the report really lands, so a genuine write failure is loud.",
           "matchKind": "literal-key-occurrence"
         },
@@ -4255,9 +4255,9 @@
         },
         {
           "path": "templates/media-asset-pack.nika",
-          "line": 108,
-          "startLine": 105,
-          "endLine": 114,
+          "line": 109,
+          "startLine": 106,
+          "endLine": 115,
           "excerpt": "    invoke:\n      tool: \"nika:write\"\n      args:\n        path: \"${{ const.out_dir }}/manifest.json\"\n        create_dirs: true\n        # `.json` path → `content:` is ONE interpolation of a value the engine\n        # serializes. `nika:jq` above BUILT that value; hand-typing braces\n        # around an interpolation emits unquoted fields and breaks the artifact.\n        content: \"${{ with.manifest }}\"\n    on_error:",
           "matchKind": "literal-key-occurrence"
         },
@@ -4271,9 +4271,9 @@
         },
         {
           "path": "templates/website-brief.nika",
-          "line": 88,
-          "startLine": 85,
-          "endLine": 94,
+          "line": 90,
+          "startLine": 87,
+          "endLine": 96,
           "excerpt": "    invoke:\n      tool: \"nika:write\"\n      args:\n        path: \"${{ const.out_path }}\"\n        create_dirs: true\n        # The path ends `.json`, so `content:` is ONE interpolation of a value\n        # the engine serializes. Typing `{ \"domain\": ${{ … }} }` by hand emits\n        # unquoted fields and the artifact stops being JSON.\n        content: \"${{ with.brief }}\"\n    on_error:",
           "matchKind": "literal-key-occurrence"
         }
@@ -4406,9 +4406,9 @@
       "examples": [
         {
           "path": "templates/agent-loop.nika",
-          "line": 44,
-          "startLine": 41,
-          "endLine": 50,
+          "line": 45,
+          "startLine": 42,
+          "endLine": 51,
           "excerpt": "    default: \"<SLOT: what the agent must accomplish>\"\n    description: \"What the agent must accomplish\"   # SLOT\n\npermits:                            # the blast radius · default-deny once present\n  # Exactly what the body invokes: `nika:assert` (the confirm task) plus the\n  # two the agent may call. No `fs:` — see the note on `tools:` below.\n  tools: [\"nika:assert\", \"nika:done\", \"nika:jq\"]\n\ntasks:\n  plan:",
           "matchKind": "literal-key-occurrence"
         },
@@ -4438,25 +4438,25 @@
         },
         {
           "path": "templates/chain.nika",
-          "line": 35,
-          "startLine": 32,
-          "endLine": 41,
+          "line": 36,
+          "startLine": 33,
+          "endLine": 42,
           "excerpt": "  source: \"./README.md\"             # SLOT: your input · README.md exists in most repos\n  destination: \"./output.md\"        # SLOT: where the result lands\n\npermits:                            # the blast radius · default-deny once present\n  tools: [\"nika:read\", \"nika:write\"]\n  # Two literal paths, one each way. `check` can read these (they come from\n  # `const:`) and proves them against the boundary before anything runs — keep\n  # them in step with the two `const:` entries above.\n  fs:\n    read: [\"./README.md\"]     # SLOT: same path as const.source",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/classify-and-route.nika",
-          "line": 71,
-          "startLine": 68,
-          "endLine": 77,
+          "line": 72,
+          "startLine": 69,
+          "endLine": 78,
           "excerpt": "        integrity: observed\n        quality: { freshness: fresh, completeness: complete, independence_group: classifier }\n\npermits:\n  tools: [\"nika:jq\", \"nika:decide\", \"nika:assert\"]\n\ntasks:\n  extract_facts:\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/corpus-qa.nika",
-          "line": 26,
-          "startLine": 23,
-          "endLine": 32,
+          "line": 27,
+          "startLine": 24,
+          "endLine": 33,
           "excerpt": "    - { id: security, text: \"Security incidents are reported within one hour.\" }\n    - { id: handbook, text: \"Support hours are 09:00 to 17:00 UTC.\" }\n\npermits:\n  tools: [\"nika:jq\", \"nika:assert\"]\n\ntasks:\n  conflicting_ids:\n    invoke:\n      tool: nika:jq",
           "matchKind": "literal-key-occurrence"
         },
@@ -4470,17 +4470,17 @@
         },
         {
           "path": "templates/docker-report.nika",
-          "line": 34,
-          "startLine": 31,
-          "endLine": 40,
-          "excerpt": "# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n\npermits:                            # the blast radius · default-deny once present\n  exec:\n    - \"docker\"                      # SLOT: the ONE program the reads may launch\n  tools:\n    - \"nika:write\"\n  fs:\n    write:",
+          "line": 35,
+          "startLine": 32,
+          "endLine": 41,
+          "excerpt": "# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo\n\npermits:                            # the blast radius · default-deny once present\n  exec:\n    - \"docker\"                      # SLOT: the ONE program the reads may launch\n  tools:\n    - \"nika:write\"\n  fs:\n    write:",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/document-to-fields.nika",
-          "line": 32,
-          "startLine": 29,
-          "endLine": 38,
+          "line": 33,
+          "startLine": 30,
+          "endLine": 39,
           "excerpt": "    Total: EUR 84.50\n    Rehearsal marker: mock\n\npermits:\n  tools: [\"nika:jq\", \"nika:assert\"]\n\ntasks:\n  normalize_document:\n    invoke:\n      tool: nika:jq",
           "matchKind": "literal-key-occurrence"
         },
@@ -4494,17 +4494,17 @@
         },
         {
           "path": "templates/evaluate-and-optimize.nika",
-          "line": 34,
-          "startLine": 31,
-          "endLine": 40,
+          "line": 35,
+          "startLine": 32,
+          "endLine": 41,
           "excerpt": "const:\n  brief: \"<SLOT: the deliverable to draft, critique and revise>\"\n\npermits: {}\n\ntasks:\n  draft:\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 300               # SLOT: the draft ceiling · sized for the SEAT (see CEILINGS)",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/fanout.nika",
-          "line": 65,
-          "startLine": 62,
-          "endLine": 71,
+          "line": 66,
+          "startLine": 63,
+          "endLine": 72,
           "excerpt": "  # the two is a red assert, not a quietly wrong report.\n  law_cases: [\"kept\", null, \"also kept\"]\n\npermits:\n  tools: [\"nika:assert\", \"nika:glob\", \"nika:jq\", \"nika:read\"]\n  fs:\n    # TWO entries, and both earn their place. `nika:glob` is gated on the\n    # DIRECTORY it walks, not on the files it returns — measured: with\n    # `./items/*.md` here (the pattern) the run dies `NIKA-SEC-004 ·\n    # ./items resolves outside the declared permits.fs.read boundary`,",
           "matchKind": "literal-key-occurrence"
         },
@@ -4526,9 +4526,9 @@
         },
         {
           "path": "templates/media-asset-pack.nika",
-          "line": 36,
-          "startLine": 33,
-          "endLine": 42,
+          "line": 37,
+          "startLine": 34,
+          "endLine": 43,
           "excerpt": "  subject: \"<SLOT: what the asset is about>\"\n  out_dir: \"./out/assets\"           # SLOT: where assets land\n\npermits:                            # the blast radius · default-deny once present\n  tools: [\"nika:image_generate\", \"nika:jq\", \"nika:write\"]\n  fs:\n    write:\n      # Two entries, and both earn their place: `check` judges the `output_dir:`\n      # ARGUMENT (`./out/assets`), while the RUN gates every FINAL file path under\n      # it — the asset, its provenance manifest, and manifest.json. Grant only the",
           "matchKind": "literal-key-occurrence"
         },
@@ -4574,9 +4574,9 @@
         },
         {
           "path": "templates/website-brief.nika",
-          "line": 37,
-          "startLine": 34,
-          "endLine": 43,
+          "line": 38,
+          "startLine": 35,
+          "endLine": 44,
           "excerpt": "  site_url: \"https://example.com\"   # SLOT: the site to understand\n  out_path: \"./out/brief.json\"      # SLOT: where the brief lands\n\npermits:                            # the blast radius · default-deny once present\n  tools: [\"nika:fetch\", \"nika:write\"]\n  net: { http: [\"example.com\"] }    # SLOT: the host from const.site_url. ONE entry is\n                                    #   enough — `traverse:` is a same-origin BFS (+ the\n                                    #   robots probe), so the crawl never leaves this host.\n  fs: { write: [\"./out/brief.json\"] }   # SLOT: the one file · keep in step with const.out_path\n                                        #   (the infer step needs no grant — it is pure compute)",
           "matchKind": "literal-key-occurrence"
         }
@@ -4626,9 +4626,9 @@
       "examples": [
         {
           "path": "templates/agent-loop.nika",
-          "line": 52,
-          "startLine": 49,
-          "endLine": 58,
+          "line": 53,
+          "startLine": 50,
+          "endLine": 59,
           "excerpt": "tasks:\n  plan:\n    infer:\n      prompt: \"Break '${{ inputs.goal }}' into at most 4 concrete steps.\"   # SLOT\n      # SLOT: the spend ceiling for the planning call. Size it for the SEAT,\n      # not for the answer: a reasoning model spends tokens thinking before\n      # it emits the first brace, and a ceiling that cuts it off mid-thought\n      # fails NIKA-INFER-002 (\"no JSON value found · the reply was cut off at\n      # the token limit\"). Measured — 400 starves qwen3.5:4b on this prompt.\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low",
           "matchKind": "literal-key-occurrence"
         },
@@ -4642,65 +4642,65 @@
         },
         {
           "path": "templates/chain.nika",
-          "line": 71,
-          "startLine": 68,
-          "endLine": 77,
+          "line": 72,
+          "startLine": 69,
+          "endLine": 78,
           "excerpt": "      # comments, so a `# SLOT:` line could never make `check` refuse —\n      # which is how an unfilled scaffold ran green and left a file that\n      # read like a result (#1066). Replace the line, keep the binding.\n      prompt: |\n        <SLOT: what should the model do with the gathered text?>\n\n        ${{ with.gather }}\n\n  persist:\n    with:",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/classify-and-route.nika",
-          "line": 79,
-          "startLine": 76,
-          "endLine": 85,
+          "line": 80,
+          "startLine": 77,
+          "endLine": 86,
           "excerpt": "    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 300                # SLOT: classification spend ceiling\n      prompt: |\n        Extract the urgency fact from this request. Use 1 only for an active\n        widespread outage, otherwise use 0.\n\n        ${{ const.request }}\n      schema:\n        type: object",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/corpus-qa.nika",
-          "line": 99,
-          "startLine": 96,
-          "endLine": 105,
+          "line": 100,
+          "startLine": 97,
+          "endLine": 106,
           "excerpt": "    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 500                # SLOT: answer spend ceiling\n      prompt: |\n        Answer from these passages only and cite their ids.\n        Question: ${{ const.query }}\n        Passages: ${{ with.hits }}\n      schema:\n        type: object\n        additionalProperties: false",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/docker-report.nika",
-          "line": 74,
-          "startLine": 71,
-          "endLine": 80,
+          "line": 75,
+          "startLine": 72,
+          "endLine": 81,
           "excerpt": "      # SLOT: what should the model DO with the readings? Keep slot markers out\n      # of the block below — everything indented under `prompt: |` is prompt\n      # TEXT, and a stray comment line is sent to the model verbatim.\n      prompt: |\n        You are reading a Docker host's state. Containers (name·status·image):\n        ${{ with.ps }}\n\n        Disk usage:\n        ${{ with.df }}\n",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/document-to-fields.nika",
-          "line": 60,
-          "startLine": 57,
-          "endLine": 66,
+          "line": 61,
+          "startLine": 58,
+          "endLine": 67,
           "excerpt": "    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 600                # SLOT: extraction spend ceiling\n      prompt: |\n        Extract only facts explicitly present in this document. For every\n        value, copy the shortest exact source fragment that anchors it.\n\n        ${{ with.document }}\n      schema:\n        type: object",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/evaluate-and-optimize.nika",
-          "line": 41,
-          "startLine": 38,
-          "endLine": 47,
+          "line": 42,
+          "startLine": 39,
+          "endLine": 48,
           "excerpt": "    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 300               # SLOT: the draft ceiling · sized for the SEAT (see CEILINGS)\n      prompt: \"Draft this deliverable: ${{ const.brief }}\"\n      schema:\n        type: object\n        additionalProperties: false\n        required: [text]\n        properties:\n          text: { type: string, minLength: 1 }",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/fanout.nika",
-          "line": 130,
-          "startLine": 127,
-          "endLine": 136,
+          "line": 131,
+          "startLine": 128,
+          "endLine": 137,
           "excerpt": "      # comments, so a `# SLOT:` line could never make `check` refuse —\n      # which is how an unfilled scaffold ran green and left a file that\n      # read like a result (#1066). Replace the line, keep the binding.\n      prompt: |\n        <SLOT: what to do with each item>\n\n        ${{ item }}\n\n  # The fan-in below is a LAW: a jq over what a model produced. A law is\n  # proven on known answers first — `prove` runs the SAME expression over",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/media-asset-pack.nika",
-          "line": 57,
-          "startLine": 54,
-          "endLine": 63,
+          "line": 58,
+          "startLine": 55,
+          "endLine": 64,
           "excerpt": "      # SLOT: the creative direction · style · constraints. Keep slot markers\n      # out of the block below — it is prompt TEXT, not YAML, so a stray\n      # comment line is sent to the model verbatim.\n      prompt: |\n        Write one vivid, concrete image prompt for: ${{ const.subject }}.\n        No text in the image · no watermark · a calm central zone.\n      schema:\n        type: object\n        additionalProperties: false\n        properties:",
           "matchKind": "literal-key-occurrence"
         },
@@ -4722,9 +4722,9 @@
         },
         {
           "path": "templates/website-brief.nika",
-          "line": 66,
-          "startLine": 63,
-          "endLine": 72,
+          "line": 68,
+          "startLine": 65,
+          "endLine": 74,
           "excerpt": "      # SLOT: the one model job · what should the brief capture? Keep slot\n      # markers out of the block below — it is prompt TEXT, not YAML, so a\n      # stray comment line is sent to the model verbatim.\n      prompt: |\n        From this site crawl, produce a creative brief: the domain of\n        activity, the dominant visual theme, the audience, the usable\n        colors and image assets.\n        Crawl digest · ${{ with.crawl_site }}\n      schema:                       # SLOT: the typed shape downstream tasks rely on\n        type: object",
           "matchKind": "literal-key-occurrence"
         }
@@ -4785,9 +4785,9 @@
         },
         {
           "path": "templates/chain.nika",
-          "line": 41,
-          "startLine": 38,
-          "endLine": 47,
+          "line": 42,
+          "startLine": 39,
+          "endLine": 48,
           "excerpt": "  # `const:`) and proves them against the boundary before anything runs — keep\n  # them in step with the two `const:` entries above.\n  fs:\n    read: [\"./README.md\"]     # SLOT: same path as const.source\n    write: [\"./output.md\"]    # SLOT: same path as const.destination\n\ntasks:\n  gather:\n    invoke:                         # SLOT: the fact source · nika:read / nika:fetch / exec\n      tool: \"nika:read\"",
           "matchKind": "literal-key-occurrence"
         },
@@ -4801,9 +4801,9 @@
         },
         {
           "path": "templates/fanout.nika",
-          "line": 78,
-          "startLine": 75,
-          "endLine": 84,
+          "line": 79,
+          "startLine": 76,
+          "endLine": 85,
           "excerpt": "    # die SEC-004, `recover: null` swallowed each, and the model was\n    # handed nulls — a green run inventing content). A deeper pattern\n    # (`./items/**/*.md`) walks deeper and needs `./items/**` for both.\n    read: [\"./items\", \"./items/*\"]\n\ntasks:\n  discover:\n    invoke:                         # SLOT: glob / fetch sitemap / exec + jq split\n      tool: \"nika:glob\"\n      args: { pattern: \"${{ const.collection_source }}/*.md\" }",
           "matchKind": "literal-key-occurrence"
         },
@@ -4891,17 +4891,17 @@
         },
         {
           "path": "templates/chain.nika",
-          "line": 59,
-          "startLine": 56,
-          "endLine": 65,
+          "line": 60,
+          "startLine": 57,
+          "endLine": 66,
           "excerpt": "      # would fail — the run does not: this recover carries it (measured ·\n      # rc=0 · « 1 recovered »). The hint retires once your source exists.\n      on_codes: [NIKA-BUILTIN-READ-001]\n      recover: \"REHEARSAL · no source document here yet.\"\n\n  think:\n    with:\n      gather: ${{ tasks.gather.output }}\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/docker-report.nika",
-          "line": 56,
-          "startLine": 53,
-          "endLine": 62,
+          "line": 57,
+          "startLine": 54,
+          "endLine": 63,
           "excerpt": "      # Offline rehearsal · a host with no daemon answers with a literal that\n      # LOOKS like the real thing, so `diagnose` reads the same shape either\n      # way. Delete this once the daemon is really there.\n      recover: \"REHEARSAL\\tno docker daemon on this host\\tn/a\"\n\n  df:\n    exec:\n      command: [\"docker\", \"system\", \"df\"]   # SLOT: the second read (drop the task if one suffices)\n    on_error:\n      recover: \"REHEARSAL · disk usage unavailable without a daemon\"",
           "matchKind": "literal-key-occurrence"
         },
@@ -4915,18 +4915,18 @@
         },
         {
           "path": "templates/fanout.nika",
-          "line": 101,
-          "startLine": 98,
-          "endLine": 107,
+          "line": 102,
+          "startLine": 99,
+          "endLine": 108,
           "excerpt": "      max_parallel: 8\n      fail_fast: false\n    on_error:\n      recover: null                 # an unreadable item yields null · the batch lives\n    invoke:\n      tool: \"nika:read\"\n      args: { path: \"${{ item }}\" }\n\n  process:\n    with:",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/gate-and-act.nika",
-          "line": 63,
-          "startLine": 60,
-          "endLine": 69,
-          "excerpt": "    on_error:\n      # Offline rehearsal · a sample UNDER the threshold — the gate stays\n      # closed, the skeleton runs green before you wire the real source.\n      recover: { value: 42 }\n\n  act:\n    with:\n      value: ${{ tasks.check.value }}   # the binding IS the edge · check → act\n    # when: is a SKIP gate — routing, not failure (a skipped task is not an error)\n    when: ${{ with.value > const.threshold }}   # SLOT: the CEL condition",
+          "line": 64,
+          "startLine": 61,
+          "endLine": 70,
+          "excerpt": "      # Rehearsal stand-in · the placeholder host resolves nowhere, so a sample\n      # UNDER the threshold takes over — the gate stays closed, the skeleton\n      # runs green before you wire the real source.\n      recover: { value: 42 }\n\n  act:\n    with:\n      value: ${{ tasks.check.value }}   # the binding IS the edge · check → act\n    # when: is a SKIP gate — routing, not failure (a skipped task is not an error)\n    when: ${{ with.value > const.threshold }}   # SLOT: the CEL condition",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -4939,9 +4939,9 @@
         },
         {
           "path": "templates/media-asset-pack.nika",
-          "line": 84,
-          "startLine": 81,
-          "endLine": 90,
+          "line": 85,
+          "startLine": 82,
+          "endLine": 91,
           "excerpt": "      # (`.images` · `.prompt`) intact — a recover value interpolates `with.`\n      # (measured on 0.118.7), so the rehearsal manifest still records the\n      # brief. Delete once a real seat renders.\n      recover: { images: [], prompt: \"${{ with.brief_image_prompt }}\" }\n\n  manifest:\n    with:\n      render: ${{ tasks.render.output }}\n    invoke:\n      # ONE input, the generator's own record: `nika:image_generate` returns",
           "matchKind": "literal-key-occurrence"
         },
@@ -4955,10 +4955,10 @@
         },
         {
           "path": "templates/website-brief.nika",
-          "line": 55,
-          "startLine": 52,
-          "endLine": 61,
-          "excerpt": "    on_error:\n      # Offline rehearsal · a literal standing in for the crawl digest, so the\n      # brief step runs with no network at all. Delete once the site is real.\n      recover: \"REHEARSAL DIGEST · Example Co · a small tool company · plain blue and white pages · buttons, a pricing table, one logo.\"\n\n  brief:\n    with:\n      crawl_site: ${{ tasks.crawl_site.output }}\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low",
+          "line": 57,
+          "startLine": 54,
+          "endLine": 63,
+          "excerpt": "      # Rehearsal stand-in · when the crawl fails (no network, a dead host),\n      # this literal stands in for the crawl digest so the brief step still\n      # runs. Delete once the site is real.\n      recover: \"REHEARSAL DIGEST · Example Co · a small tool company · plain blue and white pages · buttons, a pricing table, one logo.\"\n\n  brief:\n    with:\n      crawl_site: ${{ tasks.crawl_site.output }}\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low",
           "matchKind": "literal-key-occurrence"
         }
       ]
@@ -4986,9 +4986,9 @@
       "examples": [
         {
           "path": "templates/agent-loop.nika",
-          "line": 37,
-          "startLine": 34,
-          "endLine": 43,
+          "line": 38,
+          "startLine": 35,
+          "endLine": 44,
           "excerpt": "inputs:\n  goal:\n    type: string\n    required: true\n    # A `required:` input still carries a `default:` here so the skeleton\n    # RUNS the moment it is scaffolded. Replace the default with your job;\n    # `--var goal=…` overrides it at any time.\n    default: \"<SLOT: what the agent must accomplish>\"\n    description: \"What the agent must accomplish\"   # SLOT\n",
           "matchKind": "literal-key-occurrence"
         },
@@ -5010,17 +5010,17 @@
         },
         {
           "path": "templates/classify-and-route.nika",
-          "line": 31,
-          "startLine": 28,
-          "endLine": 37,
+          "line": 32,
+          "startLine": 29,
+          "endLine": 38,
           "excerpt": "    evidence_schema:\n      urgency:\n        type: integer\n        required: true\n        sources: [classifier]\n        integrity: observed\n    transforms:\n      urgency_step:\n        kind: bucket\n        min: 0",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/corpus-qa.nika",
-          "line": 106,
-          "startLine": 103,
-          "endLine": 112,
+          "line": 107,
+          "startLine": 104,
+          "endLine": 113,
           "excerpt": "      schema:\n        type: object\n        additionalProperties: false\n        required: [answer, citations]\n        properties:\n          answer: { type: string, minLength: 1 }\n          citations: { type: array, minItems: 1, items: { type: string } }\n\n  finalize:\n    with:",
           "matchKind": "literal-key-occurrence"
         },
@@ -5034,25 +5034,25 @@
         },
         {
           "path": "templates/document-to-fields.nika",
-          "line": 68,
-          "startLine": 65,
-          "endLine": 74,
+          "line": 69,
+          "startLine": 66,
+          "endLine": 75,
           "excerpt": "      schema:\n        type: object\n        additionalProperties: false\n        required: [fields]\n        properties:\n          fields:\n            type: array\n            minItems: 1\n            items:\n              type: object",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/evaluate-and-optimize.nika",
-          "line": 45,
-          "startLine": 42,
-          "endLine": 51,
+          "line": 46,
+          "startLine": 43,
+          "endLine": 52,
           "excerpt": "      schema:\n        type: object\n        additionalProperties: false\n        required: [text]\n        properties:\n          text: { type: string, minLength: 1 }\n\n  evaluate_1:\n    with:\n      candidate: ${{ tasks.draft.output.text }}",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/media-asset-pack.nika",
-          "line": 65,
-          "startLine": 62,
-          "endLine": 71,
+          "line": 66,
+          "startLine": 63,
+          "endLine": 72,
           "excerpt": "        additionalProperties: false\n        properties:\n          image_prompt: { type: string }\n        required: [image_prompt]\n\n  render:\n    with:\n      brief_image_prompt: ${{ tasks.brief.output.image_prompt }}\n    invoke:\n      tool: \"nika:image_generate\"",
           "matchKind": "literal-key-occurrence"
         },
@@ -5090,9 +5090,9 @@
         },
         {
           "path": "templates/website-brief.nika",
-          "line": 80,
-          "startLine": 77,
-          "endLine": 86,
+          "line": 82,
+          "startLine": 79,
+          "endLine": 88,
           "excerpt": "          audience: { type: string }\n          colors: { type: array, items: { type: string } }\n          assets: { type: array, items: { type: string } }\n        required: [domain, theme, audience, colors, assets]\n\n  persist:\n    with:\n      brief: ${{ tasks.brief.output }}\n    invoke:\n      tool: \"nika:write\"",
           "matchKind": "literal-key-occurrence"
         }
@@ -5132,9 +5132,9 @@
       "examples": [
         {
           "path": "templates/fanout.nika",
-          "line": 117,
-          "startLine": 114,
-          "endLine": 123,
+          "line": 118,
+          "startLine": 115,
+          "endLine": 124,
           "excerpt": "      max_parallel: 4                 # SLOT: the polite ceiling\n      fail_fast: false\n    timeout: \"60s\"                  # SLOT: per-iteration bound\n    retry:\n      max_attempts: 3\n      backoff_strategy: exponential\n      jitter: true\n    on_error:\n      recover: null                 # a failed item yields null at its index · the batch lives\n    infer:                          # SLOT: the per-item job (any verb)",
           "matchKind": "literal-key-occurrence"
         },
@@ -5297,10 +5297,10 @@
         },
         {
           "path": "templates/fanout.nika",
-          "line": 52,
-          "startLine": 49,
-          "endLine": 58,
-          "excerpt": "# model explicitly for a real run; `--model mock/echo` remains offline.\nmodel: mock/echo\n\nrun:\n  # A `timeout:` is a deadline, and a deadline needs a clock. Declaring it says\n  # out loud which one: `system` is the ambient wall clock (the honest default);\n  # `virtual` drives a simulated clock for deterministic tests.\n  clock: system\n\nconst:",
+          "line": 53,
+          "startLine": 50,
+          "endLine": 59,
+          "excerpt": "# model: zero keys, no model call; a fetch step still reaches its host.\nmodel: mock/echo\n\nrun:\n  # A `timeout:` is a deadline, and a deadline needs a clock. Declaring it says\n  # out loud which one: `system` is the ambient wall clock (the honest default);\n  # `virtual` drives a simulated clock for deterministic tests.\n  clock: system\n\nconst:",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -5375,9 +5375,9 @@
       "examples": [
         {
           "path": "templates/agent-loop.nika",
-          "line": 60,
-          "startLine": 57,
-          "endLine": 66,
+          "line": 61,
+          "startLine": 58,
+          "endLine": 67,
           "excerpt": "      # the token limit\"). Measured — 400 starves qwen3.5:4b on this prompt.\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 2000\n      schema:\n        type: object\n        additionalProperties: false\n        required: [steps]\n        properties:\n          steps: { type: array, items: { type: string } }\n",
           "matchKind": "literal-key-occurrence"
         },
@@ -5399,17 +5399,17 @@
         },
         {
           "path": "templates/classify-and-route.nika",
-          "line": 84,
-          "startLine": 81,
-          "endLine": 90,
+          "line": 85,
+          "startLine": 82,
+          "endLine": 91,
           "excerpt": "        widespread outage, otherwise use 0.\n\n        ${{ const.request }}\n      schema:\n        type: object\n        additionalProperties: false\n        required: [urgency]\n        properties:\n          urgency: { type: integer, enum: [0, 1] }\n",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/corpus-qa.nika",
-          "line": 103,
-          "startLine": 100,
-          "endLine": 109,
+          "line": 104,
+          "startLine": 101,
+          "endLine": 110,
           "excerpt": "        Answer from these passages only and cite their ids.\n        Question: ${{ const.query }}\n        Passages: ${{ with.hits }}\n      schema:\n        type: object\n        additionalProperties: false\n        required: [answer, citations]\n        properties:\n          answer: { type: string, minLength: 1 }\n          citations: { type: array, minItems: 1, items: { type: string } }",
           "matchKind": "literal-key-occurrence"
         },
@@ -5423,25 +5423,25 @@
         },
         {
           "path": "templates/document-to-fields.nika",
-          "line": 65,
-          "startLine": 62,
-          "endLine": 71,
+          "line": 66,
+          "startLine": 63,
+          "endLine": 72,
           "excerpt": "        value, copy the shortest exact source fragment that anchors it.\n\n        ${{ with.document }}\n      schema:\n        type: object\n        additionalProperties: false\n        required: [fields]\n        properties:\n          fields:\n            type: array",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/evaluate-and-optimize.nika",
-          "line": 42,
-          "startLine": 39,
-          "endLine": 48,
+          "line": 43,
+          "startLine": 40,
+          "endLine": 49,
           "excerpt": "      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 300               # SLOT: the draft ceiling · sized for the SEAT (see CEILINGS)\n      prompt: \"Draft this deliverable: ${{ const.brief }}\"\n      schema:\n        type: object\n        additionalProperties: false\n        required: [text]\n        properties:\n          text: { type: string, minLength: 1 }\n",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/media-asset-pack.nika",
-          "line": 60,
-          "startLine": 57,
-          "endLine": 66,
+          "line": 61,
+          "startLine": 58,
+          "endLine": 67,
           "excerpt": "      prompt: |\n        Write one vivid, concrete image prompt for: ${{ const.subject }}.\n        No text in the image · no watermark · a calm central zone.\n      schema:\n        type: object\n        additionalProperties: false\n        properties:\n          image_prompt: { type: string }\n        required: [image_prompt]\n",
           "matchKind": "literal-key-occurrence"
         },
@@ -5487,9 +5487,9 @@
         },
         {
           "path": "templates/website-brief.nika",
-          "line": 71,
-          "startLine": 68,
-          "endLine": 77,
+          "line": 73,
+          "startLine": 70,
+          "endLine": 79,
           "excerpt": "        activity, the dominant visual theme, the audience, the usable\n        colors and image assets.\n        Crawl digest · ${{ with.crawl_site }}\n      schema:                       # SLOT: the typed shape downstream tasks rely on\n        type: object\n        additionalProperties: false\n        properties:\n          domain: { type: string }\n          theme: { type: string }\n          audience: { type: string }",
           "matchKind": "literal-key-occurrence"
         }
@@ -5789,17 +5789,17 @@
         },
         {
           "path": "templates/chain.nika",
-          "line": 32,
-          "startLine": 29,
-          "endLine": 38,
+          "line": 33,
+          "startLine": 30,
+          "endLine": 39,
           "excerpt": "model: mock/echo\n\nconst:\n  source: \"./README.md\"             # SLOT: your input · README.md exists in most repos\n  destination: \"./output.md\"        # SLOT: where the result lands\n\npermits:                            # the blast radius · default-deny once present\n  tools: [\"nika:read\", \"nika:write\"]\n  # Two literal paths, one each way. `check` can read these (they come from\n  # `const:`) and proves them against the boundary before anything runs — keep",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/classify-and-route.nika",
-          "line": 64,
-          "startLine": 61,
-          "endLine": 70,
+          "line": 65,
+          "startLine": 62,
+          "endLine": 71,
           "excerpt": "    evidence:\n      - key: urgency\n        value: 1\n        source: classifier\n        observed_at: \"2027-01-01T00:00:00Z\"\n        digest: fixture-urgency\n        confidentiality: internal\n        integrity: observed\n        quality: { freshness: fresh, completeness: complete, independence_group: classifier }\n",
           "matchKind": "literal-key-occurrence"
         },
@@ -5933,9 +5933,9 @@
       "examples": [
         {
           "path": "templates/agent-loop.nika",
-          "line": 84,
-          "startLine": 81,
-          "endLine": 90,
+          "line": 85,
+          "startLine": 82,
+          "endLine": 91,
           "excerpt": "      # repair within its configured retry allowance and task budgets.\n      # A valid result shape does not prove the promised work was performed;\n      # retain an independent check of the facts or artifacts you require.\n      system: \"You are a careful analyst. Work the plan step by step and report what you actually found.\"   # SLOT\n      prompt: |\n        Goal · ${{ with.goal }}\n        Plan · ${{ with.steps }}\n      tools:                        # SLOT: the MINIMUM grant for the job\n        # Pure compute — this pair needs no filesystem, so the skeleton runs\n        # anywhere. Granting the agent a tool here is only HALF a grant: every",
           "matchKind": "literal-key-occurrence"
         }
@@ -5976,9 +5976,9 @@
       "examples": [
         {
           "path": "templates/agent-loop.nika",
-          "line": 49,
-          "startLine": 46,
-          "endLine": 55,
+          "line": 50,
+          "startLine": 47,
+          "endLine": 56,
           "excerpt": "  # two the agent may call. No `fs:` — see the note on `tools:` below.\n  tools: [\"nika:assert\", \"nika:done\", \"nika:jq\"]\n\ntasks:\n  plan:\n    infer:\n      prompt: \"Break '${{ inputs.goal }}' into at most 4 concrete steps.\"   # SLOT\n      # SLOT: the spend ceiling for the planning call. Size it for the SEAT,\n      # not for the answer: a reasoning model spends tokens thinking before\n      # it emits the first brace, and a ceiling that cuts it off mid-thought",
           "matchKind": "literal-key-occurrence"
         },
@@ -6008,25 +6008,25 @@
         },
         {
           "path": "templates/chain.nika",
-          "line": 44,
-          "startLine": 41,
-          "endLine": 50,
+          "line": 45,
+          "startLine": 42,
+          "endLine": 51,
           "excerpt": "    read: [\"./README.md\"]     # SLOT: same path as const.source\n    write: [\"./output.md\"]    # SLOT: same path as const.destination\n\ntasks:\n  gather:\n    invoke:                         # SLOT: the fact source · nika:read / nika:fetch / exec\n      tool: \"nika:read\"\n      args: { path: \"${{ const.source }}\" }\n    on_error:\n      # Offline rehearsal. A freshly scaffolded directory has no README, and a",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/classify-and-route.nika",
-          "line": 74,
-          "startLine": 71,
-          "endLine": 80,
+          "line": 75,
+          "startLine": 72,
+          "endLine": 81,
           "excerpt": "permits:\n  tools: [\"nika:jq\", \"nika:decide\", \"nika:assert\"]\n\ntasks:\n  extract_facts:\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 300                # SLOT: classification spend ceiling\n      prompt: |\n        Extract the urgency fact from this request. Use 1 only for an active",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/corpus-qa.nika",
-          "line": 29,
-          "startLine": 26,
-          "endLine": 35,
+          "line": 30,
+          "startLine": 27,
+          "endLine": 36,
           "excerpt": "permits:\n  tools: [\"nika:jq\", \"nika:assert\"]\n\ntasks:\n  conflicting_ids:\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ const.documents }}\n        expression: 'sort_by(.id) | group_by(.id) | map(select((map(.text) | unique | length) > 1) | .[0].id)'",
           "matchKind": "literal-key-occurrence"
         },
@@ -6040,17 +6040,17 @@
         },
         {
           "path": "templates/docker-report.nika",
-          "line": 43,
-          "startLine": 40,
-          "endLine": 49,
+          "line": 44,
+          "startLine": 41,
+          "endLine": 50,
           "excerpt": "    write:\n      - \"./docker-health.md\"        # SLOT: where the report lands (must match `keep`)\n\ntasks:\n  # The reads run IN PARALLEL (no edges between them) — the\n  # scheduler proves it from the DAG, nobody orders it.\n  ps:\n    exec:\n      # SLOT: argv ARRAY form — one program, exactly these arguments. The array\n      # is why there is no shell here: no word-splitting, no globbing, nothing",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/document-to-fields.nika",
-          "line": 35,
-          "startLine": 32,
-          "endLine": 41,
+          "line": 36,
+          "startLine": 33,
+          "endLine": 42,
           "excerpt": "permits:\n  tools: [\"nika:jq\", \"nika:assert\"]\n\ntasks:\n  normalize_document:\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ const.document }}\n        expression: 'gsub(\"^\\\\s+|\\\\s+$\"; \"\")'",
           "matchKind": "literal-key-occurrence"
         },
@@ -6064,17 +6064,17 @@
         },
         {
           "path": "templates/evaluate-and-optimize.nika",
-          "line": 36,
-          "startLine": 33,
-          "endLine": 42,
+          "line": 37,
+          "startLine": 34,
+          "endLine": 43,
           "excerpt": "\npermits: {}\n\ntasks:\n  draft:\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 300               # SLOT: the draft ceiling · sized for the SEAT (see CEILINGS)\n      prompt: \"Draft this deliverable: ${{ const.brief }}\"\n      schema:",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/fanout.nika",
-          "line": 80,
-          "startLine": 77,
-          "endLine": 86,
+          "line": 81,
+          "startLine": 78,
+          "endLine": 87,
           "excerpt": "    # (`./items/**/*.md`) walks deeper and needs `./items/**` for both.\n    read: [\"./items\", \"./items/*\"]\n\ntasks:\n  discover:\n    invoke:                         # SLOT: glob / fetch sitemap / exec + jq split\n      tool: \"nika:glob\"\n      args: { pattern: \"${{ const.collection_source }}/*.md\" }\n\n  # `discover` hands back PATH STRINGS — a prompt that interpolates the raw",
           "matchKind": "literal-key-occurrence"
         },
@@ -6096,9 +6096,9 @@
         },
         {
           "path": "templates/media-asset-pack.nika",
-          "line": 49,
-          "startLine": 46,
-          "endLine": 55,
+          "line": 50,
+          "startLine": 47,
+          "endLine": 56,
           "excerpt": "      - \"./out/assets\"              # SLOT: keep in step with const.out_dir\n      - \"./out/assets/*\"            # SLOT: idem · the files that land inside it\n\ntasks:\n  brief:\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 600\n      # SLOT: the creative direction · style · constraints. Keep slot markers\n      # out of the block below — it is prompt TEXT, not YAML, so a stray",
           "matchKind": "literal-key-occurrence"
         },
@@ -6144,9 +6144,9 @@
         },
         {
           "path": "templates/website-brief.nika",
-          "line": 45,
-          "startLine": 42,
-          "endLine": 51,
+          "line": 46,
+          "startLine": 43,
+          "endLine": 52,
           "excerpt": "  fs: { write: [\"./out/brief.json\"] }   # SLOT: the one file · keep in step with const.out_path\n                                        #   (the infer step needs no grant — it is pure compute)\n\ntasks:\n  crawl_site:\n    invoke:\n      tool: \"nika:fetch\"\n      args:\n        url: \"${{ const.site_url }}\"\n        traverse: { max_pages: 5 }  # SLOT: crawl bound · 1..=25 (robots honored)",
           "matchKind": "literal-key-occurrence"
         }
@@ -6279,9 +6279,9 @@
         },
         {
           "path": "templates/fanout.nika",
-          "line": 116,
-          "startLine": 113,
-          "endLine": 122,
+          "line": 117,
+          "startLine": 114,
+          "endLine": 123,
           "excerpt": "      items: \"${{ with.read == null ? [] : with.read }}\"\n      max_parallel: 4                 # SLOT: the polite ceiling\n      fail_fast: false\n    timeout: \"60s\"                  # SLOT: per-iteration bound\n    retry:\n      max_attempts: 3\n      backoff_strategy: exponential\n      jitter: true\n    on_error:\n      recover: null                 # a failed item yields null at its index · the batch lives",
           "matchKind": "literal-key-occurrence"
         },
@@ -6395,9 +6395,9 @@
       "examples": [
         {
           "path": "templates/agent-loop.nika",
-          "line": 125,
-          "startLine": 122,
-          "endLine": 131,
+          "line": 126,
+          "startLine": 123,
+          "endLine": 132,
           "excerpt": "      # answer: that gap closes upstream, by binding the goal into the agent.\n      has_findings: ${{ size(tasks.execute.output.findings) > 0 }}   # the check crosses as ONE boundary expression · SLOT: your law\n    invoke:\n      tool: \"nika:assert\"\n      args:\n        condition: \"${{ with.has_findings }}\"\n        message: \"Agent returned no findings, do not trust an empty run\"   # SLOT\n\noutputs:\n  findings:",
           "matchKind": "literal-key-occurrence"
         },
@@ -6427,25 +6427,25 @@
         },
         {
           "path": "templates/chain.nika",
-          "line": 47,
-          "startLine": 44,
-          "endLine": 53,
+          "line": 48,
+          "startLine": 45,
+          "endLine": 54,
           "excerpt": "tasks:\n  gather:\n    invoke:                         # SLOT: the fact source · nika:read / nika:fetch / exec\n      tool: \"nika:read\"\n      args: { path: \"${{ const.source }}\" }\n    on_error:\n      # Offline rehearsal. A freshly scaffolded directory has no README, and a\n      # skeleton that dies on its first run teaches nothing — so a not-found\n      # recovers into a literal standing in for the real document. `on_codes:`\n      # keeps that narrow: ONLY not-found is forgiven, a permission error",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/classify-and-route.nika",
-          "line": 95,
-          "startLine": 92,
-          "endLine": 101,
+          "line": 96,
+          "startLine": 93,
+          "endLine": 102,
           "excerpt": "    with:\n      facts: ${{ tasks.extract_facts.output }}\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ with.facts }}\n        expression: '{t: \"2027-01-01T00:00:00Z\", evidence: [{key: \"urgency\", value: .urgency, source: \"classifier\", observed_at: \"2027-01-01T00:00:00Z\", digest: \"runtime-urgency\", confidentiality: \"internal\", integrity: \"observed\", quality: {freshness: \"fresh\", completeness: \"complete\", independence_group: \"classifier\"}}]}'\n\n  decide:\n    with:",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/corpus-qa.nika",
-          "line": 32,
-          "startLine": 29,
-          "endLine": 38,
+          "line": 33,
+          "startLine": 30,
+          "endLine": 39,
           "excerpt": "tasks:\n  conflicting_ids:\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ const.documents }}\n        expression: 'sort_by(.id) | group_by(.id) | map(select((map(.text) | unique | length) > 1) | .[0].id)'\n\n  duplicates_consistent:\n    with:",
           "matchKind": "literal-key-occurrence"
         },
@@ -6459,17 +6459,17 @@
         },
         {
           "path": "templates/docker-report.nika",
-          "line": 89,
-          "startLine": 86,
-          "endLine": 95,
+          "line": 90,
+          "startLine": 87,
+          "endLine": 96,
           "excerpt": "    with:\n      diagnose: ${{ tasks.diagnose.output }}\n    invoke:\n      tool: \"nika:write\"\n      args:\n        path: \"./docker-health.md\"  # SLOT: same path as permits.fs.write\n        content: \"${{ with.diagnose }}\"\n    on_error:\n      # Golden rehearsal · `nika test` refuses effects (NIKA-452) — the pin\n      # lane recovers into this marker (outputs.report pins it · honest and",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/document-to-fields.nika",
-          "line": 38,
-          "startLine": 35,
-          "endLine": 44,
+          "line": 39,
+          "startLine": 36,
+          "endLine": 45,
           "excerpt": "tasks:\n  normalize_document:\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ const.document }}\n        expression: 'gsub(\"^\\\\s+|\\\\s+$\"; \"\")'\n\n  document_nonempty:\n    with:",
           "matchKind": "literal-key-occurrence"
         },
@@ -6483,9 +6483,9 @@
         },
         {
           "path": "templates/fanout.nika",
-          "line": 83,
-          "startLine": 80,
-          "endLine": 89,
+          "line": 84,
+          "startLine": 81,
+          "endLine": 90,
           "excerpt": "tasks:\n  discover:\n    invoke:                         # SLOT: glob / fetch sitemap / exec + jq split\n      tool: \"nika:glob\"\n      args: { pattern: \"${{ const.collection_source }}/*.md\" }\n\n  # `discover` hands back PATH STRINGS — a prompt that interpolates the raw\n  # item shows the model a FILENAME, never the file (measured: a green run\n  # whose fluent « report » was invented from the names alone — check, mock\n  # rehearsal and run all green around it). Reading the item is its own fan.",
           "matchKind": "literal-key-occurrence"
         },
@@ -6507,9 +6507,9 @@
         },
         {
           "path": "templates/media-asset-pack.nika",
-          "line": 71,
-          "startLine": 68,
-          "endLine": 77,
+          "line": 72,
+          "startLine": 69,
+          "endLine": 78,
           "excerpt": "    with:\n      brief_image_prompt: ${{ tasks.brief.output.image_prompt }}\n    invoke:\n      tool: \"nika:image_generate\"\n      args:\n        provider: mock              # SLOT: local | openai | gemini | xai (local/mock first)\n        prompt: \"${{ with.brief_image_prompt }}\"\n        output_dir: \"${{ const.out_dir }}\"\n        filename_prefix: \"asset\"    # SLOT: filename stem\n    on_error:",
           "matchKind": "literal-key-occurrence"
         },
@@ -6555,10 +6555,10 @@
         },
         {
           "path": "templates/website-brief.nika",
-          "line": 48,
-          "startLine": 45,
-          "endLine": 54,
-          "excerpt": "tasks:\n  crawl_site:\n    invoke:\n      tool: \"nika:fetch\"\n      args:\n        url: \"${{ const.site_url }}\"\n        traverse: { max_pages: 5 }  # SLOT: crawl bound · 1..=25 (robots honored)\n    on_error:\n      # Offline rehearsal · a literal standing in for the crawl digest, so the\n      # brief step runs with no network at all. Delete once the site is real.",
+          "line": 49,
+          "startLine": 46,
+          "endLine": 55,
+          "excerpt": "tasks:\n  crawl_site:\n    invoke:\n      tool: \"nika:fetch\"\n      args:\n        url: \"${{ const.site_url }}\"\n        traverse: { max_pages: 5 }  # SLOT: crawl bound · 1..=25 (robots honored)\n    on_error:\n      # Rehearsal stand-in · when the crawl fails (no network, a dead host),\n      # this literal stands in for the crawl digest so the brief step still",
           "matchKind": "literal-key-occurrence"
         }
       ]
@@ -6612,9 +6612,9 @@
       "examples": [
         {
           "path": "templates/agent-loop.nika",
-          "line": 47,
-          "startLine": 44,
-          "endLine": 53,
+          "line": 48,
+          "startLine": 45,
+          "endLine": 54,
           "excerpt": "permits:                            # the blast radius · default-deny once present\n  # Exactly what the body invokes: `nika:assert` (the confirm task) plus the\n  # two the agent may call. No `fs:` — see the note on `tools:` below.\n  tools: [\"nika:assert\", \"nika:done\", \"nika:jq\"]\n\ntasks:\n  plan:\n    infer:\n      prompt: \"Break '${{ inputs.goal }}' into at most 4 concrete steps.\"   # SLOT\n      # SLOT: the spend ceiling for the planning call. Size it for the SEAT,",
           "matchKind": "literal-key-occurrence"
         },
@@ -6644,25 +6644,25 @@
         },
         {
           "path": "templates/chain.nika",
-          "line": 36,
-          "startLine": 33,
-          "endLine": 42,
+          "line": 37,
+          "startLine": 34,
+          "endLine": 43,
           "excerpt": "  destination: \"./output.md\"        # SLOT: where the result lands\n\npermits:                            # the blast radius · default-deny once present\n  tools: [\"nika:read\", \"nika:write\"]\n  # Two literal paths, one each way. `check` can read these (they come from\n  # `const:`) and proves them against the boundary before anything runs — keep\n  # them in step with the two `const:` entries above.\n  fs:\n    read: [\"./README.md\"]     # SLOT: same path as const.source\n    write: [\"./output.md\"]    # SLOT: same path as const.destination",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/classify-and-route.nika",
-          "line": 72,
-          "startLine": 69,
-          "endLine": 78,
+          "line": 73,
+          "startLine": 70,
+          "endLine": 79,
           "excerpt": "        quality: { freshness: fresh, completeness: complete, independence_group: classifier }\n\npermits:\n  tools: [\"nika:jq\", \"nika:decide\", \"nika:assert\"]\n\ntasks:\n  extract_facts:\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 300                # SLOT: classification spend ceiling",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/corpus-qa.nika",
-          "line": 27,
-          "startLine": 24,
-          "endLine": 33,
+          "line": 28,
+          "startLine": 25,
+          "endLine": 34,
           "excerpt": "    - { id: handbook, text: \"Support hours are 09:00 to 17:00 UTC.\" }\n\npermits:\n  tools: [\"nika:jq\", \"nika:assert\"]\n\ntasks:\n  conflicting_ids:\n    invoke:\n      tool: nika:jq\n      args:",
           "matchKind": "literal-key-occurrence"
         },
@@ -6676,17 +6676,17 @@
         },
         {
           "path": "templates/docker-report.nika",
-          "line": 37,
-          "startLine": 34,
-          "endLine": 43,
+          "line": 38,
+          "startLine": 35,
+          "endLine": 44,
           "excerpt": "permits:                            # the blast radius · default-deny once present\n  exec:\n    - \"docker\"                      # SLOT: the ONE program the reads may launch\n  tools:\n    - \"nika:write\"\n  fs:\n    write:\n      - \"./docker-health.md\"        # SLOT: where the report lands (must match `keep`)\n\ntasks:",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/document-to-fields.nika",
-          "line": 33,
-          "startLine": 30,
-          "endLine": 39,
+          "line": 34,
+          "startLine": 31,
+          "endLine": 40,
           "excerpt": "    Rehearsal marker: mock\n\npermits:\n  tools: [\"nika:jq\", \"nika:assert\"]\n\ntasks:\n  normalize_document:\n    invoke:\n      tool: nika:jq\n      args:",
           "matchKind": "literal-key-occurrence"
         },
@@ -6700,9 +6700,9 @@
         },
         {
           "path": "templates/fanout.nika",
-          "line": 66,
-          "startLine": 63,
-          "endLine": 72,
+          "line": 67,
+          "startLine": 64,
+          "endLine": 73,
           "excerpt": "  law_cases: [\"kept\", null, \"also kept\"]\n\npermits:\n  tools: [\"nika:assert\", \"nika:glob\", \"nika:jq\", \"nika:read\"]\n  fs:\n    # TWO entries, and both earn their place. `nika:glob` is gated on the\n    # DIRECTORY it walks, not on the files it returns — measured: with\n    # `./items/*.md` here (the pattern) the run dies `NIKA-SEC-004 ·\n    # ./items resolves outside the declared permits.fs.read boundary`,\n    # because `*` never crosses `/` and so never matches `./items` itself.",
           "matchKind": "literal-key-occurrence"
         },
@@ -6724,9 +6724,9 @@
         },
         {
           "path": "templates/media-asset-pack.nika",
-          "line": 37,
-          "startLine": 34,
-          "endLine": 43,
+          "line": 38,
+          "startLine": 35,
+          "endLine": 44,
           "excerpt": "  out_dir: \"./out/assets\"           # SLOT: where assets land\n\npermits:                            # the blast radius · default-deny once present\n  tools: [\"nika:image_generate\", \"nika:jq\", \"nika:write\"]\n  fs:\n    write:\n      # Two entries, and both earn their place: `check` judges the `output_dir:`\n      # ARGUMENT (`./out/assets`), while the RUN gates every FINAL file path under\n      # it — the asset, its provenance manifest, and manifest.json. Grant only the\n      # directory and the file sails through check, then dies at run on the first",
           "matchKind": "literal-key-occurrence"
         },
@@ -6772,9 +6772,9 @@
         },
         {
           "path": "templates/website-brief.nika",
-          "line": 38,
-          "startLine": 35,
-          "endLine": 44,
+          "line": 39,
+          "startLine": 36,
+          "endLine": 45,
           "excerpt": "  out_path: \"./out/brief.json\"      # SLOT: where the brief lands\n\npermits:                            # the blast radius · default-deny once present\n  tools: [\"nika:fetch\", \"nika:write\"]\n  net: { http: [\"example.com\"] }    # SLOT: the host from const.site_url. ONE entry is\n                                    #   enough — `traverse:` is a same-origin BFS (+ the\n                                    #   robots probe), so the crawl never leaves this host.\n  fs: { write: [\"./out/brief.json\"] }   # SLOT: the one file · keep in step with const.out_path\n                                        #   (the infer step needs no grant — it is pure compute)\n",
           "matchKind": "literal-key-occurrence"
         }
@@ -6827,9 +6827,9 @@
       "examples": [
         {
           "path": "templates/agent-loop.nika",
-          "line": 36,
-          "startLine": 33,
-          "endLine": 42,
+          "line": 37,
+          "startLine": 34,
+          "endLine": 43,
           "excerpt": "\ninputs:\n  goal:\n    type: string\n    required: true\n    # A `required:` input still carries a `default:` here so the skeleton\n    # RUNS the moment it is scaffolded. Replace the default with your job;\n    # `--var goal=…` overrides it at any time.\n    default: \"<SLOT: what the agent must accomplish>\"\n    description: \"What the agent must accomplish\"   # SLOT",
           "matchKind": "literal-key-occurrence"
         },
@@ -6851,17 +6851,17 @@
         },
         {
           "path": "templates/classify-and-route.nika",
-          "line": 30,
-          "startLine": 27,
-          "endLine": 36,
+          "line": 31,
+          "startLine": 28,
+          "endLine": 37,
           "excerpt": "      valid_until: \"2028-01-01T00:00:00Z\"\n    evidence_schema:\n      urgency:\n        type: integer\n        required: true\n        sources: [classifier]\n        integrity: observed\n    transforms:\n      urgency_step:\n        kind: bucket",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/corpus-qa.nika",
-          "line": 104,
-          "startLine": 101,
-          "endLine": 110,
+          "line": 105,
+          "startLine": 102,
+          "endLine": 111,
           "excerpt": "        Question: ${{ const.query }}\n        Passages: ${{ with.hits }}\n      schema:\n        type: object\n        additionalProperties: false\n        required: [answer, citations]\n        properties:\n          answer: { type: string, minLength: 1 }\n          citations: { type: array, minItems: 1, items: { type: string } }\n",
           "matchKind": "literal-key-occurrence"
         },
@@ -6875,25 +6875,25 @@
         },
         {
           "path": "templates/document-to-fields.nika",
-          "line": 66,
-          "startLine": 63,
-          "endLine": 72,
+          "line": 67,
+          "startLine": 64,
+          "endLine": 73,
           "excerpt": "\n        ${{ with.document }}\n      schema:\n        type: object\n        additionalProperties: false\n        required: [fields]\n        properties:\n          fields:\n            type: array\n            minItems: 1",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/evaluate-and-optimize.nika",
-          "line": 43,
-          "startLine": 40,
-          "endLine": 49,
+          "line": 44,
+          "startLine": 41,
+          "endLine": 50,
           "excerpt": "      max_tokens: 300               # SLOT: the draft ceiling · sized for the SEAT (see CEILINGS)\n      prompt: \"Draft this deliverable: ${{ const.brief }}\"\n      schema:\n        type: object\n        additionalProperties: false\n        required: [text]\n        properties:\n          text: { type: string, minLength: 1 }\n\n  evaluate_1:",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/media-asset-pack.nika",
-          "line": 61,
-          "startLine": 58,
-          "endLine": 67,
+          "line": 62,
+          "startLine": 59,
+          "endLine": 68,
           "excerpt": "        Write one vivid, concrete image prompt for: ${{ const.subject }}.\n        No text in the image · no watermark · a calm central zone.\n      schema:\n        type: object\n        additionalProperties: false\n        properties:\n          image_prompt: { type: string }\n        required: [image_prompt]\n\n  render:",
           "matchKind": "literal-key-occurrence"
         },
@@ -6939,9 +6939,9 @@
         },
         {
           "path": "templates/website-brief.nika",
-          "line": 72,
-          "startLine": 69,
-          "endLine": 78,
+          "line": 74,
+          "startLine": 71,
+          "endLine": 80,
           "excerpt": "        colors and image assets.\n        Crawl digest · ${{ with.crawl_site }}\n      schema:                       # SLOT: the typed shape downstream tasks rely on\n        type: object\n        additionalProperties: false\n        properties:\n          domain: { type: string }\n          theme: { type: string }\n          audience: { type: string }\n          colors: { type: array, items: { type: string } }",
           "matchKind": "literal-key-occurrence"
         }
@@ -7009,7 +7009,7 @@
           "line": 106,
           "startLine": 103,
           "endLine": 112,
-          "excerpt": "    invoke:\n      tool: \"nika:fetch\"            # SLOT: fetch / read / exec · the fresh data\n      args:\n        url: \"${{ const.source_url }}\"\n        mode: jq\n        jq: \".records\"\n    on_error:\n      recover: []                   # offline rehearsal · an empty batch, the delta stays quiet\n\n  delta:",
+          "excerpt": "    invoke:\n      tool: \"nika:fetch\"            # SLOT: fetch / read / exec · the fresh data\n      args:\n        url: \"${{ const.source_url }}\"\n        mode: jq\n        jq: \".records\"\n    on_error:\n      recover: []                   # the fetch failed · an empty batch, the delta stays quiet\n\n  delta:",
           "matchKind": "literal-key-occurrence"
         },
         {
@@ -7017,15 +7017,15 @@
           "line": 55,
           "startLine": 52,
           "endLine": 61,
-          "excerpt": "    invoke:\n      tool: \"nika:fetch\"\n      args:\n        url: \"${{ const.source_url }}\"\n        mode: jq\n        jq: \".\"\n    extract:\n      value: \".value\"               # SLOT: the jq path to the watched field\n    on_error:\n      # Offline rehearsal · a sample UNDER the threshold — the gate stays",
+          "excerpt": "    invoke:\n      tool: \"nika:fetch\"\n      args:\n        url: \"${{ const.source_url }}\"\n        mode: jq\n        jq: \".\"\n    extract:\n      value: \".value\"               # SLOT: the jq path to the watched field\n    on_error:\n      # Rehearsal stand-in · the placeholder host resolves nowhere, so a sample",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/website-brief.nika",
-          "line": 50,
-          "startLine": 47,
-          "endLine": 56,
-          "excerpt": "    invoke:\n      tool: \"nika:fetch\"\n      args:\n        url: \"${{ const.site_url }}\"\n        traverse: { max_pages: 5 }  # SLOT: crawl bound · 1..=25 (robots honored)\n    on_error:\n      # Offline rehearsal · a literal standing in for the crawl digest, so the\n      # brief step runs with no network at all. Delete once the site is real.\n      recover: \"REHEARSAL DIGEST · Example Co · a small tool company · plain blue and white pages · buttons, a pricing table, one logo.\"\n",
+          "line": 51,
+          "startLine": 48,
+          "endLine": 57,
+          "excerpt": "    invoke:\n      tool: \"nika:fetch\"\n      args:\n        url: \"${{ const.site_url }}\"\n        traverse: { max_pages: 5 }  # SLOT: crawl bound · 1..=25 (robots honored)\n    on_error:\n      # Rehearsal stand-in · when the crawl fails (no network, a dead host),\n      # this literal stands in for the crawl digest so the brief step still\n      # runs. Delete once the site is real.\n      recover: \"REHEARSAL DIGEST · Example Co · a small tool company · plain blue and white pages · buttons, a pricing table, one logo.\"",
           "matchKind": "literal-key-occurrence"
         }
       ]
@@ -7063,33 +7063,33 @@
       "examples": [
         {
           "path": "templates/agent-loop.nika",
-          "line": 132,
-          "startLine": 129,
-          "endLine": 133,
+          "line": 133,
+          "startLine": 130,
+          "endLine": 134,
           "excerpt": "\noutputs:\n  findings:\n    value: ${{ tasks.execute.output.findings }}\n    description: \"The agent's typed findings\"   # SLOT",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/classify-and-route.nika",
-          "line": 63,
-          "startLine": 60,
-          "endLine": 69,
+          "line": 64,
+          "startLine": 61,
+          "endLine": 70,
           "excerpt": "    t: \"2027-01-01T00:00:00Z\"\n    evidence:\n      - key: urgency\n        value: 1\n        source: classifier\n        observed_at: \"2027-01-01T00:00:00Z\"\n        digest: fixture-urgency\n        confidentiality: internal\n        integrity: observed\n        quality: { freshness: fresh, completeness: complete, independence_group: classifier }",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/docker-report.nika",
-          "line": 102,
-          "startLine": 99,
-          "endLine": 103,
+          "line": 103,
+          "startLine": 100,
+          "endLine": 104,
           "excerpt": "\noutputs:\n  report:\n    value: ${{ tasks.keep.output }}\n    description: \"Where the report landed — nika:write hands back the path it wrote\"",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/document-to-fields.nika",
-          "line": 79,
-          "startLine": 76,
-          "endLine": 85,
+          "line": 80,
+          "startLine": 77,
+          "endLine": 86,
           "excerpt": "              required: [name, value, anchor]\n              properties:\n                name: { type: string, minLength: 1 }\n                value: { type: string, minLength: 1 }\n                anchor: { type: string, minLength: 1 }\n\n  anchors_present:\n    with:\n      fields: ${{ tasks.extract.output.fields }}\n      document: ${{ tasks.normalize_document.output }}",
           "matchKind": "literal-key-occurrence"
         },
@@ -7106,7 +7106,7 @@
           "line": 59,
           "startLine": 56,
           "endLine": 65,
-          "excerpt": "        mode: jq\n        jq: \".\"\n    extract:\n      value: \".value\"               # SLOT: the jq path to the watched field\n    on_error:\n      # Offline rehearsal · a sample UNDER the threshold — the gate stays\n      # closed, the skeleton runs green before you wire the real source.\n      recover: { value: 42 }\n\n  act:",
+          "excerpt": "        mode: jq\n        jq: \".\"\n    extract:\n      value: \".value\"               # SLOT: the jq path to the watched field\n    on_error:\n      # Rehearsal stand-in · the placeholder host resolves nowhere, so a sample\n      # UNDER the threshold takes over — the gate stays closed, the skeleton\n      # runs green before you wire the real source.\n      recover: { value: 42 }\n",
           "matchKind": "literal-key-occurrence"
         }
       ]
@@ -7221,9 +7221,9 @@
       "examples": [
         {
           "path": "templates/corpus-qa.nika",
-          "line": 95,
-          "startLine": 92,
-          "endLine": 101,
+          "line": 96,
+          "startLine": 93,
+          "endLine": 102,
           "excerpt": "  answer:\n    with:\n      hits: ${{ tasks.retrieve.output }}\n    when: ${{ size(with.hits) > 0 }}\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 500                # SLOT: answer spend ceiling\n      prompt: |\n        Answer from these passages only and cite their ids.\n        Question: ${{ const.query }}",
           "matchKind": "literal-key-occurrence"
         },
@@ -7237,9 +7237,9 @@
         },
         {
           "path": "templates/gate-and-act.nika",
-          "line": 69,
-          "startLine": 66,
-          "endLine": 75,
+          "line": 70,
+          "startLine": 67,
+          "endLine": 76,
           "excerpt": "    with:\n      value: ${{ tasks.check.value }}   # the binding IS the edge · check → act\n    # when: is a SKIP gate — routing, not failure (a skipped task is not an error)\n    when: ${{ with.value > const.threshold }}   # SLOT: the CEL condition\n    invoke:\n      tool: \"nika:notify\"           # SLOT: the action · notify / write / exec\n      args:\n        channel: webhook\n        target: \"${{ secrets.webhook }}\"\n        message: \"Threshold crossed · ${{ with.value }}\"   # SLOT",
           "matchKind": "literal-key-occurrence"
         },
@@ -7287,9 +7287,9 @@
       "examples": [
         {
           "path": "templates/agent-loop.nika",
-          "line": 68,
-          "startLine": 65,
-          "endLine": 74,
+          "line": 69,
+          "startLine": 66,
+          "endLine": 75,
           "excerpt": "          steps: { type: array, items: { type: string } }\n\n  execute:\n    with:\n      # BOTH bindings, on purpose. The plan is a summary of the goal, never a\n      # substitute for it: measured on five real seats, a prompt that carried\n      # only the plan produced three GREEN runs with an invented or an empty\n      # answer — the agent was asked to compute over data it never received,\n      # and the assert below only proves non-emptiness. The goal rides in.\n      goal: ${{ inputs.goal }}",
           "matchKind": "literal-key-occurrence"
         },
@@ -7311,25 +7311,25 @@
         },
         {
           "path": "templates/chain.nika",
-          "line": 62,
-          "startLine": 59,
-          "endLine": 68,
+          "line": 63,
+          "startLine": 60,
+          "endLine": 69,
           "excerpt": "      recover: \"REHEARSAL · no source document here yet.\"\n\n  think:\n    with:\n      gather: ${{ tasks.gather.output }}\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 800               # SLOT: the spend ceiling · sized for the SEAT, not the answer\n      # The marker below is a VALUE, not a comment. The parser drops\n      # comments, so a `# SLOT:` line could never make `check` refuse —",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/classify-and-route.nika",
-          "line": 92,
-          "startLine": 89,
-          "endLine": 98,
+          "line": 93,
+          "startLine": 90,
+          "endLine": 99,
           "excerpt": "          urgency: { type: integer, enum: [0, 1] }\n\n  snapshot:\n    with:\n      facts: ${{ tasks.extract_facts.output }}\n    invoke:\n      tool: nika:jq\n      args:\n        input: ${{ with.facts }}\n        expression: '{t: \"2027-01-01T00:00:00Z\", evidence: [{key: \"urgency\", value: .urgency, source: \"classifier\", observed_at: \"2027-01-01T00:00:00Z\", digest: \"runtime-urgency\", confidentiality: \"internal\", integrity: \"observed\", quality: {freshness: \"fresh\", completeness: \"complete\", independence_group: \"classifier\"}}]}'",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/corpus-qa.nika",
-          "line": 38,
-          "startLine": 35,
-          "endLine": 44,
+          "line": 39,
+          "startLine": 36,
+          "endLine": 45,
           "excerpt": "        expression: 'sort_by(.id) | group_by(.id) | map(select((map(.text) | unique | length) > 1) | .[0].id)'\n\n  duplicates_consistent:\n    with:\n      conflicting_ids: ${{ tasks.conflicting_ids.output }}\n    invoke:\n      tool: nika:assert\n      args:\n        condition: ${{ size(with.conflicting_ids) == 0 }}\n        message: \"One corpus id names conflicting source text\"",
           "matchKind": "literal-key-occurrence"
         },
@@ -7343,17 +7343,17 @@
         },
         {
           "path": "templates/docker-report.nika",
-          "line": 65,
-          "startLine": 62,
-          "endLine": 71,
+          "line": 66,
+          "startLine": 63,
+          "endLine": 72,
           "excerpt": "      recover: \"REHEARSAL · disk usage unavailable without a daemon\"\n\n  diagnose:\n    with:\n      ps: ${{ tasks.ps.output }}\n      df: ${{ tasks.df.output }}\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 2000              # SLOT: the spend ceiling for this call · think block + report\n      # SLOT: what should the model DO with the readings? Keep slot markers out",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/document-to-fields.nika",
-          "line": 44,
-          "startLine": 41,
-          "endLine": 50,
+          "line": 45,
+          "startLine": 42,
+          "endLine": 51,
           "excerpt": "        expression: 'gsub(\"^\\\\s+|\\\\s+$\"; \"\")'\n\n  document_nonempty:\n    with:\n      document: ${{ tasks.normalize_document.output }}\n    invoke:\n      tool: nika:assert\n      args:\n        condition: ${{ size(with.document) > 0 }}\n        message: \"Document is empty after whitespace is trimmed\"",
           "matchKind": "literal-key-occurrence"
         },
@@ -7367,25 +7367,25 @@
         },
         {
           "path": "templates/evaluate-and-optimize.nika",
-          "line": 50,
-          "startLine": 47,
-          "endLine": 56,
+          "line": 51,
+          "startLine": 48,
+          "endLine": 57,
           "excerpt": "          text: { type: string, minLength: 1 }\n\n  evaluate_1:\n    with:\n      candidate: ${{ tasks.draft.output.text }}\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 400               # SLOT: the critique ceiling · check refuses a reasoning seat under 256 (measured)\n      prompt: |\n        Critique this candidate against the brief. Name one concrete repair.",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/fanout.nika",
-          "line": 94,
-          "startLine": 91,
-          "endLine": 100,
+          "line": 95,
+          "startLine": 92,
+          "endLine": 101,
           "excerpt": "  # already ARE the content (an inline list · fetched records). Need each\n  # content paired with its path? `resume-screener` shows the transpose.\n  read:\n    with:\n      discover: ${{ tasks.discover.output }}\n    for_each:\n      items: ${{ with.discover }}\n      max_parallel: 8\n      fail_fast: false\n    on_error:",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/gate-and-act.nika",
-          "line": 66,
-          "startLine": 63,
-          "endLine": 72,
+          "line": 67,
+          "startLine": 64,
+          "endLine": 73,
           "excerpt": "      recover: { value: 42 }\n\n  act:\n    with:\n      value: ${{ tasks.check.value }}   # the binding IS the edge · check → act\n    # when: is a SKIP gate — routing, not failure (a skipped task is not an error)\n    when: ${{ with.value > const.threshold }}   # SLOT: the CEL condition\n    invoke:\n      tool: \"nika:notify\"           # SLOT: the action · notify / write / exec\n      args:",
           "matchKind": "literal-key-occurrence"
         },
@@ -7399,9 +7399,9 @@
         },
         {
           "path": "templates/media-asset-pack.nika",
-          "line": 68,
-          "startLine": 65,
-          "endLine": 74,
+          "line": 69,
+          "startLine": 66,
+          "endLine": 75,
           "excerpt": "        required: [image_prompt]\n\n  render:\n    with:\n      brief_image_prompt: ${{ tasks.brief.output.image_prompt }}\n    invoke:\n      tool: \"nika:image_generate\"\n      args:\n        provider: mock              # SLOT: local | openai | gemini | xai (local/mock first)\n        prompt: \"${{ with.brief_image_prompt }}\"",
           "matchKind": "literal-key-occurrence"
         },
@@ -7447,9 +7447,9 @@
         },
         {
           "path": "templates/website-brief.nika",
-          "line": 58,
-          "startLine": 55,
-          "endLine": 64,
+          "line": 60,
+          "startLine": 57,
+          "endLine": 66,
           "excerpt": "      recover: \"REHEARSAL DIGEST · Example Co · a small tool company · plain blue and white pages · buttons, a pricing table, one logo.\"\n\n  brief:\n    with:\n      crawl_site: ${{ tasks.crawl_site.output }}\n    infer:\n      # a reasoning model needs 16384 here, or a documented run.reasoning.effort: low\n      max_tokens: 1200\n      # SLOT: the one model job · what should the brief capture? Keep slot\n      # markers out of the block below — it is prompt TEXT, not YAML, so a",
           "matchKind": "literal-key-occurrence"
         }
@@ -7499,17 +7499,17 @@
       "examples": [
         {
           "path": "templates/chain.nika",
-          "line": 42,
-          "startLine": 39,
-          "endLine": 48,
+          "line": 43,
+          "startLine": 40,
+          "endLine": 49,
           "excerpt": "  # them in step with the two `const:` entries above.\n  fs:\n    read: [\"./README.md\"]     # SLOT: same path as const.source\n    write: [\"./output.md\"]    # SLOT: same path as const.destination\n\ntasks:\n  gather:\n    invoke:                         # SLOT: the fact source · nika:read / nika:fetch / exec\n      tool: \"nika:read\"\n      args: { path: \"${{ const.source }}\" }",
           "matchKind": "literal-key-occurrence"
         },
         {
           "path": "templates/docker-report.nika",
-          "line": 40,
-          "startLine": 37,
-          "endLine": 46,
+          "line": 41,
+          "startLine": 38,
+          "endLine": 47,
           "excerpt": "  tools:\n    - \"nika:write\"\n  fs:\n    write:\n      - \"./docker-health.md\"        # SLOT: where the report lands (must match `keep`)\n\ntasks:\n  # The reads run IN PARALLEL (no edges between them) — the\n  # scheduler proves it from the DAG, nobody orders it.\n  ps:",
           "matchKind": "literal-key-occurrence"
         },
@@ -7523,9 +7523,9 @@
         },
         {
           "path": "templates/media-asset-pack.nika",
-          "line": 39,
-          "startLine": 36,
-          "endLine": 45,
+          "line": 40,
+          "startLine": 37,
+          "endLine": 46,
           "excerpt": "permits:                            # the blast radius · default-deny once present\n  tools: [\"nika:image_generate\", \"nika:jq\", \"nika:write\"]\n  fs:\n    write:\n      # Two entries, and both earn their place: `check` judges the `output_dir:`\n      # ARGUMENT (`./out/assets`), while the RUN gates every FINAL file path under\n      # it — the asset, its provenance manifest, and manifest.json. Grant only the\n      # directory and the file sails through check, then dies at run on the first\n      # asset. `*` is one segment and never crosses `/`, which is all this needs:\n      # image_generate lands its files flat, so no subtree grant is warranted.",
           "matchKind": "literal-key-occurrence"
         }
