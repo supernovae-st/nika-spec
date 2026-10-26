@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0
+# Labels are not part of v1: the argument is refused, never silently ignored.
+nika: image-compose-unknown-argument-refused
+permits:
+  tools: ["nika:image_compose"]
+  fs:
+    read: ["./out/**"]
+    write: ["./out/**"]
+tasks:
+  sheet:
+    invoke:
+      tool: "nika:image_compose"
+      args:
+        inputs: ["./out/a.png", "./out/b.png"]
+        out: "./out/sheet.png"
+        labels: true

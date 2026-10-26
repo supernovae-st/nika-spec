@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+# The host's own synthesizer speaks: the engine starts it as part of the
+# builtin, so no permits.exec is required. The audio still rides fs.write.
+nika: tts-system-no-exec-grant
+permits:
+  tools: ["nika:tts_generate"]
+  fs: { write: ["./out/speech/**"] }
+tasks:
+  speak:
+    invoke:
+      tool: "nika:tts_generate"
+      args:
+        provider: system
+        text: "The sheet is ready."
+        output_dir: "./out/speech"

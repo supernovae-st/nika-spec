@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: Apache-2.0
+# The input list arrives from a glob at run time: no literal path exists for
+# a static judgment, so the run's boundary judges each resolved input.
+nika: image-compose-dynamic-inputs-deferred
+permits:
+  tools: ["nika:glob", "nika:image_compose"]
+  fs:
+    read: ["./out/frames/**"]
+    write: ["./out/sheet.png"]
+tasks:
+  frames:
+    invoke:
+      tool: "nika:glob"
+      args: { pattern: "./out/frames/*.png" }
+  sheet:
+    with:
+      frames: ${{ tasks.frames.output }}
+    invoke:
+      tool: "nika:image_compose"
+      args:
+        inputs: "${{ with.frames }}"
+        out: "./out/sheet.png"

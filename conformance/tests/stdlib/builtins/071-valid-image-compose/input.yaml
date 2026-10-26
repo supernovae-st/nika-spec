@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: Apache-2.0
+# Four renders become one contact sheet. Every input is a read the boundary
+# contains, and the sheet is a write it contains.
+nika: image-compose-valid
+permits:
+  tools: ["nika:image_compose"]
+  fs:
+    read: ["./out/fx/**"]
+    write: ["./out/contact-sheet.png"]
+tasks:
+  sheet:
+    invoke:
+      tool: "nika:image_compose"
+      args:
+        inputs:
+          - "./out/fx/sunset-duotone.png"
+          - "./out/fx/sunset-gameboy.png"
+          - "./out/fx/harbour-duotone.png"
+          - "./out/fx/harbour-gameboy.png"
+        out: "./out/contact-sheet.png"
+        layout: grid
+        scale: fit
+        cell: { width: 256, height: 256 }
+        gap: 6
+        padding: 12
+        background: "#10141c"

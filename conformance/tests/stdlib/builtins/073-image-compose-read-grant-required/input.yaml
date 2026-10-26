@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+# The sheet may be written, but nothing grants reading the inputs.
+nika: image-compose-read-grant-required
+permits:
+  tools: ["nika:image_compose"]
+  fs: { write: ["./out/**"] }
+tasks:
+  sheet:
+    invoke:
+      tool: "nika:image_compose"
+      args:
+        inputs: ["./out/a.png", "./out/b.png"]
+        out: "./out/sheet.png"
+        layout: row

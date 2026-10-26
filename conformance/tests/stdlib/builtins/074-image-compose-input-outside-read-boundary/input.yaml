@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: Apache-2.0
+# Three inputs sit inside the read bound; the second does not.
+nika: image-compose-input-outside-read-boundary
+permits:
+  tools: ["nika:image_compose"]
+  fs:
+    read: ["./out/fx/**"]
+    write: ["./out/sheet.png"]
+tasks:
+  sheet:
+    invoke:
+      tool: "nika:image_compose"
+      args:
+        inputs:
+          - "./out/fx/a.png"
+          - "./private/id-card.png"
+          - "./out/fx/c.png"
+        out: "./out/sheet.png"
+        layout: column

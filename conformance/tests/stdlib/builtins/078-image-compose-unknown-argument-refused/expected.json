@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-BUILTIN-001",
+      "category": "validation_error"
+    }
+  ],
+  "note": "builtins-v0.1.md §nika:image_compose · the argument set is closed (inputs · out · layout · columns · rows · scale · cell · gap · padding · background) · labels are not part of v1"
+}

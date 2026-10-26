@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+# The inputs are readable, but the sheet lands outside the write bound.
+nika: image-compose-write-grant-required
+permits:
+  tools: ["nika:image_compose"]
+  fs:
+    read: ["./out/**"]
+    write: ["./out/sheets/*"]
+tasks:
+  sheet:
+    invoke:
+      tool: "nika:image_compose"
+      args:
+        inputs: ["./out/a.png", "./out/b.png"]
+        out: "./out/sheet.png"
