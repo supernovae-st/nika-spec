@@ -364,7 +364,7 @@ patterns:
 - glob: "timeline/**"
   class: authored
   match_count: 4
-  aggregate_sha256: 133bc475c155294a8a1287a49f7188551870fdf01a8613107e85ec8ac5a965d6
+  aggregate_sha256: 01e5b7881b7dcd7e281d5cdcff00037eb83b43a316e414106cc99ccd5818585a
   evidence: "timeline.yaml (the SSOT — 'every provable claim … re-proven against its source of truth' per timeline.yml) + verify.py + project archive (historical normalization only; current planning is tracked privately)"
 - glob: "registry/**"
   class: authored
@@ -384,7 +384,7 @@ patterns:
 - glob: ".github/**"
   class: authored
   match_count: 11
-  aggregate_sha256: f9c92544d6cb8a3552dda064f2a177059a2b3bf8b398daafcccea8d3b7c934fa
+  aggregate_sha256: 9ef0ed3dae8e261b0666d8cb0e7d6d1e23d12fe6cb120fb8d269adf698f4dcc6
   evidence: "6 hand-written SHA-pinned workflows (conformance · timeline · board · codeql · reuse · scorecard) + dependabot config — ZERO in-repo bot lanes: board.yml verifies the retired Project archive offline, timeline.yml verifies read-only, nothing here rewrites tracked files; requirements.txt excepted in files:"
 - glob: "*"
   class: authored
