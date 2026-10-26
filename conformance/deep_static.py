@@ -44,14 +44,18 @@
 #                 inside an agent tools whitelist · never a standalone
 #                 invoke (02 §loop semantics · NIKA-BUILTIN-DONE-001) ·
 #                 nika:remove_file takes exactly {path: string} naming a
-#                 file by its RAW spelling (NIKA-BUILTIN-001)
+#                 file by its RAW spelling (NIKA-BUILTIN-001) ·
+#                 nika:image_compose's closed arg set, enums and literal
+#                 ranges (NIKA-BUILTIN-001)
 #   PERMITS-FIT   when a permits: block is present, the body must FIT it
 #                 (01 §permits · default-deny once present) · statically
 #                 checkable surface: invoke tools + agent whitelists vs
 #                 permits.tools globs · exec: presence/argv-program vs
 #                 permits.exec · static fetch hosts vs permits.net.http ·
 #                 literal / bare-const write, edit and remove paths vs
-#                 permits.fs.write
+#                 permits.fs.write · nika:image_compose's literal / bare-
+#                 const inputs vs permits.fs.read and its out vs
+#                 permits.fs.write (every input is a judged read)
 #   SHARED-MUTATION two write/edit/remove tasks on one known path with no
 #                 precedence path between them, or a for_each fan on one
 #                 known path (NIKA-SEC-012 · judged by the runner over its
@@ -1576,6 +1580,104 @@ def _remove_file_shape(args) -> list[str]:
     return problems
 
 
+# ── nika:image_compose · deterministic composition (builtins-v0.1.md) ──
+# The closed arg set, the enums and the literal ranges a checker can see. A
+# templated value (`${{ }}` anywhere in a string) defers to the run's
+# re-vet; a literal sibling is still judged. The authority half (every
+# input a read, `out` a write) is PERMITS-FIT's, below.
+_COMPOSE_KEYS = ("inputs", "out", "layout", "columns", "rows", "scale", "cell",
+                 "gap", "padding", "background")
+_COMPOSE_MAX_INPUTS = 64
+_COMPOSE_HEX = re.compile(r"^#[0-9a-fA-F]{6}$")
+
+
+def _templated(v) -> bool:
+    return isinstance(v, str) and bool(EXPR_BODY.search(v))
+
+
+def _literal_int_in(v, lo: int, hi: int) -> bool:
+    return isinstance(v, int) and not isinstance(v, bool) and lo <= v <= hi
+
+
+def _compose_color_problem(v) -> str | None:
+    if _templated(v):
+        return None
+    if isinstance(v, str) and _COMPOSE_HEX.match(v):
+        return None
+    if isinstance(v, list) and len(v) == 3 and all(_literal_int_in(c, 0, 255) for c in v):
+        return None
+    return f"background {v!r} must be #rrggbb or [r, g, b] with channels 0..=255"
+
+
+def _image_compose_shape(args) -> list[str]:
+    if not isinstance(args, dict):
+        return ["takes an args object {inputs, out, …}"]
+    problems = [f"has no argument {k!r} (the arguments are {' · '.join(_COMPOSE_KEYS)})"
+                for k in sorted(str(k) for k in args if k not in _COMPOSE_KEYS)]
+    inputs = args.get("inputs")
+    if inputs is None:
+        problems.append("requires inputs: (an ordered list of PNG paths)")
+    elif isinstance(inputs, list):
+        if not 1 <= len(inputs) <= _COMPOSE_MAX_INPUTS:
+            problems.append(f"inputs holds {len(inputs)} paths · the contract is "
+                            f"1..={_COMPOSE_MAX_INPUTS}")
+        for k, v in enumerate(inputs):
+            if not isinstance(v, str) or v == "":
+                problems.append(f"inputs[{k}] must be a non-empty path string")
+    elif not _templated(inputs):
+        problems.append("inputs must be a list of paths (or one whole ${{ }} list)")
+    out = args.get("out")
+    if out is None:
+        problems.append("requires out: (the .png artifact path)")
+    elif not isinstance(out, str) or out == "":
+        problems.append("out must be a non-empty path string")
+    elif not _templated(out) and not out.endswith(".png"):
+        problems.append(f"out {out!r} must end in .png (the artifact is a PNG)")
+    layout = args.get("layout", "grid")
+    if not _templated(layout) and layout not in ("grid", "row", "column"):
+        problems.append(f"layout {layout!r} is not grid | row | column")
+    for key in ("columns", "rows"):
+        if key not in args:
+            continue
+        if layout in ("row", "column"):
+            problems.append(f"{key}: applies to layout: grid only (layout is {layout})")
+        v = args[key]
+        if not _templated(v) and not _literal_int_in(v, 1, _COMPOSE_MAX_INPUTS):
+            problems.append(f"{key} {v!r} must be an integer 1..={_COMPOSE_MAX_INPUTS}")
+    cols, rows = args.get("columns"), args.get("rows")
+    if (isinstance(inputs, list) and _literal_int_in(cols, 1, _COMPOSE_MAX_INPUTS)
+            and _literal_int_in(rows, 1, _COMPOSE_MAX_INPUTS) and cols * rows < len(inputs)):
+        problems.append(f"a {cols}×{rows} grid holds fewer cells than the "
+                        f"{len(inputs)} inputs")
+    scale = args.get("scale", "none")
+    if not _templated(scale) and scale not in ("none", "fit", "fill"):
+        problems.append(f"scale {scale!r} is not none | fit | fill")
+    if "cell" in args:
+        if scale == "none":
+            problems.append("cell: applies to scale: fit | fill only (scale is none)")
+        cell = args["cell"]
+        if isinstance(cell, dict):
+            for k in sorted(str(k) for k in cell if k not in ("width", "height")):
+                problems.append(f"cell has no key {k!r} (width · height)")
+            for k in ("width", "height"):
+                v = cell.get(k)
+                if v is None:
+                    problems.append(f"cell requires {k}:")
+                elif not _templated(v) and not _literal_int_in(v, 1, 16384):
+                    problems.append(f"cell.{k} {v!r} must be an integer 1..=16384")
+        elif not _templated(cell):
+            problems.append("cell must be { width, height }")
+    for key in ("gap", "padding"):
+        v = args.get(key)
+        if v is not None and not _templated(v) and not _literal_int_in(v, 0, 1024):
+            problems.append(f"{key} {v!r} must be an integer 0..=1024")
+    if "background" in args:
+        problem = _compose_color_problem(args["background"])
+        if problem:
+            problems.append(problem)
+    return problems
+
+
 # A WHOLE bare `${{ const.x }}` / `${{ inputs['x'] }}` reference, and
 # nothing else: no navigation, concatenation or other root. It names a
 # binding identity; it is not an interpolation engine.
@@ -1616,6 +1718,33 @@ def _static_write_path(v, doc: dict) -> str | None:
     if ref is None or ref[0] != "const":
         return None
     return _const_string(_as_dict(doc.get("const")).get(ref[1]))
+
+
+def _image_compose_fit(tid: str, args: dict, doc: dict, read_globs, write_globs) -> list:
+    """nika:image_compose's authority (builtins-v0.1.md): EVERY input is a
+    read the declared fs.read must contain, and `out` a write the declared
+    fs.write must contain. A literal or whole bare-const path is judged
+    here, before any I/O; a templated list or element is the run's
+    boundary (NIKA-SEC-004 there)."""
+    errs = []
+    inputs = args.get("inputs")
+    for k, v in enumerate(inputs if isinstance(inputs, list) else []):
+        path = _static_write_path(v, doc)
+        if path is not None and not _taint_globbed(path, read_globs):
+            errs.append({"code": "NIKA-SEC-004", "namespace": "NIKA-SEC",
+                         "category": "security_error",
+                         "detail": f"task '{tid}' · nika:image_compose inputs[{k}] {path!r} "
+                                   f"(canonical {_taint_canonical_path(path)!r}) outside "
+                                   f"permits.fs.read {read_globs} (every input is a read "
+                                   "the boundary must contain)"})
+    out = _static_write_path(args.get("out"), doc)
+    if out is not None and not _taint_globbed(out, write_globs):
+        errs.append({"code": "NIKA-SEC-004", "namespace": "NIKA-SEC",
+                     "category": "security_error",
+                     "detail": f"task '{tid}' · nika:image_compose out {out!r} "
+                               f"(canonical {_taint_canonical_path(out)!r}) outside "
+                               f"permits.fs.write {write_globs} (01 §permits)"})
+    return errs
 
 
 def _mutation_key(t: dict, doc: dict):
@@ -1875,6 +2004,12 @@ def deep_static_errors(doc: dict, base_dir=None) -> list[dict]:
                              "category": "validation_error",
                              "detail": f"task '{tid}' · nika:remove_file {problem} "
                                        "(builtins-v0.1.md §nika:remove_file)"})
+        if tool == "nika:image_compose":
+            for problem in _image_compose_shape(args):
+                errs.append({"code": "NIKA-BUILTIN-001", "namespace": "NIKA-BUILTIN",
+                             "category": "validation_error",
+                             "detail": f"task '{tid}' · nika:image_compose {problem} "
+                                       "(builtins-v0.1.md §nika:image_compose)"})
         if tool == "nika:done":
             errs.append({"code": "NIKA-BUILTIN-DONE-001", "namespace": "NIKA-BUILTIN",
                          "category": "validation_error",
@@ -1932,6 +2067,7 @@ def deep_static_errors(doc: dict, base_dir=None) -> list[dict]:
         hosts = net.get("http") if isinstance(net.get("http"), list) else None
         fs = permits.get("fs") if isinstance(permits.get("fs"), dict) else {}
         write_globs = fs.get("write") if isinstance(fs.get("write"), list) else []
+        read_globs = fs.get("read") if isinstance(fs.get("read"), list) else []
 
         for tid, t in tasks:
             if "exec" in t:
@@ -1983,6 +2119,9 @@ def deep_static_errors(doc: dict, base_dir=None) -> list[dict]:
                                                f"outside permits.fs.write {write_globs} "
                                                "(01 §permits · a write grant must contain "
                                                "the exact path)"})
+                if tool == "nika:image_compose":
+                    errs.extend(_image_compose_fit(tid, _as_dict(inv.get("args")), doc,
+                                                   read_globs, write_globs))
             ag = t.get("agent")
             if isinstance(ag, dict):
                 for w in (ag.get("tools") or []):

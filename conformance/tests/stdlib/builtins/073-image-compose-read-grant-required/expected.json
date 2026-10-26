@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-004",
+      "category": "security_error"
+    }
+  ],
+  "note": "builtins-v0.1.md §nika:image_compose · every input is an fs.read the static check judges before any I/O · a write grant never satisfies a read, and the tool grant does not imply a path grant"
+}

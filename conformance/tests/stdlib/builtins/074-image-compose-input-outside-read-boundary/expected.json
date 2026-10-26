@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-004",
+      "category": "security_error"
+    }
+  ],
+  "note": "builtins-v0.1.md §nika:image_compose · each input is judged on its own · one literal input outside permits.fs.read refuses the call at check, whatever its siblings"
+}
