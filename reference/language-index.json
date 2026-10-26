@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "kind": "spec-language-knowledge",
   "owner": "supernovae-st/nika-spec",
-  "revision": "c5ffb6e11afef55486b3e8f607ff2cdbc46b6f0b",
+  "revision": "3221d0f7f5665707c8e2db41c88117f31bc485ac",
   "inputs": {
-    "schemas/workflow.schema.json": "9e78ae41ad6d258c8207809a40760e2f6e2c2576ef958d2ccbddd3d1b0d8b2f0",
+    "schemas/workflow.schema.json": "7d32af66588f6bbe0f2d013f1b5353b15fc7e3bef6060459793c8ba45364a330",
     "templates/agent-loop.nika": "9343b4d43c45c3f1cef68b5a2ec3c13449a09a272ca443a7561c98ba77e3f1bc",
     "templates/aggregate-by-key.nika": "a7a34d9415e3187ff32607d79272da49e790500f1998593730c5047dc8a111fd",
     "templates/api-upload-and-create.nika": "d78fe72bda643e088c9e992a33b32647d083f00c772c49babe7764efc353263b",
@@ -2017,6 +2017,42 @@
       ]
     },
     {
+      "id": "language:word:images",
+      "name": "images",
+      "docsPath": "reference/language/words/images",
+      "contracts": [
+        {
+          "pointer": "/$defs/agent/properties/images",
+          "context": "/$defs/agent",
+          "required": false,
+          "declaration": {
+            "description": "The images an agent application delivers during its turn, as a value of the task: `.output` becomes `{ message, images }`, each image `{ index, path, sha256, size_bytes, mime_type, width, height }`. Only bytes received on this task's own session count; a path the application reports is never opened. A task that runs on a seat (`run.access.protocol: acp`) only (spec/02-verbs.md §Harness images).",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "save": {
+                "description": "Where the engine writes the received bytes: the first image at this path, image n (n >= 2) with `-n` before its extension. Judged against `permits.fs.write` before any byte is written; `${{ }}` allowed. No image received fails NIKA-AGENT-007.",
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "siblings": [
+            "max_tokens_total",
+            "max_turns",
+            "model",
+            "prompt",
+            "schema",
+            "skills",
+            "system",
+            "temperature",
+            "tools"
+          ]
+        }
+      ],
+      "examples": []
+    },
+    {
       "id": "language:word:infer",
       "name": "infer",
       "docsPath": "reference/language/words/infer",
@@ -3109,6 +3145,7 @@
             "minimum": 0
           },
           "siblings": [
+            "images",
             "max_turns",
             "model",
             "prompt",
@@ -3147,6 +3184,7 @@
             "description": "Loop limit · a literal integer from 1 to 1000 · default 10 (spec/02-verbs.md §agent)."
           },
           "siblings": [
+            "images",
             "max_tokens_total",
             "model",
             "prompt",
@@ -3278,6 +3316,7 @@
             "type": "string"
           },
           "siblings": [
+            "images",
             "max_tokens_total",
             "max_turns",
             "prompt",
@@ -4612,6 +4651,7 @@
             "$ref": "#/$defs/promptText"
           },
           "siblings": [
+            "images",
             "max_tokens_total",
             "max_turns",
             "model",
@@ -5330,6 +5370,25 @@
       ]
     },
     {
+      "id": "language:word:save",
+      "name": "save",
+      "docsPath": "reference/language/words/save",
+      "contracts": [
+        {
+          "pointer": "/$defs/agent/properties/images/properties/save",
+          "context": "/$defs/agent/properties/images",
+          "required": false,
+          "declaration": {
+            "description": "Where the engine writes the received bytes: the first image at this path, image n (n >= 2) with `-n` before its extension. Judged against `permits.fs.write` before any byte is written; `${{ }}` allowed. No image received fails NIKA-AGENT-007.",
+            "type": "string",
+            "minLength": 1
+          },
+          "siblings": []
+        }
+      ],
+      "examples": []
+    },
+    {
       "id": "language:word:schema",
       "name": "schema",
       "docsPath": "reference/language/words/schema",
@@ -5361,6 +5420,7 @@
             "$ref": "#/$defs/schemaContract"
           },
           "siblings": [
+            "images",
             "max_tokens_total",
             "max_turns",
             "model",
@@ -5696,6 +5756,7 @@
             }
           },
           "siblings": [
+            "images",
             "max_tokens_total",
             "max_turns",
             "model",
@@ -5919,6 +5980,7 @@
             "$ref": "#/$defs/promptText"
           },
           "siblings": [
+            "images",
             "max_tokens_total",
             "max_turns",
             "model",
@@ -6188,6 +6250,7 @@
             "description": "Sampling temperature for every turn of the loop · 0 is the steadiest the provider offers, 2 the loosest. A literal number in 0-2: a `${{ }}` reference is refused at parse."
           },
           "siblings": [
+            "images",
             "max_tokens_total",
             "max_turns",
             "model",
@@ -6599,6 +6662,7 @@
             }
           },
           "siblings": [
+            "images",
             "max_tokens_total",
             "max_turns",
             "model",
