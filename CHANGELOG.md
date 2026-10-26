@@ -16,6 +16,25 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Changes merged after the spec commit engine 0.123.0 embeds. They reach the
 engine at its next `SPEC_PIN` bump.
 
+### Fixed · a mock rehearsal is not called offline (2026-10-26)
+
+- `--model mock/echo` replaces the model, not the network: a `nika:fetch`
+  step still reaches its host (nika#1605). The pack called that rehearsal
+  offline: « remains offline » in ten templates, « Offline by default » in
+  `examples/README-jobs.md`, « the offline seat » in `templates/README.md`
+  and the `nika try` lines of the README. They now say what is true: on the
+  mock model, zero keys and no model call, and a fetch step still reaches
+  its host.
+- The files that reach the network say what their rehearsal reaches:
+  `release-radar`, `seo-content-brief`, `deep-research-brief`,
+  `website-brief` (its crawl of `example.com` is real),
+  `api-upload-and-create`, `gate-and-act` and eight more.
+  `ceo-monday-brief` no longer says its news host resolves nowhere
+  (`hn.algolia.com` answers). Two recovered values change their label,
+  `(stand-in · no market signal was fetched)` and
+  `MacBook Air (rehearsal sample)`; no task, permit or schema changes.
+- Files with no network effect keep their offline claims, which are true.
+
 ### Changed · the timeline records the reference release (2026-10-24)
 
 - `timeline/timeline.yaml` gains two dated entries, each re-proven by

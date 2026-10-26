@@ -30,8 +30,10 @@ asserts that refused inputs never start the protected downstream tasks.
 ## The guarantee
 
 Every template in this directory **runs green in an empty directory once
-its named slots are filled** — offline, with no API key, no fixture, and
-nothing installed. An unfilled scaffold refuses at `nika check`; it never
+its named slots are filled** — with no API key, no fixture, nothing
+installed and no network required. It is not an offline run: a step that
+fetches still reaches its host when one answers, and its `recover:` stands
+in when none does. An unfilled scaffold refuses at `nika check`; it never
 spends or writes output that could be mistaken for a result. That is what
 makes a skeleton worth copying: you scaffold it, fill the explicit holes,
 run it, watch it work, and only then point it at your own data.
@@ -54,7 +56,9 @@ words stay incomplete — there is no closest-skeleton substitute and no
 
 How each one holds that promise:
 
-- **`--model mock/echo`** — the offline seat. Deterministic, zero keys.
+- **`--model mock/echo`** — the mock seat. Deterministic, zero keys, no
+  model call. It replaces the model, not the network: a fetch step still
+  reaches its host.
   Compile does not pick a paid provider or access from ambient
   credentials; skeletons keep their authored `model: mock/echo`. Choose
   provider and access explicitly for a real run; `--model mock/echo`
