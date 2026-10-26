@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-004",
+      "category": "security_error"
+    }
+  ],
+  "note": "builtins-v0.1.md §nika:image_compose · `out:` is an fs.write the static check judges · `./out/sheet.png` is not inside `./out/sheets/*`, and a read grant never satisfies a write"
+}

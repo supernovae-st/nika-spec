@@ -65,8 +65,8 @@ ITEM_REF = re.compile(r"\bitem\b")
 # fs-WRITE effect (NEP-0002 leg ③'s sink side). Derived by hand from the
 # ONE effect table, and PARTITIONED against the registry: together with
 # EXTERNAL_READ_ONLY below this set must equal the `external` capability
-# class of `canon/builtins.yaml` (11 rows), which the selftest asserts —
-# a 29th external builtin FAILS the completeness law instead of silently
+# class of `canon/builtins.yaml` (13 rows), which the selftest asserts —
+# an unclassified external builtin FAILS the completeness law instead of silently
 # under-reporting. That ratchet exists because a hardcoded subset was
 # exactly the defect measured 2026-07-29: with the four media writers
 # missing, a chart-sink trifecta read GREEN here while the engine
@@ -79,6 +79,7 @@ EGRESS_BUILTINS = {
     "nika:edit",            # fs write
     "nika:remove_file",     # fs write · removal is a write effect
     "nika:chart",           # fs write · the `out:` artifact (+ vega sibling)
+    "nika:image_compose",   # fs write · the `out:` artifact (its inputs are reads)
     "nika:image_fx",        # fs write · the `out:` artifact
     "nika:image_generate",  # fs write · assets land in `output_dir:` (recursive)
     "nika:tts_generate",    # fs write · same shape as image_generate

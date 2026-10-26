@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: image-compose-layout-refused
+permits:
+  tools: ["nika:image_compose"]
+  fs:
+    read: ["./out/**"]
+    write: ["./out/**"]
+tasks:
+  sheet:
+    invoke:
+      tool: "nika:image_compose"
+      args:
+        inputs: ["./out/a.png", "./out/b.png"]
+        out: "./out/sheet.png"
+        layout: diagonal

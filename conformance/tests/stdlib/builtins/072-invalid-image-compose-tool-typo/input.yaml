@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: image-compose-tool-typo
+permits:
+  tools: ["nika:imagecompose"]
+  fs:
+    read: ["./out/**"]
+    write: ["./out/**"]
+tasks:
+  sheet:
+    invoke:
+      tool: "nika:imagecompose"
+      args:
+        inputs: ["./out/a.png", "./out/b.png"]
+        out: "./out/sheet.png"

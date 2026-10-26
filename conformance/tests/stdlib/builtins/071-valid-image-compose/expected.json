@@ -1,0 +1,5 @@
+{
+  "valid": true,
+  "errors": [],
+  "note": "The cookbook sheet (§Media graduate #5 · 2026-10-26): a 2×2 grid derived from four inputs, each scaled to fit a 256×256 cell over the background. Every literal input is a read inside permits.fs.read and `out:` a write inside permits.fs.write. Engine-owned laws beyond the static check: byte-identical PNG for identical input bytes and args (recipe `image_compose/v1` in the tEXt chunk) and the header-gated caps (`-005`)."
+}

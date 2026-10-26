@@ -1,0 +1,5 @@
+{
+  "valid": true,
+  "errors": [],
+  "note": "builtins-v0.1.md §nika:image_compose · a templated input list defers to the run's boundary (NIKA-SEC-004 there) · deferral is not a grant: each resolved path is judged against permits.fs.read before it is opened"
+}

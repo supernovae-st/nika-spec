@@ -1,0 +1,5 @@
+{
+  "valid": true,
+  "errors": [],
+  "note": "builtins-v0.1.md §nika:tts_generate · `provider: system` is keyless and offline · the engine starts the host synthesizer itself (macOS /usr/bin/say · Linux espeak-ng), never through the workflow's exec:, so the file needs no permits.exec · the write of the audio stays permits.fs.write's"
+}

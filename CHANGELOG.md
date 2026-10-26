@@ -16,6 +16,46 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Changes merged after the spec commit engine 0.123.0 embeds. They reach the
 engine at its next `SPEC_PIN` bump.
 
+### Added · native image composition and keyless speech (2026-10-26)
+
+- `nika:image_compose`, the 30th builtin (stdlib §Media graduate #5): an
+  ordered list of 1..=64 PNG inputs becomes one PNG artifact, laid out as a
+  `grid` (columns and rows derived from the count when absent), a `row` or a
+  `column`. Each image is placed at its own size (`scale: none`), scaled to
+  fit its cell with the aspect kept (`fit`), or scaled and center-cropped
+  to fill it (`fill`), with `gap`, `padding` and a `background` colour. The
+  geometry is normative integer arithmetic, scaling is `image_fx`'s
+  `resize` (`filter: auto`), alpha is composited over the background, and
+  the artifact is byte-identical for identical input bytes and args: the
+  recipe `image_compose/v1` rides the PNG tEXt chunk and outputs carry
+  path, sha256, width and height, never bytes. Caps (each input's side,
+  the summed input pixels, each scaled `fit` / `fill` box and the canvas)
+  fail `NIKA-BUILTIN-IMAGE_COMPOSE-005` from the headers before any
+  decompression, an input with a second IHDR is `-004`, and an input count
+  outside 1..=64 is `-001`; the errors are `-001..006`, `image_fx`'s
+  ladder. Every literal input is an `fs.read` a static checker judges, and
+  a literal `out:` an `fs.write` (stdlib fixtures 071-079). This is the
+  composition workflows borrowed from `exec magick montage`.
+- `nika:tts_generate` `provider: system`: the host's own synthesizer,
+  keyless and offline (macOS `/usr/bin/say`, Linux `espeak-ng` on the
+  engine's `PATH`). The engine starts it itself as part of the builtin, so
+  the workflow needs no `permits.exec`; the audio lands under
+  `output_dir:` through `permits.fs.write`, the text is spoken as text
+  (every `[[` markup delimiter is broken before it reaches the program),
+  the audio is capped at 64 MiB, the journal records the start
+  as a `permit_checked` frame with `plane: builtin` (spec 17), and the call
+  reports unpriced local work (`cost_usd: null` · `cost_unpriced:
+  local_model`). Any other host, or a missing program, fails `-002` naming
+  what is missing; there is no fallback to another provider. This replaces
+  `exec /usr/bin/say` in a workflow.
+
+### Fixed · a streamed WAV's duration counts the bytes present (2026-10-26)
+
+- A WAV `data` chunk that declares more bytes than the payload carries (a
+  streamed header's `0xFFFFFFFF` placeholder) now counts only the bytes
+  present, so `tts_generate`'s `duration_ms` is the real length, never the
+  89478485 ms a streamed OpenAI narration reported.
+
 ### Added · an agent application's images as task values (2026-10-26)
 
 - `agent:` gains `images:` ([02 §Harness images](./spec/02-verbs.md#harness-images--images-normative)).

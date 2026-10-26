@@ -310,6 +310,7 @@ for _tool, _args in [
     # tainted content — an attacker-chosen filename lands attacker bytes
     # somewhere the operator did not choose.
     ("nika:image_fx", '{ input: "a.png", ops: ["dither"], out: "./out/${{ with.d }}.png" }'),
+    ("nika:image_compose", '{ inputs: ["a.png"], out: "./out/${{ with.d }}.png" }'),
     ("nika:image_generate", '{ prompt: "${{ with.d }}", output_dir: "./out" }'),
     ("nika:tts_generate", '{ text: "${{ with.d }}", output_dir: "./out" }'),
     # Removal is a write effect: an attacker-chosen path deletes a file the
