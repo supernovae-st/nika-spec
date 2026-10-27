@@ -39,6 +39,15 @@ namespace with no 05-errors table row · the « 15 error namespaces » prose
 fossil); each shadow keeps the upstream count==len law green ON PURPOSE, so
 a death proves the named cross-check and never the old law.
 
+Refreshed 2026-10-27: #393 widened the lints extractor's kind filter to
+both lint families, which moved the line its probe melts, and the weekly
+run halted on `probe table stale`. Behind that halt sat a silent rot: the
+canon shadows re-typed a hand-written counts: copy that went stale at the
+first new error code (2026-09-01); from then both cross-check probes died
+upstream on the counts: law and still read DIES. The canon shadows are now
+built from the canon under probe, and a probe naming its law must die ON
+it: a death on another law is a stale table, never a DIES.
+
 Mutations run in a throwaway detached git worktree of HEAD — the working
 tree is never touched, and the worktree is removed on every exit path.
 Probes judge HEAD: commit (or at least stage nothing you fear) before
@@ -58,36 +67,39 @@ from __future__ import annotations
 import subprocess
 import sys
 import tempfile
+from collections.abc import Callable
 from pathlib import Path
+
+import yaml
 
 REPO = Path(__file__).resolve().parent.parent
 
+
 # The #291 canon-projectors shadows · DATA mutations (canon.yaml · a
 # duplicate top-level key appended at EOF wins under yaml.safe_load — the
-# YAML twin of the shadow def). Each shadow re-types the counts: block so
-# the count==len self-check stays GREEN and the death lands on the named
-# cross-check, never upstream.
-_CANON_COUNTS = (
-    "counts:\n  verbs: 4\n  namespaces: 5\n  builtins: 28\n  providers: 17\n"
-    "  extract_modes: {extract_modes}\n  templates: 14\n"
-    "  error_namespaces: {error_namespaces}\n  error_categories: 12\n"
-    "  error_codes: 103\n  pillars: 5\n  lifecycle_product: 4\n"
-    "  lifecycle_decision: 4\n  lifecycle_risk: 4\n  diamond_layers: 7\n"
-    "  steal_pattern_tiers: 4\n  severity: 4\n  mcp_tools: 9\n"
-    "  mcp_protocol_versions: 5\n"
-)
-_SHADOW_MODES_SANS_RAW = _CANON_COUNTS.format(extract_modes=9, error_namespaces=24) + (
-    "extract_modes:\n  count: 9\n  reference: stdlib/extract-modes-v0.1.md\n"
-    "  items: [article, feed, jq, links, markdown, metadata, selector, sitemap, text]\n"
-)
-_SHADOW_NS_SANS_AUTH = _CANON_COUNTS.format(extract_modes=10, error_namespaces=23) + (
-    "error_namespaces:\n  count: 23\n  reference: spec/05-errors.md\n"
-    "  items: [NIKA-AGENT, NIKA-ASSERT, NIKA-BUILTIN, NIKA-CANCEL, NIKA-COMP,\n"
-    "          NIKA-DAG, NIKA-DEFAULT, NIKA-EXEC, NIKA-IMPL, NIKA-INFER,\n"
-    "          NIKA-INVOKE, NIKA-LOCK, NIKA-MCP, NIKA-DECIDE, NIKA-DRIFT,\n"
-    "          NIKA-PARSE, NIKA-PORT, NIKA-PROVIDER, NIKA-SEC, NIKA-TIMEOUT,\n"
-    "          NIKA-TYPE, NIKA-VAR, NIKA-VALUES]\n"
-)
+# YAML twin of the shadow def).
+def _canon_sans(category: str, item: str) -> Callable[[dict], str]:
+    """The canon shadow that drops ONE item of a counted category.
+
+    Built from the canon under probe, it re-types the category count and
+    the whole counts: row from the live lengths, so the count==len
+    self-check stays GREEN by construction and the death lands on the
+    named cross-check, never upstream. The dropped item must exist: a
+    retired one fails as a harness error, never as a silent no-op.
+    """
+    def shadow(canon: dict) -> str:
+        items = list(canon[category]["items"])
+        if item not in items:
+            raise ValueError(f"probe table stale: {item} is no canon {category} item")
+        items.remove(item)
+        counts = {**canon["counts"], category: len(items)}
+        block = {**canon[category], "count": len(items), "items": items}
+        return yaml.safe_dump({"counts": counts, category: block}, sort_keys=False)
+    return shadow
+
+
+# The prose-fossil shadow re-types no count: it restates the pillars with
+# the « 15 error namespaces » fossil in their errors row.
 _SHADOW_PILLAR_FOSSIL = (
     "pillars:\n  count: 5\n  immutable: true\n  reference: spec/00-overview.md\n"
     "  items:\n"
@@ -99,8 +111,10 @@ _SHADOW_PILLAR_FOSSIL = (
 )
 
 # (selftest invocation, judged file, permissive shadow appended at the
-# judge's EOF). Paths are repo-relative; a tuple invocation carries args
-# (a selftest living INSIDE its judge runs as `<judge> --selftest`).
+# judge's EOF[, the refusal its death must print]). Paths are
+# repo-relative; a tuple invocation carries args (a selftest living INSIDE
+# its judge runs as `<judge> --selftest`). A callable shadow is built from
+# the judged file at HEAD (the canon probes).
 PROBES = [
     ("conformance/composition_core_selftest.py", "conformance/composition_core.py",
      "def composition_errors(*a, **k):\n    return []\n"),
@@ -150,7 +164,7 @@ PROBES = [
     (("scripts/lints-differential.py", "--selftest"),
      "scripts/lints-differential.py",
      ("replace",
-      '        if not isinstance(h, dict) or h.get("kind") != "native-first":\n',
+      '        if not isinstance(h, dict) or h.get("kind") not in LINT_KINDS:\n',
       '        if not isinstance(h, dict):\n')),
     # A runtime judge that never diffs reads every tamper as agreement —
     # the flipped-status and typed-value cases must die.
@@ -161,10 +175,14 @@ PROBES = [
       '    diffs: list[str] = []\n    return diffs\n    want_state = expected.get("workflow_state")\n')),
     # The #291 canon-projectors ratchet · judge and selftest share one file
     # and the judged surface is DATA (canon.yaml · YAML last-wins) — the
-    # shadow constants above. One probe per cross-check.
-    (("scripts/canon-projectors.py", "--check"), "canon.yaml", _SHADOW_MODES_SANS_RAW),
-    (("scripts/canon-projectors.py", "--check"), "canon.yaml", _SHADOW_NS_SANS_AUTH),
-    (("scripts/canon-projectors.py", "--check"), "canon.yaml", _SHADOW_PILLAR_FOSSIL),
+    # shadows above. One probe per cross-check, each witnessed by the
+    # refusal that names it.
+    (("scripts/canon-projectors.py", "--check"), "canon.yaml",
+     _canon_sans("extract_modes", "raw"), "extract_modes doc-only: ['raw']"),
+    (("scripts/canon-projectors.py", "--check"), "canon.yaml",
+     _canon_sans("error_namespaces", "NIKA-AUTH"), "table-only, undeclared: ['NIKA-AUTH']"),
+    (("scripts/canon-projectors.py", "--check"), "canon.yaml",
+     _SHADOW_PILLAR_FOSSIL, "says « 15 error namespaces »"),
 ]
 
 
@@ -172,9 +190,18 @@ def _git(*args: str) -> None:
     subprocess.run(["git", *args], check=True, capture_output=True)
 
 
+def _tail(*streams: str) -> str:
+    """The last line of the first stream that printed one (the selftests
+    print their verdict on stdout, the canon gate its refusal on stderr)."""
+    for text in streams:
+        if text.strip():
+            return text.strip().splitlines()[-1]
+    return "(no output)"
+
+
 def probe_all(worktree: Path) -> int:
     survivors: list[tuple[str, str]] = []
-    for selftest, judged, shadow in PROBES:
+    for selftest, judged, shadow, *witness in PROBES:
         cmd = (selftest,) if isinstance(selftest, str) else tuple(selftest)
         label = " ".join(cmd)
         # A renamed selftest must fail as a HARNESS error, never count as a
@@ -194,11 +221,14 @@ def probe_all(worktree: Path) -> int:
             capture_output=True, text=True, timeout=300,
         )
         if clean.returncode != 0:
-            tail = (clean.stdout.strip().splitlines() or ["(no output)"])[-1]
             raise RuntimeError(
                 f"{label} is RED before mutation (rc={clean.returncode}) — "
-                f"fix the selftest first · {tail[:110]}")
+                f"fix the selftest first · {_tail(clean.stdout, clean.stderr)[:110]}")
         target = worktree / judged
+        if callable(shadow):
+            # Built from the judged data at HEAD (the canon probes): what
+            # must stay green is re-typed from the live file, never by hand.
+            shadow = shadow(yaml.safe_load(target.read_text()))
         if isinstance(shadow, tuple):
             # ("replace", old, new) · for judges that EXECUTE on import or
             # carry their own __main__ (an appended shadow is dead code
@@ -218,7 +248,13 @@ def probe_all(worktree: Path) -> int:
         )
         _git("-C", str(worktree), "checkout", "--", judged)
         died = proc.returncode != 0
-        tail = (proc.stdout.strip().splitlines() or ["(no output)"])[-1]
+        tail = _tail(proc.stdout, proc.stderr)
+        # A probe naming its law must die ON it: a death on another law
+        # proves that law, not the named one, and reads DIES even with the
+        # named cross-check deleted (the hand-typed counts: copy did).
+        if died and witness and witness[0] not in proc.stdout + proc.stderr:
+            raise RuntimeError(f"probe table stale: {label} died on another law · "
+                               f"{_tail(proc.stderr, proc.stdout)[:110]}")
         mark = "DIES    " if died else "SURVIVES"
         print(f"{mark} rc={proc.returncode} · {label} ⟵ permissive {judged} · {tail[:110]}")
         if not died:
