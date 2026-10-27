@@ -545,9 +545,9 @@ the row.
 ### No native conformance command
 
 The reference engine has no `conformance` subcommand: `nika conformance`
-is an unrecognized subcommand in 0.123.0, and the maintained 0.123 line
-plans none. Any engine, the reference one included, is measured from
-outside, by this repository's runners:
+is an unrecognized subcommand in 0.123.0, and none is planned. Any
+engine, the reference one included, is measured from outside, by this
+repository's runners:
 
 ```bash
 conformance/run.sh <engine>                                  # every corpus file vs its # Expected: header

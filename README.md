@@ -322,9 +322,10 @@ declaring it.
 ## Reference implementation
 
 [supernovae-st/nika](https://github.com/supernovae-st/nika) is the reference
-engine: one Rust binary, AGPL-3.0-or-later. Its 0.123.0 release is the
-open-source reference release. Install it with
-`brew install supernovae-st/tap/nika` (or
+engine: one Rust binary, AGPL-3.0-or-later. Its latest release is 0.124.0.
+0.124 is the current release line. Work stays focused on maintenance,
+security and the media capabilities workflows need; native video is planned
+for 0.125. Install it with `brew install supernovae-st/tap/nika` (or
 `curl -LsSf https://nika.sh/install.sh | sh`), then check and run any
 workflow.
 
@@ -451,19 +452,19 @@ flowchart LR
 | provenance | [`ESTATE_PIN`](ESTATE_PIN) here, and in the engine, the docs, the site and the registry | the shared provenance verifier is mirrored byte for byte from a published spec commit; the CI `mirror` job compares against exactly that commit |
 
 An engine release names its spec commit twice, and the two must agree. For
-example, at engine v0.123.0, the reference release (the last line runs in
+example, at engine v0.124.0, the current release (the last line runs in
 your clone of this repository):
 
 ```sh
-curl -sS https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/SPEC_PIN | grep -v '^#'
-curl -sS https://raw.githubusercontent.com/supernovae-st/nika/v0.123.0/crates/nika-pack/pack/SPEC_SHA
-git log -1 --format='%h %ad %s' --date=short 6390b08eb9791ce49c63ee17f8466fab118cadb8
+curl -sS https://raw.githubusercontent.com/supernovae-st/nika/v0.124.0/SPEC_PIN | grep -v '^#'
+curl -sS https://raw.githubusercontent.com/supernovae-st/nika/v0.124.0/crates/nika-pack/pack/SPEC_SHA
+git log -1 --format='%h %ad %s' --date=short 5cd95cd25c0ff453be266794a03666e5e3f2d7a8
 ```
 
 ```
-6390b08eb9791ce49c63ee17f8466fab118cadb8
-6390b08eb9791ce49c63ee17f8466fab118cadb8
-6390b08 2026-10-19 fix(conformance): refresh the pricing trace witnesses for the new table (#390)
+5cd95cd25c0ff453be266794a03666e5e3f2d7a8
+5cd95cd25c0ff453be266794a03666e5e3f2d7a8
+5cd95cd 2026-10-27 feat(stdlib): let a media cost come from a dated price catalog (#401)
 ```
 
 </details>
@@ -545,12 +546,14 @@ Not sure an idea deserves a proposal? Pressure-test it first in the engine's
 
 ## Status
 
-- **The reference release.** Engine 0.123.0 (2026-10-23) is the
-  open-source reference release, and it embeds this spec at commit
-  [`6390b08`](https://github.com/supernovae-st/nika-spec/commit/6390b08eb9791ce49c63ee17f8466fab118cadb8),
-  the commit its `SPEC_PIN` names. After 0.123 the project is maintained:
-  security fixes, bug fixes and compatibility. No 1.0 release is
-  scheduled.
+- **The current release.** Engine 0.124.0 (2026-10-27) embeds this spec
+  at commit
+  [`5cd95cd`](https://github.com/supernovae-st/nika-spec/commit/5cd95cd25c0ff453be266794a03666e5e3f2d7a8),
+  the commit its `SPEC_PIN` names. 0.124 is the current release line. Work
+  stays focused on maintenance, security and the media capabilities
+  workflows need; native video is planned for 0.125. The 0.123.x line,
+  opened by the open-source reference release 0.123.0 (2026-10-23, spec
+  `6390b08`), is the previous one. No 1.0 release is scheduled.
 - **Spec version.** [`VERSION`](VERSION) reads `0.2.0-draft`, and the
   spec badge above reads it live. [CHANGELOG.md](CHANGELOG.md) marks what
   engine 0.123.0 embeds and what landed after it.
@@ -580,8 +583,7 @@ Not sure an idea deserves a proposal? Pressure-test it first in the engine's
   tests. The NEP process
   ([NEP-0000](governance/nep-0000-the-nep-process.md) ·
   [template](governance/nep-template.md)) is built and dormant; it would
-  bind from a v1 pre-freeze, and none is scheduled after the 0.123
-  reference release.
+  bind from a v1 pre-freeze, and none is scheduled.
 - **Where it is discussed:** in the proposal's public pull request. There is
   no private track.
 - **Decisions:** accepted and rejected NEPs both stay published in
@@ -602,7 +604,7 @@ Not sure an idea deserves a proposal? Pressure-test it first in the engine's
 | 🦋 | [nika](https://github.com/supernovae-st/nika) | The engine and CLI: write, check, run and verify AI workflows |
 | 📖 | [nika-docs](https://github.com/supernovae-st/nika-docs) | The documentation, live at [docs.nika.sh](https://docs.nika.sh) |
 | 📜 | **[nika-spec](https://github.com/supernovae-st/nika-spec)** | **The language specification and the suite that proves an engine follows it** |
-| 🧩 | [nika-vscode](https://github.com/supernovae-st/nika-vscode) | The editor extension, frozen at 0.120 and not qualified with 0.123: use `nika lsp` and the JSON Schema |
+| 🧩 | [nika-vscode](https://github.com/supernovae-st/nika-vscode) | The editor extension, frozen at 0.120 and not qualified with 0.124: use `nika lsp` and the JSON Schema |
 | 🟦 | [nika-client](https://github.com/supernovae-st/nika-client) | Run and verify workflows from TypeScript |
 | ✅ | [nika-action](https://github.com/supernovae-st/nika-action) | A GitHub Action that posts a `nika check` verdict on your pull requests |
 | 🚀 | [nika-actions-starter](https://github.com/supernovae-st/nika-actions-starter) | A ready template: workflows, editor setup and CI from the first push |
@@ -624,8 +626,8 @@ Not sure an idea deserves a proposal? Pressure-test it first in the engine's
   [map of the ecosystem](https://docs.nika.sh/reference/knowledge-system)
   live in the docs
 - **From TypeScript:** [nika-client](https://github.com/supernovae-st/nika-client)
-  is published on npm as `@supernovae-st/nika` (0.123.0, which bundles
-  engine 0.123.0)
+  is published on npm as `@supernovae-st/nika`; each package version
+  bundles the engine with the same number
 
 ## Security
 

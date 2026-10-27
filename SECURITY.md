@@ -11,9 +11,9 @@ workflow files.
 The spec is the v1 contract (a workflow file types no version · `nika:`
 carries its name) · additions are additive within v1. This repository
 carries no release tags: fixes land on `main`, and each engine release
-embeds the spec commit its `SPEC_PIN` names. Engine 0.123.0, the
-maintained reference release, embeds `6390b08`; a security fix reaches it
-through the engine's next maintenance release.
+embeds the spec commit its `SPEC_PIN` names. Engine 0.124.0, the current
+release, embeds `5cd95cd`; a security fix reaches the engine through its
+next release.
 
 ## Reporting a Vulnerability
 

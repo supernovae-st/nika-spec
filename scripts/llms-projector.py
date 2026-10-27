@@ -92,8 +92,8 @@ copy published with the website, and the copy can lag: on 2026-10-24 it
 served the 2026-09-18 revision, without `nika:remove_file`, the `{{ file: }}`
 form of `prompt:`, `system:` and `schema:`, or `for_each.max_items`. For the
 exact schema an engine embeds, run `nika spec --schema`, or read it at that
-spec commit (`6390b08` for engine 0.123.0):
-`https://raw.githubusercontent.com/supernovae-st/nika-spec/6390b08eb9791ce49c63ee17f8466fab118cadb8/schemas/workflow.schema.json`
+spec commit (`5cd95cd` for engine 0.124.0):
+`https://raw.githubusercontent.com/supernovae-st/nika-spec/5cd95cd25c0ff453be266794a03666e5e3f2d7a8/schemas/workflow.schema.json`
 
 ## Spec
 
