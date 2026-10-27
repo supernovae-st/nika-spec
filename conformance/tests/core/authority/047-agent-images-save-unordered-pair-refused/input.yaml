@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: Apache-2.0
+# Two saves of one path (./out/banner.png ≡ out/banner.png) and no edge
+# between them: whichever turn ends last decides the file.
+nika: agent-images-save-unordered-pair
+run:
+  access:
+    via: codex
+    protocol: acp
+permits:
+  fs: { write: ["./out/**"] }
+tasks:
+  hero:
+    agent:
+      prompt: "Draw a 16:9 release banner, no text"
+      images:
+        save: "./out/banner.png"
+  logo:
+    agent:
+      prompt: "Draw a square release logo, no text"
+      images:
+        save: "out/banner.png"

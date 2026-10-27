@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-AUTH-006",
+      "category": "security_error"
+    }
+  ],
+  "note": "02-verbs.md §Vision inputs · NEP-0003 · a vision file is read and its bytes reach the provider (the nika:read class) · under an absent permits: block a literal path is an fs read with zero authority, refused at check before the file is opened · the twin of 043."
+}

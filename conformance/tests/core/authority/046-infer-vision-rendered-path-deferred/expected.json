@@ -1,0 +1,5 @@
+{
+  "valid": true,
+  "errors": [],
+  "note": "02-verbs.md §Vision inputs · a rendered vision path is judged at run on its rendered value, before the file is opened · static validity claims nothing about the resolved path (runtime/permits/009 is the refused twin)."
+}

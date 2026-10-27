@@ -1,0 +1,10 @@
+{
+  "workflow_state": "failure",
+  "tasks": {
+    "describe": {
+      "status": "failure",
+      "error_code": "NIKA-SEC-004"
+    }
+  },
+  "note": "02 §Vision inputs · a rendered vision path defers at check (core/authority/046) · the run judges the rendered value against permits.fs.read and refuses the escape before the file is opened or the provider is called · authored contract, native observation pending"
+}

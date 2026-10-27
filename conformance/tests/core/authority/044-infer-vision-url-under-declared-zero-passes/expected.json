@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "02-verbs.md §Vision inputs · 10 §the effect vocabulary · a source: url entry is not an fs effect and Nika never fetches it (the provider does) · it needs no fs or net.http grant, so permits: {} (the declared zero) admits it."
+}

@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: infer-vision-file-inside-read
+permits:
+  fs: { read: ["./diagrams/**"] }   # the image reaches the provider · a read inside the boundary
+tasks:
+  describe:
+    infer:
+      prompt: "Describe the flow this diagram shows"
+      vision:
+        - source: file
+          path: "./diagrams/flow.png"

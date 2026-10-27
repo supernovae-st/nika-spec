@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-012",
+      "category": "security_error"
+    }
+  ],
+  "note": "10 §the effect vocabulary (same-path mutations) · 02 §Harness images · a for_each task whose images.save names one known path fans every iteration onto the same files · derive the path from the item."
+}

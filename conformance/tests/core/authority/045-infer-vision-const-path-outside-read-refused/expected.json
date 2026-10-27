@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-004",
+      "category": "security_error"
+    }
+  ],
+  "note": "02-verbs.md §Vision inputs · a whole bare const reference to a declared string is judged at check like a literal · ./private/flow.png is outside permits.fs.read, refused before the file is opened."
+}

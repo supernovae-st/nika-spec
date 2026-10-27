@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+# The exact-file grant holds the first image, not ./out/banner-2.png.
+nika: agent-images-save-sibling-outside-write
+run:
+  access:
+    via: codex
+    protocol: acp
+permits:
+  fs: { write: ["./out/banner.png"] }
+tasks:
+  banner:
+    agent:
+      prompt: "Draw a release banner, no text"
+      images:
+        save: "./out/banner.png"

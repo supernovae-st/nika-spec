@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-012",
+      "category": "security_error"
+    }
+  ],
+  "note": "10 §the effect vocabulary (same-path mutations) · 02 §Harness images · an images.save mutates every path it can write · two saves of one lexical key with no precedence path race (the ordered twin is 050)."
+}

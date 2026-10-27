@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: infer-vision-file-outside-read
+permits:
+  fs: { read: ["./docs/**"] }
+tasks:
+  describe:
+    infer:
+      prompt: "Describe the flow this diagram shows"
+      vision:
+        - source: file
+          path: "./diagrams/flow.png"

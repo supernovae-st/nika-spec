@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-009",
+      "category": "security_error"
+    }
+  ],
+  "note": "02-verbs.md §Vision inputs · 05 NIKA-SEC-009 · NEP-0002 · the vision: entries are part of the infer task's effect surface: untrusted content that picks a path picks what the model sees, so the answer carries it to the egress write (private read · untrusted ingress · external egress, no blocking gate), as a nika:read whose path it picks does."
+}
