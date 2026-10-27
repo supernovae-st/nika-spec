@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+# A caller-supplied save path under no permits: block: no value can fit the
+# empty boundary, and the run would refuse it only after a paid turn.
+nika: agent-images-save-rendered-absent-permits
+inputs:
+  banner: { type: string, required: true }
+tasks:
+  banner:
+    agent:
+      prompt: "Draw a release banner"
+      images:
+        save: "${{ inputs.banner }}"

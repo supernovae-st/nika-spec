@@ -1918,8 +1918,8 @@ diagnostics:
     namespace: SEC
     plane: unclassified
     condition: secret flow — a secrets.<name> value reaches an unsanctioned sink (exec argument · invoke payload
-      · infer/agent prompt) · the diagnostic carries the taint path + the egress clause that would sanction it (spec
-      10 · flow rules in 01 §egress)
+      · infer/agent prompt · infer vision entry) · the diagnostic carries the taint path + the egress clause that
+      would sanction it (spec 10 · flow rules in 01 §egress)
     outcome_class: failure
     cause: security_error
     retryable: false
@@ -1927,8 +1927,9 @@ diagnostics:
     payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
     span_required: false
     teaching: secret flow — a secrets.<name> value reaches an unsanctioned sink (exec argument · invoke payload
-      · infer/agent prompt) · the diagnostic carries the taint path + the egress clause that would sanction it (spec
-      10 · flow rules in 01 §egress) · spec/05-errors.md (import-c0 · the teaching string mints at C1).
+      · infer/agent prompt · infer vision entry) · the diagnostic carries the taint path + the egress clause that
+      would sanction it (spec 10 · flow rules in 01 §egress) · spec/05-errors.md (import-c0 · the teaching string
+      mints at C1).
     notes: 'import-c0 (canon-flip) · category: security_error · transient: false (canon.yaml + spec/05-errors.md
       verbatim) · cause carries the canon.yaml category verbatim at import-c0 · the table-13 runtime cause mapping
       mints at C1 · plane (check vs runtime) is not given per-code by the source → unclassified until C1 · terminal=true

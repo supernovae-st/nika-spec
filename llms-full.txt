@@ -1550,7 +1550,9 @@ to be supplied by the deployment.
 #### `egress` · *optional · sanctioned destinations (declassification)*
 
 By default, a `secrets.<name>` value reaching ANY effect, an `exec:` or
-`invoke:` sink, OR an `infer:`/`agent:` **prompt** (`prompt:` + `system:`),
+`invoke:` sink, OR an `infer:`/`agent:` **prompt** (`prompt:` + `system:`,
+and an `infer:` task's `vision:` entries: the URL the provider fetches, the
+file path that chooses the bytes it receives),
 is a **blocking leak**: the engine masks its own output but cannot follow a
 secret a subprocess, a tool, or a third-party provider re-emits (`nika check`
 refuses the workflow — `NIKA-SEC-006`, the taint path in the diagnostic;
@@ -2586,22 +2588,39 @@ read: an ungranted path is never opened.
 | no `permits:` block at all | an effect under an absent block · zero authority | `NIKA-AUTH-006` |
 | a `permits:` block whose `fs.read` does not admit the path | outside the declared boundary | `NIKA-SEC-004` |
 | a boundary that admits the path | read when the task runs · its bytes ride the request | — |
+| a boundary that admits the path, and no file there can be read | the read's own failure, before any provider call | `NIKA-BUILTIN-READ-001` (no file at the path) · `NIKA-BUILTIN-READ-002` (any other read failure) |
 
 **When the path is judged.** A literal path, or a whole bare `const`
 reference to a declared string, is judged at check, before any token. Any
 other form is judged at run on its rendered value, in the lexical canonical
 form every fs effect is matched in (`.` and `..` resolved, separators
 collapsed), before the file is opened: an escape fails the task
-`NIKA-SEC-004`. The inferred boundary (`nika check --infer-permits`) lists
-every path judged at check in `fs.read`, so the block it prints re-checks
-clean.
+`NIKA-SEC-004`. Whatever the form, whether the boundary admits any read at
+all is known before the run: an entry under no `permits:` block
+(`NIKA-AUTH-006`), or under a block whose `fs.read` admits no path
+(`NIKA-SEC-004`), is refused at check, since no rendered value can fit an
+empty grant. The inferred boundary (`nika check --infer-permits`) lists
+every workspace path judged at check in `fs.read`, so the block it prints
+re-checks clean; a path that escapes the workspace (absolute, `~`, or a
+leading `..` after lexical normalization) is named for review and never
+printed as a grant, and its task stays refused until the author points it
+inside the workspace or grants the host path deliberately.
 
 **A URL is not an fs effect.** A `source: url` entry hands its URL to the
 provider, which fetches the image. Nika never fetches it, so the entry needs
-no `fs` grant and no `net.http` grant, and `permits: {}` admits it. The URL
-is part of what the request sends the provider: provider egress, governed by
-the secret-flow rules ([10](./10-authority.md)), not by a capability
-category.
+no `fs` grant and no `net.http` grant, and `permits: {}` admits it.
+
+**The entries are part of the request.** The URL is part of what the request
+sends the provider, and a file path chooses the bytes it sends: both are
+provider egress, governed by the secret-flow rules ([01
+§egress](./01-envelope.md#egress--optional--sanctioned-destinations-declassification)
+· [10](./10-authority.md)), not by a capability category. A secret in a
+`vision:` entry is the `infer` sink's leak (`NIKA-SEC-006`) unless its
+`egress:` sanctions `{ to: "infer" }`, exactly as a secret in the prompt is.
+For the content-taint rules the entries are part of the task's effect
+surface: untrusted content that picks a path or a URL picks what the model
+sees, so the task's answer carries it (`NIKA-SEC-009`), as a `nika:read`
+whose path it picks does.
 
 ### Conformance
 
@@ -2613,7 +2632,7 @@ A v0.1-compliant engine MUST ·
 - **Fail an answer cut at the output cap** · when the provider reports that it stopped at `max_tokens` (Anthropic `max_tokens` · OpenAI-compatible `length` · Gemini `MAX_TOKENS`), the task fails with `NIKA-INFER-005` (`budget_error` · not transient): the visible text received is preserved at `error.details.partial_output` and the stop reason at `error.details.stop_reason`. A cut answer is never the task output and is never validated against `schema:` (it would fail `NIKA-INFER-002` and hide its cause); an empty visible answer stays `NIKA-INFER-004`. On a route that reasons by default the cap also pays for the reasoning. A partial answer that is acceptable is recovered explicitly through `on_error:`
 - **Reject** any unknown field with a clear error (`NIKA-PARSE-005`) — the choice this line used to leave open is closed by [07 §unknown key](./07-conformance.md#an-unknown-key-is-an-error-at-every-level-normative--d-2026-08-11-n20): a key can REMOVE authority, so accept-and-warn fails open
 - Resolve a `{ file: }` prompt, system or schema at compose time under [§Project files](#project-files---file--normative) · the path law (`NIKA-FILE-001`), the read boundary before the read (`NIKA-AUTH-006` · `NIKA-SEC-004`), the read law (`NIKA-FILE-002` · `NIKA-FILE-003`), then the inline templating law over a text or the schema content law over a schema (`NIKA-TYPE-007`) · never start a run with an unread or unjudged project file
-- Judge every `vision:` file against the declared `permits.fs.read` boundary BEFORE opening it ([§Vision inputs](#vision-inputs--vision-normative)) · at check for a literal or whole bare `const` path (`NIKA-AUTH-006` under an absent block · `NIKA-SEC-004` outside a declared one), at run for any other form (`NIKA-SEC-004`) · never fetch a `source: url` image
+- Judge every `vision:` file against the declared `permits.fs.read` boundary BEFORE opening it ([§Vision inputs](#vision-inputs--vision-normative)) · at check for a literal or whole bare `const` path (`NIKA-AUTH-006` under an absent block · `NIKA-SEC-004` outside a declared one), and for any form under a boundary that admits no read · at run for any other form (`NIKA-SEC-004`) · fail a granted file that cannot be read with the read's own code (`NIKA-BUILTIN-READ-001` · `-002`) before any provider call · treat every `vision:` entry as a provider-egress sink of the task (`NIKA-SEC-006` · `NIKA-SEC-009`) · never fetch a `source: url` image
 
 ### Subscription harness access (normative)
 
@@ -3104,13 +3123,21 @@ halftone:
 - **`save:`** · a path, `${{ }}` allowed. The engine writes the first image's
   received bytes at that path, and image *n* (2 ≤ *n* ≤ 4) at the path with
   `-n` inserted before its extension (`banner.png`, then `banner-2.png`): a
-  save names at most four files, and a turn that delivers a fifth image fails
-  the task before any file is written. Every path is judged against
-  `permits.fs.write` before any byte is written (`NIKA-AUTH-006` under an
-  absent block, `NIKA-SEC-004` outside a declared one): at check, all four
+  save names at most four files, and a turn that delivers a fifth image (an
+  image whose bytes arrived · a reported path is not one) fails the task
+  before any file is written. Every path is judged against
+  `permits.fs.write` before any byte is written to it (`NIKA-AUTH-006` under
+  an absent block, `NIKA-SEC-004` outside a declared one). At check: all four
   for a literal path or a whole bare `const` reference to a declared string,
-  since how many images arrive is known only at run; at run, every path the
-  run will write, a rendered one included, before the first write. For the
+  since how many images arrive is known only at run, and a save of any form
+  under a boundary whose `fs.write` admits no path. At run, before the first
+  write, every path the run will write, a rendered one included, is fitted
+  against the declared boundary in the lexical form the check uses: a grant
+  that holds the first path and not a sibling refuses the delivery with
+  nothing written. Each path is then judged on its resolved form before its
+  own write, so a save spelled in a form the lexical fit cannot judge (an
+  absolute or `~` path) meets that judgment write by write, and a refused
+  sibling can follow an image already written. For the
   same-path law ([10](./10-authority.md#the-effect-vocabulary-normative--closed))
   the save mutates all four paths. A write replaces an existing file
   atomically. A task whose session delivered no image bytes fails
@@ -3134,7 +3161,7 @@ The engine MUST ·
 - Detect the `nika:done` completion sentinel and exit gracefully
 - Return the final model response as task output
 - Resolve `skills:` at compose time · judge every path against the declared `permits.fs.read` boundary BEFORE opening it (`NIKA-AUTH-006` under an absent block · `NIKA-SEC-004` outside a declared one) · inject the `## Skills` section in source order exactly as specified above · fail statically (`NIKA-AGENT-003`/`NIKA-AGENT-004`) on a missing or invalid skill file — never start a run with a half-composed context
-- Under `images:` · make the images received on the task's own session, and only those, the `images` list of `.output` · never open a path the application reports · write each received image at its `save:` path inside `permits.fs.write` before the task succeeds, judging every path it writes before the first write, or fail `NIKA-AGENT-007` when none was received · fail a turn that delivers a fifth image to a save before any write · refuse `images:` on a route without a seat before the first request
+- Under `images:` · make the images received on the task's own session, and only those, the `images` list of `.output` · never open a path the application reports · write each received image at its `save:` path inside `permits.fs.write` before the task succeeds, fitting every path it writes before the first write and judging each before its own write, or fail `NIKA-AGENT-007` when none was received · fail a turn that delivers a fifth image to a save before any write · refuse `images:` on a route without a seat before the first request
 
 ---
 
@@ -6204,7 +6231,7 @@ these from this file alone.
 | `NIKA-SEC-003` | run-recursion bound — nested-run depth exceeded OR self-launching workflow | `security_error` | false |
 | `NIKA-SEC-004` | effect outside the declared `permits:` capability boundary (fs/net/exec/tool · [01 §permits](./01-envelope.md#permits--optional--the-declared-capability-boundary)) · ⚠️ **`env` is the fifth category since D-2026-08-11-N22 and this code does NOT yet cover it** — measured 2026-08-11 on the shipped binary: an in-process expression reads the ambient environment under an absent `permits:` block and under an explicit empty `permits.env`, and the static check reports the body as pure compute. Stated as an obligation, not a guarantee: a spec that listed `env` here before the engine enforced it would be the parallel-list defect this vocabulary exists to prevent · ✅ **the measured hole is CLOSED since 2026-08-15** — re-measured that day on the same three authority shapes (absent block · explicit empty `permits.env` · granted `permits.env`): all three now REFUSE at `nika check` with `NIKA-VAR-005`, naming the class the program reached for. The remedy is D-2026-08-11-N26's SUBTRACTION, not coverage by this code: `env` is withheld from the function set every jq seam compiles with, so the program never becomes runnable. The first half of the ⚠️ therefore STANDS — this code still does not make `env` a boundary category — while the evidence sentence behind it no longer holds | `security_error` | false |
 | `NIKA-SEC-005` | SSRF block — a `nika:fetch`/`nika:notify` URL resolves to a loopback/private/link-local/metadata target (the always-on engine floor · independent of `permits:`, with ONE carve-out: an exact loopback literal in `permits.net.http` declassifies the floor for that host only · [01 §permits](./01-envelope.md#permits--optional--the-declared-capability-boundary)) | `security_error` | false |
-| `NIKA-SEC-006` | secret flow — a `secrets.<name>` value reaches an unsanctioned sink (an `exec:` argument · an `invoke:` payload · an `infer:`/`agent:` prompt) · the diagnostic carries the **taint path** + the exact `egress:` clause that would sanction it ([10 §secret flow](./10-authority.md#secret-flow-refusals-carry-their-codes-normative) · rules in [01 §egress](./01-envelope.md#egress--optional--sanctioned-destinations-declassification)) | `security_error` | false |
+| `NIKA-SEC-006` | secret flow — a `secrets.<name>` value reaches an unsanctioned sink (an `exec:` argument · an `invoke:` payload · an `infer:`/`agent:` prompt · an `infer:` `vision:` entry) · the diagnostic carries the **taint path** + the exact `egress:` clause that would sanction it ([10 §secret flow](./10-authority.md#secret-flow-refusals-carry-their-codes-normative) · rules in [01 §egress](./01-envelope.md#egress--optional--sanctioned-destinations-declassification)) | `security_error` | false |
 | `NIKA-SEC-007` | secret egress — a tainted value reaches the workflow boundary (`outputs:` · where a result leaves the run) · the diagnostic carries the taint path ([10 §secret flow](./10-authority.md#secret-flow-refusals-carry-their-codes-normative)) | `security_error` | false |
 | `NIKA-SEC-008` | a `nika:fetch` whose RESOLVED URL path names a data-as-code class — matched case-insensitively on the final extension; the diagnostic names the class and both repairs ([10 §authority](./10-authority.md)) | `security_error` | false |
 | `NIKA-SEC-009` | lethal trifecta complete — the declared boundary grants private read (`fs.read` non-empty) + untrusted ingress (a `nika:fetch` builtin invoked · an `mcp:*` tool invoked · an `agent:` whose whitelist admits ingress · **v2.2: an `exec:` task, `permits.exec` itself the ingress channel**) + external egress (`net.http` non-empty · an escaping `fs.write` glob · `exec` enabled), the untrusted content **reaches** an egress-capable task's effect surface (a realized flow), and no blocking `invoke: { tool: "nika:prompt" }` (no `default:`) dominates it · one finding per ungated tainted egress task, witness-named `source → sink` (NEP-0002 v2.0 · the Rule of Two as a static check · SEC-008 stays allocated to the AUTH plane) | `security_error` | false |
@@ -8383,7 +8410,8 @@ Two derived facts the engine computes and no author writes:
   [02 §Project files](./02-verbs.md#project-files---file--normative)). With
   neither it is **pure compute**: zero required effects (provider egress,
   a `vision:` URL the provider fetches included, is governed by the secrets
-  flow rules, not by a capability category).
+  flow rules, not by a capability category: a secret in any `vision:` entry
+  is the `infer` sink's, `NIKA-SEC-006` unless sanctioned).
 - **The workflow's needed boundary** — the union of its tasks' required
   effects, as a `permits:` block (`nika check --infer-permits` prints
   it; the round-trip law holds: the inferred block re-checks clean).
@@ -8594,7 +8622,7 @@ refusal classes were report-only until W4:
 
 | Code | Class | Witness (in the diagnostic) |
 |---|---|---|
-| `NIKA-SEC-006` | a `secrets.<name>` value reaches an **unsanctioned sink** (an `exec:` argument · an `invoke:` payload · an `infer:`/`agent:` prompt) | the **taint path**, source-first (`secrets.api_key → with.tok → tasks.call.output → exec`) + the exact `egress: [{ to: "<sink>" }]` clause that would sanction it |
+| `NIKA-SEC-006` | a `secrets.<name>` value reaches an **unsanctioned sink** (an `exec:` argument · an `invoke:` payload · an `infer:`/`agent:` prompt · an `infer:` `vision:` entry) | the **taint path**, source-first (`secrets.api_key → with.tok → tasks.call.output → exec`) + the exact `egress: [{ to: "<sink>" }]` clause that would sanction it |
 | `NIKA-SEC-007` | a tainted value reaches the **workflow boundary** (`outputs:` — where a result leaves the run) | the taint path into the `outputs:` entry |
 
 Both are `security_error`, check-time, blocking. The taint path is not

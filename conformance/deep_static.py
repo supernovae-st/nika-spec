@@ -58,7 +58,9 @@
 #                 permits.fs.write (every input is a judged read) · an
 #                 infer's literal / bare-const vision: files vs
 #                 permits.fs.read · an agent's images.save paths (the path
-#                 and its -2..-4 siblings) vs permits.fs.write
+#                 and its -2..-4 siblings) vs permits.fs.write · a vision
+#                 file or images.save of any form under a side that admits
+#                 no path (no rendered value can fit an empty grant)
 #   SHARED-MUTATION two mutating tasks (write · edit · remove · an agent's
 #                 images.save, its siblings included) on one known path
 #                 with no precedence path between them, or a for_each fan
@@ -69,6 +71,8 @@
 #                 effect is NIKA-AUTH-006 before any token · pure compute
 #                 passes · the null spelling is refused prescriptively ·
 #                 computed resources defer to the runtime NIKA-SEC-004
+#                 (a vision file or images.save of any form is an fs
+#                 requirement: ∅ decides the category, as for exec)
 #
 # Emitted errors reuse the canonical namespaces (NIKA-VAR for expression
 # surface · NIKA-PARSE for shape rules · runner-protocol.md matching).
@@ -419,18 +423,19 @@ def _task_required_absent(t: dict, doc: dict) -> set[str]:
         for sk in _static_skill_paths(ag):
             req.add("fs")
             break
-        # 02 §Harness images · a literal (or whole bare-const) images.save
-        # path is an fs write the engine performs for the task: under an
-        # absent block it is NIKA-AUTH-006 before any byte is written (a
-        # rendered one defers to the runtime boundary, law 3).
-        if _static_write_path(_agent_images_save(ag), doc) is not None:
+        # 02 §Harness images · an images.save is an fs write the engine
+        # performs for the task: under an absent block it is NIKA-AUTH-006
+        # before any byte is written, whatever form the path takes — which
+        # file a rendered one names is the run's (law 3), but ∅ decides the
+        # category question, as for exec.
+        if _agent_images_save(ag) is not None:
             req.add("fs")
     # 02 §Project files · a lawful prompt file's text reaches the model: an fs read.
     if _static_file_paths(t):
         req.add("fs")
     # 02 §Vision inputs · a vision file's bytes reach the provider: an fs read,
-    # judged at check for a literal or whole bare-const path.
-    if _static_vision_paths(t, doc):
+    # whatever form its path takes (∅ admits no read: the category question).
+    if _vision_files(t):
         req.add("fs")
     return req
 
@@ -490,6 +495,15 @@ def _static_vision_paths(t: dict, doc: dict) -> list[str]:
         if path is not None:
             out.append(path)
     return out
+
+
+def _escapes_workspace(path: str) -> bool:
+    """Whether a path leaves the workspace in its lexical canonical form:
+    absolute, `~`, or a leading `..` after normalization (the inferred
+    block never pastes such a path as a grant · 02 §Vision inputs)."""
+    canonical = _taint_canonical_path(path)
+    return (canonical.startswith(("/", "~"))
+            or canonical == ".." or canonical.startswith("../"))
 
 
 def _static_skill_paths(agent: dict) -> list[str]:
@@ -759,7 +773,10 @@ def _infer_permits_block(tasks: list, doc: dict) -> dict:
         for pf in _static_file_paths(t):
             keep(reads, pf)
         for vf in _static_vision_paths(t, doc):
-            keep(reads, vf)
+            # 02 §Vision inputs · a path that escapes the workspace is
+            # named for review, never printed as a host-file grant.
+            if not _escapes_workspace(vf):
+                keep(reads, vf)
     block: dict = {}
     if tools:
         block["tools"] = sorted(tools)
@@ -2227,6 +2244,17 @@ def deep_static_errors(doc: dict, base_dir=None) -> list[dict]:
                 # on every path the save can write (the path, then -2..-4):
                 # an exact-file grant holds the first image, not the second.
                 saves = _static_save_paths(ag, doc)
+                if (not saves and _agent_images_save(ag) is not None
+                        and not write_globs):
+                    # A rendered save under an fs.write that admits no path:
+                    # every value is outside an empty grant (the run refuses
+                    # it whatever it renders to, after a paid turn).
+                    errs.append({"code": "NIKA-SEC-004", "namespace": "NIKA-SEC",
+                                 "category": "security_error",
+                                 "detail": f"task '{tid}' · images.save path computed at "
+                                           "run, and permits.fs.write admits no path "
+                                           "(02 §Harness images · grant the paths the save "
+                                           "may name)"})
                 outside = next(((n, p) for n, p in enumerate(saves, start=1)
                                 if not _taint_globbed(p, write_globs)), None)
                 if outside is not None:
@@ -2257,6 +2285,15 @@ def deep_static_errors(doc: dict, base_dir=None) -> list[dict]:
                                            "reaches the model · grant the path)"})
             # 02 §Vision inputs · a vision file is read and its bytes reach the
             # provider: inside permits.fs.read, judged BEFORE the file is opened.
+            # A rendered path under an fs.read that admits no path can never
+            # fit: refused here, once per task (which file is the run's).
+            if (not read_globs
+                    and len(_static_vision_paths(t, doc)) < len(_vision_files(t))):
+                errs.append({"code": "NIKA-SEC-004", "namespace": "NIKA-SEC",
+                             "category": "security_error",
+                             "detail": f"task '{tid}' · vision file path computed at run, "
+                                       "and permits.fs.read admits no path (02 §Vision "
+                                       "inputs · grant the paths the task may name)"})
             for vf in _static_vision_paths(t, doc):
                 if not _taint_globbed(vf, read_globs):
                     errs.append({"code": "NIKA-SEC-004", "namespace": "NIKA-SEC",

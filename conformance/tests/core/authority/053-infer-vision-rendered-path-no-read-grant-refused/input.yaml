@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+# The declared zero admits no read: a rendered vision path can never fit it.
+nika: infer-vision-rendered-path-no-read-grant
+inputs:
+  diagram: { type: string, required: true }
+permits: {}
+tasks:
+  describe:
+    infer:
+      prompt: "Describe the flow this diagram shows"
+      vision:
+        - source: file
+          path: "${{ inputs.diagram }}"

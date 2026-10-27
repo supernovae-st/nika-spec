@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+# The declared zero admits no write: a rendered save can never fit it.
+nika: agent-images-save-rendered-no-write-grant
+inputs:
+  banner: { type: string, required: true }
+permits: {}
+tasks:
+  banner:
+    agent:
+      prompt: "Draw a release banner"
+      images:
+        save: "${{ inputs.banner }}"
