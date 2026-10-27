@@ -455,8 +455,6 @@ An engine release names its spec commit twice, and the two must agree. For
 example, at engine v0.124.0, the current release (the last line runs in
 your clone of this repository):
 
-<!-- TODO(0.124.0 tag): run these three commands against the v0.124.0 tag and keep the output below only if it matches. If the tag pins another spec commit than 5cd95cd, replace 5cd95cd everywhere in this change. -->
-
 ```sh
 curl -sS https://raw.githubusercontent.com/supernovae-st/nika/v0.124.0/SPEC_PIN | grep -v '^#'
 curl -sS https://raw.githubusercontent.com/supernovae-st/nika/v0.124.0/crates/nika-pack/pack/SPEC_SHA
@@ -548,8 +546,8 @@ Not sure an idea deserves a proposal? Pressure-test it first in the engine's
 
 ## Status
 
-- **The current release.** Engine 0.124.0 (TODO(0.124.0 tag: release
-  date)) embeds this spec at commit
+- **The current release.** Engine 0.124.0 (2026-10-27) embeds this spec
+  at commit
   [`5cd95cd`](https://github.com/supernovae-st/nika-spec/commit/5cd95cd25c0ff453be266794a03666e5e3f2d7a8),
   the commit its `SPEC_PIN` names. 0.124 is the current release line. Work
   stays focused on maintenance, security and the media capabilities

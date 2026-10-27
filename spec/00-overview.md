@@ -58,7 +58,7 @@ These 5 pillars are **locked forever** at v1. Everything else (providers · buil
 
 ## Pre-1.0 stability contract
 
-> **Amended TODO(0.124.0 tag: release date) · the current release line.**
+> **Amended 2026-10-27 · the current release line.**
 > Engine 0.124.0 embeds this spec at commit `5cd95cd`. 0.124 is the current
 > release line. Work stays focused on maintenance, security and the media
 > capabilities workflows need; native video is planned for 0.125. No engine

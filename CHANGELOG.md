@@ -16,7 +16,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Changes merged after the spec commit engine 0.123.0 embeds. They reach the
 engine at its next `SPEC_PIN` bump.
 
-### Changed · engine 0.124.0 is the current release (TODO(0.124.0 tag: date))
+### Changed · engine 0.124.0 is the current release (2026-10-27)
 
 - The README, CONTRIBUTING, SECURITY, the QUICKSTART status line and 00
   §Pre-1.0 stability contract name engine 0.124.0, which embeds this spec at
@@ -32,9 +32,12 @@ engine at its next `SPEC_PIN` bump.
   `5cd95cd` for engine 0.124.0. The `6390b08` copy they named flags
   `nika:image_compose` and an agent's `images:`, which 0.124.0 accepts.
 - `CONFORMANT_IMPLEMENTATIONS.md` lists engine 0.124.0 at `5cd95cd`,
-  measured with the released binary (TODO(0.124.0 tag: the counts of the
-  row)); the 0.123.0 row stays as history. The pre-commit usage comment
-  pins the engine's `nika-check` hook at `v0.124.0`.
+  measured with the released binary: static sweep 443/450 (core 267/268,
+  stdlib surface 109/115), runtime differential 121 agree · 4 diverge ·
+  0 engine errors with 46 of 171 unsupported, lints 7/7. No level is
+  claimed at that commit, and every red is named. The 0.123.0 row stays
+  as history. The pre-commit usage comment pins the engine's
+  `nika-check` hook at `v0.124.0`.
 
 ### Changed · a media builtin's `cost_usd` may come from a dated price catalog (2026-10-27)
 
