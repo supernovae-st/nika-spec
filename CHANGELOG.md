@@ -22,14 +22,18 @@ engine at its next `SPEC_PIN` bump.
   with `cost_basis`, the origin of the figure: the provider's own exact
   report (`provider_reported`, xai's cost ticks), or the engine's dated
   price catalog applied to what the provider reported or billed:
-  `catalog_rate_x_usage` (token rates × the usage the response reported),
-  `catalog_price_x_images` (the price per image at the requested size class
-  and quality × the images delivered, when the response reports no usage) or
-  `catalog_rate_x_characters` (the rate per character × the characters a
+  `catalog_rate_x_usage` (token rates × the usage the responses reported, a
+  response that reported none adding its images at the price per image),
+  `catalog_price_x_images` (the price per image × the images delivered, when
+  no response reports usage; the requested size class and quality, or the
+  highest the catalog lists for what the request leaves open, never below)
+  or `catalog_rate_x_characters` (the rate per character × the characters a
   speech request sent). A catalog figure also carries `cost_as_of`, the date
-  its rates were read from the provider's public price page. Without a
-  report or a catalog rate, `cost_usd` stays `null` with no marker, never an
-  estimate dressed as truth and never a zero. The catalog is engine data,
+  its rates were read from the provider's public price page. When neither a
+  report nor the catalog yields a figure (an unpriced model, or a model
+  priced by tokens only whose response reports no usage), `cost_usd` stays
+  `null` with no marker, never an estimate dressed as truth and never a
+  zero. The catalog is engine data,
   not language surface; the spend-honesty law (07, law 5) is what a figure
   must carry. Prose only: no schema, fixture or language change.
 

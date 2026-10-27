@@ -801,13 +801,19 @@ provider's own exact report (`provider_reported` · xai bills
 `cost_in_usd_ticks` in the response · 1 cent = 10⁸ ticks), or the
 engine's dated price catalog applied to what the provider reported:
 `catalog_rate_x_usage` (the model's catalog token rates × the usage the
-response reported) or `catalog_price_x_images` (the model's catalog price
-per image, at the requested size class and quality, × the images
-delivered, when the response reports no usage). A catalog figure also
-carries `cost_as_of`, the date its rates were read from the provider's
-public price page (`YYYY-MM-DD`). With neither a report nor a catalog
-rate, `cost_usd` is `null` and both markers are absent — never an
-estimate dressed as truth, never a zero. The catalog itself is engine
+responses reported, a response that reported none adding its images at
+the catalog price per image) or `catalog_price_x_images` (the model's
+catalog price per image × the images delivered, when no response reports
+usage). The price per image is the catalog's for the requested size class
+and quality; where the request leaves either open (`quality: auto`, a
+size the catalog does not list), the highest the catalog lists for what it
+could have rendered, never below. A catalog figure also carries
+`cost_as_of`, the date its rates were read from the provider's public
+price page (`YYYY-MM-DD`). When neither the provider's report nor the
+catalog yields a figure (a model the catalog does not price, or one it
+prices by tokens only whose response reports no usage), `cost_usd` is
+`null` and both markers are absent — never an estimate dressed as truth,
+never a zero. The catalog itself is engine
 data, not language surface (spend-honesty law ·
 [07](../spec/07-conformance.md)). **Invoke-cost metering (normative)** · a
 tool whose structured output carries a top-level numeric `cost_usd`
