@@ -16,6 +16,23 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Changes merged after the spec commit engine 0.123.0 embeds. They reach the
 engine at its next `SPEC_PIN` bump.
 
+### Changed · a media builtin's `cost_usd` may come from a dated price catalog (2026-10-27)
+
+- `nika:image_generate` and `nika:tts_generate` report a non-null `cost_usd`
+  with `cost_basis`, the origin of the figure: the provider's own exact
+  report (`provider_reported`, xai's cost ticks), or the engine's dated
+  price catalog applied to what the provider reported or billed:
+  `catalog_rate_x_usage` (token rates × the usage the response reported),
+  `catalog_price_x_images` (the price per image at the requested size class
+  and quality × the images delivered, when the response reports no usage) or
+  `catalog_rate_x_characters` (the rate per character × the characters a
+  speech request sent). A catalog figure also carries `cost_as_of`, the date
+  its rates were read from the provider's public price page. Without a
+  report or a catalog rate, `cost_usd` stays `null` with no marker, never an
+  estimate dressed as truth and never a zero. The catalog is engine data,
+  not language surface; the spend-honesty law (07, law 5) is what a figure
+  must carry. Prose only: no schema, fixture or language change.
+
 ### Added · native image composition and keyless speech (2026-10-26)
 
 - `nika:image_compose`, the 30th builtin (stdlib §Media graduate #5): an
