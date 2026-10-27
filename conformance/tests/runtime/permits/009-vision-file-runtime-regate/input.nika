@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: rt-permits-vision-file-regate
+model: mock/echo
+permits:
+  fs: { read: ["./diagrams/**"] }
+inputs:
+  diagram: { type: string, required: true }
+tasks:
+  describe:
+    infer:
+      prompt: "Describe the flow this diagram shows"
+      vision:
+        - source: file
+          path: "${{ inputs.diagram }}"

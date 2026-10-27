@@ -2059,9 +2059,10 @@ diagnostics:
     namespace: SEC
     plane: check
     condition: 'unordered shared mutations — two tasks incomparable in the DAG closure
-      whose nika:write/nika:edit/nika:remove_file targets collide (a literal path in
-      lexical normal form · a whole bare const/inputs reference with a string const
-      value or string input default, keyed by that string''s lexical normal form ·
+      whose nika:write/nika:edit/nika:remove_file targets or agent: images.save targets
+      (the save path and its -2, -3, -4 siblings · 02 §Harness images) collide (a literal
+      path in lexical normal form · a whole bare const/inputs reference with a string
+      const value or string input default, keyed by that string''s lexical normal form ·
       otherwise that reference''s own immutable binding identity, distinct from file
       names) with no precedence path (with: · group fold · after: other than unwind)
       to serialize them, or a for_each fan mutating one known path · parallelism is
@@ -2073,10 +2074,10 @@ diagnostics:
     payload_schema: to-mint-c1/diagnostics/payloads/security_error.schema.json
     span_required: true
     teaching: 'parallelism is safe exactly where the mutations are provably disjoint ·
-      serialize the colliding writers and removers with a precedence path (with: ·
-      group fold · after: other than unwind, which never orders) or make the targets
-      disjoint · a for_each fan mutating one constant path derives the path from the
-      item instead (NEP-0014 law 1).'
+      serialize the colliding writers, removers and image saves with a precedence path
+      (with: · group fold · after: other than unwind, which never orders) or make the
+      targets disjoint · a for_each fan mutating one constant path derives the path
+      from the item instead (NEP-0014 law 1).'
     notes: 'nep-0014 (2026-07-29) · category: security_error · transient: false
       (canon.yaml verbatim) · minted by the lot-3 thin-laws lane (F-P15) ·
       law_ids empty until the freeze batch names the canon law · the lane

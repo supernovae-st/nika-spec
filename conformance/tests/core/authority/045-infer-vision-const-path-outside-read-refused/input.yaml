@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+# A whole bare const reference names a declared string: its value is known
+# at check and judged exactly as the literal would be.
+nika: infer-vision-const-path-outside-read
+const:
+  diagram: "./private/flow.png"
+permits:
+  fs: { read: ["./diagrams/**"] }
+tasks:
+  describe:
+    infer:
+      prompt: "Describe the flow this diagram shows"
+      vision:
+        - source: file
+          path: "${{ const.diagram }}"

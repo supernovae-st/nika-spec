@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: Apache-2.0
+# A second delivered image lands at ./out/banner-2.png, the file the
+# unordered write also targets.
+nika: agent-images-save-sibling-write
+run:
+  access:
+    via: codex
+    protocol: acp
+permits:
+  tools: ["nika:write"]
+  fs: { write: ["./out/**"] }
+tasks:
+  hero:
+    agent:
+      prompt: "Draw two variants of a release banner, no text"
+      images:
+        save: "./out/banner.png"
+  placeholder:
+    invoke:
+      tool: "nika:write"
+      args: { path: "./out/banner-2.png", content: "placeholder" }

@@ -1785,10 +1785,14 @@ subprocess's environment reads are opaque) · the undeclared-read failure
 mode is the child tool's own missing-variable error, and the repair is
 one declared line (`env: [NAME]`).
 
-So `permits: {}` is a workflow limited to compute (`infer:` + CEL +
-`nika:jq`): zero fs, zero net, zero shell, zero tools, zero env
-passthrough (its children see the runner env floor plus their task `env:`
-maps, nothing else). That property is checkable BEFORE the run.
+So `permits: {}` is a workflow limited to compute (an `infer:` that reads
+no file + CEL + `nika:jq`): zero fs, zero net, zero shell, zero tools, zero
+env passthrough (its children see the runner env floor plus their task
+`env:` maps, nothing else). That property is checkable BEFORE the run. An
+`infer:` that names a `vision:` file or a `{ file: }` project file reads it,
+so it needs an `fs.read` grant
+([02 §Vision inputs](./02-verbs.md#vision-inputs--vision-normative));
+a `vision:` URL, which the provider fetches, needs none.
 
 > #### 🔴 `permits: {}` MUST be identical to an absent block · corrected 2026-08-11
 >
@@ -2425,7 +2429,7 @@ research:
         enabled: true
         budget_tokens: 4000
       vision:                            # optional · vision input
-        - source: file
+        - source: file                   # a read · permits.fs.read admits the path
           path: "./diagram.png"
 ```
 
@@ -2440,7 +2444,7 @@ research:
 | `max_tokens` | no | integer | Max output tokens · provider-dependent default · an answer the provider cuts at this cap fails (`NIKA-INFER-005`) · a model that reasons before it answers draws its reasoning from this budget: give it room (16,384), or a low `run.reasoning.effort` its route documents; too little returns an empty answer (`NIKA-INFER-004`) |
 | `schema` | no | object, or `{ file: <path> }` | raw JSON Schema, inline or kept in a project file ([§Project files](#project-files---file--normative)) · structured output validation — the **out-of-core hatch**; the typed door is task-level `returns:` ([09](./09-types.md) · both on one task = `NIKA-TYPE-003`). Numeric facts (`0\|1\|3`, counts, coded levels) are `type: integer` with a numeric `enum` — never `enum: ["0","1","3"]`. Models emit JSON numbers; a string-digit enum can reject the call before coerce (reference engine hint `digit-string-enum`). The model extracts facts; `nika:jq` or `nika:decide` is the law ([11](./11-decision.md) · `examples/13-extract-then-law.nika`) |
 | `thinking` | no | object | Extended thinking · `{ enabled, budget_tokens }` |
-| `vision` | no | array | Image inputs · each `{ source: file|url, path|url, … }` |
+| `vision` | no | array | Image inputs · each `{ source: file, path: <path> }`, a read inside `permits.fs.read`, or `{ source: url, url: <url> }`, fetched by the provider and never by Nika ([§Vision inputs](#vision-inputs--vision-normative)) |
 
 ### Project files · `{ file: }` (normative)
 
@@ -2545,6 +2549,60 @@ file text alike, never one more strictly than the other, and refuses
 nothing; a secret the provider needs belongs in `secrets:`, whose egress
 laws apply ([10](./10-authority.md)).
 
+### Vision inputs · `vision:` (normative)
+
+`vision:` lists the images sent with the prompt. Each entry is
+`{ source: file, path: <path> }`, an image file the engine reads, or
+`{ source: url, url: <url> }`, an image the provider fetches.
+
+```yaml
+tasks:
+  describe:
+    infer:
+      prompt: "Describe the flow this diagram shows"
+      vision:
+        - source: file
+          path: "./diagrams/flow.png"            # read by the engine · its bytes reach the provider
+        - source: url
+          url: "https://example.com/legend.png"  # fetched by the provider · never by Nika
+```
+
+```yaml
+permits:
+  fs: { read: ["./diagrams/**"] }   # the image reaches the provider · a read inside the boundary
+```
+
+**A vision file is a read inside `permits.fs.read`.** The engine reads the
+file and sends its bytes to the model provider with the request: a read
+whose bytes reach a destination, the class of `nika:read`, of a `skills:`
+file ([§Agent Skills](#agent-skills--skills)) and of a project file
+([§Project files](#project-files---file--normative)). Its path must be
+admitted by the workflow's declared `permits.fs.read` boundary, matched as
+the `path:` of a `nika:read` is, and the boundary is judged **before** the
+read: an ungranted path is never opened.
+
+| the workflow declares | a `source: file` entry is | code |
+|---|---|---|
+| no `permits:` block at all | an effect under an absent block · zero authority | `NIKA-AUTH-006` |
+| a `permits:` block whose `fs.read` does not admit the path | outside the declared boundary | `NIKA-SEC-004` |
+| a boundary that admits the path | read when the task runs · its bytes ride the request | — |
+
+**When the path is judged.** A literal path, or a whole bare `const`
+reference to a declared string, is judged at check, before any token. Any
+other form is judged at run on its rendered value, in the lexical canonical
+form every fs effect is matched in (`.` and `..` resolved, separators
+collapsed), before the file is opened: an escape fails the task
+`NIKA-SEC-004`. The inferred boundary (`nika check --infer-permits`) lists
+every path judged at check in `fs.read`, so the block it prints re-checks
+clean.
+
+**A URL is not an fs effect.** A `source: url` entry hands its URL to the
+provider, which fetches the image. Nika never fetches it, so the entry needs
+no `fs` grant and no `net.http` grant, and `permits: {}` admits it. The URL
+is part of what the request sends the provider: provider egress, governed by
+the secret-flow rules ([10](./10-authority.md)), not by a capability
+category.
+
 ### Conformance
 
 A v0.1-compliant engine MUST ·
@@ -2555,6 +2613,7 @@ A v0.1-compliant engine MUST ·
 - **Fail an answer cut at the output cap** · when the provider reports that it stopped at `max_tokens` (Anthropic `max_tokens` · OpenAI-compatible `length` · Gemini `MAX_TOKENS`), the task fails with `NIKA-INFER-005` (`budget_error` · not transient): the visible text received is preserved at `error.details.partial_output` and the stop reason at `error.details.stop_reason`. A cut answer is never the task output and is never validated against `schema:` (it would fail `NIKA-INFER-002` and hide its cause); an empty visible answer stays `NIKA-INFER-004`. On a route that reasons by default the cap also pays for the reasoning. A partial answer that is acceptable is recovered explicitly through `on_error:`
 - **Reject** any unknown field with a clear error (`NIKA-PARSE-005`) — the choice this line used to leave open is closed by [07 §unknown key](./07-conformance.md#an-unknown-key-is-an-error-at-every-level-normative--d-2026-08-11-n20): a key can REMOVE authority, so accept-and-warn fails open
 - Resolve a `{ file: }` prompt, system or schema at compose time under [§Project files](#project-files---file--normative) · the path law (`NIKA-FILE-001`), the read boundary before the read (`NIKA-AUTH-006` · `NIKA-SEC-004`), the read law (`NIKA-FILE-002` · `NIKA-FILE-003`), then the inline templating law over a text or the schema content law over a schema (`NIKA-TYPE-007`) · never start a run with an unread or unjudged project file
+- Judge every `vision:` file against the declared `permits.fs.read` boundary BEFORE opening it ([§Vision inputs](#vision-inputs--vision-normative)) · at check for a literal or whole bare `const` path (`NIKA-AUTH-006` under an absent block · `NIKA-SEC-004` outside a declared one), at run for any other form (`NIKA-SEC-004`) · never fetch a `source: url` image
 
 ### Subscription harness access (normative)
 
@@ -3043,11 +3102,17 @@ halftone:
   other sessions share) is a claim: the engine never opens it, never lists it
   as a value and never saves from it.
 - **`save:`** · a path, `${{ }}` allowed. The engine writes the first image's
-  received bytes at that path, and image *n* (*n* ≥ 2) at the path with `-n`
-  inserted before its extension. Each final path is judged against
-  `permits.fs.write` before any byte is written: `NIKA-AUTH-006` under an
-  absent block, `NIKA-SEC-004` outside a declared one, at check for a literal
-  path and at run for a rendered one. A write replaces an existing file
+  received bytes at that path, and image *n* (2 ≤ *n* ≤ 4) at the path with
+  `-n` inserted before its extension (`banner.png`, then `banner-2.png`): a
+  save names at most four files, and a turn that delivers a fifth image fails
+  the task before any file is written. Every path is judged against
+  `permits.fs.write` before any byte is written (`NIKA-AUTH-006` under an
+  absent block, `NIKA-SEC-004` outside a declared one): at check, all four
+  for a literal path or a whole bare `const` reference to a declared string,
+  since how many images arrive is known only at run; at run, every path the
+  run will write, a rendered one included, before the first write. For the
+  same-path law ([10](./10-authority.md#the-effect-vocabulary-normative--closed))
+  the save mutates all four paths. A write replaces an existing file
   atomically. A task whose session delivered no image bytes fails
   `NIKA-AGENT-007`: the declared file is never left unwritten behind a
   success.
@@ -3069,7 +3134,7 @@ The engine MUST ·
 - Detect the `nika:done` completion sentinel and exit gracefully
 - Return the final model response as task output
 - Resolve `skills:` at compose time · judge every path against the declared `permits.fs.read` boundary BEFORE opening it (`NIKA-AUTH-006` under an absent block · `NIKA-SEC-004` outside a declared one) · inject the `## Skills` section in source order exactly as specified above · fail statically (`NIKA-AGENT-003`/`NIKA-AGENT-004`) on a missing or invalid skill file — never start a run with a half-composed context
-- Under `images:` · make the images received on the task's own session, and only those, the `images` list of `.output` · never open a path the application reports · write each received image at its `save:` path inside `permits.fs.write` before the task succeeds, or fail `NIKA-AGENT-007` when none was received · refuse `images:` on a route without a seat before the first request
+- Under `images:` · make the images received on the task's own session, and only those, the `images` list of `.output` · never open a path the application reports · write each received image at its `save:` path inside `permits.fs.write` before the task succeeds, judging every path it writes before the first write, or fail `NIKA-AGENT-007` when none was received · fail a turn that delivers a fifth image to a save before any write · refuse `images:` on a route without a seat before the first request
 
 ---
 
@@ -6145,7 +6210,7 @@ these from this file alone.
 | `NIKA-SEC-009` | lethal trifecta complete — the declared boundary grants private read (`fs.read` non-empty) + untrusted ingress (a `nika:fetch` builtin invoked · an `mcp:*` tool invoked · an `agent:` whose whitelist admits ingress · **v2.2: an `exec:` task, `permits.exec` itself the ingress channel**) + external egress (`net.http` non-empty · an escaping `fs.write` glob · `exec` enabled), the untrusted content **reaches** an egress-capable task's effect surface (a realized flow), and no blocking `invoke: { tool: "nika:prompt" }` (no `default:`) dominates it · one finding per ungated tainted egress task, witness-named `source → sink` (NEP-0002 v2.0 · the Rule of Two as a static check · SEC-008 stays allocated to the AUTH plane) | `security_error` | false |
 | `NIKA-SEC-010` | the approval-capability law is violated (NEP-0013 · the 6th invariant) — a rate-limited approval burst (`approval.rate_limited` · the N+1th distinct mint of a run, never a queue) · an approval whose resolved content hash differs from the shown hash (`approval.content_mismatch`) · a ticket replayed outside its run/step/hash scope (`approval.scope_mismatch`) · or the static heterogeneous-batch refusal (one prompt whose descendant closure unleashes two or more of `exec · write · net`) | `security_error` | false |
 | `NIKA-SEC-011` | preview-commit divergence — the commit digest recomputed at the sink over the exact bytes about to fire differs from the preview digest judged at resolution (one bit of rendered argv · a permuted context field · a mutated tool argument) · the step refuses fail-closed and the receipt carries `divergence: {preview, commit}` — judged = executed at the action scale (NEP-0015 · F-P6) | `security_error` | false |
-| `NIKA-SEC-012` | unordered shared mutations — two tasks incomparable in the DAG closure whose `nika:write`/`nika:edit`/`nika:remove_file` targets collide (a literal path in lexical normal form · a whole bare `const`/`inputs` reference with a string const value or string input default, keyed by that string's lexical normal form · otherwise that reference's own immutable binding identity, distinct from file names) with no precedence path (`with:` · `group` fold · `after:` other than `unwind`) to serialize them, or a `for_each` fan mutating one known path · parallelism is safe exactly where the mutations are provably disjoint (NEP-0014 law 1 · F-P15) | `security_error` | false |
+| `NIKA-SEC-012` | unordered shared mutations — two tasks incomparable in the DAG closure whose `nika:write`/`nika:edit`/`nika:remove_file` targets or `agent:` `images.save` targets (the save path and its `-2`, `-3`, `-4` siblings · [02 §Harness images](./02-verbs.md#harness-images--images-normative)) collide (a literal path in lexical normal form · a whole bare `const`/`inputs` reference with a string const value or string input default, keyed by that string's lexical normal form · otherwise that reference's own immutable binding identity, distinct from file names) with no precedence path (`with:` · `group` fold · `after:` other than `unwind`) to serialize them, or a `for_each` fan mutating one known path · parallelism is safe exactly where the mutations are provably disjoint (NEP-0014 law 1 · F-P15) | `security_error` | false |
 | `NIKA-SEC-014` | the affirmative-consent law — a confirm-mode human gate (`invoke: { tool: "nika:prompt" }` · mode absent or `confirm`) reaches an egress-capable task over a route no affirmative gate closes: a REFUSED confirm settles success with value `false`, so a bare `after: { gate: success }` edge, a `when:` that never reads the answer, and a `when:` provably true on the refusal all let the effect through · the gate is credited only when every route consumes the answer and proves false on it (the Kleene-falsifiable `when:` · `when: false` · a closer confirm gate owns its closure) · an undecidable gate defers to the advisory hint, never a refusal ([10 §the affirmative-consent law](./10-authority.md#the-affirmative-consent-law--normative--nep-0020) · NEP-0020 · P0-2) | `security_error` | false |
 | `NIKA-SEC-015` | the order law — an `exec:` task sits transitively downstream of a net-effecting task (`nika:fetch` · `nika:notify`) over the derived graph (`with:` data edges ∪ `after:` control edges): content the workflow did not author must not reach a shell · the diagnostic names the PATH, which is the witness · **UNCONDITIONAL** — no block declares it and none can disable it ([10 §the unconditional laws](./10-authority.md)) | `security_error` | false |
 | `NIKA-SEC-016` | the effect-safe retry law — a declared `retry:` (`max_attempts > 1`) on a `nika:fetch` whose method replays side effects (`POST` · `PUT` · `DELETE` · `PATCH`) with no `idempotency-key` header: the failure may be ambiguous (the server may have committed before the socket dropped or the error was emitted), so the engine types the keyless call's failures non-transient and the declared retry is refused statically (an `on_codes:` retry would blind-replay regardless of `transient`) · pair an `idempotency-key` header (the receiver dedups the replay) or drop the `retry:` — GET/HEAD retry free ([§the effect-safe retry law](#the-effect-safe-retry-law-normative--issue-1371) · issue #1371) | `security_error` | false |
@@ -8290,7 +8355,7 @@ never a parallel list):
 
 | Effect category | Carried by | Granted by |
 |---|---|---|
-| `fs` (read · write) | `nika:read` · `nika:grep` · `nika:write` · `nika:edit` · `nika:remove_file` (write · no read) · file-writing media builtins | `permits.fs.read` / `permits.fs.write` (path globs) |
+| `fs` (read · write) | `nika:read` · `nika:grep` · `nika:write` · `nika:edit` · `nika:remove_file` (write · no read) · file-writing media builtins · the files whose content reaches a model provider (an `infer:` `vision:` file · a `skills:` entry · a `{ file: }` project file · read) · an `agent:` `images.save` (write) | `permits.fs.read` / `permits.fs.write` (path globs) |
 | `net` | `nika:fetch` · `nika:notify` (webhook) · any URL-reaching builtin | `permits.net.http` (host allowlist · SSRF floor beneath) |
 | `exec` | the `exec:` verb | `permits.exec` (`false` · `true` · program allowlist) |
 | `tools` | the `invoke:` verb surface | `permits.tools` (id globs) |
@@ -8312,9 +8377,13 @@ Two derived facts the engine computes and no author writes:
 - **A task's required effects** — from its verb and its arguments (the
   builtin classification table is normative for the stdlib: each
   catalog entry declares which category it carries and which argument
-  names its target). `infer:` with no tools is **pure compute**: zero
-  required effects (provider egress is governed by the secrets flow
-  rules, not by a capability category).
+  names its target). An `infer:` requires exactly the files it reads: each
+  `vision:` file and each `{ file: }` project file is an `fs` read
+  ([02 §Vision inputs](./02-verbs.md#vision-inputs--vision-normative) ·
+  [02 §Project files](./02-verbs.md#project-files---file--normative)). With
+  neither it is **pure compute**: zero required effects (provider egress,
+  a `vision:` URL the provider fetches included, is governed by the secrets
+  flow rules, not by a capability category).
 - **The workflow's needed boundary** — the union of its tasks' required
   effects, as a `permits:` block (`nika check --infer-permits` prints
   it; the round-trip law holds: the inferred block re-checks clean).
@@ -8334,23 +8403,29 @@ the taint re-gate's ground, and any other template is judged on its resolved
 value at run time.
 
 **Same-path mutations.** `nika:write`, `nika:edit` and `nika:remove_file`
-mutate their path. Two such tasks on one known target MUST be ordered by a
-precedence path (`with:` · a `group` fold · `after:` other than `unwind`),
-and a `for_each` task MUST NOT fan onto one known target; otherwise the
-check refuses `NIKA-SEC-012`. A target is known in two forms. A literal
-path is keyed by its lexical normal form. A whole bare `const`/`inputs`
-reference whose declaration gives a string — a constant's string value or
-an input's string default — is keyed by that string's lexical normal form
-too, so it collides with an equal literal or with a different binding that
-resolves to it. A reference with no resolvable string keeps the identity of
-its own immutable binding, distinct from every file name and equal only to
-another reference to that binding (resolution and declaration rules still
-judge the reference itself). Every other expression form is unknown and
-never compared. This key is not the write fit: the static fit judges a
-literal or a bare `const` value only, never a caller-replaceable `inputs`
-default, which remains the taint re-gate's ground. Ordered mutations of one path
-are permitted — there is no one-writer rule — and graph order is a
-scheduling fact, never a proof of the filesystem state that results.
+mutate their path, and an `agent:` task's `images: { save: }` mutates every
+path the save names: the path and its `-2`, `-3` and `-4` siblings
+([02 §Harness images](./02-verbs.md#harness-images--images-normative)). Two
+such tasks on one known target MUST be ordered by a precedence path
+(`with:` · a `group` fold · `after:` other than `unwind`), and a `for_each`
+task MUST NOT fan onto one known target; otherwise the check refuses
+`NIKA-SEC-012`. A target is known in two forms. A literal path is keyed by
+its lexical normal form. A whole bare `const`/`inputs` reference whose
+declaration gives a string — a constant's string value or an input's string
+default — is keyed by that string's lexical normal form too, so it collides
+with an equal literal or with a different binding that resolves to it. A
+reference with no resolvable string keeps the identity of its own immutable
+binding, distinct from every file name and equal only to another reference
+to that binding (resolution and declaration rules still judge the reference
+itself). Every other expression form is unknown and never compared. A save
+whose path is known keys that path and its three siblings, so it collides
+with a mutation of any of the four; a save through a reference with no
+resolvable string keys that binding once. This key is not the write fit:
+the static fit judges a literal or a bare `const` value only, never a
+caller-replaceable `inputs` default, which remains the taint re-gate's
+ground. Ordered mutations of one path are permitted — there is no
+one-writer rule — and graph order is a scheduling fact, never a proof of
+the filesystem state that results.
 
 ## The unconditional laws · *normative · the `policy:` block is dead*
 

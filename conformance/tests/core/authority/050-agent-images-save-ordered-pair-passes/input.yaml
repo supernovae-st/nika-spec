@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: Apache-2.0
+# The retouch runs after the hero settles: ordered saves of one path are
+# permitted (there is no one-writer rule).
+nika: agent-images-save-ordered-pair
+run:
+  access:
+    via: codex
+    protocol: acp
+permits:
+  fs: { write: ["./out/**"] }
+tasks:
+  hero:
+    agent:
+      prompt: "Draw a 16:9 release banner, no text"
+      images:
+        save: "./out/banner.png"
+  retouch:
+    after: { hero: success }
+    agent:
+      prompt: "Draw the release banner again with a warmer palette, no text"
+      images:
+        save: "./out/banner.png"

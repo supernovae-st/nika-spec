@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+# A caller-supplied path with no default has no value at check: the run
+# judges the rendered path against permits.fs.read before opening it.
+nika: infer-vision-rendered-path-deferred
+inputs:
+  diagram: { type: string, required: true }
+permits:
+  fs: { read: ["./diagrams/**"] }
+tasks:
+  describe:
+    infer:
+      prompt: "Describe the flow this diagram shows"
+      vision:
+        - source: file
+          path: "${{ inputs.diagram }}"

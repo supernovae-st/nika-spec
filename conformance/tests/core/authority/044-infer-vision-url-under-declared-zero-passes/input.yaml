@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: infer-vision-url-declared-zero
+permits: {}   # the provider fetches the URL · Nika reads no file and opens no connection to its host
+tasks:
+  describe:
+    infer:
+      prompt: "Describe this chart"
+      vision:
+        - source: url
+          url: "https://example.com/chart.png"
