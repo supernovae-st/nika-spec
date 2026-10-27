@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-012",
+      "category": "security_error"
+    }
+  ],
+  "note": "10 §the effect vocabulary (same-path mutations) · 02 §Harness images · a save keys its path and its -2..-4 siblings · a nika:write of ./out/banner-2.png with no precedence path races the second image."
+}

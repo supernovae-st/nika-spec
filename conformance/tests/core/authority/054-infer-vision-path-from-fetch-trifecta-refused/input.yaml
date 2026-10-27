@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: Apache-2.0
+# A fetched body picks the vision file, so it picks what the model sees: the
+# answer carries the untrusted content into an egress write, ungated.
+nika: infer-vision-path-from-fetch-trifecta
+permits:
+  tools: ["nika:fetch", "nika:write"]
+  net: { http: ["api.example.com"] }
+  fs:
+    read: ["./diagrams/**"]
+    write: ["./out/**"]
+tasks:
+  page:
+    invoke:
+      tool: "nika:fetch"
+      args: { url: "https://api.example.com/page" }
+  look:
+    with: { picked: "${{ tasks.page.output }}" }
+    infer:
+      prompt: "Describe the image"
+      vision:
+        - source: file
+          path: "${{ with.picked }}"
+  publish:
+    with: { answer: "${{ tasks.look.output }}" }
+    invoke:
+      tool: "nika:write"
+      args: { path: "./out/answer.txt", content: "${{ with.answer }}" }

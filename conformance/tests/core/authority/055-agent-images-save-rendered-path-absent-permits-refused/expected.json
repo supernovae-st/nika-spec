@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-AUTH-006",
+      "category": "security_error"
+    }
+  ],
+  "note": "02-verbs.md §Harness images · NEP-0003 · an absent permits: block admits no write, so an images.save of any form is refused at check, before a turn is paid for · the twin of 039."
+}

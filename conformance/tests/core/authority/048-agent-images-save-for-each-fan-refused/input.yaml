@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0
+# Every iteration saves at the same path: the fan races itself.
+nika: agent-images-save-for-each-fan
+run:
+  access:
+    via: codex
+    protocol: acp
+permits:
+  fs: { write: ["./out/**"] }
+tasks:
+  banners:
+    for_each: { items: ["red", "blue"] }
+    agent:
+      prompt: "Draw a release banner with a ${{ item }} background, no text"
+      images:
+        save: "./out/banner.png"

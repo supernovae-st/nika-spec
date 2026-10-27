@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-AUTH-006",
+      "category": "security_error"
+    }
+  ],
+  "note": "02-verbs.md §Vision inputs · NEP-0003 · an absent permits: block admits no read, so a vision file is refused at check whatever form its path takes: which file a rendered path names is the run's, whether any read is granted is known before the run · the twin of 046."
+}

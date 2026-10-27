@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-004",
+      "category": "security_error"
+    }
+  ],
+  "note": "02-verbs.md §Vision inputs · 01 §permits · a declared read boundary that does not admit a literal vision path refuses it at check, before the file is opened · the twin of 043."
+}

@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+# Which file a caller-supplied path names is the run's to judge, but no
+# rendered value can fit the empty boundary an absent block declares.
+nika: infer-vision-rendered-path-absent-permits
+inputs:
+  diagram: { type: string, required: true }
+tasks:
+  describe:
+    infer:
+      prompt: "Describe the flow this diagram shows"
+      vision:
+        - source: file
+          path: "${{ inputs.diagram }}"

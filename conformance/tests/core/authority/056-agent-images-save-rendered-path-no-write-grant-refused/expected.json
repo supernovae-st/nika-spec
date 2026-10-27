@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-004",
+      "category": "security_error"
+    }
+  ],
+  "note": "02-verbs.md §Harness images · 01 §permits · a declared block whose fs.write admits no path refuses a rendered images.save at check: no value it renders to can fit an empty grant · the twin of 040."
+}

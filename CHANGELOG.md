@@ -16,6 +16,64 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Changes merged after the spec commit engine 0.123.0 embeds. They reach the
 engine at its next `SPEC_PIN` bump.
 
+### Changed · a vision file is a read inside `permits.fs.read` (2026-10-27)
+
+- An `infer:` `vision:` entry `{ source: file, path: <path> }` is a read
+  whose bytes reach the provider, the class of `nika:read`, of a `skills:`
+  file and of a project file
+  ([02 §Vision inputs](./spec/02-verbs.md#vision-inputs--vision-normative)).
+  Its path must be admitted by `permits.fs.read`, judged before the file is
+  opened: `NIKA-AUTH-006` under an absent block, `NIKA-SEC-004` outside a
+  declared one, at check for a literal path or a whole bare `const`
+  reference, at run for a rendered one. Before, the file was read with no
+  boundary judgment, under an absent block and under `permits: {}` alike.
+- A `source: url` entry stays outside the capability categories: the
+  provider fetches it and Nika never does, so it needs no `fs` or
+  `net.http` grant.
+- 10 §the effect vocabulary lists the files whose bytes reach a model among
+  the `fs` carriers, and an `infer:` is pure compute only when it reads no
+  file; 01 §permits says the same of `permits: {}`.
+- Whatever form a vision path takes, a boundary that admits no read at all
+  (no block, `permits: {}`, a block with an empty `fs.read`) refuses it at
+  check: which file a rendered path names is the run's, whether any read is
+  granted is known before the run.
+- A granted file that cannot be read fails the task with the read's own
+  code, `NIKA-BUILTIN-READ-001` when no file is there and `-002` for any
+  other read failure, before any provider call.
+- The `vision:` entries are provider-egress sinks of the task: a secret in a
+  URL or a file path is the `infer` leak (`NIKA-SEC-006`, 01 §egress and the
+  `NIKA-SEC-006` rows), and untrusted content that picks an entry reaches
+  the task's answer (`NIKA-SEC-009`).
+- `nika check --infer-permits` lists every workspace vision path; a path
+  that escapes the workspace is named for review, never printed as a grant.
+- A workflow that names a vision file under an absent block, or outside its
+  `fs.read`, is now refused. This breaking change requires the reference
+  engine's next MINOR, 0.124.0, and its paired changelog entry.
+- Fixtures: `core/authority/041` to `046`, `052` to `054`,
+  `runtime/permits/009`. The reference runner judges a literal or
+  bare-const vision path as an fs read (the absent-block requirement, the
+  declared read boundary and the inferred block) and any vision file under a
+  side that admits no read.
+
+### Changed · an image save is a same-path mutation (2026-10-27)
+
+- `images: { save: }` names at most four files: the path, then image *n*
+  at its `-n` sibling (`banner-2.png` to `banner-4.png`); a turn that
+  delivers a fifth image (one whose bytes arrived) fails the task before any
+  file is written
+  ([02 §Harness images](./spec/02-verbs.md#harness-images--images-normative)).
+  At check all four are judged against `permits.fs.write` for a literal or
+  whole bare `const` path, so an exact-file grant that holds only the first
+  image is refused, and the inferred block lists all four. A save of any
+  form under a boundary that admits no write is refused at check. At run,
+  every path is fitted lexically before the first write, then judged on its
+  resolved form before its own write.
+- The same-path law (10 §the effect vocabulary · `NIKA-SEC-012`) names the
+  save: two unordered saves of one path, a `for_each` save of one path, and
+  a save beside an unordered mutation of one of its siblings are refused,
+  as the reference engine already refuses them (nika#1850).
+- Fixtures: `core/authority/047` to `051`, `055` and `056`.
+
 ### Added · native image composition and keyless speech (2026-10-26)
 
 - `nika:image_compose`, the 30th builtin (stdlib §Media graduate #5): an

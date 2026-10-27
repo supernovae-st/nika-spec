@@ -55,16 +55,24 @@
 #                 literal / bare-const write, edit and remove paths vs
 #                 permits.fs.write · nika:image_compose's literal / bare-
 #                 const inputs vs permits.fs.read and its out vs
-#                 permits.fs.write (every input is a judged read)
-#   SHARED-MUTATION two write/edit/remove tasks on one known path with no
-#                 precedence path between them, or a for_each fan on one
-#                 known path (NIKA-SEC-012 · judged by the runner over its
-#                 own precedence graph · shared_mutation_errors below)
+#                 permits.fs.write (every input is a judged read) · an
+#                 infer's literal / bare-const vision: files vs
+#                 permits.fs.read · an agent's images.save paths (the path
+#                 and its -2..-4 siblings) vs permits.fs.write · a vision
+#                 file or images.save of any form under a side that admits
+#                 no path (no rendered value can fit an empty grant)
+#   SHARED-MUTATION two mutating tasks (write · edit · remove · an agent's
+#                 images.save, its siblings included) on one known path
+#                 with no precedence path between them, or a for_each fan
+#                 on one known path (NIKA-SEC-012 · judged by the runner
+#                 over its own precedence graph · shared_mutation_errors)
 #   ABSENT-PERMITS when the block is ABSENT, DeclaredPermits := ∅
 #                 (NEP-0003 · LAW-AUTH-0324) · any statically visible
 #                 effect is NIKA-AUTH-006 before any token · pure compute
 #                 passes · the null spelling is refused prescriptively ·
 #                 computed resources defer to the runtime NIKA-SEC-004
+#                 (a vision file or images.save of any form is an fs
+#                 requirement: ∅ decides the category, as for exec)
 #
 # Emitted errors reuse the canonical namespaces (NIKA-VAR for expression
 # surface · NIKA-PARSE for shape rules · runner-protocol.md matching).
@@ -371,7 +379,7 @@ def _static_str(v) -> str | None:
     return v if isinstance(v, str) and _is_static(v) else None
 
 
-def _task_required_absent(t: dict) -> set[str]:
+def _task_required_absent(t: dict, doc: dict) -> set[str]:
     """The effect classes a task STATICALLY requires (NEP-0003 law 1 ·
     Required ⊆ Declared judged with Declared := ∅). Only statically visible
     resources count — a computed host/path/program defers to the runtime
@@ -415,14 +423,19 @@ def _task_required_absent(t: dict) -> set[str]:
         for sk in _static_skill_paths(ag):
             req.add("fs")
             break
-        # 02 §Harness images · a literal images.save path is an fs write the
-        # engine performs for the task: under an absent block it is
-        # NIKA-AUTH-006 before any byte is written (a rendered one defers to
-        # the runtime boundary, law 3).
-        if _static_str(_agent_images_save(ag)) is not None:
+        # 02 §Harness images · an images.save is an fs write the engine
+        # performs for the task: under an absent block it is NIKA-AUTH-006
+        # before any byte is written, whatever form the path takes — which
+        # file a rendered one names is the run's (law 3), but ∅ decides the
+        # category question, as for exec.
+        if _agent_images_save(ag) is not None:
             req.add("fs")
     # 02 §Project files · a lawful prompt file's text reaches the model: an fs read.
     if _static_file_paths(t):
+        req.add("fs")
+    # 02 §Vision inputs · a vision file's bytes reach the provider: an fs read,
+    # whatever form its path takes (∅ admits no read: the category question).
+    if _vision_files(t):
         req.add("fs")
     return req
 
@@ -432,6 +445,65 @@ def _agent_images_save(agent: dict):
     None when the task declares no save path."""
     images = agent.get("images")
     return images.get("save") if isinstance(images, dict) else None
+
+
+# 02 §Harness images · a save names at most this many files: the path, then
+# image n (2 ≤ n ≤ 4) at its `-n` sibling. One table for the fit, the
+# inferred block and the same-path law, so every judge sees every path the
+# save can write.
+_HARNESS_IMAGES_MAX = 4
+
+
+def _harness_image_paths(save: str) -> list[str]:
+    """Every path an images.save can write, in delivery order: the path
+    itself, then `-n` (n = 2..4) inserted before the extension of its last
+    segment (a name whose only `.` opens it has no extension)."""
+    cut = save.rfind("/")
+    head, name = save[:cut + 1], save[cut + 1:]
+    dot = name.rfind(".")
+    stem, ext = (name[:dot], name[dot:]) if dot > 0 else (name, "")
+    return [save] + [f"{head}{stem}-{n}{ext}"
+                     for n in range(2, _HARNESS_IMAGES_MAX + 1)]
+
+
+def _static_save_paths(agent: dict, doc: dict) -> list[str]:
+    """The paths a literal or whole bare-const images.save writes (empty for
+    no save, or a rendered one the run judges)."""
+    save = _static_write_path(_agent_images_save(agent), doc)
+    return _harness_image_paths(save) if save is not None else []
+
+
+def _vision_files(t: dict) -> list:
+    """The `path:` of every `source: file` entry of an infer task's
+    `vision:` list (02 §Vision inputs), as written. A `source: url` entry
+    is the provider's to fetch: never an fs effect, never listed here."""
+    body = t.get("infer")
+    vision = body.get("vision") if isinstance(body, dict) else None
+    if not isinstance(vision, list):
+        return []
+    return [e.get("path") for e in vision
+            if isinstance(e, dict) and e.get("source") == "file"]
+
+
+def _static_vision_paths(t: dict, doc: dict) -> list[str]:
+    """The vision files judged at check: a literal path, or a whole bare
+    const reference to a declared string. Any other form is judged at run
+    on its rendered value (NIKA-SEC-004 there)."""
+    out: list[str] = []
+    for raw in _vision_files(t):
+        path = _static_write_path(raw, doc)
+        if path is not None:
+            out.append(path)
+    return out
+
+
+def _escapes_workspace(path: str) -> bool:
+    """Whether a path leaves the workspace in its lexical canonical form:
+    absolute, `~`, or a leading `..` after normalization (the inferred
+    block never pastes such a path as a grant · 02 §Vision inputs)."""
+    canonical = _taint_canonical_path(path)
+    return (canonical.startswith(("/", "~"))
+            or canonical == ".." or canonical.startswith("../"))
 
 
 def _static_skill_paths(agent: dict) -> list[str]:
@@ -644,7 +716,7 @@ def compose_project_files(doc: dict, base_dir=None) -> tuple:
     return composed, errs
 
 
-def _infer_permits_block(tasks: list) -> dict:
+def _infer_permits_block(tasks: list, doc: dict) -> dict:
     """The minimal permits: block that re-checks clean — the repair the
     NIKA-AUTH-006 detail carries inline (NEP-0003 law 2 · paste-able). The
     tools list names every statically-invoked tool (pure included ·
@@ -695,9 +767,16 @@ def _infer_permits_block(tasks: list) -> dict:
                     keep(tools, _static_str(w))
             for sk in _static_skill_paths(ag):
                 keep(reads, sk)
-            keep(writes, _static_str(_agent_images_save(ag)))
+            # every path the save can write · the fit judges each of them
+            for sp in _static_save_paths(ag, doc):
+                keep(writes, sp)
         for pf in _static_file_paths(t):
             keep(reads, pf)
+        for vf in _static_vision_paths(t, doc):
+            # 02 §Vision inputs · a path that escapes the workspace is
+            # named for review, never printed as a host-file grant.
+            if not _escapes_workspace(vf):
+                keep(reads, vf)
     block: dict = {}
     if tools:
         block["tools"] = sorted(tools)
@@ -732,10 +811,10 @@ def absent_permits_errors(doc: dict, tasks: list) -> list[dict]:
     way). Pure compute (Required := ∅) passes (law 4). A PRESENT block is
     PERMITS-FIT's, below — untouched."""
     if "permits" not in doc:
-        inferred = _infer_permits_block(tasks)
+        inferred = _infer_permits_block(tasks, doc)
         errs: list[dict] = []
         for tid, t in tasks:
-            req = _task_required_absent(t)
+            req = _task_required_absent(t, doc)
             if req:
                 errs.append({
                     "code": "NIKA-AUTH-006", "namespace": "NIKA-AUTH",
@@ -1761,54 +1840,65 @@ def _image_compose_fit(tid: str, args: dict, doc: dict, read_globs, write_globs)
     return errs
 
 
-def _mutation_key(t: dict, doc: dict):
-    """The known target of a write/edit/remove task: ("path", lexical
-    form), or ("binding", root.name) for an immutable reference with no
-    resolvable string. Anything else is unknown (None)."""
+def _mutation_keys(t: dict, doc: dict) -> list:
+    """The known targets of a mutating task: a write/edit/remove names its
+    path, an agent's images.save names every path the save can write (the
+    path and its -n siblings · 02 §Harness images). A key is ("path",
+    lexical form), or ("binding", root.name) for an immutable reference
+    with no resolvable string (one key: its value, siblings included, is
+    unknown). Anything else is unknown (no key)."""
     inv = t.get("invoke")
-    if not isinstance(inv, dict) or inv.get("tool") not in _ABSENT_FS_WRITE_TOOLS:
-        return None
-    if inv.get("tool") == "nika:remove_file" and _remove_file_shape(inv.get("args")):
-        return None  # a refused shape names no file (NIKA-BUILTIN-001 owns it)
-    v = _as_dict(inv.get("args")).get("path")
-    if isinstance(v, str) and _is_static(v):
-        return ("path", _taint_canonical_path(v))
-    ref = _bare_binding(v)
-    if ref is None:
-        return None
-    root, name = ref
-    decl = _as_dict(doc.get(root)).get(name)
-    if root == "const":
-        value = _const_string(decl)
+    ag = t.get("agent")
+    if isinstance(inv, dict) and inv.get("tool") in _ABSENT_FS_WRITE_TOOLS:
+        if inv.get("tool") == "nika:remove_file" and _remove_file_shape(inv.get("args")):
+            return []  # a refused shape names no file (NIKA-BUILTIN-001 owns it)
+        v, saves = _as_dict(inv.get("args")).get("path"), False
+    elif isinstance(ag, dict):
+        v, saves = _agent_images_save(ag), True
     else:
-        default = _as_dict(decl).get("default")
-        value = default if isinstance(default, str) else None
-    if value is not None:
-        return ("path", _taint_canonical_path(value))
-    return ("binding", f"{root}.{name}")
+        return []
+    if isinstance(v, str) and _is_static(v):
+        value = v
+    else:
+        ref = _bare_binding(v)
+        if ref is None:
+            return []
+        root, name = ref
+        decl = _as_dict(doc.get(root)).get(name)
+        if root == "const":
+            value = _const_string(decl)
+        else:
+            default = _as_dict(decl).get("default")
+            value = default if isinstance(default, str) else None
+        if value is None:
+            return [("binding", f"{root}.{name}")]
+    paths = _harness_image_paths(value) if saves else [value]
+    return [("path", _taint_canonical_path(p)) for p in paths]
 
 
 def shared_mutation_errors(doc: dict, tasks: list, graph: dict,
                            transitive_deps, *, pair_scan: bool = True) -> list[dict]:
-    """NIKA-SEC-012 · two write/edit/remove tasks on one known target with
-    no precedence path between them (incomparable in the closure of the
-    caller's precedence graph), or a for_each task on one known target.
-    `graph`/`transitive_deps` are the runner's own G_p (with: ∪ group
-    fold ∪ after:, unwind excluded · quoted CEL text is no edge). A cyclic
-    graph has no order to read: the pair scan is skipped, the fan is not."""
+    """NIKA-SEC-012 · two mutating tasks (write/edit/remove · an agent's
+    images.save) sharing one known target with no precedence path between
+    them (incomparable in the closure of the caller's precedence graph),
+    or a for_each task on one known target. One finding per pair, naming
+    the first shared target. `graph`/`transitive_deps` are the runner's
+    own G_p (with: ∪ group fold ∪ after:, unwind excluded · quoted CEL
+    text is no edge). A cyclic graph has no order to read: the pair scan
+    is skipped, the fan is not."""
     errs: list[dict] = []
-    keyed = [(tid, t, _mutation_key(t, doc)) for tid, t in tasks
+    keyed = [(tid, t, _mutation_keys(t, doc)) for tid, t in tasks
              if isinstance(t, dict)]
-    keyed = [(tid, t, k) for tid, t, k in keyed if k is not None]
+    keyed = [(tid, t, ks) for tid, t, ks in keyed if ks]
 
     def shown(k) -> str:
         return f"path {k[1]!r}" if k[0] == "path" else f"binding {k[1]}"
 
-    for tid, t, k in keyed:
+    for tid, t, ks in keyed:
         if "for_each" in t:
             errs.append({"code": "NIKA-SEC-012", "namespace": "NIKA-SEC",
                          "category": "security_error",
-                         "detail": f"task '{tid}' fans for_each onto one {shown(k)} · "
+                         "detail": f"task '{tid}' fans for_each onto one {shown(ks[0])} · "
                                    "every iteration mutates the same target · derive the "
                                    "path from the item (NEP-0014 law 1)"})
     if not pair_scan:
@@ -1816,13 +1906,14 @@ def shared_mutation_errors(doc: dict, tasks: list, graph: dict,
     closure = {tid: transitive_deps(tid) for tid, _, _ in keyed if tid in graph}
     for i, (a, _, ka) in enumerate(keyed):
         for b, _, kb in keyed[i + 1:]:
-            if ka != kb or a not in closure or b not in closure:
+            shared = next((k for k in ka if k in kb), None)
+            if shared is None or a not in closure or b not in closure:
                 continue
             if a in closure[b] or b in closure[a]:
                 continue
             errs.append({"code": "NIKA-SEC-012", "namespace": "NIKA-SEC",
                          "category": "security_error",
-                         "detail": f"tasks '{a}' and '{b}' mutate one {shown(ka)} with no "
+                         "detail": f"tasks '{a}' and '{b}' mutate one {shown(shared)} with no "
                                    "precedence path between them (with: · group · after: "
                                    "other than unwind) · "
                                    "serialize them or make the targets disjoint "
@@ -2149,16 +2240,33 @@ def deep_static_errors(doc: dict, base_dir=None) -> list[dict]:
                 # and judged BEFORE the file is opened (an ungranted path
                 # never leaks whether it exists).
                 # 02 §Harness images · the engine's write of the received
-                # bytes is judged against permits.fs.write before any byte.
-                save = _static_write_path(_agent_images_save(ag), doc)
-                if save is not None and not _taint_globbed(save, write_globs):
+                # bytes is judged against permits.fs.write before any byte,
+                # on every path the save can write (the path, then -2..-4):
+                # an exact-file grant holds the first image, not the second.
+                saves = _static_save_paths(ag, doc)
+                if (not saves and _agent_images_save(ag) is not None
+                        and not write_globs):
+                    # A rendered save under an fs.write that admits no path:
+                    # every value is outside an empty grant (the run refuses
+                    # it whatever it renders to, after a paid turn).
                     errs.append({"code": "NIKA-SEC-004", "namespace": "NIKA-SEC",
                                  "category": "security_error",
-                                 "detail": f"task '{tid}' · images.save path {save!r} "
+                                 "detail": f"task '{tid}' · images.save path computed at "
+                                           "run, and permits.fs.write admits no path "
+                                           "(02 §Harness images · grant the paths the save "
+                                           "may name)"})
+                outside = next(((n, p) for n, p in enumerate(saves, start=1)
+                                if not _taint_globbed(p, write_globs)), None)
+                if outside is not None:
+                    n, save = outside
+                    which = "images.save" if n == 1 else f"images.save · image {n}"
+                    errs.append({"code": "NIKA-SEC-004", "namespace": "NIKA-SEC",
+                                 "category": "security_error",
+                                 "detail": f"task '{tid}' · {which} path {save!r} "
                                            f"(canonical {_taint_canonical_path(save)!r}) "
                                            f"outside permits.fs.write {write_globs} "
                                            "(02 §Harness images · a write grant must "
-                                           "contain the exact path)"})
+                                           "contain every path the save can write)"})
                 for sk in _static_skill_paths(ag):
                     if not _skill_path_admitted(sk, permits):
                         errs.append({"code": "NIKA-SEC-004", "namespace": "NIKA-SEC",
@@ -2175,6 +2283,26 @@ def deep_static_errors(doc: dict, base_dir=None) -> list[dict]:
                                  "detail": f"task '{tid}' · prompt file '{pf}' outside "
                                            "permits.fs.read (02 §Project files · the text "
                                            "reaches the model · grant the path)"})
+            # 02 §Vision inputs · a vision file is read and its bytes reach the
+            # provider: inside permits.fs.read, judged BEFORE the file is opened.
+            # A rendered path under an fs.read that admits no path can never
+            # fit: refused here, once per task (which file is the run's).
+            if (not read_globs
+                    and len(_static_vision_paths(t, doc)) < len(_vision_files(t))):
+                errs.append({"code": "NIKA-SEC-004", "namespace": "NIKA-SEC",
+                             "category": "security_error",
+                             "detail": f"task '{tid}' · vision file path computed at run, "
+                                       "and permits.fs.read admits no path (02 §Vision "
+                                       "inputs · grant the paths the task may name)"})
+            for vf in _static_vision_paths(t, doc):
+                if not _taint_globbed(vf, read_globs):
+                    errs.append({"code": "NIKA-SEC-004", "namespace": "NIKA-SEC",
+                                 "category": "security_error",
+                                 "detail": f"task '{tid}' · vision file {vf!r} "
+                                           f"(canonical {_taint_canonical_path(vf)!r}) "
+                                           f"outside permits.fs.read {read_globs} "
+                                           "(02 §Vision inputs · the image reaches the "
+                                           "provider · grant the path)"})
 
     return errs
 

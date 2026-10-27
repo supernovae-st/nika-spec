@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "02-verbs.md §Vision inputs · a literal vision path inside permits.fs.read is admitted · the file is read when the task runs, never at check · the twin of 041 and 042."
+}
