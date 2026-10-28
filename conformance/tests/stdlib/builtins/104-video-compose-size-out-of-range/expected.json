@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-BUILTIN-001",
+      "category": "validation_error"
+    }
+  ],
+  "note": "builtins-v0.1.md §nika:video_compose · `size` is `WIDTHxHEIGHT`, both even, width 64..=3840, height 64..=2160 · 4096 is even and still too wide (fixture 090 refuses an odd side)"
+}

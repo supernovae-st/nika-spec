@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: Apache-2.0
+# `quality` is an ordered ladder of three words: draft, standard, high.
+nika: video-compose-quality-closed-set
+permits:
+  tools: ["nika:video_compose"]
+  fs:
+    read: ["./out/frames/**"]
+    write: ["./out/a.mp4"]
+tasks:
+  video:
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments:
+          - { image: "./out/frames/a.png", duration_ms: 2000 }
+        out: "./out/a.mp4"
+        quality: ultra

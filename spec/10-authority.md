@@ -59,7 +59,11 @@ Two derived facts the engine computes and no author writes:
   is the `infer` sink's, `NIKA-SEC-006` unless sanctioned).
 - **The workflow's needed boundary** — the union of its tasks' required
   effects, as a `permits:` block (`nika check --infer-permits` prints
-  it; the round-trip law holds: the inferred block re-checks clean).
+  it; the round-trip law holds: the inferred block re-checks clean). A
+  required path computed at run cannot be printed: the inference then
+  says its `fs` face is partial and names the task, and the block
+  re-checks clean once the resolved paths are granted (a computed
+  `vision:` file, `images.save` or `nika:video_compose` media list).
 
 **Required ⊆ permitted is judged twice** (per 01 §permits): statically
 at `nika check` (an escape = refusal before any token) and at run time
@@ -157,8 +161,8 @@ declared with. The diagnostic names the **path**, which is the witness
 > (`conformance/envelope/secrets-two-sinks-one-sanctioned`) is already a
 > declared `check-reject`. Zero green files paid for it.
 
-**A program the engine starts itself is not `exec:`.** The law binds the
-`exec:` verb, whose program and argument vector are workflow data.
+**`nika:video_compose` is not `exec:`.** The law binds the `exec:` verb,
+whose program and argument vector are workflow data.
 `nika:video_compose` starts the host's ffmpeg and may sit downstream of a
 fetch without being refused, because its contract is the raw-only
 invariant ([stdlib](../stdlib/builtins-v0.1.md)): ffmpeg receives only the
@@ -166,7 +170,11 @@ headerless raw samples the engine wrote, behind forced raw demuxers, with
 a file-only protocol whitelist before every operand and no workflow path
 or string in its argument vector. Fetched content can change pixel and
 sample values, never what the program parses, opens or reaches. An `exec:`
-that runs ffmpeg downstream of a fetch stays refused.
+that runs ffmpeg downstream of a fetch stays refused. The reason is this
+builtin's own, not a rule for every program an engine starts: the `system`
+provider of `nika:tts_generate` hands its program the text to speak, and
+it stands on its own section's terms (the text on standard input only,
+synthesizer markup broken), not on this one.
 
 **`require.human_gate_before` did NOT make the same move, and the residue
 is owed rather than guessed.** Its unconditional substance — *a human

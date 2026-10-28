@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: Apache-2.0
+# A media reference's sha256 is 64 lowercase hex digits, the form every
+# Nika producer writes. The same digest in uppercase is refused.
+nika: video-compose-uppercase-sha256-refused
+permits:
+  tools: ["nika:video_compose"]
+  fs:
+    read: ["./out/frames/**"]
+    write: ["./out/a.mp4"]
+tasks:
+  video:
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments:
+          - image:
+              path: "./out/frames/a.png"
+              sha256: "7F071235805FBF58A2524F77BFF76E1391D0D1CFE2F4C190D73054495E05B460"
+            duration_ms: 2000
+        out: "./out/a.mp4"

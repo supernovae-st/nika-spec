@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: Apache-2.0
+# 61 frames per second is one above the fastest rate: `fps` is 1..=60.
+nika: video-compose-fps-out-of-range
+permits:
+  tools: ["nika:video_compose"]
+  fs:
+    read: ["./out/frames/**"]
+    write: ["./out/a.mp4"]
+tasks:
+  video:
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments:
+          - { image: "./out/frames/a.png", duration_ms: 2000 }
+        out: "./out/a.mp4"
+        fps: 61

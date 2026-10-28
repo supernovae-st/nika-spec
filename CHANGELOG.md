@@ -28,22 +28,28 @@ engine at its next `SPEC_PIN` bump.
   (`image_compose`'s, with `scale: fit`, `fill` or `none`), the budgets and
   the output key set hold for every backend. A media reference is a path,
   or an object carrying both `path` and `sha256` (a producer's output passes
-  as it is, and either key missing is `-001`); the bytes read must match
-  the digest (`-004`). The errors are `NIKA-BUILTIN-VIDEO_COMPOSE-001..011`.
+  as it is, and either key missing is `-001`, as is a digest that is not 64
+  lowercase hex digits); the bytes read must match the digest (`-004`).
+  Each input has a byte cap judged before it is read, and a `fit` or
+  `fill` box keeps `image_compose`'s scaled-box cap. The errors are
+  `NIKA-BUILTIN-VIDEO_COMPOSE-001..011`.
 - The engine reads and decodes every input itself, then drives the host's
   installed ffmpeg as its encoder: the workflow needs no `exec:` and no
   `permits.exec`. The raw-only invariant is normative: ffmpeg receives only
   the headerless raw samples the engine wrote into a private scratch
   directory (mode 0700, files 0600, removed on every exit, stale ones
   swept), behind forced raw demuxers, with `-protocol_whitelist file` before
-  every operand and no workflow path or string in its argument vector.
-  ffmpeg is found through `NIKA_FFMPEG` or three fixed paths, never `PATH`,
-  and refused when a directory above it is writable by others or when the
-  workflow's `permits.fs.write` could write it; the floor is FFmpeg 6.0 with
-  libx264. It runs inside the engine's confinement, and an engine never
+  every operand and no workflow path or string in its argument vector,
+  which the outputs record (`backend.details.argv`) so the rules can be
+  checked. ffmpeg is found through `NIKA_FFMPEG` or three fixed paths,
+  never `PATH`; a trust floor refuses a program under a directory writable
+  by others (an engine may refuse more), and every call refuses a program
+  the workflow's `permits.fs.write` could write. The floor is FFmpeg 6.0
+  with libx264. It runs inside the engine's confinement, and an engine never
   claims "no network" where that confinement leaves loopback reachable. An
-  engine SHOULD refuse at launch a host it can already tell cannot encode,
-  and MAY refuse clips whose sample rates differ (`-003`).
+  engine SHOULD refuse at launch a workflow with a `nika:video_compose`
+  task on a host it can already tell cannot encode (a grant alone never
+  triggers it), and MAY refuse clips whose sample rates differ (`-003`).
 - Every media input is a read under `permits.fs.read` and `out:` a write
   under `permits.fs.write`, judged at check for a literal or bare-const
   path; a call of any form under a boundary that admits no read or no write
@@ -51,16 +57,23 @@ engine at its next `SPEC_PIN` bump.
   `exec:` of ffmpeg downstream of a fetch; this builtin is not refused
   there, because of the raw-only invariant (10 §the unconditional laws).
   The trifecta law counts it as an fs-write egress, never as an ingress
-  source.
+  source, and what its outputs echo of its arguments keeps its taint.
+- 10's round-trip law now says what an inferred boundary does with a path
+  computed at run: it cannot print it, so it calls its `fs` face partial
+  and names the task (a computed `vision:` file, `images.save` or video
+  media list); the reference oracle's `NIKA-AUTH-006` hint says the same.
 - `determinism` is `none`: the recipe (`video_compose/v1`) records the
-  inputs, the plan and the backend and rides inside the file, and the call
-  carries no `cost_usd` and no `cost_unpriced`. 07 states its structural
-  conformance bar; 17 journals each start of the program as the builtin's
-  own `permit_checked` frame.
+  inputs, the plan and the backend from hashes, integers and closed words
+  known before the encode, and rides inside the file; the program's
+  version strings and the encoder's build string stay in the outputs. The
+  call carries no `cost_usd` and no `cost_unpriced`. 07 states its
+  structural conformance bar; 17 journals each start of the program as the
+  builtin's own `permit_checked` frame.
 - The reference oracle judges the closed arguments, the segment map, the
   media reference, the literal reads and the write; the trifecta table
-  classifies the builtin. Fixtures: `stdlib/builtins/080` to `094`, and the
-  example `video-compose-storyboard`. The addition requires the reference
+  classifies the builtin (a sink, not a source, a carrier). Fixtures:
+  `stdlib/builtins/080` to `117`, one rule each, and the example
+  `video-compose-storyboard`. The addition requires the reference
   engine's next MINOR, 0.125.0, which implements it: this spec commit and
   that engine land together.
 

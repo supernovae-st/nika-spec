@@ -88,9 +88,12 @@ EGRESS_BUILTINS = {
 # `nika:video_compose` starts a host program (ffmpeg) and is still NOT an
 # ingress source, unlike `exec:`: the engine hands that program only the
 # headerless raw samples it wrote (the raw-only invariant · builtins-v0.1.md
-# §nika:video_compose), and the call's outputs are engine-computed facts
-# about the file. Untrusted content REACHING its arguments is judged like
-# any fs-write sink (the selftest pins both directions).
+# §nika:video_compose), and the call adds nothing to its outputs but
+# engine-computed facts about the file. What those outputs ECHO of its
+# arguments (`metadata` · the paths read) keeps its taint, the way any
+# task's output carries what its fields read. Untrusted content REACHING
+# its arguments is judged like any fs-write sink (the selftest pins all
+# three directions: a sink, not a source, a carrier).
 # External but read-only — they touch the filesystem WITHOUT writing, so
 # they are ①'s domain (private data), never ③'s (egress).
 EXTERNAL_READ_ONLY = {"nika:read", "nika:grep", "nika:glob"}

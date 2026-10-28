@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0
+# 99 ms is one below the shortest hold: `duration_ms` is 100..=600000.
+nika: video-compose-duration-out-of-range
+permits:
+  tools: ["nika:video_compose"]
+  fs:
+    read: ["./out/frames/**"]
+    write: ["./out/a.mp4"]
+tasks:
+  video:
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments:
+          - { image: "./out/frames/a.png", duration_ms: 99 }
+        out: "./out/a.mp4"

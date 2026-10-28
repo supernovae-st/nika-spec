@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-BUILTIN-001",
+      "category": "validation_error"
+    }
+  ],
+  "note": "builtins-v0.1.md §nika:video_compose · a media reference's `sha256` is exactly 64 lowercase hex digits · 63 digits are refused at check (`-001` at run)"
+}

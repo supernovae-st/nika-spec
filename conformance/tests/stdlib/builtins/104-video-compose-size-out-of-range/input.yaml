@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: Apache-2.0
+# 4096 pixels is wider than the widest frame: `size` is even, width
+# 64..=3840 and height 64..=2160.
+nika: video-compose-size-out-of-range
+permits:
+  tools: ["nika:video_compose"]
+  fs:
+    read: ["./out/frames/**"]
+    write: ["./out/a.mp4"]
+tasks:
+  video:
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments:
+          - { image: "./out/frames/a.png", duration_ms: 2000 }
+        out: "./out/a.mp4"
+        size: "4096x2160"

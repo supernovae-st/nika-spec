@@ -1,0 +1,5 @@
+{
+  "valid": true,
+  "errors": [],
+  "note": "builtins-v0.1.md §nika:video_compose · `metadata` is at most 16384 bytes as canonical JSON (the JCS form · sorted keys · no whitespace · UTF-8) · this one is exactly 16384 bytes, so it passes (the twin of fixture 111)"
+}

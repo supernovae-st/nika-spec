@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: Apache-2.0
+# The artifact is an MP4, so `out:` names a .mp4 file: a .mov name is
+# refused before anything runs.
+nika: video-compose-out-extension-refused
+permits:
+  tools: ["nika:video_compose"]
+  fs:
+    read: ["./out/frames/**"]
+    write: ["./out/a.mov"]
+tasks:
+  video:
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments:
+          - { image: "./out/frames/a.png", duration_ms: 2000 }
+        out: "./out/a.mov"

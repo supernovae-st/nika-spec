@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0
+# A video needs at least one still: an empty segment list is refused at
+# check.
+nika: video-compose-empty-segments-refused
+permits:
+  tools: ["nika:video_compose"]
+  fs:
+    read: ["./out/frames/**"]
+    write: ["./out/a.mp4"]
+tasks:
+  video:
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments: []
+        out: "./out/a.mp4"

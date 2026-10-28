@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: Apache-2.0
+# The argument set is closed: a caption is not part of v1, and an unknown
+# argument is refused rather than ignored.
+nika: video-compose-unknown-argument-refused
+permits:
+  tools: ["nika:video_compose"]
+  fs:
+    read: ["./out/frames/**"]
+    write: ["./out/a.mp4"]
+tasks:
+  video:
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments:
+          - { image: "./out/frames/a.png", duration_ms: 2000 }
+        out: "./out/a.mp4"
+        caption: "Spring recap"

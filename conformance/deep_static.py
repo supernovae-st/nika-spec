@@ -82,6 +82,9 @@
 #                 (a vision file or images.save of any form is an fs
 #                 requirement: ∅ decides the category, as for exec · so is
 #                 a nika:video_compose call, which always reads and writes)
+#                 · the detail carries the inferred block, and says it is
+#                 partial when a path it needs is computed at run or
+#                 escapes the workspace (10 §the workflow's needed boundary)
 #
 # Emitted errors reuse the canonical namespaces (NIKA-VAR for expression
 # surface · NIKA-PARSE for shape rules · runner-protocol.md matching).
@@ -775,14 +778,16 @@ def _infer_permits_block(tasks: list, doc: dict) -> dict:
                 elif tool in _ABSENT_FS_WRITE_TOOLS:
                     keep(writes, _static_str(args.get("path")))
                 elif tool == "nika:video_compose":
-                    # every literal media input a read (a path that escapes
-                    # the workspace is named for review, never pasted as a
-                    # grant), and `out` a write
+                    # every literal media input a read and `out` a write (a
+                    # path that escapes the workspace is named for review by
+                    # _infer_partial_notes, never pasted as a grant)
                     for _slot, raw in _video_read_slots(args):
                         path = _static_write_path(raw, doc)
                         if path is not None and not _escapes_workspace(path):
                             keep(reads, path)
-                    keep(writes, _static_write_path(args.get("out"), doc))
+                    out = _static_write_path(args.get("out"), doc)
+                    if out is not None and not _escapes_workspace(out):
+                        keep(writes, out)
         ag = t.get("agent")
         if isinstance(ag, dict):
             for w in ag.get("tools") or []:
@@ -819,6 +824,58 @@ def _infer_permits_block(tasks: list, doc: dict) -> dict:
     return block
 
 
+def _infer_partial_notes(tasks: list, doc: dict) -> list[str]:
+    """Why the inferred block cannot re-check clean on its own (10 §the
+    workflow's needed boundary): an fs effect of ANY form (a `vision:`
+    file · an agent's images.save · a nika:video_compose media input or
+    `out`) whose path is computed at run cannot be printed, and a literal
+    one that escapes the workspace is named for review, never printed as a
+    grant. Each note names the task; an empty list means the block is
+    complete."""
+    notes: list[str] = []
+
+    def note(tid: str, what: str) -> None:
+        line = f"task '{tid}' {what}"
+        if line not in notes:
+            notes.append(line)
+
+    for tid, t in tasks:
+        inv = t.get("invoke")
+        if isinstance(inv, dict) and _static_str(inv.get("tool")) == "nika:video_compose":
+            args = _as_dict(inv.get("args"))
+            for slot, raw in _video_read_slots(args):
+                path = _static_write_path(raw, doc)
+                if path is None:
+                    named = slot == "audio" or slot.endswith((".image", ".audio"))
+                    note(tid, f"reads {slot} at a path computed at run" if named
+                         else f"reads the media of {slot}, computed at run")
+                elif _escapes_workspace(path):
+                    note(tid, f"reads {slot} {path!r} outside the workspace "
+                              "(never printed as a grant)")
+            raw_out = args.get("out")
+            out = _static_write_path(raw_out, doc)
+            if isinstance(raw_out, str) and raw_out and out is None:
+                note(tid, "writes out at a path computed at run")
+            elif out is not None and _escapes_workspace(out):
+                note(tid, f"writes out {out!r} outside the workspace "
+                          "(never printed as a grant)")
+        for raw in _vision_files(t):
+            if not isinstance(raw, str):
+                continue
+            path = _static_write_path(raw, doc)
+            if path is None:
+                note(tid, "reads a vision: file at a path computed at run")
+            elif _escapes_workspace(path):
+                note(tid, f"reads the vision: file {path!r} outside the workspace "
+                          "(never printed as a grant)")
+        ag = t.get("agent")
+        if isinstance(ag, dict):
+            save = _agent_images_save(ag)
+            if save is not None and _static_write_path(save, doc) is None:
+                note(tid, "saves its images at a path computed at run")
+    return notes
+
+
 def _flow_yaml(obj: dict) -> str:
     import yaml
     return yaml.safe_dump(obj, default_flow_style=True, sort_keys=False,
@@ -835,6 +892,12 @@ def absent_permits_errors(doc: dict, tasks: list) -> list[dict]:
     PERMITS-FIT's, below — untouched."""
     if "permits" not in doc:
         inferred = _infer_permits_block(tasks, doc)
+        partial = _infer_partial_notes(tasks, doc)
+        # The block re-checks clean only when the inference saw every path;
+        # otherwise the detail says it is partial and names the gaps.
+        posture = ("re-checks clean" if not partial else
+                   "partial · " + " · ".join(partial)
+                   + " · grant those paths deliberately before running")
         errs: list[dict] = []
         for tid, t in tasks:
             req = _task_required_absent(t, doc)
@@ -845,8 +908,8 @@ def absent_permits_errors(doc: dict, tasks: list) -> list[dict]:
                     "detail": f"task '{tid}' requires {', '.join(sorted(req))} "
                               "outside the declared boundary · this file has no "
                               "permits: block · absent means zero authority "
-                              "(NEP-0003) · add the inferred boundary (re-checks "
-                              f"clean): permits: {_flow_yaml(inferred)}"})
+                              f"(NEP-0003) · add the inferred boundary ({posture}): "
+                              f"permits: {_flow_yaml(inferred)}"})
         return errs
     if doc["permits"] is None:
         return [{"code": "NIKA-AUTH-006", "namespace": "NIKA-AUTH",
@@ -1934,11 +1997,15 @@ def _video_compose_shape(args) -> list[str]:
         if not isinstance(meta, dict):
             problems.append("metadata must be an object")
         elif not any(_templated(s) for _, s in _walk(meta)):
+            # The canonical JSON the cap is measured in: the JCS-shaped form
+            # of 15-proof (sorted keys · no whitespace · raw UTF-8 · the
+            # proof layer's `canonical`), a YAML timestamp read as its text.
             import json
             size_bytes = len(json.dumps(meta, sort_keys=True, separators=(",", ":"),
                                         ensure_ascii=False, default=str).encode("utf-8"))
             if size_bytes > _VIDEO_METADATA_MAX:
-                problems.append(f"metadata serializes to {size_bytes} bytes · at most 16 KiB")
+                problems.append(f"metadata is {size_bytes} bytes as canonical JSON · "
+                                "at most 16384 (16 KiB)")
     timeout = args.get("timeout_ms")
     if timeout is not None and not _templated(timeout) \
             and not _literal_int_in(timeout, 1000, 3600000):
