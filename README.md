@@ -322,7 +322,7 @@ declaring it.
 ## Reference implementation
 
 [supernovae-st/nika](https://github.com/supernovae-st/nika) is the reference
-engine: one Rust binary, AGPL-3.0-or-later. Its latest release is 0.124.0.
+engine: one Rust binary, AGPL-3.0-or-later. Its latest release is 0.124.1.
 0.124 is the current release line. Work stays focused on maintenance,
 security and the media capabilities workflows need; native video is planned
 for 0.125. Install it with `brew install supernovae-st/tap/nika` (or
@@ -452,12 +452,12 @@ flowchart LR
 | provenance | [`ESTATE_PIN`](ESTATE_PIN) here, and in the engine, the docs, the site and the registry | the shared provenance verifier is mirrored byte for byte from a published spec commit; the CI `mirror` job compares against exactly that commit |
 
 An engine release names its spec commit twice, and the two must agree. For
-example, at engine v0.124.0, the current release (the last line runs in
+example, at engine v0.124.1, the current release (the last line runs in
 your clone of this repository):
 
 ```sh
-curl -sS https://raw.githubusercontent.com/supernovae-st/nika/v0.124.0/SPEC_PIN | grep -v '^#'
-curl -sS https://raw.githubusercontent.com/supernovae-st/nika/v0.124.0/crates/nika-pack/pack/SPEC_SHA
+curl -sS https://raw.githubusercontent.com/supernovae-st/nika/v0.124.1/SPEC_PIN | grep -v '^#'
+curl -sS https://raw.githubusercontent.com/supernovae-st/nika/v0.124.1/crates/nika-pack/pack/SPEC_SHA
 git log -1 --format='%h %ad %s' --date=short 5cd95cd25c0ff453be266794a03666e5e3f2d7a8
 ```
 
@@ -546,14 +546,15 @@ Not sure an idea deserves a proposal? Pressure-test it first in the engine's
 
 ## Status
 
-- **The current release.** Engine 0.124.0 (2026-10-27) embeds this spec
+- **The current release.** Engine 0.124.1 (2026-10-28) embeds this spec
   at commit
   [`5cd95cd`](https://github.com/supernovae-st/nika-spec/commit/5cd95cd25c0ff453be266794a03666e5e3f2d7a8),
-  the commit its `SPEC_PIN` names. 0.124 is the current release line. Work
-  stays focused on maintenance, security and the media capabilities
-  workflows need; native video is planned for 0.125. The 0.123.x line,
-  opened by the open-source reference release 0.123.0 (2026-10-23, spec
-  `6390b08`), is the previous one. No 1.0 release is scheduled.
+  the commit its `SPEC_PIN` names, as 0.124.0 (2026-10-27) did. 0.124 is
+  the current release line. Work stays focused on maintenance, security and
+  the media capabilities workflows need; native video is planned for 0.125.
+  The 0.123.x line, opened by the open-source reference release 0.123.0
+  (2026-10-23, spec `6390b08`), is the previous one. No 1.0 release is
+  scheduled.
 - **Spec version.** [`VERSION`](VERSION) reads `0.2.0-draft`, and the
   spec badge above reads it live. [CHANGELOG.md](CHANGELOG.md) marks what
   engine 0.123.0 embeds and what landed after it.
