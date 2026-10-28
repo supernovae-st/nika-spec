@@ -349,7 +349,7 @@ patterns:
 - glob: "reference/**"
   class: authored
   match_count: 7
-  aggregate_sha256: 7cddd1c3a355a94b5ccacac2aef4ad7dbd908f16760ba478831ddb886977891a
+  aggregate_sha256: 8b480d7dde317ca7582fb45bcfa26dbb623ca15e9b50d3fb25effd73746a90fd
   evidence: "the executable reference semantics (semantics.py — the model that DEFINES gate-matrix outcomes · values_core.py · differential.py · generate.py · selftest.py) — hand-written Python, ruff-gated"
 - glob: "schemas/**"
   class: authored
