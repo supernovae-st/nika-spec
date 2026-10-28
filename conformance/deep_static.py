@@ -46,7 +46,10 @@
 #                 nika:remove_file takes exactly {path: string} naming a
 #                 file by its RAW spelling (NIKA-BUILTIN-001) ·
 #                 nika:image_compose's closed arg set, enums and literal
-#                 ranges (NIKA-BUILTIN-001)
+#                 ranges (NIKA-BUILTIN-001) · nika:video_compose's closed
+#                 arg set, its closed segment map, the media reference (a
+#                 path, or an object with BOTH path and sha256), enums and
+#                 literal ranges (NIKA-BUILTIN-001)
 #   PERMITS-FIT   when a permits: block is present, the body must FIT it
 #                 (01 §permits · default-deny once present) · statically
 #                 checkable surface: invoke tools + agent whitelists vs
@@ -60,7 +63,12 @@
 #                 permits.fs.read · an agent's images.save paths (the path
 #                 and its -2..-4 siblings) vs permits.fs.write · a vision
 #                 file or images.save of any form under a side that admits
-#                 no path (no rendered value can fit an empty grant)
+#                 no path (no rendered value can fit an empty grant) ·
+#                 nika:video_compose's literal / bare-const media inputs
+#                 (segments[k].image · segments[k].audio · audio · a string
+#                 or an object's path) vs permits.fs.read and its out vs
+#                 permits.fs.write · and a call of any form under a side
+#                 that admits no path (every call reads and writes)
 #   SHARED-MUTATION two mutating tasks (write · edit · remove · an agent's
 #                 images.save, its siblings included) on one known path
 #                 with no precedence path between them, or a for_each fan
@@ -72,7 +80,8 @@
 #                 passes · the null spelling is refused prescriptively ·
 #                 computed resources defer to the runtime NIKA-SEC-004
 #                 (a vision file or images.save of any form is an fs
-#                 requirement: ∅ decides the category, as for exec)
+#                 requirement: ∅ decides the category, as for exec · so is
+#                 a nika:video_compose call, which always reads and writes)
 #
 # Emitted errors reuse the canonical namespaces (NIKA-VAR for expression
 # surface · NIKA-PARSE for shape rules · runner-protocol.md matching).
@@ -408,6 +417,11 @@ def _task_required_absent(t: dict, doc: dict) -> set[str]:
                     req.add("fs")
             else:
                 req.add("tools")  # chart · image_* · tts · mcp:* · unknown
+                if tool == "nika:video_compose":
+                    # builtins-v0.1.md §nika:video_compose · every call reads a
+                    # still and writes `out`: an fs requirement whatever form
+                    # its paths take (∅ admits neither · the category question).
+                    req.add("fs")
     ag = t.get("agent")
     if isinstance(ag, dict):
         for w in ag.get("tools") or []:
@@ -760,6 +774,15 @@ def _infer_permits_block(tasks: list, doc: dict) -> dict:
                     keep(reads, _static_str(args.get("path")))
                 elif tool in _ABSENT_FS_WRITE_TOOLS:
                     keep(writes, _static_str(args.get("path")))
+                elif tool == "nika:video_compose":
+                    # every literal media input a read (a path that escapes
+                    # the workspace is named for review, never pasted as a
+                    # grant), and `out` a write
+                    for _slot, raw in _video_read_slots(args):
+                        path = _static_write_path(raw, doc)
+                        if path is not None and not _escapes_workspace(path):
+                            keep(reads, path)
+                    keep(writes, _static_write_path(args.get("out"), doc))
         ag = t.get("agent")
         if isinstance(ag, dict):
             for w in ag.get("tools") or []:
@@ -1771,6 +1794,182 @@ def _image_compose_shape(args) -> list[str]:
     return problems
 
 
+# ── nika:video_compose · native video assembly (builtins-v0.1.md) ──
+# The closed arg set, the closed segment map, the media reference (a path,
+# or an object carrying BOTH a string path and a 64-hex sha256), the enums
+# and the literal ranges a checker can see. A templated value (`${{ }}`
+# anywhere in a string) defers to the run's re-vet; a literal sibling is
+# still judged. The authority half (every media input a read, `out` a
+# write) is PERMITS-FIT's, below.
+_VIDEO_KEYS = ("segments", "audio", "audio_codec", "out", "size", "fps", "scale",
+               "background", "quality", "transition", "metadata", "timeout_ms")
+_VIDEO_SEGMENT_KEYS = ("image", "audio", "duration_ms", "pad_ms")
+_VIDEO_MAX_SEGMENTS = 200
+_VIDEO_SHA256 = re.compile(r"^[0-9a-f]{64}$")
+_VIDEO_SIZE = re.compile(r"^([0-9]+)x([0-9]+)$")
+_VIDEO_METADATA_MAX = 16384
+
+
+def _media_ref_path(v):
+    """The path a media reference names, as written: the string itself, or
+    an object's `path` (builtins-v0.1.md §nika:video_compose)."""
+    return v.get("path") if isinstance(v, dict) else v
+
+
+def _media_ref_problem(where: str, v) -> str | None:
+    """Why a literal media reference is malformed, or None. The object form
+    needs BOTH keys, so a misspelt `sha256` never drops the binding
+    silently; other keys are ignored (a producer's output passes as it is)."""
+    if _templated(v):
+        return None
+    if isinstance(v, str):
+        return None if v else f"{where} must be a non-empty path"
+    if not isinstance(v, dict):
+        return f"{where} must be a path or {{ path, sha256 }}"
+    missing = [k for k in ("path", "sha256") if k not in v]
+    if missing:
+        return (f"{where} carries no {' and no '.join(missing)} · a media reference "
+                "object needs BOTH path and sha256 (a misspelt key never drops the "
+                "binding)")
+    path, digest = v["path"], v["sha256"]
+    if not _templated(path) and (not isinstance(path, str) or not path):
+        return f"{where}.path must be a non-empty path string"
+    if not _templated(digest) and not (isinstance(digest, str)
+                                       and _VIDEO_SHA256.match(digest)):
+        return f"{where}.sha256 must be 64 lowercase hex digits"
+    return None
+
+
+def _video_segment_problems(k: int, seg, soundtrack: bool) -> list[str]:
+    where = f"segments[{k}]"
+    if _templated(seg):
+        return []
+    if not isinstance(seg, dict):
+        return [f"{where} must be a map {{ image, audio, duration_ms, pad_ms }} "
+                "(or one whole ${{ }} value)"]
+    problems = [f"{where} has no key {key!r} (the keys are "
+                f"{' · '.join(_VIDEO_SEGMENT_KEYS)})"
+                for key in sorted(str(key) for key in seg if key not in _VIDEO_SEGMENT_KEYS)]
+    if seg.get("image") is None:
+        problems.append(f"{where} requires image: (a PNG still)")
+    else:
+        problem = _media_ref_problem(f"{where}.image", seg["image"])
+        if problem:
+            problems.append(problem)
+    clip = seg.get("audio") is not None
+    if clip:
+        problem = _media_ref_problem(f"{where}.audio", seg["audio"])
+        if problem:
+            problems.append(problem)
+        if soundtrack:
+            problems.append(f"{where} carries a clip beside the top-level audio "
+                            "soundtrack (one or the other)")
+    dur, pad = seg.get("duration_ms"), seg.get("pad_ms")
+    if dur is not None and not _templated(dur) and not _literal_int_in(dur, 100, 600000):
+        problems.append(f"{where}.duration_ms {dur!r} must be an integer 100..=600000")
+    if pad is not None and not _templated(pad) and not _literal_int_in(pad, 0, 10000):
+        problems.append(f"{where}.pad_ms {pad!r} must be an integer 0..=10000")
+    if dur is None and not clip:
+        problems.append(f"{where} has no clip, so it needs duration_ms:")
+    if pad is not None and dur is not None:
+        problems.append(f"{where}.pad_ms applies only without duration_ms")
+    return problems
+
+
+def _video_compose_shape(args) -> list[str]:
+    if not isinstance(args, dict):
+        return ["takes an args object {segments, out, …}"]
+    problems = [f"has no argument {k!r} (the arguments are {' · '.join(_VIDEO_KEYS)})"
+                for k in sorted(str(k) for k in args if k not in _VIDEO_KEYS)]
+    soundtrack = args.get("audio") is not None
+    segs = args.get("segments")
+    if segs is None:
+        problems.append("requires segments: (the stills, in playback order)")
+    elif isinstance(segs, list):
+        if not 1 <= len(segs) <= _VIDEO_MAX_SEGMENTS:
+            problems.append(f"segments holds {len(segs)} items · the contract is "
+                            f"1..={_VIDEO_MAX_SEGMENTS}")
+        for k, seg in enumerate(segs):
+            problems.extend(_video_segment_problems(k, seg, soundtrack))
+    elif not _templated(segs):
+        problems.append("segments must be a list (or one whole ${{ }} list)")
+    if soundtrack:
+        problem = _media_ref_problem("audio", args["audio"])
+        if problem:
+            problems.append(problem)
+    out = args.get("out")
+    if out is None:
+        problems.append("requires out: (the .mp4 artifact path)")
+    elif not isinstance(out, str) or out == "":
+        problems.append("out must be a non-empty path string")
+    elif not _templated(out) and not out.endswith(".mp4"):
+        problems.append(f"out {out!r} must end in .mp4 (the artifact is an MP4)")
+    size = args.get("size")
+    if size is not None and not _templated(size):
+        m = _VIDEO_SIZE.match(size) if isinstance(size, str) else None
+        w, h = (int(m.group(1)), int(m.group(2))) if m else (0, 0)
+        if not (w % 2 == 0 and h % 2 == 0 and 64 <= w <= 3840 and 64 <= h <= 2160):
+            problems.append(f"size {size!r} must be WIDTHxHEIGHT with both sides even · "
+                            "width 64..=3840 · height 64..=2160")
+    fps = args.get("fps")
+    if fps is not None and not _templated(fps) and not _literal_int_in(fps, 1, 60):
+        problems.append(f"fps {fps!r} must be an integer 1..=60")
+    for key, allowed in (("scale", ("fit", "fill", "none")),
+                         ("quality", ("draft", "standard", "high")),
+                         ("audio_codec", ("aac", "flac"))):
+        v = args.get(key)
+        if v is not None and not _templated(v) and v not in allowed:
+            problems.append(f"{key} {v!r} is not {' | '.join(allowed)}")
+    transition = args.get("transition")
+    if transition == "fade":
+        problems.append("transition: fade is reserved · v1 is cuts only (transition: cut)")
+    elif transition is not None and not _templated(transition) and transition != "cut":
+        problems.append(f"transition {transition!r} is not cut (fade is reserved)")
+    if args.get("background") is not None:
+        problem = _compose_color_problem(args["background"])
+        if problem:
+            problems.append(problem)
+    meta = args.get("metadata")
+    if meta is not None and not _templated(meta):
+        if not isinstance(meta, dict):
+            problems.append("metadata must be an object")
+        elif not any(_templated(s) for _, s in _walk(meta)):
+            import json
+            size_bytes = len(json.dumps(meta, sort_keys=True, separators=(",", ":"),
+                                        ensure_ascii=False, default=str).encode("utf-8"))
+            if size_bytes > _VIDEO_METADATA_MAX:
+                problems.append(f"metadata serializes to {size_bytes} bytes · at most 16 KiB")
+    timeout = args.get("timeout_ms")
+    if timeout is not None and not _templated(timeout) \
+            and not _literal_int_in(timeout, 1000, 3600000):
+        problems.append(f"timeout_ms {timeout!r} must be an integer 1000..=3600000")
+    return problems
+
+
+def _video_read_slots(args: dict) -> list[tuple[str, object]]:
+    """(slot, path as written) for every media input nika:video_compose
+    reads: each segments[k].image, each segments[k].audio and the top-level
+    audio · a string or an object's `path`. A templated element is ONE slot
+    named segments[k], a templated whole list ONE slot named segments, each
+    with an unknown path (None): a hidden read set is never mistaken for an
+    empty one."""
+    slots: list[tuple[str, object]] = []
+    segs = args.get("segments")
+    if isinstance(segs, list):
+        for k, seg in enumerate(segs):
+            if isinstance(seg, dict):
+                for key in ("image", "audio"):
+                    if seg.get(key) is not None:
+                        slots.append((f"segments[{k}].{key}", _media_ref_path(seg[key])))
+            elif _templated(seg):
+                slots.append((f"segments[{k}]", None))
+    elif _templated(segs):
+        slots.append(("segments", None))
+    if args.get("audio") is not None:
+        slots.append(("audio", _media_ref_path(args["audio"])))
+    return slots
+
+
 # A WHOLE bare `${{ const.x }}` / `${{ inputs['x'] }}` reference, and
 # nothing else: no navigation, concatenation or other root. It names a
 # binding identity; it is not an interpolation engine.
@@ -1837,6 +2036,44 @@ def _image_compose_fit(tid: str, args: dict, doc: dict, read_globs, write_globs)
                      "detail": f"task '{tid}' · nika:image_compose out {out!r} "
                                f"(canonical {_taint_canonical_path(out)!r}) outside "
                                f"permits.fs.write {write_globs} (01 §permits)"})
+    return errs
+
+
+def _video_compose_fit(tid: str, args: dict, doc: dict, read_globs, write_globs) -> list:
+    """nika:video_compose's authority (builtins-v0.1.md): EVERY media input
+    is a read the declared fs.read must contain, and `out` a write the
+    declared fs.write must contain. A literal or whole bare-const path is
+    judged here, before any I/O; a templated one is the run's boundary
+    (NIKA-SEC-004 there), except under a side that admits no path at all,
+    where no rendered value can fit: every call reads a still and writes
+    `out`."""
+    errs: list[dict] = []
+
+    def refuse(detail: str) -> None:
+        errs.append({"code": "NIKA-SEC-004", "namespace": "NIKA-SEC",
+                     "category": "security_error", "detail": f"task '{tid}' · {detail}"})
+
+    judged = [(slot, _static_write_path(raw, doc)) for slot, raw in _video_read_slots(args)]
+    if not read_globs and any(path is None for _, path in judged):
+        refuse("nika:video_compose media path computed at run, and permits.fs.read "
+               "admits no path (every call reads at least one still · grant the "
+               "directories its media land in)")
+    for slot, path in judged:
+        if path is not None and not _taint_globbed(path, read_globs):
+            refuse(f"nika:video_compose {slot} {path!r} (canonical "
+                   f"{_taint_canonical_path(path)!r}) outside permits.fs.read "
+                   f"{read_globs} (every media input is a read the boundary must "
+                   "contain)")
+    raw_out = args.get("out")
+    out = _static_write_path(raw_out, doc)
+    if out is not None:
+        if not _taint_globbed(out, write_globs):
+            refuse(f"nika:video_compose out {out!r} (canonical "
+                   f"{_taint_canonical_path(out)!r}) outside permits.fs.write "
+                   f"{write_globs} (01 §permits)")
+    elif isinstance(raw_out, str) and raw_out and not write_globs:
+        refuse("nika:video_compose out computed at run, and permits.fs.write admits "
+               "no path (grant the video's path)")
     return errs
 
 
@@ -2115,6 +2352,12 @@ def deep_static_errors(doc: dict, base_dir=None) -> list[dict]:
                              "category": "validation_error",
                              "detail": f"task '{tid}' · nika:image_compose {problem} "
                                        "(builtins-v0.1.md §nika:image_compose)"})
+        if tool == "nika:video_compose":
+            for problem in _video_compose_shape(args):
+                errs.append({"code": "NIKA-BUILTIN-001", "namespace": "NIKA-BUILTIN",
+                             "category": "validation_error",
+                             "detail": f"task '{tid}' · nika:video_compose {problem} "
+                                       "(builtins-v0.1.md §nika:video_compose)"})
         if tool == "nika:done":
             errs.append({"code": "NIKA-BUILTIN-DONE-001", "namespace": "NIKA-BUILTIN",
                          "category": "validation_error",
@@ -2226,6 +2469,9 @@ def deep_static_errors(doc: dict, base_dir=None) -> list[dict]:
                                                "the exact path)"})
                 if tool == "nika:image_compose":
                     errs.extend(_image_compose_fit(tid, _as_dict(inv.get("args")), doc,
+                                                   read_globs, write_globs))
+                if tool == "nika:video_compose":
+                    errs.extend(_video_compose_fit(tid, _as_dict(inv.get("args")), doc,
                                                    read_globs, write_globs))
             ag = t.get("agent")
             if isinstance(ag, dict):

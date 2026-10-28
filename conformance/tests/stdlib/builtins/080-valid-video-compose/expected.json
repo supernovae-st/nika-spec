@@ -1,0 +1,5 @@
+{
+  "valid": true,
+  "errors": [],
+  "note": "builtins-v0.1.md §nika:video_compose · every literal media input (a path, or an object carrying both `path` and `sha256`, its other keys ignored) is a read inside permits.fs.read and `out:` a write inside permits.fs.write · no permits.exec: the engine starts the host's ffmpeg itself, on the raw samples it wrote. Engine-owned laws beyond the static check: the sha256 binding of each read (`-004`), the timing and keyframe plan, the verified file (`-007`), the budgets (`-005`), the host program (`-010`) and its confinement (`-011`)."
+}

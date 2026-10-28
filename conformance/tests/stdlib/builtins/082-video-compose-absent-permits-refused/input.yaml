@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+# No permits: block, so the file declares zero authority. Every call reads a
+# still and writes the video: an fs requirement, refused before any token.
+nika: video-compose-absent-permits
+tasks:
+  video:
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments:
+          - { image: "./out/frames/title.png", duration_ms: 2000 }
+        out: "./out/title.mp4"

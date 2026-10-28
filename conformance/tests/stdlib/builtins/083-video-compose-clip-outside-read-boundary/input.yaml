@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: Apache-2.0
+# The stills sit inside the read bound; the second clip, given as a
+# producer-style { path, sha256 } object, does not.
+nika: video-compose-clip-outside-read-boundary
+permits:
+  tools: ["nika:video_compose"]
+  fs:
+    read: ["./out/frames/**", "./out/voice/**"]
+    write: ["./out/storyboard.mp4"]
+tasks:
+  video:
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments:
+          - { image: "./out/frames/scene-1.png", audio: "./out/voice/scene-1.wav" }
+          - image: "./out/frames/scene-2.png"
+            audio:
+              path: "./private/voice-memo.wav"
+              sha256: "1e5a9884749325df5bf6a9905461abd6b0527e148ca872f3edc8c92f7aad0b38"
+        out: "./out/storyboard.mp4"

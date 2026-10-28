@@ -1,0 +1,47 @@
+# SPDX-License-Identifier: Apache-2.0
+# The storyboard without exec: a generated still and a narration clip become
+# the segment list, and the video reads the producers' { path, sha256 }
+# objects as they are. The list is computed, so the run's boundary judges
+# each resolved path.
+nika: video-compose-storyboard-deferred
+permits:
+  tools: ["nika:image_generate", "nika:jq", "nika:tts_generate", "nika:video_compose"]
+  fs:
+    read: ["./out/storyboard/frames/*", "./out/storyboard/voice/*"]
+    write:
+      - "./out/storyboard/frames"
+      - "./out/storyboard/frames/*"
+      - "./out/storyboard/storyboard.mp4"
+      - "./out/storyboard/voice"
+      - "./out/storyboard/voice/*"
+tasks:
+  frame:
+    invoke:
+      tool: "nika:image_generate"
+      args:
+        provider: mock
+        prompt: "a harbour at dawn, wide shot"
+        output_dir: "./out/storyboard/frames"
+  voice:
+    invoke:
+      tool: "nika:tts_generate"
+      args:
+        provider: mock
+        text: "The harbour wakes up."
+        output_dir: "./out/storyboard/voice"
+  segments:
+    with:
+      frame: "${{ tasks.frame.output }}"
+      voice: "${{ tasks.voice.output }}"
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: { frame: "${{ with.frame }}", voice: "${{ with.voice }}" }
+        expression: "[ { image: .frame.images[0], audio: .voice.audio, pad_ms: 600 } ]"
+  video:
+    with: { segments: "${{ tasks.segments.output }}" }
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments: "${{ with.segments }}"
+        out: "./out/storyboard/storyboard.mp4"

@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-015",
+      "category": "security_error"
+    }
+  ],
+  "note": "spec/10-authority.md §the unconditional laws · the order law binds the `exec:` verb, whose program and argument vector are workflow data · `render` runs ffmpeg downstream of `cues` (the path is the witness) and is refused, a human gate notwithstanding · `nika:video_compose` in the same place is not (fixture 093)"
+}

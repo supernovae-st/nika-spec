@@ -313,6 +313,10 @@ for _tool, _args in [
     ("nika:image_compose", '{ inputs: ["a.png"], out: "./out/${{ with.d }}.png" }'),
     ("nika:image_generate", '{ prompt: "${{ with.d }}", output_dir: "./out" }'),
     ("nika:tts_generate", '{ text: "${{ with.d }}", output_dir: "./out" }'),
+    # A tainted still duration reaches the artifact the engine writes.
+    ("nika:video_compose",
+     '{ segments: [{ image: "./private/a.png", duration_ms: "${{ with.d }}" }], '
+     'out: "./out/v.mp4" }'),
     # Removal is a write effect: an attacker-chosen path deletes a file the
     # operator did not choose.
     ("nika:remove_file", '{ path: "./out/${{ with.d }}.txt" }'),
@@ -337,6 +341,43 @@ tasks:
 """)
     law(f"{_tool} is a leg-③ sink (fs write)",
         len(_v) == 1 and _v[0]["task"] == "render" and _v[0]["source"] == "pull")
+
+# ── a program the engine starts itself is a sink, never a source ──
+# nika:video_compose starts ffmpeg on the raw samples the engine wrote (the
+# raw-only invariant · builtins-v0.1.md §nika:video_compose): its output is
+# engine-computed facts, so it never REALIZES leg ② the way an `exec:` does.
+# Same file, same receipt write, the program started by `exec:` instead:
+# the subprocess's stdout is untrusted by construction and the receipt is
+# the tainted egress.
+_ENGINE_RUN = """
+nika: engine-run-program
+model: mock/echo
+permits:
+  tools: ["nika:fetch", "nika:video_compose", "nika:write"]
+  fs: { read: ["./frames/**"], write: ["./out/**"] }
+  net: { http: ["api.example.com"] }
+tasks:
+  render:
+    invoke:
+      tool: "nika:video_compose"
+      args: { segments: [{ image: "./frames/a.png", duration_ms: 1000 }], out: "./out/v.mp4" }
+  receipt:
+    with: { v: "${{ tasks.render.output }}" }
+    invoke:
+      tool: "nika:write"
+      args: { path: "./out/receipt.json", content: "${{ with.v }}" }
+"""
+law("nika:video_compose realizes no ingress (its outputs carry no untrusted content)",
+    judge(_ENGINE_RUN) == [])
+_v = judge(_ENGINE_RUN.replace(
+    'tools: ["nika:fetch", "nika:video_compose", "nika:write"]',
+    'exec: ["ffmpeg"]\n  tools: ["nika:fetch", "nika:write"]').replace(
+    """    invoke:
+      tool: "nika:video_compose"
+      args: { segments: [{ image: "./frames/a.png", duration_ms: 1000 }], out: "./out/v.mp4" }""",
+    """    exec: { command: ["ffmpeg", "-version"] }"""))
+law("the same program started by exec: IS a source (the receipt is tainted)",
+    len(_v) == 1 and _v[0]["task"] == "receipt" and _v[0]["source"] == "render")
 
 # ── the COMPLETENESS ratchet (the structural half of the same repair) ──
 # Every builtin the registry classifies `external` must be explicitly

@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0
+# Captions are not part of v1: the key is refused, never silently ignored.
+nika: video-compose-unknown-segment-key-refused
+permits:
+  tools: ["nika:video_compose"]
+  fs:
+    read: ["./out/frames/**"]
+    write: ["./out/a.mp4"]
+tasks:
+  video:
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments:
+          - { image: "./out/frames/a.png", duration_ms: 2000, caption: "Day one" }
+        out: "./out/a.mp4"

@@ -1,0 +1,35 @@
+# SPDX-License-Identifier: Apache-2.0
+# A fetched cue sheet sets how long each still holds, behind a human gate.
+# The order law binds exec: only: this builtin starts ffmpeg itself on the
+# raw samples the engine wrote, so the fetched value reaches a duration,
+# never what the program parses.
+nika: video-compose-after-fetch
+permits:
+  tools: ["nika:fetch", "nika:prompt", "nika:video_compose"]
+  net: { http: ["example.com"] }
+  fs:
+    read: ["./assets/**"]
+    write: ["./out/recap.mp4"]
+tasks:
+  approve:
+    invoke:
+      tool: "nika:prompt"
+      args: { message: "Fetch today's cue sheet and render the recap?" }
+  cues:
+    with: { go: "${{ tasks.approve.output }}" }
+    when: "${{ with.go == true }}"
+    invoke:
+      tool: "nika:fetch"
+      args: { url: "https://example.com/recap/cues.json", mode: jq, jq: ".hold_ms" }
+  render:
+    with:
+      go: "${{ tasks.approve.output }}"
+      hold: "${{ tasks.cues.output }}"
+    when: "${{ with.go == true }}"
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments:
+          - { image: "./assets/recap-1.png", duration_ms: "${{ with.hold }}" }
+          - { image: "./assets/recap-2.png", duration_ms: "${{ with.hold }}" }
+        out: "./out/recap.mp4"

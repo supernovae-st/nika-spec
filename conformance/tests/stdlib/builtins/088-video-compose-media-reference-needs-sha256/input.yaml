@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: Apache-2.0
+# A misspelt key in the object form would drop the binding to the bytes the
+# producer wrote in silence, so the reference is refused instead.
+nika: video-compose-media-reference-needs-sha256
+permits:
+  tools: ["nika:video_compose"]
+  fs:
+    read: ["./out/frames/**"]
+    write: ["./out/a.mp4"]
+tasks:
+  video:
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments:
+          - image:
+              path: "./out/frames/a.png"
+              sha_256: "7f071235805fbf58a2524f77bff76e1391d0d1cfe2f4c190d73054495e05b460"
+            duration_ms: 2000
+        out: "./out/a.mp4"

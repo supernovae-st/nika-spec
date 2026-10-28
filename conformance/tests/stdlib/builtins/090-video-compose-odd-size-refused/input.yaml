@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: Apache-2.0
+# An odd frame width: 4:2:0 video needs both sides even.
+nika: video-compose-odd-size-refused
+permits:
+  tools: ["nika:video_compose"]
+  fs:
+    read: ["./out/frames/**"]
+    write: ["./out/a.mp4"]
+tasks:
+  video:
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments:
+          - { image: "./out/frames/a.png", duration_ms: 2000 }
+        out: "./out/a.mp4"
+        size: "1279x720"

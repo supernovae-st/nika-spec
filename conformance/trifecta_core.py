@@ -65,7 +65,7 @@ ITEM_REF = re.compile(r"\bitem\b")
 # fs-WRITE effect (NEP-0002 leg ③'s sink side). Derived by hand from the
 # ONE effect table, and PARTITIONED against the registry: together with
 # EXTERNAL_READ_ONLY below this set must equal the `external` capability
-# class of `canon/builtins.yaml` (13 rows), which the selftest asserts —
+# class of `canon/builtins.yaml` (14 rows), which the selftest asserts —
 # an unclassified external builtin FAILS the completeness law instead of silently
 # under-reporting. That ratchet exists because a hardcoded subset was
 # exactly the defect measured 2026-07-29: with the four media writers
@@ -83,7 +83,14 @@ EGRESS_BUILTINS = {
     "nika:image_fx",        # fs write · the `out:` artifact
     "nika:image_generate",  # fs write · assets land in `output_dir:` (recursive)
     "nika:tts_generate",    # fs write · same shape as image_generate
+    "nika:video_compose",   # fs write · the `out:` artifact (its media inputs are reads)
 }
+# `nika:video_compose` starts a host program (ffmpeg) and is still NOT an
+# ingress source, unlike `exec:`: the engine hands that program only the
+# headerless raw samples it wrote (the raw-only invariant · builtins-v0.1.md
+# §nika:video_compose), and the call's outputs are engine-computed facts
+# about the file. Untrusted content REACHING its arguments is judged like
+# any fs-write sink (the selftest pins both directions).
 # External but read-only — they touch the filesystem WITHOUT writing, so
 # they are ①'s domain (private data), never ③'s (egress).
 EXTERNAL_READ_ONLY = {"nika:read", "nika:grep", "nika:glob"}

@@ -1,0 +1,5 @@
+{
+  "valid": true,
+  "errors": [],
+  "note": "spec/10-authority.md §the unconditional laws · builtins-v0.1.md §nika:video_compose · the order law (NIKA-SEC-015) refuses an `exec:` downstream of a fetch; `render` sits downstream of `cues` and is not refused, because of the raw-only invariant: ffmpeg receives only headerless raw samples the engine wrote, behind forced raw demuxers and a file-only protocol whitelist, with no workflow string in its argument vector · the trifecta still counts the call as an fs-write egress, and the human gate dominates it · the twin with an `exec:` ffmpeg is fixture 094"
+}

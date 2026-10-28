@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0
+# The still is readable, but the video lands outside the write bound.
+nika: video-compose-out-outside-write-boundary
+permits:
+  tools: ["nika:video_compose"]
+  fs:
+    read: ["./out/frames/**"]
+    write: ["./out/clips/*"]
+tasks:
+  video:
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments:
+          - { image: "./out/frames/a.png", duration_ms: 2000 }
+        out: "./out/storyboard.mp4"

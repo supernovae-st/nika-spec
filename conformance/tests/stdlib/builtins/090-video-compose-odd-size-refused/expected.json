@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-BUILTIN-001",
+      "category": "validation_error"
+    }
+  ],
+  "note": "builtins-v0.1.md §nika:video_compose · `size` is WIDTHxHEIGHT with both sides even, width 64..=3840 and height 64..=2160 · a literal outside the bounds is refused at check"
+}

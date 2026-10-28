@@ -27,7 +27,7 @@ never a parallel list):
 
 | Effect category | Carried by | Granted by |
 |---|---|---|
-| `fs` (read · write) | `nika:read` · `nika:grep` · `nika:write` · `nika:edit` · `nika:remove_file` (write · no read) · file-writing media builtins · the files whose content reaches a model provider (an `infer:` `vision:` file · a `skills:` entry · a `{ file: }` project file · read) · an `agent:` `images.save` (write) | `permits.fs.read` / `permits.fs.write` (path globs) |
+| `fs` (read · write) | `nika:read` · `nika:grep` · `nika:write` · `nika:edit` · `nika:remove_file` (write · no read) · file-writing media builtins · the media inputs of `nika:image_compose` and `nika:video_compose` (read) · the files whose content reaches a model provider (an `infer:` `vision:` file · a `skills:` entry · a `{ file: }` project file · read) · an `agent:` `images.save` (write) | `permits.fs.read` / `permits.fs.write` (path globs) |
 | `net` | `nika:fetch` · `nika:notify` (webhook) · any URL-reaching builtin | `permits.net.http` (host allowlist · SSRF floor beneath) |
 | `exec` | the `exec:` verb | `permits.exec` (`false` · `true` · program allowlist) |
 | `tools` | the `invoke:` verb surface | `permits.tools` (id globs) |
@@ -156,6 +156,17 @@ declared with. The diagnostic names the **path**, which is the witness
 > shipped corpus, **1** refused — and that one
 > (`conformance/envelope/secrets-two-sinks-one-sanctioned`) is already a
 > declared `check-reject`. Zero green files paid for it.
+
+**A program the engine starts itself is not `exec:`.** The law binds the
+`exec:` verb, whose program and argument vector are workflow data.
+`nika:video_compose` starts the host's ffmpeg and may sit downstream of a
+fetch without being refused, because its contract is the raw-only
+invariant ([stdlib](../stdlib/builtins-v0.1.md)): ffmpeg receives only the
+headerless raw samples the engine wrote, behind forced raw demuxers, with
+a file-only protocol whitelist before every operand and no workflow path
+or string in its argument vector. Fetched content can change pixel and
+sample values, never what the program parses, opens or reaches. An `exec:`
+that runs ffmpeg downstream of a fetch stays refused.
 
 **`require.human_gate_before` did NOT make the same move, and the residue
 is owed rather than guessed.** Its unconditional substance — *a human

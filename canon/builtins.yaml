@@ -413,6 +413,26 @@ builtins:
     error_plane: NIKA-BUILTIN-VALIDATE
     notes: Import-c0 (canon-flip) · canon.yaml builtins → row · category + capability + error plane per stdlib/builtins-v0.1.md
       · classification law LAW-AUTH-0311 (chaque builtin est classé explicitement dans la SSOT).
+  - id: nika:video_compose
+    status: reserved
+    owner: spec
+    law_ids:
+      - LAW-AUTH-0311
+    introduced_in: '0.125'
+    category: media
+    capability_classification:
+      class: external
+      requires:
+        - fs
+    args_schema: to-mint-c1/video-compose-args
+    error_plane: NIKA-BUILTIN-VIDEO_COMPOSE
+    notes: Native video assembly · PNG stills with WAV clips or one soundtrack become one MP4 artifact (H.264 · AAC-LC
+      or FLAC) · the engine decodes every input and drives the host's ffmpeg on headerless raw samples only (the raw-only
+      invariant · no exec, no permits.exec) · an external filesystem effect (tool grant + fs.read for every media input
+      + fs.write for out) · the sixth §Media graduate · errors NIKA-BUILTIN-VIDEO_COMPOSE-001..011 (-001 -003 -010
+      validation_error · -005 -011 security_error · -002 -004 -006 -007 -008 -009 tool_error) and semantics per
+      stdlib/builtins-v0.1.md §nika:video_compose · args_schema is a placeholder, no formal args schema is minted yet ·
+      classification law LAW-AUTH-0311.
   - id: nika:wait
     status: reserved
     owner: spec

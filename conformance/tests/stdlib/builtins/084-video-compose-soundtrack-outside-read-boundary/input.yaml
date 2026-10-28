@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: Apache-2.0
+# Two stills hold over one soundtrack, and the soundtrack lies outside the
+# read bound.
+nika: video-compose-soundtrack-outside-read-boundary
+permits:
+  tools: ["nika:video_compose"]
+  fs:
+    read: ["./out/frames/**"]
+    write: ["./out/teaser.mp4"]
+tasks:
+  video:
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments:
+          - { image: "./out/frames/a.png", duration_ms: 4000 }
+          - { image: "./out/frames/b.png", duration_ms: 4000 }
+        audio: "./music/theme.wav"
+        out: "./out/teaser.mp4"

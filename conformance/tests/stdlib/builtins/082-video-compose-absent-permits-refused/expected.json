@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-AUTH-006",
+      "category": "security_error"
+    }
+  ],
+  "note": "builtins-v0.1.md §nika:video_compose · an absent block declares zero authority (NEP-0003) · the call requires the tool grant, an fs.read for its still and an fs.write for `out:`, so it is refused at check whatever form its paths take · the diagnostic carries the inferred boundary (tools · fs.read · fs.write), which re-checks clean"
+}

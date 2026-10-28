@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-004",
+      "category": "security_error"
+    }
+  ],
+  "note": "builtins-v0.1.md §nika:video_compose · every call reads at least one still · a templated list defers each path to the run's boundary, but under a permits.fs.read that admits no path no rendered value can fit, so the call is refused at check (the `vision:` pattern)"
+}

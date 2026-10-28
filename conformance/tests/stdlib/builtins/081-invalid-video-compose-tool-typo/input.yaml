@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: video-compose-tool-typo
+permits:
+  tools: ["nika:videocompose"]
+  fs:
+    read: ["./out/**"]
+    write: ["./out/**"]
+tasks:
+  video:
+    invoke:
+      tool: "nika:videocompose"
+      args:
+        segments: [{ image: "./out/a.png", duration_ms: 2000 }]
+        out: "./out/a.mp4"
