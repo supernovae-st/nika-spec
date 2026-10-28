@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-004",
+      "category": "security_error"
+    }
+  ],
+  "note": "builtins-v0.1.md §nika:video_compose · the top-level `audio` soundtrack is a media input like a clip: a read the static check judges against permits.fs.read before any I/O"
+}

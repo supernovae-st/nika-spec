@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-BUILTIN-001",
+      "category": "validation_error"
+    }
+  ],
+  "note": "builtins-v0.1.md §nika:video_compose · a media reference object needs BOTH `path` and `sha256` · `sha_256` is another key (ignored), so `sha256` is missing · refused at check, `-001` at run"
+}

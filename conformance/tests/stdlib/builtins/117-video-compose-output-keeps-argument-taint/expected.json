@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-009",
+      "category": "security_error"
+    }
+  ],
+  "note": "builtins-v0.1.md §nika:video_compose · spec/10-authority.md · the trifecta counts the call as an fs-write sink and never as an ingress source, and what its outputs echo of its arguments (`metadata` · the paths read) keeps its taint · `render` is dominated by the gate; `tell` reads the video's outputs and an ungated sibling, so the fetched title reaches an ungated egress through them · the finding is at `tell`, its source `title`"
+}

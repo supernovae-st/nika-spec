@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-BUILTIN-001",
+      "category": "validation_error"
+    }
+  ],
+  "note": "builtins-v0.1.md §nika:video_compose · `fps` is an integer 1..=60 · 61 is one above the bound"
+}

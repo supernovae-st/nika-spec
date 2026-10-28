@@ -1,0 +1,5 @@
+{
+  "valid": true,
+  "errors": [],
+  "note": "builtins-v0.1.md §nika:video_compose · the segment budget is 1..=200 inclusive · 200 literal segments pass the check (the twin of fixture 097)"
+}

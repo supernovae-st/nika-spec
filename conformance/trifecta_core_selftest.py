@@ -313,6 +313,10 @@ for _tool, _args in [
     ("nika:image_compose", '{ inputs: ["a.png"], out: "./out/${{ with.d }}.png" }'),
     ("nika:image_generate", '{ prompt: "${{ with.d }}", output_dir: "./out" }'),
     ("nika:tts_generate", '{ text: "${{ with.d }}", output_dir: "./out" }'),
+    # A tainted still duration reaches the artifact the engine writes.
+    ("nika:video_compose",
+     '{ segments: [{ image: "./private/a.png", duration_ms: "${{ with.d }}" }], '
+     'out: "./out/v.mp4" }'),
     # Removal is a write effect: an attacker-chosen path deletes a file the
     # operator did not choose.
     ("nika:remove_file", '{ path: "./out/${{ with.d }}.txt" }'),
@@ -337,6 +341,91 @@ tasks:
 """)
     law(f"{_tool} is a leg-③ sink (fs write)",
         len(_v) == 1 and _v[0]["task"] == "render" and _v[0]["source"] == "pull")
+
+# ── a program the engine starts itself is a sink, never a source ──
+# nika:video_compose starts ffmpeg on the raw samples the engine wrote (the
+# raw-only invariant · builtins-v0.1.md §nika:video_compose): it adds
+# nothing to its output but engine-computed facts, so it never REALIZES
+# leg ② the way an `exec:` does. Same file, same receipt write, the program
+# started by `exec:` instead: the subprocess's stdout is untrusted by
+# construction and the receipt is the tainted egress.
+_ENGINE_RUN = """
+nika: engine-run-program
+model: mock/echo
+permits:
+  tools: ["nika:fetch", "nika:video_compose", "nika:write"]
+  fs: { read: ["./frames/**"], write: ["./out/**"] }
+  net: { http: ["api.example.com"] }
+tasks:
+  render:
+    invoke:
+      tool: "nika:video_compose"
+      args: { segments: [{ image: "./frames/a.png", duration_ms: 1000 }], out: "./out/v.mp4" }
+  receipt:
+    with: { v: "${{ tasks.render.output }}" }
+    invoke:
+      tool: "nika:write"
+      args: { path: "./out/receipt.json", content: "${{ with.v }}" }
+"""
+law("nika:video_compose realizes no ingress (it adds no untrusted content of its own)",
+    judge(_ENGINE_RUN) == [])
+_v = judge(_ENGINE_RUN.replace(
+    'tools: ["nika:fetch", "nika:video_compose", "nika:write"]',
+    'exec: ["ffmpeg"]\n  tools: ["nika:fetch", "nika:write"]').replace(
+    """    invoke:
+      tool: "nika:video_compose"
+      args: { segments: [{ image: "./frames/a.png", duration_ms: 1000 }], out: "./out/v.mp4" }""",
+    """    exec: { command: ["ffmpeg", "-version"] }"""))
+law("the same program started by exec: IS a source (the receipt is tainted)",
+    len(_v) == 1 and _v[0]["task"] == "receipt" and _v[0]["source"] == "render")
+
+# ── ...and a carrier: what its outputs echo keeps the taint it came with ──
+# `metadata` and the paths read are echoed into the outputs, so fetched
+# content that enters the call leaves it again. The fetch and the render
+# sit behind the gate; the notify that reads the render's output has an
+# ungated sibling route, so the gate does not dominate it: the receipt of
+# the video is the tainted egress, its source the fetch, never the render.
+_CARRIER = """
+nika: engine-run-carrier
+model: mock/echo
+permits:
+  tools: ["nika:fetch", "nika:notify", "nika:prompt", "nika:read", "nika:video_compose"]
+  fs: { read: ["./frames/**"], write: ["./out/**"] }
+  net: { http: ["api.example.com", "hooks.example.com"] }
+tasks:
+  approve:
+    invoke:
+      tool: "nika:prompt"
+      args: { message: "fetch the title and render?" }
+  title:
+    after: { approve: success }
+    invoke:
+      tool: "nika:fetch"
+      args: { url: "https://api.example.com/title" }
+  render:
+    with: { t: "${{ tasks.title.output }}" }
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments: [{ image: "./frames/a.png", duration_ms: 1000 }]
+        out: "./out/v.mp4"
+        metadata: { title: "${{ with.t }}" }
+  notes:
+    invoke:
+      tool: "nika:read"
+      args: { path: "./frames/notes.txt" }
+  tell:
+    with: { v: "${{ tasks.render.output }}", n: "${{ tasks.notes.output }}" }
+    invoke:
+      tool: "nika:notify"
+      args: { url: "https://hooks.example.com/x", message: "${{ with.v }} ${{ with.n }}" }
+"""
+_v = judge(_CARRIER)
+law("nika:video_compose's outputs carry the taint of what they echo (metadata)",
+    len(_v) == 1 and _v[0]["task"] == "tell" and _v[0]["source"] == "title")
+law("...and the same graph without the tainted metadata is clean",
+    judge(_CARRIER.replace('        metadata: { title: "${{ with.t }}" }\n', '')
+          .replace('    with: { t: "${{ tasks.title.output }}" }\n', '')) == [])
 
 # ── the COMPLETENESS ratchet (the structural half of the same repair) ──
 # Every builtin the registry classifies `external` must be explicitly

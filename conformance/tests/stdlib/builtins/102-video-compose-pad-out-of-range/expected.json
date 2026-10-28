@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-BUILTIN-001",
+      "category": "validation_error"
+    }
+  ],
+  "note": "builtins-v0.1.md §nika:video_compose · `segments[].pad_ms` is an integer 0..=10000 · 10001 is one above the bound"
+}

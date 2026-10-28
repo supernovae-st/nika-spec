@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-004",
+      "category": "security_error"
+    }
+  ],
+  "note": "builtins-v0.1.md §nika:video_compose · each media input is judged on its own, and the object form's `path` is the read · one clip outside permits.fs.read refuses the call at check, whatever its siblings"
+}

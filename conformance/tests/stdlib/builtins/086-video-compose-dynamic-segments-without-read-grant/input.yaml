@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: Apache-2.0
+# The storyboard arrives at run time, but the boundary admits no read at all:
+# no rendered still can fit an empty grant, so the check refuses the call
+# before anything runs.
+nika: video-compose-dynamic-segments-without-read-grant
+permits:
+  tools: ["nika:jq", "nika:video_compose"]
+  fs:
+    write: ["./out/storyboard.mp4"]
+tasks:
+  plan:
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: { frames: ["./out/frames/a.png", "./out/frames/b.png"] }
+        expression: "[ .frames[] | { image: ., duration_ms: 2000 } ]"
+  video:
+    with: { segments: "${{ tasks.plan.output }}" }
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments: "${{ with.segments }}"
+        out: "./out/storyboard.mp4"

@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-SEC-004",
+      "category": "security_error"
+    }
+  ],
+  "note": "builtins-v0.1.md §nika:video_compose · `out:` is an fs.write the static check judges · `./out/storyboard.mp4` is not inside `./out/clips/*`, and a read grant never satisfies a write"
+}

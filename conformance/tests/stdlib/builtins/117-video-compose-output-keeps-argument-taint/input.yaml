@@ -1,0 +1,49 @@
+# SPDX-License-Identifier: Apache-2.0
+# A fetched title rides the video's metadata behind a human gate, and the
+# outputs echo it. The notify that reads the video's outputs also reads a
+# file the gate does not dominate, so the fetched content reaches an
+# ungated egress through the video's outputs: the call is no ingress
+# source, but its outputs carry the taint of what they echo.
+nika: video-compose-output-keeps-argument-taint
+permits:
+  tools: ["nika:fetch", "nika:notify", "nika:prompt", "nika:read", "nika:video_compose"]
+  net: { http: ["example.com", "hooks.example.com"] }
+  fs:
+    read: ["./assets/**"]
+    write: ["./out/recap.mp4"]
+tasks:
+  approve:
+    invoke:
+      tool: "nika:prompt"
+      args: { message: "Fetch today's title and render the recap?" }
+  title:
+    with: { go: "${{ tasks.approve.output }}" }
+    when: "${{ with.go == true }}"
+    invoke:
+      tool: "nika:fetch"
+      args: { url: "https://example.com/recap/title.json", mode: jq, jq: ".title" }
+  render:
+    with:
+      go: "${{ tasks.approve.output }}"
+      title: "${{ tasks.title.output }}"
+    when: "${{ with.go == true }}"
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments:
+          - { image: "./assets/recap-1.png", duration_ms: 2000 }
+        out: "./out/recap.mp4"
+        metadata: { title: "${{ with.title }}" }
+  notes:
+    invoke:
+      tool: "nika:read"
+      args: { path: "./assets/notes.txt" }
+  tell:
+    with:
+      video: "${{ tasks.render.output }}"
+      notes: "${{ tasks.notes.output }}"
+    invoke:
+      tool: "nika:notify"
+      args:
+        url: "https://hooks.example.com/recap"
+        message: "${{ with.video }} ${{ with.notes }}"

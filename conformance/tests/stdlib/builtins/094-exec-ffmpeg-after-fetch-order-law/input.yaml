@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: Apache-2.0
+# The same recap rendered by an exec: of ffmpeg. The program is the same, but
+# an exec: hands it workflow-built arguments and files, so the order law
+# refuses it downstream of a fetch, even behind a human gate.
+nika: exec-ffmpeg-after-fetch
+permits:
+  exec: ["ffmpeg"]
+  tools: ["nika:fetch", "nika:prompt"]
+  net: { http: ["example.com"] }
+  fs:
+    read: ["./assets/**"]
+    write: ["./out/recap.mp4"]
+tasks:
+  approve:
+    invoke:
+      tool: "nika:prompt"
+      args: { message: "Fetch today's cue sheet and render the recap?" }
+  cues:
+    with: { go: "${{ tasks.approve.output }}" }
+    when: "${{ with.go == true }}"
+    invoke:
+      tool: "nika:fetch"
+      args: { url: "https://example.com/recap/cues.json", mode: jq, jq: ".hold_s" }
+  render:
+    with:
+      go: "${{ tasks.approve.output }}"
+      hold: "${{ tasks.cues.output }}"
+    when: "${{ with.go == true }}"
+    exec:
+      command: ["ffmpeg", "-loop", "1", "-t", "${{ with.hold }}", "-i", "./assets/recap-1.png", "./out/recap.mp4"]

@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-BUILTIN-001",
+      "category": "validation_error"
+    }
+  ],
+  "note": "builtins-v0.1.md §nika:video_compose · a top-level `audio` soundtrack and a segment clip are one or the other (`-001` at run) · with a soundtrack every segment carries `duration_ms`"
+}

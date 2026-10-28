@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-BUILTIN-001",
+      "category": "validation_error"
+    }
+  ],
+  "note": "builtins-v0.1.md §nika:video_compose · `transition` is `cut` · `fade` is reserved · any other value is refused"
+}

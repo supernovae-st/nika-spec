@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: Apache-2.0
+# The video's path is computed at run, but the boundary admits no write at
+# all: no rendered path can fit an empty grant, so the check refuses the
+# call before anything runs.
+nika: video-compose-dynamic-out-without-write-grant
+permits:
+  tools: ["nika:jq", "nika:video_compose"]
+  fs:
+    read: ["./out/frames/**"]
+tasks:
+  name:
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: { slug: "recap" }
+        expression: '"./out/" + .slug + ".mp4"'
+  video:
+    with: { out: "${{ tasks.name.output }}" }
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments:
+          - { image: "./out/frames/a.png", duration_ms: 2000 }
+        out: "${{ with.out }}"

@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: Apache-2.0
+# `scale` is fit, fill or none. A stretch would distort the still, and no
+# backend offers it.
+nika: video-compose-scale-closed-set
+permits:
+  tools: ["nika:video_compose"]
+  fs:
+    read: ["./out/frames/**"]
+    write: ["./out/a.mp4"]
+tasks:
+  video:
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments:
+          - { image: "./out/frames/a.png", duration_ms: 2000 }
+        out: "./out/a.mp4"
+        scale: stretch

@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: Apache-2.0
+# The audio track is AAC-LC or FLAC. MP3 is not one of them.
+nika: video-compose-audio-codec-closed-set
+permits:
+  tools: ["nika:video_compose"]
+  fs:
+    read: ["./out/frames/**", "./out/voice/**"]
+    write: ["./out/a.mp4"]
+tasks:
+  video:
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments:
+          - { image: "./out/frames/a.png", audio: "./out/voice/a.wav" }
+        out: "./out/a.mp4"
+        audio_codec: mp3

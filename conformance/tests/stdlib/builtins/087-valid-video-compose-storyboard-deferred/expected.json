@@ -1,0 +1,5 @@
+{
+  "valid": true,
+  "errors": [],
+  "note": "builtins-v0.1.md §nika:video_compose · a templated segment list defers to the run's boundary (NIKA-SEC-004 there) · deferral is not a grant: each resolved path is judged against permits.fs.read before it is opened, and each producer object's `sha256` binds the read to the bytes the producer wrote (`-004` otherwise)"
+}

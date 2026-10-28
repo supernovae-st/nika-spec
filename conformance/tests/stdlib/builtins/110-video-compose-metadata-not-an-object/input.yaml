@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: Apache-2.0
+# `metadata` is a free object echoed into the outputs, never a bare
+# string.
+nika: video-compose-metadata-not-an-object
+permits:
+  tools: ["nika:video_compose"]
+  fs:
+    read: ["./out/frames/**"]
+    write: ["./out/a.mp4"]
+tasks:
+  video:
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments:
+          - { image: "./out/frames/a.png", duration_ms: 2000 }
+        out: "./out/a.mp4"
+        metadata: "spring"

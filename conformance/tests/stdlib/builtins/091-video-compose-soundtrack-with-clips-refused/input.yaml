@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: Apache-2.0
+# A soundtrack and a segment clip at once: one or the other.
+nika: video-compose-soundtrack-with-clips-refused
+permits:
+  tools: ["nika:video_compose"]
+  fs:
+    read: ["./out/frames/**", "./out/music/**", "./out/voice/**"]
+    write: ["./out/a.mp4"]
+tasks:
+  video:
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments:
+          - { image: "./out/frames/a.png", audio: "./out/voice/a.wav" }
+          - { image: "./out/frames/b.png", duration_ms: 3000 }
+        audio: "./out/music/theme.wav"
+        out: "./out/a.mp4"

@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: Apache-2.0
+# 999 ms is one below the shortest deadline: `timeout_ms` is
+# 1000..=3600000.
+nika: video-compose-timeout-out-of-range
+permits:
+  tools: ["nika:video_compose"]
+  fs:
+    read: ["./out/frames/**"]
+    write: ["./out/a.mp4"]
+tasks:
+  video:
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments:
+          - { image: "./out/frames/a.png", duration_ms: 2000 }
+        out: "./out/a.mp4"
+        timeout_ms: 999

@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: Apache-2.0
+# v1 cuts from still to still. `fade` is reserved (fixture 089) and any
+# other transition is not a word of the contract.
+nika: video-compose-unknown-transition-refused
+permits:
+  tools: ["nika:video_compose"]
+  fs:
+    read: ["./out/frames/**"]
+    write: ["./out/a.mp4"]
+tasks:
+  video:
+    invoke:
+      tool: "nika:video_compose"
+      args:
+        segments:
+          - { image: "./out/frames/a.png", duration_ms: 2000 }
+        out: "./out/a.mp4"
+        transition: dissolve

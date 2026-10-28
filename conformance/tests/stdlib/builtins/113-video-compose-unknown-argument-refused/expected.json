@@ -1,0 +1,10 @@
+{
+  "valid": false,
+  "errors": [
+    {
+      "code": "NIKA-BUILTIN-001",
+      "category": "validation_error"
+    }
+  ],
+  "note": "builtins-v0.1.md §nika:video_compose · the argument set is closed (`segments` · `audio` · `audio_codec` · `out` · `size` · `fps` · `scale` · `background` · `quality` · `transition` · `metadata` · `timeout_ms`)"
+}

@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "kind": "spec-language-knowledge",
   "owner": "supernovae-st/nika-spec",
-  "revision": "5c40ba456c53a4ab663a949d44003078e161305d",
+  "revision": "0900fc43373743f44a1f2c2a467293a3e870f78f",
   "inputs": {
-    "schemas/workflow.schema.json": "076e3b4b093b5176f2e55a0f51fab63b033e8cce37a7ceae7121aeeaa0ffa30e",
+    "schemas/workflow.schema.json": "2e2b77f72999a463c48bdcfd825c380adbcdf39ff4255470d283fcd1394dbd27",
     "templates/agent-loop.nika": "9343b4d43c45c3f1cef68b5a2ec3c13449a09a272ca443a7561c98ba77e3f1bc",
     "templates/aggregate-by-key.nika": "a7a34d9415e3187ff32607d79272da49e790500f1998593730c5047dc8a111fd",
     "templates/api-upload-and-create.nika": "d78fe72bda643e088c9e992a33b32647d083f00c772c49babe7764efc353263b",
@@ -6439,6 +6439,7 @@
                   "nika:tts_generate",
                   "nika:uuid",
                   "nika:validate",
+                  "nika:video_compose",
                   "nika:wait",
                   "nika:write"
                 ]
