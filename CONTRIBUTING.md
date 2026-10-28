@@ -13,12 +13,13 @@ PR that edits [`spec/`](./spec/) directly, with its conformance fixtures
 in the same PR — a proposal process only has meaning against something
 frozen, and this draft is not.
 
-Engine 0.124.0 embeds this spec at `5cd95cd`. 0.124 is the current
-release line. Work stays focused on maintenance, security and the media
-capabilities workflows need; native video is planned for 0.125. No
-pre-freeze is scheduled, so this is the door in use. A fix to the spec
-names what it corrects, in [CHANGELOG.md](./CHANGELOG.md) under
-`[Unreleased]`, and reaches the engine at its next `SPEC_PIN` bump.
+Engine 0.124.1, the current release, embeds this spec at `5cd95cd`, as
+0.124.0 did. 0.124 is the current release line. Work stays focused on
+maintenance, security and the media capabilities workflows need; native
+video is planned for 0.125. No pre-freeze is scheduled, so this is the door
+in use. A fix to the spec names what it corrects, in
+[CHANGELOG.md](./CHANGELOG.md) under `[Unreleased]`, and reaches the engine
+at its next `SPEC_PIN` bump.
 
 At the pre-freeze that flips: every normative change becomes a **NEP**
 (Nika Enhancement Proposal) and nobody amends the standard directly, the

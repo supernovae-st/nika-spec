@@ -328,7 +328,7 @@ declaring it.
 ## Reference implementation
 
 [supernovae-st/nika](https://github.com/supernovae-st/nika) is the reference
-engine: one Rust binary, AGPL-3.0-or-later. Its latest release is 0.124.0.
+engine: one Rust binary, AGPL-3.0-or-later. Its latest release is 0.124.1.
 0.124 is the current release line. Work stays focused on maintenance,
 security and the media capabilities workflows need; native video is planned
 for 0.125. Install it with `brew install supernovae-st/tap/nika` (or
@@ -458,12 +458,12 @@ flowchart LR
 | provenance | [`ESTATE_PIN`](ESTATE_PIN) here, and in the engine, the docs, the site and the registry | the shared provenance verifier is mirrored byte for byte from a published spec commit; the CI `mirror` job compares against exactly that commit |
 
 An engine release names its spec commit twice, and the two must agree. For
-example, at engine v0.124.0, the current release (the last line runs in
+example, at engine v0.124.1, the current release (the last line runs in
 your clone of this repository):
 
 ```sh
-curl -sS https://raw.githubusercontent.com/supernovae-st/nika/v0.124.0/SPEC_PIN | grep -v '^#'
-curl -sS https://raw.githubusercontent.com/supernovae-st/nika/v0.124.0/crates/nika-pack/pack/SPEC_SHA
+curl -sS https://raw.githubusercontent.com/supernovae-st/nika/v0.124.1/SPEC_PIN | grep -v '^#'
+curl -sS https://raw.githubusercontent.com/supernovae-st/nika/v0.124.1/crates/nika-pack/pack/SPEC_SHA
 git log -1 --format='%h %ad %s' --date=short 5cd95cd25c0ff453be266794a03666e5e3f2d7a8
 ```
 
@@ -552,14 +552,15 @@ Not sure an idea deserves a proposal? Pressure-test it first in the engine's
 
 ## Status
 
-- **The current release.** Engine 0.124.0 (2026-10-27) embeds this spec
+- **The current release.** Engine 0.124.1 (2026-10-28) embeds this spec
   at commit
   [`5cd95cd`](https://github.com/supernovae-st/nika-spec/commit/5cd95cd25c0ff453be266794a03666e5e3f2d7a8),
-  the commit its `SPEC_PIN` names. 0.124 is the current release line. Work
-  stays focused on maintenance, security and the media capabilities
-  workflows need; native video is planned for 0.125. The 0.123.x line,
-  opened by the open-source reference release 0.123.0 (2026-10-23, spec
-  `6390b08`), is the previous one. No 1.0 release is scheduled.
+  the commit its `SPEC_PIN` names, as 0.124.0 (2026-10-27) did. 0.124 is
+  the current release line. Work stays focused on maintenance, security and
+  the media capabilities workflows need; native video is planned for 0.125.
+  The 0.123.x line, opened by the open-source reference release 0.123.0
+  (2026-10-23, spec `6390b08`), is the previous one. No 1.0 release is
+  scheduled.
 - **Spec version.** [`VERSION`](VERSION) reads `0.2.0-draft`, and the
   spec badge above reads it live. [CHANGELOG.md](CHANGELOG.md) marks what
   engine 0.123.0 embeds and what landed after it.
@@ -667,7 +668,7 @@ AGPL-3.0-or-later.
 > **Status** · authoring, static checking AND execution all work TODAY:
 > `brew install supernovae-st/tap/nika`, then `nika check` + `nika run` on
 > any file in this page. The spec text itself is v0.2.0-draft, the version
-> engine 0.124.0 embeds; the language family v1 is already frozen — there is
+> engine 0.124.1 embeds; the language family v1 is already frozen — there is
 > no `nika: v2`, ever.
 
 ---
@@ -991,12 +992,13 @@ These 5 pillars are **locked forever** at v1. Everything else (providers · buil
 ## Pre-1.0 stability contract
 
 > **Amended 2026-10-27 · the current release line.**
-> Engine 0.124.0 embeds this spec at commit `5cd95cd`. 0.124 is the current
-> release line. Work stays focused on maintenance, security and the media
-> capabilities workflows need; native video is planned for 0.125. No engine
-> 1.0.0 is scheduled, so the freeze this section waits for is still not
-> planned, and each change to the grammar lands with its conformance
-> fixtures and its [CHANGELOG.md](../CHANGELOG.md) entry, as below.
+> Engine 0.124.0 embeds this spec at commit `5cd95cd`, and so does 0.124.1
+> (2026-10-28), the current release. 0.124 is the current release line.
+> Work stays focused on maintenance, security and the media capabilities
+> workflows need; native video is planned for 0.125. No engine 1.0.0 is
+> scheduled, so the freeze this section waits for is still not planned, and
+> each change to the grammar lands with its conformance fixtures and its
+> [CHANGELOG.md](../CHANGELOG.md) entry, as below.
 
 > **Amended 2026-10-23 · the maintained reference.** Engine 0.123.0 is the
 > open-source reference release and embeds this spec at commit `6390b08`.
@@ -7057,7 +7059,7 @@ can lag this repository.** On 2026-10-24 it served the revision of
 reading it flags a valid workflow that uses them. For the exact schema an
 engine embeds, `nika spec --schema` prints it offline, byte for byte, and the
 address pinned at the embedded spec commit serves the same bytes online; for
-engine 0.124.0 (spec `5cd95cd`) that is
+engines 0.124.0 and 0.124.1 (spec `5cd95cd`) that is
 `https://raw.githubusercontent.com/supernovae-st/nika-spec/5cd95cd25c0ff453be266794a03666e5e3f2d7a8/schemas/workflow.schema.json`.
 
 #### The address MUST become versioned and immutable (normative · D-2026-08-11-N24)
@@ -11147,9 +11149,21 @@ conformance · open a PR on `supernovae-st/nika-spec` to be listed in
 
 | Implementation | Language | Core | Runtime | Stdlib | Spec commit | Verified |
 |---|---|---|---|---|---|---|
-| [nika](https://github.com/supernovae-st/nika) (reference engine · **0.124.0**, the current release) | Rust | ⚠️ **267/268** core fixtures by command (`NIKA_BIN=… sh scripts/parity-sweep.sh` · full static sweep **443/450**: core 267/268 · deep 50/50 · stdlib 109/115 · values 10/10 · types 4/4 · gates 3/3). The one core red: `core/envelope/055-secret-source-vault-withdrawn-refused`, a `source: vault` secret the engine still admits after 01 withdrew it | ⚠️ **121/125 measured agree** · 4 diverge · 0 engine errors (`NIKA_BIN=… python3 scripts/runtime-differential.py` · the run, trace and access doors). The 4 that diverge, `runtime/access-harness/003 · 004 · 006 · 013`, run an `agent:` task on the scripted codex-acp seat. The engine runs an agent task on that seat only in its measured asking mode, `read-only`, which the fixtures' route world cannot offer, so it refuses with `NIKA-1805` before the first prompt (0.123.2 gives the same four). 46 of the 171 behavioral fixtures are UNSUPPORTED by this runner (no qualified adapter yet), named and never counted as passes | ⚠️ static surface **109/115**: `stdlib/001` and `stdlib/providers/001 · 002 · 006` (a bare `NIKA-PROVIDER` code with no number, which the runner's matching rule cannot match to the expected namespace; 006 is also refused with `NIKA-AUTH-006`: its agent names `nika:read`, which no `permits.tools` grants), `stdlib/hash/002 · 003` (the signing arguments of `nika:hash`, spec-ahead of this engine, refused with `NIKA-BUILTIN-001`: `key` and `op` in 002, `op`, `public_key` and `signature` in 003; 002 is also refused with `NIKA-SEC-006`: its secret key reaches `nika:hash` with no `egress:` sanction, which [01 §egress](spec/01-envelope.md#egress--optional--sanctioned-destinations-declassification) refuses, so that cause is the fixture's) · lints **7/7** at the only door + 25 NO-DOOR (`NIKA_BIN=… python3 scripts/lints-differential.py`) | `5cd95cd` | 2026-10-27 |
+| [nika](https://github.com/supernovae-st/nika) (reference engine · **0.124.1**, the current release) | Rust | ⚠️ **267/268** core fixtures by command (`NIKA_BIN=… sh scripts/parity-sweep.sh` · full static sweep **443/450**: core 267/268 · deep 50/50 · stdlib 109/115 · values 10/10 · types 4/4 · gates 3/3). The one core red: `core/envelope/055-secret-source-vault-withdrawn-refused`, a `source: vault` secret the engine still admits after 01 withdrew it | ⚠️ **121/125 measured agree** · 4 diverge · 0 engine errors (`NIKA_BIN=… python3 scripts/runtime-differential.py` · the run, trace and access doors). The 4 that diverge, `runtime/access-harness/003 · 004 · 006 · 013`, run an `agent:` task on the scripted codex-acp seat. The engine runs an agent task on that seat only in its measured asking mode, `read-only`, which the fixtures' route world cannot offer, so it refuses with `NIKA-1805` before the first prompt (0.124.0 gives the same four). 46 of the 171 behavioral fixtures are UNSUPPORTED by this runner (no qualified adapter yet), named and never counted as passes | ⚠️ static surface **109/115**: `stdlib/001` and `stdlib/providers/001 · 002 · 006` (a bare `NIKA-PROVIDER` code with no number, which the runner's matching rule cannot match to the expected namespace; 006 is also refused with `NIKA-AUTH-006`: its agent names `nika:read`, which no `permits.tools` grants), `stdlib/hash/002 · 003` (the signing arguments of `nika:hash`, spec-ahead of this engine, refused with `NIKA-BUILTIN-001`: `key` and `op` in 002, `op`, `public_key` and `signature` in 003; 002 is also refused with `NIKA-SEC-006`: its secret key reaches `nika:hash` with no `egress:` sanction, which [01 §egress](spec/01-envelope.md#egress--optional--sanctioned-destinations-declassification) refuses, so that cause is the fixture's) · lints **7/7** at the only door + 25 NO-DOOR (`NIKA_BIN=… python3 scripts/lints-differential.py`) | `5cd95cd` | 2026-10-28 |
+| [nika](https://github.com/supernovae-st/nika) (reference engine · 0.124.0 · superseded by the row above) | Rust | ⚠️ **267/268** core fixtures by command (`NIKA_BIN=… sh scripts/parity-sweep.sh` · full static sweep **443/450**: core 267/268 · deep 50/50 · stdlib 109/115 · values 10/10 · types 4/4 · gates 3/3). The one core red: `core/envelope/055-secret-source-vault-withdrawn-refused`, a `source: vault` secret the engine still admits after 01 withdrew it | ⚠️ **121/125 measured agree** · 4 diverge · 0 engine errors (`NIKA_BIN=… python3 scripts/runtime-differential.py` · the run, trace and access doors). The 4 that diverge, `runtime/access-harness/003 · 004 · 006 · 013`, run an `agent:` task on the scripted codex-acp seat. The engine runs an agent task on that seat only in its measured asking mode, `read-only`, which the fixtures' route world cannot offer, so it refuses with `NIKA-1805` before the first prompt (0.123.2 gives the same four). 46 of the 171 behavioral fixtures are UNSUPPORTED by this runner (no qualified adapter yet), named and never counted as passes | ⚠️ static surface **109/115**: `stdlib/001` and `stdlib/providers/001 · 002 · 006` (a bare `NIKA-PROVIDER` code with no number, which the runner's matching rule cannot match to the expected namespace; 006 is also refused with `NIKA-AUTH-006`: its agent names `nika:read`, which no `permits.tools` grants), `stdlib/hash/002 · 003` (the signing arguments of `nika:hash`, spec-ahead of this engine, refused with `NIKA-BUILTIN-001`: `key` and `op` in 002, `op`, `public_key` and `signature` in 003; 002 is also refused with `NIKA-SEC-006`: its secret key reaches `nika:hash` with no `egress:` sanction, which [01 §egress](spec/01-envelope.md#egress--optional--sanctioned-destinations-declassification) refuses, so that cause is the fixture's) · lints **7/7** at the only door + 25 NO-DOOR (`NIKA_BIN=… python3 scripts/lints-differential.py`) | `5cd95cd` | 2026-10-27 |
 | [nika](https://github.com/supernovae-st/nika) (reference engine · 0.123.0, the open-source reference release · superseded by the row above) | Rust | ⚠️ **247/248** core fixtures by command (`NIKA_BIN=… sh scripts/parity-sweep.sh` · full static sweep **414/421**: core 247/248 · deep 50/50 · stdlib 100/106 · values 10/10 · types 4/4 · gates 3/3). The one core red: `core/envelope/055-secret-source-vault-withdrawn-refused`, a `source: vault` secret the engine still admits after 01 withdrew it | **124/124 measured agree** · 0 diverge · 0 engine errors (`NIKA_BIN=… python3 scripts/runtime-differential.py` · the run, trace and access doors); 46 of the 170 behavioral fixtures are UNSUPPORTED by this runner (no qualified adapter yet), named and never counted as passes | ⚠️ static surface **100/106**: `stdlib/001` and `stdlib/providers/001 · 002 · 006` (a bare `NIKA-PROVIDER` code with no number, which the runner's matching rule cannot match to the expected namespace), `stdlib/hash/002 · 003` (the signing arguments of `nika:hash`, spec-ahead of this engine, refused with `NIKA-BUILTIN-001`: `key` and `op` in 002, `op`, `public_key` and `signature` in 003; 002 is also refused with `NIKA-SEC-006`: its secret key reaches `nika:hash` with no `egress:` sanction, which [01 §egress](spec/01-envelope.md#egress--optional--sanctioned-destinations-declassification) refuses, so that cause is the fixture's) · lints **7/7** at the only door + 25 NO-DOOR (`NIKA_BIN=… python3 scripts/lints-differential.py`) | `6390b08` | 2026-10-24 |
 | [nika](https://github.com/supernovae-st/nika) (reference engine · 0.106.1 · superseded by the row above) | Rust | ✅ **131/131** core fixtures — BY COMMAND, never linkage (the Bowtie adapter · `NIKA_BIN=… sh scripts/parity-sweep.sh` · full static sweep 213/217, every remaining divergence a NAMED engine owe: the codeless rungs [nika#761](https://github.com/supernovae-st/nika/issues/761)) | ✅ **56/56** behavioral fixtures by command (`NIKA_BIN=… python3 scripts/runtime-differential.py` · the run + trace doors) | ✅ static surface 28/32 (the 4 reds are the [#761](https://github.com/supernovae-st/nika/issues/761) codeless MODELS rung) · lints 4/4 at the only door + 25 NO-DOOR ([#763](https://github.com/supernovae-st/nika/issues/763)) · behavioral half pending | `63a6295` | 2026-07-30 |
+
+The 0.124.1 row was replayed with the released binary (`nika 0.124.1
+(bec4f5271)`, the macOS arm64 archive of the v0.124.1 release, checked
+against its `SHA256SUMS`) on fixtures at `5cd95cd`, the commit engine
+0.124.1 embeds (its `SPEC_PIN`), as 0.124.0 does. Two runs from fresh
+checkouts gave identical verdicts, and the released 0.124.0 binary, run
+the same way, gives the same verdicts and codes fixture by fixture: the
+static sweep, the runtime and lints differentials, and
+`conformance/run.sh nika` (91 PASS · 10 DRIFT · 0 DIVERGENT · 5 BUG, the
+files and codes named below). It earns no level claim at that commit, for
+the reasons given for 0.124.0.
 
 The 0.124.0 row was replayed with the released binary (`nika 0.124.0
 (866ed914b)`, the macOS arm64 archive of the v0.124.0 release) on

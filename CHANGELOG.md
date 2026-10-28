@@ -16,6 +16,23 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Changes merged after the spec commit engine 0.123.0 embeds. They reach the
 engine at its next `SPEC_PIN` bump.
 
+### Changed · engine 0.124.1 is the current release (2026-10-28)
+
+- The README, CONTRIBUTING, SECURITY, the QUICKSTART status line and 00
+  §Pre-1.0 stability contract name engine 0.124.1, which embeds this spec at
+  `5cd95cd`, as 0.124.0 does. 00's 2026-10-27 amendment keeps its wording
+  and adds 0.124.1.
+- The README's pin example reads engine v0.124.1, and its three commands
+  print the same lines. 07 §Editor tooling and `llms.txt` give the `5cd95cd`
+  schema address for engines 0.124.0 and 0.124.1: the released 0.124.1
+  binary's `nika spec --schema` prints the same bytes.
+- `CONFORMANT_IMPLEMENTATIONS.md` lists engine 0.124.1 at `5cd95cd`,
+  measured with the released binary: the counts and the reds of the 0.124.0
+  row, fixture by fixture. No level is claimed at that commit, and the
+  0.124.0 row stays as history. The pre-commit usage comment pins the
+  engine's `nika-check` hook at `v0.124.1`; the engine's hook file is
+  unchanged since `v0.123.0`.
+
 ### Changed · engine 0.124.0 is the current release (2026-10-27)
 
 - The README, CONTRIBUTING, SECURITY, the QUICKSTART status line and 00
