@@ -1,0 +1,43 @@
+{
+  "admission": {
+    "accepted": true
+  },
+  "workflow_state": "success",
+  "tasks": {
+    "summarize": {
+      "status": "success"
+    }
+  },
+  "receipt": {
+    "access_via": "codex",
+    "protocol": "acp",
+    "requested_model": "openai/gpt-5.5",
+    "requested_effort": "high",
+    "transmitted_model": "openai/gpt-5.5",
+    "transmitted_effort": "high",
+    "configured_model": "openai/gpt-5.5",
+    "configured_effort": "high",
+    "model_evidence": "configured",
+    "responding_model": null,
+    "requested_service_tier": "fast",
+    "offered_service_tier": [
+      "off",
+      "on"
+    ],
+    "transmitted_service_tier": "on",
+    "configured_service_tier": "on",
+    "turn_service_tier": null,
+    "effective_service_tier": null
+  },
+  "observed": {
+    "acp_config_before_first_prompt": {
+      "model": "openai/gpt-5.5",
+      "effort": "high",
+      "service_tier": "fast"
+    },
+    "acp_prompts": 1,
+    "api_inference_requests": 0,
+    "cli_invocations": 0
+  },
+  "note": "01 §run · LAW-CONF-0501 · the file asks codex over ACP for its fast tier: the model, the native effort and the tier are applied in that order as the session's own options and read back BEFORE the first prompt. The receipt keeps the tier's facts apart: the language word requested (fast), the native values the session listed once the model and the effort were selected (off, on), the value sent (on) and the value read back (on). The scripted peer cannot witness the tier carried on the turn or the tier the provider reports, so both stay null: configured is not served."
+}

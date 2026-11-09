@@ -36,10 +36,12 @@ surface:
     family: run
     exposure: authorable
     notes: 'Clé IMBRIQUÉE sous la clé d''enveloppe run: (l''enveloppe garde ses neuf clés · aucune clé access:
-      en tête ni par tâche). Mapping fermé {via, protocol, fallback} : via = la route (application d''agents ou
-      id de fournisseur API · ensemble ouvert jugé par le moteur, aucun catalogue figé) · protocol = api | acp
-      (aucune troisième famille « native ») · fallback = none (aussi le sens d''un fallback omis). Distinct de
-      l''identité du modèle (model:) · spec/01-envelope.md §run.'
+      en tête ni par tâche). Mapping fermé {via, protocol, fallback, service_tier} : via = la route (application
+      d''agents ou id de fournisseur API · ensemble ouvert jugé par le moteur, aucun catalogue figé) · protocol =
+      api | acp (aucune troisième famille « native ») · fallback = none (aussi le sens d''un fallback omis) ·
+      service_tier = standard | fast (les deux mots du langage, liés par chaque route à son propre contrôle natif
+      ou refusés · omis = le palier par défaut de la route, qui peut rester inconnu). Distinct de l''identité du
+      modèle (model:) · spec/01-envelope.md §run.'
   - id: run_reasoning
     status: active
     owner: spec

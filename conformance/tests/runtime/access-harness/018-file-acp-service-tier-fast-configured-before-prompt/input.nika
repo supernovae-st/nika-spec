@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: file-acp-service-tier-fast
+model: openai/gpt-5.5
+run:
+  access:
+    via: codex
+    protocol: acp
+    fallback: none
+    service_tier: fast
+  reasoning:
+    effort: high
+tasks:
+  summarize:
+    agent:
+      prompt: "Summarize the supplied note in one sentence."

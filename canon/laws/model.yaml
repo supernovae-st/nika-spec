@@ -314,7 +314,8 @@ laws:
   # fixtures · la porte NEP reste dormante jusqu'au pré-freeze v1). Le contrat sépare
   # l'identité du modèle (model:, LAW-SURFACE-0501 inchangée) de la route
   # (run.access.via), du protocole (run.access.protocol), du fallback
-  # (run.access.fallback) et de l'effort natif (run.reasoning.effort). Prose :
+  # (run.access.fallback), du palier de service (run.access.service_tier) et de
+  # l'effort natif (run.reasoning.effort). Prose :
   # spec/01-envelope.md §run. Schema : schemas/workflow.schema.json properties.run.
   # Le couplage entropy × clock reste la loi LAW-TEMPORAL-0435, intacte.
 
@@ -323,10 +324,10 @@ laws:
     status: active
     owner: spec
     domain: SURFACE
-    title: "Route, protocole, fallback et effort natif sont des déclarations de run:, distinctes de l'identité du modèle · protocole api | acp · aucune dixième clé d'enveloppe · aucune clé par tâche"
+    title: "Route, protocole, fallback, palier de service et effort natif sont des déclarations de run:, distinctes de l'identité du modèle · protocole api | acp · palier standard | fast · aucune dixième clé d'enveloppe · aucune clé par tâche"
     prose_projection:
       chapters: ["01-envelope"]
-      text: "model: reste la string <provider>/<name> (LAW-SURFACE-0501) et dit QUEL modèle répond · run.access dit COMMENT le run l'atteint (via: la route · protocol: api | acp · fallback: none) · run.reasoning.effort dit quel effort NATIF lui est demandé. Une épellation par sens : access et reasoning vivent sous run: — l'enveloppe garde ses neuf clés et aucune clé access:/reasoning: n'existe au niveau tâche (un run, une route, comme un run, une horloge) · le vocabulaire de protocole est exactement api | acp : « native » n'est pas une troisième famille d'accès (une CLI directe est une implémentation d'adaptateur, jamais un protocole sélectionnable, et ne satisfait jamais acp) · la spec ne fige aucun catalogue de routes, de modèles ni d'efforts · les identifiants, comptes et facturation d'une route restent dans sa propre configuration, jamais dans le fichier."
+      text: "model: reste la string <provider>/<name> (LAW-SURFACE-0501) et dit QUEL modèle répond · run.access dit COMMENT le run l'atteint (via: la route · protocol: api | acp · fallback: none) et à quel palier de service la route est priée de servir (service_tier: standard | fast) · run.reasoning.effort dit quel effort NATIF lui est demandé. Une épellation par sens : access et reasoning vivent sous run: — l'enveloppe garde ses neuf clés et aucune clé access:/reasoning: n'existe au niveau tâche, pas plus qu'une clé service_tier: hors de run.access (un run, une route, comme un run, une horloge) · le vocabulaire de protocole est exactement api | acp : « native » n'est pas une troisième famille d'accès (une CLI directe est une implémentation d'adaptateur, jamais un protocole sélectionnable, et ne satisfait jamais acp) · la spec ne fige aucun catalogue de routes, de modèles ni d'efforts · le palier de service est le seul vocabulaire fermé que le langage possède ici : deux mots, standard et fast, que chaque route lie à son propre contrôle natif ou refuse — jamais un autre modèle, jamais un alias d'effort, jamais le contrôle d'une autre route (il n'existe pas de seconde façon de choisir un modèle) · les identifiants, comptes et facturation d'une route restent dans sa propre configuration, jamais dans le fichier."
     inputs:
       - registry: surface
         id: run_access
@@ -379,10 +380,13 @@ laws:
     fixtures:
       - conformance/tests/core/envelope/033-run-access-acp-effort-passes
       - conformance/tests/core/envelope/036-run-reasoning-effort-alone-passes
+      - conformance/tests/core/envelope/056-run-access-service-tier-fast-passes
     negative_fixtures:
       - conformance/tests/core/envelope/046-run-access-protocol-native-refused
       - conformance/tests/core/envelope/049-access-top-level-key-refused
       - conformance/tests/core/envelope/050-task-access-key-refused
+      - conformance/tests/core/envelope/061-task-service-tier-key-refused
+      - conformance/tests/core/envelope/062-run-service-tier-outside-access-refused
     projections: ["prose:01-envelope", "schema", "cli:check", "lsp", "mcp", "sdk"]
     implementation_surfaces:
       - engine:nika-vocab
@@ -393,6 +397,7 @@ laws:
     introduced_in: C2
     proof_obligations:
       - "Le schema publie run.access et run.reasoning sous properties.run (additionalProperties: false) et nulle part ailleurs : une clé access: en tête d'enveloppe (049) ou au niveau tâche (050) refuse NIKA-PARSE · validation_error, la classe générique opérante (aucun code numéroté dédié n'est inventé ici)."
+      - "service_tier n'est publié que sous properties.run.properties.access : écrit sur une tâche (061) ou directement sous run: (062), il refuse NIKA-PARSE · validation_error comme toute clé inconnue à cet endroit. Le palier ne devient jamais une clé de tâche : des étapes qui demandent des paliers différents sont des workflows enfants distincts."
       - "protocol: native refuse (046) : l'énumération publique est exactement api | acp. Le transport réel d'une ancienne exécution CLI directe reste nommé dans ses propres reçus ; il ne devient pas une valeur de sélection."
     closure_gates:
       - fixture-parity
@@ -403,10 +408,10 @@ laws:
     status: active
     owner: spec
     domain: GRAMMAR
-    title: "run.access est un ensemble fermé {via, protocol, fallback} · chaque clé optionnelle, la déclaration non vide · via kebab-case non vide · protocol api | acp · fallback none · valeurs littérales"
+    title: "run.access est un ensemble fermé {via, protocol, fallback, service_tier} · chaque clé optionnelle, la déclaration non vide · via kebab-case non vide · protocol api | acp · fallback none · service_tier standard | fast · valeurs littérales"
     prose_projection:
       chapters: ["01-envelope"]
-      text: "La forme de run.access est TOUT son contrat statique : un mapping fermé {via, protocol, fallback} (une clé inconnue refuse dans les deux modes de parse, comme permits:) · chaque clé est optionnelle mais access: {} ne sélectionne rien et refuse · via est un id de route kebab-case ASCII non vide, sans rien après lui (une application d'agents ou un id de fournisseur API · ensemble ouvert jugé par le registre de routes du moteur) · protocol est l'enum fermée api | acp · fallback est l'enum fermée none — omis, il vaut none dès que access: est déclaré (une sélection explicite est exacte · les alternatives déclarées ne sont pas spécifiées, une valeur future est additive) · aucune valeur n'est un template ${{ }} (la sélection est résolue avant la première tâche, depuis le fichier seul) · protocol omis : la route se connecte comme avant la déclaration. Violation = NIKA-PARSE · validation_error. L'existence de la route, le protocole qu'elle parle et le modèle qu'elle sert ne sont PAS jugés ici (LAW-CONF-0501)."
+      text: "La forme de run.access est TOUT son contrat statique : un mapping fermé {via, protocol, fallback, service_tier} (une clé inconnue refuse dans les deux modes de parse, comme permits:) · chaque clé est optionnelle mais access: {} ne sélectionne rien et refuse · via est un id de route kebab-case ASCII non vide, sans rien après lui (une application d'agents ou un id de fournisseur API · ensemble ouvert jugé par le registre de routes du moteur) · protocol est l'enum fermée api | acp · fallback est l'enum fermée none — omis, il vaut none dès que access: est déclaré (une sélection explicite est exacte · les alternatives déclarées ne sont pas spécifiées, une valeur future est additive) · service_tier est l'enum fermée standard | fast : les deux mots du langage, jamais le mot natif d'une route (on · off · priority · un booléen refusent) — omis, la route garde son palier par défaut, qui peut rester inconnu (l'omission n'est pas standard) · aucune valeur n'est un template ${{ }} (la sélection est résolue avant la première tâche, depuis le fichier seul) · protocol omis : la route se connecte comme avant la déclaration. Violation = NIKA-PARSE · validation_error. L'existence de la route, le protocole qu'elle parle, le modèle qu'elle sert et le palier qu'elle offre ne sont PAS jugés ici (LAW-CONF-0501)."
     inputs:
       - registry: surface
         id: run_access
@@ -448,11 +453,21 @@ laws:
           value_shape:
             registry: ir
             id: access_fallback_vocabulary
+        - field: service_tier
+          cardinality: optional
+          value_shape:
+            registry: ir
+            id: access_service_tier_vocabulary
     diagnostics: []
     fixtures:
       - conformance/tests/core/envelope/033-run-access-acp-effort-passes
       - conformance/tests/core/envelope/034-run-access-seeded-virtual-passes
       - conformance/tests/core/envelope/037-run-access-protocol-alone-passes
+      - conformance/tests/core/envelope/056-run-access-service-tier-fast-passes
+      - conformance/tests/core/envelope/057-run-access-service-tier-standard-passes
+      - conformance/tests/core/envelope/063-run-access-service-tier-alone-passes
+      - conformance/tests/core/envelope/064-run-access-service-tier-api-protocol-passes
+      - conformance/tests/core/envelope/065-run-access-service-tier-seeded-virtual-passes
     negative_fixtures:
       - conformance/tests/core/envelope/038-run-access-empty-refused
       - conformance/tests/core/envelope/039-run-access-unknown-key-refused
@@ -461,6 +476,9 @@ laws:
       - conformance/tests/core/envelope/046-run-access-protocol-native-refused
       - conformance/tests/core/envelope/047-run-access-fallback-unknown-refused
       - conformance/tests/core/envelope/051-run-access-via-trailing-newline-refused
+      - conformance/tests/core/envelope/058-run-access-service-tier-unknown-refused
+      - conformance/tests/core/envelope/059-run-access-service-tier-template-refused
+      - conformance/tests/core/envelope/060-run-access-service-tier-not-a-string-refused
     projections: ["prose:01-envelope", "schema", "cli:check", "lsp", "mcp", "sdk"]
     implementation_surfaces:
       - engine:nika-vocab
@@ -472,6 +490,7 @@ laws:
     proof_obligations:
       - "Chaque fixture négative isole une seule violation de forme (mapping vide · clé inconnue · scalaire au lieu d'un mapping · via vide · protocol hors enum · fallback hors enum) et le verdict de l'oracle de référence nomme ce chemin sous run.access ; sous le schema de base (clé fermée {entropy, clock}) les fixtures positives refusaient — le patch est donc nécessaire, pas cosmétique."
       - "La coexistence avec entropy/clock (034) est légale et le couplage reste jugé à l'identique avec access: présent (035 · NIKA-PARSE-026 · LAW-TEMPORAL-0435)."
+      - "service_tier : chaque fixture négative isole une seule violation (mot hors enum, ici le mot natif d'une API, 058 · template nommant une entrée déclarée 059 · booléen natif 060) et les positives couvrent chaque mot (056 · 057), la clé seule (063), une route API dont la forme est valide alors que son offre ne se juge qu'avant inférence (064) et la coexistence avec entropy/clock (065). Sous le schema précédent (ensemble fermé {via, protocol, fallback}) les cinq positives refusaient : le patch est nécessaire. Les fixtures 033, 034 et 037, qui ne déclarent aucun palier, restent valides à l'identique : l'omission ne change rien."
     closure_gates:
       - fixture-parity
       - run-access-shape-closed
@@ -549,10 +568,10 @@ laws:
     status: reserved
     owner: spec
     domain: CONF
-    title: "Une sélection déclarée est honorée exactement — route, protocole, modèle, effort natif appliqués avant le premier prompt — ou refusée avant toute inférence · fallback: none ne substitue jamais"
+    title: "Une sélection déclarée est honorée exactement — route, protocole, modèle, effort natif, palier de service appliqués avant le premier prompt — ou refusée avant toute inférence · fallback: none ne substitue jamais"
     prose_projection:
       chapters: ["01-envelope"]
-      text: "Le contrat Runtime de run.access / run.reasoning : le fichier seul sélectionne la route (aucune option de lancement supplémentaire · une option contradictoire refuse avant inférence) · le moteur découvre l'offre de la route (handshake ACP, requête de capacités : découverte, pas inférence) puis applique le modèle et l'effort par les propres méthodes de sélection de la session AVANT le premier prompt, juge l'effort contre les options offertes APRÈS la sélection du modèle, relit la configuration là où la route l'expose et refuse une relecture qui ne tient pas la sélection · une session qui ne fait qu'accuser réception du modèle produit une preuve accepted_request, jamais configured ni servi, et un effort qu'elle ne sait pas appliquer refuse · une sélection impossible (route inconnue ou indisponible · protocole non parlé · modèle non servi · effort non offert) refuse AVANT toute requête d'inférence — zéro prompt, zéro appel d'API, zéro CLI directe — avec un diagnostic nommant le champ, la valeur demandée et les choix disponibles · fallback: none (aussi le sens d'un fallback omis) : jamais d'autre route, protocole, modèle ou effort, ni avant l'admission ni pendant le run, même si une clé d'API ou une CLI directe est configurée · une CLI directe ne satisfait jamais acp · pour infer: la rencontre infer-grade de 02 tient toujours · quatre faits séparés : demandé, transmis, configuré, répondant attesté ou absent · la sélection déclarée entre dans l'identité de chaque tâche modèle : une reprise ne réutilise jamais un résultat obtenu sous une autre sélection."
+      text: "Le contrat Runtime de run.access / run.reasoning : le fichier seul sélectionne la route (aucune option de lancement supplémentaire · une option contradictoire refuse avant inférence) · le moteur découvre l'offre de la route (handshake ACP, requête de capacités : découverte, pas inférence) puis applique le modèle, l'effort et le palier de service, dans cet ordre, par les propres méthodes de sélection de la session AVANT le premier prompt, juge l'effort contre les options offertes APRÈS la sélection du modèle et le palier contre celles offertes APRÈS la sélection du modèle et de l'effort, relit la configuration là où la route l'expose et refuse une relecture qui ne tient pas toute la sélection (une sélection ultérieure qui défait une valeur déjà appliquée refuse de même) · une session qui ne fait qu'accuser réception du modèle produit une preuve accepted_request, jamais configured ni servi, et un effort ou un palier qu'elle ne sait pas appliquer refuse · une sélection impossible (route inconnue ou indisponible · protocole non parlé · modèle non servi · effort non offert · palier non offert pour le modèle sélectionné, offert sous un autre type natif, ou demandé à une route sans contrôle de vitesse) refuse AVANT toute requête d'inférence — zéro prompt, zéro appel d'API, zéro CLI directe — avec un diagnostic nommant le champ, la valeur demandée et les choix disponibles · fallback: none (aussi le sens d'un fallback omis) : jamais d'autre route, protocole, modèle, palier ou effort, ni avant l'admission ni pendant le run, même si une clé d'API ou une CLI directe est configurée (fast n'est jamais servi comme standard, et standard n'est jamais supposé là où rien ne l'établit) · une CLI directe ne satisfait jamais acp · pour infer: la rencontre infer-grade de 02 tient toujours · quatre faits séparés : demandé, transmis, configuré, répondant attesté ou absent · pour un palier déclaré s'y ajoutent ce que la route offrait et deux faits que seul un témoin établit — le palier porté par le tour lui-même et le palier effectif chez le fournisseur — qui restent inconnus tant qu'ils ne sont pas attestés (une configuration confirmée n'est jamais requalifiée en palier servi) ; un run qui ne déclare aucun palier n'en enregistre aucun · la sélection déclarée entre dans l'identité de chaque tâche modèle : une reprise ne réutilise jamais un résultat obtenu sous une autre sélection."
     inputs:
       - registry: ir
         id: declared_access_selection
@@ -591,6 +610,10 @@ laws:
       - conformance/tests/runtime/access-harness/005-file-api-attested-responder-recorded
       - conformance/tests/runtime/access-harness/006-file-acp-effort-judged-after-model-selection
       - conformance/tests/runtime/access-harness/007-file-api-selection-honored
+      - conformance/tests/runtime/access-harness/018-file-acp-service-tier-fast-configured-before-prompt
+      - conformance/tests/runtime/access-harness/019-file-acp-service-tier-standard-configured-before-prompt
+      - conformance/tests/runtime/access-harness/020-file-acp-service-tier-omitted-sends-none
+      - conformance/tests/runtime/access-harness/022-file-acp-service-tier-judged-after-model-selection
     negative_fixtures:
       - conformance/tests/runtime/access-harness/008-file-acp-unsupported-effort-refused-before-prompt
       - conformance/tests/runtime/access-harness/009-file-acp-effort-refused-after-model-selection
@@ -602,6 +625,12 @@ laws:
       - conformance/tests/runtime/access-harness/015-launch-access-contradicting-file-refused
       - conformance/tests/runtime/access-harness/016-file-unknown-route-refused
       - conformance/tests/runtime/access-harness/017-file-route-protocol-not-spoken-refused
+      - conformance/tests/runtime/access-harness/021-file-acp-service-tier-unoffered-refused-before-prompt
+      - conformance/tests/runtime/access-harness/023-file-acp-service-tier-refused-after-model-selection
+      - conformance/tests/runtime/access-harness/024-file-acp-service-tier-unconfirmed-readback-refused
+      - conformance/tests/runtime/access-harness/025-file-acp-service-tier-legacy-session-refused
+      - conformance/tests/runtime/access-harness/026-file-acp-standard-not-assumed-when-only-fast-is-offered
+      - conformance/tests/runtime/access-harness/027-file-api-service-tier-refused-before-inference
     projections: ["prose:01-envelope", "cli:run", "sdk", "docs"]
     implementation_surfaces:
       - engine:nika-providers
@@ -611,8 +640,10 @@ laws:
     introduced_in: C2
     proof_obligations:
       - "Chaque fixture runtime déclare son monde de routes (access_routes : pair ACP scripté, CLI directe, clé d'API — jamais une découverte de l'hôte) et sépare le reçu du run (receipt) de l'observation indépendante de l'adaptateur (observed : prompts ACP, requêtes d'inférence API, invocations CLI). conformance/tests/test_access_contract.py dérive le verdict de chaque fixture de ses propres prémisses et prouve par mutation qu'un mensonge plausible (effort traduit, API substituée, accusé de réception promu en configuration) est attrapé."
+      - "Palier de service (018 à 027) : chaque fixture déclare l'offre de ses modèles dans les mots du langage (acp.models.<modèle>.service_tier) et le pair scripté la rend dans l'option native de la route, par la table de liaison de l'adaptateur (codex : option fast-mode, on pour fast, off pour standard). Elles couvrent chaque mot appliqué après le modèle et l'effort puis relu avant le premier prompt (018 · 019), l'omission qui n'envoie aucune sélection et n'enregistre aucun fait (020), l'offre jugée après la sélection du modèle dans les deux sens (022 · 023), un modèle sans contrôle de vitesse (021), une relecture qui tient le modèle et l'effort mais pas le palier (024), une session qui ne fait qu'accuser réception (025), standard jamais supposé quand seul fast est offert (026) et une route sans liaison refusée à l'admission avant toute requête (027). Le reçu garde à part le mot demandé, les valeurs natives offertes, la valeur transmise et la valeur relue ; le palier porté par le tour et celui que rapporte le fournisseur y restent inconnus, un pair scripté n'en étant pas témoin. conformance/tests/test_access_contract.py dérive chaque verdict des prémisses et prouve par mutation que sont attrapés : fast servi comme standard, un palier admis sur un modèle qui ne l'offre pas, jugé sur le modèle par défaut, appliqué après le prompt, enregistré pour un fichier qui n'en déclare aucun, ou accusé de réception promu en configuration."
       - "Aucun adaptateur de commande qualifié n'exécute encore cette extension : chaque fixture est UNSUPPORTED, jamais un accord. Les refus enregistrent le code que le moteur de référence émet dans sa famille d'accès NIKA-18xx (codes numériques nus hors du motif diagCode du registre, d'où diagnostics: [] ici) ; aucun code n'est inventé par la spec."
       - "DETTE déclarée (jamais fermée en silence) : la phrase « une reprise ne réutilise jamais un résultat obtenu sous une autre sélection » n'a pas encore de fixture exécutable — une fixture de la porte resume exige un journal qui enregistre la sélection, dont le format appartient au moteur. Elle est due avec ce format."
+      - "DETTE déclarée (jamais fermée en silence) pour le palier de service : (1) « une sélection ultérieure qui défait une valeur déjà appliquée refuse de même » n'a pas de fixture pour le palier — il est la dernière sélection que ce pair reçoit, aucune ne le suit qui puisse le défaire ; (2) une option booléenne négociée par une capacité du client n'a pas de fixture — le pair n'expose qu'une option select et ne lit aucune capacité à l'initialisation, si bien que « offert sous un autre type natif » n'est pas exécuté ; (3) la reprise sous un palier changé rejoint la dette de reprise ci-dessus et est due avec le même format de journal."
     closure_gates:
       - fixture-parity
       - access-harness-adapter-qualified

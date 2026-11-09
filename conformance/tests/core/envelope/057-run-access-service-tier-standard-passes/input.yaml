@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-run-access-service-tier-standard
+model: openai/gpt-5.5
+run:
+  access:
+    via: codex
+    protocol: acp
+    service_tier: standard
+tasks:
+  greet:
+    infer:
+      prompt: "hi"

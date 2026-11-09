@@ -9,8 +9,8 @@ static gate (these fixtures use `input.nika`):
 | `003`+ | a selection declared in the file (`run.access` · `run.reasoning`) is honored exactly or refused before inference | [01 §run](../../../../spec/01-envelope.md#runaccess--runreasoning--the-route-and-the-native-effort-normative) · LAW-CONF-0501 |
 
 The shape of a declaration is a separate, static question: its fixtures are
-`core/envelope/033`–`050`, judged by `conformance/runner.py`. A workflow that
-passes them proves nothing about any route.
+`core/envelope/033`–`053` and `056`–`065`, judged by `conformance/runner.py`.
+A workflow that passes them proves nothing about any route.
 
 ## Access-selection fixture extension
 
@@ -33,7 +33,11 @@ a host binary, reads an account store or calls a real provider.
         "readback": "confirmed",
         "default_model": "openai/gpt-5.4",
         "models": {
-          "openai/gpt-5.5": { "effort": ["low", "medium", "high"] }
+          "openai/gpt-5.4": { "effort": ["low", "medium"] },
+          "openai/gpt-5.5": {
+            "effort": ["low", "medium", "high"],
+            "service_tier": ["standard", "fast"]
+          }
         },
         "prompt": "completes"
       },
@@ -48,10 +52,11 @@ a host binary, reads an account store or calls a real provider.
 |---|---|
 | route key | a route id as `run.access.via` spells it (kebab-case) |
 | `acp.available` | `false` · the route's ACP adapter is absent or not runnable here (a probe sees it before the run) |
-| `acp.config` | `options` · the session exposes configuration options and returns the complete resulting configuration · `legacy` · the session only acknowledges a model request (no readback, no effort option) |
+| `acp.config` | `options` · the session exposes configuration options and returns the complete resulting configuration · `legacy` · the session only acknowledges a model request (no readback, no effort option, no service tier option) |
 | `acp.readback` | `options` only · `confirmed` (default) or `unconfirmed` · whether the returned configuration holds the applied values |
 | `acp.default_model` | the session's model before any selection |
 | `acp.models` | the models the session advertises, each with the native effort values offered AFTER that model is selected (an empty list offers none) |
+| `acp.models.<model>.service_tier` | optional · the service tiers the session offers AFTER that model is selected, written in the language's words (`standard` · `fast`), in the session's own order · the first one is the session's default · absent or empty, the model has no speed control and the session lists no tier option |
 | `acp.prompt` | `completes` (default) · `session_dies` · the session ends after the first prompt is received, before any answer |
 | `cli.available` | a direct, non-ACP CLI path for the same application is installed and signed in |
 | `api.configured` | an API credential for the route is configured · the adapter serves it with a mock endpoint, never a real provider |
@@ -59,7 +64,9 @@ a host binary, reads an account store or calls a real provider.
 
 All fields are closed. `acp.config` and `acp.models` are required when
 `acp.available` is `true`. Everything the fixture does not declare is absent,
-never ambient.
+never ambient. A tier offer is the one premise written in the language's
+words: the route's binding, not the fixture, says which native option and
+values carry them (see [the command adapter](#the-command-adapter)).
 
 ### `expected-run.json` · `observed` · what the adapter saw
 
@@ -70,7 +77,11 @@ engine reporting its own success never discharges `observed`.
 ```json
 {
   "observed": {
-    "acp_config_before_first_prompt": { "model": "openai/gpt-5.5", "effort": "high" },
+    "acp_config_before_first_prompt": {
+      "model": "openai/gpt-5.5",
+      "effort": "high",
+      "service_tier": "fast"
+    },
     "acp_prompts": 1,
     "api_inference_requests": 0,
     "cli_invocations": 0
@@ -80,7 +91,7 @@ engine reporting its own success never discharges `observed`.
 
 | Field | Observation |
 |---|---|
-| `acp_config_before_first_prompt` | the model and effort the peer had received and accepted through its own selection methods, and still held, when its first prompt arrived · a session default is never an applied value · an absent `effort` means none was applied |
+| `acp_config_before_first_prompt` | the model, effort and service tier the peer had received and accepted through its own selection methods, and still held, when its first prompt arrived · a session default is never an applied value · an absent `effort` or `service_tier` means none was applied · `service_tier` is the language word (`standard` · `fast`) that the route's binding gives the native value the peer held |
 | `acp_prompts` | prompt requests received by the scripted ACP peers (session setup and configuration are discovery, never counted) |
 | `api_inference_requests` | requests received by the mock API endpoints, except a model listing (`GET /v1/models`, which is discovery) |
 | `cli_invocations` | direct CLI invocations: product-CLI processes started with any argv other than the route's exact discovery and sign-in probes (a version, a sign-in status or a capability listing), which are recorded separately and never counted |
@@ -101,11 +112,17 @@ For an access-selection fixture the receipt fields are:
 | `configured_model` · `configured_effort` | what the route confirmed on readback · `null` when it confirmed nothing |
 | `model_evidence` | `configured` (read back) or `accepted_request` (acknowledged only) |
 | `responding_model` | the identity the route attested, verbatim · `null` when unattested (an ACP session names no responder) |
+| `requested_service_tier` | the language word the file declared (`standard` · `fast`) · `null` when it declared none |
+| `offered_service_tier` | the native values the session listed for the route's tier option when the tier was judged, in the session's own order |
+| `transmitted_service_tier` · `configured_service_tier` | the native value the engine sent to the route · the native value the route confirmed on readback |
+| `turn_service_tier` · `effective_service_tier` | the tier carried on the turn itself · the tier the provider reports · facts only a witness can state, so both are `null` on a scripted peer |
 
 A requested or acknowledged value is never promoted into `configured_*` or
-`responding_model`. A receipt assertion names only the fields it judges: an
-absent field is not asserted, while an explicit `null` asserts that the fact
-is unknown.
+`responding_model`, and a confirmed tier is never promoted into
+`turn_service_tier` or `effective_service_tier`. A run that declares no tier
+records none: every tier field is then `null`. A receipt assertion names only
+the fields it judges: an absent field is not asserted, while an explicit
+`null` asserts that the fact is unknown.
 
 ### Where a refusal happens
 
@@ -114,8 +131,8 @@ reference engine refuses, because that decides the observable shape:
 
 | Plane | When | Fixture shape |
 |---|---|---|
-| admission | the file and the probed routes already decide it (unknown route, a protocol the route does not speak, an absent adapter, a contradicting launch option, `infer:` with no attested ACP one-shot) | `admission.accepted: false` · no workflow or task event |
-| session | only the live session reveals it (a model it does not advertise, an effort it does not offer after the model is selected, a read-back that does not hold the selection) | the task fails before its first prompt · `observed.acp_prompts: 0` |
+| admission | the file and the probed routes already decide it (unknown route, a protocol the route does not speak, an absent adapter, a contradicting launch option, `infer:` with no attested ACP one-shot, a service tier on a route that binds none) | `admission.accepted: false` · no workflow or task event |
+| session | only the live session reveals it (a model it does not advertise, an effort it does not offer after the model is selected, a service tier it does not offer after the model and the effort are selected or has no option to apply, a read-back that does not hold the selection) | the task fails before its first prompt · `observed.acp_prompts: 0` |
 | mid-run | the session dies after the prompt | the task fails · no other route is tried |
 
 Recorded codes are the reference engine's execution-access family
@@ -131,6 +148,12 @@ Its route registry is a closed binding table of the reference engine's
 facts (today `codex` for an agent application, `openai` for an API). A
 route a fixture stages outside that table is `UNSUPPORTED`. Another
 implementation needs its own admitted adapter, never a fallback.
+
+The table also binds the language's two service tier words to each route's
+own control. For `codex` that control is the session option `fast-mode`
+(category `model_config`, a select): `on` is the route's value for `fast`
+and `off` its value for `standard`. The `openai` API route binds neither
+word. Every native tier value in a fixture comes from this binding.
 
 One fixture is one isolated stage: a private `HOME`, `TMPDIR`, project
 (the workflow's exact bytes) and `PATH` (the stage's `bin` before
@@ -148,9 +171,10 @@ binary), an explicit environment, and a fake key. The adapter then runs
 The scripted ACP agent offers each model of `acp.models` as one select
 value whose `value` and `name` are the fixture's model id verbatim. It
 derives no native, alias or display name: an engine that sends another
-spelling has sent another model. Options are `model` (category `model`)
-and the route's reasoning option (category `thought_level`), whose values
-are those offered for the current model. Without `default_model` the first
+spelling has sent another model. Options are `model` (category `model`),
+the route's reasoning option (category `thought_level`), whose values
+are those offered for the current model, and the route's tier option,
+described below. Without `default_model` the first
 advertised model is current. A model's current effort starts at its first
 offered value. An unoffered value is refused (`-32602`) and changes
 nothing. A model change keeps the current effort only when the new model
@@ -160,6 +184,17 @@ request. A `legacy` session advertises a model list, acknowledges
 `session/set_model` with `{}` and exposes no configuration option. A prompt
 answers one text chunk and `end_turn`, or, with `session_dies`, is logged
 and ends the process unanswered.
+
+The route's tier option follows the same rules. It exists only while the
+current model offers a tier, and its values are the route's native values
+for the words that model lists, in the listed order. Its current value
+starts at the first one. A value it does not list, a language word or a
+boolean is refused (`-32602`) and changes nothing. A model change keeps the
+current tier only when the new model offers it; otherwise the tier is reset
+and no longer counts as applied, and the option disappears when the new
+model offers none. An effort selection leaves the tier as it is. In the
+order the contract fixes (model, effort, tier) nothing is selected after
+the tier, so no fixture here shows a later selection undoing one.
 
 The receipt is read from each asserted task's single terminal frame. The
 frame must carry `access_id`, `access_requirement` and an `access_selection`
@@ -177,11 +212,26 @@ divergence. Another schema name has no admitted reading here
 | `requested_*` · `transmitted_*` · `configured_*` | `access_selection.model` / `.effort` · `requested` · `transmitted` · `configured` |
 | `model_evidence` | `access_selection.model.configured_source`: `confirmed_selection` reads `configured`, `accepted_request` reads `accepted_request`, any other value stays itself |
 | `responding_model` | `access_selection.responder.model` |
+| `requested_service_tier` · `offered_service_tier` · `transmitted_service_tier` · `configured_service_tier` | `access_selection.service_tier` · `requested` · `offered` · `transmitted` · `configured` |
+| `turn_service_tier` · `effective_service_tier` | `access_selection.service_tier.turn.value` · `.effective.value` |
+
+`access_selection.service_tier` is an optional record of that shape. It is
+present exactly when the file declares a tier: a record for a file that
+declares none, or no record for a file that declares one, is invalid
+evidence. It is closed over eight facts. `requested` is the language word.
+`option` names the route's option, `offered` lists the native values the
+session offered (`null` when no offer was observed), and `transmitted`,
+`configured` and `configured_source` follow the model's and the effort's
+law. `turn` and `effective` are each `{value, evidence}`, with evidence
+`unknown` exactly when the value is `null`. Without the record every tier
+field reads `null`. A tier that moves during a turn is listed in
+`changed_mid_turn` as `service_tier=<value>`.
 
 The run's two records of one selection must also agree. The
 `access_requirement` restates the file's `run.access` and `run.reasoning`
-literally. Its effort is the selection's requested effort, its protocol is
-the one travelled, and its `via` is the `access_id` that served.
+literally, a declared `service_tier` included. Its effort and its tier are
+the selection's requested ones, its protocol is the one travelled, and its
+`via` is the `access_id` that served.
 
 An asserted `transmitted_*` or `configured_*` fact is also judged on the
 routes' own records, so a truthful-looking receipt cannot cover another
@@ -197,11 +247,21 @@ there. An API reads back no configuration. A receipt asserting
 `requested_effort: null` also asserts that no effort travelled: an omitted
 declaration keeps the route's default and sends none.
 
+The tier's transmitted and configured facts are judged the same way, as the
+route's native values. Over ACP they are read from the route's own tier
+option, by its id. A receipt asserting `requested_service_tier: null` also
+asserts that no tier selection travelled: omission is not `standard`. No API
+route of the table binds a tier, so a `service_tier` in an inference request
+body never agrees with an asserted tier fact. The offered values are
+asserted on the receipt only: what the scripted session lists is the
+fixture's own premise read through the binding.
+
 ### Outcomes
 
 - `FIXTURE-ERROR` · a malformed declaration or expectation, before any
   process starts: an unknown key, a mistyped value, missing `observed`
-  counts, an effort on a legacy session, a receipt on a refused admission.
+  counts, an effort or a service tier on a legacy session, a tier offer
+  outside the language's two words, a receipt on a refused admission.
 - `UNSUPPORTED` · a premise this adapter has no seam to stage. Injected
   `harness_attestations` (the reference engine admits no injected
   attestation). An `infer:` task on an agent-application route, whose

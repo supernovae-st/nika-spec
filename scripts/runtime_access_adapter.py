@@ -51,12 +51,31 @@ FAKE_KEY = "sk-nika-conformance-scripted-never-valid"
 ROUTE_ID = re.compile(r"[a-z][a-z0-9-]*")
 ANSWER = "scripted answer"
 COUNTS = ("acp_prompts", "api_inference_requests", "cli_invocations")
+# The language's two service tier words (01 §run): the only closed vocabulary of
+# the declaration. Every other tier value in this file is a route's native one.
+TIER_WORDS = ("standard", "fast")
+TIER_FACTS = ("requested_service_tier", "offered_service_tier", "transmitted_service_tier",
+              "configured_service_tier", "turn_service_tier", "effective_service_tier")
 RECEIPT_KEYS = ("access_via", "protocol", "requested_model", "requested_effort",
                 "transmitted_model", "transmitted_effort", "configured_model",
-                "configured_effort", "model_evidence", "responding_model")
+                "configured_effort", "model_evidence", "responding_model") + TIER_FACTS
 TERMINAL_KINDS = ("task_completed", "task_failed", "task_skipped", "task_cancelled")
 VERBS = ("infer", "exec", "invoke", "agent")
 ENV_FILE = "NIKA_ACCESS_EVIDENCE_DIR"
+
+
+@dataclass(frozen=True)
+class TierOption:
+    """A route's own speed control: the select option its ACP session exposes, and
+    the native value that option holds for each of the language's two words."""
+    id: str               # the session's option id
+    category: str         # its option category
+    values: dict          # language word -> the option's native value
+
+    def word(self, native) -> str | None:
+        """The language word a native value reads back as. A value the route
+        binds to no word reads back as none: it can never pass for one."""
+        return next((word for word, value in self.values.items() if value == native), None)
 
 
 @dataclass(frozen=True)
@@ -66,6 +85,7 @@ class AgentRoute:
     identity: dict        # an initialize self-report the registry admits (name, version pin)
     product_command: str  # the product CLI: PATH presence and the sign-in probe
     effort_option: str    # the session's reasoning option id (category thought_level)
+    tier_option: TierOption  # the session's service tier option and its two native values
     discovery: tuple      # exact product-CLI argv that discover, never infer
 
 
@@ -85,11 +105,19 @@ class ApiRoute:
         session, whose advertised values are compared verbatim."""
         return model[len(self.wire_prefix):] if model.startswith(self.wire_prefix) else None
 
+    def wire_tier(self, tier: str) -> None:
+        """A service tier as this route's request body names it: no API route of
+        this table binds one, so no value has a wire form here and a tier found
+        in a request body has no lawful origin."""
+        return None
+
 
 # The reference engine's registry facts, never fixture premises: a route a
 # fixture stages outside this table is UNSUPPORTED. The ACP identity is one its
 # registry admits for the route (`agentInfo.name` and a version inside the pin);
-# it is never the identity of an audited completion profile.
+# it is never the identity of an audited completion profile. The tier option is
+# the route's own speed control: `fast-mode` reads `on` for the language's `fast`
+# and `off` for its `standard`, and exists only for a model that offers a tier.
 AGENT_ROUTES = {
     "codex": AgentRoute(
         acp_command="codex-acp",
@@ -97,6 +125,7 @@ AGENT_ROUTES = {
                   "title": "Scripted ACP peer (nika-spec access conformance)"},
         product_command="codex",
         effort_option="reasoning_effort",
+        tier_option=TierOption("fast-mode", "model_config", {"standard": "off", "fast": "on"}),
         discovery=((("--version",), "discovery:version"),
                    (("login", "status"), "discovery:auth"),
                    (("features", "list"), "discovery:capability"),
@@ -200,7 +229,7 @@ def _acp(acp, via):
         raise FixtureError(f"{label}.models must be a nonempty object")
     for model, offer in models.items():
         _word(model, f"{label}.models key")
-        _closed(offer, ("effort",), f"{label}.models.{model}", ("effort",))
+        _closed(offer, ("effort", "service_tier"), f"{label}.models.{model}", ("effort",))
         efforts = offer["effort"]
         if not isinstance(efforts, list):
             raise FixtureError(f"{label}.models.{model}.effort must be an array")
@@ -210,6 +239,16 @@ def _acp(acp, via):
             raise FixtureError(f"{label}.models.{model}.effort repeats a value")
         if acp["config"] == "legacy" and efforts:
             raise FixtureError(f"{label}: a legacy session offers no effort option")
+        # The offer is written in the language's words; the route's binding turns
+        # it into its own option. Absent or empty: the model has no speed control.
+        tiers = offer.get("service_tier", [])
+        if not isinstance(tiers, list) or any(tier not in TIER_WORDS for tier in tiers):
+            raise FixtureError(f"{label}.models.{model}.service_tier must be an array of "
+                               "standard, fast or both")
+        if len(set(tiers)) != len(tiers):
+            raise FixtureError(f"{label}.models.{model}.service_tier repeats a word")
+        if acp["config"] == "legacy" and tiers:
+            raise FixtureError(f"{label}: a legacy session offers no service tier option")
     if "default_model" in acp:
         _word(acp["default_model"], f"{label}.default_model")
 
@@ -246,9 +285,13 @@ def _observed(value):
             raise FixtureError(f"observed.{key} must be an exact nonnegative integer")
     if "acp_config_before_first_prompt" in value:
         applied = value["acp_config_before_first_prompt"]
-        _closed(applied, ("model", "effort"), "observed.acp_config_before_first_prompt")
+        _closed(applied, ("model", "effort", "service_tier"),
+                "observed.acp_config_before_first_prompt")
         for key, word in applied.items():
             _word(word, f"observed.acp_config_before_first_prompt.{key}")
+        if applied.get("service_tier", TIER_WORDS[0]) not in TIER_WORDS:
+            raise FixtureError("observed.acp_config_before_first_prompt.service_tier is the "
+                               "language word, standard or fast, never a route's own value")
         if value["acp_prompts"] == 0:
             raise FixtureError("no prompt arrives, so no configuration precedes one")
     return value
@@ -267,6 +310,15 @@ def _receipt(value):
         elif key == "model_evidence":
             if word not in ("configured", "accepted_request", None):
                 raise FixtureError("receipt.model_evidence must be configured, accepted_request or null")
+        elif key == "requested_service_tier":
+            if word not in (*TIER_WORDS, None):
+                raise FixtureError("receipt.requested_service_tier must be standard, fast or null")
+        elif key == "offered_service_tier":
+            if word is not None:
+                if not isinstance(word, list):
+                    raise FixtureError("receipt.offered_service_tier must be an array or null")
+                for native in word:
+                    _word(native, "receipt.offered_service_tier value")
         elif word is not None:
             _word(word, f"receipt.{key}")
     return value
@@ -320,7 +372,8 @@ def _declaration(root) -> tuple[dict, set]:
     import yaml
     run = _entries(_entries(root).get("run"))
     declared = {}
-    for section, keys in (("access", ("via", "protocol", "fallback")), ("reasoning", ("effort",))):
+    for section, keys in (("access", ("via", "protocol", "fallback", "service_tier")),
+                          ("reasoning", ("effort",))):
         entries = _entries(run.get(section))
         for key in keys:
             if key in entries:
@@ -438,9 +491,12 @@ class Stage:
                     "discovery": [{"argv": list(argv), "kind": kind}
                                   for argv, kind in agent.discovery]})
             if agent is not None and acp_ready:
+                tier = agent.tier_option
                 self.peer(agent.acp_command, "acp", {
                     "route": via, "acp": acp, "identity": agent.identity,
-                    "effort_option": agent.effort_option})
+                    "effort_option": agent.effort_option,
+                    "tier_option": {"id": tier.id, "category": tier.category,
+                                    "values": dict(tier.values)}})
             if "api" in route:
                 binding = API_ROUTES[via]
                 port = self.serve(via, route["api"])
@@ -539,7 +595,8 @@ def endpoint(route: str, api: dict, record):
                     "authorization": ("absent" if auth is None
                                       else "staged" if auth == f"Bearer {FAKE_KEY}" else "other"),
                     "model": body.get("model"), "stream": body.get("stream"),
-                    "reasoning_effort": body.get("reasoning_effort"), "body_bytes": len(raw),
+                    "reasoning_effort": body.get("reasoning_effort"),
+                    "service_tier": body.get("service_tier"), "body_bytes": len(raw),
                     "body": payload if payload is not None else raw[:2048].decode("utf-8", "replace")})
             if listing:
                 self.answer(404, "application/json",
@@ -651,6 +708,18 @@ def observe(logs: pathlib.Path, api: list[dict]) -> Observation:
     return observation
 
 
+def applied_words(prompt: dict) -> dict:
+    """What a prompt record says a client selection had applied, in the fixture's
+    vocabulary: the model and the effort verbatim, the service tier read back
+    through the route's binding as the language word it holds."""
+    applied = dict(prompt["applied"])
+    if "service_tier" in applied:
+        # Only a staged agent route logs a prompt, and the table binds every one.
+        tier = AGENT_ROUTES[prompt["route"]].tier_option
+        applied["service_tier"] = tier.word(applied["service_tier"])
+    return applied
+
+
 def diff_observed(expected: dict, observation: Observation) -> list[str]:
     """The adapter's own counts and the configuration held at the first prompt, exactly."""
     diffs = []
@@ -662,9 +731,9 @@ def diff_observed(expected: dict, observation: Observation) -> list[str]:
         want, first = expected["acp_config_before_first_prompt"], observation.first_prompt()
         if first is None:
             diffs.append(f"observed.acp_config_before_first_prompt: want {want} · no prompt arrived")
-        elif first["applied"] != want:
+        elif applied_words(first) != want:
             diffs.append(f"observed.acp_config_before_first_prompt: want {want} · "
-                         f"got {first['applied']} (the session held {first['current']})")
+                         f"got {applied_words(first)} (the session held {first['current']})")
     return diffs
 
 
@@ -682,16 +751,25 @@ def acp_facts(observation: Observation) -> dict | None:
     if not chosen:
         return None
     session, binding = chosen[0], AGENT_ROUTES.get(chosen[0]["route"])
+    tier_id = None if binding is None else binding.tier_option.id
     sent = {"model": [s["value"] for s in session["selections"]
                       if s["method"] == "session/set_model" or s["config_id"] == "model"],
             "effort": [s["value"] for s in session["selections"]
-                       if binding is not None and s["config_id"] == binding.effort_option]}
-    readback = {option.get("category"): option.get("currentValue")
-                for option in (session["readbacks"][-1] if session["readbacks"] else [])}
+                       if binding is not None and s["config_id"] == binding.effort_option],
+            "service_tier": [s["value"] for s in session["selections"]
+                             if tier_id is not None and s["config_id"] == tier_id]}
+    last = session["readbacks"][-1] if session["readbacks"] else []
+    readback = {option.get("category"): option.get("currentValue") for option in last}
     facts = {}
     for dimension, category in (("model", "model"), ("effort", "thought_level")):
         facts[f"transmitted_{dimension}"] = sent[dimension][-1] if sent[dimension] else None
         facts[f"configured_{dimension}"] = readback.get(category) if sent[dimension] else None
+    # The tier is read back by its option id: its category is the route's own and
+    # may hold other options. Both facts stay the route's native values.
+    tier = next((option.get("currentValue") for option in last
+                 if tier_id is not None and option.get("id") == tier_id), None)
+    facts["transmitted_service_tier"] = sent["service_tier"][-1] if sent["service_tier"] else None
+    facts["configured_service_tier"] = tier if sent["service_tier"] else None
     return facts
 
 
@@ -704,8 +782,12 @@ def diff_physical(expected: dict, observation: Observation) -> list[str]:
     if expected.get("requested_effort", "") is None:
         # No effort was asked: none may travel (01 §run · omitted keeps the route's default).
         expected.setdefault("transmitted_effort", None)
-    keys = [key for key in ("transmitted_model", "transmitted_effort", "configured_model",
-                            "configured_effort") if key in expected]
+    if expected.get("requested_service_tier", "") is None:
+        # No tier was asked: no tier selection may travel (01 §run · omission is not standard).
+        expected.setdefault("transmitted_service_tier", None)
+    keys = [key for key in ("transmitted_model", "transmitted_effort", "transmitted_service_tier",
+                            "configured_model", "configured_effort", "configured_service_tier")
+            if key in expected]
     if not keys:
         return []
     diffs = []
@@ -725,7 +807,9 @@ def diff_physical(expected: dict, observation: Observation) -> list[str]:
         for record in inference:
             binding = API_ROUTES[record["route"]]
             for key, field_name, wire in (("transmitted_model", "model", binding.wire_model),
-                                          ("transmitted_effort", "reasoning_effort", str)):
+                                          ("transmitted_effort", "reasoning_effort", str),
+                                          ("transmitted_service_tier", "service_tier",
+                                           binding.wire_tier)):
                 if key not in expected:
                     continue
                 want = None if expected[key] is None else wire(expected[key])
@@ -733,7 +817,7 @@ def diff_physical(expected: dict, observation: Observation) -> list[str]:
                     diffs.append(f"receipt.{key} · the {record['route']} endpoint received "
                                  f"{field_name} {record[field_name]!r} · the receipt asserts "
                                  f"{expected[key]!r}, sent on this route as {want!r}")
-            for key in ("configured_model", "configured_effort"):
+            for key in ("configured_model", "configured_effort", "configured_service_tier"):
                 if key in expected and expected[key] is not None:
                     diffs.append(f"receipt.{key} · an API route reads back no configuration")
     return diffs
@@ -741,8 +825,12 @@ def diff_physical(expected: dict, observation: Observation) -> list[str]:
 
 # ----------------------------------------------------------------- the receipt
 
-SELECTION_KEYS = {"schema", "protocol", "model", "effort", "responder", "changed_mid_turn"}
+SELECTION_KEYS = {"schema", "protocol", "model", "effort", "responder", "changed_mid_turn",
+                  "service_tier"}
 VALUE_KEYS = {"requested", "option", "transmitted", "configured", "configured_source"}
+# A declared service tier: the five facts, what the session offered, and the two
+# facts only a witness states (the turn's own tier, the provider's).
+TIER_KEYS = VALUE_KEYS | {"offered", "turn", "effective"}
 SOURCES = {"session_config", "confirmed_selection", "accepted_request"}
 RESPONDER_EVIDENCE = {"unknown", "api_response", "cli_reported"}
 EVIDENCE_WORDS = {"confirmed_selection": "configured", "accepted_request": "accepted_request"}
@@ -760,13 +848,61 @@ def decode_requirement(raw, strict_json) -> dict:
         value = strict_json(raw)
     except ValueError as error:
         raise InvalidEvidence(f"access_requirement is not one JSON object ({error})") from error
-    if not isinstance(value, dict) or not value or set(value) - {"via", "protocol", "fallback", "effort"}:
+    if (not isinstance(value, dict) or not value
+            or set(value) - {"via", "protocol", "fallback", "service_tier", "effort"}):
         raise InvalidEvidence("access_requirement is not a closed nonempty requirement")
     if not all(_text(word) for word in value.values()):
         raise InvalidEvidence("access_requirement holds a non-string or empty word")
-    if value.get("protocol", "acp") not in ("acp", "api") or value.get("fallback", "none") != "none":
-        raise InvalidEvidence("access_requirement names a protocol or fallback the language lacks")
+    if (value.get("protocol", "acp") not in ("acp", "api")
+            or value.get("fallback", "none") != "none"
+            or value.get("service_tier", TIER_WORDS[0]) not in TIER_WORDS):
+        raise InvalidEvidence("access_requirement names a protocol, fallback or service tier the "
+                              "language lacks")
     return value
+
+
+def _confirmation(label: str, entry: dict) -> None:
+    """The four facts stay apart: an acknowledgement is never a configuration, and
+    a configured value always says how it was learned."""
+    source, configured = entry["configured_source"], entry["configured"]
+    if source is not None and source not in SOURCES:
+        raise InvalidEvidence(f"{label} source {source!r} is not the schema's")
+    if source == "accepted_request" and configured is not None:
+        raise InvalidEvidence(f"{label}: an acknowledged request is recorded as configured")
+    if (configured is None) != (source in (None, "accepted_request")):
+        raise InvalidEvidence(f"{label}: configured value and source disagree")
+
+
+def _service_tier(entry) -> None:
+    """The optional `service_tier` record of a selection: closed over eight facts.
+    Requested is the language's word; offered, transmitted and configured are the
+    route's native values; the turn and the provider stay unknown until a witness
+    attests them, under the responder's law."""
+    label = "access_selection.service_tier"
+    if not isinstance(entry, dict) or set(entry) != TIER_KEYS:
+        raise InvalidEvidence(f"{label} is not the eight facts")
+    if entry["requested"] not in TIER_WORDS:
+        raise InvalidEvidence(f"{label} requests {entry['requested']!r}, not a word of the "
+                              "language")
+    offered = entry["offered"]
+    if offered is not None and (not isinstance(offered, list)
+                                or not all(_text(native) for native in offered)):
+        raise InvalidEvidence(f"{label}.offered is neither a list of native values nor null")
+    if any(entry[key] is not None and not _text(entry[key])
+           for key in ("option", "transmitted", "configured", "configured_source")):
+        raise InvalidEvidence(f"{label} holds a non-string or empty fact")
+    _confirmation(label, entry)
+    for witness in ("turn", "effective"):
+        fact = entry[witness]
+        if not isinstance(fact, dict) or set(fact) != {"value", "evidence"}:
+            raise InvalidEvidence(f"{label}.{witness} is not {{value, evidence}}")
+        if fact["value"] is not None and not _text(fact["value"]):
+            raise InvalidEvidence(f"service_tier {witness} value is neither a native value "
+                                  "nor null")
+        if not _text(fact["evidence"]):
+            raise InvalidEvidence(f"service_tier {witness} names no evidence")
+        if (fact["value"] is None) != (fact["evidence"] == "unknown"):
+            raise InvalidEvidence(f"service_tier {witness} value and its evidence disagree")
 
 
 def decode_selection(raw, strict_json) -> dict:
@@ -795,16 +931,10 @@ def decode_selection(raw, strict_json) -> dict:
             raise InvalidEvidence(f"access_selection.{dimension} is not the five facts")
         if any(word is not None and not _text(word) for word in entry.values()):
             raise InvalidEvidence(f"access_selection.{dimension} holds a non-string or empty fact")
-        source, configured = entry["configured_source"], entry["configured"]
-        if source is not None and source not in SOURCES:
-            raise InvalidEvidence(f"access_selection.{dimension} source {source!r} is not the schema's")
-        # The four facts stay apart: an acknowledgement is never a configuration,
-        # and a configured value always says how it was learned.
-        if source == "accepted_request" and configured is not None:
-            raise InvalidEvidence(f"access_selection.{dimension}: an acknowledged request is "
-                                  "recorded as configured")
-        if (configured is None) != (source in (None, "accepted_request")):
-            raise InvalidEvidence(f"access_selection.{dimension}: configured value and source disagree")
+        _confirmation(f"access_selection.{dimension}", entry)
+    # Present only for a declared tier (judge_receipts holds it to the file).
+    if "service_tier" in value:
+        _service_tier(value["service_tier"])
     responder = value["responder"]
     if not isinstance(responder, dict) or set(responder) != {"model", "evidence"}:
         raise InvalidEvidence("access_selection.responder is not {model, evidence}")
@@ -824,6 +954,14 @@ def project_receipt(access_id: str, selection: dict) -> dict:
     """The engine's record in the fixture's vocabulary (access-harness/README.md)."""
     model, effort = selection["model"], selection["effort"]
     source = model["configured_source"]
+    tier = selection.get("service_tier")
+
+    def tier_fact(key):
+        """A selection that declares no tier records none: every tier fact is unknown."""
+        if tier is None:
+            return None
+        return tier[key]["value"] if key in ("turn", "effective") else tier[key]
+
     return {
         "access_via": access_id,
         "protocol": selection["protocol"],
@@ -835,6 +973,12 @@ def project_receipt(access_id: str, selection: dict) -> dict:
         "configured_effort": effort["configured"],
         "model_evidence": None if source is None else EVIDENCE_WORDS.get(source, source),
         "responding_model": selection["responder"]["model"],
+        "requested_service_tier": tier_fact("requested"),
+        "offered_service_tier": tier_fact("offered"),
+        "transmitted_service_tier": tier_fact("transmitted"),
+        "configured_service_tier": tier_fact("configured"),
+        "turn_service_tier": tier_fact("turn"),
+        "effective_service_tier": tier_fact("effective"),
     }
 
 
@@ -867,6 +1011,14 @@ def judge_receipts(access: Contract, events: list[dict], event_fields, strict_js
             requirement = decode_requirement(fields["access_requirement"], strict_json)
             if not _text(fields.get("access_id")):
                 raise InvalidEvidence("no access_id names the route that served")
+            # A tier record exists exactly when the file declares a tier: a run
+            # that declares none records none, and a declared one is never dropped.
+            if "service_tier" in selection and "service_tier" not in access.declared:
+                raise InvalidEvidence("access_selection records a service tier the file never "
+                                      "declared")
+            if "service_tier" in access.declared and "service_tier" not in selection:
+                raise InvalidEvidence("access_selection records no service tier for the one the "
+                                      "file declares")
         except InvalidEvidence as error:
             diffs.append(f"receipt: task {task}: invalid evidence ({error})")
             continue
@@ -884,6 +1036,9 @@ def judge_receipts(access: Contract, events: list[dict], event_fields, strict_js
         if requirement.get("effort") != selection["effort"]["requested"]:
             diffs.append(f"receipt: task {task}: the requirement and the selection request "
                          "different efforts")
+        if requirement.get("service_tier") != got["requested_service_tier"]:
+            diffs.append(f"receipt: task {task}: the requirement and the selection request "
+                         "different service tiers")
         if "protocol" in requirement and selection["protocol"] != requirement["protocol"]:
             diffs.append(f"receipt: task {task}: travelled {selection['protocol']} under a declared "
                          f"protocol {requirement['protocol']}")

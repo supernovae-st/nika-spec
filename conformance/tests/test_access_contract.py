@@ -28,10 +28,11 @@ SCHEMA = json.loads((ROOT / "schemas/workflow.schema.json").read_text(encoding="
 ENVELOPE = ROOT / "conformance/tests/core/envelope"
 HARNESS = ROOT / "conformance/tests/runtime/access-harness"
 FIRST_ACCESS_FIXTURE = 33
-# An access fixture is one whose document declares the `run:` block or an `access:` key: the
+# An access fixture is one whose document declares the `run:` block, an `access:` key or a
+# `service_tier:` key wherever it was written (a misplaced one has no `run:` line): the
 # envelope's later fixtures for other laws (the retired version tag, a withdrawn secret source)
 # are not the access contract's to cite.
-ACCESS_SUBJECT = re.compile(r"^\s*(run|access):", re.M)
+ACCESS_SUBJECT = re.compile(r"^\s*(run|access|service_tier):", re.M)
 ENVELOPE_KEYS = {"nika", "model", "inputs", "const", "secrets", "permits", "run", "tasks", "outputs"}
 ACCESS_LAWS = {"LAW-SURFACE-0503", "LAW-GRAMMAR-0502", "LAW-GRAMMAR-0503", "LAW-CONF-0501"}
 # The reference engine's execution-access family (NIKA-1800..1849). A refusal
@@ -43,11 +44,24 @@ VERBS = ("infer", "exec", "invoke", "agent")
 
 ROUTE_KEYS = {"acp", "cli", "api"}
 ACP_KEYS = {"available", "config", "readback", "default_model", "models", "prompt"}
+OFFER_KEYS = {"effort", "service_tier"}
+APPLIED_KEYS = {"model", "effort", "service_tier"}
 OBSERVED_KEYS = {"acp_config_before_first_prompt", "acp_prompts", "api_inference_requests",
                  "cli_invocations"}
+# A declared service tier keeps six facts apart: the language word requested, the native values
+# the session offered, the native value sent, the one read back, and the two facts only a
+# witness states (the tier carried on the turn, the tier the provider reports).
+TIER_FACTS = {"requested_service_tier", "offered_service_tier", "transmitted_service_tier",
+              "configured_service_tier", "turn_service_tier", "effective_service_tier"}
 RECEIPT_KEYS = {"access_via", "protocol", "requested_model", "requested_effort",
                 "transmitted_model", "transmitted_effort", "configured_model",
-                "configured_effort", "model_evidence", "responding_model"}
+                "configured_effort", "model_evidence", "responding_model"} | TIER_FACTS
+# The language's two words (01 §run), and the native value each route of the reference binding
+# table gives them over ACP (runtime/access-harness/README.md): codex reads `fast` as its
+# `fast-mode` option set to `on`, and `standard` as that option set to `off`. A route absent
+# from this table binds no tier, and neither does any route over its inference API.
+TIER_WORDS = ("standard", "fast")
+TIER_BINDING = {"codex": {"standard": "off", "fast": "on"}}
 
 
 def laws() -> dict:
@@ -111,11 +125,18 @@ def shape_errors(run: dict, expected: dict) -> list[str]:
                     for model, offer in models.items():
                         if not MODEL_ID.match(model):
                             errors.append(f"{via}.acp.models: {model!r} is not <provider>/<name>")
-                        errors += closed(offer, {"effort"}, f"{via}.acp.models.{model}")
+                        errors += closed(offer, OFFER_KEYS, f"{via}.acp.models.{model}")
                         efforts = offer.get("effort") if isinstance(offer, dict) else None
                         if not isinstance(efforts, list) or any(
                                 not isinstance(e, str) or not e for e in efforts):
                             errors.append(f"{via}.acp.models.{model}.effort must list nonempty strings")
+                        tiers = offer.get("service_tier", []) if isinstance(offer, dict) else []
+                        if (not isinstance(tiers, list) or any(t not in TIER_WORDS for t in tiers)
+                                or len(set(tiers)) != len(tiers)):
+                            errors.append(f"{via}.acp.models.{model}.service_tier lists standard, "
+                                          "fast or both, once each")
+                        elif tiers and acp.get("config") == "legacy":
+                            errors.append(f"{via}.acp: a legacy session offers no service tier")
                 if "default_model" in acp and not MODEL_ID.match(str(acp["default_model"])):
                     errors.append(f"{via}.acp.default_model is not <provider>/<name>")
                 if acp.get("prompt", "completes") not in {"completes", "session_dies"}:
@@ -138,7 +159,10 @@ def shape_errors(run: dict, expected: dict) -> list[str]:
                 errors.append(f"observed.{key} must be an exact nonnegative integer")
         applied = observed.get("acp_config_before_first_prompt")
         if applied is not None:
-            errors += closed(applied, {"model", "effort"}, "observed.acp_config_before_first_prompt")
+            errors += closed(applied, APPLIED_KEYS, "observed.acp_config_before_first_prompt")
+            if isinstance(applied, dict) and applied.get("service_tier", "fast") not in TIER_WORDS:
+                errors.append("observed.acp_config_before_first_prompt.service_tier is the "
+                              "language word, never a route's own value")
     if "receipt" in expected:
         errors += closed(expected["receipt"], RECEIPT_KEYS, "receipt")
     return errors
@@ -161,10 +185,14 @@ def predict(workflow: dict, run: dict) -> tuple[str, dict]:
     declared = workflow.get("run", {})
     access = declared.get("access", {})
     effort = declared.get("reasoning", {}).get("effort")
+    tier = access.get("service_tier")
     model, via, protocol = workflow.get("model"), access.get("via"), access.get("protocol")
     verbs = [verb for task in workflow["tasks"].values() for verb in VERBS if verb in task]
     model_tasks = sum(verb in {"infer", "agent"} for verb in verbs)
     route = run["access_routes"].get(via)
+    # The route's own values for the two words: a route fact, known before any session.
+    binding = TIER_BINDING.get(via) if protocol == "acp" else None
+    unbound = {"reason": "the route binds no service tier on this protocol"}
     if "access" in run and run["access"] != via:
         return "admission", {"reason": "a launch option contradicts the declared route"}
     if route is None:
@@ -172,8 +200,10 @@ def predict(workflow: dict, run: dict) -> tuple[str, dict]:
     if protocol == "api":
         if not route.get("api", {}).get("configured"):
             return "admission", {"reason": "the route does not speak api here"}
+        if tier is not None:
+            return "admission", unbound
         return "run", {"protocol": "api", "via": via, "model": model, "effort": effort,
-                       "responder": route["api"].get("responder"),
+                       "tier": None, "responder": route["api"].get("responder"),
                        "api": model_tasks, "acp": 0, "cli": 0}
     if protocol != "acp":
         raise ValueError("an access-selection fixture declares api or acp")
@@ -184,16 +214,26 @@ def predict(workflow: dict, run: dict) -> tuple[str, dict]:
         return "admission", {"reason": "the ACP adapter is absent"}
     if "infer" in verbs and not infer_grade(run.get("harness_attestations", {}).get(via)):
         return "admission", {"reason": "infer: has no attested ACP one-shot on this route"}
+    if tier is not None and binding is None:
+        return "admission", unbound
     if model not in acp["models"]:
         return "session", {"reason": "the session does not advertise the model"}
     if effort is not None and (acp["config"] == "legacy"
                                or effort not in acp["models"][model]["effort"]):
         return "session", {"reason": "the selected model is not offered this effort"}
+    # The tier is judged last, against what the SELECTED model offers. A session
+    # that only acknowledges a model request exposes no option to apply one with.
+    offered = acp["models"][model].get("service_tier", [])
+    if tier is not None and acp["config"] == "legacy":
+        return "session", {"reason": "a session that only acknowledges cannot apply a service tier"}
+    if tier is not None and tier not in offered:
+        return "session", {"reason": "the selected model is not offered this service tier"}
     configured = acp["config"] == "options"
     if configured and acp.get("readback", "confirmed") == "unconfirmed":
         return "session", {"reason": "the read-back configuration does not hold the selection"}
     return "run", {
         "protocol": "acp", "via": via, "model": model, "effort": effort,
+        "tier": tier, "tier_offered": offered, "tier_values": binding or {},
         "configured": configured, "responder": None,  # an ACP session names no responder
         "dies": acp.get("prompt", "completes") == "session_dies",
         "api": 0, "acp": model_tasks, "cli": 0,
@@ -249,16 +289,24 @@ def judge(workflow: dict, run: dict, expected: dict) -> list[str]:
     diffs += exact_counts(observed, {"acp_prompts": facts["acp"],
                                      "api_inference_requests": facts["api"],
                                      "cli_invocations": facts["cli"]})
+    tier = facts["tier"]
     if facts["protocol"] == "acp":
-        applied = {"model": facts["model"], **({"effort": facts["effort"]} if facts["effort"] else {})}
+        # A declared tier is held in the language's word; a session default is never applied.
+        applied = {"model": facts["model"],
+                   **({"effort": facts["effort"]} if facts["effort"] else {}),
+                   **({"service_tier": tier} if tier else {})}
         if observed.get("acp_config_before_first_prompt") != applied:
             diffs.append(f"the peer holds {applied} before its first prompt")
     elif "acp_config_before_first_prompt" in observed:
         diffs.append("an API run configures no ACP session")
     receipt = expected.get("receipt", {})
+    # A run that declares no tier records none: every tier fact is unknown. The
+    # scripted peer witnesses neither the turn nor the provider, so those two
+    # stay unknown for a declared tier as well.
     want = {"access_via": facts["via"], "protocol": facts["protocol"],
             "requested_model": facts["model"], "requested_effort": facts["effort"],
-            "transmitted_model": facts["model"], "responding_model": facts["responder"]}
+            "transmitted_model": facts["model"], "responding_model": facts["responder"],
+            **dict.fromkeys(TIER_FACTS), "requested_service_tier": tier}
     if facts["protocol"] == "acp":
         confirmed = facts["configured"]
         want.update({
@@ -267,12 +315,27 @@ def judge(workflow: dict, run: dict, expected: dict) -> list[str]:
             "configured_effort": facts["effort"] if confirmed else None,
             "model_evidence": "configured" if confirmed else "accepted_request",
         })
+        if tier:
+            # The route's native values, in the session's own order. A tier is honored only
+            # through a configuration option, so its read-back is always the value sent.
+            native = facts["tier_values"]
+            want.update({
+                "offered_service_tier": [native.get(word) for word in facts["tier_offered"]],
+                "transmitted_service_tier": native.get(tier),
+                "configured_service_tier": native.get(tier),
+            })
     for key, value in receipt.items():
         if key in want and value != want[key]:
             diffs.append(f"receipt.{key}: premises give {want[key]!r} · fixture claims {value!r}")
-    if facts["protocol"] == "acp" and not facts.get("dies") and not {
-            "configured_model", "model_evidence", "responding_model"} <= set(receipt):
-        diffs.append("an ACP fixture keeps configured, evidence and responder facts apart")
+    if facts["protocol"] == "acp" and not facts.get("dies"):
+        if not {"configured_model", "model_evidence", "responding_model"} <= set(receipt):
+            diffs.append("an ACP fixture keeps configured, evidence and responder facts apart")
+        if tier and not TIER_FACTS <= set(receipt):
+            diffs.append("a fixture that honors a declared tier keeps its six facts apart")
+        if not tier and facts["tier_offered"] and not {
+                "requested_service_tier", "transmitted_service_tier"} <= set(receipt):
+            diffs.append("a tier offered and not declared: the receipt states that none was "
+                         "requested and none travelled")
     return diffs
 
 
@@ -292,10 +355,17 @@ class SchemaShape(unittest.TestCase):
         self.assertIs(access["additionalProperties"], False)
         self.assertEqual(access["minProperties"], 1)
         self.assertNotIn("required", access)
-        self.assertEqual(set(access["properties"]), {"via", "protocol", "fallback"})
+        self.assertEqual(set(access["properties"]), {"via", "protocol", "fallback", "service_tier"})
         self.assertEqual(access["properties"]["protocol"]["enum"], ["api", "acp"])
         self.assertEqual(access["properties"]["fallback"]["enum"], ["none"])
         self.assertEqual(access["properties"]["via"]["pattern"], "^[a-z][a-z0-9-]*(?![\\s\\S])")
+
+    def test_the_service_tier_is_two_words_and_nothing_else(self):
+        tier = SCHEMA["properties"]["run"]["properties"]["access"]["properties"]["service_tier"]
+        self.assertEqual(tier["enum"], ["standard", "fast"])
+        # A closed literal: the enum is the whole rule. A type, a pattern or a default would
+        # let a route's own word, a boolean or an assumed tier through another door.
+        self.assertFalse({"type", "pattern", "default", "const", "anyOf", "oneOf"} & set(tier))
 
     def test_reasoning_requires_a_native_effort_and_lists_none(self):
         reasoning = SCHEMA["properties"]["run"]["properties"]["reasoning"]
@@ -338,6 +408,17 @@ class SchemaShape(unittest.TestCase):
                        "\ufeffhigh", "high\x1c", "${{ inputs.e }}", "", " "]:
             with self.subTest(effort=effort):
                 self.assertEqual(admitted({"reasoning": {"effort": effort}}), verbatim(effort))
+        # The tier is two exact words: no case folding, no padding, no route-native word
+        # (an on/off switch, an API's own tier names), no template, no other scalar type.
+        for tier in ["standard", "fast", "Fast", "FAST", " fast", "fast ", "fast\n", "on", "off",
+                     "priority", "flex", "default", "auto", "ultrafast", "",
+                     "${{ inputs.tier }}"]:
+            with self.subTest(tier=tier):
+                self.assertEqual(admitted({"access": {"service_tier": tier}}),
+                                 tier in ("standard", "fast"))
+        for tier in [True, False, 1, None, ["fast"], {"fast": True}]:
+            with self.subTest(tier=repr(tier)):
+                self.assertFalse(admitted({"access": {"service_tier": tier}}))
 
     def test_selection_is_declared_only_under_run(self):
         places = []
@@ -345,7 +426,7 @@ class SchemaShape(unittest.TestCase):
         def walk(node, pointer):
             if isinstance(node, dict):
                 for name in node.get("properties", {}):
-                    if name in {"access", "reasoning"}:
+                    if name in {"access", "reasoning", "service_tier"}:
                         places.append(f"{pointer}/properties/{name}")
                 for key, child in node.items():
                     walk(child, f"{pointer}/{key}")
@@ -354,8 +435,10 @@ class SchemaShape(unittest.TestCase):
                     walk(child, f"{pointer}/{index}")
 
         walk(SCHEMA, "")
-        self.assertEqual(sorted(places), ["/properties/run/properties/access",
-                                          "/properties/run/properties/reasoning"])
+        self.assertEqual(sorted(places), [
+            "/properties/run/properties/access",
+            "/properties/run/properties/access/properties/service_tier",
+            "/properties/run/properties/reasoning"])
 
 
 class StaticFixtures(unittest.TestCase):
@@ -460,20 +543,47 @@ def acknowledged_as_configured(workflow, run, expected):
                                configured_effort=None)
 
 
+def tier_acknowledged_as_configured(workflow, run, expected):
+    """A legacy session acknowledged the model and exposes no option to apply a tier
+    with. Everything else is restated truthfully; the tier is still claimed configured."""
+    acknowledged_as_configured(workflow, run, expected)
+    expected["receipt"].update(configured_model=None, model_evidence="accepted_request")
+
+
+def tier_over_an_api(workflow, run, expected):
+    """The same file on a route's inference API, where no route binds a tier."""
+    workflow["run"]["access"].update(via="openai", protocol="api")
+    run["access_routes"]["openai"] = {"api": {"configured": True}}
+
+
+def tier_on_an_unbound_agent_route(workflow, run, expected):
+    """The same file and session on an agent application the binding table does not know."""
+    workflow["run"]["access"]["via"] = "another-agent"
+    run["access_routes"]["another-agent"] = run["access_routes"].pop("codex")
+    expected["receipt"]["access_via"] = "another-agent"
+
+
 class TheJudgeHasTeeth(unittest.TestCase):
     """Each mutation is a plausible authoring or engine-shaped lie; all must be caught."""
 
     def setUp(self):
         self.base = load(HARNESS / "003-file-acp-selection-configured-before-prompt")
 
-    def mutated(self, change):
-        workflow, run, expected = copy.deepcopy(self.base)
+    def mutated(self, change, base=None):
+        workflow, run, expected = copy.deepcopy(self.base if base is None else base)
         change(workflow, run, expected)
         return workflow, run, expected
 
-    def caught(self, change):
-        workflow, run, expected = self.mutated(change)
-        return bool(judge(workflow, run, expected) or shape_errors(run, expected))
+    def caught(self, change, base=None):
+        return bool(self.findings(change, base))
+
+    def findings(self, change, base=None) -> list[str]:
+        """Every difference the judge and the shape check name for a mutated fixture,
+        with the reason the premises give when they are the ones that refuse."""
+        workflow, run, expected = self.mutated(change, base)
+        found = judge(workflow, run, expected) + shape_errors(run, expected)
+        reason = predict(workflow, run)[1].get("reason")
+        return found + ([f"premises refuse: {reason}"] if found and reason else [])
 
     def test_the_unmutated_fixture_is_clean(self):
         self.assertEqual(judge(*self.base), [])
@@ -513,6 +623,131 @@ class TheJudgeHasTeeth(unittest.TestCase):
         for label, change in mutations.items():
             with self.subTest(mutation=label):
                 self.assertTrue(self.caught(change), label)
+
+    def test_service_tier_mutations_are_caught_for_their_own_reason(self):
+        fast = load(HARNESS / "018-file-acp-service-tier-fast-configured-before-prompt")
+        standard = load(HARNESS / "019-file-acp-service-tier-standard-configured-before-prompt")
+        omitted = load(HARNESS / "020-file-acp-service-tier-omitted-sends-none")
+        for base in (fast, standard, omitted):
+            self.assertEqual(judge(*base) + shape_errors(base[1], base[2]), [])
+        acp = lambda r: r["access_routes"]["codex"]["acp"]
+        offer = lambda r: acp(r)["models"]["openai/gpt-5.5"]
+        held = lambda e: e["observed"]["acp_config_before_first_prompt"]
+        unoffered = "the selected model is not offered this service tier"
+        mutations = {
+            "fast served as standard on the wire": (
+                fast, lambda w, r, e: held(e).update(service_tier="standard"), "the peer holds"),
+            "fast served as standard in the receipt": (
+                fast, lambda w, r, e: e["receipt"].update(transmitted_service_tier="off",
+                                                          configured_service_tier="off"),
+                "receipt.transmitted_service_tier: premises give 'on'"),
+            "standard served as fast": (
+                standard, lambda w, r, e: e["receipt"].update(transmitted_service_tier="on",
+                                                              configured_service_tier="on"),
+                "receipt.configured_service_tier: premises give 'off'"),
+            "a tier admitted on a model that does not offer it": (
+                fast, lambda w, r, e: offer(r).pop("service_tier"), unoffered),
+            "standard assumed where only fast is offered": (
+                standard, lambda w, r, e: offer(r).update(service_tier=["fast"]), unoffered),
+            "a tier judged on the default model": (
+                fast, lambda w, r, e: (
+                    acp(r).update(default_model="openai/gpt-5.4"),
+                    acp(r)["models"].update({"openai/gpt-5.4": {
+                        "effort": ["high"], "service_tier": ["standard", "fast"]}}),
+                    offer(r).pop("service_tier")), unoffered),
+            "a tier applied after the prompt": (
+                fast, lambda w, r, e: held(e).pop("service_tier"), "the peer holds"),
+            "a tier recorded for a file that declared none": (
+                omitted, lambda w, r, e: e["receipt"].update(configured_service_tier="on"),
+                "receipt.configured_service_tier: premises give None"),
+            "the session's offer recorded for a file that declared none": (
+                omitted, lambda w, r, e: e["receipt"].update(offered_service_tier=["on", "off"]),
+                "receipt.offered_service_tier: premises give None"),
+            "the session default held as an applied tier": (
+                omitted, lambda w, r, e: held(e).update(service_tier="fast"), "the peer holds"),
+            "the declaration dropped from the file, the tier still claimed": (
+                fast, lambda w, r, e: w["run"]["access"].pop("service_tier"),
+                "receipt.requested_service_tier: premises give None"),
+            "an acknowledged tier promoted to configured": (
+                fast, tier_acknowledged_as_configured,
+                "a session that only acknowledges cannot apply a service tier"),
+            "an unconfirmed read-back admitted": (
+                fast, lambda w, r, e: acp(r).update(readback="unconfirmed"),
+                "the read-back configuration does not hold the selection"),
+            "a tier admitted over an API": (
+                fast, tier_over_an_api, "the route binds no service tier on this protocol"),
+            "a tier admitted on an agent route that binds none": (
+                fast, tier_on_an_unbound_agent_route,
+                "the route binds no service tier on this protocol"),
+            "the confirmed configuration relabelled as the tier that served": (
+                fast, lambda w, r, e: e["receipt"].update(effective_service_tier="on"),
+                "receipt.effective_service_tier: premises give None"),
+            "the turn's tier claimed with no witness": (
+                fast, lambda w, r, e: e["receipt"].update(turn_service_tier="on"),
+                "receipt.turn_service_tier: premises give None"),
+            "the language word recorded as the value sent": (
+                fast, lambda w, r, e: e["receipt"].update(transmitted_service_tier="fast"),
+                "receipt.transmitted_service_tier: premises give 'on'"),
+            "the route's value held as the language word": (
+                fast, lambda w, r, e: held(e).update(service_tier="on"),
+                "service_tier is the language word"),
+            "the offer reordered": (
+                fast, lambda w, r, e: e["receipt"].update(offered_service_tier=["on", "off"]),
+                "receipt.offered_service_tier: premises give ['off', 'on']"),
+            "a tier fact left out of an honored tier": (
+                fast, lambda w, r, e: e["receipt"].pop("turn_service_tier"),
+                "keeps its six facts apart"),
+            "an offered tier left unstated by the receipt": (
+                omitted, lambda w, r, e: e["receipt"].pop("requested_service_tier"),
+                "a tier offered and not declared"),
+            "a word outside the language in the offer": (
+                fast, lambda w, r, e: offer(r).update(service_tier=["fast", "priority"]),
+                "service_tier lists standard, fast or both, once each"),
+            "a tier offered by a legacy session": (
+                fast, lambda w, r, e: acp(r).update(config="legacy"),
+                "a legacy session offers no service tier"),
+            "an unknown tier receipt key": (
+                fast, lambda w, r, e: e["receipt"].update(served_service_tier="on"),
+                "receipt: unknown key 'served_service_tier'"),
+        }
+        for label, (base, change, witness) in mutations.items():
+            with self.subTest(mutation=label):
+                found = self.findings(change, base)
+                self.assertTrue(any(witness in line for line in found),
+                                f"{witness!r} not in {found}")
+
+    def test_tier_refusals_observe_zero_inference_on_their_plane(self):
+        zero = {"acp_prompts": 0, "api_inference_requests": 0, "cli_invocations": 0}
+        refusals = {number: load(next(HARNESS.glob(f"{number}-*")))
+                    for number in ("021", "023", "024", "025", "026", "027")}
+        for number, base in refusals.items():
+            with self.subTest(fixture=number, case="clean"):
+                self.assertEqual(judge(*base) + shape_errors(base[1], base[2]), [])
+            for label, leak in {"a prompt was sent": {"acp_prompts": 1},
+                                "the API was called": {"api_inference_requests": 1},
+                                "the CLI was started": {"cli_invocations": 1}}.items():
+                with self.subTest(fixture=number, leak=label):
+                    self.assertTrue(self.caught(
+                        lambda w, r, e, leak=leak: e["observed"].update(leak), base))
+            with self.subTest(fixture=number, case="honored anyway"):
+                self.assertTrue(self.caught(lambda w, r, e: (e.clear(), e.update(
+                    {"admission": {"accepted": True}, "workflow_state": "success",
+                     "tasks": {"summarize": {"status": "success"}},
+                     "observed": dict(zero, acp_prompts=1)})), base))
+        with self.subTest(case="a session refusal claimed at admission"):
+            self.assertTrue(self.caught(lambda w, r, e: (e.clear(), e.update(
+                {"admission": {"accepted": False, "error_code": "NIKA-1805"},
+                 "observed": dict(zero)})), refusals["021"]))
+        with self.subTest(case="an admission refusal claimed as a task failure"):
+            self.assertTrue(self.caught(lambda w, r, e: (e.clear(), e.update(
+                {"admission": {"accepted": True}, "workflow_state": "failure",
+                 "tasks": {"summarize": {"status": "failure", "error_code": "NIKA-1800"}},
+                 "observed": dict(zero)})), refusals["027"]))
+        with self.subTest(case="the unbound route served at its own default tier"):
+            self.assertTrue(self.caught(lambda w, r, e: (e.clear(), e.update(
+                {"admission": {"accepted": True}, "workflow_state": "success",
+                 "tasks": {"summarize": {"status": "success"}},
+                 "observed": dict(zero, api_inference_requests=1)})), refusals["027"]))
 
     def test_refusals_observe_zero_inference_on_their_plane(self):
         zero = {"acp_prompts": 0, "api_inference_requests": 0, "cli_invocations": 0}

@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-run-access-service-tier-priority
+run:
+  access:
+    via: codex
+    protocol: acp
+    service_tier: priority
+tasks:
+  greet:
+    infer:
+      prompt: "hi"
