@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "LAW-GRAMMAR-0502 · the static contract does not couple the tier to a route or a protocol. Whether this route binds the word to a native control is a runtime fact: an engine with no such binding refuses before any inference request (LAW-CONF-0501)."
+}

@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-run-service-tier-outside-access
+run:
+  service_tier: fast
+tasks:
+  greet:
+    infer:
+      prompt: "hi"

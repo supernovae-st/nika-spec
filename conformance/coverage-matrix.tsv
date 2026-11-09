@@ -167,6 +167,16 @@ dag	NIKA-PARSE	check-reject	conformance/tests/core/dag-topology/027-foreach-max-
 verbs	NIKA-PARSE	check-reject	conformance/tests/core/verbs-shape/027-infer-numbers-are-literals-refused
 verbs	NIKA-PARSE	check-reject	conformance/tests/core/verbs-shape/028-agent-max-turns-over-ceiling-refused
 envelope	(positive)	positive-check	conformance/tests/core/envelope/053-run-reasoning-effort-inner-space-passes
+envelope	(positive)	positive-check	conformance/tests/core/envelope/056-run-access-service-tier-fast-passes
+envelope	(positive)	positive-check	conformance/tests/core/envelope/057-run-access-service-tier-standard-passes
+envelope	NIKA-PARSE	check-reject	conformance/tests/core/envelope/058-run-access-service-tier-unknown-refused
+envelope	NIKA-PARSE	check-reject	conformance/tests/core/envelope/059-run-access-service-tier-template-refused
+envelope	NIKA-PARSE	check-reject	conformance/tests/core/envelope/060-run-access-service-tier-not-a-string-refused
+envelope	NIKA-PARSE	check-reject	conformance/tests/core/envelope/061-task-service-tier-key-refused
+envelope	NIKA-PARSE	check-reject	conformance/tests/core/envelope/062-run-service-tier-outside-access-refused
+envelope	(positive)	positive-check	conformance/tests/core/envelope/063-run-access-service-tier-alone-passes
+envelope	(positive)	positive-check	conformance/tests/core/envelope/064-run-access-service-tier-api-protocol-passes
+envelope	(positive)	positive-check	conformance/tests/core/envelope/065-run-access-service-tier-seeded-virtual-passes
 verbs	NIKA-AGENT-003	check-reject	conformance/tests/core/verbs-shape/023-agent-skill-missing-refused
 verbs	NIKA-AGENT-003	check-reject	conformance/tests/core/verbs-shape/026-agent-skill-templated-path-refused
 verbs	NIKA-SEC-004	check-reject	conformance/tests/deep/029-skill-outside-fs-read-boundary-refused

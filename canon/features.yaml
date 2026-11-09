@@ -39,9 +39,10 @@ features:
     detection_law: LAW-GRAMMAR-0502
     conformance_profile: core
     notes: 'Détectée quand un workflow déclare run.access (spec/01-envelope.md §run). Feature de LANGAGE, pas une
-      capacité : Core juge la forme statique ; honorer la sélection (route · protocole · modèle) ou la refuser avant
-      inférence est le contrat Runtime de LAW-CONF-0501. Un moteur antérieur la refuse comme clé run inconnue,
-      jamais en l''ignorant.'
+      capacité : Core juge la forme statique ; honorer la sélection (route · protocole · modèle · palier de service)
+      ou la refuser avant inférence est le contrat Runtime de LAW-CONF-0501. Un moteur antérieur la refuse comme
+      clé run inconnue, jamais en l''ignorant ; il refuse de même run.access.service_tier comme clé inconnue de
+      run.access.'
   - id: run.reasoning
     status: active
     owner: spec

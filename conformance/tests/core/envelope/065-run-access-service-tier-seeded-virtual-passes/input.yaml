@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-run-access-service-tier-seeded
+run:
+  entropy: { seeded: 7 }
+  clock: virtual
+  access:
+    via: codex
+    protocol: acp
+    service_tier: standard
+tasks:
+  greet:
+    infer:
+      prompt: "hi"

@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0
+nika: t-task-service-tier
+tasks:
+  greet:
+    service_tier: fast
+    infer:
+      prompt: "hi"

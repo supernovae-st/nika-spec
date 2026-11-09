@@ -1,0 +1,4 @@
+{
+  "valid": true,
+  "note": "LAW-GRAMMAR-0502 · each access key is optional on its own. A tier alone leaves the route to the engine's resolution; the route that answers then honors the tier or refuses it before inference."
+}

@@ -28,10 +28,11 @@ SCHEMA = json.loads((ROOT / "schemas/workflow.schema.json").read_text(encoding="
 ENVELOPE = ROOT / "conformance/tests/core/envelope"
 HARNESS = ROOT / "conformance/tests/runtime/access-harness"
 FIRST_ACCESS_FIXTURE = 33
-# An access fixture is one whose document declares the `run:` block or an `access:` key: the
+# An access fixture is one whose document declares the `run:` block, an `access:` key or a
+# `service_tier:` key wherever it was written (a misplaced one has no `run:` line): the
 # envelope's later fixtures for other laws (the retired version tag, a withdrawn secret source)
 # are not the access contract's to cite.
-ACCESS_SUBJECT = re.compile(r"^\s*(run|access):", re.M)
+ACCESS_SUBJECT = re.compile(r"^\s*(run|access|service_tier):", re.M)
 ENVELOPE_KEYS = {"nika", "model", "inputs", "const", "secrets", "permits", "run", "tasks", "outputs"}
 ACCESS_LAWS = {"LAW-SURFACE-0503", "LAW-GRAMMAR-0502", "LAW-GRAMMAR-0503", "LAW-CONF-0501"}
 # The reference engine's execution-access family (NIKA-1800..1849). A refusal
@@ -292,10 +293,17 @@ class SchemaShape(unittest.TestCase):
         self.assertIs(access["additionalProperties"], False)
         self.assertEqual(access["minProperties"], 1)
         self.assertNotIn("required", access)
-        self.assertEqual(set(access["properties"]), {"via", "protocol", "fallback"})
+        self.assertEqual(set(access["properties"]), {"via", "protocol", "fallback", "service_tier"})
         self.assertEqual(access["properties"]["protocol"]["enum"], ["api", "acp"])
         self.assertEqual(access["properties"]["fallback"]["enum"], ["none"])
         self.assertEqual(access["properties"]["via"]["pattern"], "^[a-z][a-z0-9-]*(?![\\s\\S])")
+
+    def test_the_service_tier_is_two_words_and_nothing_else(self):
+        tier = SCHEMA["properties"]["run"]["properties"]["access"]["properties"]["service_tier"]
+        self.assertEqual(tier["enum"], ["standard", "fast"])
+        # A closed literal: the enum is the whole rule. A type, a pattern or a default would
+        # let a route's own word, a boolean or an assumed tier through another door.
+        self.assertFalse({"type", "pattern", "default", "const", "anyOf", "oneOf"} & set(tier))
 
     def test_reasoning_requires_a_native_effort_and_lists_none(self):
         reasoning = SCHEMA["properties"]["run"]["properties"]["reasoning"]
@@ -338,6 +346,17 @@ class SchemaShape(unittest.TestCase):
                        "\ufeffhigh", "high\x1c", "${{ inputs.e }}", "", " "]:
             with self.subTest(effort=effort):
                 self.assertEqual(admitted({"reasoning": {"effort": effort}}), verbatim(effort))
+        # The tier is two exact words: no case folding, no padding, no route-native word
+        # (an on/off switch, an API's own tier names), no template, no other scalar type.
+        for tier in ["standard", "fast", "Fast", "FAST", " fast", "fast ", "fast\n", "on", "off",
+                     "priority", "flex", "default", "auto", "ultrafast", "",
+                     "${{ inputs.tier }}"]:
+            with self.subTest(tier=tier):
+                self.assertEqual(admitted({"access": {"service_tier": tier}}),
+                                 tier in ("standard", "fast"))
+        for tier in [True, False, 1, None, ["fast"], {"fast": True}]:
+            with self.subTest(tier=repr(tier)):
+                self.assertFalse(admitted({"access": {"service_tier": tier}}))
 
     def test_selection_is_declared_only_under_run(self):
         places = []
@@ -345,7 +364,7 @@ class SchemaShape(unittest.TestCase):
         def walk(node, pointer):
             if isinstance(node, dict):
                 for name in node.get("properties", {}):
-                    if name in {"access", "reasoning"}:
+                    if name in {"access", "reasoning", "service_tier"}:
                         places.append(f"{pointer}/properties/{name}")
                 for key, child in node.items():
                     walk(child, f"{pointer}/{key}")
@@ -354,8 +373,10 @@ class SchemaShape(unittest.TestCase):
                     walk(child, f"{pointer}/{index}")
 
         walk(SCHEMA, "")
-        self.assertEqual(sorted(places), ["/properties/run/properties/access",
-                                          "/properties/run/properties/reasoning"])
+        self.assertEqual(sorted(places), [
+            "/properties/run/properties/access",
+            "/properties/run/properties/access/properties/service_tier",
+            "/properties/run/properties/reasoning"])
 
 
 class StaticFixtures(unittest.TestCase):

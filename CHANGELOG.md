@@ -16,6 +16,26 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Changes merged after the spec commit engine 0.123.0 embeds. They reach the
 engine at its next `SPEC_PIN` bump.
 
+### Added · a service tier for the access route (2026-11-10)
+
+- `run.access` gains `service_tier` ([01 §run](./spec/01-envelope.md#runaccess--runreasoning--the-route-and-the-native-effort-normative)):
+  the serving speed asked of the route, a closed vocabulary of two words,
+  `standard` and `fast`. A route binds each word to its own native control
+  and the engine applies exactly that control, or refuses before any
+  inference request. A word is never translated into another model, another
+  effort or another route's control, and `fast` is never served as
+  `standard`. Omitted, the route keeps its default tier and nothing else
+  changes: the same file parses, runs and resumes as it did.
+- The tier is applied after the model and the effort, and the configuration
+  read back before the first prompt must hold all three. A run that declares
+  a tier records what the route offered, what was transmitted and what was
+  confirmed. The tier carried on the turn itself and the tier the provider
+  reports stay unknown until a witness attests them.
+- An engine that predates the key refuses it as an unknown `run.access` key
+  in both parse modes. It never ignores it.
+- Fixtures: `core/envelope/056` to `065`. `039`'s note names the widened key
+  set.
+
 ### Changed · engine 0.124.1 is the current release (2026-10-28)
 
 - The README, CONTRIBUTING, SECURITY, the QUICKSTART status line and 00
