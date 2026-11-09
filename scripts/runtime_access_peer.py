@@ -50,24 +50,34 @@ class Log:
 class Session:
     """One ACP session's state: what is current, and what a client selection applied."""
 
-    def __init__(self, world: dict, sid: str):
+    def __init__(self, world: dict, sid: str, tier_values: dict):
         self.sid = sid
         self.models = world["models"]
         self.legacy = world["config"] == "legacy"
+        # The route's own value for each language word (the adapter's binding table).
+        self.tier_values = tier_values
         self.model = world.get("default_model") or next(iter(self.models))
-        efforts = self.efforts()
+        efforts, tiers = self.efforts(), self.tiers()
         # ACP requires a current value for every option: the first offered one.
         self.effort = efforts[0] if efforts and not self.legacy else None
+        self.tier = tiers[0] if tiers else None
         # Only values a client selection set, and that still hold.
         self.applied: dict[str, str] = {}
 
     def efforts(self) -> list[str]:
         return [] if self.legacy else list(self.models[self.model]["effort"])
 
-    def current(self) -> dict:
-        return {"model": self.model, "effort": self.effort}
+    def tiers(self) -> list[str]:
+        """The route's native values for the tiers the current model offers, in the
+        world's order. A model with no speed control offers none."""
+        if self.legacy:
+            return []
+        return [self.tier_values[word] for word in self.models[self.model].get("service_tier", [])]
 
-    def options(self, effort_id: str) -> list[dict]:
+    def current(self) -> dict:
+        return {"model": self.model, "effort": self.effort, "service_tier": self.tier}
+
+    def options(self, effort_id: str, tier_option: dict) -> list[dict]:
         """The complete configuration, as session/new and every answer report it."""
         def select_option(option_id, category, current, values):
             return {"id": option_id, "name": option_id, "category": category, "type": "select",
@@ -76,6 +86,9 @@ class Session:
         options = [select_option("model", "model", self.model, list(self.models))]
         if self.efforts():
             options.append(select_option(effort_id, "thought_level", self.effort, self.efforts()))
+        if self.tiers():
+            options.append(select_option(tier_option["id"], tier_option["category"], self.tier,
+                                         self.tiers()))
         return options
 
     def select_model(self, model: str) -> None:
@@ -83,16 +96,25 @@ class Session:
         self.applied["model"] = model
         if self.legacy:
             return
-        efforts = self.efforts()
+        efforts, tiers = self.efforts(), self.tiers()
         if self.effort not in efforts:
             # The previous effort is not offered for this model: the session
             # resets it, and no client selection holds it any more.
             self.effort = efforts[0] if efforts else None
             self.applied.pop("effort", None)
+        if self.tier not in tiers:
+            # Likewise for the tier: reset to this model's first value, or gone
+            # with its option when the model offers no speed control.
+            self.tier = tiers[0] if tiers else None
+            self.applied.pop("service_tier", None)
 
     def select_effort(self, effort: str) -> None:
         self.effort = effort
         self.applied["effort"] = effort
+
+    def select_tier(self, tier: str) -> None:
+        self.tier = tier
+        self.applied["service_tier"] = tier
 
 
 class AcpPeer:
@@ -105,6 +127,8 @@ class AcpPeer:
         self.confirms = self.world.get("readback", "confirmed") == "confirmed"
         self.behavior = self.world.get("prompt", "completes")
         self.effort_id = config["effort_option"]
+        # The route's own speed control: {id, category, values: language word -> native value}.
+        self.tier_option = config["tier_option"]
         self.sessions: dict[str, Session] = {}
         self.log = log
 
@@ -176,7 +200,7 @@ class AcpPeer:
 
     def new_session(self, request_id, params: dict) -> None:
         sid = f"scripted-{len(self.sessions) + 1}"
-        session = Session(self.world, sid)
+        session = Session(self.world, sid, self.tier_option["values"])
         self.sessions[sid] = session
         result = {"sessionId": sid}
         if self.legacy:
@@ -184,7 +208,7 @@ class AcpPeer:
             result["models"] = {"currentModelId": session.model, "availableModels": [
                 {"modelId": model, "name": model} for model in session.models]}
         else:
-            result["configOptions"] = session.options(self.effort_id)
+            result["configOptions"] = session.options(self.effort_id, self.tier_option)
         self.log.write("session", session=sid, cwd=params.get("cwd"), current=session.current())
         self.reply(request_id, result)
 
@@ -202,8 +226,13 @@ class AcpPeer:
         if session is None:
             return
         config_id, value = params.get("configId"), params.get("value")
-        offers = {"model": list(session.models), self.effort_id: session.efforts()}
-        offered = offers.get(config_id) if isinstance(config_id, str) else None
+        # Each option the session may expose, with the values it offers now (an
+        # absent option offers none) and the selection that applies one.
+        selectors = {"model": (list(session.models), session.select_model),
+                     self.effort_id: (session.efforts(), session.select_effort),
+                     self.tier_option["id"]: (session.tiers(), session.select_tier)}
+        offered, select = selectors.get(config_id if isinstance(config_id, str) else None,
+                                        (None, None))
         record = {"session": session.sid, "method": "session/set_config_option",
                   "config_id": config_id, "value": value}
         if not offered or not isinstance(value, str) or value not in offered:
@@ -212,12 +241,12 @@ class AcpPeer:
                        f"{value!r} is not an offered value of option {config_id!r}")
             return
         if self.confirms:
-            (session.select_model if config_id == "model" else session.select_effort)(value)
+            select(value)
             self.log.write("selection", outcome="applied", **record)
         else:
             # An unconfirmed read-back: the answer carries the configuration as it was.
             self.log.write("selection", outcome="ignored", **record)
-        options = session.options(self.effort_id)
+        options = session.options(self.effort_id, self.tier_option)
         self.log.write("readback", session=session.sid, configOptions=options)
         self.reply(request_id, {"configOptions": options})
 

@@ -1,0 +1,43 @@
+{
+  "admission": {
+    "accepted": true
+  },
+  "workflow_state": "success",
+  "tasks": {
+    "summarize": {
+      "status": "success"
+    }
+  },
+  "receipt": {
+    "access_via": "codex",
+    "protocol": "acp",
+    "requested_model": "openai/gpt-5.5",
+    "requested_effort": "high",
+    "transmitted_model": "openai/gpt-5.5",
+    "transmitted_effort": "high",
+    "configured_model": "openai/gpt-5.5",
+    "configured_effort": "high",
+    "model_evidence": "configured",
+    "responding_model": null,
+    "requested_service_tier": "standard",
+    "offered_service_tier": [
+      "on",
+      "off"
+    ],
+    "transmitted_service_tier": "off",
+    "configured_service_tier": "off",
+    "turn_service_tier": null,
+    "effective_service_tier": null
+  },
+  "observed": {
+    "acp_config_before_first_prompt": {
+      "model": "openai/gpt-5.5",
+      "effort": "high",
+      "service_tier": "standard"
+    },
+    "acp_prompts": 1,
+    "api_inference_requests": 0,
+    "cli_invocations": 0
+  },
+  "note": "01 §run two words for the tier · standard is a selection like fast, never the absence of one. The session's own default is its faster tier here (the option reads on), so the explicit standard sends the route's off and reads it back BEFORE the first prompt. The offered values are recorded in the session's own order."
+}

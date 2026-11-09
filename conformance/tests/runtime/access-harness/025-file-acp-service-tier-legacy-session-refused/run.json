@@ -1,0 +1,15 @@
+{
+  "access_routes": {
+    "codex": {
+      "acp": {
+        "available": true,
+        "config": "legacy",
+        "models": {
+          "openai/gpt-5.5": {
+            "effort": []
+          }
+        }
+      }
+    }
+  }
+}

@@ -181,7 +181,7 @@ def selection(protocol="acp", model=None, effort=None, responder=None, **extra):
     return value
 
 
-def configured(model=MODEL, effort="high"):
+def configured(model=MODEL, effort="high", tier=None):
     """The receipt of a selection applied through config options and read back."""
     facts = {"model": {"requested": MODEL, "option": "model", "transmitted": model,
                        "configured": model, "configured_source": "confirmed_selection"}}
@@ -189,13 +189,31 @@ def configured(model=MODEL, effort="high"):
         facts["effort"] = {"requested": effort, "option": "reasoning_effort",
                            "transmitted": effort, "configured": effort,
                            "configured_source": "confirmed_selection"}
+    if tier:
+        facts["service_tier"] = tier
     return selection(**facts)
 
 
-def requirement(via="codex", protocol="acp", effort="high"):
+def tier_record(word="fast", native="on", offered=("off", "on"), **change):
+    """The engine's record of a declared service tier, applied through the route's
+    own option and read back. A scripted peer witnesses neither the turn nor the
+    provider, so both stay unknown."""
+    record = {"requested": word, "option": "fast-mode",
+              "offered": None if offered is None else list(offered),
+              "transmitted": native, "configured": native,
+              "configured_source": "confirmed_selection",
+              "turn": {"value": None, "evidence": "unknown"},
+              "effective": {"value": None, "evidence": "unknown"}}
+    record.update(change)
+    return record
+
+
+def requirement(via="codex", protocol="acp", effort="high", tier=None):
     value = {"via": via, "protocol": protocol, "fallback": "none"}
     if effort:
         value["effort"] = effort
+    if tier:
+        value["service_tier"] = tier
     return value
 
 
@@ -216,6 +234,9 @@ def receipt_fields(sel, req, via="codex"):
 
 SIGN_IN = {"do": "cli", "argv": ["login", "status"]}
 PROBE = {"do": "acp", "probe": True}
+# The model, then the effort; and the codex route's own words for the two tiers.
+SELECT = (("model", MODEL), ("reasoning_effort", "high"))
+FAST, STANDARD = ("fast-mode", "on"), ("fast-mode", "off")
 
 
 def session(*actions):
@@ -256,6 +277,19 @@ class ScriptedEngineCase(unittest.TestCase):
 
     def engine(self, plan: dict) -> str:
         return write_engine(self.tmp.name, plan)
+
+    def variant(self, name: str, source: str, world=None, expected=None) -> pathlib.Path:
+        """A private copy of one corpus fixture with a changed premise or claim."""
+        origin = next(HARNESS.glob(f"{source}-*"))
+        fixture = pathlib.Path(self.tmp.name) / name
+        fixture.mkdir(exist_ok=True)
+        (fixture / "input.nika").write_bytes((origin / "input.nika").read_bytes())
+        for filename, change in (("run.json", world), ("expected-run.json", expected)):
+            value = json.loads((origin / filename).read_text(encoding="utf-8"))
+            if change is not None:
+                change(value)
+            (fixture / filename).write_text(json.dumps(value), encoding="utf-8")
+        return fixture
 
     def verdict(self, fixture, plan: dict) -> tuple[str, list[str]]:
         directory = fixture if isinstance(fixture, pathlib.Path) else next(HARNESS.glob(f"{fixture}-*"))
@@ -472,9 +506,224 @@ class LegacyAndRefusalLaws(ScriptedEngineCase):
         self.assertVerdict("008", plan, "DIVERGE", "error_code: want NIKA-1805")
 
 
+class ServiceTierLaws(ScriptedEngineCase):
+    """018–026: the tier is applied after the model and the effort and read back
+    before the one prompt. A session default is never an applied tier, an omitted
+    tier never travels, and a session refusal sends no prompt."""
+
+    def conformant(self, word="fast", native="on", offered=("off", "on"), **overrides):
+        plan = {"steps": [SIGN_IN, PROBE, session(*SELECT, ("fast-mode", native), ("prompt",))],
+                "tasks": success(receipt_fields(
+                    configured(tier=tier_record(word, native, offered)), requirement(tier=word)))}
+        plan.update(overrides)
+        return plan
+
+    def test_a_conformant_double_agrees_on_each_honored_tier(self):
+        self.assertVerdict("018", self.conformant(), "AGREE")
+        self.assertVerdict("019", self.conformant("standard", "off", ("on", "off")), "AGREE")
+        self.assertVerdict("022", self.conformant(), "AGREE")
+
+    def test_fast_is_never_served_as_standard_nor_standard_as_fast(self):
+        # The receipt stays the conformant one: only the wire differs.
+        for fixture, plan, sent in [
+            ("018", self.conformant(), STANDARD),
+            ("019", self.conformant("standard", "off", ("on", "off")), FAST),
+        ]:
+            with self.subTest(fixture=fixture, sent=sent[1]):
+                plan["steps"] = [session(*SELECT, sent, ("prompt",))]
+                self.assertVerdict(
+                    fixture, plan, "DIVERGE",
+                    f"receipt.transmitted_service_tier · the ACP peer received {sent[1]!r}",
+                    f"receipt.configured_service_tier · the ACP peer read back {sent[1]!r}",
+                    "observed.acp_config_before_first_prompt")
+        # The other tier written down honestly is still not the tier the file asked.
+        honest = self.conformant(steps=[session(*SELECT, STANDARD, ("prompt",))], tasks=success(
+            receipt_fields(configured(tier=tier_record("fast", "off")), requirement(tier="fast"))))
+        self.assertVerdict("018", honest, "DIVERGE",
+                           "receipt.transmitted_service_tier: want 'on' · got 'off'",
+                           "receipt.configured_service_tier: want 'on' · got 'off'")
+
+    def test_a_tier_the_session_was_never_sent_is_not_applied(self):
+        # The model and the effort are selected and no tier is: only the receipt says fast.
+        plan = self.conformant(steps=[session(*SELECT, ("prompt",))])
+        self.assertVerdict("018", plan, "DIVERGE",
+                           "receipt.transmitted_service_tier · the ACP peer received None",
+                           "observed.acp_config_before_first_prompt")
+
+    def test_a_tier_applied_after_the_prompt_is_not_held_before_it(self):
+        plan = self.conformant(steps=[session(*SELECT, ("prompt",), FAST)])
+        self.assertVerdict("018", plan, "DIVERGE", "observed.acp_config_before_first_prompt")
+
+    def test_a_tier_judged_on_the_default_model_does_not_hold(self):
+        # 022: the default model offers no tier, so the early setter is refused and
+        # nothing holds a tier when the prompt arrives.
+        plan = self.conformant(steps=[session(FAST, *SELECT, ("prompt",))])
+        self.assertVerdict("022", plan, "DIVERGE", "observed.acp_config_before_first_prompt",
+                           "receipt.configured_service_tier · the ACP peer read back 'off'")
+
+    def test_a_session_default_is_never_an_applied_tier(self):
+        # 018 on a session that already starts at its fast tier: an engine that
+        # sends nothing and reads the default back has applied no tier.
+        fixture = self.variant(
+            "default-fast", "018",
+            world=lambda run: run["access_routes"]["codex"]["acp"]["models"][MODEL].update(
+                service_tier=["fast", "standard"]),
+            expected=lambda claim: claim["receipt"].update(offered_service_tier=["on", "off"]))
+        self.assertVerdict(fixture, self.conformant(offered=("on", "off")), "AGREE")
+        read = tier_record(offered=("on", "off"), transmitted=None,
+                           configured_source="session_config")
+        plan = self.conformant(steps=[session(*SELECT, ("prompt",))], tasks=success(
+            receipt_fields(configured(tier=read), requirement(tier="fast"))))
+        self.assertVerdict(fixture, plan, "DIVERGE", "observed.acp_config_before_first_prompt",
+                           "receipt.transmitted_service_tier: want 'on' · got None",
+                           "receipt.configured_service_tier · the ACP peer read back None")
+
+    def test_an_omitted_tier_never_travels_and_records_nothing(self):
+        plan = {"steps": [SIGN_IN, PROBE, session(*SELECT, ("prompt",))],
+                "tasks": success(receipt_fields(configured(), requirement()))}
+        self.assertVerdict("020", plan, "AGREE")
+        for label, sent in [("standard assumed and sent", STANDARD),
+                            ("the session's own default sent back to it", FAST)]:
+            with self.subTest(case=label):
+                moved = dict(plan, steps=[session(*SELECT, sent, ("prompt",))])
+                self.assertVerdict(
+                    "020", moved, "DIVERGE",
+                    f"receipt.transmitted_service_tier · the ACP peer received {sent[1]!r}",
+                    "observed.acp_config_before_first_prompt")
+        # The wire is clean and the record is not: a tier fact for a file that declared none.
+        default = tier_record(offered=("on", "off"), transmitted=None,
+                              configured_source="session_config")
+        for label, sel, req, witness in [
+            ("the session default recorded as a tier", configured(tier=default), requirement(),
+             "records a service tier the file never declared"),
+            ("a tier in the requirement that the file never wrote", configured(),
+             requirement(tier="fast"), "does not restate"),
+            ("both records invent the tier", configured(tier=default), requirement(tier="fast"),
+             "records a service tier the file never declared"),
+        ]:
+            with self.subTest(case=label):
+                self.assertVerdict("020", dict(plan, tasks=success(receipt_fields(sel, req))),
+                                   "DIVERGE", witness)
+
+    def test_tier_refusals_agree_only_with_zero_prompts(self):
+        refused = {"state": "failure", "tasks": failure("NIKA-1805")}
+        legacy = (("set_model", MODEL),)
+        for fixture, actions in [("021", SELECT), ("023", SELECT), ("024", (*SELECT, FAST)),
+                                 ("025", legacy), ("026", SELECT)]:
+            with self.subTest(fixture=fixture):
+                self.assertVerdict(fixture, dict(refused, steps=[SIGN_IN, session(*actions)]), "AGREE")
+        for fixture, actions, why in [
+            ("021", (*SELECT, FAST, ("prompt",)), "an unoffered tier sent, then a prompt anyway"),
+            ("021", (*SELECT, ("prompt",)), "the tier dropped to the route's default"),
+            ("023", (FAST, *SELECT, ("prompt",)), "the tier judged on the default model"),
+            ("024", (*SELECT, FAST, ("prompt",)), "an unconfirmed read-back assumed applied"),
+            ("025", (*legacy, ("prompt",)), "the tier dropped on a session that cannot apply it"),
+            ("025", (*legacy, FAST, ("prompt",)), "a setter the session refused, then a prompt anyway"),
+            ("026", (*SELECT, ("prompt",)), "standard assumed where only fast is offered"),
+            ("026", (*SELECT, FAST, ("prompt",)), "standard served by the fast tier"),
+            ("026", (*SELECT, STANDARD, ("prompt",)), "an unoffered standard sent, then a prompt anyway"),
+        ]:
+            with self.subTest(case=why):
+                self.assertVerdict(fixture, dict(refused, steps=[session(*actions)]), "DIVERGE",
+                                   "observed.acp_prompts: want 0 · got 1")
+
+    def test_the_unconfirmed_read_back_holds_everything_but_the_tier(self):
+        # 024's premise on the peer's own record: the unchanged configuration reads
+        # the model and the effort back as asked, and only the tier differs.
+        plan = {"state": "failure", "tasks": failure("NIKA-1805"), "steps": [session(*SELECT, FAST)]}
+        lines = self.assertVerdict("024", plan, "AGREE")
+        facts = next(line for line in lines if "acp session facts" in line)
+        for fact in (f"configured_model={MODEL!r}", "configured_effort='high'",
+                     "transmitted_service_tier='on'", "configured_service_tier='off'"):
+            self.assertIn(fact, facts)
+
+    def test_a_refused_tier_never_completes_and_keeps_its_code(self):
+        plan = {"steps": [session(*SELECT)], "tasks": success(receipt_fields(
+            configured(tier=tier_record()), requirement(tier="fast")))}
+        self.assertVerdict("021", plan, "DIVERGE", "workflow_state: want failure")
+        plan = {"state": "failure", "tasks": failure("NIKA-1800"), "steps": [session(*SELECT)]}
+        self.assertVerdict("021", plan, "DIVERGE", "error_code: want NIKA-1805")
+
+    def test_tier_record_lies_and_contradictions_never_agree(self):
+        req = requirement(tier="fast")
+        whole = tier_record()
+        lies = {
+            "an acknowledged tier recorded as configured": (
+                tier_record(configured_source="accepted_request"),
+                "service_tier: an acknowledged request is recorded as configured"),
+            "a configured tier without its source": (
+                tier_record(configured_source=None),
+                "service_tier: configured value and source disagree"),
+            "a source without a configured tier": (
+                tier_record(configured=None), "service_tier: configured value and source disagree"),
+            "a source outside the schema": (
+                tier_record(configured_source="served"), "source 'served' is not the schema's"),
+            "the confirmed configuration relabelled as the tier that served": (
+                tier_record(effective={"value": "on", "evidence": "witnessed"}),
+                "receipt.effective_service_tier: want None · got 'on'"),
+            "a turn tier this stage cannot witness": (
+                tier_record(turn={"value": "on", "evidence": "witnessed"}),
+                "receipt.turn_service_tier: want None · got 'on'"),
+            "a turn tier without evidence": (
+                tier_record(turn={"value": "on", "evidence": "unknown"}),
+                "service_tier turn value and its evidence disagree"),
+            "evidence for an unknown tier": (
+                tier_record(effective={"value": None, "evidence": "witnessed"}),
+                "service_tier effective value and its evidence disagree"),
+            "a witness fact that is a bare value": (
+                tier_record(turn="on"), "service_tier.turn is not {value, evidence}"),
+            "the route's word recorded as the request": (
+                tier_record(word="on"), "requests 'on', not a word of the language"),
+            "a word outside the language": (
+                tier_record(word="priority"), "requests 'priority', not a word of the language"),
+            "the language word recorded as transmitted": (
+                tier_record(transmitted="fast"),
+                "receipt.transmitted_service_tier: want 'on' · got 'fast'"),
+            "the offer reordered": (
+                tier_record(offered=("on", "off")),
+                "receipt.offered_service_tier: want ['off', 'on'] · got ['on', 'off']"),
+            "an offer the session never listed": (
+                tier_record(offered=("off", "on", "priority")),
+                "receipt.offered_service_tier: want ['off', 'on'] · got ['off', 'on', 'priority']"),
+            "the offer flattened to one string": (
+                {**whole, "offered": "off,on"},
+                "service_tier.offered is neither a list of native values nor null"),
+            "an unknown tier key": ({**whole, "served": "on"}, "service_tier is not the eight facts"),
+            "a missing tier fact": ({key: value for key, value in whole.items() if key != "offered"},
+                                    "service_tier is not the eight facts"),
+            "a boolean tier fact": (tier_record(transmitted=True, configured=True),
+                                    "service_tier holds a non-string or empty fact"),
+            "a tier record that is a bare word": ("fast", "service_tier is not the eight facts"),
+        }
+        for label, (lie, witness) in lies.items():
+            with self.subTest(lie=label):
+                plan = self.conformant(tasks=success(receipt_fields(configured(tier=lie), req)))
+                self.assertVerdict("018", plan, "DIVERGE", witness)
+
+    def test_the_requirement_restates_the_declared_tier(self):
+        whole = configured(tier=tier_record())
+        for label, sel, req, witness in [
+            ("a dropped tier", whole, requirement(), "does not restate"),
+            ("another tier", whole, requirement(tier="standard"),
+             "the requirement and the selection request different service tiers"),
+            ("the route's word", whole, dict(requirement(), service_tier="on"),
+             "access_requirement names a protocol, fallback or service tier the language lacks"),
+            ("a selection that records no tier", configured(), requirement(tier="fast"),
+             "records no service tier for the one the file declares"),
+        ]:
+            with self.subTest(case=label):
+                plan = self.conformant(tasks=success(receipt_fields(sel, req)))
+                self.assertVerdict("018", plan, "DIVERGE", witness)
+
+    def test_the_last_tier_sent_is_the_transmitted_one_even_when_refused(self):
+        plan = self.conformant(steps=[session(*SELECT, FAST, ("fast-mode", "priority"), ("prompt",))])
+        self.assertVerdict("018", plan, "DIVERGE",
+                           "receipt.transmitted_service_tier · the ACP peer received 'priority'")
+
+
 class AdmissionLaws(ScriptedEngineCase):
-    """012 · 015–017: refused at admission with the exact code and witnesses, and
-    nothing sent anywhere."""
+    """012 · 015–017 · 027: refused at admission with the exact code and witnesses,
+    and nothing sent anywhere."""
 
     def refusal(self, code, message, steps=(SIGN_IN,), **plan):
         return dict({"steps": list(steps), "refuse": {"code": code, "message": message}}, **plan)
@@ -517,6 +766,35 @@ class AdmissionLaws(ScriptedEngineCase):
         served = {"steps": [SIGN_IN, session(("model", MODEL), ("reasoning_effort", "high"), ("prompt",))],
                   "tasks": success(receipt_fields(configured(), requirement(protocol="api")))}
         self.assertVerdict("017", served, "DIVERGE", "admission: execution events")
+
+    def test_a_tier_on_a_route_that_binds_none_is_refused_at_admission(self):
+        # 027: the API is configured and a codex session offers the tier for the
+        # same model. Neither is touched: the declared route binds no tier.
+        words = "run.access.service_tier: fast is not a tier the openai route can serve over api"
+        self.assertVerdict("027", self.refusal("NIKA-1800", words, steps=()), "AGREE")
+        self.assertVerdict("027", self.refusal("NIKA-1800", words, steps=(), settled=True), "AGREE")
+        self.assertVerdict("027", self.refusal("NIKA-1805", words, steps=()), "DIVERGE",
+                           "admission.error_code")
+        for message, missing in [("run.access.service_tier is not served by the openai route", "fast"),
+                                 ("fast is not served by the openai route", "run.access.service_tier")]:
+            with self.subTest(missing=missing):
+                self.assertVerdict("027", self.refusal("NIKA-1800", message, steps=()), "DIVERGE",
+                                   f"missing witness {missing!r}")
+        for label, step, witness in [
+            ("the configured API at its own default tier", {"do": "api"},
+             "observed.api_inference_requests: want 0 · got 1"),
+            ("the codex session that offers the tier", session(*SELECT, FAST, ("prompt",)),
+             "observed.acp_prompts: want 0 · got 1"),
+            ("the direct CLI", {"do": "cli", "argv": ["exec", "--json"]},
+             "observed.cli_invocations: want 0 · got 1"),
+        ]:
+            with self.subTest(substitute=label):
+                self.assertVerdict("027", self.refusal("NIKA-1800", words, [step]), "DIVERGE", witness)
+        served = {"steps": [{"do": "api"}], "tasks": success(receipt_fields(
+            selection(protocol="api", model={"requested": MODEL, "option": "model",
+                                             "transmitted": MODEL}),
+            requirement(via="openai", protocol="api", effort=None, tier="fast"), via="openai"))}
+        self.assertVerdict("027", served, "DIVERGE", "admission: execution events")
 
     def test_the_engine_sees_exactly_the_staged_environment(self):
         wanted = ["HOME", "NIKA_KEYCHAIN", "NIKA_OPENAI_BASE_URL", "OPENAI_API_KEY", "PATH", "TERM",
@@ -564,6 +842,29 @@ class ApiAndDeathLaws(ScriptedEngineCase):
         self.assertVerdict("007", plan, "DIVERGE",
                            "the openai endpoint received reasoning_effort 'high'")
         self.assertVerdict("007", self.api(), "AGREE")
+
+    def test_a_tier_the_file_never_asked_never_travels_over_an_api(self):
+        # 007 also asserting that no tier was requested. The openai route binds no
+        # tier, so a service_tier in its request body has no lawful origin.
+        fixture = self.variant("api-no-tier", "007", expected=lambda claim: claim["receipt"].update(
+            requested_service_tier=None))
+        self.assertVerdict(fixture, self.api(), "AGREE")
+        for sent in ("priority", "default"):
+            with self.subTest(sent=sent):
+                plan = self.api()
+                plan["steps"] = [{"do": "api", "body": {"model": "gpt-5.5", "messages": [],
+                                                        "stream": False, "service_tier": sent}}]
+                self.assertVerdict(fixture, plan, "DIVERGE",
+                                   f"the openai endpoint received service_tier {sent!r}")
+        # Asserting a transmitted tier there cannot agree either: the route has no wire form for one.
+        claimed = self.variant("api-claimed-tier", "007", expected=lambda claim: claim["receipt"].update(
+            transmitted_service_tier="priority", configured_service_tier="priority"))
+        plan = self.api()
+        plan["steps"] = [{"do": "api", "body": {"model": "gpt-5.5", "messages": [], "stream": False,
+                                                "service_tier": "priority"}}]
+        self.assertVerdict(claimed, plan, "DIVERGE",
+                           "receipt.configured_service_tier · an API route reads back no configuration",
+                           "sent on this route as None")
 
     def test_a_model_listing_is_discovery_not_inference(self):
         plan = self.api()
@@ -690,6 +991,17 @@ class ContractLaws(unittest.TestCase):
             "a repeated effort": self.acp(models={MODEL: {"effort": ["high", "high"]}}),
             "a padded effort": self.acp(models={MODEL: {"effort": [" high"]}}),
             "an unknown offer key": self.acp(models={MODEL: {"effort": [], "max": 1}}),
+            "a tier offer that is not an array": self.acp(models={MODEL: {"effort": [],
+                                                                         "service_tier": "fast"}}),
+            "a tier outside the language": self.acp(models={MODEL: {"effort": [],
+                                                                   "service_tier": ["priority"]}}),
+            "a route's own word as a tier": self.acp(models={MODEL: {"effort": [],
+                                                                    "service_tier": ["on", "off"]}}),
+            "a boolean tier": self.acp(models={MODEL: {"effort": [], "service_tier": [True]}}),
+            "a repeated tier": self.acp(models={MODEL: {"effort": [],
+                                                       "service_tier": ["fast", "fast"]}}),
+            "a tier on a legacy session": self.acp(config="legacy", models={MODEL: {
+                "effort": [], "service_tier": ["fast"]}}),
             "a session behind an unavailable adapter": {"access_routes": {"codex": {"acp": {
                 "available": False, "config": "options"}}}},
             "a string cli flag": dict(run, access_routes={"codex": {"cli": {"available": 1}}}),
@@ -720,12 +1032,38 @@ class ContractLaws(unittest.TestCase):
             "an empty receipt fact": dict(self.expected, receipt={"configured_model": ""}),
             "a receipt on a refused admission": {"admission": {"accepted": False, "error_code": "NIKA-1803"},
                                                  "observed": ZERO, "receipt": {"protocol": "acp"}},
+            "the route's word as the applied tier": dict(self.expected, observed=dict(
+                observed, acp_config_before_first_prompt={"model": MODEL, "service_tier": "on"})),
+            "a requested tier outside the language": dict(self.expected, receipt={
+                "requested_service_tier": "priority"}),
+            "the route's word as the requested tier": dict(self.expected, receipt={
+                "requested_service_tier": "on"}),
+            "an offered tier that is not an array": dict(self.expected, receipt={
+                "offered_service_tier": "on"}),
+            "an empty offered value": dict(self.expected, receipt={"offered_service_tier": ["on", ""]}),
+            "a boolean offered value": dict(self.expected, receipt={"offered_service_tier": [True]}),
+            "an empty tier fact": dict(self.expected, receipt={"configured_service_tier": ""}),
+            "a boolean tier fact": dict(self.expected, receipt={"turn_service_tier": False}),
         }
         for label, invalid in cases.items():
             with self.subTest(case=label):
                 self.assertEqual(self.classify(expected=invalid)[0], "FIXTURE-ERROR")
         self.assertEqual(self.classify(workflow=b"nika: x\nnika: y\n")[0], "FIXTURE-ERROR")
         self.assertEqual(self.classify(workflow=b"\xff")[0], "FIXTURE-ERROR")
+
+    def test_the_tier_vocabulary_is_admitted_whole(self):
+        run = self.acp(models={MODEL: {"effort": ["high"], "service_tier": ["fast", "standard"]},
+                               OLD: {"effort": ["high"], "service_tier": []}})
+        expected = json.loads(json.dumps(self.expected))
+        expected["observed"]["acp_config_before_first_prompt"]["service_tier"] = "standard"
+        expected["receipt"].update(
+            requested_service_tier="standard", offered_service_tier=["on", "off"],
+            transmitted_service_tier="off", configured_service_tier="off",
+            turn_service_tier=None, effective_service_tier=None)
+        self.assertEqual(self.classify(run=run, expected=expected), ("CONTRACT", ""))
+        unknown = dict(expected, receipt=dict.fromkeys(
+            (key for key in expected["receipt"] if key.endswith("service_tier"))))
+        self.assertEqual(self.classify(run=run, expected=unknown), ("CONTRACT", ""))
 
     def test_the_declaration_is_read_as_the_literal_words_of_the_file(self):
         directory = pathlib.Path(self.tmp.name) / "literal"
@@ -734,6 +1072,12 @@ class ContractLaws(unittest.TestCase):
         access = adapter.contract(directory, self.expected, self.base)
         self.assertEqual(access.declared, {"via": "codex", "protocol": "acp", "fallback": "none",
                                            "effort": "on"})
+        # A tier is one more literal word of run.access, and absent unless written.
+        (directory / "input.nika").write_bytes(self.workflow.replace(
+            b"    fallback: none\n", b"    fallback: none\n    service_tier: fast\n"))
+        access = adapter.contract(directory, self.expected, self.base)
+        self.assertEqual(access.declared, {"via": "codex", "protocol": "acp", "fallback": "none",
+                                           "service_tier": "fast", "effort": "high"})
 
     def test_unstageable_premises_are_unsupported(self):
         infer = self.workflow.replace(b"    agent:", b"    infer:")
@@ -791,6 +1135,19 @@ class StageLaws(StageCase):
         self.assertIn("NIKA_OPENAI_BASE_URL", stage.env)
         empty = self.stage({"codex": {}})
         self.assertEqual(os.listdir(empty.dirs["bin"]), [])
+
+    def test_the_agent_peer_is_staged_with_its_route_binding(self):
+        # The binding table's own facts reach the peer; a fixture never names them.
+        stage = self.stage(self.acp_world())
+        config = json.loads((stage.dirs["config"] / "acp-codex-acp.json").read_text())
+        self.assertEqual(config["effort_option"], "reasoning_effort")
+        self.assertEqual(config["tier_option"], {"id": "fast-mode", "category": "model_config",
+                                                  "values": {"standard": "off", "fast": "on"}})
+        tier = adapter.AGENT_ROUTES["codex"].tier_option
+        self.assertEqual([tier.word(native) for native in ("on", "off", "priority", "fast")],
+                         ["fast", "standard", None, None])
+        for route in adapter.API_ROUTES.values():
+            self.assertEqual([route.wire_tier(word) for word in adapter.TIER_WORDS], [None, None])
 
     def test_a_host_registry_binary_on_the_system_path_refuses_the_stage(self):
         with tempfile.TemporaryDirectory() as system:
@@ -926,6 +1283,122 @@ class PeerLaws(StageCase):
         proc.wait(timeout=10)
         self.assertEqual(stage.observe().counts()["acp_prompts"], 1)
 
+    def answer(self, proc, method, params):
+        """One request and ITS answer: a prompt's update notification is read past."""
+        self.requests = getattr(self, "requests", 100) + 1
+        line = {"jsonrpc": "2.0", "id": self.requests, "method": method, "params": params}
+        proc.stdin.write((json.dumps(line) + "\n").encode())
+        proc.stdin.flush()
+        while True:
+            message = json.loads(proc.stdout.readline())
+            if message.get("id") == self.requests:
+                return message
+
+    def choose(self, proc, sid, option, value):
+        return self.answer(proc, "session/set_config_option",
+                           {"sessionId": sid, "configId": option, "value": value})
+
+    def held(self, stage, proc):
+        """What each prompt record says a client selection had applied, in order."""
+        proc.stdin.close()
+        proc.wait(timeout=10)
+        return [prompt["applied"] for prompt in stage.observe().prompts]
+
+    def test_the_tier_option_exists_only_for_a_model_that_offers_one(self):
+        stage = self.stage(self.acp_world(default_model=OLD, models={
+            OLD: {"effort": ["low", "high"]},
+            MODEL: {"effort": ["low", "high"], "service_tier": ["standard", "fast"]}}))
+        proc = self.start(stage)
+        answer = self.open_session(proc)[1]
+        sid = answer["sessionId"]
+        self.assertEqual(self.current(answer["configOptions"]), {"model": OLD, "thought_level": "low"})
+        self.assertEqual(self.choose(proc, sid, "fast-mode", "on")["error"]["code"], -32602)
+        options = self.choose(proc, sid, "model", MODEL)["result"]["configOptions"]
+        self.assertEqual(options[-1], {
+            "id": "fast-mode", "name": "fast-mode", "category": "model_config", "type": "select",
+            "currentValue": "off",
+            "options": [{"value": "off", "name": "off"}, {"value": "on", "name": "on"}]})
+        # The option is a select over the route's own two values: a language word,
+        # another route's word and a native boolean are all refused, and change nothing.
+        for value in ("fast", "priority", True):
+            self.assertEqual(self.choose(proc, sid, "fast-mode", value)["error"]["code"], -32602)
+        self.answer(proc, "session/prompt", {"sessionId": sid, "prompt": []})
+        options = self.choose(proc, sid, "fast-mode", "on")["result"]["configOptions"]
+        self.assertEqual(self.current(options),
+                         {"model": MODEL, "thought_level": "low", "model_config": "on"})
+        self.answer(proc, "session/prompt", {"sessionId": sid, "prompt": []})
+        self.assertEqual(self.held(stage, proc), [{"model": MODEL},
+                                                  {"model": MODEL, "service_tier": "on"}])
+        outcomes = [(s["config_id"], s["value"], s["outcome"])
+                    for s in stage.observe().acp[0]["selections"]]
+        self.assertEqual(outcomes, [
+            ("fast-mode", "on", "rejected"), ("model", MODEL, "applied"),
+            ("fast-mode", "fast", "rejected"), ("fast-mode", "priority", "rejected"),
+            ("fast-mode", True, "rejected"), ("fast-mode", "on", "applied")])
+
+    def test_the_tier_starts_at_the_first_listed_word(self):
+        stage = self.stage(self.acp_world(models={MODEL: {"effort": [],
+                                                          "service_tier": ["fast", "standard"]}}))
+        proc = self.start(stage)
+        [model, tier] = self.open_session(proc)[1]["configOptions"]
+        self.assertEqual((tier["currentValue"], [value["value"] for value in tier["options"]]),
+                         ("on", ["on", "off"]))
+        only = self.stage(self.acp_world(models={MODEL: {"effort": [], "service_tier": ["fast"]}}))
+        [model, tier] = self.open_session(self.start(only))[1]["configOptions"]
+        self.assertEqual((tier["currentValue"], [value["value"] for value in tier["options"]]),
+                         ("on", ["on"]))
+
+    def test_a_model_change_keeps_a_tier_only_where_it_is_offered(self):
+        only_fast = "openai/gpt-5.5-mini"
+        stage = self.stage(self.acp_world(default_model=MODEL, models={
+            MODEL: {"effort": [], "service_tier": ["standard", "fast"]},
+            only_fast: {"effort": [], "service_tier": ["fast"]},
+            OLD: {"effort": []}}))
+        proc = self.start(stage)
+        sid = self.open_session(proc)[1]["sessionId"]
+        prompt = lambda: self.answer(proc, "session/prompt", {"sessionId": sid, "prompt": []})
+        current = lambda option, value: self.current(
+            self.choose(proc, sid, option, value)["result"]["configOptions"])
+        self.assertEqual(current("fast-mode", "on"), {"model": MODEL, "model_config": "on"})
+        # The next model offers `on`: the tier is kept, and a selection still holds it.
+        self.assertEqual(current("model", only_fast), {"model": only_fast, "model_config": "on"})
+        prompt()
+        # This one offers no speed control: the option is gone and nothing holds a tier.
+        self.assertEqual(current("model", OLD), {"model": OLD})
+        prompt()
+        # Back on a model that offers it, the option reads its first value, unapplied.
+        self.assertEqual(current("model", MODEL), {"model": MODEL, "model_config": "off"})
+        prompt()
+        # An applied `off` is not offered by the next model: reset to its `on`, unapplied.
+        self.assertEqual(current("fast-mode", "off"), {"model": MODEL, "model_config": "off"})
+        self.assertEqual(current("model", only_fast), {"model": only_fast, "model_config": "on"})
+        prompt()
+        self.assertEqual(self.held(stage, proc), [
+            {"model": only_fast, "service_tier": "on"}, {"model": OLD}, {"model": MODEL},
+            {"model": only_fast}])
+
+    def test_an_unconfirmed_read_back_leaves_the_tier_as_it_was(self):
+        stage = self.stage(self.acp_world(readback="unconfirmed", models={
+            MODEL: {"effort": ["high"], "service_tier": ["standard", "fast"]}}))
+        proc = self.start(stage)
+        before = self.open_session(proc)[1]
+        sid = before["sessionId"]
+        answer = self.choose(proc, sid, "fast-mode", "on")["result"]
+        self.assertEqual(answer["configOptions"], before["configOptions"])
+        self.assertEqual(self.current(answer["configOptions"]),
+                         {"model": MODEL, "thought_level": "high", "model_config": "off"})
+        self.answer(proc, "session/prompt", {"sessionId": sid, "prompt": []})
+        self.assertEqual(self.held(stage, proc), [{}])
+        self.assertEqual(stage.observe().acp[0]["selections"][0]["outcome"], "ignored")
+
+    def test_a_legacy_session_exposes_no_tier_option(self):
+        stage = self.stage(self.acp_world(config="legacy", models={MODEL: {"effort": []}}))
+        proc = self.start(stage)
+        answer = self.open_session(proc)[1]
+        self.assertNotIn("configOptions", answer)
+        refused = self.choose(proc, answer["sessionId"], "fast-mode", "on")
+        self.assertEqual(refused["error"]["code"], -32601)
+
 
 class CliLaws(StageCase):
     def test_discovery_is_an_exact_argv(self):
@@ -1008,7 +1481,11 @@ class ReceiptDecoderLaws(unittest.TestCase):
                                "requested_effort": "high", "transmitted_model": MODEL,
                                "transmitted_effort": "high", "configured_model": MODEL,
                                "configured_effort": "high", "model_evidence": "configured",
-                               "responding_model": None})
+                               "responding_model": None,
+                               # A selection that declares no tier records none: all unknown.
+                               "requested_service_tier": None, "offered_service_tier": None,
+                               "transmitted_service_tier": None, "configured_service_tier": None,
+                               "turn_service_tier": None, "effective_service_tier": None})
         session_config = selection(model={"requested": None, "configured": "m",
                                           "configured_source": "session_config"})
         projected = adapter.project_receipt("codex", adapter.decode_selection(
@@ -1016,6 +1493,84 @@ class ReceiptDecoderLaws(unittest.TestCase):
         self.assertEqual(projected["model_evidence"], "session_config")
         moved = dict(acp, changed_mid_turn=["model=other"])
         adapter.decode_selection(json.dumps(moved), runner.strict_json)
+
+    def tier_facts(self, record) -> dict:
+        got = adapter.project_receipt("codex", adapter.decode_selection(
+            json.dumps(configured(tier=record)), runner.strict_json))
+        return {key[:-len("_service_tier")]: value for key, value in got.items()
+                if key.endswith("_service_tier")}
+
+    def test_a_declared_tier_decodes_and_projects_its_six_facts(self):
+        self.assertEqual(self.tier_facts(tier_record()), {
+            "requested": "fast", "offered": ["off", "on"], "transmitted": "on", "configured": "on",
+            "turn": None, "effective": None})
+        # A witness may attest the turn and the provider; the reading keeps them apart.
+        attested = tier_record(turn={"value": "on", "evidence": "witnessed"},
+                               effective={"value": "priority", "evidence": "witnessed"})
+        self.assertEqual(self.tier_facts(attested), {
+            "requested": "fast", "offered": ["off", "on"], "transmitted": "on", "configured": "on",
+            "turn": "on", "effective": "priority"})
+        # A tier that was requested and never reached a session records only the request.
+        unreached = tier_record(option=None, offered=None, transmitted=None, configured=None,
+                                configured_source=None)
+        self.assertEqual(self.tier_facts(unreached), {
+            "requested": "fast", "offered": None, "transmitted": None, "configured": None,
+            "turn": None, "effective": None})
+        # A session default read without a selection, and one that listed an option with no value.
+        self.tier_facts(tier_record(transmitted=None, configured_source="session_config"))
+        self.assertEqual(self.tier_facts(tier_record(offered=()))["offered"], [])
+        moved = dict(configured(tier=tier_record()), changed_mid_turn=["service_tier=off"])
+        adapter.decode_selection(json.dumps(moved), runner.strict_json)
+
+    def test_a_malformed_tier_record_never_reads(self):
+        whole = tier_record()
+        lies = {
+            "a bare word": "fast",
+            "a list": ["fast"],
+            "no record at all": None,
+            "a missing fact": {key: value for key, value in whole.items() if key != "turn"},
+            "an unknown fact": {**whole, "priority": True},
+            "no requested word": tier_record(word=None),
+            "the route's word as the request": tier_record(word="off"),
+            "an offer that is one string": {**whole, "offered": "on"},
+            "an offer holding an empty value": {**whole, "offered": ["on", ""]},
+            "an offer holding a boolean": {**whole, "offered": [True, False]},
+            "an empty option id": tier_record(option=""),
+            "a numeric transmitted value": tier_record(transmitted=1),
+            "a boolean configured value": tier_record(configured=True),
+            "an acknowledgement recorded as configured": tier_record(configured_source="accepted_request"),
+            "a configured value without its source": tier_record(configured_source=None),
+            "a source without a configured value": tier_record(configured=None),
+            "a source outside the schema": tier_record(configured_source="served"),
+            "a turn that is a bare value": tier_record(turn="on"),
+            "a turn with an unknown key": tier_record(turn={"value": None, "evidence": "unknown",
+                                                           "model": "x"}),
+            "a turn value with unknown evidence": tier_record(turn={"value": "on",
+                                                                   "evidence": "unknown"}),
+            "evidence for an unknown provider tier": tier_record(effective={"value": None,
+                                                                           "evidence": "witnessed"}),
+            "an empty provider tier": tier_record(effective={"value": "", "evidence": "witnessed"}),
+            "a provider tier with no evidence word": tier_record(effective={"value": "on",
+                                                                           "evidence": None}),
+        }
+        for label, lie in lies.items():
+            with self.subTest(lie=label):
+                raw = dict(configured(), service_tier=lie)
+                with self.assertRaises(adapter.InvalidEvidence):
+                    adapter.decode_selection(json.dumps(raw), runner.strict_json)
+
+    def test_the_requirement_admits_the_two_tier_words_only(self):
+        self.assertEqual(adapter.decode_requirement('{"service_tier":"fast"}', runner.strict_json),
+                         {"service_tier": "fast"})
+        self.assertEqual(adapter.decode_requirement(
+            '{"via":"codex","service_tier":"standard"}', runner.strict_json),
+            {"via": "codex", "service_tier": "standard"})
+        for raw in ['{"service_tier":"on"}', '{"service_tier":"priority"}', '{"service_tier":""}',
+                    '{"service_tier":true}', '{"service_tier":null}', '{"service_tier":["fast"]}',
+                    '{"service_tier":"fast","service_tier":"standard"}']:
+            with self.subTest(requirement=raw):
+                with self.assertRaises(adapter.InvalidEvidence):
+                    adapter.decode_requirement(raw, runner.strict_json)
 
     def test_ambiguous_or_foreign_receipts_never_read(self):
         text = json.dumps(configured())

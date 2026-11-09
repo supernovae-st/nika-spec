@@ -610,6 +610,10 @@ laws:
       - conformance/tests/runtime/access-harness/005-file-api-attested-responder-recorded
       - conformance/tests/runtime/access-harness/006-file-acp-effort-judged-after-model-selection
       - conformance/tests/runtime/access-harness/007-file-api-selection-honored
+      - conformance/tests/runtime/access-harness/018-file-acp-service-tier-fast-configured-before-prompt
+      - conformance/tests/runtime/access-harness/019-file-acp-service-tier-standard-configured-before-prompt
+      - conformance/tests/runtime/access-harness/020-file-acp-service-tier-omitted-sends-none
+      - conformance/tests/runtime/access-harness/022-file-acp-service-tier-judged-after-model-selection
     negative_fixtures:
       - conformance/tests/runtime/access-harness/008-file-acp-unsupported-effort-refused-before-prompt
       - conformance/tests/runtime/access-harness/009-file-acp-effort-refused-after-model-selection
@@ -621,6 +625,12 @@ laws:
       - conformance/tests/runtime/access-harness/015-launch-access-contradicting-file-refused
       - conformance/tests/runtime/access-harness/016-file-unknown-route-refused
       - conformance/tests/runtime/access-harness/017-file-route-protocol-not-spoken-refused
+      - conformance/tests/runtime/access-harness/021-file-acp-service-tier-unoffered-refused-before-prompt
+      - conformance/tests/runtime/access-harness/023-file-acp-service-tier-refused-after-model-selection
+      - conformance/tests/runtime/access-harness/024-file-acp-service-tier-unconfirmed-readback-refused
+      - conformance/tests/runtime/access-harness/025-file-acp-service-tier-legacy-session-refused
+      - conformance/tests/runtime/access-harness/026-file-acp-standard-not-assumed-when-only-fast-is-offered
+      - conformance/tests/runtime/access-harness/027-file-api-service-tier-refused-before-inference
     projections: ["prose:01-envelope", "cli:run", "sdk", "docs"]
     implementation_surfaces:
       - engine:nika-providers
@@ -630,8 +640,10 @@ laws:
     introduced_in: C2
     proof_obligations:
       - "Chaque fixture runtime déclare son monde de routes (access_routes : pair ACP scripté, CLI directe, clé d'API — jamais une découverte de l'hôte) et sépare le reçu du run (receipt) de l'observation indépendante de l'adaptateur (observed : prompts ACP, requêtes d'inférence API, invocations CLI). conformance/tests/test_access_contract.py dérive le verdict de chaque fixture de ses propres prémisses et prouve par mutation qu'un mensonge plausible (effort traduit, API substituée, accusé de réception promu en configuration) est attrapé."
+      - "Palier de service (018 à 027) : chaque fixture déclare l'offre de ses modèles dans les mots du langage (acp.models.<modèle>.service_tier) et le pair scripté la rend dans l'option native de la route, par la table de liaison de l'adaptateur (codex : option fast-mode, on pour fast, off pour standard). Elles couvrent chaque mot appliqué après le modèle et l'effort puis relu avant le premier prompt (018 · 019), l'omission qui n'envoie aucune sélection et n'enregistre aucun fait (020), l'offre jugée après la sélection du modèle dans les deux sens (022 · 023), un modèle sans contrôle de vitesse (021), une relecture qui tient le modèle et l'effort mais pas le palier (024), une session qui ne fait qu'accuser réception (025), standard jamais supposé quand seul fast est offert (026) et une route sans liaison refusée à l'admission avant toute requête (027). Le reçu garde à part le mot demandé, les valeurs natives offertes, la valeur transmise et la valeur relue ; le palier porté par le tour et celui que rapporte le fournisseur y restent inconnus, un pair scripté n'en étant pas témoin. conformance/tests/test_access_contract.py dérive chaque verdict des prémisses et prouve par mutation que sont attrapés : fast servi comme standard, un palier admis sur un modèle qui ne l'offre pas, jugé sur le modèle par défaut, appliqué après le prompt, enregistré pour un fichier qui n'en déclare aucun, ou accusé de réception promu en configuration."
       - "Aucun adaptateur de commande qualifié n'exécute encore cette extension : chaque fixture est UNSUPPORTED, jamais un accord. Les refus enregistrent le code que le moteur de référence émet dans sa famille d'accès NIKA-18xx (codes numériques nus hors du motif diagCode du registre, d'où diagnostics: [] ici) ; aucun code n'est inventé par la spec."
       - "DETTE déclarée (jamais fermée en silence) : la phrase « une reprise ne réutilise jamais un résultat obtenu sous une autre sélection » n'a pas encore de fixture exécutable — une fixture de la porte resume exige un journal qui enregistre la sélection, dont le format appartient au moteur. Elle est due avec ce format."
+      - "DETTE déclarée (jamais fermée en silence) pour le palier de service : (1) « une sélection ultérieure qui défait une valeur déjà appliquée refuse de même » n'a pas de fixture pour le palier — il est la dernière sélection que ce pair reçoit, aucune ne le suit qui puisse le défaire ; (2) une option booléenne négociée par une capacité du client n'a pas de fixture — le pair n'expose qu'une option select et ne lit aucune capacité à l'initialisation, si bien que « offert sous un autre type natif » n'est pas exécuté ; (3) la reprise sous un palier changé rejoint la dette de reprise ci-dessus et est due avec le même format de journal."
     closure_gates:
       - fixture-parity
       - access-harness-adapter-qualified

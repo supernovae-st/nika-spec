@@ -35,6 +35,23 @@ engine at its next `SPEC_PIN` bump.
   in both parse modes. It never ignores it.
 - Fixtures: `core/envelope/056` to `065`. `039`'s note names the widened key
   set.
+- Runtime fixtures: `runtime/access-harness/018` to `027`. Over ACP each
+  word is applied after the model and the effort and read back before the
+  first prompt, and an omitted tier sends no selection and records no fact.
+  A tier is refused with zero prompts when the selected model does not offer
+  it, when the read-back does not hold it, or when the session can only
+  acknowledge a model request. `standard` is never assumed where only `fast`
+  is offered. A route that binds no tier refuses it at admission, before any
+  inference request.
+- The access adapter and its scripted ACP peer execute those fixtures for
+  the reference engine's `codex` route, whose own option is `fast-mode`
+  (`on` for `fast`, `off` for `standard`). A route world lists a model's
+  tier offer in the language's words, `observed` reports the word the peer
+  held before its first prompt, and the receipt keeps six tier facts apart
+  ([access-harness contract](./conformance/tests/runtime/access-harness/README.md)).
+  A selection that resets a tier applied before it, a boolean tier option
+  and resume under a changed tier have no fixture yet. LAW-CONF-0501
+  declares them as debt.
 
 ### Changed · engine 0.124.1 is the current release (2026-10-28)
 

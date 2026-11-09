@@ -18,11 +18,11 @@ classes:
   testimonial: "captured evidence — fixtures, corpora, traces, receipts: proves behavior; neither shipped source nor regenerable output"
   foreign: "pointer to a third-party sovereign source"
 summary:
-  classified_files: 2379
+  classified_files: 2409
   file_rows: 22
   pattern_rows: 29
   by_class:
-    authored: 2044
+    authored: 2074
     authored-pin: 1
     generated: 137
     pinned-copy: 4
@@ -54,7 +54,7 @@ files:
   evidence: "its own header: 'Bump deliberately: edit this' · the already-published nika-spec rev the shared estate tool is mirrored from (path tools/estate/scripts/estate.py), and the INPUT the mirror gate compares against; names f14f6872 (PR #315) and records historical nika-estate 247deb86 as the upgrade from 74287c75"
 - path: "SSOT.md"
   class: authored
-  sha256: 950e4d302df4380138dcaa3c6dda47307c1bc6c2a293a9c224db4a9a009f9ccc
+  sha256: b07a0bc35a42eee1f7ef9d983bb1297c4f973b08a1751875cc19b9caa1e13c6b
   evidence: "the map of where every fact lives — prose and judgments are authored, but it carries ONE generated island (the estate:map markers · §9): scripts/ssot-map-projector.py --write derives the gated-surfaces table from THIS manifest, and --check (exit 5 · conformance.yml 'Projection gates') refuses a hand edit inside the markers — the canon.yaml hybrid, inverted"
 - path: "VERSION"
   class: authored
@@ -78,7 +78,7 @@ files:
   note: "hybrid by design: the 15 ledger sections (canon/EXCEPTIONS.md · SSOT-1 §18) stay AUTHORED and are carried verbatim through the regeneration — editing those sections is legal, editing an imported section is rc=5"
 - path: "canon/laws-index.json"
   class: generated
-  sha256: b7f8e35317caa2d96ae3a02e6b8836950375a4d95431f7abc17e55b7b6c6bac1
+  sha256: 79a7eb256294359430987049c808cbfe2fde40db92a435ccd308923ca92a1e40
   evidence: "carries the generator identity block ('ssot-compiler' + source_sha256) · scripts/ssot-compiler.py header: 'emits ONE deterministic projection (canon/laws-index.json, stable sort by law id, canonical JSON, NFC, LF)'"
   derivation:
     tool: "python3 scripts/ssot-compiler.py (write mode)"
@@ -89,7 +89,7 @@ files:
     - "schemas/registries.schema.json"
 - path: "canon/ssot.lock"
   class: generated
-  sha256: 3105dbddff805ce92203ebf70f8ad28a218b208f1bdf8ab8ac7f685932be8aab
+  sha256: c02eb23fe5238ce2efd0a977171c9a2f12ac5a55247dce4ff017c7e076a5014a
   evidence: "single-line canonical JSON carrying generator identity ('ssot-compiler' 0.2.0-sandbox + its own source_sha256), the 27 leaf digests and law_count — no human writes a lock"
   derivation:
     tool: "python3 scripts/ssot-compiler.py (write mode · leaf digests only, digest-dag layer 1, own digest DETACHED per PAA-006)"
@@ -100,7 +100,7 @@ files:
     - "canon/laws-index.json (leaf-hashed)"
 - path: "canon/ssot.lock.sha256"
   class: generated
-  sha256: d87da4353b1f603e0e2ed7cb99aed6345c5e05edd3c85f218bb29fa52972517f
+  sha256: 9ca82cb4ea6734fd929231f3e5de9e6961bc980b76286e40f75609889c0f7ce3
   evidence: "the lock's own digest, DETACHED into a sidecar per PAA-006 (a file cannot contain its own hash) — written by the compiler alongside the lock"
   derivation:
     tool: "python3 scripts/ssot-compiler.py (write mode · the detached-sidecar emission)"
@@ -109,7 +109,7 @@ files:
     - "canon/ssot.lock"
 - path: "conformance/coverage-matrix.tsv"
   class: authored
-  sha256: 19b76ba93d63935618b9688e55a8fb6fde39a5a111f1cb210c37c956af4d2027
+  sha256: 65c4b35e1d463692bffd43fdc0cfee25407000e8f8c133f9296dcb09d3c334a9
   evidence: "conformance/README.md §Scope + coverage: 'Curated 2026-07-08 from the reference engine's private e2e lab (475 workflows → 95 by per-cell best-file selection)' — hand-curated, no script in the tree writes it; empty cells are the declared v0.2 backlog"
 - path: "conformance/type-corpus/corpus.jsonl"
   class: generated
@@ -230,7 +230,7 @@ patterns:
 - glob: "canon/laws/**"
   class: authored
   match_count: 13
-  aggregate_sha256: d41e714bb3cd2421becc676bc7b55f716ac8b4313a075930d2117c8d50c920ce
+  aggregate_sha256: 50fa4071ff9df2e36be8ccfbf437f12e4bc6eafccedff890ac0007bbb7766469
   evidence: "the law registries humans edit — every entry schema-validated against schemas/law.schema.json, leaf-hashed into canon/ssot.lock by the ssot-compiler (law_count lives in the lock, never typed here); the compiler CONSUMES these, nothing writes them"
 - glob: "canon/**"
   class: authored
@@ -271,8 +271,8 @@ patterns:
     - "the VOCAB_FIXTURE constant in scripts/gen-gate-matrix.py"
 - glob: "conformance/tests/**"
   class: authored
-  match_count: 1388
-  aggregate_sha256: 75c572bd09d30b8d95f479c24548fa12653e8c1850159b90b029ef88cf88a49f
+  match_count: 1418
+  aggregate_sha256: 8cf2c8de2a512382c919155cfc2521840f66dddd55ad2e9bc350b72a8382b0cb
   evidence: "the executable law — the 5-tier fixture corpus (core · deep 001-022 · lints · runtime · stdlib): input + expected pairs written at spec-authoring time, consumed by conformance/runner.py; no generation markers"
 - glob: "conformance/.nika/**"
   class: testimonial
@@ -359,7 +359,7 @@ patterns:
 - glob: "scripts/**"
   class: authored
   match_count: 43
-  aggregate_sha256: c21b976adc8f4e6584ff807f3fb8e13ca82d6db7040f53425220e6c8e4eadd7d
+  aggregate_sha256: 2287db294a7257d94caa59389ee6b019d4c96dbd23b46e01e2cae1868784d04c
   evidence: "the compiler + projectors humans wrote (ssot-compiler · canon/showcase/llms/starters/authoring/design projectors · gen-gate-matrix · gen-type-corpus · check-md-refs) — the tools that WRITE the generated surfaces; estate.py excepted in files: (the self row)"
 - glob: "timeline/**"
   class: authored
@@ -389,7 +389,7 @@ patterns:
 - glob: "*"
   class: authored
   match_count: 17
-  aggregate_sha256: 57139be402f4feb0483485d09971a338ac1ff7345694ed6e774d74738840447e
+  aggregate_sha256: 7e15b74ad9759d09bfe86c2f8dc47abeba2309693e92ee6fb19643702667fdcb
   evidence: "root prose + config (README · QUICKSTART · GLOSSARY · CONTRIBUTING · CHANGELOG hand-kept per Keep a Changelog · SECURITY · CITATION.cff · CONFORMANT_IMPLEMENTATIONS · PROOFS.md the receipts ledger · LICENSE · REUSE.toml · ruff.toml · .gitignore · .pre-commit-hooks.yaml · .bestpractices.json) — no generation markers; VERSION · llms*.txt · canon.yaml · CODE_OF_CONDUCT.md excepted in files:"
   note: "README · QUICKSTART · GLOSSARY · CONTRIBUTING · CHANGELOG carry the canon-projected count markers — tool-maintained blocks inside authored prose"
 - glob: "**"

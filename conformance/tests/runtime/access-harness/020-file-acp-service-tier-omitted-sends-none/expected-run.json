@@ -1,0 +1,39 @@
+{
+  "admission": {
+    "accepted": true
+  },
+  "workflow_state": "success",
+  "tasks": {
+    "summarize": {
+      "status": "success"
+    }
+  },
+  "receipt": {
+    "access_via": "codex",
+    "protocol": "acp",
+    "requested_model": "openai/gpt-5.5",
+    "requested_effort": "high",
+    "transmitted_model": "openai/gpt-5.5",
+    "transmitted_effort": "high",
+    "configured_model": "openai/gpt-5.5",
+    "configured_effort": "high",
+    "model_evidence": "configured",
+    "responding_model": null,
+    "requested_service_tier": null,
+    "offered_service_tier": null,
+    "transmitted_service_tier": null,
+    "configured_service_tier": null,
+    "turn_service_tier": null,
+    "effective_service_tier": null
+  },
+  "observed": {
+    "acp_config_before_first_prompt": {
+      "model": "openai/gpt-5.5",
+      "effort": "high"
+    },
+    "acp_prompts": 1,
+    "api_inference_requests": 0,
+    "cli_invocations": 0
+  },
+  "note": "01 §run two words for the tier · omission is not standard. The selected model offers a tier and the session's own default is its faster one, yet the file declares none: no tier selection travels, the session keeps its default and the run records no tier fact, so every tier field of the receipt is null. The model and the effort are applied and read back as in 003."
+}

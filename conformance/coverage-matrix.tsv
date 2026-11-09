@@ -199,6 +199,16 @@ envelope	NIKA-1800	admission-refuse	conformance/tests/runtime/access-harness/014
 envelope	NIKA-1801	admission-refuse	conformance/tests/runtime/access-harness/015-launch-access-contradicting-file-refused
 envelope	NIKA-1802	admission-refuse	conformance/tests/runtime/access-harness/016-file-unknown-route-refused
 envelope	NIKA-1800	admission-refuse	conformance/tests/runtime/access-harness/017-file-route-protocol-not-spoken-refused
+envelope	(positive)	positive-run	conformance/tests/runtime/access-harness/018-file-acp-service-tier-fast-configured-before-prompt
+envelope	(positive)	positive-run	conformance/tests/runtime/access-harness/019-file-acp-service-tier-standard-configured-before-prompt
+envelope	(positive)	positive-run	conformance/tests/runtime/access-harness/020-file-acp-service-tier-omitted-sends-none
+envelope	NIKA-1805	run-fail	conformance/tests/runtime/access-harness/021-file-acp-service-tier-unoffered-refused-before-prompt
+envelope	(positive)	positive-run	conformance/tests/runtime/access-harness/022-file-acp-service-tier-judged-after-model-selection
+envelope	NIKA-1805	run-fail	conformance/tests/runtime/access-harness/023-file-acp-service-tier-refused-after-model-selection
+envelope	NIKA-1805	run-fail	conformance/tests/runtime/access-harness/024-file-acp-service-tier-unconfirmed-readback-refused
+envelope	NIKA-1805	run-fail	conformance/tests/runtime/access-harness/025-file-acp-service-tier-legacy-session-refused
+envelope	NIKA-1805	run-fail	conformance/tests/runtime/access-harness/026-file-acp-standard-not-assumed-when-only-fast-is-offered
+envelope	NIKA-1800	admission-refuse	conformance/tests/runtime/access-harness/027-file-api-service-tier-refused-before-inference
 verbs	NIKA-BUILTIN	check-reject	conformance/tests/stdlib/hash/009-content-null-refused
 verbs	(positive)	positive-check	conformance/tests/stdlib/hash/010-empty-content-valid
 verbs	NIKA-BUILTIN	check-reject	conformance/tests/stdlib/hash/011-content-missing-refused
