@@ -16,6 +16,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Changes merged after the spec commit engine 0.123.0 embeds. They reach the
 engine at its next `SPEC_PIN` bump.
 
+### Added · a Claude Code entry that loads `AGENTS.md` (2026-11-10)
+
+- `CLAUDE.md` is a thin entry that makes Claude Code load `AGENTS.md`, which
+  stays the vendor-neutral agent entry. It carries no guidance of its own.
+
 ### Added · a service tier for the access route (2026-11-10)
 
 - `run.access` gains `service_tier` ([01 §run](./spec/01-envelope.md#runaccess--runreasoning--the-route-and-the-native-effort-normative)):
