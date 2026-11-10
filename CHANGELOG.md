@@ -16,6 +16,31 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Changes merged after the spec commit engine 0.123.0 embeds. They reach the
 engine at its next `SPEC_PIN` bump.
 
+### Changed · engine 0.124.2 is the current release (2026-11-10)
+
+- The README, CONTRIBUTING, SECURITY, the QUICKSTART status line and 00
+  §Pre-1.0 stability contract name engine 0.124.2, which embeds this spec at
+  `b4c692f`, the commit that adds `run.access.service_tier`. Engines 0.124.0
+  and 0.124.1 embed `5cd95cd`. 00's 2026-10-27 amendment keeps its wording
+  and adds 0.124.2.
+- The README's pin example reads engine v0.124.2, and its three commands
+  print `b4c692f`. 07 §Editor tooling and `llms.txt` give the `b4c692f`
+  schema address for engine 0.124.2: the released 0.124.2 binary's
+  `nika spec --schema` prints the same bytes.
+- `CONFORMANT_IMPLEMENTATIONS.md` lists engine 0.124.2 at `b4c692f`,
+  measured with the released binary. The static sweep gains the ten
+  `core/envelope/056` to `065` fixtures and passes them. Of the ten new
+  behavioral fixtures, `runtime/access-harness/018` to `027`, five agree,
+  each a refusal before the first prompt, and five diverge, each for a
+  reason the row names. Nine behavioral fixtures diverge in all, the four
+  of the 0.124.1 row among them, and on the fixtures both trees share
+  every verdict is the one 0.124.1 gives. No level is claimed at that
+  commit, and the 0.124.1 row stays as history. The pre-commit usage
+  comment pins the engine's `nika-check` hook at `v0.124.2`; the engine's
+  hook file is unchanged since `v0.123.0`.
+- `timeline/timeline.yaml` gains the dated entry `release-0-124-2`. The
+  release line is unchanged, so no milestone is added and no gate changes.
+
 ### Added · a Claude Code entry that loads `AGENTS.md` (2026-11-10)
 
 - `CLAUDE.md` is a thin entry that makes Claude Code load `AGENTS.md`, which
