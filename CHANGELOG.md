@@ -16,6 +16,33 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Changes merged after the spec commit engine 0.123.0 embeds. They reach the
 engine at its next `SPEC_PIN` bump.
 
+### Changed · engine 0.124.4 is the current release (2026-11-12)
+
+- The README, CONTRIBUTING, SECURITY, the QUICKSTART status line and 00
+  §Pre-1.0 stability contract name engine 0.124.4, which embeds this spec at
+  `66dbdd6`. Engine 0.124.3 embeds `5a579bc`, engine 0.124.2 embeds
+  `b4c692f`, and engines 0.124.0 and 0.124.1 embed `5cd95cd`. 00's
+  2026-10-27 amendment keeps its wording and adds 0.124.4. The release
+  changes no language rule: it adds a standing cost rule that an operator
+  gives `nika serve` at startup (`--cost-policy`), which is engine API,
+  ends a late session offer as its own deadline, and moves a dependency
+  past a security advisory.
+- The README's pin example reads engine v0.124.4, and its three commands
+  print `66dbdd6`. 07 §Editor tooling and `llms.txt` give the `66dbdd6`
+  schema address for engine 0.124.4: the released 0.124.4 binary's
+  `nika spec --schema` prints the same bytes, which are also the bytes at
+  `5a579bc` and `b4c692f`.
+- `CONFORMANT_IMPLEMENTATIONS.md` lists engine 0.124.4 at `66dbdd6`,
+  measured with the released binary in two runs from fresh checkouts.
+  `66dbdd6` changes no fixture, schema or example of `5a579bc`, and the
+  released 0.124.3 binary, run the same way on the same tree, gives the
+  verdict of 0.124.4 on every fixture. No level is claimed at that
+  commit, and the 0.124.3 row stays as history. The pre-commit usage
+  comment pins the engine's `nika-check` hook at `v0.124.4`; the engine's
+  hook file is unchanged since `v0.123.0`.
+- `timeline/timeline.yaml` gains the dated entry `release-0-124-4`. The
+  release line is unchanged, so no milestone is added and no gate changes.
+
 ### Changed · engine 0.124.3 is the current release (2026-11-10)
 
 - The README, CONTRIBUTING, SECURITY, the QUICKSTART status line and 00
